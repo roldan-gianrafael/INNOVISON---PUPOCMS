@@ -1,0 +1,60 @@
+/* styles.css - Shared visual styles for the landing page and admin placeholder */
+:root{
+  --accent: #8B3A3A; /* primary burgundy color */
+  --accent-dark: #6B0000; /* darker burgundy */
+  --accent-light: #A85050; /* lighter burgundy */
+  --bg: #ffffff;
+  --muted: #f6f7f7;
+  --text: #122; 
+  --soft-shadow: 0 12px 30px rgba(16,24,28,0.06);
+}
+
+/* Base reset */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;color:var(--text);background:linear-gradient(rgba(0,0,0,0.75),rgba(107,0,0,0.75)),url('PUPBG.jpg');background-size:cover;background-position:center;background-attachment:fixed}
+
+/* Logo Header */
+.logo-header{background:#6B0000;padding:12px 24px;border-bottom:3px solid rgba(0,0,0,0.3);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.logo-brand{display:flex;align-items:center;gap:12px;max-width:1100px;margin:0 auto}
+.logo-icon{width:48px;height:48px;object-fit:contain}
+.logo-text{display:flex;flex-direction:column;justify-content:center}
+.logo-title{font-size:16px;font-weight:800;color:#fff;letter-spacing:0.5px;line-height:1.2}
+.logo-subtitle{font-size:16px;color:#f0d9d9;letter-spacing:0.3px;margin-top:2px;line-height:1.2}
+
+.lp-container{max-width:1100px;margin:36px auto;padding:0 20px}
+
+/* Hero */
+.lp-hero{text-align:center;padding:36px 12px;background:transparent;color:#fff;margin-bottom:30px}
+.lp-hero h1{margin:0;font-size:36px;letter-spacing:0.2px;color:#fff;font-weight:900;text-shadow:2px 2px 4px rgba(0,0,0,0.5)}
+.lp-sub{margin-top:12px;color:#fff;font-size:16px;text-shadow:1px 1px 3px rgba(0,0,0,0.5)}
+
+/* Role selection */
+.role-section{margin-top:26px}
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:600px;margin:0 auto}
+.role-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 22px;aspect-ratio:1/1;border-radius:14px;background:#8B3A3A;box-shadow:var(--soft-shadow);border:1px solid rgba(107,0,0,0.3);cursor:pointer;transition:transform 220ms ease,box-shadow 220ms ease,border-color 220ms ease;color:#fff}
+.role-card:focus{outline:3px solid rgba(139,58,58,0.3);outline-offset:4px}
+.role-card:hover{transform:translateY(-6px);background:#6B0000;box-shadow:0 20px 40px rgba(107,0,0,0.3);border-color:rgba(107,0,0,0.5)}
+.card-icon{font-size:48px;text-align:center}
+.card-body{display:flex;flex-direction:column;text-align:center}
+.card-title{font-weight:800;font-size:18px;color:#fff}
+.card-sub{color:#f0d9d9;margin-top:6px;font-size:13px}
+
+/* Footer */
+.lp-foot{text-align:center;color:#8B3A3A;margin-top:28px;font-size:13px;font-weight:600}
+
+/* Responsive */
+@media(max-width:720px){
+  .role-grid{grid-template-columns:1fr;}
+  .lp-hero h1{font-size:22px}
+}
+
+/* Admin placeholder page styles reuse */
+.admin-wrap{max-width:900px;margin:40px auto;padding:18px}
+.admin-header{padding:20px;border-radius:12px;background:var(--bg);box-shadow:var(--soft-shadow);border:1px solid rgba(0,0,0,0.04)}
+.admin-header h1{margin:0;color:var(--accent)}
+
+/* Utility */
+.visually-hidden{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+
+/* End of styles */

@@ -1,0 +1,120 @@
+/* Modern student FAQ styles */
+:root{
+  --bg:#f7fbfb;
+  --card:#ffffff;
+  --accent:#8B0000;      /* Standard Maroon */
+  --header-bg:#600000;   /* Deep Maroon for Header */
+  --muted:#6b7b7d;
+  --shadow: 0 10px 30px rgba(16,24,28,0.08);
+  --radius:12px;
+  --gap:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Arial;color:#102425;background:var(--bg);-webkit-font-smoothing:antialiased}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+.faq-container{max-width:1100px;margin:28px auto;padding:20px}
+
+/* Header / nav styles (UPDATED to Dark Maroon) */
+.site-header{
+    background: var(--header-bg); /* Changed from #fff to Dark Maroon */
+    position:sticky;
+    top:0;
+    z-index:60;
+    box-shadow:0 6px 20px rgba(0,0,0,0.15);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 0;gap:16px}
+.brand-link{display:flex;align-items:center;gap:12px;text-decoration:none}
+
+/* Added border to logo to make it pop against dark bg */
+.brand-img{
+    width:48px;
+    height:48px;
+    object-fit:cover;
+    border-radius:50%;
+    border: 2px solid rgba(255,255,255,0.2); 
+}
+
+.brand-text{display:flex;flex-direction:column;line-height:1}
+
+/* Updated Brand Title: Removed gradient, set to White */
+.brand-title{
+    font-weight:900;
+    font-size:18px;
+    letter-spacing:0.5px;
+    color: #ffffff;
+}
+
+/* Updated Subtitle: Light Gray */
+.brand-subtitle{
+    font-size:11px;
+    color: #e0e0e0;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-top:2px;
+}
+
+.nav-list{display:flex;gap:24px;list-style:none;margin:0;padding:0}
+
+/* Updated Nav Links: White text */
+.nav-list a{
+    color: #ffffff;
+    text-decoration:none;
+    font-weight:500;
+    font-size:14px;
+    transition: opacity 0.2s;
+}
+
+/* Updated Hover: Opacity and underline */
+.nav-list a:hover{
+    opacity:0.8;
+    text-decoration:underline;
+    text-underline-offset:4px;
+}
+
+/* FAQ Content Styles */
+.faq-header{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.faq-header h1{margin:0;font-size:20px}
+.lead{color:var(--muted);margin-top:6px}
+.faq-controls input[type="search"]{padding:10px 14px;border-radius:10px;border:1px solid rgba(16,24,28,0.06);min-width:220px}
+
+.faq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap);margin-top:20px}
+@media(max-width:880px){.faq-grid{grid-template-columns:1fr}}
+
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+.card-heading{display:flex;align-items:center;gap:12px}
+.cat-icon{width:48px;height:48px;border-radius:10px;background:linear-gradient(180deg,rgba(139,0,0,0.06),rgba(139,0,0,0.02));display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--accent)}
+.cat-title{font-weight:800}
+.card-sub{color:var(--muted);font-size:13px}
+
+.accordion{margin-top:12px}
+.accordion-item{border-top:1px solid rgba(16,24,28,0.04)}
+.accordion-button{width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px;border:0;background:transparent;cursor:pointer;font-weight:700;font-size:15px}
+.accordion-button:focus{outline:2px solid rgba(139,0,0,0.12);outline-offset:2px}
+.accordion-question{display:flex;gap:10px;align-items:center}
+.q-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:0.12}
+.accordion-icon{transition:transform 220ms cubic-bezier(.2,.9,.2,1)}
+
+.accordion-panel{overflow:hidden;max-height:0;transition:max-height 320ms cubic-bezier(.2,.9,.2,1);padding:0 12px}
+.accordion-body{padding:10px 0 16px;color:#234;line-height:1.5}
+
+/* subtle answer highlight */
+.answer{background:linear-gradient(90deg,#fff,#fbfbff);border-radius:8px;padding:10px}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+/* small screen tweaks */
+@media(max-width:560px){
+  .cat-icon{width:44px;height:44px;font-size:18px}
+  .faq-header{flex-direction:column;align-items:flex-start;gap:12px}
+}
+
+/* hero and appointment summary styles */
+.PUPBG.small-hero{min-height:160px;padding:28px 0;background:linear-gradient(180deg,rgba(15,27,38,0.7),rgba(15,27,38,0.7)),url('PUPBG.jpg') center/cover no-repeat;color:#fff}
+.PUPBG.small-hero .PUPBG-inner{padding:18px 0}
+.PUPBG.small-hero .PUPBG-title{font-size:28px;margin:0}
+.kicker{letter-spacing:2px;font-weight:700;margin:0 0 8px 0;opacity:0.95;color:#ffd0c9}
+.appointment-summary{display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,0.96);padding:12px;border-radius:10px;box-shadow:0 10px 30px rgba(16,24,28,0.06);min-width:220px;color:#111}
+.summary-row{display:flex;justify-content:space-between;align-items:center}
+.summary-count{font-weight:800;color:var(--accent)}

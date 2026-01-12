@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Appointment extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'student_id', // <--- ADD THIS LINE
+        'name',
+        'email',
+        'service',
+        'date',
+        'time',
+        'status',
+        'notes'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}

@@ -2,6 +2,7 @@
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
+ use App\Http\Controllers\WalkInController;
 
 // Root route: serve the landing page
 Route::get('/', function () {
@@ -58,3 +59,21 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 
     Route::post('/student/update-contact', [App\Http\Controllers\AppointmentController::class, 'updateContact']);
     Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
+    
+
+    // Walk-in page
+    Route::get('/admin/walk-in', [WalkInController::class, 'index']);
+
+    // Store walk-in appointment
+
+
+
+Route::get('/admin/walk-in', [WalkInController::class, 'index'])->name('walkin.index');
+Route::post('/admin/walk-in/store', [WalkInController::class, 'store'])->name('walkin.store');
+
+
+
+
+
+
+

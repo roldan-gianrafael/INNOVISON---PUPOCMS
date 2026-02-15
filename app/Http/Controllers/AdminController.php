@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Item;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response; // <-- for CSV exports
 
 class AdminController extends Controller
 {
@@ -17,14 +18,12 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        // 1. Fetch Real Stats
         $total = Appointment::count();
         $pending = Appointment::where('status', 'Pending')->count();
         $upcoming = Appointment::where('status', 'Approved')->count();
         $completed = Appointment::where('status', 'Completed')->count();
         $cancelled = Appointment::where('status', 'Cancelled')->count();
         
-        // 2. Fetch Recent Activity
         $recentAppointments = Appointment::latest()->take(5)->get();
 
         return view('admin.dashboard', compact('total', 'pending', 'upcoming', 'completed', 'cancelled', 'recentAppointments'));
@@ -66,45 +65,32 @@ class AdminController extends Controller
     //  PART 2: ACTION METHODS (The Real Logic)
     // ==========================================
 
-    // --- 1. APPOINTMENT ACTIONS (FIXED) ---
-    
-    // This handles Approve / Cancel / Complete logic
+    // --- 1. APPOINTMENT ACTIONS ---
     public function updateStatus($id, $status)
     {
-        // 1. Find the appointment in the database
         $appointment = Appointment::find($id);
-        
-        // 2. If it exists, update the status and SAVE it
         if ($appointment) {
             $appointment->status = $status;
-            $appointment->save(); // <--- This updates the database!
-            
-            // 3. Redirect back (No more white screen)
+            $appointment->save();
             return redirect()->back()->with('success', "Appointment marked as $status.");
         }
-
         return redirect()->back()->with('error', "Appointment not found.");
     }
 
-    // This handles Rescheduling
     public function reschedule($id, Request $request)
     {
         $appointment = Appointment::find($id);
-        
         if ($appointment) {
             $appointment->date = $request->date;
             $appointment->time = $request->time;
-            $appointment->status = 'Approved'; // Auto-approve if rescheduled by admin
+            $appointment->status = 'Approved';
             $appointment->save();
-            
             return redirect()->back()->with('success', "Appointment rescheduled successfully.");
         }
-
         return redirect()->back()->with('error', "Error rescheduling.");
     }
 
     // --- 2. INVENTORY ACTIONS ---
-
     public function storeItem(Request $request)
     {
         Item::create($request->all());
@@ -128,7 +114,6 @@ class AdminController extends Controller
     }
 
     // --- 3. SETTINGS & PROFILE ---
-
     public function updateSettings(Request $request)
     {
         $settings = Setting::first();
@@ -150,41 +135,82 @@ class AdminController extends Controller
         $user = Auth::user();
         $user->name = $request->name;
         $user->email = $request->email;
-        
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
-        
         $user->save();
         return redirect()->back()->with('success', 'Profile updated successfully.');
     }
 
-    // --- 4. EXPORTS ---
-    public function exportReports() { return redirect()->back()->with('success', 'Export function coming soon!'); }
-    public function exportInventory() { return redirect()->back()->with('success', 'Export function coming soon!'); }
+    // --- 4. EXPORTS (CSV) ---
+    public function exportReports()
+    {
+        $appointments = Appointment::all();
+        $filename = "appointments_" . date('Y-m-d_H-i-s') . ".csv";
+        $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
+        $columns = ['ID','Name','Email','Student ID','Service','Date','Time','Status','Notes'];
 
-    // New function to Complete Appointment & Deduct Inventory
-    // USAGE: You will need a form in your Admin UI that sends 'item_id' to this route
+        $callback = function() use ($appointments, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($appointments as $appt) {
+                fputcsv($file, [
+                    $appt->id,
+                    $appt->name,
+                    $appt->email,
+                    $appt->student_id,
+                    $appt->service,
+                    $appt->date,
+                    $appt->time,
+                    $appt->status,
+                    $appt->notes
+                ]);
+            }
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+    public function exportInventory()
+    {
+        $items = Item::all();
+        $filename = "inventory_" . date('Y-m-d_H-i-s') . ".csv";
+        $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
+        $columns = ['ID','Name','Category','Quantity'];
+
+        $callback = function() use ($items, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($items as $item) {
+                fputcsv($file, [
+                    $item->id,
+                    $item->name,
+                    $item->category,
+                    $item->quantity
+                ]);
+            }
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+    // --- 5. COMPLETE APPOINTMENT & DEDUCT INVENTORY ---
     public function completeWithMedicine(Request $request, $id)
     {
         $appointment = Appointment::find($id);
-        
-        if(!$appointment) {
-            return redirect()->back()->with('error', 'Appointment not found.');
-        }
+        if(!$appointment) return redirect()->back()->with('error', 'Appointment not found.');
 
-        // 1. Mark as Completed
         $appointment->status = 'Completed';
         $appointment->save();
 
-        // 2. Deduct Medicine (If selected)
         if ($request->filled('item_id')) {
             $item = Item::find($request->item_id);
-            
             if ($item && $item->quantity > 0) {
-                $item->decrement('quantity', 1); // Deduct 1 from stock
+                $item->decrement('quantity', 1);
                 return redirect()->back()->with('success', "Appointment completed and 1 {$item->name} deducted.");
-            } elseif ($item && $item->quantity <= 0) {
+            } elseif ($item) {
                 return redirect()->back()->with('error', "Appointment completed, but {$item->name} is OUT OF STOCK.");
             }
         }

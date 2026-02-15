@@ -3,49 +3,54 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Appointment; 
-use App\Models\User; 
+use App\Models\Appointment;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
-    // --- 1. HOMEPAGE ---
+    // -------------------------------
+    // 1. STUDENT DASHBOARD
+    // -------------------------------
     public function index()
     {
-        if (Auth::check()) {
-            $userId = Auth::id();
-        } else {
-            $guest = User::where('email', 'guest@pup.edu.ph')->first();
-            $userId = $guest ? $guest->id : 999;
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+
+        if (!$user) {
+            $user = User::create([
+                'first_name' => 'Guest',
+                'last_name' => 'Student',
+                'name' => 'Guest Student',
+                'email' => 'guest@pup.edu.ph',
+                'password' => bcrypt('password'),
+                'is_admin' => 0,
+            ]);
         }
 
-        $myAppointments = Appointment::where('user_id', $userId)
-                                     ->orderBy('date', 'desc')
-                                     ->get();
-
-        $upcoming = $myAppointments->where('status', 'Approved');
-        $pending  = $myAppointments->where('status', 'Pending');
-        $history  = $myAppointments->whereIn('status', ['Completed', 'Cancelled']);
+        $appointments = Appointment::where('user_id', $user->id)->get();
+        $upcoming = $appointments->where('status', 'Approved');
+        $pending = $appointments->where('status', 'Pending');
+        $history = $appointments->whereIn('status', ['Completed', 'Cancelled']);
 
         return view('student.home', compact('upcoming', 'pending', 'history'));
     }
 
-    // --- 2. BOOKING FORM ---
+    // -------------------------------
+    // 2. BOOKING FORM
+    // -------------------------------
     public function create()
     {
-        $user = Auth::user();
+        $user = Auth::user() ?? User::firstOrCreate(
+            ['email' => 'guest@pup.edu.ph'],
+            [
+                'first_name' => 'Guest',
+                'last_name' => 'Student',
+                'name' => 'Guest Student',
+                'password' => bcrypt('password'),
+                'is_admin' => 0
+            ]
+        );
 
-        if (!$user) {
-            $user = User::where('email', 'guest@pup.edu.ph')->first();
-            if (!$user) {
-                $user = new User();
-                $user->name = 'Guest Student';
-                $user->email = 'guest@pup.edu.ph';
-                $user->id = 999; 
-            }
-        }
-        
         $appointments = Appointment::where('user_id', $user->id)
                                    ->whereIn('status', ['Pending', 'Approved'])
                                    ->orderBy('date', 'asc')
@@ -54,7 +59,9 @@ class AppointmentController extends Controller
         return view('student.booking', compact('user', 'appointments'));
     }
 
-    // --- 3. STORE APPOINTMENT ---
+    // -------------------------------
+    // 3. STORE APPOINTMENT
+    // -------------------------------
     public function store(Request $request)
     {
         $request->validate([
@@ -64,53 +71,42 @@ class AppointmentController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // 1. CHECK FOR OVERLAPPING SCHEDULES
+        // Prevent overlapping appointments
         $exists = Appointment::where('date', $request->date)
                              ->where('time', $request->time)
                              ->where('status', '!=', 'Cancelled')
                              ->exists();
 
         if ($exists) {
-            return redirect()->back()->withInput()->with('error', 'Sorry, that time slot is already taken.');
+            return redirect()->back()->withInput()->with('error', 'That time slot is already taken.');
         }
 
-        // 2. MAX PATIENTS CHECK
-        $dailyCount = Appointment::where('date', $request->date)->where('status', '!=', 'Cancelled')->count();
+        // Max 10 appointments per day
+        $dailyCount = Appointment::where('date', $request->date)
+                                 ->where('status', '!=', 'Cancelled')
+                                 ->count();
         if ($dailyCount >= 10) {
             return redirect()->back()->withInput()->with('error', 'Fully booked for this date.');
         }
 
-        // 3. CREATE OR UPDATE USER
-        if (!Auth::check()) {
-            // Find the guest user
-            $user = User::firstOrCreate(
-                ['email' => 'guest@pup.edu.ph'], 
-                [
-                    'password' => bcrypt('password'),
-                    'is_admin' => 0
-                ]
-            );
+        // Get or create user
+        $user = Auth::user() ?? User::firstOrCreate(
+            ['email' => 'guest@pup.edu.ph'],
+            [
+                'first_name' => 'Guest',
+                'last_name' => 'Student',
+                'name' => 'Guest Student',
+                'password' => bcrypt('password'),
+                'is_admin' => 0
+            ]
+        );
 
-            // FORCE UPDATE THE NAME (This fixes the Admin side)
-            $user->name = 'Altheno Mari Tero';
-            $user->save();
-
-            $userId = $user->id;
-            $userName = $user->name;
-            $userEmail = $user->email;
-        } else {
-            $userId = Auth::id();
-            $userName = Auth::user()->name;
-            $userEmail = Auth::user()->email;
-        }
-
-        $studentId = $request->input('student_id', '2025-0000-TG-0');
-
+        // Create appointment
         Appointment::create([
-            'user_id'    => $userId,
-            'student_id' => $studentId,
-            'name'       => $userName, // Now this will use the updated name
-            'email'      => $userEmail,
+            'user_id'    => $user->id,
+            'student_id' => $request->input('student_id', '2025-0000-TG-0'),
+            'name'       => $user->name,
+            'email'      => $user->email,
             'date'       => $request->date,
             'time'       => $request->time,
             'service'    => $request->service,
@@ -121,75 +117,68 @@ class AppointmentController extends Controller
         return redirect()->back()->with('success', 'Appointment request submitted! Please wait for admin approval.');
     }
 
-    // --- 4. MY ACCOUNT (Fixed Missing Approved Count) ---
+    // -------------------------------
+    // 4. STUDENT ACCOUNT
+    // -------------------------------
     public function account()
-    {
-        $user = Auth::user();
-        
-        // Guest Fallback
-        if(!$user) {
-             $user = User::where('email', 'guest@pup.edu.ph')->first();
-             if(!$user) {
-                 $user = new User();
-                 $user->name = 'Altheno Mari Tero'; // <--- CHANGED HERE
-                 $user->email = 'guest@pup.edu.ph';
-                 $user->id = 999;
-             }
-        }
+{
+    $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
 
-        $appointments = Appointment::where('user_id', $user->id)->latest()->get();
-        
-        // --- CALCULATE STATS ---
-        $cancelledCount = $appointments->where('status', 'Cancelled')->count();
-        $completedCount = $appointments->where('status', 'Completed')->count();
-        $pendingCount   = $appointments->where('status', 'Pending')->count();
-        $approvedCount  = $appointments->where('status', 'Approved')->count(); // <--- MATH IS DONE HERE
-
-        // --- NOTIFICATIONS ---
-        $notifications = [];
-        foreach($appointments as $appt) {
-            $timeAgo = $appt->updated_at ? $appt->updated_at->diffForHumans() : 'Just now';
-            $dateStr = $appt->date ? date('M d', strtotime($appt->date)) : 'N/A';
-
-            if($appt->status == 'Approved') {
-                $notifications[] = [
-                    'type' => 'success',
-                    'icon' => '✅',
-                    'message' => "Your {$appt->service} on {$dateStr} has been APPROVED.",
-                    'date' => $timeAgo,
-                    'time' => $timeAgo
-                ];
-            }
-            elseif($appt->status == 'Cancelled') {
-                $notifications[] = [
-                    'type' => 'danger',
-                    'icon' => '❌',
-                    'message' => "Your {$appt->service} on {$dateStr} was Cancelled.",
-                    'date' => $timeAgo,
-                    'time' => $timeAgo
-                ];
-            }
-        }
-        $notifications = collect($notifications);
-
-        // --- PASS VARIABLES TO VIEW ---
-        return view('student.account', compact(
-            'user', 'appointments', 'cancelledCount', 'completedCount', 
-            'pendingCount', 'approvedCount', 'notifications'
-        ));
+    if (!$user) {
+        $user = User::create([
+            'first_name' => 'Guest',
+            'last_name' => 'Student',
+            'name' => 'Guest Student',
+            'email' => 'guest@pup.edu.ph',
+            'password' => bcrypt('password'),
+            'is_admin' => 0,
+        ]);
     }
 
-    // --- 5. OTHER PAGES ---
+    $appointments = Appointment::where('user_id', $user->id)->get();
+
+    $pendingCount = $appointments->where('status', 'Pending')->count();
+    $approvedCount = $appointments->where('status', 'Approved')->count();
+    $completedCount = $appointments->where('status', 'Completed')->count();
+    $cancelledCount = $appointments->where('status', 'Cancelled')->count();
+
+    // --- Notifications ---
+    $notifications = [];
+    foreach ($appointments as $appt) {
+        $timeAgo = $appt->updated_at ? $appt->updated_at->diffForHumans() : 'Just now';
+        $dateStr = $appt->date ? date('M d', strtotime($appt->date)) : 'N/A';
+
+        if ($appt->status == 'Approved') {
+            $notifications[] = [
+                'type' => 'success',
+                'icon' => '✅',
+                'message' => "Your {$appt->service} on {$dateStr} has been APPROVED.",
+                'time' => $timeAgo
+            ];
+        } elseif ($appt->status == 'Cancelled') {
+            $notifications[] = [
+                'type' => 'danger',
+                'icon' => '❌',
+                'message' => "Your {$appt->service} on {$dateStr} was CANCELLED.",
+                'time' => $timeAgo
+            ];
+        }
+    }
+    $notifications = collect($notifications);
+
+    return view('student.account', compact(
+        'user', 'appointments', 'pendingCount', 'approvedCount', 'completedCount', 'cancelledCount', 'notifications'
+    ));
+}
+
+
+    // -------------------------------
+    // 5. CANCEL APPOINTMENT
+    // -------------------------------
     public function cancel($id)
     {
-        if (Auth::check()) {
-            $userId = Auth::id();
-        } else {
-            $guest = User::where('email', 'guest@pup.edu.ph')->first();
-            $userId = $guest ? $guest->id : 999;
-        }
-
-        $appointment = Appointment::where('id', $id)->where('user_id', $userId)->first();
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+        $appointment = Appointment::where('id', $id)->where('user_id', $user->id)->first();
 
         if ($appointment) {
             $appointment->status = 'Cancelled';
@@ -200,60 +189,84 @@ class AppointmentController extends Controller
         return redirect()->back()->with('error', 'Appointment not found.');
     }
 
-    public function faq() 
+    // -------------------------------
+    // 6. FAQ PAGE
+    // -------------------------------
+    public function faq()
     {
-        // 1. Get User (Standard Logic)
-        if (Auth::check()) {
-            $user = Auth::user();
-        } else {
-            $user = User::where('email', 'guest@pup.edu.ph')->first();
-            if (!$user) {
-                $user = new User();
-                $user->name = 'Guest Student'; 
-                $user->email = 'guest@pup.edu.ph';
-                $user->id = 999; 
-            }
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+
+        if (!$user) {
+            $user = User::create([
+                'first_name' => 'Guest',
+                'last_name' => 'Student',
+                'name' => 'Guest Student',
+                'email' => 'guest@pup.edu.ph',
+                'password' => bcrypt('password'),
+                'is_admin' => 0,
+            ]);
         }
 
-        // 2. Fetch Appointments to Calculate Stats
         $appointments = Appointment::where('user_id', $user->id)->get();
-
-        $pendingCount   = $appointments->where('status', 'Pending')->count();
-        $upcomingCount  = $appointments->where('status', 'Approved')->count(); // Approved means Upcoming
+        $pendingCount = $appointments->where('status', 'Pending')->count();
+        $upcomingCount = $appointments->where('status', 'Approved')->count();
         $completedCount = $appointments->where('status', 'Completed')->count();
         $cancelledCount = $appointments->where('status', 'Cancelled')->count();
 
-        // 3. Return View with Data
-        return view('student.faq', compact(
-            'user', 
-            'pendingCount', 
-            'upcomingCount', 
-            'completedCount', 
-            'cancelledCount'
-        ));
+        return view('student.faq', compact('user', 'pendingCount', 'upcomingCount', 'completedCount', 'cancelledCount'));
     }
+
+    //-------------------------------
+    // 7. Update Contact
+
+    public function updateContact(Request $request)
+{
+    // 1. Get the logged-in user or guest
+    $user = Auth::user();
     
+    if (!$user) {
+        $user = User::where('email', 'guest@pup.edu.ph')->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'Guest user not found.');
+        }
+    }
+
+    // 2. Validate the contact number
+    $request->validate([
+        'contact_number' => 'required|string|max:20', // adjust max length if needed
+    ]);
+
+    // 3. Update the contact number
+    $user->contact_number = $request->contact_number;
+    $user->save();
+
+    return redirect()->back()->with('success', 'Contact number updated successfully.');
+}
+
+
+    // -------------------------------
+    // 8. APPOINTMENT HISTORY
+    // -------------------------------
     public function history()
     {
-        // 1. Identify the User (Logged in or Guest)
-        $user = Auth::user();
-        
-        if(!$user) {
-             $user = User::where('email', 'guest@pup.edu.ph')->first();
-             // Safe fallback if guest doesn't exist yet
-             if(!$user) {
-                 $user = new User();
-                 $user->id = 999; 
-             }
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+
+        if (!$user) {
+            $user = User::create([
+                'first_name' => 'Guest',
+                'last_name' => 'Student',
+                'name' => 'Guest Student',
+                'email' => 'guest@pup.edu.ph',
+                'password' => bcrypt('password'),
+                'is_admin' => 0,
+            ]);
         }
 
-        // 2. Fetch all appointments for this user, sorted by newest first
         $appointments = Appointment::where('user_id', $user->id)
                                    ->orderBy('date', 'desc')
                                    ->orderBy('time', 'desc')
                                    ->get();
 
-        // 3. Send data to the view
         return view('student.history', compact('appointments'));
     }
 }

@@ -12,24 +12,60 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
-        'name', // Keep this for legacy support
-        'first_name', // New
-        'last_name',  // New
+        'name',        // Legacy support
+        'first_name',  // New
+        'last_name',   // New
         'email',
         'password',
-        'student_id',
-        'is_admin'
+        'student_id',  // Barcode/Student ID
+        'is_admin'     // Admin flag
     ];
 
-    // --- MAGIC ACCESSOR ---
-    // This allows you to still use {{ $user->name }} in your blade files!
+    /**
+     * The attributes that should be hidden for arrays.
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
+    ];
+
+    /**
+     * MAGIC ACCESSOR for $user->name
+     * Returns "First Last" if first_name exists, else old 'name' column.
+     */
     public function getNameAttribute($value)
     {
-        // If first_name exists, combine them. Otherwise return the old 'name' column.
         if ($this->first_name) {
             return "{$this->first_name} {$this->last_name}";
         }
         return $value;
+    }
+
+    /**
+     * RELATION: User has many appointments
+     */
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    /**
+     * SCOPE: Only students
+     */
+    public function scopeStudents($query)
+    {
+        return $query->where('is_admin', 0);
     }
 }

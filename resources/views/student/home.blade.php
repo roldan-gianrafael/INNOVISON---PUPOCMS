@@ -200,6 +200,7 @@
               <li><a href="{{ url('/student/home') }}">Home</a></li>
               <li><a href="#">About Us</a></li>
               <li><a href="{{ url('/student/booking') }}">Book Appointment</a></li>
+               <li><a href="{{ url('/student/barcode-register') }}">Register</a></li>
               <li><a href="{{ url('/student/faq') }}">FAQ</a></li>
             </ul>
           </div>

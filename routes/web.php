@@ -3,6 +3,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WalkInController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BarcodeController;
 
 // Root route: serve the landing page
 Route::get('/', function () {
@@ -50,12 +51,39 @@ Route::get('/admin/settings', [AdminController::class, 'settings']);
 Route::put('/admin/settings/update', [AdminController::class, 'updateSettings']);
 Route::put('/admin/profile/update', [AdminController::class, 'updateProfile']);
 
-/// Walk-in page
-Route::get('/admin/walk-in', [WalkInController::class, 'index'])->name('walkin.index');
+/// FOR Student BARCODE CONTROLLER
 
-// Store walk-in appointment
-Route::post('/admin/walk-in/store', [WalkInController::class, 'store'])->name('walkin.store');
+// Show barcode register page
+Route::get('student/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
 
-// Get student info by student_id
-Route::get('/admin/walk-in/student', [WalkInController::class, 'getStudent'])->name('walkin.getStudent');
-Route::post('/admin/walk-in/select-student', [WalkInController::class, 'selectStudent'])->name('walkin.selectStudent');
+// Save barcode
+Route::post('student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');
+
+// Fetch student info
+Route::get('/fetch-user/{student_id}', [AppointmentController::class, 'fetchUser']);
+
+// Reset barcode (for testing)
+Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
+
+
+//// FOR ADMIN WALKIN REGISTRATION AND SCANNING
+//// ADMIN WALK-IN ROUTES
+    Route::prefix('admin/walkin')->group(function () {
+
+    // Show Walk-in page (scanner + registration)
+    Route::get('/', [WalkInController::class, 'index'])->name('walkin.index');
+
+    // Fetch student info by student_id (AJAX)
+    Route::get('/get-student', [WalkInController::class, 'getStudent'])->name('walkin.getStudent');
+
+    // Store walk-in appointment
+    Route::post('/store', [WalkInController::class, 'store'])->name('walkin.store');
+
+    
+// Register a new student from admin walk-in page
+Route::post('/admin/walkin/register-student', [WalkInController::class, 'registerStudent'])
+    ->name('walkin.registerStudent');
+
+    });
+
+

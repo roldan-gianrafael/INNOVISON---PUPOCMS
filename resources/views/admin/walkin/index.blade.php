@@ -1,54 +1,69 @@
 @extends('layouts.admin')
-@section('title', 'Walk-in Patients')
+@section('title', 'Walk-in Management')
 
 @section('content')
 <div class="card p-4">
-    <h3 class="text-center">Walk-in Appointments</h3>
+    <h3 class="text-center">Walk-in Management</h3>
 
-    <!-- Start Scanner Button -->
+    <!-- Action Buttons -->
     <div class="text-center mt-3">
-        <button type="button" id="startScanner" style="padding:8px 20px;">Start Scanner</button>
+        <button type="button" id="btnScan" style="padding:8px 20px; margin-right:10px;">Scan Student</button>
+        <button type="button" id="btnRegister" style="padding:8px 20px;">Register Student</button>
     </div>
 
-    <!-- Scanner Container with animation -->
-    <div id="scanner-container" style="position: relative; max-width:400px; margin:20px auto;">
-        <div id="reader" style="width:100%; height:300px; border: 2px solid #333; border-radius:10px; overflow:hidden;"></div>
-        <div id="scan-line" style="
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: rgba(255,0,0,0.7);
-            animation: scan-animation 2s linear infinite;
-        "></div>
-    </div>
-
-    <!-- Walk-in Form -->
-    <form id="walkinForm" enctype="multipart/form-data" class="text-center mt-3">
-        @csrf
-        <input type="text" name="student_id" id="student_id" placeholder="Scan or enter Student ID" style="width:250px; padding:8px;">
-        <input type="file" name="attachment" style="margin-top:10px; display:block; margin:auto;">
-        <button type="submit" style="padding:8px 20px; margin-top:10px;">Add Walk-in</button>
-    </form>
-
-    <div id="message" class="text-center mt-2"></div>
-
-    <!-- Latest Walk-in -->
-    <h4 class="mt-4 text-center">Latest Walk-in</h4>
-    <div id="appointmentTable"></div>
-
-    <!-- Student Info Modal -->
-    <div id="studentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-         background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
-        <div style="background:#fff; padding:20px; border-radius:10px; width:400px; position:relative;">
-            <span style="position:absolute; top:10px; right:15px; cursor:pointer;" onclick="closeModal()">X</span>
-            <div id="modalContent"></div>
-            <div class="text-center mt-3">
-                <button onclick="selectStudent()" style="padding:5px 10px;">Select</button>
-                <button onclick="closeModal()" style="padding:5px 10px;">Close</button>
-            </div>
+    <!-- Scan Student Form -->
+    <div id="scanForm" style="display:none; margin-top:20px;">
+        <div id="scanner-container-scan" style="position: relative; max-width:400px; margin:20px auto;">
+            <div id="readerScan" style="width:100%; height:300px; border: 2px solid #333; border-radius:10px; overflow:hidden;"></div>
+            <div id="scan-line" style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: rgba(255,0,0,0.7);
+                animation: scan-animation 2s linear infinite;
+            "></div>
         </div>
+
+        <form id="walkinForm" class="text-center mt-3">
+            @csrf
+            <input type="text" name="student_id" id="student_id_scan" placeholder="Scan or enter Student ID" style="width:250px; padding:8px;" required>
+            <button type="submit" style="padding:8px 20px; margin-top:10px;">Add Walk-in</button>
+        </form>
+
+        <div id="walkinInfo" class="mt-3 text-center"></div>
+    </div>
+
+    <!-- Register Student Form -->
+    <div id="registerForm" style="display:none; margin-top:20px;">
+        <div id="scanner-container-register" style="position: relative; max-width:400px; margin:20px auto; display:none;">
+            <div id="readerRegister" style="width:100%; height:300px; border: 2px solid #333; border-radius:10px; overflow:hidden;"></div>
+            <div style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: rgba(255,0,0,0.7);
+                animation: scan-animation 2s linear infinite;
+            "></div>
+        </div>
+
+        <form id="formRegisterStudent" method="POST" class="text-center mt-3">
+            @csrf
+            <button type="button" id="startRegisterScanner" style="padding:5px 10px; margin-bottom:10px;">Start Scanner</button><br>
+
+            <input type="text" name="student_id" id="reg_student_id" placeholder="Student ID" style="width:250px; padding:8px; margin-top:10px;" required>
+            <input type="text" name="first_name" id="reg_first_name" placeholder="First Name" style="width:250px; padding:8px; margin-top:10px;" required>
+            <input type="text" name="last_name" id="reg_last_name" placeholder="Last Name" style="width:250px; padding:8px; margin-top:10px;" required>
+            <input type="email" name="email" id="reg_email" placeholder="Email" style="width:250px; padding:8px; margin-top:10px;" required>
+            <input type="password" name="password" id="reg_password" placeholder="Password" style="width:250px; padding:8px; margin-top:10px;" required>
+            <input type="text" name="barcode" id="reg_barcode" placeholder="Barcode" style="width:250px; padding:8px; margin-top:10px;">
+
+            <div id="notification" style="margin-top:10px; color:red;"></div>
+            <button type="button" id="confirmBtn" style="padding:8px 20px; margin-top:10px;">Confirm Registration</button>
+        </form>
     </div>
 </div>
 @endsection
@@ -67,133 +82,124 @@
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-let selectedStudent = null;
 document.addEventListener('DOMContentLoaded', () => {
-    const studentInput = document.getElementById('student_id');
-    const startBtn = document.getElementById('startScanner');
-    const form = document.getElementById('walkinForm');
-    let html5QrcodeScanner;
+    const btnScan = document.getElementById('btnScan');
+    const btnRegister = document.getElementById('btnRegister');
+    const scanForm = document.getElementById('scanForm');
+    const registerForm = document.getElementById('registerForm');
 
-    // Start scanner
-    startBtn.addEventListener('click', () => {
-        if (!html5QrcodeScanner) {
-            html5QrcodeScanner = new Html5Qrcode("reader");
-
-            html5QrcodeScanner.start(
-                { facingMode: "environment" },
-                { 
-                    fps: 10, 
-                    qrbox: { width: 250, height: 150 }, 
-                    formatsToSupport: [ Html5QrcodeSupportedFormats.CODE_128 ]
-                },
-                (decodedText) => {
-                    studentInput.value = decodedText;
-                    fetchStudent(decodedText);
-                    html5QrcodeScanner.clear().catch(err => console.error(err));
-                },
-                (error) => {
-                    console.log("Scan failed:", error);
-                }
-            ).catch(err => console.error("Unable to start scanner: ", err));
-        }
+    // Toggle forms
+    btnScan.addEventListener('click', () => {
+        scanForm.style.display = 'block';
+        registerForm.style.display = 'none';
+    });
+    btnRegister.addEventListener('click', () => {
+        registerForm.style.display = 'block';
+        scanForm.style.display = 'none';
     });
 
-    // Manual input student_id detection
-    studentInput.addEventListener('change', function(){
-        let id = this.value.trim();
-        if(id) fetchStudent(id);
+    // ------------------- SCAN WALK-IN -------------------
+    let html5QrcodeScannerScan;
+    const studentInputScan = document.getElementById('student_id_scan');
+    const walkinInfo = document.getElementById('walkinInfo');
+
+    studentInputScan.addEventListener('change', () => fetchStudent(studentInputScan.value));
+
+    btnScan.addEventListener('click', () => {
+        if (!html5QrcodeScannerScan) {
+            html5QrcodeScannerScan = new Html5Qrcode("readerScan");
+            html5QrcodeScannerScan.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 150 }, formatsToSupport: [ Html5QrcodeSupportedFormats.CODE_128 ] },
+                (decodedText) => {
+                    studentInputScan.value = decodedText;
+                    fetchStudent(decodedText);
+                    html5QrcodeScannerScan.clear().catch(err => console.error(err));
+                },
+                (error) => { console.log("Scan error:", error); }
+            ).catch(err => console.error("Scanner start error: ", err));
+        }
     });
 
     function fetchStudent(student_id){
         $.get("{{ route('walkin.getStudent') }}", { student_id }, function(res){
-            selectedStudent = res.student;
-            showStudentInfo(res.student);
-        });
-    }
-
-    // AJAX form submit
-    $('#walkinForm').on('submit', function(e){
-        e.preventDefault();
-        if(!selectedStudent){
-            $('#message').html('<span style="color:red;">Select a student first!</span>');
-            return;
-        }
-        let formData = new FormData(this);
-        formData.append('student_id', selectedStudent.student_id);
-
-        $.ajax({
-            url: "{{ route('walkin.store') }}",
-            method: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(res){
-                $('#message').html('<span style="color:green;">Walk-in added successfully!</span>');
-                displayAppointment(res);
-                form.reset();
-                selectedStudent = null;
-            },
-            error: function(xhr){
-                let err = xhr.responseJSON?.message || 'Something went wrong!';
-                $('#message').html('<span style="color:red;">'+err+'</span>');
+            if(res.student){
+                walkinInfo.innerHTML = `
+                    <p><strong>Student ID:</strong> ${res.student.student_id}</p>
+                    <p><strong>Name:</strong> ${res.student.first_name} ${res.student.last_name}</p>
+                    <p><strong>Email:</strong> ${res.student.email}</p>`;
+            } else {
+                walkinInfo.innerHTML = `<p style="color:red;">Student not registered yet.</p>`;
             }
         });
-        closeModal();
+    }
+
+    // ------------------- REGISTRATION SCANNER -------------------
+    let html5QrcodeScannerRegister;
+    const startRegisterBtn = document.getElementById('startRegisterScanner');
+    const scannerContainerRegister = document.getElementById('scanner-container-register');
+
+    startRegisterBtn.addEventListener('click', () => {
+        scannerContainerRegister.style.display = 'block';
+        if (!html5QrcodeScannerRegister) {
+            html5QrcodeScannerRegister = new Html5Qrcode("readerRegister");
+            html5QrcodeScannerRegister.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 150 }, formatsToSupport: [ Html5QrcodeSupportedFormats.CODE_128 ] },
+                (decodedText) => {
+                    document.getElementById('reg_student_id').value = decodedText;
+
+                    // Fetch existing student info
+                    $.get("{{ route('walkin.getStudent') }}", { student_id: decodedText }, function(res){
+                        if(res.student){
+                            document.getElementById('reg_first_name').value = res.student.first_name;
+                            document.getElementById('reg_last_name').value = res.student.last_name;
+                            document.getElementById('reg_email').value = res.student.email;
+                            document.getElementById('notification').innerText = "Student already exists!";
+                        } else {
+                            document.getElementById('reg_first_name').value = '';
+                            document.getElementById('reg_last_name').value = '';
+                            document.getElementById('reg_email').value = '';
+                            document.getElementById('notification').innerText = '';
+                        }
+                    });
+
+                    html5QrcodeScannerRegister.clear().catch(err => console.error(err));
+                },
+                (error) => { console.log("Scan error:", error); }
+            ).catch(err => console.error("Scanner start error: ", err));
+        }
     });
 
-    // Display appointment
-    function displayAppointment(data){
-        let html = `
-        <table border="1" cellpadding="8" cellspacing="0" width="100%" style="margin-top:10px;">
-            <thead>
-                <tr>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Service</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>${data.student.student_id}</td>
-                    <td>${data.student.name}</td>
-                    <td>${data.student.email}</td>
-                    <td>${data.appointment.service ?? '-'}</td>
-                    <td>${data.appointment.date}</td>
-                    <td>${data.appointment.time}</td>
-                    <td>${data.appointment.status}</td>
-                    <td><button onclick="showStudentInfo(${JSON.stringify(data.student)})">View Info</button></td>
-                </tr>
-            </tbody>
-        </table>`;
-        $('#appointmentTable').html(html);
-    }
+    // ------------------- CONFIRM REGISTRATION -------------------
+    const confirmBtn = document.getElementById('confirmBtn');
+    confirmBtn.addEventListener('click', () => {
+        const student_id = document.getElementById('reg_student_id').value;
+        const first_name = document.getElementById('reg_first_name').value;
+        const last_name = document.getElementById('reg_last_name').value;
+        const email = document.getElementById('reg_email').value;
+        const password = document.getElementById('reg_password').value;
+        const barcode = document.getElementById('reg_barcode').value;
+
+        if(!student_id || !first_name || !last_name || !email || !password){
+            alert('Please fill all required fields!');
+            return;
+        }
+
+        if(confirm(`Confirm registration?\nStudent ID: ${student_id}\nName: ${first_name} ${last_name}\nEmail: ${email}`)){
+            $.post("{{ route('walkin.registerStudent') }}", {
+                _token: "{{ csrf_token() }}",
+                student_id, first_name, last_name, email, password, barcode
+            }, function(res){
+                alert(res.message);
+                document.getElementById('formRegisterStudent').reset();
+                document.getElementById('notification').innerText = '';
+            }).fail(function(xhr){
+                alert(xhr.responseJSON.message || 'Error registering student!');
+            });
+        }
+    });
+
 });
-
-// Modal functions
-function showStudentInfo(student){
-    let html = `<h4>Student Information</h4>
-        <p><strong>Student ID:</strong> ${student.student_id}</p>
-        <p><strong>Name:</strong> ${student.name}</p>
-        <p><strong>Email:</strong> ${student.email}</p>`;
-    $('#modalContent').html(html);
-    document.getElementById('studentModal').style.display = 'flex';
-}
-
-function closeModal(){
-    document.getElementById('studentModal').style.display = 'none';
-}
-
-// When clicking Select button in modal
-function selectStudent(){
-    if(selectedStudent){
-        $('#student_id').val(selectedStudent.student_id);
-        closeModal();
-    }
-}
 </script>
 @endpush

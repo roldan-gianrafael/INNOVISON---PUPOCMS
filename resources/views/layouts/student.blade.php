@@ -85,11 +85,11 @@
             <nav id="main-menu" class="main-nav">
                 <ul class="nav-list">
                     <li><a href="{{ url('/student/home') }}" class="{{ Request::is('student/home') ? 'active' : '' }}">Home</a></li>
-                    
-                    <li><a href="{{ url('/student/home') }}#about">About Us</a></li>
 
+                    <li><a href="{{ url('/student/home') }}#about">About Us</a></li>
                     <li><a href="{{ url('/student/booking') }}" class="{{ Request::is('student/booking') ? 'active' : '' }}">Appointments</a></li>
-                    <li><a href="{{ url('/student/account') }}" class="{{ Request::is('student/account') ? 'active' : '' }}">My Account</a></li>
+                    <li><a href="{{ url('/student/barcode-register') }}" class="{{ Request::is('student/barcode-register') ? 'active' : '' }}">Register</a></li>
+                   <li><a href="{{ url('/student/account') }}" class="{{ Request::is('student/account') ? 'active' : '' }}">My Account</a></li>
                     <li><a href="{{ url('/student/faq') }}" class="{{ Request::is('student/faq') ? 'active' : '' }}">FAQ</a></li>
                     
                     <li>

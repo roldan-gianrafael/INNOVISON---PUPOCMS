@@ -194,8 +194,8 @@
       </a>
       
 
-      <a href="{{ route('walkin.index') }}">
-         <span class="sidebar-icon">⚙️</span>Walk-in
+      <a href="{{ url('/admin/walkin') }}" class="{{ Request::is('admin/walkin') ? 'active' : '' }}">
+        <span class="sidebar-icon">⚙️</span> Walk-in
       </a>
 
 

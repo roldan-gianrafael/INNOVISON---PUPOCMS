@@ -3,121 +3,155 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Appointment;
 use App\Models\User;
+use App\Models\Appointment;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class WalkInController extends Controller
 {
-    // Show Walk-in page
-    public function index(Request $request)
+    // -------------------------------
+    // 1. INDEX PAGE
+    // -------------------------------
+    public function index()
     {
-        $scannedStudent = null;
+        // Optional: fetch latest walk-ins to display in table
+        $walkins = Appointment::latest()->take(10)->get();
 
-        if ($request->filled('student_id')) {
-            $scannedStudent = User::where('barcode', $request->student_id)
-                                ->orWhere('student_id', $request->student_id)
-                                ->first();
-        }
-
-        return view('admin.walkin.index', compact('scannedStudent'));
+        return view('admin.walkin.index', compact('walkins'));
     }
 
-    // Get student info by student_id (AJAX)
+    // -------------------------------
+    // 2. GET STUDENT INFO (AJAX)
+    // -------------------------------
     public function getStudent(Request $request)
     {
         $student_id = $request->student_id;
-
         $student = User::where('student_id', $student_id)->first();
-
-        if ($student) {
-            return response()->json(['success' => true, 'student' => $student]);
-        } else {
-            // Return a default walk-in object if not found
-            return response()->json([
-                'success' => false,
-                'student' => [
-                    'student_id' => $student_id,
-                    'name' => 'Walk-in Client',
-                    'email' => '-'
-                ]
-            ]);
-        }
-    }
-
-    // Store a walk-in appointment
-    public function store(Request $request)
-    {
-        $request->validate([
-            'student_id' => 'required|string',
-            'service' => 'required|string',
-            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-        ]);
-
-        $user = User::where('student_id', $request->student_id)->first();
-        if(!$user){
-            return response()->json(['message'=>'Student not found'], 404);
-        }
-
-        $fileName = null;
-        if($request->hasFile('attachment')){
-            $file = $request->file('attachment');
-            $fileName = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads'), $fileName);
-        }
-
-        $appointment = Appointment::create([
-            'user_id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'student_id' => $user->student_id,
-            'service' => $request->service,
-            'type' => 'walk-in',
-            'status' => 'Approved',
-            'date' => now()->toDateString(),
-            'time' => now()->format('H:i:s'),
-            'notes' => $fileName,
-        ]);
 
         return response()->json([
-            'student' => $user,
-            'appointment' => $appointment
+            'student' => $student
         ]);
     }
 
-    // **NEW METHOD**: Handle "Select" from modal
-    public function selectStudent(Request $request)
+    // -------------------------------
+    // 3. REGISTER STUDENT
+    // -------------------------------
+    public function register(Request $request)
     {
-        $student_id = $request->student_id;
+        $request->validate([
+            'student_id' => 'required|unique:users,student_id',
+            'name'       => 'required|string|max:255',
+            'email'      => 'required|email|unique:users,email',
+            'password'   => 'required|string|min:6',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
 
-        $student = User::where('student_id', $student_id)->first();
+        $user = new User();
+        $user->student_id = $request->student_id;
+        $user->name       = $request->name;
+        $user->email      = $request->email;
+        $user->password   = Hash::make($request->password);
 
-        if (!$student) {
-            // Optionally, create a default walk-in client if not in users
-            $student = User::create([
-                'student_id' => $student_id,
-                'name' => 'Walk-in Client',
-                'email' => '-',
-            ]);
+        // Save attachment if uploaded
+        if($request->hasFile('attachment')){
+            $path = $request->file('attachment')->store('students', 'public');
+            $user->attachment = $path;
         }
 
-        // Create walk-in appointment
-        $appointment = Appointment::create([
-            'user_id' => $student->id,
-            'name' => $student->name,
-            'email' => $student->email,
-            'student_id' => $student->student_id,
-            'service' => null, // will add in modal later
-            'type' => 'walk-in',
-            'status' => 'Pending',
-            'date' => now()->toDateString(),
-            'time' => now()->format('H:i:s'),
-            'notes' => null,
-        ]);
+        $user->save();
 
         return response()->json([
             'success' => true,
-            'student' => $student,
+            'message' => 'Student registered successfully!',
+            'student' => $user
+        ]);
+    }
+
+    // -------------------------------
+    // 4. STORE WALK-IN
+    // -------------------------------
+    public function store(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:users,student_id',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'service'    => 'nullable|string|max:255', // optional
+            'date'       => 'nullable|date',
+            'time'       => 'nullable',
+        ]);
+
+        $student = User::where('student_id', $request->student_id)->first();
+
+        if(!$student){
+            return response()->json(['success'=>false,'message'=>'Student not found!'], 404);
+        }
+
+        $appointment = new Appointment();
+        $appointment->user_id   = $student->id;
+        $appointment->student_id= $student->student_id;
+        $appointment->name      = $student->name;
+        $appointment->email     = $student->email;
+        $appointment->service   = $request->service ?? 'Walk-in';
+        $appointment->date      = $request->date ?? now()->format('Y-m-d');
+        $appointment->time      = $request->time ?? now()->format('H:i:s');
+        $appointment->status    = 'Pending';
+
+        // Save attachment if uploaded
+        if($request->hasFile('attachment')){
+            $path = $request->file('attachment')->store('walkins', 'public');
+            $appointment->attachment = $path;
+        }
+
+        $appointment->save();
+
+        return response()->json([
+            'success'     => true,
+            'message'     => 'Walk-in added successfully!',
+            'student'     => $student,
             'appointment' => $appointment
         ]);
     }
+    public function registerStudent(Request $request)
+{
+    $request->validate([
+        'student_id' => 'required',
+        'first_name' => 'required',
+        'last_name' => 'required',
+        'email' => 'required|email',
+        'password' => 'required|min:6',
+        'barcode' => 'nullable'
+    ]);
+
+    // Check if student_id or email already exists
+    $existingUser = \App\Models\User::where('student_id', $request->student_id)
+                        ->orWhere('email', $request->email)
+                        ->first();
+
+    if ($existingUser) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Student already exists in the system!',
+            'student' => $existingUser
+        ]);
+    }
+
+    // Create user
+    $user = \App\Models\User::create([
+        'student_id' => $request->student_id,
+        'first_name' => $request->first_name,
+        'last_name'  => $request->last_name,
+        'name'       => $request->first_name . ' ' . $request->last_name,
+        'email'      => $request->email,
+        'password'   => bcrypt($request->password),
+        'barcode'    => $request->barcode,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Student registered successfully!',
+        'student' => $user
+    ]);
+}
+    
 }

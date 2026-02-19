@@ -269,4 +269,98 @@ class AppointmentController extends Controller
 
         return view('student.history', compact('appointments'));
     }
+
+    // -------------------------------
+// 9. BARCODE REGISTER PAGE
+
+    // -------------------------------
+// 9. BARCODE REGISTER PAGE
+// -------------------------------
+public function barcodeRegister()
+{
+    // Use logged-in user or temporary guest
+    $user = Auth::user() ?? User::firstOrCreate(
+        ['email' => 'guest@pup.edu.ph'],
+        [
+            'name' => 'Tero Student',
+            'email' => 'guest@pup.edu.ph',
+            'password' => bcrypt('password'),
+            'is_admin' => 0,
+            'student_id' => '2025-0000-TG-0', // temporary student ID
+        ]
+    );
+
+    // Pass user to Blade
+    return view('student.barcode-register', compact('user'));
+}
+
+
+// -------------------------------
+// SAVE BARCODE
+// -------------------------------
+public function storeBarcode(Request $request)
+{
+    // Validate that barcode is present
+    $request->validate([
+        'barcode' => 'required|string|max:255'
+    ]);
+
+    $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+
+    if (!$user) {
+        return redirect()->back()->with('error', 'User not found!');
+    }
+
+    // Save barcode to database
+    $user->barcode = $request->barcode;
+    $user->save();
+
+    return redirect()->back()->with('success', 'Barcode registered successfully!');
+}
+
+
+// -------------------------------
+// FETCH USER USING STUDENT ID
+// -------------------------------
+public function fetchUser($student_id)
+{
+    $user = User::where('student_id', $student_id)->first();
+
+    if ($user) {
+        return response()->json([
+            'success' => true,
+            'name' => $user->name,
+            'student_id' => $user->student_id,
+            'barcode' => $user->barcode
+        ]);
+    }
+
+    return response()->json([
+        'success' => false
+    ]);
+}
+
+
+/////
+
+// -------------------------------
+// RESET BARCODE (for testing)
+// -------------------------------
+public function resetBarcode()
+{
+    // Get current student or guest
+    $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+
+    if (!$user) {
+        return redirect()->back()->with('error', 'User not found.');
+    }
+
+    // Clear barcode
+    $user->barcode = null;
+    $user->save();
+
+    return redirect()->back()->with('success', 'Barcode reset successfully! You can scan again.');
+}
+
+
 }

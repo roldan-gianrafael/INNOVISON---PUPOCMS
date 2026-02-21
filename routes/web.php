@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WalkInController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\ReportsController;
 
 // Root route: serve the landing page
 Route::get('/', function () {
@@ -68,22 +69,15 @@ Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarco
 
 //// FOR ADMIN WALKIN REGISTRATION AND SCANNING
 //// ADMIN WALK-IN ROUTES
-    Route::prefix('admin/walkin')->group(function () {
+Route::get('/admin/walkin', [WalkInController::class, 'index'])->name('walkin.index');
+Route::get('/admin/walkin/get-student', [WalkInController::class, 'getStudent'])->name('walkin.getStudent');
+Route::post('/admin/walkin/register', [WalkInController::class, 'registerStudent'])->name('walkin.registerStudent');
+Route::get('/admin/walkin/form/{student_id}', [WalkInController::class, 'showWalkinForm'])->name('walkin.form');
+Route::post('/admin/walkin/store', [WalkInController::class, 'store'])->name('walkin.store');
 
-    // Show Walk-in page (scanner + registration)
-    Route::get('/', [WalkInController::class, 'index'])->name('walkin.index');
+//This is for Report Controller
 
-    // Fetch student info by student_id (AJAX)
-    Route::get('/get-student', [WalkInController::class, 'getStudent'])->name('walkin.getStudent');
-
-    // Store walk-in appointment
-    Route::post('/store', [WalkInController::class, 'store'])->name('walkin.store');
-
-    
-// Register a new student from admin walk-in page
-Route::post('/admin/walkin/register-student', [WalkInController::class, 'registerStudent'])
-    ->name('walkin.registerStudent');
-
-    });
-
-
+Route::prefix('admin')->middleware(['auth','admin'])->group(function () {
+    Route::get('/reports/mar', [ReportsController::class, 'marReport'])->name('reports.mar');
+Route::get('/admin/reports/mar/export', [ReportsController::class, 'exportExcel'])->name('reports.mar.export');
+});

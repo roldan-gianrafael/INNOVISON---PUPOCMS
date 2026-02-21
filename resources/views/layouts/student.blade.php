@@ -41,7 +41,7 @@
         }
 
         /* Underline Animation */
-        .nav-list li a:not(.logout-btn):::after {
+        .nav-list li a:not(.logout-btn)::after {
             content: '';
             position: absolute;
             width: 0;

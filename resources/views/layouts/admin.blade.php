@@ -194,10 +194,7 @@
       </a>
       
 
-      <a href="{{ url('/admin/walkin') }}" class="{{ Request::is('admin/walkin') ? 'active' : '' }}">
-        <span class="sidebar-icon">⚙️</span> Walk-in
-      </a>
-
+     
 
       <a href="{{ url('/') }}" style="margin-top: 40px; background: rgba(0,0,0,0.2);">
         <span class="sidebar-icon">🚪</span> Logout

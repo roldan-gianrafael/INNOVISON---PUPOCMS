@@ -104,7 +104,46 @@
         border-radius: 6px;
         margin-top: 4px;
     }
-    
+    /* Container for alignment */
+.action-header {
+    margin-bottom: 20px;
+}
+
+/* Main Button para sa Add Walkin*/
+.btn-add-walkin {
+    display: inline-flex;
+    align-items: center;
+    background-color: #8B0000; /* Deep Maroon */
+    color: #ffffff !important; /* Force white text */
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+/* Icon styling inside button */
+.btn-icon {
+    font-size: 20px;
+    margin-right: 10px;
+    line-height: 1;
+}
+
+/* Hover Effects */
+.btn-add-walkin:hover {
+    background-color: #a50000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 0, 0, 0.4);
+    text-decoration: none;
+}
+
+.btn-add-walkin:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(139, 0, 0, 0.2);
+}
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 @endpush
@@ -117,8 +156,15 @@
         <input type="text" id="searchInput" placeholder="Search by name..." 
                style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 300px;">
     </div>
-
+<!-- Button for Walk in-->
+ <div class="action-header">
+    <a href="{{ url('/admin/walkin') }}" class="btn-add-walkin">
+        <span class="btn-icon">+</span>
+        <span class="btn-text">Add New Walk-in</span>
+    </a>
+</div>
     <div class="card">
+        Appointments Summary
         <table id="apptTable">
             <thead>
                 <tr>
@@ -151,7 +197,7 @@
                                         '{{ $appt->service }}', 
                                         '{{ $appt->date }}', 
                                         '{{ $appt->time }}', 
-                                        '{{ $appt->notes ?? 'None' }}', 
+                                        '{{ $appt->notes }}', 
                                         '{{ $appt->email }}'
                                     )">
                                 View

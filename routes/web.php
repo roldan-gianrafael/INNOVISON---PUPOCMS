@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WalkInController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\MedicalConditionController;
 use App\Http\Controllers\ReportsController;
 
 // Root route: serve the landing page
@@ -77,7 +78,25 @@ Route::post('/admin/walkin/store', [WalkInController::class, 'store'])->name('wa
 
 //This is for Report Controller
 
-Route::prefix('admin')->middleware(['auth','admin'])->group(function () {
-    Route::get('/reports/mar', [ReportsController::class, 'marReport'])->name('reports.mar');
-Route::get('/admin/reports/mar/export', [ReportsController::class, 'exportExcel'])->name('reports.mar.export');
+
+
+Route::prefix('admin')->group(function () {
+    
+    // MAR Report View
+Route::get('/reports/mar', [ReportsController::class, 'marReport'])->name('reports.mar');
+
+// MAR Export (Excel)
+Route::get('/reports/mar/export', [ReportsController::class, 'exportExcel'])->name('reports.mar.export');
+
+    // You can add your other report routes here later
+    // Route::get('/reports/appointments', [ReportsController::class, 'appointmentReport']);
 });
+
+//ito ay sa MEdical Conditons Controller
+
+
+Route::post('/admin/medical-conditions', [MedicalConditionController::class, 'store'])->name('conditions.store');
+Route::delete('/admin/medical-conditions/{id}', [MedicalConditionController::class, 'destroy'])->name('conditions.destroy');
+
+//for manage mar button
+Route::get('/reports/manage-mar', [ReportsController::class, 'manageMar'])->name('admin.reports.manage-mar');

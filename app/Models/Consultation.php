@@ -20,6 +20,6 @@ class Consultation extends Model
 
     public function medicalCondition(): BelongsTo
     {
-        return $this->belongsTo(MedicalCondition::class);
+        return $this->belongsTo(MedicalConditions::class, 'medical_condition_id');
     }
 }

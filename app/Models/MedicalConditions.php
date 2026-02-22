@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MedicalCondition extends Model
+class MedicalConditions extends Model
 {
     use SoftDeletes;
 
@@ -21,6 +21,6 @@ class MedicalCondition extends Model
 
     public function consultations(): HasMany
     {
-        return $this->hasMany(Consultation::class);
+       return $this->hasMany(Consultation::class, 'medical_condition_id');
     }
 }

@@ -7,8 +7,7 @@ use App\Models\User;
 use App\Models\Appointment;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-// Using 'as LaravelDB' solves the conflict between VS Code and your Browser
-use Illuminate\Support\Facades\DB as LaravelDB; 
+use Illuminate\Support\Facades\DB;
 
 class WalkInController extends Controller
 {
@@ -21,16 +20,19 @@ class WalkInController extends Controller
 
     // 2. SHOW WALKIN FORM (The page users go to after scanning)
     public function showWalkinForm($student_id)
-    {
-        $student = User::where('student_id', $student_id)->firstOrFail();
-        
-        // Fetch only items labeled as 'Medicine' from your inventory table
-        $items = \App\Models\Item::where('category', 'Medicine')
-                                 ->where('quantity', '>', 0)
-                                 ->get();
+{
+    $student = User::where('student_id', $student_id)->firstOrFail();
+    
+    // get medicine with stock
+    $items = \App\Models\Item::where('category', 'Medicine')
+                             ->where('quantity', '>', 0)
+                             ->get();
 
-        return view('admin.walkin-form', compact('student', 'items'));
-    }
+    //get med conditons
+    $conditions = \App\Models\MedicalConditions::with('category')->get();
+
+    return view('admin.walkin-form', compact('student', 'items', 'conditions'));
+}
 
     // 3. GET STUDENT INFO (Modified for Barcode Redirect)
     public function getStudent(Request $request)
@@ -104,43 +106,66 @@ public function registerStudent(Request $request)
 
     // 5. FINAL STORE (Saves the consultation/appointment)
     public function store(Request $request)
-    {
-        $request->validate([
-            'student_id' => 'required',
-            'service'    => 'required',
-            'remarks'    => 'required',
-        ]);
+{
+    $request->validate([
+        'student_id'   => 'required',
+        'service'      => 'required',
+        'remarks'      => 'required',
+        'condition_id' => 'required|exists:medical_conditions,id',
+    ]);
 
-        $student = User::where('student_id', $request->student_id)->first();
+    $student = User::where('student_id', $request->student_id)->first();
 
-        if (!$student) {
-            return redirect()->back()->with('error', 'Student not found.');
+    if (!$student) {
+        return redirect()->back()->with('error', 'Student not found.');
+    }
+
+    DB::transaction(function () use ($request, $student) {
+        
+        // --- 1. APPOINTMENTS TABLE (General Log Only) ---
+        $appointment = new Appointment();
+        $appointment->user_id      = $student->id;
+        $appointment->student_id   = $student->student_id;
+        $appointment->name         = $student->first_name . ' ' . $student->last_name;
+        $appointment->email        = $student->email; 
+        $appointment->service      = $request->service;
+        $appointment->remarks      = $request->remarks;
+        // ALISIN ANG condition_id, temp, at bp DITO dahil wala ito sa appointments table mo
+        $appointment->status       = 'Completed';
+        $appointment->date         = now()->format('Y-m-d');
+        $appointment->time         = now()->format('H:i:s'); 
+        $appointment->user_role    = $student->user_type; 
+        $appointment->user_type    = 'walkin';
+        $appointment->save();
+
+        // --- 2. CONSULTATIONS TABLE (Medical Details) ---
+        $medicineName = null;
+        if ($request->item_id) {
+            $item = \App\Models\Item::find($request->item_id);
+            $medicineName = $item ? $item->name : null;
         }
 
-        
-        LaravelDB::transaction(function () use ($request, $student) {
-            
-            $appointment = new Appointment();
-            $appointment->user_id    = $student->id;
-            $appointment->student_id = $student->student_id;
-            $appointment->name       = $student->name;
-            $appointment->email      = $student->email; 
-            $appointment->service    = $request->service;
-            $appointment->remarks    = $request->remarks;
-            $appointment->status     = 'Completed';
-            $appointment->date       = now()->format('Y-m-d');
-            $appointment->time       = now()->format('H:i:s'); 
-            $appointment->save();
+        \App\Models\Consultation::create([
+            'name'                 => $student->first_name . ' ' . $student->last_name,
+            'consultation_date'    => now()->format('Y-m-d'),
+            'user_type'            => $student->user_type, 
+            'service'              => $request->service,
+            'medical_condition_id' => $request->condition_id, // Dito lang ito dapat
+            'temperature'          => $request->temp,
+            'medicine'             => $medicineName,
+            'medicine_quantity'    => $request->issued_quantity,
+            'comments'             => $request->remarks,
+        ]);
 
-            // Handle Inventory Deduction
-            if ($request->item_id && $request->issued_quantity) {
-                $item = \App\Models\Item::find($request->item_id);
-                if ($item && $item->quantity >= $request->issued_quantity) {
-                    $item->decrement('quantity', $request->issued_quantity);
-                }
+        // --- 3. INVENTORY DEDUCTION ---
+        if ($request->item_id && $request->issued_quantity) {
+            $item = \App\Models\Item::find($request->item_id);
+            if ($item && $item->quantity >= $request->issued_quantity) {
+                $item->decrement('quantity', $request->issued_quantity);
             }
-        });
+        }
+    });
 
-        return redirect()->route('walkin.index')->with('consultation_done', true);
-    }
+    return redirect()->route('walkin.index')->with('consultation_done', true);
+}
 }

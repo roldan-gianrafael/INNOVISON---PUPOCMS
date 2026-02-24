@@ -30,6 +30,12 @@
 
 @section('content')
 
+
+
+ <a href="{{ route('admin.reports') }}" style="color: #64748b; text-decoration: none;">← Back to Reports</a>
+
+
+
 <div class="stats-container">
     <div class="stat-card">
         <span>Total Consultations Today</span>
@@ -45,7 +51,7 @@
 <a href="{{ route('admin.reports.manage-mar', ['month' => $month]) }}" 
    class="btn-filter" 
    style="background:#334155; color:white; padding:8px 15px; border-radius:6px; text-decoration:none; font-size:14px;">
-   Manage Personnel MAR
+   Manage MAR
 </a>
 <div class="card">
     <h2>Medical Accomplishment Report</h2>
@@ -53,7 +59,6 @@
     <form method="GET" class="filter-box" style="display: flex; gap: 10px; margin-bottom: 20px;">
         <input type="month" name="month" class="form-control" value="{{ $month }}">
         <button class="btn-filter" type="submit" style="background:#8B0000; color:white; padding:8px 15px; border-radius:6px; border:none;">Generate</button>
-        <a href="{{ route('reports.mar.export', ['month' => $month]) }}" class="btn-filter" style="background:#1e293b; color:white; padding:8px 15px; border-radius:6px; text-decoration:none; font-size:14px;">Excel Export</a>
     </form>
    
 
@@ -71,29 +76,27 @@
         </thead>
         <tbody>
             @foreach($categories as $cat)
-                <tr class="category-row">
-                    <td colspan="5">Category {{ $cat->code }}: {{ $cat->name }}</td>
-                </tr>
-                @forelse($cat->medicalConditions as $condition)
-                    @php
-                        // Filter base sa role ng user na may consultation
-                        $stu = $condition->consultations->where('user.role', 'Student')->count();
-                        $fac = $condition->consultations->where('user.role', 'Faculty')->count();
-                        $adm = $condition->consultations->where('user.role', 'Admin')->count();
-                    @endphp
-                    <tr>
-                        <td style="padding-left: 30px;">{{ $condition->name }}</td>
-                        <td style="text-align: center;">{{ $stu }}</td>
-                        <td style="text-align: center;">{{ $fac }}</td>
-                        <td style="text-align: center;">{{ $adm }}</td>
-                        <td style="text-align: center; font-weight: 700;">{{ $stu + $fac + $adm }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" style="padding-left: 30px; color: #94a3b8; font-style: italic;">No conditions listed.</td>
-                    </tr>
-                @endforelse
-            @endforeach
+    <tr style="background-color: #f8f9fa; font-weight: bold;">
+        <td colspan="5">Category {{ $cat->code }} - {{ $cat->name }}</td>
+    </tr>
+
+    @foreach($cat->medicalConditions as $condition)
+        @php
+            // Bilangin ang consultations per role gamit ang 'user_type' column sa consultations table
+            $stu = $condition->consultations->where('user_type', 'Student')->count();
+            $fac = $condition->consultations->where('user_type', 'Faculty')->count();
+            $adm = $condition->consultations->where('user_type', 'Staff')->count(); // o 'Admin' depende sa nakasave
+            $total = $stu + $fac + $adm;
+        @endphp
+        <tr>
+            <td style="padding-left: 30px;">{{ $condition->name }}</td>
+            <td class="text-center">{{ $stu }}</td>
+            <td class="text-center">{{ $fac }}</td>
+            <td class="text-center">{{ $adm }}</td>
+            <td class="text-center">{{ $total }}</td>
+        </tr>
+    @endforeach
+@endforeach
         </tbody>
     </table>
 </div>

@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; // <-- for CSV exports
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -42,16 +43,33 @@ class AdminController extends Controller
     }
 
     public function reports()
-    {
-        $appointments = Appointment::all();
-        $total = Appointment::count();
-        $approved = Appointment::where('status', 'Approved')->count();
-        $cancelled = Appointment::where('status', 'Cancelled')->count();
-        $lowStock = Item::where('quantity', '<', 10)->count();
-        $items = Item::all();
+{
+   
+    $appointments = Appointment::all();
+    $total = Appointment::count();
+    $approved = Appointment::where('status', 'Approved')->count();
+    $cancelled = Appointment::where('status', 'Cancelled')->count();
+    
 
-        return view('admin.reports', compact('appointments', 'total', 'approved', 'cancelled', 'lowStock', 'items'));
-    }
+    $lowStockCount = Item::where('quantity', '<', 10)->count(); 
+    
+   
+    $appointmentsToday = Appointment::where('status', 'Approved')
+                                    ->whereDate('date', \Carbon\Carbon::today())
+                                    ->count();
+
+
+    $totalConsultations = Appointment::where('status', 'Approved')
+                                     ->whereMonth('date', \Carbon\Carbon::now()->month)
+                                     ->count();
+
+    $items = Item::all();
+
+    return view('admin.reports', compact(
+        'appointments', 'total', 'approved', 'cancelled', 
+        'lowStockCount', 'appointmentsToday', 'totalConsultations', 'items'
+    ));
+}
 
     public function settings()
     {
@@ -138,7 +156,7 @@ class AdminController extends Controller
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
-        $user->save();
+      
         return redirect()->back()->with('success', 'Profile updated successfully.');
     }
 
@@ -217,4 +235,25 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Appointment completed (No medicine deducted).');
     }
+
+    // 6. FOR INVENTORY SUMMARY
+    public function inventorySummary()
+{
+    // Kuhanin ang breakdown ng inventory
+    $totalItems = Item::count();
+    $totalStock = Item::sum('quantity');
+    $outOfStock = Item::where('quantity', 0)->count();
+    $lowStockItems = Item::where('quantity', '>', 0)->where('quantity', '<', 10)->get();
+    
+    // Grouping by category para sa summary table
+    $categorySummary = Item::select('category', 
+                    DB::raw('count(*) as count'), // May backslash na sa unahan
+                    DB::raw('sum(quantity) as total_qty'))
+                    ->groupBy('category')
+                    ->get();
+
+    return view('admin.reports.inventory-summary', compact(
+        'totalItems', 'totalStock', 'outOfStock', 'lowStockItems', 'categorySummary'
+    ));
+}
 }

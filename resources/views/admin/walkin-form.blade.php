@@ -16,6 +16,9 @@
     .patient-header { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8B0000; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .badge-role { background: #e2e8f0; color: #334155; padding: 4px 10px; border-radius: 6px; font-size: 11px; text-transform: uppercase; font-weight: 700; }
+    
+    /* Highlight for MAR requirement */
+    .mar-required { border: 1px solid #fecaca; background-color: #fef2f2; }
 </style>
 @endpush
 
@@ -36,7 +39,7 @@
 <form action="{{ route('walkin.store') }}" method="POST">
     @csrf
     <input type="hidden" name="student_id" value="{{ $student->student_id }}">
-    <input type="hidden" name="user_type" value="{{ $student->role }}">
+    <input type="hidden" name="user_role" value="{{ $student->role }}">
 
     <div class="grid-2">
         <div>
@@ -50,6 +53,19 @@
                         <option value="Medical Certificate">Medical Certificate</option>
                         <option value="BP Monitoring">BP Monitoring</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="color: #8B0000;">Medical Condition (MAR Classification)</label>
+                    <select name="condition_id" class="form-control mar-required" required>
+                        <option value="" disabled selected>-- Select Diagnosis --</option>
+                        @foreach($conditions as $cond)
+                            <option value="{{ $cond->id }}">
+                                Category {{ $cond->category->code }}: {{ $cond->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small style="color: #94a3b8; font-size: 11px;">Required to automatically update the MAR Report.</small>
                 </div>
 
                 <div class="grid-2" style="margin-top: 20px;">

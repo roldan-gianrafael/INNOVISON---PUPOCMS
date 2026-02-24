@@ -11,8 +11,11 @@ class Consultation extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['user_id', 'medical_condition_id', 'consultation_date', 'comments'];
-
+    protected $fillable = [
+    'name', 'consultation_date', 'user_type', 'service', 
+    'medical_condition_id', 'temperature', 'medicine', 
+    'medicine_quantity', 'comments'
+];
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -22,7 +22,7 @@ class Appointment extends Model
         'date',         // Appointment date
         'time',         // Appointment time
         'status',       // Pending / Completed / Cancelled
-        'type',         // 'online' or 'walk-in'
+        'user_type',    // 'online' or 'walk-in'
         'notes',        // Optional notes
     ];
 

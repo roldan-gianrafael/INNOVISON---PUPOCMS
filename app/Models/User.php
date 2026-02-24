@@ -26,7 +26,7 @@ class User extends Authenticatable
     'password',
     'student_id',   
     'barcode',      
-    'user_type',    
+    'user_role',    
     'is_admin'      
 ];
 

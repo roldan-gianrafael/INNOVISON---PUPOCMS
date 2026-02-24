@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title }} - {{ $monthFilter }}</title>
-    
+
     <style>
     /* 1. Print & Base Styles */
     @media print { 
@@ -335,9 +335,9 @@
                 @forelse($data as $app)
                 <tr>
                     <td>{{ date('M d, Y', strtotime($app->date)) }}</td>
-                    <td class="text-left">{{ $app->student_name }}</td>
+                    <td class="text-left">{{ $app->name }}</td>
                     <td>{{ $app->user_type ?? 'N/A' }}</td>
-                    <td>{{ $app->reason }}</td>
+                    <td>{{ $app->service }}</td>
                     <td>{{ $app->status }}</td>
                 </tr>
                 @empty

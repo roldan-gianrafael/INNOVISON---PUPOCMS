@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\MedicalConditions;
@@ -65,13 +64,9 @@ public function update(Request $request, $id)
 
     return back()->with('success', 'Category updated successfully!');
 }
-
-    // Export to Excel / CSV
-    public function exportHub(Request $request)
+public function exportHub() 
 {
-    // Hahawakan nito yung month filter sa UI natin
-    $month = $request->get('month', date('Y-m'));
-    
-    return view('admin.reports.export-reports', compact('month'));
+    // Kahit return view muna para lang ma-check kung working ang routing
+    return view('admin.reports.export-reports'); 
 }
 }

@@ -80,29 +80,16 @@ Route::post('/admin/walkin/store', [WalkInController::class, 'store'])->name('wa
 Route::prefix('admin/reports')->group(function () {
     
     // Main Reports Dashboard
-    Route::get('/', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::get('/', [\App\Http\Controllers\AdminController::class, 'reports'])->name('admin.reports');
 
-    // EXPORT HUB - Ang bago nating page
-    Route::get('/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
+    // EXPORT HUB
+    Route::get('/export-hub', [\App\Http\Controllers\ReportsController::class, 'exportHub'])->name('reports.exportHub');
 
     // MAR Report View & Management
-    Route::get('/mar', [ReportsController::class, 'marReport'])->name('reports.mar');
-    Route::get('/manage-mar', [ReportsController::class, 'manageMar'])->name('admin.reports.manage-mar');
+    Route::get('/mar', [\App\Http\Controllers\ReportsController::class, 'marReport'])->name('reports.mar');
+    Route::get('/manage-mar', [\App\Http\Controllers\ReportsController::class, 'manageMar'])->name('admin.reports.manage-mar');
     
     // Inventory Summary View
-    Route::get('/inventory-summary', [AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
+    Route::get('/inventory-summary', [\App\Http\Controllers\AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
 
-    // --- DOWNLOAD/EXPORT ACTIONS ---
-    // Gagamitin natin ang mga ito sa Export Hub cards
-    Route::get('/mar/export', [ReportsController::class, 'exportExcel'])->name('reports.mar.export');
-    Route::get('/appointments/export', [AdminController::class, 'exportReports'])->name('admin.export.appointments');
-    Route::get('/inventory/export', [AdminController::class, 'exportInventory'])->name('admin.export.inventory');
 });
-
-
-// ==========================================
-// 5. MEDICAL CONDITIONS ACTIONS
-// ==========================================
-Route::post('/admin/medical-conditions', [MedicalConditionController::class, 'store'])->name('conditions.store');
-Route::delete('/admin/medical-conditions/{id}', [MedicalConditionController::class, 'destroy'])->name('conditions.destroy');
-Route::put('/admin/medical-conditions/{id}', [ReportsController::class, 'update'])->name('conditions.update');

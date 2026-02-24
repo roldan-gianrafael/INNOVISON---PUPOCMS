@@ -1,100 +1,173 @@
 @extends('layouts.admin')
 
-@section('title', 'Export Hub')
-
-@push('styles')
+@section('content')
 <style>
-    .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-    
-    /* Re-using your exact card style */
-    .report-grid {
+    /* Main Container */
+    .export-hub-container {
+        padding: 30px;
+        background: #f8fafc;
+        min-height: 100vh;
+    }
+
+    .hub-header {
+        margin-bottom: 30px;
+    }
+
+    .hub-header h2 {
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .hub-header p {
+        color: #64748b;
+    }
+
+    /* Grid Layout */
+    .hub-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 20px;
     }
 
+    /* Card Styling */
     .report-card {
-        background: #70131B;
-        color: #fff;
-        border-radius: 16px;
-        padding: 24px 20px;
-        text-decoration: none;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        min-height: 160px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
+    }
+
+    .report-card h3 {
+        margin-top: 0;
+        color: #1e293b;
+    }
+
+    .report-card p {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    /* Form Elements */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: bold;
+        color: #475569;
+        margin-bottom: 5px;
+    }
+
+    .input-month {
+        width: 100%;
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        outline-color: #800000;
+    }
+
+    /* Buttons & Links */
+    .btn-generate {
+        width: 100%;
         border: none;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        transition: opacity 0.2s;
     }
 
-    .report-card:hover {
-        transform: translateY(-8px);
-        filter: brightness(1.2);
+    .btn-generate:hover {
+        opacity: 0.9;
     }
 
-    .report-label { font-size: 14px; font-weight: 500; color: #cbd5e1; text-transform: uppercase; margin-bottom: 5px; }
-    .report-main-title { font-size: 22px; font-weight: 700; color: #fff; line-height: 1.2; }
-    .report-badge { 
-        display: inline-block; font-size: 11px; font-weight: 600; padding: 6px 12px; 
-        border-radius: 8px; width: fit-content; background: rgba(255,255,255,0.1); color: #fff; margin-top: 15px; 
-    }
+    /* Dynamic Border & Button Colors */
+    .border-mar { border-top: 5px solid #800000; }
+    .bg-mar { background: #800000; }
 
-    .filter-card {
-        background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 30px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid #8B0000;
-    }
+    .border-inventory { border-top: 5px solid #800000; }
+    .bg-inventory { background: #800000; }
+
+    .border-appointment { border-top: 5px solid #800000; }
+    .bg-appointment { background: #800000; }
 </style>
-@endpush
 
-@section('content')
-<div class="dashboard-container">
-    <div style="margin-bottom: 20px;">
-        <a href="{{ route('admin.reports') }}" style="text-decoration: none; color: #64748b; font-weight: 600; font-size: 14px;">
-            ← Back to Reports
-        </a>
+<div class="export-hub-container">
+    
+    <div class="hub-header">
+        <h2>Export & Reports Hub</h2>
+        <p>Select a report type to generate a printable document.</p>
     </div>
 
-    <h2 style="font-size: 24px; color: #1e293b; margin-bottom: 10px; font-weight: 700;">Export Center</h2>
-    <p style="color: #64748b; margin-bottom: 30px;">Select the data you want to download as PDF.</p>
-
-    <div class="filter-card">
-        <form action="{{ route('reports.exportHub') }}" method="GET" style="display: flex; align-items: center; gap: 15px;">
+    <div class="hub-grid">
+        
+        <div class="report-card border-mar">
             <div>
-                <label style="font-size: 12px; font-weight: 700; color: #64748b; display: block; margin-bottom: 5px;">SELECT MONTH</label>
-                <input type="month" name="month" value="{{ request('month', date('Y-m')) }}" 
-                       style="padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none;">
+                <h3>MAR Report</h3>
+                <p>Monthly Accomplishment Report showing patient counts.</p>
             </div>
-            <button type="submit" style="margin-top: 20px; padding: 10px 20px; background: #8B0000; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                Update Links
-            </button>
-        </form>
-    </div>
+            <form action="{{ route('reports.print') }}" method="GET" target="_blank">
+                <input type="hidden" name="type" value="mar">
+                <div class="form-group">
+                    <label>SELECT MONTH:</label>
+                    <input type="month" name="month" value="{{ date('Y-m') }}" class="input-month">
+                </div>
+                <button type="submit" class="btn-generate bg-mar">
+                    Generate MAR Report
+                </button>
+            </form>
+        </div>
 
-    <div class="report-grid">
-        <a href="#" class="report-card">
-            <div>
-                <div class="report-label">Monthly Accomplishment</div>
-                <div class="report-main-title">MAR Report Data</div>
-            </div>
-            <div class="report-badge">Download PDF</div>
-        </a>
 
-        <a href="#" class="report-card">
-            <div>
-                <div class="report-label">Clinic Schedules</div>
-                <div class="report-main-title">All Appointments</div>
-            </div>
-            <div class="report-badge">Download PDF</div>
-        </a>
 
-        <a href="#" class="report-card">
+        
+        <div class="report-card border-inventory">
             <div>
-                <div class="report-label">Supplies Log</div>
-                <div class="report-main-title">Inventory Stock</div>
+                <h3>Inventory Stock</h3>
+                <p>Complete list of medical supplies, current stock, expiration date...</p>
             </div>
-            <div class="report-badge">Download PDF</div>
-        </a>
+            <form action="{{ route('reports.print') }}" method="GET" target="_blank">
+                <input type="hidden" name="type" value="inventory">
+                <div class="form-group">
+                    <label>SELECT MONTH:</label>
+                    <input type="month" name="month" value="{{ date('Y-m') }}" class="input-month">
+                </div>
+                <button type="submit" class="btn-generate bg-inventory">
+                    View Stock Report
+                </button>
+            </form>
+        </div>
+
+
+
+
+        <div class="report-card border-appointment">
+            <div>
+                <h3>Appointments</h3>
+                <p>Summary of student appointments and medical consultations for the selected period.</p>
+            </div>
+            <form action="{{ route('reports.print') }}" method="GET" target="_blank">
+                <input type="hidden" name="type" value="appointment">
+                <div class="form-group">
+                    <label>SELECT MONTH:</label>
+                    <input type="month" name="month" value="{{ date('Y-m') }}" class="input-month">
+                </div>
+                <button type="submit" class="btn-generate bg-appointment">
+                    Generate Appointment Report
+                </button>
+            </form>
+        </div>
+
     </div>
 </div>
 @endsection

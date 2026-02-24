@@ -64,9 +64,53 @@ public function update(Request $request, $id)
 
     return back()->with('success', 'Category updated successfully!');
 }
+// Para sa Export Hub Landing Page
 public function exportHub() 
 {
-    // Kahit return view muna para lang ma-check kung working ang routing
     return view('admin.reports.export-reports'); 
+}
+
+// Para sa Universal Printing System
+public function printReport(Request $request)
+{
+    $type = $request->query('type'); // mar, inventory, or appointment
+    $monthFilter = $request->input('month', date('Y-m'));
+    $year = date('Y', strtotime($monthFilter));
+    $month = date('m', strtotime($monthFilter));
+
+    $title = "";
+    $data = [];
+
+    if ($type == 'mar') {
+        $title = "MONTHLY ACCOMPLISHMENT REPORT";
+        // for categories
+        $data = \App\Models\Category::with(['medicalConditions.consultations' => function($query) use ($year, $month) {
+            $query->whereYear('consultation_date', $year)
+                  ->whereMonth('consultation_date', $month);
+        }])->get();
+    } 
+    elseif ($type == 'inventory') {
+    $title = "INVENTORY STOCK REPORT";
+    
+    // Kunin ang lahat ng items sa table na 'items'
+    $data = \App\Models\Item::all(); 
+
+    // Dahil wala kang 'consumed' column sa DB, i-inject natin ito bilang temporary data
+    $data->transform(function($item) {
+        $item->consumed = 0; // Placeholder muna dahil walang history sa table
+        $item->starting = $item->quantity; // I-assume natin na ito ang starting
+        return $item;
+    });
+}
+    elseif ($type == 'appointment') {
+    $title = "APPOINTMENT SUMMARY REPORT";
+    // for date
+    $data = \App\Models\Appointment::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get();
+}
+
+    // Siguraduhin na ang view name ay tumutugma sa ginawa mong file
+    return view('admin.reports.print-reports', compact('data', 'type', 'title', 'monthFilter'));
 }
 }

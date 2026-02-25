@@ -214,13 +214,20 @@
                                 <a href="{{ url('/admin/appointments/' . $appt->id . '/Cancelled') }}" class="btn-action btn-cancel" title="Reject" onclick="return confirm('Cancel this request?')">✕</a>
                             
                             @elseif($appt->status == 'Approved')
-                                <a href="{{ url('/admin/appointments/' . $appt->id . '/Completed') }}" 
-                                   class="btn-action btn-complete" 
-                                   title="Mark as Done" 
-                                   onclick="return confirm('Mark this appointment as completed?')">
-                                    ✅ Complete
-                                </a>
-                            @endif
+                            <a href="{{ route('walkin.index', ['student_id' => $appt->student_id]) }}" 
+                            class="btn-action btn-consult" 
+                            style="background: #0d6efd; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; margin-right: 5px;"
+                            title="Start Consultation">
+                            🔍 Consult
+                            </a>
+
+                            <a href="{{ url('/admin/appointments/' . $appt->id . '/Completed') }}" 
+                            class="btn-action btn-complete" 
+                            title="Mark as Done" 
+                            onclick="return confirm('Mark this appointment as completed?')">
+                                ✅ Complete
+                            </a>
+                        @endif
                         </td>
                     </tr>
                 @empty

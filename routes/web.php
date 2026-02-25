@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\MedicalConditionController;
 use App\Http\Controllers\ReportsController;
+use Illuminate\Support\Facades\Auth;
 
 // Root route
 Route::get('/', function () { return view('landing'); });
@@ -71,3 +72,19 @@ Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])
 
 // Route for Printing logic
 Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
+
+/// Barcode Registration Routes for Students (student side)
+Route::get('/barcode-register', [App\Http\Controllers\AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
+Route::post('/barcode-store', [App\Http\Controllers\AppointmentController::class, 'storeBarcode'])->name('barcode.store');
+Route::post('/barcode-reset', [App\Http\Controllers\AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
+
+
+/// this is for temporary log in acc for fomralization aalisin if may integration na
+Route::get('/dev-login/{id}', function($id) {
+    $user = \App\Models\User::find($id);
+    if ($user) {
+        Auth::login($user);
+        return redirect('/student/account')->with('success', 'Logged in as ' . $user->name);
+    }
+    return "User not found!";
+});

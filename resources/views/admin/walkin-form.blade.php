@@ -42,66 +42,105 @@
     <input type="hidden" name="user_role" value="{{ $student->role }}">
 
     <div class="grid-2">
-        <div>
-            <div class="card">
-                <h3>Visit Details</h3>
-                <div class="form-group">
-                    <label>Purpose of Visit / Service</label>
-                    <select name="service" class="form-control" required>
-                        <option value="" disabled selected>-- Select Service --</option>
-                        <option value="General Consultation">General Consultation</option>
-                        <option value="Medical Certificate">Medical Certificate</option>
-                        <option value="BP Monitoring">BP Monitoring</option>
-                    </select>
-                </div>
+    <div>
+        <div class="card">
+            <h3>Physical Assessment</h3>
+            
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" name="dob" class="form-control">
+            </div>
 
+            <div class="grid-2" style="margin-top: 20px;">
                 <div class="form-group">
-                    <label style="color: #8B0000;">Medical Condition (MAR Classification)</label>
-                    <select name="condition_id" class="form-control mar-required" required>
-                        <option value="" disabled selected>-- Select Diagnosis --</option>
-                        @foreach($conditions as $cond)
-                            <option value="{{ $cond->id }}">
-                                Category {{ $cond->category->code }}: {{ $cond->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <small style="color: #94a3b8; font-size: 11px;">Required to automatically update the MAR Report.</small>
+                    <label>Height (ft)</label>
+                    <input type="text" name="height" class="form-control" placeholder="5'4">
                 </div>
+                <div class="form-group">
+                    <label>Weight (lbs)</label>
+                    <input type="number" name="weight" class="form-control" placeholder="120">
+                </div>
+            </div>
 
-                <div class="grid-2" style="margin-top: 20px;">
-                    <div class="form-group">
-                        <label>Temperature (°C)</label>
-                        <input type="number" step="0.1" name="temp" class="form-control" placeholder="36.5">
-                    </div>
-                    <div class="form-group">
-                        <label>Blood Pressure</label>
-                        <input type="text" name="bp" class="form-control" placeholder="120/80">
-                    </div>
-                </div>
+            <div class="grid-2">
+                <div class="form-group">
+                 <label>Temperature (°C)</label>
+                 <input type="number" step="0.1" name="temp" class="form-control" placeholder="36.5">
+         </div>
+        <div class="form-group">
+            <label>Blood Pressure</label>
+                <input type="text" name="bp" class="form-control" placeholder="120/80">
             </div>
         </div>
 
-        <div>
-            <div class="card">
-                <h3>Medicine Dispensing</h3>
-                <div class="form-group">
-                    <label>Select Medicine (Inventory)</label>
-                    <select name="item_id" class="form-control">
-                        <option value="">-- No Medicine Issued --</option>
-                        @foreach($items as $item)
-                            <option value="{{ $item->id }}" {{ $item->quantity <= 0 ? 'disabled' : '' }}>
-                                {{ $item->name }} (Available: {{ $item->quantity }})
-                            </option>
-                        @endforeach
-                    </select>
+<div class="grid-2" style="margin-top: 10px;"> <div class="form-group">
+        <label>Pulse Rate (bpm)</label>
+        <input type="number" name="pr" class="form-control" placeholder="72">
+    </div>
+    <div class="form-group">
+        <label>Respiratory Rate (cpm)</label>
+        <input type="number" name="rr" class="form-control" placeholder="18">
+    </div>
+</div>
+
+            <div class="form-group">
+                <label>Covid Positive?</label>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer;">Yes</button>
+                    <button type="button" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer;">No</button>
                 </div>
-                <div class="form-group">
-                    <label>Quantity to Issue</label>
-                    <input type="number" name="issued_quantity" class="form-control" min="1" placeholder="Enter amount">
-                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <h3>Visit Details</h3>
+            <div class="form-group">
+                <label>Purpose of Visit / Service</label>
+                <select name="service" class="form-control" required>
+                    <option value="" disabled selected>-- Select Service --</option>
+                    <option value="General Consultation">General Consultation</option>
+                    <option value="Medical Certificate">Medical Certificate</option>
+                    <option value="BP Monitoring">BP Monitoring</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label style="color: #8B0000;">Medical Condition (MAR Classification)</label>
+                <select name="condition_id" class="form-control mar-required" required>
+                    <option value="" disabled selected>-- Select Diagnosis --</option>
+                    @foreach($conditions as $cond)
+                        <option value="{{ $cond->id }}">
+                            Category {{ $cond->category->code }}: {{ $cond->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <small style="color: #94a3b8; font-size: 11px;">Required for MAR Report.</small>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Medicine Dispensing</h3>
+            <div class="form-group">
+                <label>Select Medicine (Inventory)</label>
+                <select name="item_id" class="form-control">
+                    <option value="">-- No Medicine Issued --</option>
+                    @foreach($items as $item)
+                        <option value="{{ $item->id }}" {{ $item->quantity <= 0 ? 'disabled' : '' }}>
+                            {{ $item->name }} (Available: {{ $item->quantity }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Quantity to Issue</label>
+                <input type="number" name="issued_quantity" class="form-control" min="1" placeholder="Enter amount">
             </div>
         </div>
     </div>
+</div>
 
     <div class="card">
         <h3>Clinical Findings</h3>

@@ -68,7 +68,7 @@ class AppointmentController extends Controller
             'date' => 'required|date',
             'time' => 'required',
             'service' => 'required',
-            'notes' => 'nullable|string',
+            'remarks' => 'nullable|string',
         ]);
 
         // Prevent overlapping appointments
@@ -101,48 +101,49 @@ class AppointmentController extends Controller
             ]
         );
 
-        // Create appointment
-        Appointment::create([
-            'user_id'    => $user->id,
-            'student_id' => $request->input('student_id', '2025-0000-TG-0'),
-            'name'       => $user->name,
-            'email'      => $user->email,
-            'date'       => $request->date,
-            'time'       => $request->time,
-            'service'    => $request->service,
-            'status'     => 'Pending',
-            'notes'      => $request->notes,
-        ]);
+        // Create appointment for student side
+  
+
+        $appointment = new Appointment();
+        $appointment->user_id    = $user->id;
+        $appointment->student_id = $request->input('student_id', '2025-0000-TG-0');
+        $appointment->name       = $user->name;
+        $appointment->email      = $user->email;
+        $appointment->date       = $request->date;
+        $appointment->time       = $request->time;
+        $appointment->service    = $request->service;
+        $appointment->status     = 'Pending';
+        $appointment->remarks    = $request->remarks; 
+        $appointment->user_type  = 'online';
+        $appointment->save(); // Dito lang dapat magtatapos ang command.
 
         return redirect()->back()->with('success', 'Appointment request submitted! Please wait for admin approval.');
     }
-
     // -------------------------------
     // 4. STUDENT ACCOUNT
     // -------------------------------
-    public function account()
+   public function account()
 {
-    $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+    // 1. Kunin ang logged-in user. Kung walang session, redirect sa login page.
+    $user = Auth::user();
 
     if (!$user) {
-        $user = User::create([
-            'first_name' => 'Guest',
-            'last_name' => 'Student',
-            'name' => 'Guest Student',
-            'email' => 'guest@pup.edu.ph',
-            'password' => bcrypt('password'),
-            'is_admin' => 0,
-        ]);
+        // Imbis na gumawa ng guest, force login natin para stable ang testing
+        return redirect('/login-as-student')->with('error', 'Please login first.');
     }
 
-    $appointments = Appointment::where('user_id', $user->id)->get();
+    // 2. Kunin ang appointments ng SPECIFIC user na naka-login
+    $appointments = Appointment::where('user_id', $user->id)
+                                ->orderBy('updated_at', 'desc')
+                                ->get();
 
-    $pendingCount = $appointments->where('status', 'Pending')->count();
-    $approvedCount = $appointments->where('status', 'Approved')->count();
+    // 3. Stats calculation
+    $pendingCount   = $appointments->where('status', 'Pending')->count();
+    $approvedCount  = $appointments->where('status', 'Approved')->count();
     $completedCount = $appointments->where('status', 'Completed')->count();
     $cancelledCount = $appointments->where('status', 'Cancelled')->count();
 
-    // --- Notifications ---
+    // 4. Notification Logic
     $notifications = [];
     foreach ($appointments as $appt) {
         $timeAgo = $appt->updated_at ? $appt->updated_at->diffForHumans() : 'Just now';
@@ -150,24 +151,32 @@ class AppointmentController extends Controller
 
         if ($appt->status == 'Approved') {
             $notifications[] = [
-                'type' => 'success',
-                'icon' => '✅',
+                'type'    => 'success',
+                'icon'    => '✅',
                 'message' => "Your {$appt->service} on {$dateStr} has been APPROVED.",
-                'time' => $timeAgo
+                'time'    => $timeAgo
             ];
         } elseif ($appt->status == 'Cancelled') {
             $notifications[] = [
-                'type' => 'danger',
-                'icon' => '❌',
+                'type'    => 'danger',
+                'icon'    => '❌',
                 'message' => "Your {$appt->service} on {$dateStr} was CANCELLED.",
-                'time' => $timeAgo
+                'time'    => $timeAgo
             ];
         }
     }
+    
     $notifications = collect($notifications);
 
+    // 5. I-return ang view kasama ang totoong User data mula sa database
     return view('student.account', compact(
-        'user', 'appointments', 'pendingCount', 'approvedCount', 'completedCount', 'cancelledCount', 'notifications'
+        'user', 
+        'appointments', 
+        'pendingCount', 
+        'approvedCount', 
+        'completedCount', 
+        'cancelledCount', 
+        'notifications'
     ));
 }
 
@@ -218,22 +227,28 @@ class AppointmentController extends Controller
 
     //-------------------------------
     // 7. Update Contact
+    //wag muna galawin
 
-    public function updateContact(Request $request)
+   /*public function updateContact(Request $request)
 {
-    // 1. Get the logged-in user or guest
+    // 1. Get the logged-in user (Dahil may temp login tayo, ito na dapat ang priority)
     $user = Auth::user();
     
+    // Kung sakaling walang session, fallback sa guest (pero ideal na dapat laging may Auth::user())
     if (!$user) {
         $user = User::where('email', 'guest@pup.edu.ph')->first();
         if (!$user) {
-            return redirect()->back()->with('error', 'Guest user not found.');
+            return redirect()->back()->with('error', 'User session not found.');
         }
     }
 
     // 2. Validate the contact number
+    // Mas maganda ang 'numeric' para siguradong numero ang ilalagay nila
     $request->validate([
-        'contact_number' => 'required|string|max:20', // adjust max length if needed
+        'contact_number' => 'required|numeric|digits_between:10,13', 
+    ], [
+        'contact_number.numeric' => 'Dapat numero lamang ang ilagay sa contact number.',
+        'contact_number.digits_between' => 'Ang contact number ay dapat nasa 10 hanggang 13 digits.',
     ]);
 
     // 3. Update the contact number
@@ -242,7 +257,7 @@ class AppointmentController extends Controller
 
     return redirect()->back()->with('success', 'Contact number updated successfully.');
 }
-
+*/
 
     // -------------------------------
     // 8. APPOINTMENT HISTORY
@@ -271,96 +286,70 @@ class AppointmentController extends Controller
     }
 
     // -------------------------------
-// 9. BARCODE REGISTER PAGE
+    // 9. BARCODE REGISTER PAGE
+    // -------------------------------
+    public function barcodeRegister()
+    {
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+        return view('student.barcode-register', compact('user'));
+    }
 
     // -------------------------------
-// 9. BARCODE REGISTER PAGE
-// -------------------------------
-public function barcodeRegister()
-{
-    // Use logged-in user or temporary guest
-    $user = Auth::user() ?? User::firstOrCreate(
-        ['email' => 'guest@pup.edu.ph'],
-        [
-            'name' => 'Tero Student',
-            'email' => 'guest@pup.edu.ph',
-            'password' => bcrypt('password'),
-            'is_admin' => 0,
-            'student_id' => '2025-0000-TG-0', // temporary student ID
-        ]
-    );
-
-    // Pass user to Blade
-    return view('student.barcode-register', compact('user'));
-}
-
-
-// -------------------------------
-// SAVE BARCODE
-// -------------------------------
-public function storeBarcode(Request $request)
-{
-    // Validate that barcode is present
-    $request->validate([
-        'barcode' => 'required|string|max:255'
-    ]);
-
-    $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
-
-    if (!$user) {
-        return redirect()->back()->with('error', 'User not found!');
-    }
-
-    // Save barcode to database
-    $user->barcode = $request->barcode;
-    $user->save();
-
-    return redirect()->back()->with('success', 'Barcode registered successfully!');
-}
-
-
-// -------------------------------
-// FETCH USER USING STUDENT ID
-// -------------------------------
-public function fetchUser($student_id)
-{
-    $user = User::where('student_id', $student_id)->first();
-
-    if ($user) {
-        return response()->json([
-            'success' => true,
-            'name' => $user->name,
-            'student_id' => $user->student_id,
-            'barcode' => $user->barcode
+    // SAVE BARCODE
+    // -------------------------------
+    public function storeBarcode(Request $request)
+    {
+        // Mas safe itong validation para hindi mag-crash ang app kung may duplicate
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+        
+        $request->validate([
+            'barcode' => 'required|string|max:255|unique:users,barcode,' . $user->id
         ]);
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found!');
+        }
+
+        $user->barcode = $request->barcode;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Barcode registered successfully!');
     }
 
-    return response()->json([
-        'success' => false
-    ]);
-}
+    // -------------------------------
+    // FETCH USER USING STUDENT ID (Bridge for Walk-in)
+    // -------------------------------
+    public function fetchUser($student_id)
+    {
+        $user = User::where('student_id', $student_id)->first();
 
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'name' => $user->name,
+                'student_id' => $user->student_id,
+                'barcode' => $user->barcode
+            ]);
+        }
 
-/////
-
-// -------------------------------
-// RESET BARCODE (for testing)
-// -------------------------------
-public function resetBarcode()
-{
-    // Get current student or guest
-    $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
-
-    if (!$user) {
-        return redirect()->back()->with('error', 'User not found.');
+        return response()->json(['success' => false]);
     }
 
-    // Clear barcode
-    $user->barcode = null;
-    $user->save();
+    // -------------------------------
+    // RESET BARCODE (for testing)
+    // -------------------------------
+    public function resetBarcode()
+    {
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
 
-    return redirect()->back()->with('success', 'Barcode reset successfully! You can scan again.');
-}
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
 
+        $user->barcode = null;
+        $user->save();
 
-}
+        return redirect()->back()->with('success', 'Barcode reset successfully! You can scan again.');
+    }
+} 
+

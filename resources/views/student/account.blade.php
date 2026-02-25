@@ -4,8 +4,6 @@
 
 @push('styles')
 <style>
-    /* ... (Your existing styles remain unchanged) ... */
-    
     /* --- HERO PROFILE SECTION --- */
     .profile-hero {
         background: linear-gradient(135deg, #8B0000 0%, #5a0f15 100%);
@@ -86,16 +84,16 @@
         margin-bottom: 16px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         border: 1px solid #f1f5f9;
-        border-left: 5px solid #cbd5e1; /* Default Gray Border */
+        border-left: 5px solid #cbd5e1;
         transition: transform 0.2s;
     }
     .appt-card:hover { transform: translateY(-3px); }
 
     /* Status Colors */
-    .appt-card.approved { border-left-color: #10b981; } /* Green */
-    .appt-card.pending { border-left-color: #f59e0b; }  /* Orange */
-    .appt-card.cancelled { border-left-color: #ef4444; } /* Red */
-    .appt-card.completed { border-left-color: #3b82f6; } /* Blue */
+    .appt-card.approved { border-left-color: #10b981; }
+    .appt-card.pending { border-left-color: #f59e0b; }
+    .appt-card.cancelled { border-left-color: #ef4444; }
+    .appt-card.completed { border-left-color: #3b82f6; }
 
     .appt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
     .appt-service { font-size: 18px; font-weight: 700; color: #334155; }
@@ -173,6 +171,31 @@
     .notif-text { font-size: 13px; color: #334155; line-height: 1.4; }
     .notif-time { display: block; font-size: 11px; color: #94a3b8; margin-top: 4px; }
 
+    /* --- BARCODE WIDGET --- */
+    .barcode-status-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .barcode-status-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+    }
+    .barcode-status-card.linked::before { background: #10b981; }
+    .barcode-status-card.not-linked::before { background: #f59e0b; }
+
+    .barcode-icon-box { font-size: 24px; margin-bottom: 10px; }
+    .barcode-label { font-size: 11px; text-transform: uppercase; font-weight: 800; color: #64748b; letter-spacing: 0.5px; }
+    .barcode-value { font-size: 16px; font-weight: 700; color: #1e293b; display: block; margin: 4px 0; }
+    .btn-barcode-action { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700; text-decoration: none; color: #8B0000; }
+    .btn-barcode-action:hover { text-decoration: underline; }
+
     @media (max-width: 900px) {
         .account-layout { grid-template-columns: 1fr; }
         .hero-stats { gap: 20px; flex-wrap: wrap; }
@@ -196,42 +219,40 @@
     @endif
 
     <div class="profile-hero">
-        <div class="hero-avatar">AT</div>
+        <div class="hero-avatar">
+            {{ strtoupper(substr($user->name, 0, 1)) }}
+        </div>
         <div class="hero-info">
             <h1 class="hero-name">{{ $user->name }} <span class="hero-badge">Active</span></h1>
-            <div class="hero-course">2025-00001-TG-0 • BSIT / 2nd Year</div>
+            <div class="hero-course">
+                {{ $user->student_id }} • {{ $user->course ?? 'BS Information Technology' }}
+            </div>
             
             <div class="hero-stats">
                 <div class="stat-item">
                     <span class="stat-val">{{ $pendingCount ?? 0 }}</span>
                     <span class="stat-label">Pending</span>
                 </div>
-
                 <div class="stat-item">
                     <span class="stat-val">{{ $approvedCount ?? 0 }}</span>
                     <span class="stat-label">Approved</span>
                 </div>
-                
                 <div class="stat-item">
                     <span class="stat-val">{{ $completedCount ?? 0 }}</span>
                     <span class="stat-label">Completed</span>
                 </div>
-                
                 <div class="stat-item">
                     <span class="stat-val">{{ $cancelledCount ?? 0 }}</span>
                     <span class="stat-label">Cancelled</span>
                 </div>
             </div>
-
         </div>
     </div>
 
     <div class="account-layout">
         
         <div>
-            <div class="section-title">
-                My Appointment History
-            </div>
+            <div class="section-title">My Appointment History</div>
 
             @forelse($appointments as $appt)
                 <div class="appt-card {{ strtolower($appt->status) }}">
@@ -243,9 +264,9 @@
                         </div>
                     </div>
                     
-                    @if($appt->notes)
+                    @if($appt->remarks) {{-- Ginagamit ang remarks field mula sa booking --}}
                         <div class="appt-notes">
-                            "{{ $appt->notes }}"
+                            "{{ $appt->remarks }}"
                         </div>
                     @endif
 
@@ -259,16 +280,26 @@
                     <div style="color: #64748b; font-weight: 600;">No appointment history found.</div>
                 </div>
             @endforelse
-
         </div>
-
+    
         <div>
+            <div class="barcode-status-card {{ $user->barcode ? 'linked' : 'not-linked' }}">
+                <div class="barcode-label">Clinic ID Link Status</div>
+                
+                @if($user->barcode)
+                    <div class="barcode-icon-box">✅</div>
+                    <span class="barcode-value">{{ $user->barcode }}</span>
+                    <p style="font-size: 12px; color: #64748b; margin: 0;">Your account is ready for clinic walk-ins.</p>
+                @else
+                    <div class="barcode-icon-box">⚠️</div>
+                    <span class="barcode-value" style="color: #b45309;">Not Yet Linked</span>
+                    <p style="font-size: 12px; color: #64748b; margin: 0;">Scan your physical ID to enable quick clinic check-ins.</p>
+                    <a href="{{ route('barcode.register') }}" class="btn-barcode-action">Register Barcode Now →</a>
+                @endif
+            </div>
             
             <div class="widget-card">
-                <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">
-                    Notifications
-                </div>
-                
+                <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Notifications</div>
                 @forelse($notifications as $notif)
                     <div class="notif-item">
                         <div class="notif-icon">{{ $notif['icon'] }}</div>
@@ -278,20 +309,15 @@
                         </div>
                     </div>
                 @empty
-                    <div style="font-size: 14px; color: #64748b; text-align: center; padding: 20px 0;">
-                        No new notifications.
-                    </div>
+                    <div style="font-size: 14px; color: #64748b; text-align: center; padding: 20px 0;">No new notifications.</div>
                 @endforelse
             </div>
 
             <div class="widget-card">
-                <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">
-                    Profile Details
-                </div>
+                <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Profile Details</div>
                 
                 <form action="{{ url('/student/update-contact') }}" method="POST">
                     @csrf
-                    
                     <label class="input-label">Full Name</label>
                     <div class="input-wrapper">
                         <input type="text" class="form-control" value="{{ $user->name }}" disabled>
@@ -304,20 +330,19 @@
 
                     <label class="input-label">Email Address</label>
                     <div class="input-wrapper">
-                        <input type="email" class="form-control" value="juan@iskolar.pup.edu.ph" disabled>
+                        <input type="email" class="form-control" value="{{ $user->email }}" disabled>
                     </div>
 
-                    <label class="input-label">Contact Number (Editable)</label>
+                     <label class="input-label">Contact Number (Editable)</label>
                     <div class="input-wrapper">
-                        <input type="text" name="contact_number" class="form-control" value="09123456789" required>
+                     
+                        <input type="text" class="form-control" value="09123456789" disabled>
+                        <small style="color: #64748b; font-size: 11px;">Editing is currently disabled.</small>
                     </div>
 
-                    <button type="submit" class="btn-save">Update Contact Info</button>
                 </form>
             </div>
-
         </div>
-
     </div>
 </div>
 @endsection

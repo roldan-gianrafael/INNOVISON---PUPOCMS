@@ -192,16 +192,16 @@
                         </td>
                         <td>
                             <button class="btn-action btn-view" title="View Details"
-                                    onclick="openInfoModal(
-                                        '{{ $appt->name }}', 
-                                        '{{ $appt->service }}', 
-                                        '{{ $appt->date }}', 
-                                        '{{ $appt->time }}', 
-                                        '{{ $appt->notes }}', 
-                                        '{{ $appt->email }}'
-                                    )">
-                                View
-                            </button>
+        onclick="openInfoModal(
+            '{{ $appt->name }}', 
+            '{{ $appt->service }}', 
+            '{{ $appt->date }}', 
+            '{{ $appt->time }}', 
+            '{{ $appt->remarks}}', 
+            '{{ $appt->email }}'
+        )">
+    View
+</button>
 
                             @if($appt->status == 'Pending')
                                 <a href="{{ url('/admin/appointments/' . $appt->id . '/Approved') }}" class="btn-action btn-approve" title="Approve" onclick="return confirm('Approve this appointment?')">✓</a>
@@ -294,11 +294,11 @@
 @push('scripts')
 <script>
     // --- 1. VIEW INFO MODAL LOGIC ---
-    function openInfoModal(name, service, date, time, notes, email) {
+    function openInfoModal(name, service, date, time, remarks, email) {
         document.getElementById('mName').innerText = name;
         document.getElementById('mService').innerText = service;
         document.getElementById('mDateTime').innerText = date + ' at ' + time;
-        document.getElementById('mNotes').innerText = notes;
+        document.getElementById('mNotes').innerText = remarks;
         document.getElementById('mEmail').innerText = email;
         
         document.getElementById('infoModal').style.display = 'flex';

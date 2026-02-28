@@ -1,6 +1,6 @@
 <div style="padding: 50px; text-align: center; font-family: sans-serif;">
     <h2>Clinic System: Temporary Login</h2>
-    <p>Piliin ang account na gagamitin para sa testing:</p>
+    <p>ito yong link http://localhost:8000/dev-login/1</p>
     
     @foreach(\App\Models\User::where('is_admin', 0)->get() as $student)
         <a href="/dev-login/{{ $student->id }}" 

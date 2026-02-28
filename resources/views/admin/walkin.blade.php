@@ -2,8 +2,8 @@
 @section('title', 'Walk-in Management')
 
 @push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    /* Ginaya ang styling sa Student Barcode Register */
     .notification-toast {
         position: fixed; top: 25px; right: 25px;
         background: #15803d; color: white; padding: 15px 20px;
@@ -14,20 +14,46 @@
     }
     .btn-toast-action {
         background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.4);
-        color: white; padding: 6px 14px; border-radius: 6px;
-        font-size: 12px; font-weight: 700; cursor: pointer;
+        color: white; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;
     }
-    .toast-close-x { background: transparent; border: none; color: white; font-size: 22px; cursor: pointer; }
-    
-    .form-control { display: block; width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; transition: 0.3s; }
-    .form-control:focus { border-color: #8B0000; outline: none; box-shadow: 0 0 0 3px rgba(139,0,0,0.1); }
 
-    @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes scan-animation { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+    .mode-header {
+        padding: 20px; color: white; display: flex; align-items: center;
+        justify-content: center; gap: 12px; border-radius: 12px 12px 0 0;
+        margin: -25px -25px 25px -25px;
+        transition: background 0.4s ease;
+    }
+    .bg-scan { background: #8B0000; }
+    .bg-register { background: #334155; }
+
+    .scanner-box {
+        width: 100% !important; max-width: 480px; aspect-ratio: 16 / 9;
+        margin: 0 auto; background: #1a1a1a; border: 2px dashed #cbd5e1;
+        border-radius: 12px; overflow: hidden; position: relative;
+    }
+    .scanner-box video { object-fit: cover !important; }
+
+    .scan-line-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+        background: rgba(255, 255, 255, 0.6); z-index: 10;
+        box-shadow: 0 0 10px white;
+        animation: scan-animation 2s linear infinite;
+    }
+
+    .form-control { display: block; width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px; }
+    
+    /* Password Toggle Styling Fix */
+    .password-wrapper { position: relative; width: 100%; margin-bottom: 10px; }
+    .password-wrapper .form-control { margin-bottom: 0; padding-right: 45px; }
+    .password-toggle {
+        position: absolute; right: 15px; top: 50%;
+        transform: translateY(-50%);
+        color: #64748b; cursor: pointer; z-index: 10;
+        font-size: 1.1rem;
+    }
 
     #scan-loading {
-        display: none; position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
+        display: none; position: absolute; inset: 0;
         background: rgba(255, 255, 255, 0.9); z-index: 20;
         flex-direction: column; justify-content: center; align-items: center;
         border-radius: 12px;
@@ -37,12 +63,10 @@
         border-top: 4px solid #8B0000; border-radius: 50%;
         animation: spin 1s linear infinite;
     }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Ginawang rectangle ang focus area ng scanner */
-    #readerScan video, #readerRegister video {
-        object-fit: cover !important;
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes scan-animation { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+    @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 </style>
 @endpush
 
@@ -51,81 +75,113 @@
 @if(session('consultation_done'))
 <div id="successToast" class="notification-toast">
     <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 20px;">✅</span>
+        <span>✅</span>
         <div>
             <strong style="display: block; font-size: 14px;">Consultation Done!</strong>
-            <span style="font-size: 12px; opacity: 0.9;">Record saved and inventory updated.</span>
+            <span style="font-size: 11px; opacity: 0.9;">Record saved successfully.</span>
         </div>
     </div>
-    <div style="display: flex; gap: 8px; align-items: center; margin-left: 20px;">
-        <button onclick="closeToastAndScan()" class="btn-toast-action">New Appointment</button>
-        <button onclick="closeToast()" class="toast-close-x">&times;</button>
-    </div>
+    <button onclick="location.href='/admin/walkin'" class="btn-toast-action">Scan Again</button>
 </div>
 @endif
 
-<div class="card p-4">
-    <h3 class="text-center" style="color:#8B0000; margin-bottom: 20px;">Walk-in Management</h3>
-
-    <div class="text-center mt-3" style="margin-bottom: 30px;">
-        <button type="button" id="btnScan" class="btn-save" style="padding:10px 25px; margin-right:10px; background:#8B0000; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
-            📷 Scan Student/User
-        </button>
-        <button type="button" id="btnRegister" class="btn-edit" style="padding:10px 25px; background:#e2e8f0; color:#334155; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
-            📝 Register New User
-        </button>
+<div class="card p-4 shadow-sm" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
+    
+    <div id="dynamicHeader" class="mode-header bg-scan">
+        <span id="headerIcon" style="font-size: 24px;">📷</span>
+        <h3 id="headerTitle" style="margin: 0; font-weight: 700; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
+            Scanner Ready
+        </h3>
     </div>
 
-    <div id="scanForm" style="display:none; margin-top:20px;">
-        <div id="scanner-container-scan" style="position: relative; max-width:500px; margin:20px auto;">
+    <div id="scanForm">
+        <div id="scanner-container-scan" style="position: relative;">
             <div id="scan-loading">
                 <div class="spinner"></div>
-                <p style="margin-top:10px; color:#8B0000; font-weight:bold;">Checking Database...</p>
+                <p style="margin-top:10px; color:#8B0000; font-weight:bold; font-size: 12px;">Verifying...</p>
             </div>
-
-            <div id="readerScan" style="width:100%; border: 2px dashed #cbd5e1; border-radius:12px; overflow:hidden; background: #f8fafc;"></div>
-            <div id="scan-line" style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: rgba(139, 0, 0, 0.5); z-index: 5; animation: scan-animation 2s linear infinite;"></div>
+            <div id="readerScan" class="scanner-box">
+                <div class="scan-line-overlay"></div>
+            </div>
         </div>
         
         <div class="text-center mt-3">
-            <button type="button" id="btnShowManual" style="background:none; border:none; color:#8B0000; text-decoration:underline; cursor:pointer; font-weight:600;">
-                Can't scan? Type ID Number instead
+            <button type="button" id="btnShowManual" style="background:none; border:none; color:#8B0000; text-decoration:underline; cursor:pointer; font-weight:600; font-size: 0.85rem;">
+                Type ID Number Manually
             </button>
         </div>
 
-        <div id="manualInputArea" style="display:none;" class="text-center mt-3">
-            <form id="walkinFormManual">
-                <input type="text" id="student_id_manual" placeholder="Enter Student/User ID" class="form-control" style="width:250px; display:inline-block; padding:8px;" required>
-                <button type="submit" class="btn-save" style="background:#8B0000; color:white; border:none; padding:8px 20px; border-radius:6px; margin-left:10px;">Find User</button>
+        <div id="manualInputArea" style="display:none;" class="mt-3">
+            <form id="walkinFormManual" class="d-flex gap-2">
+                <input type="text" id="student_id_manual" placeholder="Enter ID Number" class="form-control" style="margin-bottom:0;" required>
+                <button type="submit" style="background:#8B0000; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:700;">Find</button>
             </form>
+        </div>
+
+        <div class="mt-4 pt-3" style="border-top: 1px dashed #cbd5e1;">
+            <a href="{{ url('/admin/appointments') }}" class="btn w-100 py-2" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                 📅 BACK TO APPOINTMENTS LIST
+            </a>
         </div>
     </div>
 
-    <div id="registerForm" style="display:none; margin-top:20px;">
-        <div id="scanner-container-register" style="position: relative; max-width:500px; margin:20px auto; display:none;">
-            <div id="readerRegister" style="width:100%; border: 2px dashed #cbd5e1; border-radius:12px; overflow:hidden;"></div>
-        </div>
-        <form id="formRegisterStudent" method="POST" class="text-center mt-3">
+    <div id="registerForm" style="display:none;">
+        <form id="formRegisterStudent">
             @csrf
-            <button type="button" id="startRegisterScanner" style="padding:10px 20px; margin-bottom:15px; cursor:pointer; background:#333; color:white; border:none; border-radius:8px; font-weight:600;">📷 Scan Barcode for Registration</button><br>
             
-            <select name="user_type" id="reg_user_type" class="form-control" style="width:300px; margin:10px auto;" required>
-                <option value="" disabled selected>Select User Type</option>
-                <option value="Student">Student</option>
-                <option value="Faculty">Faculty</option>
-                <option value="Admin">Admin</option>
-                <option value="Dependent">Dependent</option>
-            </select>
+            <div id="registerScannerContainer" style="display:none;">
+                <div id="readerRegister" class="scanner-box mb-2">
+                    <div class="scan-line-overlay" style="background: rgba(255, 255, 255, 0.6);"></div>
+                </div>
+                <p class="text-center text-muted mb-3" style="font-size: 11px;">Scan barcode now</p>
+            </div>
+
+            <div class="mb-3">
+                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Barcode / ID Number</label>
+                <div class="d-flex gap-2">
+                    <input type="text" id="reg_student_id" class="form-control mb-0" style="background: #f1f5f9; font-weight: bold; border: 2px solid #cbd5e1;" readonly>
+                    <input type="hidden" id="reg_barcode"> 
+                    <button type="button" id="btnRescan" class="btn btn-secondary" style="border-radius: 8px; font-size: 12px; white-space: nowrap;">🔄 Rescan</button>
+                </div>
+            </div>
             
-            <input type="text" name="student_id" id="reg_student_id" placeholder="ID Number" class="form-control" style="width:300px; margin:10px auto;" required>
-            <input type="text" name="first_name" id="reg_first_name" placeholder="First Name" class="form-control" style="width:300px; margin:10px auto;" required>
-            <input type="text" name="last_name" id="reg_last_name" placeholder="Last Name" class="form-control" style="width:300px; margin:10px auto;" required>
-            <input type="email" name="email" id="reg_email" placeholder="Email" class="form-control" style="width:300px; margin:10px auto;" required>
-            <input type="password" name="password" id="reg_password" placeholder="Password (Initial)" class="form-control" style="width:300px; margin:10px auto;" required>
-            <input type="text" name="barcode" id="reg_barcode" placeholder="Scanned Barcode Value" class="form-control" style="width:300px; margin:10px auto; background:#f1f5f9;" readonly>
+            <div class="mb-2">
+                <label style="font-size: 11px; font-weight: 700; color: #475569;">SELECT USER ROLE</label>
+                <select id="reg_user_type" class="form-control" required>
+                    <option value="" disabled selected>-- Choose Role --</option>
+                    <option value="Student">Student</option>
+                    <option value="Faculty">Faculty</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Dependent">Dependent</option>
+                </select>
+            </div>
             
-            <div id="notification" style="margin-top:10px;"></div>
-            <button type="button" id="confirmBtn" style="padding:12px 25px; margin-top:10px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; width:300px;">Confirm & Open Consultation</button>
+            <div class="d-flex gap-2">
+                <input type="text" id="reg_first_name" placeholder="First Name" class="form-control" required>
+                <input type="text" id="reg_last_name" placeholder="Last Name" class="form-control" required>
+            </div>
+            
+            <input type="email" id="reg_email" placeholder="Email Address" class="form-control" required>
+            
+            <div class="password-wrapper">
+                <input type="password" id="reg_password" placeholder="Initial Password" class="form-control" required>
+                <i class="fa-solid fa-eye password-toggle" onclick="togglePass('reg_password', this)"></i>
+            </div>
+
+            <div class="password-wrapper">
+                <input type="password" id="reg_password_confirmation" placeholder="Confirm Password" class="form-control" required>
+                <i class="fa-solid fa-eye password-toggle" onclick="togglePass('reg_password_confirmation', this)"></i>
+            </div>
+            
+            <div id="notification" style="margin: 10px 0;"></div>
+            
+            <button type="button" id="confirmBtn" class="btn btn-success w-100 fw-bold py-3 mt-2" style="border-radius: 8px; background: #15803d; border: none; color: white;">
+                CONFIRM REGISTRATION
+            </button>
+            
+            <div class="text-center mt-3">
+                <a href="javascript:location.reload()" style="font-size: 12px; color: #64748b; text-decoration: none;">Cancel and back to scan</a>
+            </div>
         </form>
     </div>
 </div>
@@ -135,131 +191,139 @@
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
-    const isConsultationDone = "{{ session('consultation_done') ? 'true' : 'false' }}";
+    let mainScanner;
+    let registerScanner;
 
-    function closeToast() {
-        const toast = document.getElementById('successToast');
-        if(toast) toast.style.display = 'none';
+    // Show/Hide Password Logic
+    function togglePass(id, icon) {
+        const input = document.getElementById(id);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
     }
 
-    function closeToastAndScan() {
-        closeToast();
-        document.getElementById('btnScan').click();
-    }
+    $(document).ready(function() {
+        startMainScanner();
 
-    document.addEventListener('DOMContentLoaded', () => {
-        if (isConsultationDone === 'true') setTimeout(closeToast, 7000);
-
-        const btnScan = document.getElementById('btnScan');
-        const btnRegister = document.getElementById('btnRegister');
-        const scanForm = document.getElementById('scanForm');
-        const registerForm = document.getElementById('registerForm');
-        const manualInputArea = document.getElementById('manualInputArea');
-
-        btnScan.addEventListener('click', () => { 
-            scanForm.style.display = 'block'; 
-            registerForm.style.display = 'none'; 
-            startScanner();
-        });
-
-        btnRegister.addEventListener('click', () => { 
-            registerForm.style.display = 'block'; 
-            scanForm.style.display = 'none'; 
-            if(html5QrcodeScannerScan) {
-                html5QrcodeScannerScan.stop().then(() => { html5QrcodeScannerScan = null; });
-            }
-        });
-
-        document.getElementById('btnShowManual').addEventListener('click', () => {
-            manualInputArea.style.display = manualInputArea.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // --- SCANNER FOR WALK-IN (STUDENT SIZE SETTINGS) ---
-        let html5QrcodeScannerScan;
-        function startScanner() {
-            if (!html5QrcodeScannerScan) {
-                html5QrcodeScannerScan = new Html5Qrcode("readerScan");
-                html5QrcodeScannerScan.start(
+        function startMainScanner() {
+            if (!mainScanner) {
+                mainScanner = new Html5Qrcode("readerScan");
+                mainScanner.start(
                     { facingMode: "environment" },
-                    { 
-                        fps: 10, 
-                        qrbox: { width: 400, height: 150 }, // GINAYANG RECTANGLE SIZE
-                        aspectRatio: 1.777778 
-                    },
-                    (decodedText) => {
-                        fetchStudent(decodedText);
-                    }
-                ).catch(err => console.log(err));
+                    { fps: 20, qrbox: { width: 400, height: 160 }, aspectRatio: 1.777778 },
+                    (decodedText) => { verifyUser(decodedText); }
+                ).catch(err => console.warn(err));
             }
         }
 
-        function fetchStudent(scannedValue) {
-            document.getElementById('scan-loading').style.display = 'flex';
-            $.get("{{ route('walkin.getStudent') }}", { student_id: scannedValue }, function(res) {
-                document.getElementById('scan-loading').style.display = 'none';
+        function verifyUser(id) {
+            $('#scan-loading').css('display', 'flex');
+            $.get("{{ route('walkin.getStudent') }}", { student_id: id }, function(res) {
+                $('#scan-loading').hide();
                 if (res.status === 'found') {
                     window.location.href = res.redirect_url;
                 } else {
-                    alert("User not found. Switching to registration...");
-                    scanForm.style.display = 'none';
-                    registerForm.style.display = 'block';
-                    document.getElementById('reg_barcode').value = scannedValue;
-                    document.getElementById('reg_student_id').value = scannedValue;
-                    if(html5QrcodeScannerScan) {
-                        html5QrcodeScannerScan.stop().then(() => { html5QrcodeScannerScan = null; });
-                    }
-                }
-            });
-        }
-
-        document.getElementById('walkinFormManual').addEventListener('submit', function(e) {
-            e.preventDefault();
-            fetchStudent(document.getElementById('student_id_manual').value);
-        });
-
-        // --- SCANNER FOR REGISTRATION (STUDENT SIZE SETTINGS) ---
-        let html5QrcodeScannerRegister;
-        document.getElementById('startRegisterScanner').addEventListener('click', () => {
-            document.getElementById('scanner-container-register').style.display = 'block';
-            if (!html5QrcodeScannerRegister) {
-                html5QrcodeScannerRegister = new Html5Qrcode("readerRegister");
-                html5QrcodeScannerRegister.start(
-                    { facingMode: "environment" },
-                    { 
-                        fps: 10, 
-                        qrbox: { width: 400, height: 150 }, // GINAYANG RECTANGLE SIZE
-                        aspectRatio: 1.777778
-                    },
-                    (decodedText) => {
-                        document.getElementById('reg_barcode').value = decodedText;
-                        document.getElementById('reg_student_id').value = decodedText;
-                        html5QrcodeScannerRegister.stop().then(() => {
-                            html5QrcodeScannerRegister = null;
-                            document.getElementById('scanner-container-register').style.display = 'none';
-                            document.getElementById('notification').innerHTML = "<span style='color:green; font-weight:bold;'>✅ Barcode Scanned!</span>";
+                    if(mainScanner) {
+                        mainScanner.stop().then(() => {
+                            mainScanner = null;
+                            if (confirm("User ID: " + id + " not found. Register?")) {
+                                showRegisterUI(id);
+                            } else { window.location.reload(); }
                         });
                     }
-                );
+                }
+            }).fail(() => { $('#scan-loading').hide(); });
+        }
+
+        function showRegisterUI(scannedId = '') {
+            $('#scanForm').hide();
+            $('#registerForm').show();
+            $('#dynamicHeader').removeClass('bg-scan').addClass('bg-register');
+            $('#headerTitle').text('New User Registration');
+            $('#headerIcon').text('📝');
+            if(scannedId) {
+                $('#reg_barcode').val(scannedId);
+                $('#reg_student_id').val(scannedId);
+                $('#registerScannerContainer').hide();
+            } else {
+                $('#registerScannerContainer').show();
+                startRegisterScanner();
             }
+        }
+
+        function startRegisterScanner() {
+            if (!registerScanner) {
+                registerScanner = new Html5Qrcode("readerRegister");
+                registerScanner.start(
+                    { facingMode: "environment" },
+                    { fps: 20, qrbox: { width: 400, height: 160 }, aspectRatio: 1.777778 },
+                    (decodedText) => {
+                        $('#reg_barcode').val(decodedText);
+                        $('#reg_student_id').val(decodedText);
+                        $('#registerScannerContainer').slideUp();
+                        if(registerScanner) {
+                            registerScanner.stop().then(() => { registerScanner = null; });
+                        }
+                    }
+                ).catch(err => console.warn(err));
+            }
+        }
+
+        $('#btnRescan').on('click', function() {
+            $('#registerScannerContainer').slideDown();
+            startRegisterScanner();
         });
 
-        document.getElementById('confirmBtn').addEventListener('click', () => {
+        $('#btnShowManual').on('click', function() {
+            $('#manualInputArea').toggle();
+        });
+
+        $('#walkinFormManual').on('submit', function(e) {
+            e.preventDefault();
+            verifyUser($('#student_id_manual').val());
+        });
+
+        $('#confirmBtn').on('click', function() {
+            const role = $('#reg_user_type').val();
+            const pass = $('#reg_password').val();
+            const confirmPass = $('#reg_password_confirmation').val();
+
+            if(!role) { alert("Please select a User Role!"); return; }
+            if(pass !== confirmPass) { 
+                $('#notification').html('<p style="color:red; font-size:12px; font-weight:bold;">⚠️ Passwords do not match!</p>');
+                return; 
+            }
+
+            $(this).prop('disabled', true).text('PROCESSING...');
+            
             const formData = {
                 _token: "{{ csrf_token() }}",
-                user_type: document.getElementById('reg_user_type').value,
-                student_id: document.getElementById('reg_student_id').value,
-                first_name: document.getElementById('reg_first_name').value,
-                last_name: document.getElementById('reg_last_name').value,
-                email: document.getElementById('reg_email').value,
-                password: document.getElementById('reg_password').value,
-                barcode: document.getElementById('reg_barcode').value
+                role: role,
+                user_role: role,
+                user_type: role,
+                student_id: $('#reg_student_id').val(),
+                first_name: $('#reg_first_name').val(),
+                last_name: $('#reg_last_name').val(),
+                email: $('#reg_email').val(),
+                password: pass,
+                password_confirmation: confirmPass,
+                barcode: $('#reg_barcode').val() || $('#reg_student_id').val()
             };
 
-            $.post("{{ route('walkin.registerStudent') }}", formData, function(res){
+            $.post("{{ route('walkin.registerStudent') }}", formData, function(res) {
                 if(res.redirect_url) window.location.href = res.redirect_url;
-                else location.reload();
-            }).fail(function(xhr){
-                document.getElementById('notification').innerHTML = `<span style="color:red;">${xhr.responseJSON.message || 'Error!'}</span>`;
+                else window.location.reload();
+            }).fail(function(xhr) {
+                $('#confirmBtn').prop('disabled', false).text('CONFIRM REGISTRATION');
+                let errorMsg = "Registration Failed.";
+                if(xhr.responseJSON && xhr.responseJSON.errors) {
+                    errorMsg = Object.values(xhr.responseJSON.errors)[0][0];
+                }
+                $('#notification').html(`<p style="color:red; font-size:12px; font-weight:bold; background:#fee2e2; padding:10px; border-radius:8px;">⚠️ ${errorMsg}</p>`);
             });
         });
     });

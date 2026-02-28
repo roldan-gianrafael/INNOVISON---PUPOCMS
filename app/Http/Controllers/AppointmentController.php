@@ -114,7 +114,7 @@ class AppointmentController extends Controller
         $appointment->service    = $request->service;
         $appointment->status     = 'Pending';
         $appointment->remarks    = $request->remarks; 
-        $appointment->user_type  = 'online';
+        $appointment->user_type = $request->input('user_type', 'online');
         $appointment->save(); // Dito lang dapat magtatapos ang command.
 
         return redirect()->back()->with('success', 'Appointment request submitted! Please wait for admin approval.');
@@ -168,7 +168,7 @@ class AppointmentController extends Controller
     
     $notifications = collect($notifications);
 
-    // 5. I-return ang view kasama ang totoong User data mula sa database
+    // 5. Return view user
     return view('student.account', compact(
         'user', 
         'appointments', 

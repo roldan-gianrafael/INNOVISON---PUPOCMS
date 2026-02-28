@@ -19,6 +19,27 @@
     
     /* Highlight for MAR requirement */
     .mar-required { border: 1px solid #fecaca; background-color: #fef2f2; }
+
+    .badge-source {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-left: 8px;
+}
+.source-online { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.source-walkin { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+.appt-date-info {
+    font-size: 13px;
+    color: #1e293b;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
 </style>
 @endpush
 
@@ -26,12 +47,32 @@
 
 <div class="patient-header card">
     <div>
-        <h3 style="margin-bottom: 5px;">{{ $student->first_name }} {{ $student->last_name }}</h3>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <h3 style="margin: 0;">{{ $student->first_name }} {{ $student->last_name }}</h3>
+        
+        @if($user_source == 'online' && $latestAppointment)
+            <span class="badge-source source-online">Online Appointment Found</span>
+        @else
+            <span class="badge-source source-walkin">Walk-in Patient</span>
+        @endif
+        </div>
+        
         <span class="badge-role">{{ $student->role }}</span>
         <span style="font-size: 13px; color: #64748b; margin-left: 10px;">ID: {{ $student->student_id }}</span>
+        
+        @if(($user_source ?? '') == 'online' && isset($latestAppointment))
+            <div style="margin-top: 10px;">
+                <span style="font-size: 12px; color: #64748b;">Scheduled for: </span>
+                <span class="appt-date-info">
+                    📅 {{ \Carbon\Carbon::parse($latestAppointment->date)->format('M d, Y') }} 
+                    at {{ \Carbon\Carbon::parse($latestAppointment->time)->format('g:i A') }}
+                </span>
+            </div>
+        @endif
     </div>
+
     <div style="text-align: right;">
-        <span style="display: block; font-size: 12px; color: #94a3b8;">Consultation Date</span>
+        <span style="display: block; font-size: 12px; color: #94a3b8;">Today's Consultation</span>
         <span style="font-weight: 600; color: #334155;">{{ now()->format('F d, Y') }}</span>
     </div>
 </div>
@@ -40,6 +81,7 @@
     @csrf
     <input type="hidden" name="student_id" value="{{ $student->student_id }}">
     <input type="hidden" name="user_role" value="{{ $student->role }}">
+    <input type="hidden" name="user_type" value="{{ $user_source ?? 'walkin' }}">
 
     <div class="grid-2">
     <div>
@@ -96,15 +138,38 @@
 
     <div>
         <div class="card">
-            <h3>Visit Details</h3>
+    <h3>Visit Details</h3>
+    <div class="form-group">
+    <label>{{ $user_source == 'online' ? 'Appointment Remarks' : 'Student Reason' }}</label>
+    <input type="text" 
+        name="student_reason" class="form-control" {{ $user_source == 'online' ? 'readonly' : '' }} 
+        value="{{ $latestAppointment->remarks ?? '' }}"> {{-- Kung null, blanko lang --}}
+    </div>
             <div class="form-group">
                 <label>Purpose of Visit / Service</label>
-                <select name="service" class="form-control" required>
-                    <option value="" disabled selected>-- Select Service --</option>
-                    <option value="General Consultation">General Consultation</option>
-                    <option value="Medical Certificate">Medical Certificate</option>
-                    <option value="BP Monitoring">BP Monitoring</option>
+                
+                <select class="form-control" {{ ($user_source ?? '') == 'online' ? 'disabled' : '' }} required>
+                    <option value="" disabled {{ !$latestAppointment ? 'selected' : '' }}>-- Select Service --</option>
+                    
+                    <option value="General Consultation" 
+                        {{ (isset($latestAppointment) && $latestAppointment->service == 'General Consultation') ? 'selected' : '' }}>
+                        General Consultation
+                    </option>
+                    
+                    <option value="BP Monitoring" 
+                        {{ (isset($latestAppointment) && $latestAppointment->service == 'BP Monitoring') ? 'selected' : '' }}>
+                        BP Monitoring
+                    </option>
                 </select>
+
+                @if(($user_source ?? '') == 'online')
+                    <input type="hidden" name="service" value="{{ $latestAppointment->service }}">
+                    <small style="color: #0d6efd; font-size: 11px;"><i>Service is locked based on online appointment request.</i></small>
+                @else
+                    <script>
+                        document.currentScript.parentElement.querySelector('select').setAttribute('name', 'service');
+                    </script>
+                @endif
             </div>
 
             <div class="form-group">
@@ -136,7 +201,7 @@
             </div>
             <div class="form-group">
                 <label>Quantity to Issue</label>
-                <input type="number" name="issued_quantity" class="form-control" min="1" placeholder="Enter amount">
+                <input type="number" name="issued_quantity" class="form-control" min="0" placeholder="Enter amount">
             </div>
         </div>
     </div>

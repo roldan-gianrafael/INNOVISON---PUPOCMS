@@ -176,7 +176,6 @@
                         <select name="service" class="form-control" required>
                             <option value="" disabled selected>Select a Service...</option>
                             <option value="General Consultation">General Consultation</option>
-                            <option value="Medical Certificate">Medical Certificate</option>
                             <option value="Blood Pressure Monitoring">Blood Pressure Monitoring</option>
                         </select>
                     </div>

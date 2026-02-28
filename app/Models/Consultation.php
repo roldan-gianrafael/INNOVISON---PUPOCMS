@@ -12,7 +12,7 @@ class Consultation extends Model
     use SoftDeletes;
 
     protected $fillable = [
-    'name', 'consultation_date', 'user_type', 'service', 
+    'name', 'consultation_date', 'user_type', 'user_role', 'service', 
     'medical_condition_id', 'temperature', 'medicine', 
     'medicine_quantity', 'comments'
 ];

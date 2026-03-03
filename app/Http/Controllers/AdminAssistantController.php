@@ -17,7 +17,7 @@ class AdminAssistantController extends Controller
         ]);
 
         $text = trim($validated['text']);
-        $normalized = Str::of($text)->lower()->squish()->value();
+        $normalized = Str::lower((string) preg_replace('/\s+/', ' ', $text));
 
         $intent = $this->resolveIntent($normalized);
         if ($intent !== null) {

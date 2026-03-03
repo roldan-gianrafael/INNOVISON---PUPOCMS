@@ -226,38 +226,27 @@ class AppointmentController extends Controller
     }
 
     //-------------------------------
-    // 7. Update Contact
-    //wag muna galawin
+    // 7. UPDATE CONTACT
+    //-------------------------------
+    public function updateContact(Request $request)
+    {
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
 
-   /*public function updateContact(Request $request)
-{
-    // 1. Get the logged-in user (Dahil may temp login tayo, ito na dapat ang priority)
-    $user = Auth::user();
-    
-    // Kung sakaling walang session, fallback sa guest (pero ideal na dapat laging may Auth::user())
-    if (!$user) {
-        $user = User::where('email', 'guest@pup.edu.ph')->first();
         if (!$user) {
             return redirect()->back()->with('error', 'User session not found.');
         }
+
+        $validated = $request->validate([
+            'contact_number' => ['required', 'regex:/^[0-9]{10,13}$/'],
+        ], [
+            'contact_number.regex' => 'Contact number must be 10 to 13 digits.',
+        ]);
+
+        $user->contact_number = $validated['contact_number'];
+        $user->save();
+
+        return redirect()->back()->with('success', 'Contact number updated successfully.');
     }
-
-    // 2. Validate the contact number
-    // Mas maganda ang 'numeric' para siguradong numero ang ilalagay nila
-    $request->validate([
-        'contact_number' => 'required|numeric|digits_between:10,13', 
-    ], [
-        'contact_number.numeric' => 'Dapat numero lamang ang ilagay sa contact number.',
-        'contact_number.digits_between' => 'Ang contact number ay dapat nasa 10 hanggang 13 digits.',
-    ]);
-
-    // 3. Update the contact number
-    $user->contact_number = $request->contact_number;
-    $user->save();
-
-    return redirect()->back()->with('success', 'Contact number updated successfully.');
-}
-*/
 
     // -------------------------------
     // 8. APPOINTMENT HISTORY

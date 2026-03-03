@@ -70,7 +70,7 @@
 
                 <div class="grid-2" style="margin-top: 20px;">
                     <div class="form-group">
-                        <label>Temperature (°C)</label>
+                        <label>Temperature (&deg;C)</label>
                         <input type="number" step="0.1" name="temp" class="form-control" placeholder="36.5">
                     </div>
                     <div class="form-group">

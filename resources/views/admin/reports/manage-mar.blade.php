@@ -13,15 +13,15 @@
     .mar-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155; }
     
     .manage-section { background: #fdfdfd; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 10px; }
-    .btn-save { background: #0206ff; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .btn-save { background: #70131B; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
     .form-control { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
 
     /* Modal Styles for .btn-change */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
 .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-.btn-change { background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+.btn-change { background: #8f2230; color: white; border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-right: 5px; }
 .btn-cancel { background: #e2e8f0; color: #475569; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
-.btn-filter { background: #22c55e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.btn-filter { background: #70131B; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
  </style>
 @endpush
 
@@ -29,7 +29,7 @@
 
 
 <div style="margin-bottom: 20px;">
-    <a href="{{ route('reports.mar') }}" style="text-decoration: none; color: #64748b; font-size: 14px;">← Back to MAR Report</a>
+    <a href="{{ route('reports.mar') }}" style="text-decoration: none; color: #64748b; font-size: 14px;">&larr; Back to MAR Report</a>
 </div>
 
 <div class="card manage-section">
@@ -49,7 +49,6 @@
         
         <button type="submit" class="btn-save">Add New</button>
     </form>
-<button class="btn-filter">Filter Button</button>
     <table class="mar-table">
         <thead>
             <tr>
@@ -108,7 +107,7 @@
             
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
                 <button type="button" class="btn-cancel" onclick="closeChangeModal()">Cancel</button>
-                <button type="submit" class="btn-save" style="background: #3b82f6;">Save Changes</button>
+                <button type="submit" class="btn-save">Save Changes</button>
             </div>
         </form>
     </div>

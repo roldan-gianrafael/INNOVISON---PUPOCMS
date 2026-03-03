@@ -49,7 +49,7 @@
 
     @if(session('success'))
         <div class="alert alert-success">
-            ✅ {{ session('success') }}
+            {{ session('success') }}
         </div>
     @endif
 
@@ -57,7 +57,7 @@
         <div class="alert alert-error">
             <ul>
                 @foreach ($errors->all() as $error)
-                    <li>⚠️ {{ $error }}</li>
+                    <li>{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
@@ -66,7 +66,7 @@
     <section class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3>Admin Profile</h3>
-            <button class="btn-edit" onclick="openProfileModal()">✏️ Edit Profile</button>
+            <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
         </div>
 
         <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">

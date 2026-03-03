@@ -75,7 +75,113 @@
     .badge-danger  { background: rgba(239, 68, 68, 0.2);  color: #f87171; } /* Red tint */
 
 
-    /* --- 2. RECENT ACTIVITY PANEL (Styled like the charts in reference) --- */
+    /* --- 2. STATISTICS GRAPH PANEL --- */
+    .chart-panel {
+        margin-bottom: 24px;
+    }
+
+    .chart-header {
+        margin-bottom: 16px;
+    }
+
+    .chart-title-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .chart-subtitle {
+        margin: 0;
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .chart-insight {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8B0000;
+        background: #fff1f2;
+        border: 1px solid #ffe4e6;
+        border-radius: 999px;
+        padding: 6px 12px;
+        white-space: nowrap;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .chart-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        background: #fcfcfd;
+        padding: 14px;
+    }
+
+    .chart-card-wide {
+        grid-column: span 2;
+    }
+
+    .chart-card-title {
+        margin: 0 0 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+
+    .chart-wrap {
+        position: relative;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+        padding: 12px;
+    }
+
+    .chart-large {
+        height: 320px;
+    }
+
+    .chart-small {
+        height: 260px;
+    }
+
+    .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #334155;
+    }
+
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .dot-pending { background: #8f2230; }
+    .dot-upcoming { background: #a83242; }
+    .dot-completed { background: #c15b69; }
+    .dot-cancelled { background: #5a0f16; }
+
+    /* --- 3. RECENT ACTIVITY PANEL (Styled like the charts in reference) --- */
     .panel {
         background: #fff; /* Keep white for readability of table */
         border-radius: 16px;
@@ -137,14 +243,26 @@
     .st-cancelled { background: #fee2e2; color: #b91c1c; }
 
     /* Responsive */
-    @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 1200px) {
+        .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        .charts-grid { grid-template-columns: 1fr; }
+        .chart-card-wide { grid-column: span 1; }
+    }
+    @media (max-width: 768px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .chart-large { height: 280px; }
+        .chart-small { height: 240px; }
+        .chart-insight { display: none; }
+    }
     @media (max-width: 500px) { .stats-grid { grid-template-columns: 1fr; } }
 </style>
 @endpush
 
 @section('content')
 <div class="dashboard-container">
+    @php
+        $totalAppointments = ($pending ?? 0) + ($upcoming ?? 0) + ($completed ?? 0) + ($cancelled ?? 0);
+    @endphp
 
     <div class="stats-grid">
         
@@ -190,6 +308,45 @@
 
     </div>
 
+    <div class="panel chart-panel">
+        <div class="panel-header chart-header">
+            <div class="chart-title-wrap">
+                <h3 class="panel-title">Statistics Overview</h3>
+                <p class="chart-subtitle">Current distribution of appointment statuses.</p>
+            </div>
+            <span class="chart-insight">{{ $totalAppointments }} Total Appointments</span>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card chart-card-wide">
+                <h4 class="chart-card-title">Monthly Appointments ({{ $currentYear }})</h4>
+                <div class="chart-wrap chart-large">
+                    <canvas id="monthlyBarChart" aria-label="Monthly appointment bar chart" role="img"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h4 class="chart-card-title">Monthly Completion Trend</h4>
+                <div class="chart-wrap chart-small">
+                    <canvas id="monthlyLineChart" aria-label="Monthly appointment line chart" role="img"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h4 class="chart-card-title">Status Radial Chart</h4>
+                <div class="chart-wrap chart-small">
+                    <canvas id="statusRadialChart" aria-label="Appointment status radial chart" role="img"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="legend-dot dot-pending"></span>Pending</span>
+                    <span class="legend-item"><span class="legend-dot dot-upcoming"></span>Upcoming</span>
+                    <span class="legend-item"><span class="legend-dot dot-completed"></span>Completed</span>
+                    <span class="legend-item"><span class="legend-dot dot-cancelled"></span>Cancelled</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="panel">
         <div class="panel-header">
             <h3 class="panel-title">Recent Activity</h3>
@@ -215,7 +372,7 @@
                         <td>{{ $appt->service }}</td>
                         <td>
                             {{ \Carbon\Carbon::parse($appt->date)->format('M d') }}
-                            <span style="color:#cbd5e1; margin:0 4px;">•</span>
+                            <span style="color:#cbd5e1; margin:0 4px;">&bull;</span>
                             <span style="color:#64748b; font-size:12px;">{{ \Carbon\Carbon::parse($appt->time)->format('g:i A') }}</span>
                         </td>
                         <td>
@@ -239,3 +396,191 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof Chart === 'undefined') return;
+
+        const monthLabels = @json($monthLabels ?? []);
+        const monthlyTotals = @json($monthlyTotals ?? []);
+        const monthlyCompleted = @json($monthlyCompleted ?? []);
+
+        const statusValues = [
+            Number(@json((int) ($pending ?? 0))),
+            Number(@json((int) ($upcoming ?? 0))),
+            Number(@json((int) ($completed ?? 0))),
+            Number(@json((int) ($cancelled ?? 0)))
+        ];
+
+        const monthlyBarCanvas = document.getElementById('monthlyBarChart');
+        const monthlyLineCanvas = document.getElementById('monthlyLineChart');
+        const statusRadialCanvas = document.getElementById('statusRadialChart');
+
+        if (monthlyBarCanvas) {
+            new Chart(monthlyBarCanvas, {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Total Appointments',
+                        data: monthlyTotals,
+                        backgroundColor: 'rgba(112, 19, 27, 0.72)',
+                        borderColor: '#70131B',
+                        borderWidth: 1.4,
+                        borderRadius: 10,
+                        borderSkipped: false,
+                        maxBarThickness: 36
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e5e7eb',
+                            displayColors: false,
+                            padding: 10
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#475569',
+                                font: { size: 11, weight: '600' }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                stepSize: 1,
+                                color: '#64748b'
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.25)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (monthlyLineCanvas) {
+            new Chart(monthlyLineCanvas, {
+                type: 'line',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Completed',
+                        data: monthlyCompleted,
+                        borderColor: '#8f2230',
+                        backgroundColor: 'rgba(143, 34, 48, 0.14)',
+                        borderWidth: 2.5,
+                        pointRadius: 3.5,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#8f2230',
+                        pointBorderWidth: 2,
+                        fill: true,
+                        tension: 0.35
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e5e7eb',
+                            displayColors: false,
+                            padding: 10
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#475569',
+                                font: { size: 11, weight: '600' }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                stepSize: 1,
+                                color: '#64748b'
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.25)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (statusRadialCanvas) {
+            new Chart(statusRadialCanvas, {
+                type: 'polarArea',
+                data: {
+                    labels: ['Pending', 'Upcoming', 'Completed', 'Cancelled'],
+                    datasets: [{
+                        label: 'Appointment Status',
+                        data: statusValues,
+                        backgroundColor: [
+                            'rgba(143, 34, 48, 0.78)',
+                            'rgba(168, 50, 66, 0.78)',
+                            'rgba(193, 91, 105, 0.78)',
+                            'rgba(90, 15, 22, 0.78)'
+                        ],
+                        borderColor: ['#8f2230', '#a83242', '#c15b69', '#5a0f16'],
+                        borderWidth: 1.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e5e7eb',
+                            padding: 10
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                color: '#64748b',
+                                backdropColor: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.25)'
+                            },
+                            angleLines: {
+                                color: 'rgba(148, 163, 184, 0.2)'
+                            },
+                            pointLabels: {
+                                color: '#475569',
+                                font: { size: 11, weight: '600' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+@endpush

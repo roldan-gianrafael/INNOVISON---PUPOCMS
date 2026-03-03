@@ -6,7 +6,7 @@
 @if(session('consultation_done'))
 <div id="successToast" class="notification-toast">
     <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 20px;">✅</span>
+        <span style="font-size: 20px;">OK</span>
         <div>
             <strong style="display: block; font-size: 14px;">Consultation Done!</strong>
             <span style="font-size: 12px; opacity: 0.9;">Record saved and inventory updated.</span>
@@ -24,10 +24,10 @@
 
     <div class="text-center mt-3" style="margin-bottom: 30px;">
         <button type="button" id="btnScan" class="btn-save" style="padding:10px 25px; margin-right:10px; background:#8B0000; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
-            📷 Scan Student/User
+            Scan Student/User
         </button>
         <button type="button" id="btnRegister" class="btn-edit" style="padding:10px 25px; background:#e2e8f0; color:#334155; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
-            📝 Register New User
+            Register New User
         </button>
     </div>
 
@@ -62,7 +62,7 @@
         </div>
         <form id="formRegisterStudent" method="POST" class="text-center mt-3">
             @csrf
-            <button type="button" id="startRegisterScanner" style="padding:5px 10px; margin-bottom:10px; cursor:pointer; background:#333; color:white; border:none; border-radius:4px;">📷 Scan Barcode for Registration</button><br>
+            <button type="button" id="startRegisterScanner" style="padding:5px 10px; margin-bottom:10px; cursor:pointer; background:#70131B; color:white; border:none; border-radius:4px;">Scan Barcode for Registration</button><br>
             
             <select name="user_type" id="reg_user_type" class="form-control" style="width:300px; margin:10px auto;" required>
                 <option value="" disabled selected>Select User Type</option>
@@ -81,7 +81,7 @@
             <input type="text" name="barcode" id="reg_barcode" placeholder="Scanned Barcode Value" class="form-control" style="width:300px; margin:10px auto; background:#f8fafc;" readonly>
             
             <div id="notification" style="margin-top:10px;"></div>
-            <button type="button" id="confirmBtn" style="padding:10px 25px; margin-top:10px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">Confirm & Open Consultation</button>
+            <button type="button" id="confirmBtn" style="padding:10px 25px; margin-top:10px; background:#70131B; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">Confirm & Open Consultation</button>
         </form>
     </div>
 </div>
@@ -91,7 +91,7 @@
 <style>
     .notification-toast {
         position: fixed; top: 25px; right: 25px;
-        background: #15803d; color: white; padding: 15px 20px;
+        background: #70131B; color: white; padding: 15px 20px;
         border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         z-index: 10000; display: flex; align-items: center;
         justify-content: space-between; min-width: 380px;
@@ -229,7 +229,7 @@
                         html5QrcodeScannerRegister.stop().then(() => {
                             html5QrcodeScannerRegister = null;
                             document.getElementById('scanner-container-register').style.display = 'none';
-                            document.getElementById('notification').innerHTML = "<span style='color:green;'>Barcode Scanned!</span>";
+                            document.getElementById('notification').innerHTML = "<span style='color:#70131B;'>Barcode Scanned!</span>";
                         });
                     }
                 );
@@ -253,7 +253,7 @@
                 if(res.redirect_url) window.location.href = res.redirect_url;
                 else location.reload();
             }).fail(function(xhr){
-                document.getElementById('notification').innerHTML = `<span style="color:red;">${xhr.responseJSON.message || 'Error!'}</span>`;
+                document.getElementById('notification').innerHTML = `<span style="color:#b42339;">${xhr.responseJSON.message || 'Error!'}</span>`;
             });
         });
     });

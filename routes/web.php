@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\MedicalConditionController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\AdminAssistantController;
 
 // Root route
 Route::get('/', function () { return view('landing'); });
@@ -36,6 +37,7 @@ Route::delete('/admin/inventory/{id}', [AdminController::class, 'deleteItem']);
 Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
 Route::put('/admin/settings/update', [AdminController::class, 'updateSettings']);
 Route::put('/admin/profile/update', [AdminController::class, 'updateProfile']);
+Route::post('/admin/assistant/intent', [AdminAssistantController::class, 'handle'])->name('admin.assistant.intent');
 Route::get('student/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
 Route::post('student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');
 Route::get('/fetch-user/{student_id}', [AppointmentController::class, 'fetchUser']);

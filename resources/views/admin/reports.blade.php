@@ -30,7 +30,7 @@
     }
 
     .stat-card-mini span { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; }
-    .stat-card-mini h3 { font-size: 24px; color: #1e293b; margin: 5px 0 0 0; }
+    .stat-card-mini h3 { font-size: 24px; color: #4b0f17; margin: 5px 0 0 0; }
 
     /* --- REPORT BUTTONS (Gayang-gaya sa Dashboard Stats Cards) --- */
     .report-grid {
@@ -115,17 +115,17 @@
             <span>Monthly Cases</span>
             <h3>{{ $totalConsultations ?? '0' }}</h3>
         </div>
-        <div class="stat-card-mini" style="border-left-color: #f59e0b;">
+        <div class="stat-card-mini" style="border-left-color: #70131B;">
             <span>Low Stock Items</span>
             <h3>{{ $lowStockCount ?? '0' }}</h3>
         </div>
-        <div class="stat-card-mini" style="border-left-color: #10b981;">
+        <div class="stat-card-mini" style="border-left-color: #8f2230;">
             <span>Scheduled Today</span>
             <h3>{{ $appointmentsToday ?? '0' }}</h3>
         </div>
     </div>
 
-    <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 20px; font-weight: 700;">Select Report to Generate</h2>
+    <h2 style="font-size: 18px; color: #4b0f17; margin-bottom: 20px; font-weight: 700;">Select Report to Generate</h2>
 
     <div class="report-grid">
         
@@ -165,7 +165,7 @@
 
     <div class="back-nav">
         <a href="{{ url('/admin/dashboard') }}" class="btn-back-dashboard">
-            ← Back to System Dashboard
+            &larr; Back to System Dashboard
         </a>
     </div>
 

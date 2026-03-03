@@ -24,10 +24,42 @@ class AdminController extends Controller
         $upcoming = Appointment::where('status', 'Approved')->count();
         $completed = Appointment::where('status', 'Completed')->count();
         $cancelled = Appointment::where('status', 'Cancelled')->count();
-        
+
+        $currentYear = now()->year;
+        $monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        $monthlyTotalsRaw = Appointment::selectRaw('MONTH(date) as month_num, COUNT(*) as total')
+            ->whereYear('date', $currentYear)
+            ->groupBy('month_num')
+            ->pluck('total', 'month_num');
+
+        $monthlyCompletedRaw = Appointment::selectRaw('MONTH(date) as month_num, COUNT(*) as total')
+            ->whereYear('date', $currentYear)
+            ->where('status', 'Completed')
+            ->groupBy('month_num')
+            ->pluck('total', 'month_num');
+
+        $monthlyTotals = [];
+        $monthlyCompleted = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $monthlyTotals[] = (int) ($monthlyTotalsRaw[$month] ?? 0);
+            $monthlyCompleted[] = (int) ($monthlyCompletedRaw[$month] ?? 0);
+        }
+
         $recentAppointments = Appointment::latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('total', 'pending', 'upcoming', 'completed', 'cancelled', 'recentAppointments'));
+        return view('admin.dashboard', compact(
+            'total',
+            'pending',
+            'upcoming',
+            'completed',
+            'cancelled',
+            'recentAppointments',
+            'currentYear',
+            'monthLabels',
+            'monthlyTotals',
+            'monthlyCompleted'
+        ));
     }
 
     public function appointments()

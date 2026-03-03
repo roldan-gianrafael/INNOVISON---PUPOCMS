@@ -56,20 +56,20 @@
         justify-content: center;
         margin-right: 4px;
     }
-    .btn-view { background: #f1f5f9; color: #475569; }
-    .btn-view:hover { background: #e2e8f0; color: #0f172a; }
+    .btn-view { background: #fff3f5; color: #70131B; border: 1px solid #f0d7dc; }
+    .btn-view:hover { background: #fae9ed; color: #5a0f16; }
     
-    .btn-approve { background: #dcfce7; color: #15803d; }
-    .btn-approve:hover { background: #bbf7d0; }
+    .btn-approve { background: #fbecef; color: #70131B; border: 1px solid #f3d7dd; }
+    .btn-approve:hover { background: #f7e2e7; }
 
-    .btn-reschedule { background: #fffbeb; color: #b45309; }
-    .btn-reschedule:hover { background: #fde68a; }
+    .btn-reschedule { background: #f9eef0; color: #7a1b28; border: 1px solid #f0d6dc; }
+    .btn-reschedule:hover { background: #f4dde3; }
 
     .btn-cancel { background: #fee2e2; color: #b91c1c; }
     .btn-cancel:hover { background: #fecaca; }
 
-    .btn-complete { background: #3b82f6; color: white; }
-    .btn-complete:hover { background: #2563eb; }
+    .btn-complete { background: #70131B; color: white; }
+    .btn-complete:hover { background: #5a0f16; }
 
     /* Modal Overlay */
     .modal-overlay {
@@ -151,7 +151,7 @@
 @section('content')
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="margin:0; color:#1e293b;">Appointments</h2>
+        <h2 style="margin:0; color:#4b0f17;">Appointments</h2>
         
         <input type="text" id="searchInput" placeholder="Search by name..." 
                style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 300px;">
@@ -204,21 +204,21 @@
                             </button>
 
                             @if($appt->status == 'Pending')
-                                <a href="{{ url('/admin/appointments/' . $appt->id . '/Approved') }}" class="btn-action btn-approve" title="Approve" onclick="return confirm('Approve this appointment?')">✓</a>
+                                <a href="{{ url('/admin/appointments/' . $appt->id . '/Approved') }}" class="btn-action btn-approve" title="Approve" onclick="return confirm('Approve this appointment?')">Approve</a>
                                 
                                 <button class="btn-action btn-reschedule" title="Reschedule"
                                         onclick="openRescheduleModal('{{ $appt->id }}', '{{ $appt->date }}', '{{ $appt->time }}')">
-                                    📅
+                                    Reschedule
                                 </button>
 
-                                <a href="{{ url('/admin/appointments/' . $appt->id . '/Cancelled') }}" class="btn-action btn-cancel" title="Reject" onclick="return confirm('Cancel this request?')">✕</a>
+                                <a href="{{ url('/admin/appointments/' . $appt->id . '/Cancelled') }}" class="btn-action btn-cancel" title="Reject" onclick="return confirm('Cancel this request?')">Reject</a>
                             
                             @elseif($appt->status == 'Approved')
                                 <a href="{{ url('/admin/appointments/' . $appt->id . '/Completed') }}" 
                                    class="btn-action btn-complete" 
                                    title="Mark as Done" 
                                    onclick="return confirm('Mark this appointment as completed?')">
-                                    ✅ Complete
+                                    Complete
                                 </a>
                             @endif
                         </td>
@@ -265,7 +265,7 @@
 
     <div id="rescheduleModal" class="modal-overlay">
         <div class="modal-box">
-            <h3 style="margin-top:0; color:#b45309; border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:16px;">Reschedule Appointment</h3>
+            <h3 style="margin-top:0; color:#70131B; border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:16px;">Reschedule Appointment</h3>
             
             <form id="rescheduleForm" method="POST" action="">
                 @csrf
@@ -283,7 +283,7 @@
 
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px;">
                     <button type="button" onclick="closeRescheduleModal()" style="padding: 10px 16px; background: #eee; color: #333; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
-                    <button type="submit" style="padding: 10px 16px; background: #b45309; color: white; border: none; border-radius: 6px; cursor: pointer;">Confirm New Schedule</button>
+                    <button type="submit" style="padding: 10px 16px; background: #70131B; color: white; border: none; border-radius: 6px; cursor: pointer;">Confirm New Schedule</button>
                 </div>
             </form>
         </div>

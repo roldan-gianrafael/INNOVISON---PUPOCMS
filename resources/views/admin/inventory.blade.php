@@ -29,7 +29,7 @@
 
     /* Action Buttons */
     .btn-icon { padding: 6px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; margin-right: 4px; }
-    .btn-edit { background: #e0f2fe; color: #0369a1; }
+    .btn-edit { background: #fff3f5; color: #70131B; border: 1px solid #f0d7dc; }
     .btn-delete { background: #fee2e2; color: #b91c1c; }
 
     /* Modal */
@@ -44,7 +44,7 @@
 @section('content')
 
     <div class="controls">
-        <h2 style="margin:0; color:#1e293b;">Clinic Inventory</h2>
+        <h2 style="margin:0; color:#4b0f17;">Clinic Inventory</h2>
         <button class="btn-add" onclick="openModal()">+ Add New Item</button>
     </div>
 
@@ -77,12 +77,12 @@
                         <td>
                             <button class="btn-icon btn-edit" 
                                 onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}')">
-                                ✏️
+                                Edit
                             </button>
 
                             <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="display:inline;">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn-icon btn-delete" onclick="return confirm('Delete this item?')">🗑️</button>
+                                <button type="submit" class="btn-icon btn-delete" onclick="return confirm('Delete this item?')">Delete</button>
                             </form>
                         </td>
                     </tr>

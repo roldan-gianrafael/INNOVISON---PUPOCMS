@@ -23,7 +23,7 @@
     /* CRUD Form */
     .manage-section { background: #fdfdfd; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 10px; margin-top: 40px; }
     .form-group { margin-bottom: 15px; }
-    .btn-save { background: #22c55e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+    .btn-save { background: #70131B; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
     .btn-delete { color: #ef4444; text-decoration: none; font-size: 12px; margin-left: 10px; }
 </style>
 @endpush
@@ -32,7 +32,7 @@
 
 
 
- <a href="{{ route('admin.reports') }}" style="color: #64748b; text-decoration: none;">← Back to Reports</a>
+ <a href="{{ route('admin.reports') }}" style="color: #64748b; text-decoration: none;">&larr; Back to Reports</a>
 
 
 
@@ -41,7 +41,7 @@
         <span>Total Consultations Today</span>
         <strong>{{ $totalToday ?? 0 }}</strong>
     </div>
-    <div class="stat-card" style="background: #64748b;">
+    <div class="stat-card" style="background: #8f2230;">
         <span>Current Filter Month</span>
         <strong>{{ date('F Y', strtotime($month)) }}</strong>
     </div>
@@ -50,7 +50,7 @@
 <!-- button for managing mar-->
 <a href="{{ route('admin.reports.manage-mar', ['month' => $month]) }}" 
    class="btn-filter" 
-   style="background:#334155; color:white; padding:8px 15px; border-radius:6px; text-decoration:none; font-size:14px;">
+   style="background:#70131B; color:white; padding:8px 15px; border-radius:6px; text-decoration:none; font-size:14px;">
    Manage MAR
 </a>
 <div class="card">

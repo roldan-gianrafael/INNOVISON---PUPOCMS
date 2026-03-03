@@ -4,9 +4,8 @@
 <style>
     /* Main Container */
     .export-hub-container {
-        padding: 30px;
-        background: #f8fafc;
-        min-height: 100vh;
+        padding: 14px;
+        background: transparent;
     }
 
     .hub-header {
@@ -14,7 +13,7 @@
     }
 
     .hub-header h2 {
-        color: #1e293b;
+        color: #4b0f17;
         margin: 0;
     }
 

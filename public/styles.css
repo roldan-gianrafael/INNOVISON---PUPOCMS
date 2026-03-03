@@ -12,7 +12,7 @@
 /* Base reset */
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;color:var(--text);background:linear-gradient(rgba(0,0,0,0.75),rgba(107,0,0,0.75)),url('PUPBG.jpg');background-size:cover;background-position:center;background-attachment:fixed}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;color:var(--text);background:linear-gradient(rgba(0,0,0,0.75),rgba(107,0,0,0.75)),url('/images/PUPBG.jpg');background-size:cover;background-position:center;background-attachment:fixed}
 
 /* Logo Header */
 .logo-header{background:#6B0000;padding:12px 24px;border-bottom:3px solid rgba(0,0,0,0.3);box-shadow:0 2px 8px rgba(0,0,0,0.3)}

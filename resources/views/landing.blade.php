@@ -9,7 +9,7 @@
 <body>
   <div class="logo-header">
     <div class="logo-brand">
-      <img src="{{ asset('pup_logo.png') }}" alt="PUP Logo" class="logo-icon">
+      <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="logo-icon">
       <div class="logo-text">
         <div class="logo-title">PUP TAGUIG</div>
         <div class="logo-subtitle">ONLINE CLINIC</div>

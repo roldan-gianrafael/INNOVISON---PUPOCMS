@@ -78,6 +78,12 @@
     .contact-icon { width:20px; height:20px; fill:#ffb3a9; flex:0 0 20px; margin-top:4px; }
     .footer-bottom { border-top:1px solid rgba(255,255,255,0.04); padding-top:22px; text-align:center; color:rgba(255,255,255,0.6); font-size:14px; margin-top:18px; }
 
+    /* Modal Animation */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
     /* Responsive */
     @media (max-width:900px){
         .comments-grid { grid-template-columns:repeat(2,1fr); }
@@ -92,6 +98,37 @@
 @endpush
 
 @section('content')
+    <div id="session-checker" 
+         data-has-barcode="{{ Auth::user()->barcode ? 'true' : 'false' }}" 
+         data-is-skipped="{{ session('barcode_skipped') ? 'true' : 'false' }}">
+    </div>
+
+    <div id="barcodeModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div style="background: #fff; padding: 40px; border-radius: 24px; max-width: 450px; width: 90%; text-align: center; color: #333; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: slideUp 0.4s ease-out;">
+            
+            <div style="background: #fff5f5; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                <svg style="width: 40px; height: 40px; fill: #8B0000;" viewBox="0 0 24 24">
+                    <path d="M3 5h2v14H3V5zm4 0h1v14H7V5zm3 0h3v14h-3V5zm4 0h1v14h-1V5zm3 0h2v14h-2V5zm4 0h1v14h-1V5z"/>
+                </svg>
+            </div>
+
+            <h2 style="color: #20343a; font-weight: 800; font-size: 24px; margin-bottom: 12px;">Barcode Required</h2>
+            <p style="color: #64748b; line-height: 1.6; margin-bottom: 32px; font-size: 15px;">
+                Hi <strong>{{ Auth::user()->first_name }}</strong>! It looks like your student barcode isn't registered yet. This is needed for clinic attendance and transactions.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <a href="{{ url('/student/barcode-register') }}" class="btn" style="background: #8B0000; color: #fff; padding: 14px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 16px; transition: 0.3s;">
+                    Register Barcode Now
+                </a>
+                
+                <button onclick="closeBarcodeModal()" style="background: #f1f5f9; border: none; color: #475569; font-weight: 600; cursor: pointer; padding: 12px; border-radius: 10px; font-size: 14px; transition: 0.3s;">
+                    Maybe Later (Skip)
+                </button>
+            </div>
+        </div>
+    </div>
+
     <svg style="display: none;">
       <symbol id="avatar-placeholder" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="12" fill="#e2e8f0"/>
@@ -114,20 +151,16 @@
     </section>
 
     <section id="about" class="container" style="padding: 60px 20px; text-align: center; max-width: 800px; margin: 0 auto; scroll-margin-top: 100px;">
-    
-    <h2 style="color: #20343a; font-weight: 800; margin-bottom: 16px;">Welcome to the Official PUPT Clinic</h2>
-    
-    <p style="color: #64748b; line-height: 1.8; margin-bottom: 24px;">
-        Welcome to the official website for the PUP - Taguig Branch school clinic. If you ever feel unwell,
-        you can make a consultation request here online. Additionally, you can check and evaluate all the
-        information and status related to your appointment.
-    </p>
-
-    <a href="#" style="color: #8B0000; font-weight: 700; text-decoration: none; border: 1px solid #8B0000; padding: 10px 24px; border-radius: 6px; display: inline-block; transition: 0.2s;">
-        Learn More
-    </a>
-
-</section>  
+        <h2 style="color: #20343a; font-weight: 800; margin-bottom: 16px;">Welcome to the Official PUPT Clinic</h2>
+        <p style="color: #64748b; line-height: 1.8; margin-bottom: 24px;">
+            Welcome to the official website for the PUP - Taguig Branch school clinic. If you ever feel unwell,
+            you can make a consultation request here online. Additionally, you can check and evaluate all the
+            information and status related to your appointment.
+        </p>
+        <a href="#" style="color: #8B0000; font-weight: 700; text-decoration: none; border: 1px solid #8B0000; padding: 10px 24px; border-radius: 6px; display: inline-block; transition: 0.2s;">
+            Learn More
+        </a>
+    </section>  
 
     <section class="comments-section">
       <div class="container">
@@ -172,7 +205,6 @@
     <footer class="site-footer">
       <div class="footer-top">
         <div class="container footer-grid">
-          
           <div class="footer-col footer-brand">
             <div class="brand">
               <div class="brand-logo">
@@ -239,4 +271,37 @@
         <div class="container">© 2025 PUP Taguig Online Clinic. All rights reserved.</div>
       </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get data from the hidden HTML bridge
+            const checker = document.getElementById('session-checker');
+            const hasBarcode = checker.getAttribute('data-has-barcode') === 'true';
+            const isSkipped = checker.getAttribute('data-is-skipped') === 'true';
+
+            // Logic to show modal
+            if (!hasBarcode && !isSkipped) {
+                setTimeout(() => {
+                    const modal = document.getElementById('barcodeModal');
+                    if(modal) modal.style.display = 'flex';
+                }, 1000);
+            }
+        });
+
+        function closeBarcodeModal() {
+            document.getElementById('barcodeModal').style.display = 'none';
+
+            // Send signal to Laravel to update the session
+            fetch("{{ url('/student/skip-barcode') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => console.log('Session updated:', data.status))
+            .catch(error => console.error('Error updating session:', error));
+        }
+    </script>
 @endsection

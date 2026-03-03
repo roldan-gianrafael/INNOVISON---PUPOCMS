@@ -196,9 +196,15 @@
 
      
 
-      <a href="{{ url('/') }}" style="margin-top: 40px; background: rgba(0,0,0,0.2);">
-        <span class="sidebar-icon">🚪</span> Logout
-      </a>
+      <a href="#" 
+   style="margin-top: 40px; background: rgba(0,0,0,0.2); display: block; text-decoration: none;" 
+   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+    <span class="sidebar-icon">🚪</span> Logout
+</a>
+
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
     </nav>
   </aside>
 

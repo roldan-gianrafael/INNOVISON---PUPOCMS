@@ -93,9 +93,15 @@
                     <li><a href="{{ url('/student/faq') }}" class="{{ Request::is('student/faq') ? 'active' : '' }}">FAQ</a></li>
                     
                     <li>
-                        <a href="{{ url('/') }}" class="logout-btn" style="margin-left: 15px; padding: 8px 24px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.5); color: white; border-radius: 20px; transition: 0.3s;">
+                        <a href="#" class="logout-btn" 
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                        style="margin-left: 15px; padding: 8px 24px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.5); color: white; border-radius: 20px; transition: 0.3s; cursor: pointer;">
                             Logout
                         </a>
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                     </li>
                     
                 </ul>

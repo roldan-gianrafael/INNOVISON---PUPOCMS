@@ -26,7 +26,9 @@
     <section class="role-section" aria-label="Choose your role">
       <div class="role-grid">
         <button class="role-card" data-target="{{ route('login') }}?role=student" aria-label="Go to Student Login">
-          <div class="card-icon">Student</div>
+          <div class="card-icon" aria-hidden="true">
+            <img src="{{ asset('images/students-icon.jpg') }}" alt="" class="card-icon-img">
+          </div>
           <div class="card-body">
             <div class="card-title">Student</div>
             <div class="card-sub">Access your clinic dashboard and book appointments</div>
@@ -34,7 +36,9 @@
         </button>
 
         <button class="role-card" data-target="{{ route('login') }}?role=faculty" aria-label="Go to Faculty/Admin Login">
-          <div class="card-icon">Faculty</div>
+          <div class="card-icon" aria-hidden="true">
+            <img src="{{ asset('images/faculty-icon.webp') }}" alt="" class="card-icon-img">
+          </div>
           <div class="card-body">
             <div class="card-title">Faculty</div>
             <div class="card-sub">Clinic administration and appointment management</div>

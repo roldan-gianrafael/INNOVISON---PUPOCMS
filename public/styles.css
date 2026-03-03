@@ -32,10 +32,23 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 /* Role selection */
 .role-section{margin-top:26px}
 .role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:600px;margin:0 auto}
-.role-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 22px;aspect-ratio:1/1;border-radius:14px;background:#8B3A3A;box-shadow:var(--soft-shadow);border:1px solid rgba(107,0,0,0.3);cursor:pointer;transition:transform 220ms ease,box-shadow 220ms ease,border-color 220ms ease;color:#fff}
+.role-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 22px;aspect-ratio:1/1;border-radius:14px;background:#8B3A3A;box-shadow:var(--soft-shadow);border:1px solid rgba(107,0,0,0.3);cursor:pointer;transition:transform 220ms ease,box-shadow 220ms ease,border-color 220ms ease;color:#fff;isolation:isolate}
 .role-card:focus{outline:3px solid rgba(139,58,58,0.3);outline-offset:4px}
 .role-card:hover{transform:translateY(-6px);background:#6B0000;box-shadow:0 20px 40px rgba(107,0,0,0.3);border-color:rgba(107,0,0,0.5)}
-.card-icon{font-size:48px;text-align:center}
+.card-icon{
+  width:116px;
+  height:116px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.card-icon-img{
+  width:112%;
+  height:112%;
+  object-fit:contain;
+  mix-blend-mode:multiply;
+  filter:grayscale(1) contrast(1.5) brightness(0.36) drop-shadow(0 4px 8px rgba(0,0,0,0.55));
+}
 .card-body{display:flex;flex-direction:column;text-align:center}
 .card-title{font-weight:800;font-size:18px;color:#fff}
 .card-sub{color:#f0d9d9;margin-top:6px;font-size:13px}

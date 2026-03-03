@@ -19,15 +19,19 @@ class User extends Authenticatable
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-    'name',         
-    'first_name',   
-    'last_name',    
+    'first_name',
+    'last_name',
+    'name',
+    'student_id',
     'email',
+    'DOB',
+    'course',
+    'year',
+    'section',
+    'barcode',
+    'user_role',
+    'user_type',
     'password',
-    'student_id',   
-    'barcode',      
-    'user_role',    
-    'is_admin'      
 ];
 
     /**

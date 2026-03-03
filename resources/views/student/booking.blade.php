@@ -127,17 +127,7 @@
                 Appointment Details
             </div>
 
-            @if(session('error'))
-    <div style="background-color: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600;">
-        ⚠️ {{ session('error') }}
-    </div>
-@endif
-
-@if(session('success'))
-    <div style="background-color: #dcfce7; border: 1px solid #22c55e; color: #15803d; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600;">
-        ✅ {{ session('success') }}
-    </div>
-@endif
+            
             <form id="bookingForm" method="POST" action="/student/appointments/store" autocomplete="off">
                 @csrf 
                 
@@ -152,7 +142,7 @@
                     <div class="input-group">
                         <label class="input-label">Student ID</label>
                         <div class="input-wrapper">
-                            <input type="text" name="student_id" class="form-control" value="2025-{{ rand(1000,9999) }}-TG" readonly>
+                           <input type="text" name="student_id" class="form-control" value="{{ $user->student_id }}" readonly>
                         </div>
                     </div>
                 </div>
@@ -186,7 +176,6 @@
                         <select name="service" class="form-control" required>
                             <option value="" disabled selected>Select a Service...</option>
                             <option value="General Consultation">General Consultation</option>
-                            <option value="Medical Certificate">Medical Certificate</option>
                             <option value="Blood Pressure Monitoring">Blood Pressure Monitoring</option>
                         </select>
                     </div>
@@ -194,7 +183,7 @@
 
                 <div class="input-group">
                     <label class="input-label">Reason / Symptoms</label>
-                    <textarea name="notes" class="form-control" placeholder="Briefly describe what you are feeling..." rows="3">{{ old('notes') }}</textarea>
+                    <textarea name="remarks" class="form-control" placeholder="Briefly describe what you are feeling..." rows="3">{{ old('remarks') }}</textarea>
                 </div>
 
                 <button type="submit" class="btn-submit">

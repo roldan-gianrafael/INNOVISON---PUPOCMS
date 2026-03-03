@@ -822,42 +822,42 @@
 </header>
 
 <div class="admin-layout">
-    <aside class="sidebar" id="adminSidebar">
-        <div class="sidebar-logo">
-            <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
-            <div class="sidebar-logo-text">
-                <p class="sidebar-logo-title">PUP Taguig</p>
-                <p class="sidebar-logo-sub">Clinic Admin</p>
-            </div>
-        </div>
+  
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
+      <div class="sidebar-logo-text">
+        <div class="sidebar-logo-title">PUP TAGUIG</div>
+        <div class="sidebar-logo-sub">Clinic Admin</div>
+      </div>
+    </div>
+    
+    <h4>Main Menu</h4>
+    <nav class="sidebar-nav">
+      <a href="{{ url('/admin/dashboard') }}" class="{{ Request::is('admin/dashboard') ? 'active' : '' }}">
+        <span class="sidebar-icon">🏠</span> Dashboard
+      </a>
+      <a href="{{ url('/admin/appointments') }}" class="{{ Request::is('admin/appointments') ? 'active' : '' }}">
+        <span class="sidebar-icon">📅</span> Appointments
+      </a>
+      <a href="{{ url('/admin/inventory') }}" class="{{ Request::is('admin/inventory') ? 'active' : '' }}">
+        <span class="sidebar-icon">📦</span> Inventory
+      </a>
+      <a href="{{ url('/admin/reports') }}" class="{{ Request::is('admin/reports') ? 'active' : '' }}">
+        <span class="sidebar-icon">📊</span> Reports
+      </a>
+      <a href="{{ url('/admin/settings') }}" class="{{ Request::is('admin/settings') ? 'active' : '' }}">
+        <span class="sidebar-icon">⚙️</span> Settings
+      </a>
+      
 
-        <h4>Main Menu</h4>
-        <nav class="sidebar-nav">
-            <a href="{{ url('/admin/dashboard') }}" class="{{ Request::is('admin/dashboard') ? 'active' : '' }}">
-                <span class="sidebar-icon">DB</span><span class="sidebar-label">Dashboard</span>
-            </a>
-            <a href="{{ url('/admin/appointments') }}" class="{{ Request::is('admin/appointments') ? 'active' : '' }}">
-                <span class="sidebar-icon">AP</span><span class="sidebar-label">Appointments</span>
-            </a>
-            <a href="{{ url('/admin/inventory') }}" class="{{ Request::is('admin/inventory') ? 'active' : '' }}">
-                <span class="sidebar-icon">IN</span><span class="sidebar-label">Inventory</span>
-            </a>
-            <a href="{{ url('/admin/reports') }}" class="{{ Request::is('admin/reports') ? 'active' : '' }}">
-                <span class="sidebar-icon">RP</span><span class="sidebar-label">Reports</span>
-            </a>
-            <a href="{{ url('/admin/settings') }}" class="{{ Request::is('admin/settings') ? 'active' : '' }}">
-                <span class="sidebar-icon">ST</span><span class="sidebar-label">Settings</span>
-            </a>
-        </nav>
+     
 
-        <div class="sidebar-logout">
-            <nav class="sidebar-nav">
-                <a href="{{ url('/') }}">
-                    <span class="sidebar-icon">LO</span><span class="sidebar-label">Logout</span>
-                </a>
-            </nav>
-        </div>
-    </aside>
+      <a href="{{ url('/') }}" style="margin-top: 40px; background: rgba(0,0,0,0.2);">
+        <span class="sidebar-icon">🚪</span> Logout
+      </a>
+    </nav>
+  </aside>
 
     <main class="main">
         @yield('content')

@@ -22,8 +22,9 @@ class Appointment extends Model
         'date',         // Appointment date
         'time',         // Appointment time
         'status',       // Pending / Completed / Cancelled
-        'user_type',    // 'online' or 'walk-in'
-        'remarks',        // Optional notes
+        'user_type'=> 'online',
+        'user_role' => 'Admin', 'Student', 'Faculty','Dependents',
+        'notes',        // Optional notes
     ];
 
     /**

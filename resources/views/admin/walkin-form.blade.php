@@ -143,7 +143,7 @@
     <label>{{ $user_source == 'online' ? 'Appointment Remarks' : 'Student Reason' }}</label>
     <input type="text" 
         name="student_reason" class="form-control" {{ $user_source == 'online' ? 'readonly' : '' }} 
-        value="{{ $latestAppointment->remarks ?? '' }}"> {{-- Kung null, blanko lang --}}
+        value="{{ $latestAppointment->notes ?? '' }}"> {{-- Kung null, blanko lang --}}
     </div>
             <div class="form-group">
                 <label>Purpose of Visit / Service</label>

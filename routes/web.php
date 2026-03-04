@@ -11,7 +11,7 @@ use App\Http\Controllers\ReportsController;
 use Illuminate\Support\Facades\Auth;
 
 // --- PUBLIC ROUTES (No login required) ---
-Route::get('/', function () { return view('landing'); });
+Route::get('/', function () { return view('login'); });
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login-action', [LoginController::class, 'login']);
 Route::post('/register-action', [RegisterController::class, 'register']);

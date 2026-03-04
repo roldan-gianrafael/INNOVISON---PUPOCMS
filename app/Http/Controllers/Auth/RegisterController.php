@@ -21,7 +21,8 @@ class RegisterController extends Controller
         'year'       => 'required',
         'section'    => 'required',
         'password'   => 'required|min:6|confirmed',
-    ]);
+        'terms_agreed' => 'required|accepted',
+]);
 
     $user = User::create([
         'first_name' => $request->first_name,

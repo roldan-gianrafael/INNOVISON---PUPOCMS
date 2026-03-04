@@ -264,11 +264,11 @@
 
 @push('scripts')
 <script>
-    function openInfoModal(name, service, date, time, remarks, email) {
+    function openInfoModal(name, service, date, time, notes, email) {
         document.getElementById('mName').innerText = name;
         document.getElementById('mService').innerText = service;
         document.getElementById('mDateTime').innerText = date + ' at ' + time;
-        document.getElementById('mNotes').innerText = remarks;
+        document.getElementById('mNotes').innerText = notes;
         document.getElementById('mEmail').innerText = email;
         document.getElementById('infoModal').style.display = 'flex';
     }

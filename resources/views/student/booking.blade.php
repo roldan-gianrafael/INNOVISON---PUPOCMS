@@ -183,7 +183,7 @@
 
                 <div class="input-group">
                     <label class="input-label">Reason / Symptoms</label>
-                    <textarea name="remarks" class="form-control" placeholder="Briefly describe what you are feeling..." rows="3">{{ old('remarks') }}</textarea>
+                    <textarea name="notes" class="form-control" placeholder="Briefly describe what you are feeling..." rows="3">{{ old('notes') }}</textarea>
                 </div>
 
                 <button type="submit" class="btn-submit">

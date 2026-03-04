@@ -171,7 +171,7 @@ class WalkInController extends Controller
                 $appointment->name       = $student->first_name . ' ' . $student->last_name;
                 $appointment->email      = $student->email; 
                 $appointment->service    = $request->service;
-                $appointment->remarks    = $request->remarks;
+                $appointment->notes    = $request->notes;
                 $appointment->status     = 'Completed';
                 $appointment->date       = now()->format('Y-m-d');
                 $appointment->time       = now()->format('H:i:s'); 

@@ -56,7 +56,6 @@
             width: 100%;
         }
 
-        /* Login Box Styling */
         .login-box {
             background: var(--glass-bg);
             padding: 40px;
@@ -71,7 +70,6 @@
         .login-box h2 { color: var(--accent); font-weight: 800; margin-bottom: 8px; }
         .login-box p { color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
 
-        /* Error Alert Styling */
         .alert-error {
             background-color: var(--error-bg);
             color: var(--error-text);
@@ -84,7 +82,6 @@
         }
         .alert-error ul { list-style: none; margin: 0; padding: 0; }
 
-        /* Form Elements */
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 6px; letter-spacing: 0.5px; }
         .form-group input, .form-group select {
@@ -92,6 +89,8 @@
         }
         .form-group input:focus { outline: none; border-color: var(--accent); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        .error-message { color: var(--error-text); font-size: 11px; font-weight: 600; margin-top: 4px; display: block; }
 
         .btn-submit {
             width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
@@ -122,6 +121,28 @@
             overflow-y: auto;
         }
         .modal-close { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 28px; color: var(--text-light); }
+
+        /* Terms Pop-up Styling */
+        .terms-popup-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+        .terms-popup-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            color: var(--text-dark);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
 
         .switch-form { margin-top: 20px; font-size: 14px; color: var(--text-light); }
         .switch-form span { color: var(--accent); cursor: pointer; font-weight: 700; text-decoration: underline; }
@@ -163,11 +184,13 @@
             <div class="form-group">
                 <label>EMAIL ADDRESS</label>
                 <input type="email" name="email" value="{{ old('email') }}" placeholder="e.g. name@pup.edu.ph" required>
+                @error('email') <span class="error-message">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
                 <label>PASSWORD</label>
                 <input type="password" name="password" placeholder="••••••••" required>
+                @error('password') <span class="error-message">{{ $message }}</span> @enderror
             </div>
 
             <button type="submit" class="btn-submit">Login to Portal</button>
@@ -182,70 +205,81 @@
   <div id="registerModal" class="modal-overlay">
       <div class="modal-content">
           <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
-          <h2 style="color: var(--accent); font-weight: 800; margin-bottom: 5px;">Student Registration</h2>
-          <p style="color: var(--text-light); margin-bottom: 25px; font-size: 14px;">Please fill out the form to create your medical profile.</p>
+          <h2 style="color: var(--accent); font-weight: 800; margin-bottom: 5px;">User Registration</h2>
+          <p style="color: var(--text-light); margin-bottom: 25px; font-size: 14px;">Fill out the form to create your medical profile.</p>
           
-          <form action="{{ url('/register-action') }}" method="POST">
+          <form id="regForm" action="{{ url('/register-action') }}" method="POST">
               @csrf
+              <input type="hidden" name="terms_agreed" id="hiddenTerms" value="">
+
               <div class="form-row">
-                  <div class="form-group">
-                      <label>FIRST NAME</label>
-                      <input type="text" name="first_name" required>
-                  </div>
-                  <div class="form-group">
-                      <label>LAST NAME</label>
-                      <input type="text" name="last_name" required>
-                  </div>
+                  <div class="form-group"><label>FIRST NAME</label><input type="text" name="first_name" required></div>
+                  <div class="form-group"><label>LAST NAME</label><input type="text" name="last_name" required></div>
               </div>
 
               <div class="form-row">
-                  <div class="form-group">
-                      <label>STUDENT ID</label>
-                      <input type="text" name="student_id" placeholder="202X-XXXXX-TG-0" required>
-                  </div>
-                  <div class="form-group">
-                      <label>DATE OF BIRTH</label>
-                      <input type="date" name="DOB" required>
-                  </div>
+                  <div class="form-group"><label>STUDENT/FACULTY ID</label><input type="text" name="student_id" placeholder="202X-XXXXX-TG-0" required></div>
+                  <div class="form-group"><label>DATE OF BIRTH</label><input type="date" name="DOB" required></div>
               </div>
 
-              <div class="form-group">
-                  <label>EMAIL ADDRESS</label>
-                  <input type="email" name="email" required>
-              </div>
+              <div class="form-group"><label>EMAIL ADDRESS</label><input type="email" name="email" required></div>
 
               <div class="form-row">
                   <div class="form-group">
-                      <label>COURSE</label>
+                      <label>COURSE / DEPARTMENT</label>
                       <select name="course" required>
+                          <option value="" disabled selected>Select Course</option>
                           <option value="BSIT">BSIT</option>
                           <option value="BSCS">BSCS</option>
                           <option value="BSCpE">BSCpE</option>
                           <option value="BSA">BSA</option>
+                          <option value="FACULTY">FACULTY DEPT</option>
                       </select>
                   </div>
                   <div class="form-group">
                       <label>YEAR & SECTION</label>
                       <div class="form-row" style="grid-template-columns: 1fr 1fr;">
-                          <input type="text" name="year" placeholder="Year" required>
-                          <input type="text" name="section" placeholder="Sec" required>
+                          <select name="year" required>
+                              <option value="" disabled selected>Year</option>
+                              <option value="1">1st Year</option>
+                              <option value="2">2nd Year</option>
+                              <option value="3">3rd Year</option>
+                              <option value="4">4th Year</option>
+                          </select>
+                          <select name="section" required>
+                              <option value="" disabled selected>Sec</option>
+                              <option value="1">1</option>
+                              <option value="2">2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                              <option value="5">5</option>
+                          </select>
                       </div>
                   </div>
               </div>
 
               <div class="form-row">
-                  <div class="form-group">
-                      <label>PASSWORD</label>
-                      <input type="password" name="password" required>
-                  </div>
-                  <div class="form-group">
-                      <label>CONFIRM PASSWORD</label>
-                      <input type="password" name="password_confirmation" required>
-                  </div>
+                  <div class="form-group"><label>PASSWORD</label><input type="password" name="password" required></div>
+                  <div class="form-group"><label>CONFIRM PASSWORD</label><input type="password" name="password_confirmation" required></div>
               </div>
 
-              <button type="submit" class="btn-submit">Register Account</button>
+              <button type="button" onclick="validateAndShowTerms()" class="btn-submit" style="margin-top: 10px;">Register Account</button>
           </form>
+      </div>
+  </div>
+
+  <div id="termsPopUp" class="terms-popup-overlay">
+      <div class="terms-popup-box">
+          <h3 style="color: var(--accent); margin-bottom: 15px;">License & Terms of Agreement</h3>
+          <div style="text-align: justify; font-size: 13px; line-height: 1.5; color: #444; margin-bottom: 20px; max-height: 250px; overflow-y: auto; padding-right: 10px;">
+              <p><strong>1. Data Privacy Act:</strong> By clicking "I Agree", you voluntarily provide your personal and medical information to the PUP Taguig Clinic in compliance with RA 10173.</p><br>
+              <p><strong>2. Accuracy:</strong> You certify that all data entered is true. Any falsification of medical records is a violation of University policy.</p><br>
+              <p><strong>3. Use of Data:</strong> Your data will only be used for clinic appointments, medical history tracking, and university health reports.</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+              <button type="button" onclick="closeTerms()" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ccc; cursor: pointer; background: #eee;">Cancel</button>
+              <button type="button" onclick="submitFinalForm()" style="flex: 2; padding: 12px; border-radius: 10px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: bold;">I Agree and Register</button>
+          </div>
       </div>
   </div>
 
@@ -255,10 +289,26 @@
       function openModal(id) { document.getElementById(id).style.display = 'flex'; }
       function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-      window.onclick = function(event) {
-          if (event.target.className === 'modal-overlay') {
-              event.target.style.display = 'none';
+      function validateAndShowTerms() {
+          const form = document.getElementById('regForm');
+          if (form.checkValidity()) {
+              document.getElementById('termsPopUp').style.display = 'flex';
+          } else {
+              form.reportValidity(); 
           }
+      }
+
+      function closeTerms() { document.getElementById('termsPopUp').style.display = 'none'; }
+
+      function submitFinalForm() {
+          // Set the hidden terms field to '1' so Laravel validation passes
+          document.getElementById('hiddenTerms').value = '1';
+          document.getElementById('regForm').submit();
+      }
+
+      window.onclick = function(event) {
+          if (event.target.className === 'modal-overlay') { closeModal(event.target.id); }
+          if (event.target.className === 'terms-popup-overlay') { closeTerms(); }
       }
   </script>
 

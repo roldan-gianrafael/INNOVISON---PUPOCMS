@@ -68,7 +68,7 @@ class AppointmentController extends Controller
             'date' => 'required|date',
             'time' => 'required',
             'service' => 'required',
-            'remarks' => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         // Prevent overlapping appointments
@@ -113,7 +113,8 @@ class AppointmentController extends Controller
         $appointment->time       = $request->time;
         $appointment->service    = $request->service;
         $appointment->status     = 'Pending';
-        $appointment->remarks    = $request->remarks; 
+        $appointment->notes    = $request->notes; 
+        $appointment->user_role  = $request->user_role;
         $appointment->user_type = $request->input('user_type', 'online');
         $appointment->save(); // Dito lang dapat magtatapos ang command.
 

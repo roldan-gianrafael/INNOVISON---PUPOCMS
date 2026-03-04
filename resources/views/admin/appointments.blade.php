@@ -175,11 +175,17 @@
                         </td>
                        <td>
     @php
-        // Palitan ang 'type' ng 'user_type' base sa sinasave ng controller mo
-        $currentType = strtolower($appt->user_type ?? ''); 
+        // Preferred source field is `type`; fallback for legacy records.
+        $currentType = strtolower(trim((string) ($appt->type ?? '')));
+        if ($currentType === '') {
+            $legacyType = strtolower(trim((string) ($appt->user_type ?? '')));
+            if (in_array($legacyType, ['walkin', 'walk-in', 'online'], true)) {
+                $currentType = str_replace('-', '', $legacyType);
+            }
+        }
     @endphp
 
-    @if($currentType == 'walkin' || $currentType == 'walk-in')
+    @if($currentType === 'walkin')
         <span class="type-badge type-walkin">Walk-in</span>
     @else
         <span class="type-badge type-online">Online</span>

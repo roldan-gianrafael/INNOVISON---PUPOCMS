@@ -9,6 +9,28 @@ use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
+    private function normalizeBarcodeValue(?string $value): string
+    {
+        return strtoupper((string) preg_replace('/[^A-Za-z0-9]/', '', $value ?? ''));
+    }
+
+    private function getBarcodeMismatchMessage(User $user, string $barcode): ?string
+    {
+        $studentId = trim((string) $user->student_id);
+        if ($studentId === '') {
+            return null;
+        }
+
+        $normalizedStudentId = $this->normalizeBarcodeValue($studentId);
+        $normalizedBarcode = $this->normalizeBarcodeValue($barcode);
+
+        if ($normalizedStudentId !== '' && $normalizedBarcode !== '' && $normalizedStudentId !== $normalizedBarcode) {
+            return 'The scanned barcode does not match your Student ID.';
+        }
+
+        return null;
+    }
+
     // -------------------------------
     // 1. STUDENT DASHBOARD
     // -------------------------------
@@ -114,7 +136,10 @@ class AppointmentController extends Controller
         $appointment->service    = $request->service;
         $appointment->status     = 'Pending';
         $appointment->remarks    = $request->remarks; 
-        $appointment->user_type = $request->input('user_type', 'online');
+        $appointment->type       = 'online';
+        $appointment->user_type  = Appointment::normalizeUserType(
+            $request->input('user_type', $user->user_role ?? $user->user_type)
+        );
         $appointment->save(); // Dito lang dapat magtatapos ang command.
 
         return redirect()->back()->with('success', 'Appointment request submitted! Please wait for admin approval.');
@@ -288,21 +313,75 @@ class AppointmentController extends Controller
     // -------------------------------
     public function storeBarcode(Request $request)
     {
-        // Mas safe itong validation para hindi mag-crash ang app kung may duplicate
         $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
-        
-        $request->validate([
-            'barcode' => 'required|string|max:255|unique:users,barcode,' . $user->id
-        ]);
 
         if (!$user) {
             return redirect()->back()->with('error', 'User not found!');
         }
 
-        $user->barcode = $request->barcode;
+        $request->validate([
+            'barcode' => 'required|string|max:255'
+        ]);
+
+        $barcode = trim((string) $request->barcode);
+        $mismatchMessage = $this->getBarcodeMismatchMessage($user, $barcode);
+        if ($mismatchMessage) {
+            return redirect()->back()->withInput()->withErrors([
+                'barcode' => $mismatchMessage,
+            ]);
+        }
+
+        $request->merge(['barcode' => $barcode]);
+        $request->validate([
+            'barcode' => 'required|string|max:255|unique:users,barcode,' . $user->id
+        ]);
+
+        $user->barcode = $barcode;
         $user->save();
 
         return redirect()->back()->with('success', 'Barcode registered successfully!');
+    }
+
+    public function validateBarcodeScan(Request $request)
+    {
+        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+
+        if (!$user) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'User session not found. Please login again.',
+            ], 401);
+        }
+
+        $request->validate([
+            'barcode' => 'required|string|max:255',
+        ]);
+
+        $barcode = trim((string) $request->barcode);
+        $mismatchMessage = $this->getBarcodeMismatchMessage($user, $barcode);
+        if ($mismatchMessage) {
+            return response()->json([
+                'valid' => false,
+                'message' => $mismatchMessage,
+            ], 422);
+        }
+
+        $barcodeInUse = User::where('barcode', $barcode)
+            ->where('id', '!=', $user->id)
+            ->exists();
+
+        if ($barcodeInUse) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'This barcode is already linked to another account.',
+            ], 422);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'barcode' => $barcode,
+            'message' => 'Barcode validated. You can submit registration.',
+        ]);
     }
 
     // -------------------------------

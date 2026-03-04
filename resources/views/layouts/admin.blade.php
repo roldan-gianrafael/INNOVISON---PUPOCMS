@@ -722,7 +722,7 @@
         }
 
         .assistant-controls {
-            border-top: 1px solid #eee2e5;
+            border-top: 1px solid #e5053d;
             padding: 10px;
             display: flex;
             gap: 8px;

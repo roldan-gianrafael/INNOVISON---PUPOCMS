@@ -175,8 +175,8 @@ class WalkInController extends Controller
                 $appointment->status     = 'Completed';
                 $appointment->date       = now()->format('Y-m-d');
                 $appointment->time       = now()->format('H:i:s'); 
-                $appointment->user_role  = $student->user_role; 
-                $appointment->user_type  = 'walkin';
+                $appointment->type       = 'walkin';
+                $appointment->user_type  = Appointment::normalizeUserType($student->user_role ?? $student->user_type);
                 $appointment->save();
                 
                 $finalSource = 'walkin';

@@ -46,6 +46,7 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class])->group(func
     Route::post('/admin/assistant/intent', [AdminAssistantController::class, 'handle'])->name('admin.assistant.intent');
     Route::get('student/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
     Route::post('student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');
+    Route::post('student/barcode-validate', [AppointmentController::class, 'validateBarcodeScan'])->name('barcode.validate');
     Route::get('/fetch-user/{student_id}', [AppointmentController::class, 'fetchUser']);
     Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
 
@@ -91,6 +92,7 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class])->group(func
     // Barcode Registration Routes for Students (student side)
     Route::get('/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
     Route::post('/barcode-store', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');
+    Route::post('/barcode-validate', [AppointmentController::class, 'validateBarcodeScan'])->name('barcode.validate');
     Route::post('/barcode-reset', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
 
 }); // End of Protected Routes

@@ -259,6 +259,10 @@
 @endpush
 
 @section('content')
+@php
+    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $appointmentsUrl = $role === 'student_assistant' ? url('/assistant/appointments') : url('/admin/appointments');
+@endphp
 <div class="dashboard-container">
     @php
         $totalAppointments = ($pending ?? 0) + ($upcoming ?? 0) + ($completed ?? 0) + ($cancelled ?? 0);
@@ -350,7 +354,7 @@
     <div class="panel">
         <div class="panel-header">
             <h3 class="panel-title">Recent Activity</h3>
-            <a href="{{ url('/admin/appointments') }}" class="btn-view-all">View All</a>
+            <a href="{{ $appointmentsUrl }}" class="btn-view-all">View All</a>
         </div>
 
         <table>

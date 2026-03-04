@@ -11,6 +11,25 @@ use Illuminate\Support\Facades\DB;
 
 class WalkInController extends Controller
 {
+    private function inAssistantWorkspace(Request $request): bool
+    {
+        return $request->is('assistant/*');
+    }
+
+    private function walkinRouteName(Request $request, string $suffix): string
+    {
+        if ($this->inAssistantWorkspace($request)) {
+            return 'assistant.walkin.' . $suffix;
+        }
+
+        return 'walkin.' . $suffix;
+    }
+
+    private function adminBasePrefix(Request $request): string
+    {
+        return $this->inAssistantWorkspace($request) ? '/assistant' : '/admin';
+    }
+
     // 1. INDEX PAGE
     public function index(Request $request)
 {
@@ -77,7 +96,7 @@ class WalkInController extends Controller
 
         return response()->json([
             'status' => 'found',
-            'redirect_url' => route('walkin.form', [
+            'redirect_url' => route($this->walkinRouteName($request, 'form'), [
                 'student_id' => $student->student_id, 
                 'source' => $source // Ito ang magsasabi sa form kung online or walkin
             ])
@@ -110,7 +129,7 @@ class WalkInController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'This account already exists.',
-                'redirect_url' => route('walkin.form', ['student_id' => $existingUser->student_id])
+                'redirect_url' => route($this->walkinRouteName($request, 'form'), ['student_id' => $existingUser->student_id])
             ], 409);
         }
 
@@ -128,7 +147,7 @@ class WalkInController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Student registered successfully!',
-            'redirect_url' => route('walkin.form', ['student_id' => $user->student_id])
+            'redirect_url' => route($this->walkinRouteName($request, 'form'), ['student_id' => $user->student_id])
         ]);
     }
 
@@ -211,9 +230,10 @@ class WalkInController extends Controller
 
         // Redirect logic
         if ($request->input('user_type') === 'online') {
-            return redirect('/admin/appointments')->with('success', 'Online consultation completed!');
+            return redirect($this->adminBasePrefix($request) . '/appointments')
+                ->with('success', 'Online consultation completed!');
         }
 
-        return redirect()->route('walkin.index')->with('consultation_done', true);
+        return redirect()->route($this->walkinRouteName($request, 'index'))->with('consultation_done', true);
     }
 }

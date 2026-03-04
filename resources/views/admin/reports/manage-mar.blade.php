@@ -121,8 +121,8 @@
         // Set the current category in dropdown
         document.getElementById('modalCategoryId').value = categoryId;
         
-        // Dynamic Action URL (Siguraduhin na may 'conditions.update' route ka)
-        document.getElementById('changeForm').action = "/admin/conditions/" + id;
+        const changeRouteTemplate = @json(route('conditions.update', ['id' => '__ID__']));
+        document.getElementById('changeForm').action = changeRouteTemplate.replace('__ID__', id);
         
         // Show Modal
         document.getElementById('changeModal').style.display = 'flex';

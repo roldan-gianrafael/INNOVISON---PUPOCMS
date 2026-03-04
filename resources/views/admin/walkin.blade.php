@@ -71,6 +71,10 @@
 @endpush
 
 @section('content')
+@php
+    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
+@endphp
 
 @if(session('consultation_done'))
 <div id="successToast" class="notification-toast">
@@ -81,7 +85,7 @@
             <span style="font-size: 11px; opacity: 0.9;">Record saved successfully.</span>
         </div>
     </div>
-    <button onclick="location.href='/admin/walkin'" class="btn-toast-action">Scan Again</button>
+    <button onclick="location.href='{{ url($basePrefix . '/walkin') }}'" class="btn-toast-action">Scan Again</button>
 </div>
 @endif
 
@@ -119,7 +123,7 @@
         </div>
 
         <div class="mt-4 pt-3" style="border-top: 1px dashed #cbd5e1;">
-            <a href="{{ url('/admin/appointments') }}" class="btn w-100 py-2" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+            <a href="{{ url($basePrefix . '/appointments') }}" class="btn w-100 py-2" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
                  BACK TO APPOINTMENTS LIST
             </a>
         </div>
@@ -251,7 +255,7 @@
 
         function verifyUser(id) {
             $('#scan-loading').css('display', 'flex');
-            $.get("{{ route('walkin.getStudent') }}", { student_id: id }, function(res) {
+            $.get("{{ url($basePrefix . '/walkin/get-student') }}", { student_id: id }, function(res) {
                 $('#scan-loading').hide();
                 if (res.status === 'found') {
                     window.location.href = res.redirect_url;
@@ -343,7 +347,7 @@
                 barcode: $('#reg_barcode').val() || $('#reg_student_id').val()
             };
 
-            $.post("{{ route('walkin.registerStudent') }}", formData, function(res) {
+            $.post("{{ url($basePrefix . '/walkin/register') }}", formData, function(res) {
                 if(res.redirect_url) window.location.href = res.redirect_url;
                 else window.location.reload();
             }).fail(function(xhr) {

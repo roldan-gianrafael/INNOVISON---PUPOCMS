@@ -10,7 +10,12 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || Auth::user()->role !== 'Admin') {
+        if (!Auth::check()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $role = strtolower((string) (Auth::user()->user_role ?? ''));
+        if (!in_array($role, ['admin', 'super_admin'], true)) {
             abort(403, 'Unauthorized');
         }
 

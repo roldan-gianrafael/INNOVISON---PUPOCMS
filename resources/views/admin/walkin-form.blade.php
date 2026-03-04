@@ -44,6 +44,10 @@
 @endpush
 
 @section('content')
+@php
+    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
+@endphp
 
 <div class="patient-header card">
     <div>
@@ -57,7 +61,7 @@
         @endif
         </div>
         
-        <span class="badge-role">{{ $student->role }}</span>
+        <span class="badge-role">{{ $student->user_role }}</span>
         <span style="font-size: 13px; color: #64748b; margin-left: 10px;">ID: {{ $student->student_id }}</span>
         
         @if(($user_source ?? '') == 'online' && isset($latestAppointment))
@@ -77,10 +81,10 @@
     </div>
 </div>
 
-<form action="{{ route('walkin.store') }}" method="POST">
+<form action="{{ url($basePrefix . '/walkin/store') }}" method="POST">
     @csrf
     <input type="hidden" name="student_id" value="{{ $student->student_id }}">
-    <input type="hidden" name="user_role" value="{{ $student->role }}">
+    <input type="hidden" name="user_role" value="{{ $student->user_role }}">
     <input type="hidden" name="user_type" value="{{ $user_source ?? 'walkin' }}">
 
     <div class="grid-2">
@@ -218,7 +222,7 @@
         
         <div style="display: flex; gap: 15px; margin-top: 10px;">
             <button type="submit" class="btn-save">Save & Finalize Consultation</button>
-            <a href="{{ route('walkin.index') }}" style="text-decoration: none; padding: 12px; color: #64748b; font-weight: 600; font-size: 14px;">Cancel</a>
+            <a href="{{ url($basePrefix . '/walkin') }}" style="text-decoration: none; padding: 12px; color: #64748b; font-weight: 600; font-size: 14px;">Cancel</a>
         </div>
     </div>
 </form>

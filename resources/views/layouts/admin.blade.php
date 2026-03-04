@@ -846,11 +846,33 @@
     </style>
 </head>
 <body>
+@php
+    $authUser = auth()->user();
+    $currentRole = strtolower((string) (optional($authUser)->user_role ?? ''));
+    $isStudentAssistant = $currentRole === 'student_assistant';
+    $isAdminLike = in_array($currentRole, ['admin', 'super_admin'], true);
+    $dashboardUrl = $isStudentAssistant ? url('/assistant/dashboard') : url('/admin/dashboard');
+    $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
+    $inventoryUrl = $isStudentAssistant ? url('/assistant/inventory') : url('/admin/inventory');
+    $reportsUrl = $isStudentAssistant ? url('/assistant/reports') : url('/admin/reports');
+    $settingsUrl = url('/admin/settings');
+    $assistantAccountsUrl = url('/admin/student-assistants');
+    $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
+    $assistantEndpoint = $isStudentAssistant ? route('assistant.intent') : route('admin.assistant.intent');
+    $displayName = optional($authUser)->name ?? 'Clinic User';
+    $avatarInitial = strtoupper(substr($displayName, 0, 1));
+    $roleLabelMap = [
+        'super_admin' => 'Super Admin',
+        'admin' => 'Admin',
+        'student_assistant' => 'Student Assistant',
+    ];
+    $displayRole = $roleLabelMap[$currentRole] ?? ucfirst($currentRole ?: 'user');
+@endphp
 
 <header class="admin-header">
     <div class="header-left">
-        <p class="header-kicker">Clinic Administration</p>
-        <h1 class="header-title">Welcome back, <span>Nurse Joyce</span></h1>
+        <p class="header-kicker">{{ $isStudentAssistant ? 'Clinic Assistant Console' : 'Clinic Administration' }}</p>
+        <h1 class="header-title">Welcome back, <span>{{ $displayName }}</span></h1>
         <p class="header-subtitle">Monitor operations and patient flow in one clear workspace.</p>
     </div>
 
@@ -861,16 +883,17 @@
         <div class="profile-wrap">
             <button type="button" class="admin-user" onclick="toggleProfileMenu()">
                 <div class="admin-user-meta">
-                    <div class="admin-user-name">Nurse Joyce</div>
-                    <div class="admin-user-role">Admin</div>
+                    <div class="admin-user-name">{{ $displayName }}</div>
+                    <div class="admin-user-role">{{ $displayRole }}</div>
                 </div>
-                <div class="user-avatar">J</div>
+                <div class="user-avatar">{{ $avatarInitial }}</div>
             </button>
 
             <div id="profileDropdown" class="profile-dropdown">
-                <a href="#">Edit Profile</a>
-                <a href="#">Settings</a>
-                <a href="{{ url('/') }}" class="logout-link">Logout</a>
+                @if($isAdminLike)
+                    <a href="{{ $settingsUrl }}">Settings</a>
+                @endif
+                <a href="#" class="logout-link" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">Logout</a>
             </div>
         </div>
     </div>
@@ -883,31 +906,39 @@
       <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
       <div class="sidebar-logo-text">
         <div class="sidebar-logo-title">PUP TAGUIG</div>
-        <div class="sidebar-logo-sub">Clinic Admin</div>
+        <div class="sidebar-logo-sub">{{ $isStudentAssistant ? 'Clinic Assistant' : 'Clinic Admin' }}</div>
       </div>
     </div>
     
     <h4>Main Menu</h4>
     <nav class="sidebar-nav">
-      <a href="{{ url('/admin/dashboard') }}" class="{{ Request::is('admin/dashboard') ? 'active' : '' }}">
+      <a href="{{ $dashboardUrl }}" class="{{ (Request::is('admin/dashboard') || Request::is('assistant/dashboard')) ? 'active' : '' }}">
         <span class="sidebar-short">DB</span><span class="sidebar-label">Dashboard</span>
       </a>
-      <a href="{{ url('/admin/appointments') }}" class="{{ Request::is('admin/appointments') ? 'active' : '' }}">
+      <a href="{{ $appointmentsUrl }}" class="{{ (Request::is('admin/appointments*') || Request::is('assistant/appointments*')) ? 'active' : '' }}">
         <span class="sidebar-short">AP</span><span class="sidebar-label">Appointments</span>
       </a>
-      <a href="{{ url('/admin/inventory') }}" class="{{ Request::is('admin/inventory') ? 'active' : '' }}">
+      <a href="{{ $inventoryUrl }}" class="{{ (Request::is('admin/inventory*') || Request::is('assistant/inventory*')) ? 'active' : '' }}">
         <span class="sidebar-short">IN</span><span class="sidebar-label">Inventory</span>
       </a>
-      <a href="{{ url('/admin/reports') }}" class="{{ Request::is('admin/reports') ? 'active' : '' }}">
+      <a href="{{ $reportsUrl }}" class="{{ (Request::is('admin/reports*') || Request::is('assistant/reports*')) ? 'active' : '' }}">
         <span class="sidebar-short">RP</span><span class="sidebar-label">Reports</span>
       </a>
-      <a href="{{ url('/admin/settings') }}" class="{{ Request::is('admin/settings') ? 'active' : '' }}">
-        <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>
+      <a href="{{ $walkinUrl }}" class="{{ (Request::is('admin/walkin*') || Request::is('assistant/walkin*')) ? 'active' : '' }}">
+        <span class="sidebar-short">WK</span><span class="sidebar-label">Walk-in</span>
       </a>
+      @if($isAdminLike)
+          <a href="{{ $assistantAccountsUrl }}" class="{{ Request::is('admin/student-assistants*') ? 'active' : '' }}">
+            <span class="sidebar-short">SA</span><span class="sidebar-label">Student Assistants</span>
+          </a>
+          <a href="{{ $settingsUrl }}" class="{{ Request::is('admin/settings*') ? 'active' : '' }}">
+            <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>
+          </a>
+      @endif
     </nav>
 
     <div class="sidebar-logout">
-      <a href="{{ url('/') }}">
+      <a href="#" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">
         <span class="sidebar-short">LO</span><span class="sidebar-label">Logout</span>
       </a>
     </div>
@@ -918,6 +949,10 @@
     </main>
 
 </div>
+
+<form id="layoutLogoutForm" method="POST" action="{{ route('logout') }}" style="display:none;">
+    @csrf
+</form>
 
 <section id="assistantPanel" class="assistant-panel" aria-live="polite">
     <div class="assistant-head">
@@ -944,7 +979,7 @@
 @stack('scripts')
 
 <script>
-    const assistantEndpoint = @json(route('admin.assistant.intent'));
+    const assistantEndpoint = @json($assistantEndpoint);
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     function toggleSidebar() {

@@ -42,10 +42,16 @@
 @endpush
 
 @section('content')
+    @php
+        $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+        $canManageInventory = in_array($role, ['admin', 'super_admin'], true);
+    @endphp
 
     <div class="controls">
         <h2 style="margin:0; color:#ffffff;">Clinic Inventory</h2>
-        <button class="btn-add" onclick="openModal()">+ Add New Item</button>
+        @if($canManageInventory)
+            <button class="btn-add" onclick="openModal()">+ Add New Item</button>
+        @endif
     </div>
 
     <div class="card">
@@ -56,7 +62,7 @@
                     <th>Category</th>
                     <th>Quantity</th>
                     <th>Stock Status</th>
-                    <th>Actions</th>
+                    <th>{{ $canManageInventory ? 'Actions' : 'Access' }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,15 +81,19 @@
                             @endif
                         </td>
                         <td>
-                            <button class="btn-icon btn-edit" 
-                                onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}')">
-                                Edit
-                            </button>
+                            @if($canManageInventory)
+                                <button class="btn-icon btn-edit" 
+                                    onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}')">
+                                    Edit
+                                </button>
 
-                            <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="display:inline;">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn-icon btn-delete" onclick="return confirm('Delete this item?')">Delete</button>
-                            </form>
+                                <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="display:inline;">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn-icon btn-delete" onclick="return confirm('Delete this item?')">Delete</button>
+                                </form>
+                            @else
+                                <span style="font-size: 12px; color: #64748b; font-weight: 700;">View Only</span>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -93,45 +103,50 @@
         </table>
     </div>
 
-    <div id="itemModal" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="modalTitle" style="margin-top:0; color:#8B0000;">Add New Item</h3>
-            
-            <form id="itemForm" method="POST" action="{{ url('/admin/inventory/store') }}">
-                @csrf
-                <div id="methodField"></div> <div class="form-group">
-                    <label>Item Name</label>
-                    <input name="name" id="iName" class="form-control" required placeholder="e.g. Paracetamol">
-                </div>
+    @if($canManageInventory)
+        <div id="itemModal" class="modal-overlay">
+            <div class="modal-box">
+                <h3 id="modalTitle" style="margin-top:0; color:#8B0000;">Add New Item</h3>
+                
+                <form id="itemForm" method="POST" action="{{ url('/admin/inventory/store') }}">
+                    @csrf
+                    <div id="methodField"></div> <div class="form-group">
+                        <label>Item Name</label>
+                        <input name="name" id="iName" class="form-control" required placeholder="e.g. Paracetamol">
+                    </div>
 
-                <div class="form-group">
-                    <label>Category</label>
-                    <select name="category" id="iCategory" class="form-control">
-                        <option>Medicine</option>
-                        <option>Equipment</option>
-                        <option>Supplies</option>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category" id="iCategory" class="form-control">
+                            <option>Medicine</option>
+                            <option>Equipment</option>
+                            <option>Supplies</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" name="quantity" id="iQty" class="form-control" required min="0">
-                </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" id="iQty" class="form-control" required min="0">
+                    </div>
 
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                    <button type="button" onclick="closeModal()" style="padding: 8px 16px; border: none; background: #eee; cursor: pointer; border-radius: 6px;">Cancel</button>
-                    <button type="submit" class="btn-add">Save Item</button>
-                </div>
-            </form>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" onclick="closeModal()" style="padding: 8px 16px; border: none; background: #eee; cursor: pointer; border-radius: 6px;">Cancel</button>
+                        <button type="submit" class="btn-add">Save Item</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    @endif
 
 @endsection
 
 @push('scripts')
 <script>
+    const itemModal = document.getElementById('itemModal');
+
     function openModal() {
-        document.getElementById('itemModal').style.display = 'flex';
+        if (!itemModal) return;
+        itemModal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Add New Item';
         document.getElementById('itemForm').action = "{{ url('/admin/inventory/store') }}";
         document.getElementById('methodField').innerHTML = ''; // Clear PUT method
@@ -142,7 +157,8 @@
     }
 
     function editItem(id, name, category, qty) {
-        document.getElementById('itemModal').style.display = 'flex';
+        if (!itemModal) return;
+        itemModal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Edit Item';
         document.getElementById('itemForm').action = "/admin/inventory/" + id;
         
@@ -156,11 +172,12 @@
     }
 
     function closeModal() {
-        document.getElementById('itemModal').style.display = 'none';
+        if (!itemModal) return;
+        itemModal.style.display = 'none';
     }
 
     window.onclick = function(event) {
-        if (event.target == document.getElementById('itemModal')) {
+        if (itemModal && event.target == itemModal) {
             closeModal();
         }
     }

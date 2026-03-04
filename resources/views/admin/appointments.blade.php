@@ -140,6 +140,10 @@
 @endpush
 
 @section('content')
+    @php
+        $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+        $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
+    @endphp
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="margin:0; color:#ffffff;">Appointments</h2>
@@ -148,7 +152,7 @@
     </div>
 
     <div class="action-header">
-        <a href="{{ url('/admin/walkin?mode=scan') }}" class="btn-add-walkin">
+        <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="btn-add-walkin">
             <span class="btn-icon">📷</span>
             <span class="btn-text">Scan Barcode</span>
         </a>
@@ -206,9 +210,9 @@
                             </button>
 
                             @if($appt->status == 'Pending')
-                                <a href="{{ url('/admin/appointments/' . $appt->id . '/Approved') }}" class="btn-action btn-approve" title="Approve" onclick="return confirm('Approve this appointment?')">✓</a>
+                                <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Approved') }}" class="btn-action btn-approve" title="Approve" onclick="return confirm('Approve this appointment?')">✓</a>
                                 <button class="btn-action btn-reschedule" title="Reschedule" onclick="openRescheduleModal('{{ $appt->id }}', '{{ $appt->date }}', '{{ $appt->time }}')">📅</button>
-                                <a href="{{ url('/admin/appointments/' . $appt->id . '/Cancelled') }}" class="btn-action btn-cancel" title="Reject" onclick="return confirm('Cancel this request?')">✕</a>
+                                <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Cancelled') }}" class="btn-action btn-cancel" title="Reject" onclick="return confirm('Cancel this request?')">✕</a>
                             
                             @elseif($appt->status == 'Approved')
                                 @php
@@ -222,7 +226,7 @@
                                         ⏳ Consult
                                     </button>
                                 @else
-                                    <a href="{{ url('/admin/walkin/form/' . $appt->student_id) }}?source=online" class="btn-action btn-consult" style="background: #0d6efd; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; margin-right: 5px; display: inline-flex; align-items: center; gap: 5px;">
+                                    <a href="{{ url($basePrefix . '/walkin/form/' . $appt->student_id) }}?source=online" class="btn-action btn-consult" style="background: #0d6efd; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; margin-right: 5px; display: inline-flex; align-items: center; gap: 5px;">
                                         🔍 Consult
                                     </a>
                                 @endif
@@ -283,7 +287,7 @@
 
     function openRescheduleModal(id, currentDate, currentTime) {
         var form = document.getElementById('rescheduleForm');
-        form.action = '{{ url("/admin/appointments") }}/' + id + '/reschedule';
+        form.action = '{{ url($basePrefix . "/appointments") }}/' + id + '/reschedule';
         document.getElementById('rDate').value = currentDate;
         document.getElementById('rTime').value = currentTime;
         document.getElementById('rescheduleModal').style.display = 'flex';

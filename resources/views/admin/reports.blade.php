@@ -108,6 +108,13 @@
 @endpush
 
 @section('content')
+@php
+    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $dashboardUrl = $role === 'student_assistant' ? url('/assistant/dashboard') : url('/admin/dashboard');
+    $marUrl = $role === 'student_assistant' ? url('/assistant/reports/mar') : url('/admin/reports/mar');
+    $inventorySummaryUrl = $role === 'student_assistant' ? url('/assistant/reports/inventory-summary') : url('/admin/reports/inventory-summary');
+    $exportHubUrl = $role === 'student_assistant' ? url('/assistant/reports/export-hub') : url('/admin/reports/export-hub');
+@endphp
 <div class="dashboard-container">
 
     <div class="stats-grid">
@@ -129,7 +136,7 @@
 
     <div class="report-grid">
         
-        <a href="{{ route('reports.mar') }}" class="report-card">
+        <a href="{{ $marUrl }}" class="report-card">
             <div>
                 <div class="report-label">Personnel Records</div>
                 <div class="report-main-title">Medical Accomplishment (MAR)</div>
@@ -137,7 +144,7 @@
             <div class="report-badge">Action Needed</div>
         </a>
 
-        <a href="{{ route('reports.inventory-summary') }}" class="report-card">
+        <a href="{{ $inventorySummaryUrl }}" class="report-card">
             <div>
                 <div class="report-label">Stocks & Supplies</div>
                 <div class="report-main-title">Inventory Summary</div>
@@ -153,7 +160,7 @@
             <div class="report-badge">Scheduled</div>
         </a>
 
-        <a href="{{ route('reports.exportHub') }}" class="report-card">
+        <a href="{{ $exportHubUrl }}" class="report-card">
             <div>
                 <div class="report-label">Summary Report</div>
                 <div class="report-main-title">Export Reports</div>
@@ -164,7 +171,7 @@
     </div>
 
     <div class="back-nav">
-        <a href="{{ url('/admin/dashboard') }}" class="btn-back-dashboard">
+        <a href="{{ $dashboardUrl }}" class="btn-back-dashboard">
             &larr; Back to System Dashboard
         </a>
     </div>

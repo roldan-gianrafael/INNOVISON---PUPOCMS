@@ -42,13 +42,13 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * The application's route middleware aliases.
+     * The application's route middleware.
      *
      * These middleware may be assigned to groups or used individually.
      *
      * @var array<string, class-string|string>
      */
-    protected $middlewareAliases = [
+    protected $routeMiddleware = [
         'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -62,5 +62,6 @@ class Kernel extends HttpKernel
 
         // ✅ Admin middleware alias added
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
     ];
 }

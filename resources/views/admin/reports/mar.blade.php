@@ -29,10 +29,15 @@
 @endpush
 
 @section('content')
+@php
+    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $isAdminLike = in_array($role, ['admin', 'super_admin'], true);
+    $reportsHomeUrl = $role === 'student_assistant' ? url('/assistant/reports') : url('/admin/reports');
+@endphp
 
 
 
- <a href="{{ route('admin.reports') }}" style="color: #64748b; text-decoration: none;">&larr; Back to Reports</a>
+ <a href="{{ $reportsHomeUrl }}" style="color: #64748b; text-decoration: none;">&larr; Back to Reports</a>
 
 
 
@@ -47,12 +52,13 @@
     </div>
 </div>
 
-<!-- button for managing mar-->
-<a href="{{ route('admin.reports.manage-mar', ['month' => $month]) }}" 
-   class="btn-filter" 
-   style="background:#70131B; color:white; padding:8px 15px; border-radius:6px; text-decoration:none; font-size:14px;">
-   Manage MAR
-</a>
+@if($isAdminLike)
+    <a href="{{ route('admin.reports.manage-mar', ['month' => $month]) }}" 
+       class="btn-filter" 
+       style="background:#70131B; color:white; padding:8px 15px; border-radius:6px; text-decoration:none; font-size:14px;">
+       Manage MAR
+    </a>
+@endif
 <div class="card">
     <h2>Medical Accomplishment Report</h2>
 

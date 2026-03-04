@@ -104,6 +104,10 @@
 @endpush
 
 @section('content')
+@php
+    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $reportsHomeUrl = $role === 'student_assistant' ? url('/assistant/reports') : url('/admin/reports');
+@endphp
 <div class="summary-container">
     <h2 class="summary-title">Inventory Summary Report</h2>
 
@@ -144,6 +148,6 @@
         </table>
     </div>
 
-    <a href="{{ route('admin.reports') }}" class="summary-back">&larr; Back to Reports</a>
+    <a href="{{ $reportsHomeUrl }}" class="summary-back">&larr; Back to Reports</a>
 </div>
 @endsection

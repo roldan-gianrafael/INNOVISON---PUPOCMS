@@ -182,13 +182,20 @@ class AdminController extends Controller
 
     public function updateProfile(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+
         $user = Auth::user();
         $user->name = $request->name;
         $user->email = $request->email;
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
-      
+        $user->save();
+
         return redirect()->back()->with('success', 'Profile updated successfully.');
     }
 

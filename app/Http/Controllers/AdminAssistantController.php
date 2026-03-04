@@ -61,62 +61,76 @@ class AdminAssistantController extends Controller
     private function resolveIntent(string $text): ?array
     {
         $month = $this->parseMonthFromText($text);
+        $basePath = $this->resolveWorkspaceBasePath();
+        $isAdminLike = $this->isAdminLikeUser();
 
         if ($this->containsAny($text, ['generate mar', 'open mar', 'show mar', 'medical accomplishment'])) {
-            $url = url('/admin/reports/mar?month=' . $month);
+            $url = url($basePath . '/reports/mar?month=' . $month);
             return $this->redirectIntent('Opening MAR report.', $url);
         }
 
         if ($this->containsAny($text, ['manage mar', 'edit mar conditions'])) {
+            if (!$isAdminLike) {
+                return [
+                    'type' => 'answer',
+                    'message' => 'Manage MAR is restricted to Admin and Super Admin accounts.',
+                ];
+            }
             $url = url('/admin/reports/manage-mar?month=' . $month);
             return $this->redirectIntent('Opening Manage MAR.', $url);
         }
 
         if ($this->containsAny($text, ['print mar', 'export mar'])) {
-            $url = url('/admin/reports/print-reports?type=mar&month=' . $month);
+            $url = url($basePath . '/reports/print-reports?type=mar&month=' . $month);
             return $this->redirectIntent('Generating MAR print report.', $url);
         }
 
         if ($this->containsAny($text, ['print inventory', 'export inventory'])) {
-            $url = url('/admin/reports/print-reports?type=inventory&month=' . $month);
+            $url = url($basePath . '/reports/print-reports?type=inventory&month=' . $month);
             return $this->redirectIntent('Generating inventory print report.', $url);
         }
 
         if ($this->containsAny($text, ['print appointment', 'export appointment'])) {
-            $url = url('/admin/reports/print-reports?type=appointment&month=' . $month);
+            $url = url($basePath . '/reports/print-reports?type=appointment&month=' . $month);
             return $this->redirectIntent('Generating appointment print report.', $url);
         }
 
         if ($this->containsAny($text, ['open dashboard', 'go to dashboard', 'show dashboard'])) {
-            return $this->redirectIntent('Opening dashboard.', url('/admin/dashboard'));
+            return $this->redirectIntent('Opening dashboard.', url($basePath . '/dashboard'));
         }
 
         if ($this->containsAny($text, ['open appointment', 'go to appointment', 'show appointment'])) {
-            return $this->redirectIntent('Opening appointments.', url('/admin/appointments'));
+            return $this->redirectIntent('Opening appointments.', url($basePath . '/appointments'));
         }
 
         if ($this->containsAny($text, ['open inventory', 'go to inventory', 'show inventory'])) {
-            return $this->redirectIntent('Opening inventory.', url('/admin/inventory'));
+            return $this->redirectIntent('Opening inventory.', url($basePath . '/inventory'));
         }
 
         if ($this->containsAny($text, ['open reports', 'go to reports', 'show reports'])) {
-            return $this->redirectIntent('Opening reports.', url('/admin/reports'));
+            return $this->redirectIntent('Opening reports.', url($basePath . '/reports'));
         }
 
         if ($this->containsAny($text, ['open settings', 'go to settings', 'show settings'])) {
+            if (!$isAdminLike) {
+                return [
+                    'type' => 'answer',
+                    'message' => 'Settings access is restricted to Admin and Super Admin accounts.',
+                ];
+            }
             return $this->redirectIntent('Opening settings.', url('/admin/settings'));
         }
 
         if ($this->containsAny($text, ['open walk in', 'open walkin', 'new walk in'])) {
-            return $this->redirectIntent('Opening walk-in management.', url('/admin/walkin'));
+            return $this->redirectIntent('Opening walk-in management.', url($basePath . '/walkin'));
         }
 
         if ($this->containsAny($text, ['open export hub', 'reports hub', 'export reports'])) {
-            return $this->redirectIntent('Opening export hub.', url('/admin/reports/export-hub'));
+            return $this->redirectIntent('Opening export hub.', url($basePath . '/reports/export-hub'));
         }
 
         if ($this->containsAny($text, ['inventory summary'])) {
-            return $this->redirectIntent('Opening inventory summary.', url('/admin/reports/inventory-summary'));
+            return $this->redirectIntent('Opening inventory summary.', url($basePath . '/reports/inventory-summary'));
         }
 
         return null;
@@ -293,6 +307,18 @@ class AdminAssistantController extends Controller
         }
 
         return sprintf('%04d-%02d', $year, $month);
+    }
+
+    private function resolveWorkspaceBasePath(): string
+    {
+        $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+        return $role === 'student_assistant' ? '/assistant' : '/admin';
+    }
+
+    private function isAdminLikeUser(): bool
+    {
+        $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+        return in_array($role, ['admin', 'super_admin'], true);
     }
 }
 

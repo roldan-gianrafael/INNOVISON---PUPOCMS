@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 
 @section('content')
+@php
+    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $printReportUrl = $role === 'student_assistant' ? url('/assistant/reports/print-reports') : url('/admin/reports/print-reports');
+@endphp
 <style>
     /* Main Container */
     .export-hub-container {
@@ -115,7 +119,7 @@
                 <h3>MAR Report</h3>
                 <p>Monthly Accomplishment Report showing patient counts.</p>
             </div>
-            <form action="{{ route('reports.print') }}" method="GET" target="_blank">
+            <form action="{{ $printReportUrl }}" method="GET" target="_blank">
                 <input type="hidden" name="type" value="mar">
                 <div class="form-group">
                     <label>SELECT MONTH:</label>
@@ -135,7 +139,7 @@
                 <h3>Inventory Stock</h3>
                 <p>Complete list of medical supplies, current stock, expiration date...</p>
             </div>
-            <form action="{{ route('reports.print') }}" method="GET" target="_blank">
+            <form action="{{ $printReportUrl }}" method="GET" target="_blank">
                 <input type="hidden" name="type" value="inventory">
                 <div class="form-group">
                     <label>SELECT MONTH:</label>
@@ -155,7 +159,7 @@
                 <h3>Appointments</h3>
                 <p>Summary of student appointments and medical consultations for the selected period.</p>
             </div>
-            <form action="{{ route('reports.print') }}" method="GET" target="_blank">
+            <form action="{{ $printReportUrl }}" method="GET" target="_blank">
                 <input type="hidden" name="type" value="appointment">
                 <div class="form-group">
                     <label>SELECT MONTH:</label>

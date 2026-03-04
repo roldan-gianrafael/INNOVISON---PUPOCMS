@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - PUPT Admin</title>
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('admin_theme');
+                var theme = savedTheme === 'light' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (error) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -212,6 +223,12 @@
         .profile-dropdown a.logout-link {
             color: var(--danger);
             border-bottom: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.2;
+            padding: 12px 14px;
         }
 
         .profile-dropdown a.logout-link:hover {
@@ -390,6 +407,7 @@
             margin-bottom: 0;
             color: rgba(255, 255, 255, 0.95);
             background: rgba(0, 0, 0, 0.18);
+            line-height: 1.2;
         }
 
         .sidebar-logout a:hover {
@@ -690,6 +708,176 @@
             border-color: rgba(255, 255, 255, 0.42);
         }
 
+        .theme-toggle-admin {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            padding: 0;
+        }
+
+        .theme-toggle-admin:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.42);
+            transform: translateY(-1px);
+        }
+
+        .theme-toggle-admin:focus-visible {
+            outline: 2px solid var(--pup-gold);
+            outline-offset: 2px;
+        }
+
+        .theme-toggle-admin svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: block;
+        }
+
+        html[data-theme="light"] body {
+            background:
+                radial-gradient(circle at -10% -10%, rgba(128, 0, 0, 0.06) 0%, transparent 42%),
+                radial-gradient(circle at 110% 120%, rgba(128, 0, 0, 0.08) 0%, transparent 36%),
+                linear-gradient(180deg, #faf2f5 0%, #f4e6eb 80%);
+            color: #3f111b;
+        }
+
+        html[data-theme="light"] .admin-header {
+            background: linear-gradient(180deg, rgba(255, 245, 248, 0.98) 0%, rgba(245, 226, 233, 0.96) 100%);
+            border-bottom-color: rgba(128, 0, 0, 0.18);
+        }
+
+        html[data-theme="light"] .header-kicker,
+        html[data-theme="light"] .header-subtitle {
+            color: #7d4b5a;
+        }
+
+        html[data-theme="light"] .header-title {
+            color: #4f1220;
+        }
+
+        html[data-theme="light"] .header-title span {
+            color: #8b0000;
+        }
+
+        html[data-theme="light"] .assistant-launch,
+        html[data-theme="light"] .theme-toggle-admin,
+        html[data-theme="light"] .sidebar-toggle {
+            background: rgba(128, 0, 0, 0.08);
+            border-color: rgba(128, 0, 0, 0.24);
+            color: #5f0012;
+        }
+
+        html[data-theme="light"] .assistant-launch:hover,
+        html[data-theme="light"] .theme-toggle-admin:hover,
+        html[data-theme="light"] .sidebar-toggle:hover {
+            background: rgba(128, 0, 0, 0.14);
+            border-color: rgba(128, 0, 0, 0.34);
+        }
+
+        html[data-theme="light"] .admin-user {
+            border-color: rgba(128, 0, 0, 0.24);
+            background: rgba(255, 255, 255, 0.78);
+        }
+
+        html[data-theme="light"] .admin-user-name {
+            color: #4f1220;
+        }
+
+        html[data-theme="light"] .admin-user-role {
+            color: #7d4b5a;
+        }
+
+        html[data-theme="light"] .sidebar {
+            background: linear-gradient(180deg, #f9edf1 0%, #efd8df 100%);
+            border-color: rgba(128, 0, 0, 0.18);
+        }
+
+        html[data-theme="light"] .sidebar-logo {
+            border-bottom-color: rgba(128, 0, 0, 0.18);
+        }
+
+        html[data-theme="light"] .sidebar-logo-title {
+            color: #5a1421;
+        }
+
+        html[data-theme="light"] .sidebar-logo-sub,
+        html[data-theme="light"] .sidebar h4 {
+            color: rgba(90, 20, 33, 0.72);
+        }
+
+        html[data-theme="light"] .sidebar-nav a {
+            color: #5a1421;
+        }
+
+        html[data-theme="light"] .sidebar-nav a:hover {
+            background: rgba(128, 0, 0, 0.08);
+            border-color: rgba(128, 0, 0, 0.18);
+        }
+
+        html[data-theme="light"] .sidebar-nav a.active {
+            background: rgba(128, 0, 0, 0.13);
+            border-color: rgba(128, 0, 0, 0.26);
+            color: #4a0f1a;
+        }
+
+        html[data-theme="light"] .sidebar-short {
+            color: #5a1421;
+            border-color: rgba(128, 0, 0, 0.24);
+            background: rgba(128, 0, 0, 0.08);
+        }
+
+        html[data-theme="light"] .sidebar-logout {
+            border-top-color: rgba(128, 0, 0, 0.18);
+        }
+
+        html[data-theme="light"] .sidebar-logout a {
+            background: rgba(128, 0, 0, 0.08);
+            border-color: rgba(128, 0, 0, 0.2);
+            color: #561320;
+        }
+
+        html[data-theme="light"] .sidebar-logout a:hover {
+            background: rgba(128, 0, 0, 0.14);
+            border-color: rgba(128, 0, 0, 0.28);
+        }
+
+        html[data-theme="light"] .main {
+            color: #3c0f18;
+            background: linear-gradient(180deg, rgba(242, 220, 227, 0.96) 0%, rgba(234, 208, 217, 0.96) 100%);
+            border-color: rgba(128, 0, 0, 0.16);
+        }
+
+        html[data-theme="light"] .profile-dropdown {
+            background: #fff4f7;
+            border-color: #d5a4af;
+        }
+
+        html[data-theme="light"] .profile-dropdown a {
+            color: #5b1623;
+            border-bottom-color: #e7c2ca;
+        }
+
+        html[data-theme="light"] .profile-dropdown a:hover {
+            background: #f8e4ea;
+            color: #56111d;
+        }
+
+        html[data-theme="light"] .profile-dropdown a.logout-link {
+            color: #a2263f;
+        }
+
         .assistant-panel {
             position: fixed;
             right: 20px;
@@ -878,6 +1066,12 @@
 
     <div class="header-right">
         <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">&#9776;</button>
+        <button type="button" class="theme-toggle-admin" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+            </svg>
+        </button>
         <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">AI Assistant</button>
 
         <div class="profile-wrap">
@@ -984,6 +1178,48 @@
 
     function toggleSidebar() {
         document.body.classList.toggle('sidebar-open');
+    }
+
+    function applyAdminTheme(theme) {
+        const normalizedTheme = theme === 'light' ? 'light' : 'dark';
+        const toggle = document.getElementById('adminThemeToggle');
+        const moonIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"></path></svg>';
+        const sunIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>';
+
+        document.documentElement.setAttribute('data-theme', normalizedTheme);
+
+        if (!toggle) {
+            return;
+        }
+
+        const isDark = normalizedTheme === 'dark';
+        toggle.innerHTML = isDark ? moonIcon : sunIcon;
+        toggle.setAttribute('aria-label', isDark ? 'Dark mode enabled' : 'Light mode enabled');
+        toggle.setAttribute('title', isDark ? 'Dark mode' : 'Light mode');
+        toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    }
+
+    function initThemeToggle() {
+        const toggle = document.getElementById('adminThemeToggle');
+        const storageKey = 'admin_theme';
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+        applyAdminTheme(currentTheme);
+
+        if (!toggle) {
+            return;
+        }
+
+        toggle.addEventListener('click', function () {
+            const activeTheme = document.documentElement.getAttribute('data-theme');
+            const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
+            applyAdminTheme(nextTheme);
+            try {
+                localStorage.setItem(storageKey, nextTheme);
+            } catch (error) {
+                console.warn('Theme preference was not saved.', error);
+            }
+        });
     }
 
     function toggleProfileMenu() {
@@ -1159,6 +1395,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
+        initThemeToggle();
     });
 </script>
 

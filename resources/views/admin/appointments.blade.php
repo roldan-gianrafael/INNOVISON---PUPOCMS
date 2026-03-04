@@ -142,7 +142,7 @@
 @section('content')
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="margin:0; color:#1e293b;">Appointments</h2>
+        <h2 style="margin:0; color:#ffffff;">Appointments</h2>
         <input type="text" id="searchInput" placeholder="Search by name..." 
                style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 300px;">
     </div>

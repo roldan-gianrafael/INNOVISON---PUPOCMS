@@ -125,7 +125,7 @@
         </div>
     </div>
 
-    <h2 style="font-size: 18px; color: #4b0f17; margin-bottom: 20px; font-weight: 700;">Select Report to Generate</h2>
+    <h2 style="font-size: 18px; color: #ffffff; margin-bottom: 20px; font-weight: 700;">Select Report to Generate</h2>
 
     <div class="report-grid">
         

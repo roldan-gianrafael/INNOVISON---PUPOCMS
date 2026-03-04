@@ -12,20 +12,21 @@
 
     <style>
         :root {
-            --bg: #f4f6f8;
-            --bg-grad-1: #f8fafc;
-            --bg-grad-2: #f2f4f7;
-            --surface: #ffffff;
-            --surface-soft: #f8fafc;
-            --stroke: #e4e8ef;
-            --stroke-strong: #d5dbe5;
-            --text: #111827;
-            --muted: #6b7280;
-            --pup-maroon: #70131B;
-            --pup-maroon-dark: #5a0f16;
-            --pup-maroon-soft: #f9edef;
-            --danger: #d83a52;
-            --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.06);
+            --bg: #2a0e16;
+            --bg-grad-1: #5b1a2a;
+            --bg-grad-2: #3a111c;
+            --surface: #5a1d2a;
+            --surface-soft: #733242;
+            --stroke: #8d4c5b;
+            --stroke-strong: #a86373;
+            --text: #fff0f4;
+            --muted: #f0c5cf;
+            --pup-maroon: #800000;
+            --pup-maroon-dark: #5f0012;
+            --pup-maroon-soft: #f1d9df;
+            --pup-gold: #ffb81c;
+            --danger: #ff9cb0;
+            --shadow-soft: 0 14px 30px rgba(22, 5, 10, 0.32);
             --radius-xl: 22px;
             --radius-lg: 16px;
             --radius-md: 12px;
@@ -42,7 +43,8 @@
             margin: 0;
             font-family: "Manrope", "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
             background:
-                radial-gradient(circle at 0% -20%, var(--bg-grad-1) 0%, transparent 50%),
+                radial-gradient(circle at -10% -10%, rgba(255, 255, 255, 0.09) 0%, transparent 42%),
+                radial-gradient(circle at 110% 120%, rgba(255, 184, 28, 0.08) 0%, transparent 36%),
                 linear-gradient(180deg, var(--bg-grad-2) 0%, var(--bg) 80%);
             color: var(--text);
             height: 100vh;
@@ -54,9 +56,9 @@
         .admin-header {
             position: sticky;
             top: 0;
-            background: rgba(244, 246, 248, 0.88);
+            background: linear-gradient(180deg, rgba(80, 18, 31, 0.96) 0%, rgba(59, 13, 23, 0.94) 100%);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--stroke);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
             padding: 14px clamp(16px, 3vw, 30px);
             display: flex;
             justify-content: space-between;
@@ -90,7 +92,7 @@
         }
 
         .header-title span {
-            color: var(--pup-maroon);
+            color: var(--pup-gold);
         }
 
         .header-subtitle {
@@ -125,8 +127,8 @@
         }
 
         .admin-user {
-            border: 1px solid var(--stroke);
-            background: var(--surface);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 14px;
             padding: 8px 10px;
             display: flex;
@@ -138,7 +140,7 @@
         }
 
         .admin-user:hover {
-            border-color: var(--stroke-strong);
+            border-color: rgba(255, 255, 255, 0.4);
             box-shadow: var(--shadow-soft);
             transform: translateY(-1px);
         }
@@ -182,11 +184,11 @@
             position: absolute;
             top: 54px;
             right: 0;
-            background: var(--surface);
+            background: #f4dde4;
             width: 190px;
             box-shadow: var(--shadow-soft);
             border-radius: 12px;
-            border: 1px solid var(--stroke);
+            border: 1px solid #cb97a3;
             overflow: hidden;
             z-index: 1000;
         }
@@ -194,17 +196,17 @@
         .profile-dropdown a {
             display: block;
             padding: 12px 16px;
-            color: #1f2937;
+            color: #4b0f19;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
             transition: background 0.2s ease, color 0.2s ease;
-            border-bottom: 1px solid var(--surface-soft);
+            border-bottom: 1px solid #e4bdc7;
         }
 
         .profile-dropdown a:hover {
-            background: var(--surface-soft);
-            color: var(--pup-maroon);
+            background: #edd0d8;
+            color: #5c0e1a;
         }
 
         .profile-dropdown a.logout-link {
@@ -213,7 +215,7 @@
         }
 
         .profile-dropdown a.logout-link:hover {
-            background: #fff1f4;
+            background: #f4cfd8;
         }
 
         .admin-layout {
@@ -226,9 +228,9 @@
         }
 
         .sidebar {
-            width: 92px;
-            background: linear-gradient(180deg, #771822 0%, #631018 100%);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            width: 86px;
+            background: linear-gradient(180deg, #2a1318 0%, #1a0b0f 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-soft);
             padding: 20px 14px;
@@ -241,7 +243,7 @@
         }
 
         .sidebar:hover {
-            width: 270px;
+            width: 258px;
         }
 
         .sidebar-logo {
@@ -250,18 +252,18 @@
             gap: 12px;
             margin-bottom: 20px;
             padding-bottom: 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            min-width: 220px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+            min-width: 210px;
         }
 
         .sidebar-logo img {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
             background: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.28);
             object-fit: cover;
-            padding: 4px;
+            padding: 3px;
         }
 
         .sidebar-logo-title {
@@ -276,10 +278,10 @@
 
         .sidebar-logo-sub {
             margin: 3px 0 0;
-            color: rgba(255, 255, 255, 0.75);
-            font-size: 11px;
+            color: rgba(255, 255, 255, 0.68);
+            font-size: 10px;
             font-weight: 600;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
@@ -290,10 +292,10 @@
         }
 
         .sidebar h4 {
-            color: rgba(255, 255, 255, 0.72);
+            color: rgba(255, 255, 255, 0.62);
             margin: 0 0 12px;
             font-size: 10px;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.16em;
             text-transform: uppercase;
             font-weight: 800;
             white-space: nowrap;
@@ -306,52 +308,53 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 11px 12px;
+            padding: 10px 12px;
             border-radius: var(--radius-md);
             border: 1px solid transparent;
-            color: rgba(255, 255, 255, 0.92);
+            color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             letter-spacing: 0.01em;
             transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-            min-width: 220px;
+            min-width: 210px;
             white-space: nowrap;
         }
 
         .sidebar-nav a:hover {
-            background: rgba(255, 255, 255, 0.13);
-            border-color: rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
             transform: translateX(1px);
         }
 
         .sidebar-nav a.active {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.34);
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.26);
             color: #ffffff;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
         }
 
-        .sidebar-icon {
-            width: 32px;
-            height: 32px;
+        .sidebar-short {
+            width: 34px;
+            height: 34px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.34);
-            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
             flex-shrink: 0;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.1em;
             color: #ffffff;
+            font-family: "Outfit", "Manrope", sans-serif;
         }
 
-        .sidebar-nav a.active .sidebar-icon {
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.2);
+        .sidebar-nav a.active .sidebar-short {
+            border-color: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.16);
             color: #ffffff;
         }
 
@@ -371,25 +374,45 @@
         .sidebar-logout {
             margin-top: auto;
             padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.16);
         }
 
         .sidebar-logout a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            min-width: 210px;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
             margin-bottom: 0;
             color: rgba(255, 255, 255, 0.95);
+            background: rgba(0, 0, 0, 0.18);
         }
 
-        .sidebar-logout .sidebar-icon {
+        .sidebar-logout a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateX(1px);
+        }
+
+        .sidebar-logout .sidebar-short {
             color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.4);
-            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.26);
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .main {
             flex: 1;
             min-width: 0;
             overflow-y: auto;
-            padding: 2px;
+            padding: 14px;
+            color: #3c0f18;
+            background: linear-gradient(180deg, rgba(140, 72, 89, 0.22) 0%, rgba(98, 33, 47, 0.26) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: var(--radius-xl);
         }
 
         .main::-webkit-scrollbar,
@@ -404,7 +427,7 @@
 
         .main::-webkit-scrollbar-thumb,
         .sidebar::-webkit-scrollbar-thumb {
-            background: #d6dce5;
+            background: #b17382;
             border-radius: 999px;
         }
 
@@ -532,39 +555,70 @@
 
     <style>
         /* Global Admin Theme Overrides */
-        .main :where(.card, .panel, .report-card, .stat-card-mini, .modal-box) {
-            border: 1px solid #eadde1 !important;
+        .main :where(.card, .panel, .stat-card-mini, .modal-box) {
+            background: linear-gradient(165deg, #f2dee4 0%, #eacbd3 100%) !important;
+            border: 1px solid #cc97a3 !important;
             border-radius: 14px !important;
-            box-shadow: 0 8px 24px rgba(112, 19, 27, 0.06) !important;
+            box-shadow: 0 10px 24px rgba(47, 8, 16, 0.16) !important;
+            color: #3b0f18 !important;
         }
 
-        .main :where(h2, h3) {
+        .main :where(h1, h2, h3, h4, h5) {
             color: #4b0f17;
             letter-spacing: -0.01em;
         }
 
-        .main :where(a) {
+        .main :where(a):not(.report-card) {
             color: #70131B;
         }
 
-        .main :where(a:hover) {
+        .main :where(a:hover):not(.report-card) {
             color: #5a0f16;
         }
 
+        /* Keep Reports cards high-contrast even on hover */
+        .main .report-grid .report-card {
+            background: #6f1422 !important;
+            border: 1px solid #8f3444 !important;
+            color: #ffffff !important;
+        }
+
+        .main .report-grid .report-card:hover {
+            background: #7d1a2a !important;
+            color: #ffffff !important;
+            filter: none !important;
+        }
+
+        .main .report-grid .report-card .report-label {
+            color: #f2d4dc !important;
+        }
+
+        .main .report-grid .report-card .report-main-title {
+            color: #ffffff !important;
+        }
+
+        .main .report-grid .report-card .report-badge {
+            background: rgba(255, 255, 255, 0.16) !important;
+            color: #ffffff !important;
+        }
+
         .main :where(table th) {
-            border-bottom-color: #eddde2 !important;
-            color: #6b7280 !important;
+            border-bottom-color: #ca97a2 !important;
+            color: #61202d !important;
             letter-spacing: 0.06em;
+            background: rgba(255, 255, 255, 0.24) !important;
         }
 
         .main :where(table td) {
-            border-bottom-color: #f4ebee !important;
+            border-bottom-color: #d7b0b9 !important;
+            color: #43111a !important;
         }
 
         .main :where(.form-control, .form-input, .input-month, input, select, textarea) {
-            border-color: #dcc9ce !important;
+            border-color: #c88f9b !important;
             border-radius: 10px !important;
-            background: #ffffff;
+            background: #fff6f8 !important;
+            color: #41111b !important;
         }
 
         .main :where(.form-control, .form-input, .input-month, input, select, textarea):focus {
@@ -574,35 +628,35 @@
         }
 
         .main :where(.btn-save, .btn-add, .btn-add-walkin, .btn-filter, .btn-change, .btn-generate, .btn-primary, .btn-complete) {
-            background: #70131B !important;
+            background: #720f1e !important;
             color: #ffffff !important;
-            border: 1px solid #70131B !important;
+            border: 1px solid #720f1e !important;
         }
 
         .main :where(.btn-save:hover, .btn-add:hover, .btn-add-walkin:hover, .btn-filter:hover, .btn-change:hover, .btn-generate:hover, .btn-primary:hover, .btn-complete:hover) {
-            background: #5a0f16 !important;
-            border-color: #5a0f16 !important;
+            background: #590b17 !important;
+            border-color: #590b17 !important;
             color: #ffffff !important;
         }
 
         .main :where(.btn-edit, .btn-view, .btn-outline) {
-            background: #fff3f5 !important;
-            color: #70131B !important;
-            border: 1px solid #f1d8dd !important;
+            background: #f7e2e8 !important;
+            color: #65101d !important;
+            border: 1px solid #d6a2ad !important;
         }
 
         .main :where(.btn-edit:hover, .btn-view:hover, .btn-outline:hover) {
-            background: #fbe8ed !important;
+            background: #efd0d8 !important;
         }
 
         .main :where(.btn-delete, .btn-cancel) {
-            background: #fff1f4 !important;
+            background: #f6d9e2 !important;
             color: #b42339 !important;
-            border: 1px solid #f8c7d2 !important;
+            border: 1px solid #e6a8b7 !important;
         }
 
         .main :where(.status.completed) {
-            background: #f9eaed !important;
+            background: #f3d2dc !important;
             color: #781826 !important;
         }
 
@@ -620,9 +674,9 @@
         }
 
         .assistant-launch {
-            border: 1px solid #e9d9de;
-            background: #fff3f6;
-            color: #70131B;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
             border-radius: 12px;
             padding: 9px 12px;
             font-size: 12px;
@@ -632,8 +686,8 @@
         }
 
         .assistant-launch:hover {
-            background: #fbe8ee;
-            border-color: #e8cdd5;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.42);
         }
 
         .assistant-panel {
@@ -641,8 +695,8 @@
             right: 20px;
             bottom: 18px;
             width: min(420px, calc(100vw - 24px));
-            background: #ffffff;
-            border: 1px solid #e6d5db;
+            background: #f2dde3;
+            border: 1px solid #bf8592;
             border-radius: 16px;
             box-shadow: 0 20px 40px rgba(112, 19, 27, 0.14);
             z-index: 1200;
@@ -692,7 +746,7 @@
             max-height: 300px;
             overflow-y: auto;
             padding: 12px;
-            background: #fff;
+            background: #f8eaee;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -710,31 +764,31 @@
 
         .assistant-bubble.user {
             margin-left: auto;
-            background: #fff3f6;
-            border-color: #ead2d9;
-            color: #70131B;
+            background: #efd2d9;
+            border-color: #d49faa;
+            color: #5b0e1a;
         }
 
         .assistant-bubble.assistant {
-            background: #f9fafb;
-            border-color: #e5e7eb;
-            color: #1f2937;
+            background: #f3dde4;
+            border-color: #dbb1bb;
+            color: #3e0f18;
         }
 
         .assistant-controls {
-            border-top: 1px solid #e5053d;
+            border-top: 1px solid #c7909e;
             padding: 10px;
             display: flex;
             gap: 8px;
             align-items: center;
-            background: #fff;
+            background: #f2dce3;
         }
 
         .assistant-mic,
         .assistant-send {
-            border: 1px solid #e4ccd3;
-            background: #fff3f6;
-            color: #70131B;
+            border: 1px solid #6e1220;
+            background: #6e1220;
+            color: #ffffff;
             padding: 8px 10px;
             border-radius: 10px;
             font-size: 12px;
@@ -756,11 +810,12 @@
 
         .assistant-input {
             flex: 1;
-            border: 1px solid #dcc9ce;
+            border: 1px solid #c18895;
             border-radius: 10px;
             padding: 9px 10px;
             font-size: 13px;
-            color: #111827;
+            color: #40111b;
+            background: #fff6f8;
         }
 
         .assistant-input:focus {
@@ -773,9 +828,9 @@
             margin: 0;
             padding: 8px 11px 11px;
             font-size: 11px;
-            color: #6b7280;
-            border-top: 1px solid #f3e8eb;
-            background: #fffdfd;
+            color: #5d2833;
+            border-top: 1px solid #d9b0bb;
+            background: #ebd2d9;
         }
 
         @media (max-width: 860px) {
@@ -823,7 +878,7 @@
 
 <div class="admin-layout">
   
-  <aside class="sidebar">
+  <aside class="sidebar" id="adminSidebar">
     <div class="sidebar-logo">
       <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
       <div class="sidebar-logo-text">
@@ -835,28 +890,27 @@
     <h4>Main Menu</h4>
     <nav class="sidebar-nav">
       <a href="{{ url('/admin/dashboard') }}" class="{{ Request::is('admin/dashboard') ? 'active' : '' }}">
-        <span class="sidebar-icon">🏠</span> Dashboard
+        <span class="sidebar-short">DB</span><span class="sidebar-label">Dashboard</span>
       </a>
       <a href="{{ url('/admin/appointments') }}" class="{{ Request::is('admin/appointments') ? 'active' : '' }}">
-        <span class="sidebar-icon">📅</span> Appointments
+        <span class="sidebar-short">AP</span><span class="sidebar-label">Appointments</span>
       </a>
       <a href="{{ url('/admin/inventory') }}" class="{{ Request::is('admin/inventory') ? 'active' : '' }}">
-        <span class="sidebar-icon">📦</span> Inventory
+        <span class="sidebar-short">IN</span><span class="sidebar-label">Inventory</span>
       </a>
       <a href="{{ url('/admin/reports') }}" class="{{ Request::is('admin/reports') ? 'active' : '' }}">
-        <span class="sidebar-icon">📊</span> Reports
+        <span class="sidebar-short">RP</span><span class="sidebar-label">Reports</span>
       </a>
       <a href="{{ url('/admin/settings') }}" class="{{ Request::is('admin/settings') ? 'active' : '' }}">
-        <span class="sidebar-icon">⚙️</span> Settings
-      </a>
-      
-
-     
-
-      <a href="{{ url('/') }}" style="margin-top: 40px; background: rgba(0,0,0,0.2);">
-        <span class="sidebar-icon">🚪</span> Logout
+        <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>
       </a>
     </nav>
+
+    <div class="sidebar-logout">
+      <a href="{{ url('/') }}">
+        <span class="sidebar-short">LO</span><span class="sidebar-label">Logout</span>
+      </a>
+    </div>
   </aside>
 
     <main class="main">

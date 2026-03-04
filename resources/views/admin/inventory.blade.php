@@ -44,14 +44,14 @@
 @section('content')
 
     <div class="controls">
-        <h2 style="margin:0; color:#4b0f17;">Clinic Inventory</h2>
+        <h2 style="margin:0; color:#ffffff;">Clinic Inventory</h2>
         <button class="btn-add" onclick="openModal()">+ Add New Item</button>
     </div>
 
     <div class="card">
         <table>
             <thead>
-                <tr>
+                <tr>    
                     <th>Item Name</th>
                     <th>Category</th>
                     <th>Quantity</th>

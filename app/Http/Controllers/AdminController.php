@@ -187,14 +187,16 @@ class AdminController extends Controller
             'email' => 'required|email|max:255',
             'password' => 'nullable|string|min:6|confirmed',
         ]);
-
+        
+       /** @var \App\Models\User $user */
         $user = Auth::user();
         $user->name = $request->name;
         $user->email = $request->email;
+
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
-        $user->save();
+        $user->save(); // Mawawala na ang error dito
 
         return redirect()->back()->with('success', 'Profile updated successfully.');
     }

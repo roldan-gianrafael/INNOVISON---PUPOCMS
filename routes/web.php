@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Http\Controllers\AdminAssistantController;
 use App\Http\Controllers\AdminController;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 // --- PUBLIC ROUTES (No login required) ---
 Route::get('/', function () {
-    return view('landing');
+    return view('login');
 });
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login-action', [LoginController::class, 'login']);

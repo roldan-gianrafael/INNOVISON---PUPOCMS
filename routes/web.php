@@ -39,7 +39,7 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class])->group(func
     Route::get('/student/history', [AppointmentController::class, 'history']);
     Route::post('/student/appointments/store', [AppointmentController::class, 'store']);
     Route::post('/student/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
-    Route::post('/student/update-contact', [AppointmentController::class, 'updateContact']);
+Route::post('/student/update-contact', [AppointmentController::class, 'updateContact'])->name('student.updateContact');
 
     Route::get('/student/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
     Route::post('/student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');

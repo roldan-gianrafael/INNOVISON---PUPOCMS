@@ -62,7 +62,7 @@
     /* --- LAYOUT GRID --- */
     .account-layout {
         display: grid;
-        grid-template-columns: 2fr 1fr; /* Left: Appointments, Right: Settings */
+        grid-template-columns: 2fr 1fr;
         gap: 24px;
     }
 
@@ -89,7 +89,6 @@
     }
     .appt-card:hover { transform: translateY(-3px); }
 
-    /* Status Colors */
     .appt-card.approved { border-left-color: #10b981; }
     .appt-card.pending { border-left-color: #f59e0b; }
     .appt-card.cancelled { border-left-color: #ef4444; }
@@ -135,7 +134,6 @@
     }
 
     .input-label { font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; display: block; }
-    .input-wrapper { position: relative; margin-bottom: 16px; }
     
     .form-control { 
         width: 100%; 
@@ -149,19 +147,6 @@
     }
     .form-control:focus { border-color: #8B0000; box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.05); outline: none; }
     .form-control:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
-
-    .btn-save {
-        width: 100%;
-        background: #334155;
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 8px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-    .btn-save:hover { background: #1e293b; }
 
     /* --- NOTIFICATIONS --- */
     .alert-success { background: #dcfce7; color: #15803d; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; border: 1px solid #bbf7d0; }
@@ -251,6 +236,7 @@
 
     <div class="account-layout">
         
+        {{-- Left: History --}}
         <div>
             <div class="section-title">My Appointment History</div>
 
@@ -264,7 +250,7 @@
                         </div>
                     </div>
                     
-                    @if($appt->remarks) {{-- Ginagamit ang remarks field mula sa booking --}}
+                    @if($appt->remarks)
                         <div class="appt-notes">
                             "{{ $appt->remarks }}"
                         </div>
@@ -282,6 +268,7 @@
             @endforelse
         </div>
     
+        {{-- Right: Widgets --}}
         <div>
             <div class="barcode-status-card {{ $user->barcode ? 'linked' : 'not-linked' }}">
                 <div class="barcode-label">Clinic ID Link Status</div>
@@ -293,11 +280,12 @@
                 @else
                     <div class="barcode-icon-box">⚠️</div>
                     <span class="barcode-value" style="color: #b45309;">Not Yet Linked</span>
-                    <p style="font-size: 12px; color: #64748b; margin: 0;">Scan your physical ID to enable quick clinic check-ins.</p>
+                    <p style="font-size: 12px; color: #64748b; margin: 0;">Scan your physical ID for quick check-ins.</p>
                     <a href="{{ route('barcode.register') }}" class="btn-barcode-action">Register Barcode Now →</a>
                 @endif
             </div>
             
+            {{-- Notification Div (Nandito pa rin) --}}
             <div class="widget-card">
                 <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Notifications</div>
                 @forelse($notifications as $notif)
@@ -313,55 +301,62 @@
                 @endforelse
             </div>
 
-             <div class="widget-card">
+            {{-- Full Profile Widget --}}
+            <div class="widget-card">
     <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Full Medical & Academic Profile</div>
     
     <form action="{{ route('student.updateContact') }}" method="POST">
-    @csrf
-    
-    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <div>
-            <label class="input-label">Course</label>
-            <input type="text" class="form-control" value="{{ $user->course }}" readonly style="background-color: #f8fafc;">
+        @csrf
+        
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div>
+                <label class="input-label">Course</label>
+                <input type="text" class="form-control" value="{{ $user->course }}" readonly style="background-color: #f8fafc;">
+            </div>
+            <div>
+                <label class="input-label">Year</label>
+                <input type="text" name="year" class="form-control editable-input" value="{{ old('year', $user->year) }}" disabled>
+            </div>
+            <div>
+                <label class="input-label">Section</label>
+                <input type="text" name="section" class="form-control editable-input" value="{{ old('section', $user->section) }}" disabled>
+            </div>
         </div>
-        <div>
-            <label class="input-label">Year</label>
-            <input type="text" class="form-control" value="{{ $user->year }}" readonly style="background-color: #f8fafc;">
-        </div>
-        <div>
-            <label class="input-label">Section</label>
-            <input type="text" class="form-control" value="{{ $user->section }}" readonly style="background-color: #f8fafc;">
-        </div>
-    </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <div>
-            <label class="input-label">Gender</label>
-            <input type="text" class="form-control" value="{{ $user->gender }}" readonly style="background-color: #f8fafc;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div>
+                <label class="input-label">Gender</label>
+                <input type="text" class="form-control" value="{{ $user->gender }}" readonly style="background-color: #f8fafc;">
+            </div>
+            <div>
+                <label class="input-label">Birthday (DOB)</label>
+                <input type="text" class="form-control" value="{{ $user->DOB }}" readonly style="background-color: #f8fafc;">
+            </div>
         </div>
-        <div>
-            <label class="input-label">Birthday (DOB)</label>
-            <input type="text" class="form-control" value="{{ $user->DOB }}" readonly style="background-color: #f8fafc;">
-        </div>
-    </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <div>
-            <label class="input-label">Height (cm)</label>
-            <input type="number" step="0.1" name="height" class="form-control" value="{{ old('height', $user->height) }}">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div>
+                <label class="input-label">Height (cm)</label>
+                <input type="number" step="0.1" name="height" class="form-control editable-input" value="{{ old('height', $user->height) }}" disabled>
+            </div>
+            <div>
+                <label class="input-label">Weight (kg)</label>
+                <input type="number" step="0.1" name="weight" class="form-control editable-input" value="{{ old('weight', $user->weight) }}" disabled>
+            </div>
         </div>
-        <div>
-            <label class="input-label">Weight (kg)</label>
-            <input type="number" step="0.1" name="weight" class="form-control" value="{{ old('weight', $user->weight) }}">
+
+        <div style="margin-bottom: 15px;">
+            <label class="input-label">Contact Number</label>
+            <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $user->contact_no) }}" disabled>
         </div>
-    </div>
 
-    <div style="margin-bottom: 15px;">
-        <label class="input-label">Contact Number</label>
-        <input type="text" name="contact_no" class="form-control" value="{{ old('contact_no', $user->contact_no) }}">
-    </div>
+        <div id="editActionContainer">
+            <button type="button" id="editBtn" onclick="enableEditing()" style="width: 100%; padding: 12px; background: #8B0000; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                Edit Profile
+            </button>
+        </div>
 
-    <div id="saveAction" style="display: none; gap: 10px;">
+        <div id="saveAction" style="display: none; gap: 10px;">
             <button type="submit" style="flex: 1; padding: 12px; background: #8B0000; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
                 Save Changes
             </button>
@@ -369,25 +364,26 @@
                 Cancel
             </button>
         </div>
-</form>
+    </form>
 </div>
+        </div>
     </div>
 </div>
-@endsection
+
 <script>
 function enableEditing() {
-    // 1. Kunin lahat ng input na may class 'editable-input'
+    // 1. I-enable lahat ng inputs na may class 'editable-input'
     const inputs = document.querySelectorAll('.editable-input');
     
-    // 2. Tanggalin ang 'disabled' attribute para makapag-type na ang student
     inputs.forEach(input => {
         input.removeAttribute('disabled');
-        input.style.borderColor = '#8B0000'; // Palitan ang kulay para alam nilang editable na
+        input.style.borderColor = '#8B0000'; 
         input.style.backgroundColor = '#fff';
     });
 
-    // 3. Itago ang Edit button at ipakita ang Save/Cancel buttons
+    // 2. I-toggle ang buttons
     document.getElementById('editBtn').style.display = 'none';
     document.getElementById('saveAction').style.display = 'flex';
 }
 </script>
+@endsection

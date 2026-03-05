@@ -123,6 +123,16 @@ class AdminController extends Controller
         if ($appointment) {
             $appointment->status = $status;
             $appointment->save();
+
+            \App\Models\ActivityLog::create([
+            'user_id'     => auth()->id(), 
+            'user_name'   => auth()->user()->name,
+            'action'      => 'Status Updated',
+            'description' => "Updated Appointment #$id status to $status",
+            'ip_address'  => request()->ip(),
+            'user_agent'  => request()->userAgent(),
+        ]);
+
             return redirect()->back()->with('success', "Appointment marked as $status.");
         }
         return redirect()->back()->with('error', "Appointment not found.");
@@ -136,6 +146,17 @@ class AdminController extends Controller
             $appointment->time = $request->time;
             $appointment->status = 'Approved';
             $appointment->save();
+
+            // LOGS CODES
+             \App\Models\ActivityLog::create([
+            'user_id'     => auth()->id(),
+            'user_name'   => auth()->user()->name,
+            'action'      => 'Appointment Rescheduled', 
+            'description' => "Rescheduled Appointment #$id to $request->date at $request->time. Status set to Approved.", 
+            'ip_address'  => request()->ip(),
+            'user_agent'  => request()->userAgent(),
+        ]);
+
             return redirect()->back()->with('success', "Appointment rescheduled successfully.");
         }
         return redirect()->back()->with('error', "Error rescheduling.");
@@ -143,26 +164,73 @@ class AdminController extends Controller
 
     // --- 2. INVENTORY ACTIONS ---
     public function storeItem(Request $request)
-    {
-        Item::create($request->all());
-        return redirect()->back()->with('success', 'New item added to inventory.');
+{
+    // 1. I-save muna ang item at i-store sa variable ($item) para makuha natin ang data nito
+    $item = Item::create($request->all());
+
+    // 2. LOGS CODES
+    \App\Models\ActivityLog::create([
+        'user_id'     => auth()->id(),
+        'user_name'   => auth()->user()->name,
+        'action'      => 'Inventory Update', // Baguhin ang Action Name para sa Inventory
+        'description' => "Added new item: " . $item->item_name . " (Qty: " . $item->quantity . ")", 
+        // Ginamit natin ang $item variable para makuha ang pangalan at quantity
+        'ip_address'  => request()->ip(),
+        'user_agent'  => request()->userAgent(),
+    ]);
+
+     return redirect()->back()->with('success', 'New item added to inventory.');
     }
 
     public function updateItem($id, Request $request)
-    {
-        $item = Item::find($id);
-        if ($item) {
-            $item->update($request->all());
-            return redirect()->back()->with('success', 'Item updated successfully.');
-        }
-        return redirect()->back()->with('error', 'Item not found.');
-    }
+{
+    $item = Item::find($id);
+    if ($item) {
+      
+        $oldName = $item->item_name; 
+        
+        $item->update($request->all());
 
-    public function deleteItem($id)
-    {
-        Item::destroy($id);
+        // LOGS CODES
+        \App\Models\ActivityLog::create([
+            'user_id'     => auth()->id(),
+            'user_name'   => auth()->user()->name,
+            'action'      => 'Inventory Edited', 
+            'description' => "Updated Item: $oldName (ID: #$id). New Qty: " . $item->quantity,
+            'ip_address'  => request()->ip(),
+            'user_agent'  => request()->userAgent(),
+        ]);
+
+        return redirect()->back()->with('success', 'Item updated successfully.');
+    }
+    return redirect()->back()->with('error', 'Item not found.');
+}
+
+   public function deleteItem($id)
+{
+  
+    $item = Item::find($id);
+
+    if ($item) {
+        $itemName = $item->item_name; 
+
+        $item->delete();
+
+        // 3. LOGS CODES
+        \App\Models\ActivityLog::create([
+            'user_id'     => auth()->id(),
+            'user_name'   => auth()->user()->name,
+            'action'      => 'Inventory Deleted',
+            'description' => "Permanently removed item: $itemName (ID: #$id) from inventory.",
+            'ip_address'  => request()->ip(),
+            'user_agent'  => request()->userAgent(),
+        ]);
+
         return redirect()->back()->with('success', 'Item removed.');
     }
+
+    return redirect()->back()->with('error', 'Item not found.');
+}
 
     // --- 3. SETTINGS & PROFILE ---
     public function updateSettings(Request $request)
@@ -178,29 +246,54 @@ class AdminController extends Controller
         $settings->auto_approve = $request->has('auto_approve');
         $settings->save();
 
+        // --- LOGS CODES ---
+    \App\Models\ActivityLog::create([
+        'user_id'     => auth()->id(),
+        'user_name'   => auth()->user()->name,
+        'action'      => 'System Settings Updated',
+        'description' => "Modified clinic configuration (Name: $request->clinic_name, Hours: $request->open_time - $request->close_time)",
+        'ip_address'  => request()->ip(),
+        'user_agent'  => request()->userAgent(),
+    ]);
+
         return redirect()->back()->with('success', 'System settings saved.');
     }
 
     public function updateProfile(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'password' => 'nullable|string|min:6|confirmed',
-        ]);
-        
-       /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $user->name = $request->name;
-        $user->email = $request->email;
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'password' => 'nullable|string|min:6|confirmed',
+    ]);
+    
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+    
+    // I-track natin kung nagpalit ba ng password para sa log description
+    $passwordChanged = $request->filled('password') ? ' (Password was also updated)' : '';
 
-        if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
-        }
-        $user->save(); // Mawawala na ang error dito
+    $user->name = $request->name;
+    $user->email = $request->email;
 
-        return redirect()->back()->with('success', 'Profile updated successfully.');
+    if ($request->filled('password')) {
+        $user->password = bcrypt($request->password);
     }
+    
+    $user->save();
+
+    // --- LOGS CODES ---
+    \App\Models\ActivityLog::create([
+        'user_id'     => $user->id,
+        'user_name'   => $user->name,
+        'action'      => 'Security Update', 
+        'description' => "User updated their primary profile info: Name/Email{$passwordChanged}.",
+        'ip_address'  => $request->ip(),
+        'user_agent'  => $request->userAgent(),
+    ]);
+
+    return redirect()->back()->with('success', 'Profile updated successfully.');
+}
 
     // --- 4. EXPORTS (CSV) ---
     public function exportReports()

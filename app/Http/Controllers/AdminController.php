@@ -9,7 +9,7 @@ use App\Models\ActivityLog;
 use App\Models\Item;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Response; // <-- for CSV exports
+use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -165,16 +165,16 @@ class AdminController extends Controller
     // --- 2. INVENTORY ACTIONS ---
     public function storeItem(Request $request)
 {
-    // 1. I-save muna ang item at i-store sa variable ($item) para makuha natin ang data nito
+  
     $item = Item::create($request->all());
 
     // 2. LOGS CODES
     \App\Models\ActivityLog::create([
         'user_id'     => auth()->id(),
         'user_name'   => auth()->user()->name,
-        'action'      => 'Inventory Update', // Baguhin ang Action Name para sa Inventory
+        'action'      => 'Inventory Update', 
         'description' => "Added new item: " . $item->item_name . " (Qty: " . $item->quantity . ")", 
-        // Ginamit natin ang $item variable para makuha ang pangalan at quantity
+   
         'ip_address'  => request()->ip(),
         'user_agent'  => request()->userAgent(),
     ]);
@@ -270,7 +270,7 @@ class AdminController extends Controller
     /** @var \App\Models\User $user */
     $user = Auth::user();
     
-    // I-track natin kung nagpalit ba ng password para sa log description
+
     $passwordChanged = $request->filled('password') ? ' (Password was also updated)' : '';
 
     $user->name = $request->name;
@@ -297,95 +297,127 @@ class AdminController extends Controller
 
     // --- 4. EXPORTS (CSV) ---
     public function exportReports()
-    {
-        $appointments = Appointment::all();
-        $filename = "appointments_" . date('Y-m-d_H-i-s') . ".csv";
-        $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
-        $columns = ['ID','Name','Email','Student ID','Service','Date','Time','Status','Notes'];
+{
+    $appointments = Appointment::all();
+    $filename = "appointments_" . date('Y-m-d_H-i-s') . ".csv";
+    $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
+    $columns = ['ID','Name','Email','Student ID','Service','Date','Time','Status','Notes'];
 
-        $callback = function() use ($appointments, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-            foreach ($appointments as $appt) {
-                fputcsv($file, [
-                    $appt->id,
-                    $appt->name,
-                    $appt->email,
-                    $appt->student_id,
-                    $appt->service,
-                    $appt->date,
-                    $appt->time,
-                    $appt->status,
-                    $appt->notes
-                ]);
-            }
-            fclose($file);
-        };
+    // --- LOGS CODES ---
+    \App\Models\ActivityLog::create([
+        'user_id'     => auth()->id(),
+        'user_name'   => auth()->user()->name,
+        'action'      => 'Report Exported',
+        'description' => "Downloaded appointment reports as CSV ($filename). Total records: " . $appointments->count(),
+        'ip_address'  => request()->ip(),
+        'user_agent'  => request()->userAgent(),
+    ]);
 
-        return Response::stream($callback, 200, $headers);
-    }
+    $callback = function() use ($appointments, $columns) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+        foreach ($appointments as $appt) {
+            fputcsv($file, [
+                $appt->id,
+                $appt->name,
+                $appt->email,
+                $appt->student_id,
+                $appt->service,
+                $appt->date,
+                $appt->time,
+                $appt->status,
+                $appt->notes
+            ]);
+        }
+        fclose($file);
+    };
+
+    return Response::stream($callback, 200, $headers);
+}
 
     public function exportInventory()
-    {
-        $items = Item::all();
-        $filename = "inventory_" . date('Y-m-d_H-i-s') . ".csv";
-        $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
-        $columns = ['ID','Name','Category','Quantity'];
+{
+    $items = Item::all();
+    $filename = "inventory_" . date('Y-m-d_H-i-s') . ".csv";
+    $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
+    $columns = ['ID','Name','Category','Quantity'];
 
-        $callback = function() use ($items, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-            foreach ($items as $item) {
-                fputcsv($file, [
-                    $item->id,
-                    $item->name,
-                    $item->category,
-                    $item->quantity
-                ]);
-            }
-            fclose($file);
-        };
+    // --- LOGS CODES ---
+    \App\Models\ActivityLog::create([
+        'user_id'     => auth()->id(),
+        'user_name'   => auth()->user()->name,
+        'action'      => 'Inventory Exported',
+        'description' => "Exported full inventory list to CSV ($filename). Total items logged: " . $items->count(),
+        'ip_address'  => request()->ip(),
+        'user_agent'  => request()->userAgent(),
+    ]);
 
-        return Response::stream($callback, 200, $headers);
-    }
+    $callback = function() use ($items, $columns) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+        foreach ($items as $item) {
+            fputcsv($file, [
+                $item->id,
+                $item->name,
+                $item->category,
+                $item->quantity
+            ]);
+        }
+        fclose($file);
+    };
+
+    return Response::stream($callback, 200, $headers);
+}
 
     // --- 5. COMPLETE APPOINTMENT & DEDUCT INVENTORY ---
     public function completeWithMedicine(Request $request, $id)
-    {
-        $appointment = Appointment::find($id);
-        if(!$appointment) return redirect()->back()->with('error', 'Appointment not found.');
+{
+    $appointment = Appointment::find($id);
+    if(!$appointment) return redirect()->back()->with('error', 'Appointment not found.');
 
-        $appointment->status = 'Completed';
-        $appointment->save();
+    $appointment->status = 'Completed';
+    $appointment->save();
 
-        if ($request->filled('item_id')) {
-            $item = Item::find($request->item_id);
-            if ($item && $item->quantity > 0) {
-                $item->decrement('quantity', 1);
-                return redirect()->back()->with('success', "Appointment completed and 1 {$item->name} deducted.");
-            } elseif ($item) {
-                return redirect()->back()->with('error', "Appointment completed, but {$item->name} is OUT OF STOCK.");
-            }
-        }
+    $logDescription = "Completed Appointment #$id for {$appointment->name}.";
 
-        return redirect()->back()->with('success', 'Appointment completed (No medicine deducted).');
+    if ($request->filled('item_id')) {
+        $item = Item::find($request->item_id);
+        if ($item && $item->quantity > 0) {
+            $item->decrement('quantity', 1);
+            $logDescription .= " Deducted 1 unit of {$item->name} from inventory."; 
+            
+            $this->logActivity('Appointment & Inventory', $logDescription); 
+            return redirect()->back()->with('success', "Appointment completed and 1 {$item->name} deducted.");
+        } 
     }
+
+    $this->logActivity('Appointment Completed', $logDescription);
+    return redirect()->back()->with('success', 'Appointment completed (No medicine deducted).');
+}
 
     // 6. FOR INVENTORY SUMMARY
     public function inventorySummary()
 {
-    // Kuhanin ang breakdown ng inventory
     $totalItems = Item::count();
     $totalStock = Item::sum('quantity');
     $outOfStock = Item::where('quantity', 0)->count();
     $lowStockItems = Item::where('quantity', '>', 0)->where('quantity', '<', 10)->get();
     
-    // Grouping by category para sa summary table
     $categorySummary = Item::select('category', 
-                    DB::raw('count(*) as count'), // May backslash na sa unahan
-                    DB::raw('sum(quantity) as total_qty'))
-                    ->groupBy('category')
-                    ->get();
+                        DB::raw('count(*) as count'), 
+                        DB::raw('sum(quantity) as total_qty'))
+                        ->groupBy('category')
+                        ->get();
+
+    // LOGS CODES
+    \App\Models\ActivityLog::create([
+        'user_id'     => auth()->id(),
+        'user_name'   => auth()->user()->name,
+        'action'      => 'Viewed Inventory Report',
+        'description' => "Accessed Inventory Summary. System detected $outOfStock out-of-stock items.",
+        'ip_address'  => request()->ip(),
+        'user_agent'  => request()->userAgent(),
+    ]);
 
     return view('admin.reports.inventory-summary', compact(
         'totalItems', 'totalStock', 'outOfStock', 'lowStockItems', 'categorySummary'
@@ -395,9 +427,8 @@ class AdminController extends Controller
 // 7.LOG CONTROLLER
 public function indexLogs()
     {
-        // Kunin ang logs, pinakabago ang una (descending)
-        // Naka-paginate para hindi mabigat i-load
-        $logs = ActivityLog::orderBy('created_at', 'desc')->paginate(20);
+        
+        $logs = ActivityLog::latest()->paginate(20);
 
         return view('admin.activity_logs', compact('logs'));
     }

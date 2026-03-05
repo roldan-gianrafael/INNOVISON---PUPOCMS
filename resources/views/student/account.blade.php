@@ -313,36 +313,81 @@
                 @endforelse
             </div>
 
-            <div class="widget-card">
-                <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Profile Details</div>
-                
-                <form action="{{ url('/student/update-contact') }}" method="POST">
-                    @csrf
-                    <label class="input-label">Full Name</label>
-                    <div class="input-wrapper">
-                        <input type="text" class="form-control" value="{{ $user->name }}" disabled>
-                    </div>
-
-                    <label class="input-label">Student ID</label>
-                    <div class="input-wrapper">
-                        <input type="text" class="form-control" value="{{ $user->student_id }}" disabled>
-                    </div>
-
-                    <label class="input-label">Email Address</label>
-                    <div class="input-wrapper">
-                        <input type="email" class="form-control" value="{{ $user->email }}" disabled>
-                    </div>
-
-                     <label class="input-label">Contact Number (Editable)</label>
-                    <div class="input-wrapper">
-                     
-                        <input type="text" class="form-control" value="09123456789" disabled>
-                        <small style="color: #64748b; font-size: 11px;">Editing is currently disabled.</small>
-                    </div>
-
-                </form>
-            </div>
+             <div class="widget-card">
+    <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Full Medical & Academic Profile</div>
+    
+    <form action="{{ route('student.updateContact') }}" method="POST">
+    @csrf
+    
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div>
+            <label class="input-label">Course</label>
+            <input type="text" class="form-control" value="{{ $user->course }}" readonly style="background-color: #f8fafc;">
         </div>
+        <div>
+            <label class="input-label">Year</label>
+            <input type="text" class="form-control" value="{{ $user->year }}" readonly style="background-color: #f8fafc;">
+        </div>
+        <div>
+            <label class="input-label">Section</label>
+            <input type="text" class="form-control" value="{{ $user->section }}" readonly style="background-color: #f8fafc;">
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div>
+            <label class="input-label">Gender</label>
+            <input type="text" class="form-control" value="{{ $user->gender }}" readonly style="background-color: #f8fafc;">
+        </div>
+        <div>
+            <label class="input-label">Birthday (DOB)</label>
+            <input type="text" class="form-control" value="{{ $user->DOB }}" readonly style="background-color: #f8fafc;">
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div>
+            <label class="input-label">Height (cm)</label>
+            <input type="number" step="0.1" name="height" class="form-control" value="{{ old('height', $user->height) }}">
+        </div>
+        <div>
+            <label class="input-label">Weight (kg)</label>
+            <input type="number" step="0.1" name="weight" class="form-control" value="{{ old('weight', $user->weight) }}">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label class="input-label">Contact Number</label>
+        <input type="text" name="contact_no" class="form-control" value="{{ old('contact_no', $user->contact_no) }}">
+    </div>
+
+    <div id="saveAction" style="display: none; gap: 10px;">
+            <button type="submit" style="flex: 1; padding: 12px; background: #8B0000; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                Save Changes
+            </button>
+            <button type="button" onclick="window.location.reload()" style="flex: 1; padding: 12px; background: #cbd5e1; color: #1e293b; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                Cancel
+            </button>
+        </div>
+</form>
+</div>
     </div>
 </div>
 @endsection
+<script>
+function enableEditing() {
+    // 1. Kunin lahat ng input na may class 'editable-input'
+    const inputs = document.querySelectorAll('.editable-input');
+    
+    // 2. Tanggalin ang 'disabled' attribute para makapag-type na ang student
+    inputs.forEach(input => {
+        input.removeAttribute('disabled');
+        input.style.borderColor = '#8B0000'; // Palitan ang kulay para alam nilang editable na
+        input.style.backgroundColor = '#fff';
+    });
+
+    // 3. Itago ang Edit button at ipakita ang Save/Cancel buttons
+    document.getElementById('editBtn').style.display = 'none';
+    document.getElementById('saveAction').style.display = 'flex';
+}
+</script>

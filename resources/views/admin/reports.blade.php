@@ -168,6 +168,14 @@
             <div class="report-badge">All Reports</div>
         </a>
 
+        <a href="#" class="report-card">
+            <div>
+                <div class="report-label">System Logs</div>
+                <div class="report-main-title">Keep track of system transactions</div>
+            </div>
+            <div class="report-badge">Logs</div>
+        </a>
+
     </div>
 
     <div class="back-nav">

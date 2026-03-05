@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -29,17 +28,10 @@ class LoginController extends Controller
     // 2. Kung nandun ang email, i-check naman ang password
     if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
         $request->session()->regenerate();
-
-        $role = strtolower((string) (Auth::user()->user_role ?? ''));
-
-        if (in_array($role, [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN], true)) {
+        
+        if (Auth::user()->user_role === 'admin') {
             return redirect('/admin/dashboard');
         }
-
-        if ($role === User::ROLE_STUDENT_ASSISTANT) {
-            return redirect('/assistant/dashboard');
-        }
-
         return redirect('/student/home');
     }
 

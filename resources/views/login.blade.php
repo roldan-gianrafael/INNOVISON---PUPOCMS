@@ -220,8 +220,9 @@
                       <select name="course" required>
                           <option value="BSIT">BSIT</option>
                           <option value="BSCS">BSCS</option>
-                          <option value="BSCpE">BSCpE</option>
-                          <option value="BSA">BSA</option>
+                          <option value="BSECE">BSECE</option>
+                          <option value="BSBAHRM">BSBAHRM</option>
+                          
                       </select>
                   </div>
                   <div class="form-group">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Appointment;
+use App\Models\ActivityLog;
 use App\Models\Item;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
@@ -297,4 +298,15 @@ class AdminController extends Controller
         'totalItems', 'totalStock', 'outOfStock', 'lowStockItems', 'categorySummary'
     ));
 }
+
+// 7.LOG CONTROLLER
+public function indexLogs()
+    {
+        // Kunin ang logs, pinakabago ang una (descending)
+        // Naka-paginate para hindi mabigat i-load
+        $logs = ActivityLog::orderBy('created_at', 'desc')->paginate(20);
+
+        return view('admin.activity_logs', compact('logs'));
+    }
+
 }

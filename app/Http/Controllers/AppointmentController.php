@@ -252,24 +252,49 @@ class AppointmentController extends Controller
     // 7. UPDATE CONTACT
     //-------------------------------
     public function updateContact(Request $request)
-    {
-        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+{
+    // 1. Kunin ang user
+    $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
 
-        if (!$user) {
-            return redirect()->back()->with('error', 'User session not found.');
-        }
-
-        $validated = $request->validate([
-            'contact_number' => ['required', 'regex:/^[0-9]{10,13}$/'],
-        ], [
-            'contact_number.regex' => 'Contact number must be 10 to 13 digits.',
-        ]);
-
-        $user->contact_number = $validated['contact_number'];
-        $user->save();
-
-        return redirect()->back()->with('success', 'Contact number updated successfully.');
+    if (!$user) {
+        return redirect()->back()->with('error', 'User session not found.');
     }
+
+    // 2. I-validate ang lahat ng fields (Contact, Year, Section, etc.)
+    $validated = $request->validate([
+        'contact_no' => ['required', 'regex:/^[0-9]{10,13}$/'],
+        'year'       => ['required', 'string', 'max:10'],
+        'section'    => ['required', 'string', 'max:10'],
+        'height'     => ['nullable', 'numeric'],
+        'weight'     => ['nullable', 'numeric'],
+    ], [
+        'contact_no.regex' => 'Contact number must be 10 to 13 digits.',
+    ]);
+
+    // 3. I-track ang changes para sa Log (Optional: Para alam ng Admin kung ano ang binago)
+    $oldYear = $user->year;
+    $newYear = $validated['year'];
+
+    // 4. I-save ang mga bagong data
+    $user->contact_no = $validated['contact_no'];
+    $user->year = $validated['year'];
+    $user->section = $validated['section'];
+    $user->height = $validated['height'];
+    $user->weight = $validated['weight'];
+    $user->save();
+
+    // 5. SYSTEM LOG ---
+    \App\Models\ActivityLog::create([
+        'user_id'     => $user->id,
+        'user_name'   => $user->name,
+        'action'      => 'Profile Update',
+        'description' => "Updated profile: Year ($oldYear to $newYear), Section, and Medical Info.",
+        'ip_address'  => $request->ip(),
+        'user_agent'  => $request->userAgent(),
+    ]);
+
+    return redirect()->back()->with('success', 'Profile and academic details updated successfully.');
+}
 
     // -------------------------------
     // 8. APPOINTMENT HISTORY

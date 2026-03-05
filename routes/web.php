@@ -77,6 +77,7 @@ Route::post('/student/update-contact', [AppointmentController::class, 'updateCon
         Route::get('/admin/reports/inventory-summary', [AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
         Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
+        Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])->name('admin.logs');
     });
 
     // Admin-only routes (Admin/Super Admin)

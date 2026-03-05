@@ -168,7 +168,7 @@
             <div class="report-badge">All Reports</div>
         </a>
 
-        <a href="#" class="report-card">
+        <a href="{{ route('admin.logs') }}" class="report-card">
             <div>
                 <div class="report-label">System Monitoring</div>
                 <div class="report-main-title">System Logs</div>

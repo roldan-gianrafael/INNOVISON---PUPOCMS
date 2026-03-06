@@ -22,6 +22,9 @@
         <h2 class="text-center fw-bold" style="color: #800000;">MEDICAL SERVICES DEPARTMENT</h2>
         <h5 class="text-center text-muted mb-5">Student Health Information Entry</h5>
 
+        <p class="mb-0 text-muted" style="font-size: 0.9rem;">
+                    <strong>Instruction:</strong> Please provide complete and truthful information. Type <b>"N/A"</b> or <b>"NONE"</b> for fields that do not apply to you. Do not leave any field blank to ensure successful submission.
+                </p>
         <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
             @csrf
 

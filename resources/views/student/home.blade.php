@@ -99,35 +99,34 @@
 
 @section('content')
     <div id="session-checker" 
-         data-has-barcode="{{ Auth::user()->barcode ? 'true' : 'false' }}" 
-         data-is-skipped="{{ session('barcode_skipped') ? 'true' : 'false' }}">
-    </div>
+     data-has-profile="{{ Auth::user()->is_health_profile_completed ? 'true' : 'false' }}">
+</div>
 
-    <div id="barcodeModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-        <div style="background: #fff; padding: 40px; border-radius: 24px; max-width: 450px; width: 90%; text-align: center; color: #333; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: slideUp 0.4s ease-out;">
-            
-            <div style="background: #fff5f5; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
-                <svg style="width: 40px; height: 40px; fill: #8B0000;" viewBox="0 0 24 24">
-                    <path d="M3 5h2v14H3V5zm4 0h1v14H7V5zm3 0h3v14h-3V5zm4 0h1v14h-1V5zm3 0h2v14h-2V5zm4 0h1v14h-1V5z"/>
-                </svg>
-            </div>
+<div id="healthFormModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(10px);">
+    <div style="background: #fff; padding: 45px; border-radius: 24px; max-width: 500px; width: 90%; text-align: center; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: slideUp 0.5s ease-out;">
+        
+        <div style="background: #fff1f2; width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; border: 4px solid #fecdd3;">
+            <svg style="width: 45px; height: 45px; fill: #8B0000;" viewBox="0 0 24 24">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z"/>
+            </svg>
+        </div>
 
-            <h2 style="color: #20343a; font-weight: 800; font-size: 24px; margin-bottom: 12px;">Barcode Required</h2>
-            <p style="color: #64748b; line-height: 1.6; margin-bottom: 32px; font-size: 15px;">
-                Hi <strong>{{ Auth::user()->first_name }}</strong>! It looks like your student barcode isn't registered yet. This is needed for clinic attendance and transactions.
+        <h2 style="color: #1e293b; font-weight: 800; font-size: 28px; margin-bottom: 15px; letter-spacing: -0.5px;">Medical Requirement</h2>
+        
+        <p style="color: #475569; line-height: 1.6; margin-bottom: 35px; font-size: 16px;">
+            Hi <strong>{{ Auth::user()->first_name }}</strong>! To access clinic services, all students (especially new enrollees) must submit their <strong>Health Information Form (HIF)</strong>.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <a href="{{ url('/student/health-form') }}" style="background: #8B0000; color: #fff; padding: 18px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 17px; transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(139, 0, 0, 0.4);">
+                Fill Up Health Information Form
+            </a>
+            <p style="color: #94a3b8; font-size: 13px; font-style: italic;">
+                * This form is mandatory for clinic consultations and medical records.
             </p>
-
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <a href="{{ url('/student/barcode-register') }}" class="btn" style="background: #8B0000; color: #fff; padding: 14px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 16px; transition: 0.3s;">
-                    Register Barcode Now
-                </a>
-                
-                <button onclick="closeBarcodeModal()" style="background: #f1f5f9; border: none; color: #475569; font-weight: 600; cursor: pointer; padding: 12px; border-radius: 10px; font-size: 14px; transition: 0.3s;">
-                    Maybe Later (Skip)
-                </button>
-            </div>
         </div>
     </div>
+</div>
 
     <svg style="display: none;">
       <symbol id="avatar-placeholder" viewBox="0 0 24 24">
@@ -273,35 +272,21 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get data from the hidden HTML bridge
-            const checker = document.getElementById('session-checker');
-            const hasBarcode = checker.getAttribute('data-has-barcode') === 'true';
-            const isSkipped = checker.getAttribute('data-is-skipped') === 'true';
+    document.addEventListener('DOMContentLoaded', function() {
+        const checker = document.getElementById('session-checker');
+        const hasProfile = checker.getAttribute('data-has-profile') === 'true';
 
-            // Logic to show modal
-            if (!hasBarcode && !isSkipped) {
-                setTimeout(() => {
-                    const modal = document.getElementById('barcodeModal');
-                    if(modal) modal.style.display = 'flex';
-                }, 1000);
-            }
-        });
-
-        function closeBarcodeModal() {
-            document.getElementById('barcodeModal').style.display = 'none';
-
-            // Send signal to Laravel to update the session
-            fetch("{{ url('/student/skip-barcode') }}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
+        // Kung wala pang profile (false), lilitaw ang modal pagkatapos ng 1.5 seconds
+        if (!hasProfile) {
+            setTimeout(() => {
+                const modal = document.getElementById('healthFormModal');
+                if(modal) {
+                    modal.style.display = 'flex';
+                    // Disable scrolling sa background para hindi sila makatakas
+                    document.body.style.overflow = 'hidden'; 
                 }
-            })
-            .then(response => response.json())
-            .then(data => console.log('Session updated:', data.status))
-            .catch(error => console.error('Error updating session:', error));
+            }, 1500);
         }
-    </script>
+    });
+</script>
 @endsection

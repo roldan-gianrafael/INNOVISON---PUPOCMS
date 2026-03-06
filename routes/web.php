@@ -33,13 +33,19 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class])->group(func
     Route::get('/student/home', function () {
         return view('student.home');
     });
+    // Route for Health form
+    Route::get('/student/health-form', [App\Http\Controllers\AppointmentController::class, 'showHealthForm'])->name('student.health.form');
+
+    // Route to save data
+    Route::post('/student/save-health-form', [App\Http\Controllers\AppointmentController::class, 'storeHealthForm'])->name('student.health.save');
+    
     Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
     Route::get('/student/account', [AppointmentController::class, 'account']);
     Route::get('/student/faq', [AppointmentController::class, 'faq']);
     Route::get('/student/history', [AppointmentController::class, 'history']);
     Route::post('/student/appointments/store', [AppointmentController::class, 'store']);
     Route::post('/student/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
-Route::post('/student/update-contact', [AppointmentController::class, 'updateContact'])->name('student.updateContact');
+    Route::post('/student/update-contact', [AppointmentController::class, 'updateContact'])->name('student.updateContact');
 
     Route::get('/student/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
     Route::post('/student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');

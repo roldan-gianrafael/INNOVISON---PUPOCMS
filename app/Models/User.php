@@ -40,6 +40,7 @@ class User extends Authenticatable
     'barcode',
     'user_role',
     'password',
+    'is_health_profile_completed',
 
 ];
 
@@ -107,4 +108,7 @@ class User extends Authenticatable
     {
         return $this->hasRole(self::ROLE_STUDENT_ASSISTANT);
     }
+    public function healthProfile() {
+    return $this->hasOne(HealthProfile::class);
+}
 }

@@ -426,6 +426,56 @@ class AppointmentController extends Controller
         return response()->json(['success' => false]);
     }
 
+
+    // -------------------------------
+    // HEALTH FORM FUNTION
+    // -------------------------------
+
+public function showHealthForm()
+{
+    $user = Auth::user();
+    
+    // Kung tapos na siya, i-redirect na lang natin sa home para hindi paulit-ulit
+    if ($user->is_health_profile_completed) {
+        return redirect()->route('student.home')->with('info', 'You have already completed your health profile.');
+    }
+
+    return view('student.health_form', compact('user'));
+}
+
+public function storeHealthForm(Request $request)
+{
+    // 1. I-validate ang lahat ng parts (Student Info, Medical History, Social, Vaccines)
+    $request->validate([
+        'medical_history' => 'required|array',
+        'smoking' => 'required|string',
+        'alcohol' => 'required|string',
+        // Dagdagan mo ang validation dito base sa iba pang fields
+    ]);
+
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+
+    // 2. LOGIC: Dito mo ise-save ang data sa isang bagong table (e.g., HealthProfile model)
+    // Halimbawa: HealthProfile::create($request->all() + ['user_id' => $user->id]);
+
+    // 3. UPDATE USER STATUS: Ito ang pinaka-importante para mawala ang modal
+    $user->is_health_profile_completed = 1;
+    $user->save();
+
+    // 4. ACTIVITY LOG (Hard Mode style)
+    \App\Models\ActivityLog::create([
+        'user_id'     => $user->id,
+        'user_name'   => $user->name,
+        'action'      => 'Health Profile Completed',
+        'description' => "Student completed the mandatory Health Information Form (HIF).",
+        'ip_address'  => $request->ip(),
+        'user_agent'  => $request->userAgent(),
+    ]);
+
+    return redirect()->route('student.home')->with('success', 'Health Profile submitted successfully! You can now access clinic services.');
+}
+
     // -------------------------------
     // RESET BARCODE (for testing)
     // -------------------------------

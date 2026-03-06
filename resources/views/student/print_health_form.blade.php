@@ -27,16 +27,16 @@
             margin: 0 !important; 
             padding: 0 !important;
             box-shadow: none !important;
-            line-height: 1.1;
+            line-height: 1.2; /* In-adjust mula 1.1 para sa mas malaking text */
         }
 
         @page { 
             size: 8.5in 13in; 
-            margin: 0.4in 0.4in; 
+            margin: 0.5in 0.5in; /* Bahagyang pinalaki ang margin */
         }
         
-        .row { margin-bottom: 2px !important; }
-        .section-header { margin-top: 8px !important; }
+        .row { margin-bottom: 4px !important; }
+        .section-header { margin-top: 12px !important; }
     }
 
     /* --- SCREEN VIEW --- */
@@ -55,40 +55,43 @@
         box-sizing: border-box;
     }
 
-    .header-section { display: flex; align-items: center; position: relative; margin-bottom: 5px; }
-    .logo { width: 70px; height: 70px; margin-right: 15px; }
-    .header-text p { margin: 0; line-height: 1.2; }
-    .univ-name { font-size: 13px; font-weight: bold; }
-    .dept-name { font-size: 15px; font-weight: bold; }
+    .header-section { display: flex; align-items: center; position: relative; margin-bottom: 8px; }
+    .logo { width: 80px; height: 80px; margin-right: 15px; margin-left: 50px;} /* Pinalaki rin ang logo konti */
+    .header-text p { margin: 0; line-height: 1.3; }
+    
+    /* Font Size Updates (+2) */
+    .univ-name { font-size: 15px; font-weight: bold; } /* From 13px */
+    .dept-name { font-size: 17px; font-weight: bold; } /* From 15px */
 
     .photo-box {
         position: absolute; right: 0; top: 0;
-        width: 120px; height: 120px;
+        width: 150px; height: 130px;
         border: 1px solid #000;
         text-align: center; display: flex; align-items: center; justify-content: center;
         overflow: hidden;
     }
     .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 
-    .form-title { text-align: center; font-weight: bold; font-style: italic; font-size: 14px; margin: 15px 0; text-decoration: underline; }
-    .section-header { font-weight: bold; font-style: italic; margin-top: 10px; text-transform: uppercase; font-size: 11px;  padding-left: 5px; }
+    .form-title { text-align: center; font-weight: bold; font-style: italic; font-size: 16px; margin: 18px 0;  } /* From 14px */
+    .section-header { font-weight: bold; font-style: italic; margin-top: 12px; text-transform: uppercase; font-size: 13px; padding-left: 5px; } /* From 11px */
 
-    .row { display: flex; margin-bottom: 4px; gap: 8px; align-items: baseline; }
-    .field { border-bottom: 1px solid #000; flex: 1; padding-left: 5px; min-height: 16px; font-size: 12px; font-weight: bold; color: #000; }
-    .label { font-weight: bold; white-space: nowrap; font-size: 11px; }
+    .row { display: flex; margin-bottom: 6px; gap: 10px; align-items: baseline; }
+    .field { border-bottom: 1px solid #000; flex: 1; padding-left: 5px; min-height: 18px; font-size: 14px; font-weight: bold; color: #000; } /* From 12px */
+    .label { font-weight: bold; white-space: nowrap; font-size: 13px; } /* From 11px */
+    .labels {  white-space: nowrap; font-size: 13px; } /* From 11px */
 
-    .checkbox-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin: 5px 0 5px 20px; }
-    .check-item { display: flex; align-items: center; gap: 4px; font-size: 10px; }
-    .box-ui { width: 11px; height: 11px; border: 1px solid #000; display: inline-block; text-align: center; line-height: 10px; font-weight: bold; }
+    .checkbox-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 8px 0 8px 20px; }
+    .check-item { display: flex; align-items: center; gap: 6px; font-size: 12px; } /* From 10px */
+    .box-ui { width: 13px; height: 13px; border: 1px solid #000; display: inline-block; text-align: center; line-height: 12px; font-weight: bold; }
 
-    .vax-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-    .vax-table th, .vax-table td { border: 1px solid #000; padding: 2px; text-align: center; font-size: 10px; }
+    .vax-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .vax-table th, .vax-table td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 12px; } /* From 10px */
     
-    .cert-text { font-style: italic; font-size: 9px; text-align: justify; margin-top: 10px; line-height: 1.2; }
-    .signature-row { display: flex; justify-content: space-between; margin-top: 30px; align-items: flex-end; }
-    .sig-block { width: 30%; text-align: center; }
-    .sig-image { width: 100px; height: auto; margin-bottom: -10px; }
-    .sig-line { border-top: 1px solid #000; font-size: 9px; padding-top: 2px; font-weight: bold; }
+    .cert-text { font-style: italic; font-size: 11px; text-align: justify; margin-top: 15px; line-height: 1.3; } /* From 9px */
+    .signature-row { display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-end; }
+    .sig-block { width: 35%; text-align: center; }
+    .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
+    .sig-line { border-top: 1px solid #000; font-size: 11px; padding-top: 4px; font-weight: bold; } /* From 9px */
 </style>
 @endpush
 
@@ -196,20 +199,31 @@
         @endforeach
     </div>
 
-    <div class="section-header">PART III. SOCIAL & VAX HISTORY</div>
-    <div class="row">
-        <span class="label">Smoking:</span> 
-        <div class="check-item"><div class="box-ui">{{ ($profile->is_smoker ?? '') == 'Yes' ? '/' : '' }}</div> Yes</div>
-        <div class="check-item"><div class="box-ui">{{ ($profile->is_smoker ?? '') == 'No' ? '/' : '' }}</div> No</div>
-        <span class="label" style="margin-left:20px;">Alcohol:</span> 
-        <div class="check-item"><div class="box-ui">{{ ($profile->is_drinker ?? '') == 'Yes' ? '/' : '' }}</div> Yes</div>
-        <div class="check-item"><div class="box-ui">{{ ($profile->is_drinker ?? '') == 'No' ? '/' : '' }}</div> No</div>
+    <div class="section-header">PART III. PERSONAL SOCIAL HISTORY</div>
+    <div class="row" style="margin-top: 5px;">
+    <span class="labels">Cigarette Smoking :</span>
+    <div class="check-item" style="margin-left: 10px;">
+        <div class="box-ui">{{ ($profile->is_smoker ?? '') == 'Yes' ? '/' : '' }}</div> Yes
     </div>
+    <div class="check-item">
+        <div class="box-ui">{{ ($profile->is_smoker ?? '') == 'No' ? '/' : '' }}</div> No
+    </div>
+</div>
+
+<div class="row">
+    <span class="labels">Alcohol Drinking:</span>
+    <div class="check-item" style="margin-left: 24px;">
+        <div class="box-ui">{{ ($profile->is_drinker ?? '') == 'Yes' ? '/' : '' }}</div> Yes
+    </div>
+    <div class="check-item">
+        <div class="box-ui">{{ ($profile->is_drinker ?? '') == 'No' ? '/' : '' }}</div> No
+    </div>
+</div>
 
     <div class="row">
         <div style="flex: 1;">
-            <span class="label">COVID-19 Vax History:</span><br>
-            <small>Doses received and brand information recorded for safety protocols.</small>
+            <span class="label">COVID-19 Vaccination History:</span><br>
+            <small>.</small>
         </div>
         <table class="vax-table" style="width: 65%;">
             @php $vax = is_array($profile->vaccine_history) ? $profile->vaccine_history : json_decode($profile->vaccine_history ?? '[]', true); @endphp
@@ -224,8 +238,21 @@
     </div>
 
     <div class="cert-text">
-        I hereby certify that the medical health information given to PUP Medical Services are true, correct and fully disclosed to the best of my knowledge and all the medical condition that may affect in the assessment for purpose of consultation/ issuance of medical clearance/ certificate as a student of PUP. I voluntarily consent to the collection, processing and storage of my personal and health information.
+        I hereby certify that the medical health information given to PUP Medical Services are true, correct and fully disclosed to the best of
+my knowledge and all the medical condition that may affect in the assessment for purpose of consultation/ issuance of medical
+clearance/ certificate as a student of PUP.
     </div>
+<div class="cert-text">
+        I also understand that the PUP MSD and university will not be liable for any untoward incident that may arise due to any failure to
+disclose accurate information or intentionally providing false and deceptive information.
+    </div>
+    <div class="cert-text">
+        In compliance with the Data Privacy Act of 2012 and its IRR, I voluntarily consent to the collection, processing and storage of my
+personal and health information for the purpose/s of health assessment/ treatment/ or research following research ethics guidelines
+for the improvement of healthcare services.
+    </div>
+
+
 
     <div class="signature-row">
         <div class="sig-block">

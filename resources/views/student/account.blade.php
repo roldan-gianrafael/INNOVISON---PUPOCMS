@@ -185,6 +185,52 @@
         .account-layout { grid-template-columns: 1fr; }
         .hero-stats { gap: 20px; flex-wrap: wrap; }
     }
+
+  
+    /* --- HEALTH PROFILE STATUS WIDGET --- */
+    .health-status-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 15px rgba(139, 0, 0, 0.08);
+        border: 1px solid #fce7e7;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+    .health-status-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: #8B0000;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        display: block;
+    }
+    .btn-print-form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px;
+        background: #8B0000;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+    .btn-print-form:hover {
+        background: #5a0f15;
+        box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
+        color: white;
+    }
+    .status-indicator {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 10px;
+        display: block;
+    }
 </style>
 @endpush
 
@@ -300,6 +346,32 @@
                     <div style="font-size: 14px; color: #64748b; text-align: center; padding: 20px 0;">No new notifications.</div>
                 @endforelse
             </div>
+
+            {{-- NEW: Health Form Quick Access Div --}}
+            <div class="health-status-card">
+                <span class="health-status-title">🩺 Health Information Record</span>
+                
+                @if($user->is_health_profile_completed)
+                    <div style="margin-bottom: 15px;">
+                        <span style="font-size: 32px;">📄</span>
+                        <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">Your health profile is complete and ready for printing.</p>
+                    </div>
+                    <a href="{{ route('print.health.form') }}" class="btn-print-form">
+                        <span>🖨️</span> PRINT HEALTH FORM
+                    </a>
+                    <span class="status-indicator">✅ Valid for Academic Year 2025-2026</span>
+                @else
+                    <div style="margin-bottom: 15px; opacity: 0.6;">
+                        <span style="font-size: 32px;">📝</span>
+                        <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">You haven't completed your health profile yet.</p>
+                    </div>
+                    <a href="{{ route('student.health.form') }}" class="btn-print-form" style="background: #64748b;">
+                        COMPLETE FORM NOW
+                    </a>
+                    <span class="status-indicator">⚠️ Required for clinic consultations.</span>
+                @endif
+            </div>
+            
 
             {{-- Full Profile Widget --}}
             <div class="widget-card">

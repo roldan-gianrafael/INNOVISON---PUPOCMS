@@ -97,6 +97,11 @@
     <button onclick="window.print()" class="btn btn-primary" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px;">
         CLICK TO PRINT FORM 🖨️
     </button>
+
+    <button onclick="window.history.back()" style="background: #64748b; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
+         ✖
+    </button>
+
 </div>
 
 <div class="print-container">

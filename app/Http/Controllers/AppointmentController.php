@@ -427,54 +427,142 @@ class AppointmentController extends Controller
     }
 
 
-    // -------------------------------
-    // HEALTH FORM FUNTION
-    // -------------------------------
+    // ---------------------------------------------------------
+// HEALTH FORM FUNCTIONS
+// ---------------------------------------------------------
 
 public function showHealthForm()
 {
+    /** @var \App\Models\User $user */
     $user = Auth::user();
     
-    // Kung tapos na siya, i-redirect na lang natin sa home para hindi paulit-ulit
     if ($user->is_health_profile_completed) {
-        return redirect()->route('student.home')->with('info', 'You have already completed your health profile.');
+        return redirect()->route('print.health.form')->with('info', 'You have already completed your health profile.');
     }
 
-    return view('student.health_form', compact('user'));
+    $calculatedAge = null;
+    if ($user->DOB) {
+        $calculatedAge = \Carbon\Carbon::parse($user->DOB)->age;
+    }
+    return view('student.health_form', compact('user', 'calculatedAge'));
 }
+
 
 public function storeHealthForm(Request $request)
 {
-    // 1. I-validate ang lahat ng parts (Student Info, Medical History, Social, Vaccines)
+    // 1. VALIDATION: Siguraduhin na lahat ng fields ay tama ang format
     $request->validate([
-        'medical_history' => 'required|array',
-        'smoking' => 'required|string',
-        'alcohol' => 'required|string',
-        // Dagdagan mo ang validation dito base sa iba pang fields
+        'school_year'       => 'required|string',
+        'home_address'      => 'required|string|max:255',
+        'student_photo'     => 'required|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+        'age'               => 'required|numeric|min:15|max:100',
+        'sex'               => 'required|string',
+        'civil_status'      => 'required|string',
+        'course_college'    => 'required|string',
+        'blood_type'        => 'nullable|string|max:10',
+        'guardian_name'     => 'required|string|max:255',
+        'cellphone'         => 'required|string|max:20',
+        
+        // Medical History
+        'medical_history'   => 'nullable|array', 
+        'has_illness'       => 'required|string',
+        'has_disability'    => 'required|string',
+        
+        // Allergies
+        'medicine_allergies' => 'nullable|array',
+        
+        // Signature
+        'digital_signature' => 'required|image|mimes:jpeg,png,jpg|max:2048',
     ]);
 
     /** @var \App\Models\User $user */
     $user = Auth::user();
 
-    // 2. LOGIC: Dito mo ise-save ang data sa isang bagong table (e.g., HealthProfile model)
-    // Halimbawa: HealthProfile::create($request->all() + ['user_id' => $user->id]);
+    try {
+        // 2. FILE HANDLING: I-save ang Photo at Signature sa storage
+        // Gagamit ng 'public' disk para ma-access ng 'storage:link'
+        $photoPath = $request->file('student_photo')->store('health_profiles/photos', 'public');
+        $sigPath = $request->file('digital_signature')->store('health_profiles/signatures', 'public');
 
-    // 3. UPDATE USER STATUS: Ito ang pinaka-importante para mawala ang modal
-    $user->is_health_profile_completed = 1;
-    $user->save();
+        // 3. LOGIC: I-save ang data sa health_profiles table
+        \App\Models\HealthProfile::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'school_year'        => $request->school_year,
+                'home_address'       => $request->home_address,
+                'student_photo'      => $photoPath,
+                'age'                => $request->age,
+                'sex'                => $request->sex,
+                'civil_status'       => $request->civil_status,
+                'course_college'     => $request->course_college,
+                'blood_type'         => $request->blood_type,
+                'guardian_name'      => $request->guardian_name,
+                'landline'           => $request->landline,
+                'cellphone'          => $request->cellphone,
 
-    // 4. ACTIVITY LOG (Hard Mode style)
-    \App\Models\ActivityLog::create([
-        'user_id'     => $user->id,
-        'user_name'   => $user->name,
-        'action'      => 'Health Profile Completed',
-        'description' => "Student completed the mandatory Health Information Form (HIF).",
-        'ip_address'  => $request->ip(),
-        'user_agent'  => $request->userAgent(),
-    ]);
+                // Part II
+                'has_illness'        => $request->has_illness,
+                'medical_history'    => $request->medical_history, 
+                'other_illness'      => $request->other_illness,
+                'has_disability'     => $request->has_disability,
+                'disability_type'    => $request->disability_type,
 
-    return redirect()->route('student.home')->with('success', 'Health Profile submitted successfully! You can now access clinic services.');
+                // Section 3
+                'food_allergies'      => $request->food_allergies,
+                'no_allergies'        => $request->has('no_allergies'),
+                'medicine_allergies'  => $request->medicine_allergies,
+                'other_med_allergies' => $request->other_med_allergies,
+
+                // Part III: COVID Vax
+                'vaccine_history' => [
+                    'dose1'    => ['date' => $request->vax_date_1, 'brand' => $request->vax_brand_1],
+                    'dose2'    => ['date' => $request->vax_date_2, 'brand' => $request->vax_brand_2],
+                    'booster1' => ['date' => $request->booster_date_1, 'brand' => $request->booster_brand_1],
+                    'booster2' => ['date' => $request->booster_date_2, 'brand' => $request->booster_brand_2],
+                ],
+
+                'digital_signature'  => $sigPath,
+                'is_smoker'          => $request->smoking ?? 'No',
+                'is_drinker'         => $request->alcohol ?? 'No',
+            ]
+        );
+
+        // 4. UPDATE USER STATUS
+        $user->is_health_profile_completed = 1;
+        $user->save();
+
+        // 5. ACTIVITY LOG
+        \App\Models\ActivityLog::create([
+            'user_id'     => $user->id,
+            'user_name'   => $user->name,
+            'action'      => 'Health Profile Completed',
+            'description' => "Student completed the detailed Health Information Form (HIF).",
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
+
+        // Eto yung binago natin para diretso agad sa Print Form pagkatapos mag-submit
+        return redirect()->route('print.health.form')->with('success', 'Health Profile saved! You can now print your form.');
+
+    } catch (\Exception $e) {
+   
+        return back()->withInput()->with('error', 'Something went wrong: ' . $e->getMessage());
+    }
 }
+
+public function printHealthForm()
+{
+    $user = Auth::user();
+    // Kunin ang profile record
+    $profile = \App\Models\HealthProfile::where('user_id', $user->id)->first();
+
+    if (!$profile) {
+        return redirect()->route('health.form')->with('error', 'Please fill up the form first.');
+    }
+
+    return view('student.print_health_form', compact('profile'));
+}
+
 
     // -------------------------------
     // RESET BARCODE (for testing)

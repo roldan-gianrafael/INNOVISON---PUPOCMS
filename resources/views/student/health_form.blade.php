@@ -1,279 +1,272 @@
-@extends('layouts.student')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill Up - Student Health Information Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; padding: 40px 0; font-family: 'Segoe UI', sans-serif; }
+        .form-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; }
+        .section-title { background-color: #800000; color: white; padding: 12px; margin-top: 30px; border-radius: 6px; font-weight: bold; text-transform: uppercase; font-size: 0.95rem; }
+        .form-label { font-weight: 600; font-size: 0.9rem; color: #333; }
+        .sub-label { font-size: 0.85rem; font-style: italic; color: #666; margin-bottom: 15px; display: block; }
+        .vax-table th { background-color: #f8f9fa; font-size: 0.85rem; text-align: center; }
+        .upload-box { border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #fafafa; }
+    </style>
+</head>
+<body>
 
-@section('title', 'Health Information Form')
+<div class="container">
+    <div class="form-card">
+        <h2 class="text-center fw-bold" style="color: #800000;">MEDICAL SERVICES DEPARTMENT</h2>
+        <h5 class="text-center text-muted mb-5">Student Health Information Entry</h5>
 
-@push('styles')
-<style>
-    /* --- PRINT STYLES: LONG BOND PAPER (8.5 x 13) --- */
-    @media print {
-        @page {
-            size: 8.5in 13in;
-            margin: 0.5in;
-        }
-        body * { visibility: hidden; }
-        .print-container, .print-container * { visibility: visible; }
-        .print-container { 
-            position: absolute; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            margin: 0; 
-            padding: 0; 
-            border: none; 
-        }
-        .no-print { display: none !important; }
-        main { padding: 0 !important; margin: 0 !important; }
-    }
+        <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-    /* --- FORM STYLES --- */
-    .print-container {
-        background: #fff;
-        max-width: 816px; /* 8.5 inches approx */
-        margin: 20px auto;
-        padding: 40px 50px;
-        border: 1px solid #e2e8f0;
-        color: #000;
-        font-family: Arial, Helvetica, sans-serif; /* Arial Font */
-    }
+            <div class="section-title">PART I. STUDENT INFORMATION</div>
+            
+            <div class="row mt-4">
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control bg-light" value="{{ Auth::user()->name }}" readonly>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">PUP Student No.</label>
+                            <input type="text" class="form-control bg-light" value="{{ Auth::user()->student_id }}" readonly>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Home Address</label>
+                            <input type="text" name="home_address" class="form-control" placeholder="House No., Street, Brgy, City" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">School Year</label>
+                            <input type="text" name="school_year" class="form-control" value="2025-2026">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label text-center d-block">Upload ID Photo</label>
+                    <div class="upload-box">
+                        <input type="file" name="student_photo" class="form-control form-control-sm" accept="image/*" required>
+                        <small class="text-muted">2x2 or Passport Size</small>
+                    </div>
+                </div>
+            </div>
 
-    /* OFFICIAL HEADER: CENTERED GROUP, LEFT-ALIGNED TEXT */
-    .header-wrapper {
-        display: flex;
-        align-items: center; 
-        justify-content: center; 
-        gap: 15px; 
-        margin-bottom: 10px;
-        position: relative;
-        width: 100%;
-    }
+            <div class="row">
+               <div class="col-md-3 mb-3">
+                <label class="form-label">Age</label>
+                <input type="number" 
+                    name="age" 
+                    value="{{ $calculatedAge }}" 
+                    class="form-control" 
+                    readonly 
+                    placeholder="Auto-calculated from DOB">
+            </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Sex</label>
+                    <select name="sex" class="form-select" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Civil Status</label>
+                    <input type="text" name="civil_status" class="form-control" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Course / College</label>
+                    <input type="text" name="course_college" class="form-control" value="{{ Auth::user()->course }}" readonly>
+                </div>
+            </div>
 
-    .header-logo-left { 
-        width: 85px; 
-        height: 85px; 
-        object-fit: contain; 
-    }
-    
-    .header-text { 
-        text-align: left; 
-        line-height: 1.1;
-    }
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Blood Type</label>
+                    <input type="text" name="blood_type" class="form-control" placeholder="e.g. O+">
+                </div>
+                <div class="col-md-8 mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ Auth::user()->email }}" readonly>
+                </div>
+                <div class="col-md-7 mb-3">
+                    <label class="form-label">Parent's Name / Guardian / Spouse</label>
+                    <input type="text" name="guardian_name" class="form-control" required>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Landline</label>
+                    <input type="text" name="landline" class="form-control">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Cellphone No.</label>
+                    <input type="text" name="cellphone" class="form-control" required>
+                </div>
+            </div>
 
-    .header-text .gov-name { font-size: 11px; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
-    .header-text .univ-name { font-size: 17px; font-weight: bold; margin: 2px 0; }
-    .header-text .vp-office { font-size: 11px; margin: 0; font-weight: normal; }
-    .header-text .dept-name { font-size: 19px; font-weight: bold; margin-top: 2px; }
+            <div class="section-title">PART II. MEDICAL HISTORY</div>
+            
+            <div class="row mt-3">
+                <div class="col-12 mb-2">
+                    <label class="form-label">1. Do you need medical attention or has known medical illness?</label>
+                    <div class="form-check form-check-inline ms-3">
+                        <input class="form-check-input" type="radio" name="has_illness" value="No">
+                        <label class="form-check-label">No</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="has_illness" value="Yes">
+                        <label class="form-check-label">Yes</label>
+                    </div>
+                </div>
+            </div>
 
-    .header-right-box {
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 90px;
-        height: 90px;
-        border: 1px solid #000;
-        background: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        z-index: 10;
-        text-align: center;
-    }
+            <span class="sub-label">(Please check the following that apply as needed)</span>
+            
+            <div class="row px-3">
+                @php
+                    $illnesses = ['Asthma', 'Loss of Consciousness', 'Eye Disease/ Defect', 'Accident Injuries', 'Diabetes', 'Heart Disease', 'Kidney Disease', 'Tuberculosis', 'Convulsion/ Epilepsy', 'Hyperventilation', 'High Blood Pressure', 'Migraine'];
+                @endphp
+                @foreach($illnesses as $illness)
+                <div class="col-md-4 mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="medical_history[]" value="{{ $illness }}" id="{{ $illness }}">
+                        <label class="form-check-label" for="{{ $illness }}">{{ $illness }}</label>
+                    </div>
+                </div>
+                @endforeach
+                <div class="col-md-12 mt-2">
+                    <label class="form-label">Others (Pls. Indicate):</label>
+                    <input type="text" name="other_illness" class="form-control">
+                </div>
+            </div>
 
-    .header-divider {
-        border-top: 2px solid #000;
-        margin-top: -20px; 
-        margin-bottom: 20px;
-        position: relative;
-        z-index: 1;
-        width: 100%;
-    }
+            <div class="row mt-4">
+                <div class="col-12 mb-2">
+                    <label class="form-label">2. Do you have disability?</label>
+                    <div class="form-check form-check-inline ms-3">
+                        <input class="form-check-input" type="radio" name="has_disability" value="None">
+                        <label class="form-check-label">None</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="has_disability" value="Yes">
+                        <label class="form-check-label">Yes, What type?</label>
+                    </div>
+                    <input type="text" name="disability_type" class="form-control d-inline-block w-50 ms-2" placeholder="Specify disability">
+                </div>
+            </div>
 
-    .form-title {
-        text-align: center;
-        font-weight: bold;
-        font-size: 18px;
-        margin-bottom: 25px;
-        text-transform: uppercase;
-    }
+            <div class="row mt-4">
+                <div class="col-12">
+                    <label class="form-label">3. Additional Information for Students and Medical Conditions:</label>
+                    <p class="text-muted small italic">As a Parent/ Guardian, I would like to declare that my child has history of allergies to the following:</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Food (Please specify):</label>
+                            <input type="text" name="food_allergies" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">No Known Allergies:</label>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="no_allergies" value="1">
+                                <label class="form-check-label">I confirm no known allergies</label>
+                            </div>
+                        </div>
+                    </div>
 
-    /* SECTION & GRID STYLES */
-    .section-title { 
-        background: #f1f5f9; 
-        padding: 5px 10px; 
-        font-weight: bold; 
-        text-transform: uppercase; 
-        border: 1px solid #000;
-        margin-top: 20px;
-        font-size: 14px;
-    }
+                    <label class="form-label mt-2">Medicines:</label>
+                    <div class="row px-3">
+                        @php $meds = ['Aspirin', 'Ibuprofen', 'Amoxicillin', 'Mefenamic Acid', 'Penicillin']; @endphp
+                        @foreach($meds as $med)
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="medicine_allergies[]" value="{{ $med }}">
+                                <label class="form-check-label">{{ $med }}</label>
+                            </div>
+                        </div>
+                        @endforeach
+                        <div class="col-md-12 mt-2">
+                            <input type="text" name="other_med_allergies" class="form-control" placeholder="Others: Specify">
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    .info-row { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 12px; }
-    .input-group { display: flex; align-items: baseline; flex: 1; min-width: 200px; }
-    .input-group label { font-weight: bold; margin-right: 8px; white-space: nowrap; font-size: 13px; }
-    
-    .line-fill { 
-        border-bottom: 1px solid #000; 
-        flex: 1; 
-        padding-left: 5px; 
-        font-size: 14px; 
-        min-height: 1.2em;
-    }
+            <div class="section-title">PART III. PERSONAL SOCIAL HISTORY & VACCINATION</div>
+            <div class="row mt-4">
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">COVID-19 Vaccination History:</label>
+                    <table class="table table-bordered vax-table mt-2">
+                        <thead>
+                            <tr>
+                                <th>Dose</th>
+                                <th>Date Received</th>
+                                <th>Brand</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1st Dose</td>
+                                <td><input type="date" name="vax_date_1" class="form-control form-control-sm"></td>
+                                <td><input type="text" name="vax_brand_1" class="form-control form-control-sm"></td>
+                            </tr>
+                            <tr>
+                                <td>2nd Dose</td>
+                                <td><input type="date" name="vax_date_2" class="form-control form-control-sm"></td>
+                                <td><input type="text" name="vax_brand_2" class="form-control form-control-sm"></td>
+                            </tr>
+                            <tr>
+                                <td>Booster 1st Dose</td>
+                                <td><input type="date" name="booster_date_1" class="form-control form-control-sm"></td>
+                                <td><input type="text" name="booster_brand_1" class="form-control form-control-sm"></td>
+                            </tr>
+                            <tr>
+                                <td>Booster 2nd Dose</td>
+                                <td><input type="date" name="booster_date_2" class="form-control form-control-sm"></td>
+                                <td><input type="text" name="booster_brand_2" class="form-control form-control-sm"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    .line-fill input {
-        border: none;
-        width: 100%;
-        background: transparent;
-        outline: none;
-        font-family: inherit;
-        font-size: inherit;
-    }
+            <div class="row mt-4">
+                <div class="col-md-6 offset-md-3">
+                    <label class="form-label text-center d-block">Upload Digital Signature</label>
+                    <div class="upload-box">
+                        <input type="file" name="digital_signature" class="form-control" accept="image/*" required>
+                        <small class="text-muted">PNG or JPG with clear background</small>
+                    </div>
+                </div>
+            </div>
 
-    .medical-history-grid { 
-        display: grid; 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 10px; 
-        padding: 10px; 
-    }
-    
-    table.vax-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-    table.vax-table th, table.vax-table td { border: 1px solid #000; padding: 8px; text-align: left; }
-
-    .signature-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; text-align: center; }
-    .sig-box { border-top: 1px solid #000; margin-top: 50px; padding-top: 5px; font-size: 12px; font-weight: bold; }
-
-    .cut-line { 
-        border-top: 2px dashed #000; 
-        margin-top: 40px; 
-        padding-top: 10px; 
-        position: relative; 
-        text-align: center;
-        font-style: italic;
-        font-size: 11px;
-    }
-    .cut-line::before { content: "✂"; position: absolute; left: 0; top: -14px; font-size: 18px; }
-
-    .physician-section { border: 2px solid #000; padding: 20px; margin-top: 20px; }
-</style>
-@endpush
-
-@section('content')
-<div class="container no-print" style="margin-top: 20px; text-align: right; max-width: 816px;">
-    <button onclick="window.print()" class="btn btn-primary" style="background: #1a202c; border:none; padding: 10px 20px; border-radius: 8px; font-family: Arial;">Print Form 🖨️</button>
+            <div class="text-center mt-5">
+                <button type="submit" class="btn btn-success btn-lg px-5 shadow">SUBMIT HEALTH PROFILE</button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<form action="{{ route('student.health.save') }}" method="POST">
-    @csrf
-    <div class="print-container">
-        <div class="header-wrapper">
-            <img src="{{ asset('images/pup_logo.png') }}" class="header-logo-left" alt="PUP Logo">
-            <div class="header-text">
-                <p class="gov-name">Republic of the Philippines</p>
-                <p class="univ-name">POLYTECHNIC UNIVERSITY OF THE PHILIPPINES</p>
-                <p class="vp-office">Office of the Vice President for Administration</p>
-                <p class="dept-name">MEDICAL SERVICES DEPARTMENT</p>
-            </div>
-            <div class="header-right-box">2x2<br>ID Photo</div>
-        </div>
-        
-        <div class="header-divider"></div>
+</body>
+</html>
+<script>
 
-        <div class="form-title">Health Information Form for Students</div>
+document.getElementById('dob').addEventListener('change', function() {
+    const dob = new Date(this.value);
+    const today = new Date();
+    
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    
+    // Check kung nag-birthday na siya ngayong taon
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+    
+    document.getElementById('age').value = age;
+});
 
-        <div class="section-title">Part 1: Student Information</div>
-        
-        <div class="info-row">
-            <div class="input-group" style="flex: 2;"><label>Name:</label><div class="line-fill">{{ Auth::user()->name }}</div></div>
-            <div class="input-group"><label>PUP Student No:</label><div class="line-fill">{{ Auth::user()->student_id ?? '__________' }}</div></div>
-        </div>
-
-        <div class="info-row">
-            <div class="input-group" style="flex: 2;"><label>Home Address:</label><div class="line-fill"><input type="text" name="address" required></div></div>
-            <div class="input-group"><label>School Year:</label><div class="line-fill">2025 - 2026</div></div>
-        </div>
-
-        <div class="info-row">
-            <div class="input-group" style="flex: 0.5;"><label>Age:</label><div class="line-fill"><input type="number" name="age" required></div></div>
-            <div class="input-group" style="flex: 0.8;"><label>Sex:</label><div class="line-fill"><input type="text" name="sex" required></div></div>
-            <div class="input-group"><label>Civil Status:</label><div class="line-fill"><input type="text" name="civil_status" required></div></div>
-            <div class="input-group" style="flex: 1.5;"><label>Course/College:</label><div class="line-fill">{{ Auth::user()->course ?? '__________' }}</div></div>
-        </div>
-
-        <div class="info-row">
-            <div class="input-group"><label>Blood Type:</label><div class="line-fill"><input type="text" name="blood_type" required></div></div>
-            <div class="input-group" style="flex: 2;"><label>Email Address:</label><div class="line-fill">{{ Auth::user()->email }}</div></div>
-        </div>
-
-        <div class="info-row">
-            <div class="input-group"><label>Parent's Name/Guardian/Spouse:</label><div class="line-fill"><input type="text" name="emergency_contact_name" required></div></div>
-        </div>
-
-        <div class="info-row">
-            <div class="input-group"><label>Landline:</label><div class="line-fill"><input type="text" name="landline"></div></div>
-            <div class="input-group"><label>Cellphone:</label><div class="line-fill"><input type="text" name="emergency_contact_number" required></div></div>
-        </div>
-
-        <div class="section-title">Part 2: Medical History</div>
-        <p style="font-size: 11px; margin: 5px 10px;">(Please check if you have/had any of the following)</p>
-        <div class="medical-history-grid">
-            @php $conditions = ['Asthma', 'Diabetes', 'Hypertension', 'Heart Disease', 'Seizures', 'Allergies', 'Anxiety/Depression', 'Vision Problems', 'Thyroid Problem', 'Primary Complex', 'Kidney Disease', 'Others: ______']; @endphp
-            @foreach($conditions as $condition)
-            <label style="font-size: 13px; font-weight: normal;">
-                <input type="checkbox" name="medical_history[]" value="{{ $condition }}"> {{ $condition }}
-            </label>
-            @endforeach
-        </div>
-
-        <div class="section-title">Part 3: Personal & Social History</div>
-        <div class="info-row" style="padding-left: 10px;">
-            <div class="input-group">
-                <label>Do you smoke?</label>
-                <input type="radio" name="is_smoker" value="Yes" required> <span style="margin-right:10px">Yes</span>
-                <input type="radio" name="is_smoker" value="No" required> No
-            </div>
-            <div class="input-group">
-                <label>Do you drink alcohol?</label>
-                <input type="radio" name="is_drinker" value="Yes" required> <span style="margin-right:10px">Yes</span>
-                <input type="radio" name="is_drinker" value="No" required> No
-            </div>
-        </div>
-
-        <div class="section-title">Part 4: Immunization / Vaccine History</div>
-        <table class="vax-table">
-            <thead>
-                <tr><th>Vaccine Type</th><th>Date Given</th><th>Brand/Remarks</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>COVID-19 (Dose 1 & 2)</td><td><input type="text" name="vax_date_covid" style="width:100%; border:none;"></td><td><input type="text" name="vax_brand_covid" style="width:100%; border:none;"></td></tr>
-                <tr><td>Flu Vaccine</td><td><input type="text" name="vax_date_flu" style="width:100%; border:none;"></td><td><input type="text" name="vax_brand_flu" style="width:100%; border:none;"></td></tr>
-                <tr><td>Others:</td><td><input type="text" name="vax_date_other" style="width:100%; border:none;"></td><td><input type="text" name="vax_brand_other" style="width:100%; border:none;"></td></tr>
-            </tbody>
-        </table>
-
-        <p style="margin-top: 30px; font-style: italic; font-size: 13px; line-height: 1.4;">
-            I hereby certify that the above information is true and correct to the best of my knowledge. 
-            I authorize the PUP Health Services to use this information for my medical care.
-        </p>
-
-        <div class="signature-section">
-            <div class="sig-box">Signature of Parent/Guardian</div>
-            <div class="sig-box">Signature of Student</div>
-            <div class="sig-box">Date Signed</div>
-        </div>
-
-        <div class="cut-line">Detach here for Physician's Copy</div>
-
-        <div class="physician-section">
-            <h4 style="margin: 0 0 10px 0; text-align: center; font-size: 16px;">FOR PHYSICIAN USE ONLY</h4>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 14px;">
-                <div>BP: ________________ HR: ________________</div>
-                <div>Findings: ___________________________</div>
-            </div>
-            <div style="margin-top: 15px; font-size: 14px;">Remarks/Recommendations: ____________________________________________________</div>
-        </div>
-
-        <div class="no-print" style="margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
-            <button type="submit" class="btn btn-success" style="padding: 15px 50px; font-size: 18px; font-weight: bold; background: #28a745; color: white; border: none; border-radius: 10px; cursor: pointer;">Finalize and Save Profile</button>
-        </div>
-    </div>
-</form>
-@endsection
+</script>

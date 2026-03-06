@@ -2,33 +2,29 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class HealthProfile extends Model
 {
-    use HasFactory;
-
-    // 1. Dito natin inililista kung anong columns ang pwedeng lagyan ng data
     protected $fillable = [
         'user_id', 
-        'emergency_contact_name', 
-        'emergency_contact_number', 
-        'blood_type', 
-        'medical_history', // Dito papasok yung mga checkboxes
-        'is_smoker', 
-        'is_drinker', 
-        'vaccine_history'  // Dito papasok yung vaccine table data
+        'school_year', 'home_address', 'student_photo', 
+        'age', 'sex', 'civil_status', 'course_college', 
+        'blood_type', 'guardian_name', 'landline', 'cellphone',
+        'has_illness', 'medical_history', 'other_illness', 
+        'has_disability', 'disability_type',
+        'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies',
+        'is_smoker', 'is_drinker', 'vaccine_history', 'digital_signature'
     ];
 
-    // 2. Importante 'to: Ginagawa nitong "Array" yung JSON galing sa database
-    // para hindi mag-error kapag tinawag mo sa Blade or Controller.
+    // NAPAKA-IMPORTANTE: Para kusa nang maging array ang JSON columns mo
     protected $casts = [
         'medical_history' => 'array',
+        'medicine_allergies' => 'array',
         'vaccine_history' => 'array',
+        'no_allergies' => 'boolean',
     ];
 
-    // 3. Relationship: Ikinakabit natin ang profile na ito sa isang User
     public function user()
     {
         return $this->belongsTo(User::class);

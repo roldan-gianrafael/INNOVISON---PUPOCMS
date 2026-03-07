@@ -24,38 +24,39 @@ Route::post('/register-action', [RegisterController::class, 'register']);
 Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // Student + general authenticated routes
-    Route::post('/student/skip-barcode', function () {
-        session(['barcode_skipped' => true]);
-        return response()->json(['status' => 'success']);
+    // Student-only routes
+    Route::middleware('role:student')->group(function () {
+        Route::post('/student/skip-barcode', function () {
+            session(['barcode_skipped' => true]);
+            return response()->json(['status' => 'success']);
+        });
+
+        Route::get('/student/home', function () {
+            return view('student.home');
+        });
+
+        // 1. Route para ipakita ang blankong form
+        Route::get('/student/health-form', [AppointmentController::class, 'showHealthForm'])->name('health.form');
+
+        // 2. Route para i-save ang data (Dito galing ang form submit)
+        Route::post('/student/store-health-form', [AppointmentController::class, 'storeHealthForm'])->name('store.health.form');
+
+        // 3. Route para sa Printable View (Dito tayo pupunta pagkatapos mag-save)
+        Route::get('/student/print-health-form', [AppointmentController::class, 'printHealthForm'])->name('print.health.form');
+
+        Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
+        Route::get('/student/account', [AppointmentController::class, 'account']);
+        Route::get('/student/faq', [AppointmentController::class, 'faq']);
+        Route::get('/student/history', [AppointmentController::class, 'history']);
+        Route::post('/student/appointments/store', [AppointmentController::class, 'store']);
+        Route::post('/student/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
+        Route::post('/student/update-contact', [AppointmentController::class, 'updateContact'])->name('student.updateContact');
+
+        Route::get('/student/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
+        Route::post('/student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');
+        Route::post('/student/barcode-validate', [AppointmentController::class, 'validateBarcodeScan'])->name('barcode.validate');
+        Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
     });
-
-    Route::get('/student/home', function () {
-        return view('student.home');
-    });
-
-// Route para ipakita ang form
-    // 1. Route para ipakita ang blankong form
-Route::get('/student/health-form', [AppointmentController::class, 'showHealthForm'])->name('health.form');
-
-// 2. Route para i-save ang data (Dito galing ang form submit)
-Route::post('/student/store-health-form', [AppointmentController::class, 'storeHealthForm'])->name('store.health.form');
-
-// 3. Route para sa Printable View (Dito tayo pupunta pagkatapos mag-save)
-Route::get('/student/print-health-form', [AppointmentController::class, 'printHealthForm'])->name('print.health.form');
-    
-    Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
-    Route::get('/student/account', [AppointmentController::class, 'account']);
-    Route::get('/student/faq', [AppointmentController::class, 'faq']);
-    Route::get('/student/history', [AppointmentController::class, 'history']);
-    Route::post('/student/appointments/store', [AppointmentController::class, 'store']);
-    Route::post('/student/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
-    Route::post('/student/update-contact', [AppointmentController::class, 'updateContact'])->name('student.updateContact');
-
-    Route::get('/student/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
-    Route::post('/student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');
-    Route::post('/student/barcode-validate', [AppointmentController::class, 'validateBarcodeScan'])->name('barcode.validate');
-    Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
 
     // Legacy barcode endpoints kept for compatibility
     Route::get('/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.legacy.register');

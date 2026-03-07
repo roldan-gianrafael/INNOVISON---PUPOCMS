@@ -365,7 +365,7 @@
                         <span style="font-size: 32px;">📝</span>
                         <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">You haven't completed your health profile yet.</p>
                     </div>
-                    <a href="{{ route('student.health.form') }}" class="btn-print-form" style="background: #64748b;">
+                    <a href="{{ route('health.form') }}" class="btn-print-form" style="background: #64748b;">
                         COMPLETE FORM NOW
                     </a>
                     <span class="status-indicator">⚠️ Required for clinic consultations.</span>

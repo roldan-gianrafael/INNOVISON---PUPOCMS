@@ -136,8 +136,8 @@ class AppointmentController extends Controller
         $appointment->service    = $request->service;
         $appointment->status     = 'Pending';
         $appointment->remarks    = $request->remarks; 
-        $appointment->user_type       = 'online';
-        $appointment->user_role = Appointment::normalizeUserType($user->user_role);
+        $appointment->type            = 'online';
+        $appointment->user_type       = Appointment::normalizeUserType($user->user_role);
         $appointment->save(); // Dito lang dapat magtatapos ang command.
 
         return redirect()->back()->with('success', 'Appointment request submitted! Please wait for admin approval.');

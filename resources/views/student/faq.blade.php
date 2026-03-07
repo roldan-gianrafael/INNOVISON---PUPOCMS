@@ -19,7 +19,7 @@
     
     .faq-subtitle {
         font-size: 16px;
-        color: #000000; 
+        color: #8e8e8e; 
         font-weight: 500;
         max-width: 600px;
         margin: 0 auto 30px auto;

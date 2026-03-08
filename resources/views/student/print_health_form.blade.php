@@ -333,41 +333,36 @@ for the improvement of healthcare services.
             </div>
         </div>
 
-        <div class="row" style="margin-top: 25px; display: flex; align-items: flex-end; gap: 20px;">
-            <div style="flex: 0.4;">
-    <div class="field" style="border-bottom: 1px solid #000; text-align: center; font-weight: bold; min-height: 20px;">
-        {{-- I-check kung may verified_at date na sa DB, kung wala, ipakita ang date ngayon --}}
-        {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
-    </div>
-    <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
-</div>
-
-            <div style="flex: 0.6; text-align: center; position: relative;">
-                
-                @if($profile->physician_signature)
-                    <div style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                        <img src="{{ asset('storage/' . $profile->digital_signature) }}" alt="Signature" style="height: 60px; pointer-events: none;">
-                    </div>
-                @endif
-
-                <div style="flex: 0.6; text-align: center; position: relative; min-height: 80px;">
+        <div class="row" style="margin-top: 30px; display: flex; align-items: flex-end; gap: 20px;">
     
-
-    @if($profile->clearance_status == 'Issued')
-        <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
-            <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
-                 alt="Nurse Signature" 
-                 style="height: 80px; width: auto; pointer-events: none;">
+    <div style="flex: 0.4; text-align: center;">
+        <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; min-height: 20px; padding-bottom: 5px;">
+            @if($profile->clearance_status == 'Issued')
+                {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
+            @else
+                &nbsp; 
+            @endif
         </div>
-    @endif
-
-    <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
-
-        MS. NURSE NAME, RN
+        <div style="font-size: 10px; font-weight: bold; margin-top: 5px;">Date</div>
     </div>
-    <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
-</div>
+
+    <div style="flex: 0.6; text-align: center; position: relative;">
+        
+        @if($profile->clearance_status == 'Issued')
+            <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 10;">
+                <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
+                     alt="Nurse Signature" 
+                     style="height: 85px; width: auto; pointer-events: none;">
             </div>
+        @endif
+
+        <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-bottom: 5px;">
+            MS. NURSE NAME, RN
+        </div>
+        <div style="font-size: 10px; font-weight: bold; margin-top: 5px;">Physician's Name and Signature</div>
+    </div>
+
+</div>
         </div>
     </div>
 </div>

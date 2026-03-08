@@ -59,18 +59,35 @@
         </div>
         <div class="info-box">
             <div class="info-label">Contact Number</div>
-            <div class="info-value">{{ $record->user->contact_no ?? 'N/A' }}</div>
+            <div class="info-value" style="font-size: 15px; color: #1e293b; font-weight: 700;">
+        {{ $record->contact_no ?? ($record->cellphone ?? 'NOT PROVIDED') }}
+    </div>
         </div>
     </div>
 
     @if($record->has_illness == 'Yes')
-    <div class="medical-alert">
+    <div class="medical-alert" style="background-color: #fef2f2; border-left: 4px solid #b91c1c; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
         <h6 style="color: #b91c1c; font-weight: 800; font-size: 13px; margin-bottom: 5px;">
-            <i class="fas fa-exclamation-triangle me-1"></i> DECLARED MEDICAL CONDITION:
+            <i class="fas fa-exclamation-triangle me-1"></i> DECLARED MEDICAL CONDITION/S:
         </h6>
-        <p style="margin: 0; font-size: 14px; color: #334155;">{{ $record->illness_details }}</p>
+        <p style="margin: 0; font-size: 14px; color: #334155; font-weight: 600;">
+            @php
+  
+                $history = is_array($record->medical_history) 
+                           ? $record->medical_history 
+                           : json_decode($record->medical_history ?? '[]', true);
+            @endphp
+
+            @if(!empty($history))
+                {{ implode(', ', $history) }}
+            @endif
+
+            @if($record->other_illness)
+                {{ !empty($history) ? ', ' : '' }} {{ $record->other_illness }}
+            @endif
+        </p>
     </div>
-    @endif
+@endif
 
     <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;">
 

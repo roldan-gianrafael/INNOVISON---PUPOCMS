@@ -94,7 +94,7 @@ public function showSignPage($id)
 // 2. Para sa pag-save ng pinirmahan (PUT)
 public function updateClearance(Request $request, $id)
 {
-    // 1. I-validate ang basic data (Wala na yung physician_signature validation)
+    // 1. I-validate ang data
     $request->validate([
         'clearance_status' => 'required',
         'pending_reason'   => 'nullable|string',
@@ -108,14 +108,21 @@ public function updateClearance(Request $request, $id)
     $record->clearance_status = $request->clearance_status;
     $record->pending_reason   = $request->pending_reason;
 
-    // Kung ang status ay 'Issued', i-save natin ang date ngayon kung walang nilagay
+    // 4. Date Logic
     if ($request->clearance_status == 'Issued') {
+        // Kapag Issued, gamitin ang nilagay na date o ang oras ngayon (now)
         $record->verified_at = $request->verified_at ?? now();
     } else {
-        $record->verified_at = $request->verified_at;
+        // Kapag Pending o Rejected, gawing NULL ang date para hindi lumitaw sa form
+        $record->verified_at = null;
+        
+        // Optional: I-clear din ang pending_reason kung Issued na uli
+        if ($request->clearance_status == 'Issued') {
+            $record->pending_reason = null;
+        }
     }
 
-    // 4. I-save at i-check
+    // 5. I-save at i-check
     if($record->save()){
         return redirect()->route('admin.health_records')
                          ->with('success', 'Health Clearance status updated successfully!');

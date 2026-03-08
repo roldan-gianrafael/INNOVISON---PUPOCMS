@@ -1121,6 +1121,10 @@
       <a href="{{ $walkinUrl }}" class="{{ (Request::is('admin/walkin*') || Request::is('assistant/walkin*')) ? 'active' : '' }}">
         <span class="sidebar-short">WK</span><span class="sidebar-label">Walk-in</span>
       </a>
+      <a href="{{ route('admin.health_records') }}" class="{{ Request::is('admin/health-records*') ? 'active' : '' }}">
+    <span class="sidebar-short">HR</span>
+    <span class="sidebar-label">Student Health Form</span>
+    </a>
       @if($isAdminLike)
           <a href="{{ $assistantAccountsUrl }}" class="{{ Request::is('admin/student-assistants*') ? 'active' : '' }}">
             <span class="sidebar-short">SA</span><span class="sidebar-label">Student Assistants</span>

@@ -14,7 +14,11 @@ class HealthProfile extends Model
         'has_illness', 'medical_history', 'other_illness', 
         'has_disability', 'disability_type',
         'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies',
-        'is_smoker', 'is_drinker', 'vaccine_history', 'digital_signature'
+        'is_smoker', 'is_drinker', 'vaccine_history', 'digital_signature', 'clearance_status',
+    'physician_signature',
+    'pending_reason',
+    'verified_at',
+        
     ];
 
     // NAPAKA-IMPORTANTE: Para kusa nang maging array ang JSON columns mo
@@ -23,6 +27,7 @@ class HealthProfile extends Model
         'medicine_allergies' => 'array',
         'vaccine_history' => 'array',
         'no_allergies' => 'boolean',
+
     ];
 
     public function user()

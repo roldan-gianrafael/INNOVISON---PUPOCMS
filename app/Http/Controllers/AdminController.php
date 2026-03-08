@@ -11,6 +11,8 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
+use App\Models\HealthProfile;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -62,6 +64,62 @@ class AdminController extends Controller
             'monthlyCompleted'
         ));
     }
+    public function viewHealth()
+    {
+        // Kukunin natin ang lahat ng records mula sa health_profile table
+        $records = HealthProfile::with('user')->latest()->get();
+        
+        return view('admin.health_records', compact('records'));
+    }
+
+    public function showHealth($id)
+    {
+
+        $profile = HealthProfile::with('user')->findOrFail($id);
+        
+
+        $calculatedAge = Carbon::parse($profile->user->DOB)->age;
+
+        return view('admin.show_health', compact('profile', 'calculatedAge'));
+    }
+
+// 1. Para lumabas 'yung page (GET)
+public function showSignPage($id)
+{
+    // Ginaya ko ang variable name na $record para tugma sa blade na binigay ko kanina
+    $record = HealthProfile::with('user')->findOrFail($id);
+    return view('admin.sign_clearance', compact('record'));
+}
+
+// 2. Para sa pag-save ng pinirmahan (PUT)
+public function updateClearance(Request $request, $id)
+{
+    $request->validate([
+        'clearance_status' => 'required|in:Issued,Pending,Rejected',
+        'physician_signature' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+    ]);
+
+    try {
+        $record = HealthProfile::findOrFail($id);
+
+        // Handle signature upload kung meron
+        if ($request->hasFile('physician_signature')) {
+            $path = $request->file('physician_signature')->store('signatures', 'public');
+            $record->physician_signature = $path;
+        }
+
+        $record->clearance_status = $request->clearance_status;
+        $record->remarks = $request->remarks; // Remarks field
+        $record->expiry_date = $request->expiry_date;
+        $record->verified_at = now();
+        $record->save();
+
+        return redirect()->route('admin.health_records')->with('success', 'Clearance updated successfully!');
+
+    } catch (\Exception $e) {
+        return back()->with('error', 'Error: ' . $e->getMessage());
+    }
+}
 
     public function appointments()
     {

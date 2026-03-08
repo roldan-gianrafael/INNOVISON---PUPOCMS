@@ -43,6 +43,8 @@ Route::post('/student/store-health-form', [AppointmentController::class, 'storeH
 
 // 3. Route para sa Printable View (Dito tayo pupunta pagkatapos mag-save)
 Route::get('/student/print-health-form', [AppointmentController::class, 'printHealthForm'])->name('print.health.form');
+
+Route::get('/account', [AppointmentController::class, 'index'])->name('account');
     
     Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
     Route::get('/student/account', [AppointmentController::class, 'account']);

@@ -101,9 +101,10 @@
         CLICK TO PRINT FORM 🖨️
     </button>
 
-    <button onclick="window.history.back()" style="background: #64748b; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
-         ✖
-    </button>
+    <a href="{{ route('account') }}" 
+   style="display: inline-block; text-decoration: none; background: #64748b; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer; line-height: 1;">
+    ✖
+</a>
 
 </div>
 

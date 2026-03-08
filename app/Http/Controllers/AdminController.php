@@ -94,30 +94,33 @@ public function showSignPage($id)
 // 2. Para sa pag-save ng pinirmahan (PUT)
 public function updateClearance(Request $request, $id)
 {
+    // 1. I-validate ang basic data (Wala na yung physician_signature validation)
     $request->validate([
-        'clearance_status' => 'required|in:Issued,Pending,Rejected',
-        'physician_signature' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+        'clearance_status' => 'required',
+        'pending_reason'   => 'nullable|string',
+        'verified_at'      => 'nullable|date',
     ]);
 
-    try {
-        $record = HealthProfile::findOrFail($id);
+    // 2. Hanapin ang record
+    $record = HealthProfile::findOrFail($id);
 
-        // Handle signature upload kung meron
-        if ($request->hasFile('physician_signature')) {
-            $path = $request->file('physician_signature')->store('signatures', 'public');
-            $record->physician_signature = $path;
-        }
+    // 3. Manual Assignment
+    $record->clearance_status = $request->clearance_status;
+    $record->pending_reason   = $request->pending_reason;
 
-        $record->clearance_status = $request->clearance_status;
-        $record->remarks = $request->remarks; // Remarks field
-        $record->expiry_date = $request->expiry_date;
-        $record->verified_at = now();
-        $record->save();
+    // Kung ang status ay 'Issued', i-save natin ang date ngayon kung walang nilagay
+    if ($request->clearance_status == 'Issued') {
+        $record->verified_at = $request->verified_at ?? now();
+    } else {
+        $record->verified_at = $request->verified_at;
+    }
 
-        return redirect()->route('admin.health_records')->with('success', 'Clearance updated successfully!');
-
-    } catch (\Exception $e) {
-        return back()->with('error', 'Error: ' . $e->getMessage());
+    // 4. I-save at i-check
+    if($record->save()){
+        return redirect()->route('admin.health_records')
+                         ->with('success', 'Health Clearance status updated successfully!');
+    } else {
+        return back()->with('error', 'Failed to save to database.');
     }
 }
 

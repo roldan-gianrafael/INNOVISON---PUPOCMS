@@ -15,7 +15,6 @@ class HealthProfile extends Model
         'has_disability', 'disability_type',
         'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies',
         'is_smoker', 'is_drinker', 'vaccine_history', 'digital_signature', 'clearance_status',
-    'physician_signature',
     'pending_reason',
     'verified_at',
         

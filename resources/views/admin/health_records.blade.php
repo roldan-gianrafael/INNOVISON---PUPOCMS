@@ -112,60 +112,82 @@
     </div>
 
     {{-- Main Table Card --}}
-    <div class="card">
-        <div class="fw-bold mb-2 text-muted" style="font-size: 13px;">Health Profile Summary</div>
-        <table id="healthTable">
-            <thead>
+<div class="card">
+    <div class="fw-bold mb-2 text-muted" style="font-size: 13px;">Health Profile Summary</div>
+    <table id="healthTable">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Full Name</th>
+                <th>Course / Yr / Sec</th>
+                <th>Medical Condition</th> {{-- Dating Medical Status --}}
+                <th>Clearance Status</th> {{-- BAGONG COLUMN --}}
+                <th>Submitted At</th>
+                <th style="text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($records as $record)
                 <tr>
-                    <th>Student ID</th>
-                    <th>Full Name</th>
-                    <th>Course / Yr / Sec</th>
-                    <th>Medical Status</th>
-                    <th>Submitted At</th>
-                    <th style="text-align: center;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($records as $record)
-                    <tr>
-                        <td class="fw-bold">{{ $record->user->student_id }}</td>
-                        <td>
-                            <div class="student-name" style="font-weight: 700;">{{ $record->user->name }}</div>
-                        </td>
-                        <td>{{ $record->user->course }} {{ $record->year }}-{{ $record->section }}</td>
-                        <td>
-                            @if($record->clearance_status == 'Pending')
-                                <span class="status pending">Pending</span>
-                            @elseif($record->clearance_status == 'Issued')
-                                <span class="status issued">Issued</span>
-                            @elseif($record->has_illness == 'Yes')
-                                <span class="status review">For Review</span>
+                    <td class="fw-bold">{{ $record->user->student_id }}</td>
+                    <td>
+                        <div class="student-name" style="font-weight: 700;">{{ $record->user->name }}</div>
+                    </td>
+                    <td>{{ $record->user->course }} {{ $record->user->year }}-{{ $record->user->section }}</td>
+                    
+                    {{-- Column 1: Medical Condition Status --}}
+                    <td>
+                        @if($record->has_illness == 'Yes')
+                            <span class="status review">With Condition</span>
+                        @else
+                            <span class="status submitted">No Condition</span>
+                        @endif
+                    </td>
+
+                    {{-- Column 2: Clearance Issuance Status --}}
+                    <td>
+                        @if($record->clearance_status == 'Issued')
+                            <span class="status issued"><i class="fas fa-check-circle me-1"></i> Issued</span>
+                        @elseif($record->clearance_status == 'Rejected')
+                            <span class="status review">Rejected</span>
+                        @elseif($record->clearance_status == 'Pending')
+                            <span class="status pending">Pending</span>
+                        @else
+                            <span class="status submitted">Not Processed</span>
+                        @endif
+                    </td>
+
+                    <td style="color: #94a3b8; font-size: 12px;">
+                        {{ $record->created_at->format('M d, Y') }}
+                    </td>
+
+                    <td style="text-align: center;">
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-view">
+                                View
+                            </a>
+                            
+                            {{-- Change Sign Button appearance if already Issued --}}
+                            @if($record->clearance_status == 'Issued')
+                                <button class="btn-action" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;" disabled>
+                                    Signed
+                                </button>
                             @else
-                                <span class="status submitted">Submitted</span>
-                            @endif
-                        </td>
-                        <td style="color: #94a3b8; font-size: 12px;">
-                            {{ $record->created_at->format('M d, Y') }}
-                        </td>
-                        <td style="text-align: center;">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-view">
-                                    View
-                                </a>
                                 <a href="{{ route('admin.sign_page', $record->id) }}" class="btn-action btn-sign">
                                     Sign
                                 </a>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8;">No health records found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">No health records found.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 @endsection
 
 @push('scripts')

@@ -97,6 +97,7 @@
     <button onclick="window.print()" class="btn" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
         PRINT FORM 🖨️
     </button>
+
 </div>
 
 <div class="print-container">
@@ -199,7 +200,11 @@
     </div>
 
     <div class="row">
-        <table class="vax-table">
+        <div style="flex: 1;">
+            <span class="label">COVID-19 Vaccination History:</span><br>
+            <small>.</small>
+        </div>
+        <table class="vax-table" style="width: 65%;">
             @php $vax = is_array($profile->vaccine_history) ? $profile->vaccine_history : json_decode($profile->vaccine_history ?? '[]', true); @endphp
             <thead><tr><th>Dose</th><th>Date Received</th><th>Brand</th></tr></thead>
             <tbody>
@@ -211,6 +216,23 @@
         </table>
     </div>
 
+    <div class="cert-text">
+        I hereby certify that the medical health information given to PUP Medical Services are true, correct and fully disclosed to the best of
+my knowledge and all the medical condition that may affect in the assessment for purpose of consultation/ issuance of medical
+clearance/ certificate as a student of PUP.
+    </div>
+<div class="cert-text">
+        I also understand that the PUP MSD and university will not be liable for any untoward incident that may arise due to any failure to
+disclose accurate information or intentionally providing false and deceptive information.
+    </div>
+    <div class="cert-text">
+        In compliance with the Data Privacy Act of 2012 and its IRR, I voluntarily consent to the collection, processing and storage of my
+personal and health information for the purpose/s of health assessment/ treatment/ or research following research ethics guidelines
+for the improvement of healthcare services.
+    </div>
+
+
+
     <div class="signature-row">
         <div class="sig-block">
             <div class="sig-line">Parent/Guardian Signature</div>
@@ -219,25 +241,74 @@
             @if($profile->digital_signature)
                 <img src="{{ asset('storage/' . $profile->digital_signature) }}" class="sig-image">
             @endif
-            <div class="sig-line">{{ strtoupper($profile->user->name) }}</div>
+            <div class="sig-line">{{ strtoupper(Auth::user()->name) }}</div>
             <div style="font-size: 8px;">Student Digital Signature</div>
         </div>
         <div class="sig-block">
-            <div style="padding-bottom: 5px; font-weight: bold;">{{ $profile->created_at->format('m/d/Y') }}</div>
+            <div style="padding-bottom: 5px; font-weight: bold;">{{ date('m/d/Y') }}</div>
             <div class="sig-line">Date Signed</div>
         </div>
     </div>
 
-    <div style="border: 1px solid #000; margin-top: 15px; padding: 10px;">
-        <p style="text-align: center; font-weight: bold; margin: 0; font-size: 11px;">FOR PHYSICIAN ONLY</p>
-        <div class="row">
-            <span>Medical Clearance:</span>
-            <div class="check-item"><div class="box-ui"></div> Issued</div>
-            <div class="check-item"><div class="box-ui"></div> Pending, Reason: <div class="field" style="width: 150px;"></div></div>
+    <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
+        <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
+        
+        <div class="row" style="display: flex; align-items: center; gap: 15px;">
+            <span style="font-weight: bold;">Medical Clearance:</span>
+            
+            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
+                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
+                    {{ $profile->clearance_status == 'Issued' ? '✔' : '' }}
+                </div> 
+                Issued
+            </div>
+
+            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
+                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
+                    {{ $profile->clearance_status == 'Pending' ? '✔' : '' }}
+                </div> 
+                Pending, Reason: 
+                <div class="field" style="border-bottom: 1px solid #000; min-width: 150px; padding-left: 5px; font-size: 12px; font-style: italic;">
+                    {{ $profile->clearance_status == 'Pending' ? $profile->pending_reason : '' }}
+                </div>
+            </div>
         </div>
-        <div class="row" style="margin-top: 10px;">
-            <div class="field" style="flex: 0.4;">Date:</div>
-            <div class="field">Physician's Name and Signature</div>
+
+        <div class="row" style="margin-top: 25px; display: flex; align-items: flex-end; gap: 20px;">
+            <div style="flex: 0.4;">
+    <div class="field" style="border-bottom: 1px solid #000; text-align: center; font-weight: bold; min-height: 20px;">
+        {{-- I-check kung may verified_at date na sa DB, kung wala, ipakita ang date ngayon --}}
+        {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
+    </div>
+    <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
+</div>
+
+            <div style="flex: 0.6; text-align: center; position: relative;">
+                
+                @if($profile->physician_signature)
+                    <div style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 10;">
+                        <img src="{{ asset('storage/' . $profile->digital_signature) }}" alt="Signature" style="height: 60px; pointer-events: none;">
+                    </div>
+                @endif
+
+                <div style="flex: 0.6; text-align: center; position: relative; min-height: 80px;">
+    
+
+    @if($profile->clearance_status == 'Issued')
+        <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
+            <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
+                 alt="Nurse Signature" 
+                 style="height: 80px; width: auto; pointer-events: none;">
+        </div>
+    @endif
+
+    <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
+
+        MS. NURSE NAME, RN
+    </div>
+    <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
+</div>
+            </div>
         </div>
     </div>
 </div>

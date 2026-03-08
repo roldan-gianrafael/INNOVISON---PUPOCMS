@@ -218,10 +218,20 @@
                   <div class="form-group">
                       <label>COURSE</label>
                       <select name="course" required>
-                          <option value="BSIT">BSIT</option>
-                          <option value="BSCS">BSCS</option>
-                          <option value="BSECE">BSECE</option>
-                          <option value="BSBAHRM">BSBAHRM</option>
+                        <option value="BSBAHRM">Bachelor of Science in Business Administration - Human Resourse Management</option>
+                        <option value="BSBAMM">Bachelor of Science in Business Administration - Marketing Management</option>
+                        <option value="BSED-English">Bachelor of Science in Education - English</option>
+                        <option value="BSED-Math">Bachelor of Science in Education - Mathematics</option>
+                        <option value="BSED-Math">Bachelor of Science in Education - Mathematics</option>
+                        <option value="BSECE">Bachelor of Science in Electronic Engineering</option>
+                        <option value="BSEME">Bachelor of Science in Mechanical Mathematics</option>
+                        <option value="BSIT">Bachelor of Science in Information Technology</option>
+                        <option value="BSOA">Bachelor of Science in Office Administration</option>
+                        <option value="BSPSYCH">Bachelor of Science in Psychology</option>
+                        <option value="DIT">Diploma in Information Technology</option>
+                        <option value="DOMT">Diploma in Office Management and Technology</option>
+                        <option value="FACULTY">Faculty</option>
+                    
                           
                       </select>
                   </div>

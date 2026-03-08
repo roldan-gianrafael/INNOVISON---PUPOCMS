@@ -120,16 +120,27 @@
 @endpush
 
 @section('content')
-<div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto;">
-    <button onclick="window.print()" class="btn btn-primary" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px;">
-        CLICK TO PRINT FORM 🖨️
-    </button>
+<div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+    
+    @if($profile->clearance_status == 'Issued')
+
+        <button onclick="window.print()" class="btn btn-primary" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
+            CLICK TO PRINT FORM 🖨️
+        </button>
+    @else
+
+        <div style="background: #fef2f2; color: #b91c1c; padding: 8px 15px; border-radius: 5px; font-size: 13px; font-weight: bold; border: 1px solid #fecaca;">
+            ⚠️ VIEWING ONLY: Pending Medical Review
+        </div>
+        <button disabled style="background: #94a3b8; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: not-allowed;">
+            PRINTING DISABLED
+        </button>
+    @endif
 
     <a href="{{ route('account') }}" 
    style="display: inline-block; text-decoration: none; background: #64748b; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer; line-height: 1;">
     ✖
 </a>
-
 </div>
 
 <div class="print-container">

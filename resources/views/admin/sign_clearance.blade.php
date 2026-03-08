@@ -137,13 +137,13 @@
             <div>
                 <label class="form-label">Date Verified</label>
                 <input type="date" name="verified_at" class="form-control" value="{{ $record->verified_at ?? date('Y-m-d') }}" readonly>
-                <small class="text-muted" style="font-size: 11px;">System generated date</small>
+                <small class="text-muted" style="font-size: 11px;">Current Date</small>
             </div>
         </div>
 
         <div style="text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
             <a href="{{ route('admin.health_records') }}" class="btn-cancel">Cancel</a>
-            <button type="submit" class="btn-save">Update & Sign Clearance</button>
+            <button type="submit" class="btn-save">Update & Save</button>
         </div>
     </form>
 </div>

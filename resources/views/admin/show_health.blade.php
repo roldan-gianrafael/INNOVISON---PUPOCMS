@@ -154,11 +154,11 @@
 
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     <div class="row">
-        <span class="label">Name:</span> <div class="field">{{ Auth::user()->name }}</div>
-        <span class="label">Student No.:</span> <div class="field">{{ Auth::user()->student_id }}</div>
+        <span class="label">Name:</span> <div class="field">{{ $profile->user->name }}</div>
+        <span class="label">Student No.:</span> <div class="field">{{ $profile->user->student_id }}</div>
     </div>
     <div class="row">
-        <span class="label">Home Address:</span> <div class="field">{{ $profile->home_address ?? '' }}</div>
+        <span class="label">Home Address:</span> <div class="field">{{ $profile->user->home_address ?? '' }}</div>
         <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
     </div>
     <div class="row">
@@ -169,7 +169,7 @@
     </div>
     <div class="row">
         <span class="label">Blood Type:</span> <div class="field">{{ $profile->blood_type ?? 'N/A' }}</div>
-        <span class="label">Email:</span> <div class="field">{{ Auth::user()->email }}</div>
+        <span class="label">Email:</span> <div class="field">{{ $profile->user->email }}</div>
     </div>
     <div class="row">
         <span class="label">Parent/Guardian:</span> <div class="field">{{ $profile->guardian_name ?? '' }}</div>

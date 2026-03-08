@@ -162,12 +162,12 @@
             @csrf
             <div class="form-group">
                 <label>EMAIL ADDRESS</label>
-                <input type="email" name="email" value="{{ old('email') }}" placeholder="e.g. name@pup.edu.ph" required>
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="" required>
             </div>
 
             <div class="form-group">
                 <label>PASSWORD</label>
-                <input type="password" name="password" placeholder="••••••••" required>
+                <input type="password" name="password" placeholder="" required>
             </div>
 
             <button type="submit" class="btn-submit">Login to Portal</button>

@@ -4,36 +4,47 @@
 
 @push('styles')
 <style>
-    /* --- PRINT SETTINGS --- */
-    @media print {
-        header, footer, nav, .sidebar, .navbar, .no-print, .main-header, .main-sidebar, .btn { 
-            display: none !important; 
-        }
+   /* --- PRINT SETTINGS --- */
+@media print {
+    /* 1. Itago lahat ng admin elements at buttons */
+    header, footer, nav, .sidebar, .navbar, .no-print, 
+    .main-header, .main-sidebar, .btn, .content-header { 
+        display: none !important; 
+    }
 
-        body { 
-            visibility: hidden; 
-            background: none !important; 
-            margin: 0; padding: 0;
-        }
+    /* 2. Siguraduhin na walang background at margin ang body */
+    body { 
+        visibility: hidden; 
+        background: white !important; 
+        margin: 0 !important; 
+        padding: 0 !important;
+    }
 
-        .print-container, .print-container * { 
-            visibility: visible; 
-        }
+    /* 3. Ipakita lang ang form container */
+    .print-container, .print-container * { 
+        visibility: visible; 
+    }
 
-        .print-container { 
-            position: absolute; 
-            left: 0; top: 0; 
-            width: 100%; 
-            margin: 0 !important; 
-            padding: 0 !important;
-            box-shadow: none !important;
-            line-height: 1.2; /* In-adjust mula 1.1 para sa mas malaking text */
-        }
+    /* 4. I-dikit sa pinakataas ang container */
+    .print-container { 
+        position: absolute !important; 
+        left: 0 !important; 
+        top: 0 !important; 
+        width: 100% !important; 
+        margin: 0 !important; 
+        /* Dito mo kontrolin ang layo sa gilid at taas ng papel */
+        padding: 0.2in 0.5in !important; 
+        box-shadow: none !important;
+        line-height: 1.2;
+        border: none !important;
+    }
 
-        @page { 
-            size: 8.5in 13in; 
-            margin: 0.5in 0.5in; /* Bahagyang pinalaki ang margin */
-        }
+    /* 5. Force the page size and REMOVE default browser margins */
+    @page { 
+        size: 8.5in 13in; 
+        margin: 0 !important; /* Ginawang 0 para mawala ang 0.81 gap */
+    }
+}
         
         .row { margin-bottom: 4px !important; }
         .section-header { margin-top: 12px !important; }
@@ -91,7 +102,20 @@
     .signature-row { display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-end; }
     .sig-block { width: 35%; text-align: center; }
     .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
-    .sig-line { border-top: 1px solid #000; font-size: 11px; padding-top: 4px; font-weight: bold; } /* From 9px */
+    /* --- I-update ang sig-line sa <style> section --- */
+.sig-line { 
+    border-bottom: 1px solid #000; /* Ginawang bottom border para sa ibabaw ang text */
+    font-size: 11px; 
+    font-weight: bold; 
+    text-transform: uppercase;
+    min-height: 15px;
+    margin-bottom: 2px;
+}
+.sig-label {
+    font-size: 9px;
+    font-weight: bold;
+    color: #000;
+}
 </style>
 @endpush
 

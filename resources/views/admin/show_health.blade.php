@@ -1,39 +1,53 @@
-@extends('layouts.admin') {{-- Gamit ang admin layout mo --}}
+@extends('layouts.admin')
 
-@section('title', 'Student Health Profile - Admin View')
+@section('title', 'Health Information Form - Print')
 
 @push('styles')
 <style>
     /* --- PRINT SETTINGS --- */
-    @media print {
-        header, footer, nav, .sidebar, .navbar, .no-print, .main-header, .main-sidebar, .btn, .btn-primary { 
-            display: none !important; 
-        }
+@media print {
+    /* 1. Itago lahat ng admin elements at buttons */
+    header, footer, nav, .sidebar, .navbar, .no-print, 
+    .main-header, .main-sidebar, .btn, .content-header { 
+        display: none !important; 
+    }
 
-        body { 
-            visibility: hidden; 
-            background: none !important; 
-            margin: 0; padding: 0;
-        }
+    /* 2. Siguraduhin na walang background at margin ang body */
+    body { 
+        visibility: hidden; 
+        background: white !important; 
+        margin: 0 !important; 
+        padding: 0 !important;
+    }
 
-        .print-container, .print-container * { 
-            visibility: visible; 
-        }
+    /* 3. Ipakita lang ang form container */
+    .print-container, .print-container * { 
+        visibility: visible; 
+    }
 
-        .print-container { 
-            position: absolute; 
-            left: 0; top: 0; 
-            width: 100%; 
-            margin: 0 !important; 
-            padding: 0 !important;
-            box-shadow: none !important;
-            line-height: 1.2;
-        }
+    /* 4. I-dikit sa pinakataas ang container */
+    .print-container { 
+        position: absolute !important; 
+        left: 0 !important; 
+        top: 0 !important; 
+        width: 100% !important; 
+        margin: 0 !important; 
+        /* Dito mo kontrolin ang layo sa gilid at taas ng papel */
+        padding: 0.2in 0.5in !important; 
+        box-shadow: none !important;
+        line-height: 1.2;
+        border: none !important;
+    }
 
-        @page { 
-            size: 8.5in 13in; 
-            margin: 0.5in 0.5in;
-        }
+    /* 5. Force the page size and REMOVE default browser margins */
+    @page { 
+        size: 8.5in 13in; 
+        margin: 0 !important; /* Ginawang 0 para mawala ang 0.81 gap */
+    }
+}
+        
+        .row { margin-bottom: 4px !important; }
+        .section-header { margin-top: 12px !important; }
     }
 
     /* --- SCREEN VIEW --- */
@@ -53,10 +67,12 @@
     }
 
     .header-section { display: flex; align-items: center; position: relative; margin-bottom: 8px; }
-    .logo { width: 80px; height: 80px; margin-right: 15px; margin-left: 50px;}
+    .logo { width: 80px; height: 80px; margin-right: 15px; margin-left: 50px;} /* Pinalaki rin ang logo konti */
     .header-text p { margin: 0; line-height: 1.3; }
-    .univ-name { font-size: 15px; font-weight: bold; }
-    .dept-name { font-size: 17px; font-weight: bold; }
+    
+    /* Font Size Updates (+2) */
+    .univ-name { font-size: 15px; font-weight: bold; } /* From 13px */
+    .dept-name { font-size: 17px; font-weight: bold; } /* From 15px */
 
     .photo-box {
         position: absolute; right: 0; top: 0;
@@ -67,25 +83,39 @@
     }
     .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 
-    .form-title { text-align: center; font-weight: bold; font-style: italic; font-size: 16px; margin: 18px 0; }
-    .section-header { font-weight: bold; font-style: italic; margin-top: 12px; text-transform: uppercase; font-size: 13px; padding-left: 5px; }
+    .form-title { text-align: center; font-weight: bold; font-style: italic; font-size: 16px; margin: 18px 0;  } /* From 14px */
+    .section-header { font-weight: bold; font-style: italic; margin-top: 12px; text-transform: uppercase; font-size: 13px; padding-left: 5px; } /* From 11px */
 
     .row { display: flex; margin-bottom: 6px; gap: 10px; align-items: baseline; }
-    .field { border-bottom: 1px solid #000; flex: 1; padding-left: 5px; min-height: 18px; font-size: 14px; font-weight: bold; color: #000; }
-    .label { font-weight: bold; white-space: nowrap; font-size: 13px; }
+    .field { border-bottom: 1px solid #000; flex: 1; padding-left: 5px; min-height: 18px; font-size: 14px; font-weight: bold; color: #000; } /* From 12px */
+    .label { font-weight: bold; white-space: nowrap; font-size: 13px; } /* From 11px */
+    .labels {  white-space: nowrap; font-size: 13px; } /* From 11px */
 
     .checkbox-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 8px 0 8px 20px; }
-    .check-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .check-item { display: flex; align-items: center; gap: 6px; font-size: 12px; } /* From 10px */
     .box-ui { width: 13px; height: 13px; border: 1px solid #000; display: inline-block; text-align: center; line-height: 12px; font-weight: bold; }
 
     .vax-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    .vax-table th, .vax-table td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 12px; }
+    .vax-table th, .vax-table td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 12px; } /* From 10px */
     
-    .cert-text { font-style: italic; font-size: 11px; text-align: justify; margin-top: 15px; line-height: 1.3; }
+    .cert-text { font-style: italic; font-size: 11px; text-align: justify; margin-top: 15px; line-height: 1.3; } /* From 9px */
     .signature-row { display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-end; }
     .sig-block { width: 35%; text-align: center; }
     .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
-    .sig-line { border-top: 1px solid #000; font-size: 11px; padding-top: 4px; font-weight: bold; }
+    /* --- I-update ang sig-line sa <style> section --- */
+.sig-line { 
+    border-bottom: 1px solid #000; /* Ginawang bottom border para sa ibabaw ang text */
+    font-size: 11px; 
+    font-weight: bold; 
+    text-transform: uppercase;
+    min-height: 15px;
+    margin-bottom: 2px;
+}
+.sig-label {
+    font-size: 9px;
+    font-weight: bold;
+    color: #000;
+}
 </style>
 @endpush
 
@@ -124,22 +154,27 @@
 
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     <div class="row">
-        <span class="label">Name:</span> <div class="field">{{ $profile->user->name }}</div>
-        <span class="label">Student No.:</span> <div class="field">{{ $profile->user->student_id }}</div>
+        <span class="label">Name:</span> <div class="field">{{ Auth::user()->name }}</div>
+        <span class="label">Student No.:</span> <div class="field">{{ Auth::user()->student_id }}</div>
     </div>
     <div class="row">
         <span class="label">Home Address:</span> <div class="field">{{ $profile->home_address ?? '' }}</div>
         <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
     </div>
     <div class="row">
-        <span class="label">Age:</span> <div class="field">{{ $calculatedAge }}</div>
+        <span class="label">Age:</span> <div class="field">{{ $profile->age ?? '' }}</div>
         <span class="label">Sex:</span> <div class="field">{{ $profile->sex ?? '' }}</div>
         <span class="label">Civil Status:</span> <div class="field">{{ $profile->civil_status ?? '' }}</div>
-        <span class="label">Course:</span> <div class="field">{{ $profile->user->course }}</div>
+        <span class="label">Course:</span> <div class="field">{{ $profile->course_college ?? '' }}</div>
     </div>
     <div class="row">
         <span class="label">Blood Type:</span> <div class="field">{{ $profile->blood_type ?? 'N/A' }}</div>
-        <span class="label">Email:</span> <div class="field">{{ $profile->user->email }}</div>
+        <span class="label">Email:</span> <div class="field">{{ Auth::user()->email }}</div>
+    </div>
+    <div class="row">
+        <span class="label">Parent/Guardian:</span> <div class="field">{{ $profile->guardian_name ?? '' }}</div>
+        <span class="label">Landline:</span> <div class="field">{{ $profile->landline ?? 'N/A' }}</div>
+        <span class="label">Cellphone:</span> <div class="field">{{ $profile->cellphone ?? '' }}</div>
     </div>
 
     <div class="section-header">PART II. MEDICAL HISTORY</div>
@@ -164,8 +199,8 @@
 
     <div class="row">
         <span>2. Do you have disability?</span>
-        <div class="check-item"><div class="box-ui">{{ ($profile->has_disability ?? 'None') == 'None' ? '/' : '' }}</div> None</div>
-        <div class="check-item"><div class="box-ui">{{ ($profile->has_disability ?? '') == 'Yes' ? '/' : '' }}</div> Yes:</div>
+        <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'None' ? '/' : '' }}</div> None</div>
+        <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'Yes' ? '/' : '' }}</div> Yes:</div>
         <div class="field">{{ $profile->disability_type ?? '' }}</div>
     </div>
 
@@ -174,7 +209,7 @@
         <span class="label">Food:</span> <div class="field">{{ $profile->food_allergies ?? 'None' }}</div>
         <span class="label">No Known Allergies:</span> <div class="box-ui">{{ $profile->no_allergies ? '/' : '' }}</div>
     </div>
-    <div class="row">
+    <div class="row px-4">
         <span class="label">Medicines:</span>
         @php
             $meds_list = ['Aspirin', 'Ibuprofen', 'Amoxicillin', 'Mefenamic Acid', 'Penicillin'];
@@ -188,16 +223,25 @@
     </div>
 
     <div class="section-header">PART III. PERSONAL SOCIAL HISTORY</div>
-    <div class="row">
-        <span class="label">Cigarette Smoking:</span>
-        <div class="check-item"><div class="box-ui">{{ ($profile->is_smoker ?? '') == 'Yes' ? '/' : '' }}</div> Yes</div>
-        <div class="check-item"><div class="box-ui">{{ ($profile->is_smoker ?? '') == 'No' ? '/' : '' }}</div> No</div>
+    <div class="row" style="margin-top: 5px;">
+    <span class="labels">Cigarette Smoking :</span>
+    <div class="check-item" style="margin-left: 10px;">
+        <div class="box-ui">{{ ($profile->is_smoker ?? '') == 'Yes' ? '/' : '' }}</div> Yes
     </div>
-    <div class="row">
-        <span class="label">Alcohol Drinking:</span>
-        <div class="check-item"><div class="box-ui">{{ ($profile->is_drinker ?? '') == 'Yes' ? '/' : '' }}</div> Yes</div>
-        <div class="check-item"><div class="box-ui">{{ ($profile->is_drinker ?? '') == 'No' ? '/' : '' }}</div> No</div>
+    <div class="check-item">
+        <div class="box-ui">{{ ($profile->is_smoker ?? '') == 'No' ? '/' : '' }}</div> No
     </div>
+</div>
+
+<div class="row">
+    <span class="labels">Alcohol Drinking:</span>
+    <div class="check-item" style="margin-left: 24px;">
+        <div class="box-ui">{{ ($profile->is_drinker ?? '') == 'Yes' ? '/' : '' }}</div> Yes
+    </div>
+    <div class="check-item">
+        <div class="box-ui">{{ ($profile->is_drinker ?? '') == 'No' ? '/' : '' }}</div> No
+    </div>
+</div>
 
     <div class="row">
         <div style="flex: 1;">
@@ -234,23 +278,36 @@ for the improvement of healthcare services.
 
 
     <div class="signature-row">
-        <div class="sig-block">
-            <div class="sig-line">Parent/Guardian Signature</div>
-        </div>
-        <div class="sig-block">
-            @if($profile->digital_signature)
-                <img src="{{ asset('storage/' . $profile->digital_signature) }}" class="sig-image">
-            @endif
-            <div class="sig-line">{{ strtoupper(Auth::user()->name) }}</div>
-            <div style="font-size: 8px;">Student Digital Signature</div>
-        </div>
-        <div class="sig-block">
-            <div style="padding-bottom: 5px; font-weight: bold;">{{ date('m/d/Y') }}</div>
-            <div class="sig-line">Date Signed</div>
-        </div>
+    {{-- Parent Signature Block --}}
+    <div class="sig-block">
+        <div style="height: 60px;"></div> {{-- Space para sa manual signature --}}
+        <div class="sig-line">Parent/Guardian Signature</div>
     </div>
 
-    <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
+    {{-- Student Signature Block --}}
+    <div class="sig-block">
+        @if($profile->digital_signature)
+            <img src="{{ asset('storage/' . $profile->digital_signature) }}" class="sig-image" style="height: 60px; width: auto;">
+        @else
+            <div style="height: 60px;"></div>
+        @endif
+        
+        {{-- FIX: Gamitin ang name ng student mula sa profile, hindi Auth::user() --}}
+        <div class="sig-line">{{ strtoupper($profile->user->name) }}</div>
+        <div style="font-size: 8px;">Student Digital Signature</div>
+    </div>
+
+    {{-- Date Signed Block --}}
+    <div class="sig-block">
+        <div style="padding-bottom: 5px; font-weight: bold; height: 60px; display: flex; align-items: flex-end; justify-content: center;">
+            {{-- FIX: Gamitin ang created_at date ng profile record --}}
+            {{ $profile->created_at ? $profile->created_at->format('m/d/Y') : date('m/d/Y') }}
+        </div>
+        <div class="sig-line">Date Signed</div>
+    </div>
+</div>
+
+   <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
         <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
         
         <div class="row" style="display: flex; align-items: center; gap: 15px;">

@@ -280,21 +280,34 @@ for the improvement of healthcare services.
 
 
     <div class="signature-row">
-        <div class="sig-block">
-            <div class="sig-line">Parent/Guardian Signature</div>
-        </div>
-        <div class="sig-block">
-            @if($profile->digital_signature)
-                <img src="{{ asset('storage/' . $profile->digital_signature) }}" class="sig-image">
-            @endif
-            <div class="sig-line">{{ strtoupper(Auth::user()->name) }}</div>
-            <div style="font-size: 8px;">Student Digital Signature</div>
-        </div>
-        <div class="sig-block">
-            <div style="padding-bottom: 5px; font-weight: bold;">{{ date('m/d/Y') }}</div>
-            <div class="sig-line">Date Signed</div>
-        </div>
+    {{-- Parent Signature Block --}}
+    <div class="sig-block">
+        <div style="height: 60px;"></div> {{-- Space para sa manual signature --}}
+        <div class="sig-line">Parent/Guardian Signature</div>
     </div>
+
+    {{-- Student Signature Block --}}
+    <div class="sig-block">
+        @if($profile->digital_signature)
+            <img src="{{ asset('storage/' . $profile->digital_signature) }}" class="sig-image" style="height: 60px; width: auto;">
+        @else
+            <div style="height: 60px;"></div>
+        @endif
+        
+        {{-- FIX: Gamitin ang name ng student mula sa profile, hindi Auth::user() --}}
+        <div class="sig-line">{{ strtoupper($profile->user->name) }}</div>
+        <div style="font-size: 8px;">Student Digital Signature</div>
+    </div>
+
+    {{-- Date Signed Block --}}
+    <div class="sig-block">
+        <div style="padding-bottom: 5px; font-weight: bold; height: 60px; display: flex; align-items: flex-end; justify-content: center;">
+            {{-- FIX: Gamitin ang created_at date ng profile record --}}
+            {{ $profile->created_at ? $profile->created_at->format('m/d/Y') : date('m/d/Y') }}
+        </div>
+        <div class="sig-line">Date Signed</div>
+    </div>
+</div>
 
    <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
         <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>

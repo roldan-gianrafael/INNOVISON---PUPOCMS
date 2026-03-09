@@ -69,10 +69,18 @@ Route::get('/student/health-form', [AppointmentController::class, 'showHealthFor
 Route::post('/student/store-health-form', [AppointmentController::class, 'storeHealthForm'])->name('store.health.form');
 Route::get('/student/print-health-form', [AppointmentController::class, 'printHealthForm'])->name('print.health.form');
 Route::get('/account', [AppointmentController::class, 'index'])->name('account');
-Route::get('/health-records', [AdminController::class, 'viewHealth'])->name('admin.health_records');
-Route::get('/health-profile/{id}', [AdminController::class, 'showHealth'])->name('admin.show_health');
-Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage'])->name('admin.sign_page');
-Route::put('/health-profile/{id}/update', [AdminController::class, 'updateClearance'])->name('admin.update_clearance');
+Route::get('/health-records', [AdminController::class, 'viewHealth'])
+    ->middleware('role:admin,super_admin,student_assistant')
+    ->name('admin.health_records');
+Route::get('/health-profile/{id}', [AdminController::class, 'showHealth'])
+    ->middleware('role:admin,super_admin,student_assistant')
+    ->name('admin.show_health');
+Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage'])
+    ->middleware('role:admin,super_admin')
+    ->name('admin.sign_page');
+Route::put('/health-profile/{id}/update', [AdminController::class, 'updateClearance'])
+    ->middleware('role:admin,super_admin')
+    ->name('admin.update_clearance');
 
     Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
     Route::get('/student/account', [AppointmentController::class, 'account']);

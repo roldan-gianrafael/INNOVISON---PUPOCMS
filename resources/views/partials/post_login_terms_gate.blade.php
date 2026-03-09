@@ -1,4 +1,53 @@
 <style>
+    .post-login-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 5100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.74);
+        backdrop-filter: blur(4px);
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .post-login-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .post-login-loader-card {
+        text-align: center;
+        color: #ffffff;
+        font-family: inherit;
+    }
+
+    .post-login-loader-logo {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.45);
+        background: #ffffff;
+        padding: 2px;
+        animation: postLoginBounce 0.85s ease-in-out infinite;
+    }
+
+    .post-login-loader-text {
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+    }
+
+    @keyframes postLoginBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
     .terms-gate-overlay {
         position: fixed;
         inset: 0;
@@ -21,36 +70,37 @@
     }
 
     .terms-gate-modal {
-        width: min(760px, 100%);
+        width: min(560px, 100%);
         background: #ffffff;
-        border-radius: 12px;
+        border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
         color: #1f2937;
+        font-family: inherit;
     }
 
     .terms-gate-head {
         background: #8B0000;
         color: #ffffff;
-        padding: 16px 20px;
+        padding: 12px 16px;
     }
 
     .terms-gate-head h3 {
         margin: 0;
-        font-size: 34px;
+        font-size: 24px;
         line-height: 1.2;
         font-weight: 800;
     }
 
     .terms-gate-body {
-        padding: 20px;
+        padding: 16px;
         border-bottom: 1px solid #e5e7eb;
     }
 
     .terms-gate-body p {
-        margin: 0 0 16px;
-        line-height: 1.65;
-        font-size: 20px;
+        margin: 0 0 12px;
+        line-height: 1.55;
+        font-size: 15px;
         color: #1f2937;
     }
 
@@ -65,18 +115,18 @@
     }
 
     .terms-gate-checkbox {
-        margin-top: 20px;
+        margin-top: 14px;
         display: flex;
         align-items: flex-start;
-        gap: 10px;
+        gap: 8px;
         color: #1f2937;
-        font-size: 18px;
+        font-size: 14px;
     }
 
     .terms-gate-checkbox input[type="checkbox"] {
-        margin-top: 4px;
-        width: 18px;
-        height: 18px;
+        margin-top: 2px;
+        width: 16px;
+        height: 16px;
         accent-color: #8B0000;
         flex-shrink: 0;
     }
@@ -85,18 +135,18 @@
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        padding: 14px 20px;
+        padding: 12px 16px;
         background: #f8fafc;
     }
 
     .terms-gate-btn {
         border: 1px solid transparent;
-        border-radius: 8px;
-        padding: 10px 16px;
-        font-size: 14px;
+        border-radius: 7px;
+        padding: 8px 14px;
+        font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        min-width: 108px;
+        min-width: 96px;
         font-family: inherit;
     }
 
@@ -123,15 +173,15 @@
 
     @media (max-width: 640px) {
         .terms-gate-head h3 {
-            font-size: 26px;
+            font-size: 20px;
         }
 
         .terms-gate-body p {
-            font-size: 17px;
+            font-size: 14px;
         }
 
         .terms-gate-checkbox {
-            font-size: 16px;
+            font-size: 13px;
         }
 
         .terms-gate-actions {
@@ -145,6 +195,13 @@
 </style>
 
 @if (session('show_terms_modal'))
+    <div class="post-login-loader" id="postLoginLoader" aria-live="polite" aria-label="Loading">
+        <div class="post-login-loader-card">
+            <img src="{{ asset('images/clinic_logo.png') }}" alt="Loading" class="post-login-loader-logo">
+            <div class="post-login-loader-text">Loading...</div>
+        </div>
+    </div>
+
     <div class="terms-gate-overlay" id="termsGateOverlay" role="dialog" aria-modal="true" aria-labelledby="termsGateTitle">
         <div class="terms-gate-modal">
             <div class="terms-gate-head">
@@ -182,6 +239,7 @@
 
     <script>
         (function () {
+            const loader = document.getElementById('postLoginLoader');
             const overlay = document.getElementById('termsGateOverlay');
             const agreeInput = document.getElementById('termsGateAgree');
             const continueBtn = document.getElementById('termsGateContinueBtn');
@@ -197,11 +255,14 @@
             }
 
             syncContinueState();
+            document.body.classList.add('terms-gate-lock');
 
             setTimeout(function () {
+                if (loader) {
+                    loader.classList.add('hidden');
+                }
                 overlay.classList.add('is-visible');
-                document.body.classList.add('terms-gate-lock');
-            }, 500);
+            }, 1000);
 
             agreeInput.addEventListener('change', syncContinueState);
 

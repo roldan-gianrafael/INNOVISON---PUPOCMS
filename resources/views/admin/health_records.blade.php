@@ -86,6 +86,7 @@
     @php
         $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
         $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
+        $canSignHealth = in_array($role, ['admin', 'super_admin'], true);
     @endphp
 
     {{-- Header with Search --}}
@@ -167,15 +168,21 @@
                                 View
                             </a>
                             
-                            {{-- Change Sign Button appearance if already Issued --}}
-                            @if($record->clearance_status == 'Issued')
-                                <button class="btn-action" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;" disabled>
-                                    Signed
-                                </button>
+                            @if($canSignHealth)
+                                {{-- Change Sign Button appearance if already Issued --}}
+                                @if($record->clearance_status == 'Issued')
+                                    <button class="btn-action" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;" disabled>
+                                        Signed
+                                    </button>
+                                @else
+                                    <a href="{{ route('admin.sign_page', $record->id) }}" class="btn-action btn-sign">
+                                        Sign
+                                    </a>
+                                @endif
                             @else
-                                <a href="{{ route('admin.sign_page', $record->id) }}" class="btn-action btn-sign">
-                                    Sign
-                                </a>
+                                <button class="btn-action" style="background: #e2e8f0; color: #64748b; cursor: default;" disabled>
+                                    View Only
+                                </button>
                             @endif
                         </div>
                     </td>

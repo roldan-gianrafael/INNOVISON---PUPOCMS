@@ -259,7 +259,7 @@
 
   <div class="logo-header">
     <div class="logo-brand">
-      <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="logo-icon">
+      <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="logo-icon">
       <div class="logo-text">
         <div class="logo-title">PUP TAGUIG</div>
         <div class="logo-subtitle">ONLINE CLINIC</div>
@@ -385,7 +385,7 @@
 
   <div id="loginLoadingOverlay" class="login-loading-overlay" aria-hidden="true">
       <div class="login-loading-card">
-          <img src="{{ asset('images/pup_logo.png') }}" alt="Loading" class="login-loading-logo">
+          <img src="{{ asset('images/clinic_logo.png') }}" alt="Loading" class="login-loading-logo">
           <div class="login-loading-text">Signing in...</div>
       </div>
   </div>
@@ -418,8 +418,15 @@
               return;
           }
 
-          loginForm.addEventListener('submit', function () {
+          function showLoadingAndSubmit(event) {
+              if (event) {
+                  event.preventDefault();
+              }
               if (isSubmitting) {
+                  return;
+              }
+              if (typeof loginForm.checkValidity === 'function' && !loginForm.checkValidity()) {
+                  loginForm.reportValidity();
                   return;
               }
 
@@ -428,7 +435,16 @@
               loadingOverlay.setAttribute('aria-hidden', 'false');
               loginSubmitBtn.disabled = true;
               loginSubmitBtn.textContent = 'Signing in...';
-          });
+
+              requestAnimationFrame(function () {
+                  setTimeout(function () {
+                      HTMLFormElement.prototype.submit.call(loginForm);
+                  }, 260);
+              });
+          }
+
+          loginSubmitBtn.addEventListener('click', showLoadingAndSubmit);
+          loginForm.addEventListener('submit', showLoadingAndSubmit);
       })();
   </script>
 

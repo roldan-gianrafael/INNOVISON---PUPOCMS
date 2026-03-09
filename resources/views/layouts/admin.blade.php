@@ -1086,7 +1086,7 @@
     $displayName = optional($authUser)->name ?? 'Clinic User';
     $welcomeName = $displayName === 'Admin Account' ? 'Nurse Joyce' : $displayName;
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
-    $brandLogo = asset('images/pup_logo.png');
+    $brandLogo = asset('images/clinic_logo.png');
     $roleLabelMap = [
         'super_admin' => 'Super Admin',
         'admin' => 'Admin',

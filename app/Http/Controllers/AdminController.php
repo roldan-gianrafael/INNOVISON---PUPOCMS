@@ -16,6 +16,12 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    private function canSignHealthClearance(): bool
+    {
+        $role = strtolower((string) (optional(Auth::user())->user_role ?? ''));
+        return in_array($role, ['admin', 'super_admin'], true);
+    }
+
     // ==========================================
     //  PART 1: VIEW METHODS (Loading the Pages)
     // ==========================================
@@ -86,6 +92,11 @@ class AdminController extends Controller
 // 1. Para lumabas 'yung page (GET)
 public function showSignPage($id)
 {
+    if (!$this->canSignHealthClearance()) {
+        return redirect()->route('admin.health_records')
+            ->with('error', 'Only Nurse Joyce or Super Admin can e-sign health records.');
+    }
+
     // Ginaya ko ang variable name na $record para tugma sa blade na binigay ko kanina
     $record = HealthProfile::with('user')->findOrFail($id);
     return view('admin.sign_clearance', compact('record'));
@@ -94,6 +105,11 @@ public function showSignPage($id)
 // 2. Para sa pag-save ng pinirmahan (PUT)
 public function updateClearance(Request $request, $id)
 {
+    if (!$this->canSignHealthClearance()) {
+        return redirect()->route('admin.health_records')
+            ->with('error', 'Only Nurse Joyce or Super Admin can e-sign health records.');
+    }
+
     // 1. I-validate ang data
     $request->validate([
         'clearance_status' => 'required',

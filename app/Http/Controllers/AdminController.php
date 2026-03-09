@@ -11,6 +11,8 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
+use App\Models\HealthProfile;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -62,6 +64,72 @@ class AdminController extends Controller
             'monthlyCompleted'
         ));
     }
+    public function viewHealth()
+    {
+        // Kukunin natin ang lahat ng records mula sa health_profile table
+        $records = HealthProfile::with('user')->latest()->get();
+        
+        return view('admin.health_records', compact('records'));
+    }
+
+    public function showHealth($id)
+    {
+
+        $profile = HealthProfile::with('user')->findOrFail($id);
+        
+
+        $calculatedAge = Carbon::parse($profile->user->DOB)->age;
+
+        return view('admin.show_health', compact('profile', 'calculatedAge'));
+    }
+
+// 1. Para lumabas 'yung page (GET)
+public function showSignPage($id)
+{
+    // Ginaya ko ang variable name na $record para tugma sa blade na binigay ko kanina
+    $record = HealthProfile::with('user')->findOrFail($id);
+    return view('admin.sign_clearance', compact('record'));
+}
+
+// 2. Para sa pag-save ng pinirmahan (PUT)
+public function updateClearance(Request $request, $id)
+{
+    // 1. I-validate ang data
+    $request->validate([
+        'clearance_status' => 'required',
+        'pending_reason'   => 'nullable|string',
+        'verified_at'      => 'nullable|date',
+    ]);
+
+    // 2. Hanapin ang record
+    $record = HealthProfile::findOrFail($id);
+
+    // 3. Manual Assignment
+    $record->clearance_status = $request->clearance_status;
+    $record->pending_reason   = $request->pending_reason;
+
+    // 4. Date Logic
+    if ($request->clearance_status == 'Issued') {
+        // Kapag Issued, gamitin ang nilagay na date o ang oras ngayon (now)
+        $record->verified_at = $request->verified_at ?? now();
+    } else {
+        // Kapag Pending o Rejected, gawing NULL ang date para hindi lumitaw sa form
+        $record->verified_at = null;
+        
+        // Optional: I-clear din ang pending_reason kung Issued na uli
+        if ($request->clearance_status == 'Issued') {
+            $record->pending_reason = null;
+        }
+    }
+
+    // 5. I-save at i-check
+    if($record->save()){
+        return redirect()->route('admin.health_records')
+                         ->with('success', 'Health Clearance status updated successfully!');
+    } else {
+        return back()->with('error', 'Failed to save to database.');
+    }
+}
 
     public function appointments()
     {

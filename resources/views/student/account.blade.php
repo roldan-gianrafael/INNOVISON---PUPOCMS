@@ -349,28 +349,65 @@
 
             {{-- NEW: Health Form Quick Access Div --}}
             <div class="health-status-card">
-                <span class="health-status-title">🩺 Health Information Record</span>
-                
-                @if($user->is_health_profile_completed)
-                    <div style="margin-bottom: 15px;">
-                        <span style="font-size: 32px;">📄</span>
-                        <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">Your health profile is complete and ready for printing.</p>
-                    </div>
-                    <a href="{{ route('print.health.form') }}" class="btn-print-form">
-                        <span>🖨️</span> PRINT HEALTH FORM
-                    </a>
-                    <span class="status-indicator">✅ Valid for Academic Year 2025-2026</span>
-                @else
-                    <div style="margin-bottom: 15px; opacity: 0.6;">
-                        <span style="font-size: 32px;">📝</span>
-                        <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">You haven't completed your health profile yet.</p>
-                    </div>
-                    <a href="{{ route('health.form') }}" class="btn-print-form" style="background: #64748b;">
-                        COMPLETE FORM NOW
-                    </a>
-                    <span class="status-indicator">⚠️ Required for clinic consultations.</span>
-                @endif
+    <span class="health-status-title">🩺 Health Information Record</span>
+    
+    @if($user->is_health_profile_completed)
+        @php
+            $status = $user->healthProfile->clearance_status ?? 'Pending';
+        @endphp
+
+        @if($status == 'Issued')
+            {{-- CASE 1: APPROVED --}}
+            <div style="margin-bottom: 15px;">
+                <span style="font-size: 32px;">📜</span>
+                <p style="font-size: 14px; color: #065f46; font-weight: bold; margin: 5px 0;">
+                    Your health profile is now approved and ready for printing.
+                </p>
             </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <a href="{{ route('print.health.form') }}" class="btn-print-form" style="background: #059669;">
+                    <span>🖨️</span> PRINT APPROVED FORM
+                </a>
+        
+                <a href="{{ route('student.view.health.profile') }}" style="font-size: 12px; color: #64748b; text-decoration: underline; text-align: center;">
+                    View Record Details
+                </a>
+            </div>
+            <span class="status-indicator">✅ Valid for Academic Year 2025-2026</span>
+
+        @else
+           
+            <div style="margin-bottom: 15px;">
+                <span style="font-size: 32px;">⏳</span>
+                <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">
+                    Your profile has been submitted and is currently <strong>awaiting medical review</strong>.
+                </p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <a href="{{ route('print.health.form') }}" class="btn-print-form" style="background: #8f2724;">
+                    <span>👁️</span> VIEW SUBMITTED FORM
+                </a>
+                <button class="btn-print-form" style="background: #dd4b4b; cursor: not-allowed; font-size: 11px;" disabled>
+                    🖨️ PRINTING DISABLED (PENDING)
+                </button>
+            </div>
+            <span class="status-indicator">⏳ Physician's signature is required to print.</span>
+        @endif
+
+    @else
+        {{-- CASE 3: NOT COMPLETED --}}
+        <div style="margin-bottom: 15px; opacity: 0.6;">
+            <span style="font-size: 32px;">📝</span>
+            <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">You haven't completed your health profile yet.</p>
+        </div>
+        <a href="{{ route('student.health.form') }}" class="btn-print-form" style="background: #800000;">
+            COMPLETE FORM NOW
+        </a>
+        <span class="status-indicator">⚠️ Required for clinic consultations.</span>
+    @endif
+</div>
             
 
             {{-- Full Profile Widget --}}

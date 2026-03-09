@@ -1,10 +1,10 @@
-@extends('layouts.student')
+@extends('layouts.admin')
 
 @section('title', 'Health Information Form - Print')
 
 @push('styles')
 <style>
-   /* --- PRINT SETTINGS --- */
+    /* --- PRINT SETTINGS --- */
 @media print {
     /* 1. Itago lahat ng admin elements at buttons */
     header, footer, nav, .sidebar, .navbar, .no-print, 
@@ -120,27 +120,14 @@
 @endpush
 
 @section('content')
-<div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
-    
-    @if($profile->clearance_status == 'Issued')
+<div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto;">
+    <a href="{{ route('admin.health_records') }}" class="btn" style="background: #64748b; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
+        BACK TO RECORDS
+    </a>
+    <button onclick="window.print()" class="btn" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
+        PRINT FORM 🖨️
+    </button>
 
-        <button onclick="window.print()" class="btn btn-primary" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
-            CLICK TO PRINT FORM 🖨️
-        </button>
-    @else
-
-        <div style="background: #fef2f2; color: #b91c1c; padding: 8px 15px; border-radius: 5px; font-size: 13px; font-weight: bold; border: 1px solid #fecaca;">
-            ⚠️ VIEWING ONLY: Pending Medical Review
-        </div>
-        <button disabled style="background: #94a3b8; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: not-allowed;">
-            PRINTING DISABLED
-        </button>
-    @endif
-
-    <a href="{{ route('account') }}" 
-   style="display: inline-block; text-decoration: none; background: #64748b; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer; line-height: 1;">
-    ✖
-</a>
 </div>
 
 <div class="print-container">
@@ -167,11 +154,11 @@
 
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     <div class="row">
-        <span class="label">Name:</span> <div class="field">{{ Auth::user()->name }}</div>
-        <span class="label">Student No.:</span> <div class="field">{{ Auth::user()->student_id }}</div>
+        <span class="label">Name:</span> <div class="field">{{ $profile->user->name }}</div>
+        <span class="label">Student No.:</span> <div class="field">{{ $profile->user->student_id }}</div>
     </div>
     <div class="row">
-        <span class="label">Home Address:</span> <div class="field">{{ $profile->home_address ?? '' }}</div>
+        <span class="label">Home Address:</span> <div class="field">{{ $profile->user->home_address ?? '' }}</div>
         <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
     </div>
     <div class="row">
@@ -182,7 +169,7 @@
     </div>
     <div class="row">
         <span class="label">Blood Type:</span> <div class="field">{{ $profile->blood_type ?? 'N/A' }}</div>
-        <span class="label">Email:</span> <div class="field">{{ Auth::user()->email }}</div>
+        <span class="label">Email:</span> <div class="field">{{ $profile->user->email }}</div>
     </div>
     <div class="row">
         <span class="label">Parent/Guardian:</span> <div class="field">{{ $profile->guardian_name ?? '' }}</div>
@@ -344,36 +331,41 @@ for the improvement of healthcare services.
             </div>
         </div>
 
-        <div class="row" style="margin-top: 30px; display: flex; align-items: flex-end; gap: 20px;">
-    
-    <div style="flex: 0.4; text-align: center;">
-        <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; min-height: 20px; padding-bottom: 5px;">
-            @if($profile->clearance_status == 'Issued')
-                {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
-            @else
-                &nbsp; 
-            @endif
-        </div>
-        <div style="font-size: 10px; font-weight: bold; margin-top: 5px;">Date</div>
+        <div class="row" style="margin-top: 25px; display: flex; align-items: flex-end; gap: 20px;">
+            <div style="flex: 0.4;">
+    <div class="field" style="border-bottom: 1px solid #000; text-align: center; font-weight: bold; min-height: 20px;">
+        {{-- I-check kung may verified_at date na sa DB, kung wala, ipakita ang date ngayon --}}
+        {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
     </div>
-
-    <div style="flex: 0.6; text-align: center; position: relative;">
-        
-        @if($profile->clearance_status == 'Issued')
-            <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
-                     alt="Nurse Signature" 
-                     style="height: 85px; width: auto; pointer-events: none;">
-            </div>
-        @endif
-
-        <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-bottom: 5px;">
-            MS. NURSE NAME, RN
-        </div>
-        <div style="font-size: 10px; font-weight: bold; margin-top: 5px;">Physician's Name and Signature</div>
-    </div>
-
+    <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
 </div>
+
+            <div style="flex: 0.6; text-align: center; position: relative;">
+                
+                @if($profile->physician_signature)
+                    <div style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 10;">
+                        <img src="{{ asset('storage/' . $profile->digital_signature) }}" alt="Signature" style="height: 60px; pointer-events: none;">
+                    </div>
+                @endif
+
+                <div style="flex: 0.6; text-align: center; position: relative; min-height: 80px;">
+    
+
+    @if($profile->clearance_status == 'Issued')
+        <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
+            <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
+                 alt="Nurse Signature" 
+                 style="height: 80px; width: auto; pointer-events: none;">
+        </div>
+    @endif
+
+    <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
+
+        MS. NURSE NAME, RN
+    </div>
+    <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
+</div>
+            </div>
         </div>
     </div>
 </div>

@@ -60,6 +60,12 @@
         justify-content: center;
         margin-right: 4px;
     }
+    .action-list {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
     .btn-view { background: #fff3f5; color: #70131B; border: 1px solid #f0d7dc; }
     .btn-view:hover { background: #fae9ed; color: #5a0f16; }
     
@@ -69,7 +75,9 @@
     .btn-reschedule { background: #f9eef0; color: #7a1b28; border: 1px solid #f0d6dc; }
     .btn-reschedule:hover { background: #f4dde3; }
 
-    .btn-cancel { background: #fee2e2; color: #b91c1c; }
+    .btn-reject,
+    .btn-cancel { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .btn-reject:hover,
     .btn-cancel:hover { background: #fecaca; }
 
     .btn-complete { background: #70131B; color: white; }
@@ -99,6 +107,64 @@
     .modal-row { margin-bottom: 12px; }
     .modal-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
     .modal-val { font-size: 15px; color: #334155; font-weight: 500; }
+    .modal-title {
+        margin-top: 0;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+    }
+    .modal-subtitle {
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 16px;
+    }
+    .dialog-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 22px;
+    }
+    .dialog-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .dialog-btn-neutral {
+        background: #eee;
+        color: #333;
+    }
+    .dialog-btn-neutral:hover {
+        background: #e5e7eb;
+    }
+    .dialog-btn-primary {
+        background: #70131B;
+        color: #fff;
+    }
+    .dialog-btn-primary:hover {
+        background: #5a0f16;
+    }
+    .dialog-btn-approve {
+        background: #166534;
+        color: #fff;
+    }
+    .dialog-btn-approve:hover {
+        background: #14532d;
+    }
+    .dialog-btn-reject {
+        background: #b91c1c;
+        color: #fff;
+    }
+    .dialog-btn-reject:hover {
+        background: #991b1b;
+    }
 
     /* Form Inputs for Reschedule */
     .form-input {
@@ -204,15 +270,25 @@
                             <span class="status {{ strtolower($appt->status) }}">{{ $appt->status }}</span>
                         </td>
                         <td>
-                            <button class="btn-action btn-view" title="View Details"
-                                onclick="openInfoModal('{{ $appt->name }}', '{{ $appt->service }}', '{{ $appt->date }}', '{{ $appt->time }}', '{{ $appt->remarks }}', '{{ $appt->email }}')">
+                            <div class="action-list">
+                            <button
+                                type="button"
+                                class="btn-action btn-view"
+                                title="View Details"
+                                data-name="{{ $appt->name }}"
+                                data-service="{{ $appt->service }}"
+                                data-date="{{ $appt->date }}"
+                                data-time="{{ $appt->time }}"
+                                data-remarks="{{ $appt->remarks ?? 'No notes provided.' }}"
+                                data-email="{{ $appt->email }}"
+                                onclick="openInfoModal(this)">
                                 View
                             </button>
 
                             @if($appt->status == 'Pending')
-                                <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Approved') }}" class="btn-action btn-approve" title="Approve" onclick="return confirm('Approve this appointment?')">✓</a>
-                                <button class="btn-action btn-reschedule" title="Reschedule" onclick="openRescheduleModal('{{ $appt->id }}', '{{ $appt->date }}', '{{ $appt->time }}')">📅</button>
-                                <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Cancelled') }}" class="btn-action btn-cancel" title="Reject" onclick="return confirm('Cancel this request?')">✕</a>
+                                <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Approved') }}" class="btn-action btn-approve" title="Approve" onclick="return confirm('Approve this appointment?')">Approve</a>
+                                <button class="btn-action btn-reschedule" title="Reschedule" onclick="openRescheduleModal('{{ $appt->id }}', '{{ $appt->date }}', '{{ $appt->time }}')">Reschedule</button>
+                                <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Cancelled') }}" class="btn-action btn-reject btn-cancel" title="Reject" onclick="return confirm('Cancel this request?')">Reject</a>
                             
                             @elseif($appt->status == 'Approved')
                                 @php
@@ -223,14 +299,13 @@
 
                                 @if($isFuture)
                                     <button class="btn-action" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed; padding: 6px 12px; border-radius: 4px;" title="Scheduled for {{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }}">
-                                        ⏳ Consult
-                                    </button>
+                                        Consult (Scheduled)</button>
                                 @else
                                     <a href="{{ url($basePrefix . '/walkin/form/' . $appt->student_id) }}?source=online" class="btn-action btn-consult" style="background: #0d6efd; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; margin-right: 5px; display: inline-flex; align-items: center; gap: 5px;">
-                                        🔍 Consult
-                                    </a>
+                                        Consult</a>
                                 @endif
                             @endif
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -244,27 +319,46 @@
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-box">
-            <h3 style="margin-top:0; color:#8B0000; border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:16px;">Appointment Details</h3>
+            <h3 class="modal-title" style="color:#8B0000;">Appointment Details</h3>
             <div class="modal-row"><div class="modal-label">Student Name</div><div class="modal-val" id="mName"></div></div>
             <div class="modal-row"><div class="modal-label">Email</div><div class="modal-val" id="mEmail"></div></div>
             <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="mService"></div></div>
             <div class="modal-row"><div class="modal-label">Scheduled For</div><div class="modal-val" id="mDateTime"></div></div>
             <div class="modal-row"><div class="modal-label">Notes</div><div class="modal-val" id="mNotes" style="background:#f8fafc; padding:10px; border-radius:6px; font-size:13px;"></div></div>
-            <div style="text-align: right; margin-top: 20px;"><button onclick="closeInfoModal()" style="padding: 8px 16px; background: #334155; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button></div>
+            <div class="dialog-actions">
+                <button type="button" class="dialog-btn dialog-btn-primary" onclick="closeInfoModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="statusActionModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="statusActionTitle" class="modal-title" style="color:#70131B;">Appointment Action</h3>
+            <p id="statusActionSubtitle" class="modal-subtitle">Confirm this appointment update.</p>
+            <div class="modal-row"><div class="modal-label">Student Name</div><div class="modal-val" id="sName"></div></div>
+            <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="sService"></div></div>
+            <div class="modal-row"><div class="modal-label">Schedule</div><div class="modal-val" id="sDateTime"></div></div>
+            <div class="dialog-actions">
+                <button type="button" class="dialog-btn dialog-btn-neutral" onclick="closeStatusActionModal()">Cancel</button>
+                <a id="statusActionConfirm" href="#" class="dialog-btn dialog-btn-primary">Confirm</a>
+            </div>
         </div>
     </div>
 
     <div id="rescheduleModal" class="modal-overlay">
         <div class="modal-box">
-            <h3 style="margin-top:0; color:#b45309; border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:16px;">Reschedule Appointment</h3>
+            <h3 class="modal-title" style="color:#b45309;">Reschedule Appointment</h3>
             <form id="rescheduleForm" method="POST" action="">
                 @csrf
-                <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Select a new date and time for this appointment.</p>
+                <p class="modal-subtitle">Select a new date and time for this appointment.</p>
+                <div class="modal-row"><div class="modal-label">Student Name</div><div class="modal-val" id="rName"></div></div>
+                <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="rService"></div></div>
+                <div class="modal-row"><div class="modal-label">Current Schedule</div><div class="modal-val" id="rCurrentSchedule"></div></div>
                 <div class="modal-row"><label class="modal-label">New Date</label><input type="date" name="date" id="rDate" class="form-input" required></div>
                 <div class="modal-row"><label class="modal-label">New Time</label><input type="time" name="time" id="rTime" class="form-input" required></div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px;">
-                    <button type="button" onclick="closeRescheduleModal()" style="padding: 10px 16px; background: #eee; color: #333; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
-                    <button type="submit" style="padding: 10px 16px; background: #70131B; color: white; border: none; border-radius: 6px; cursor: pointer;">Confirm New Schedule</button>
+                <div class="dialog-actions">
+                    <button type="button" class="dialog-btn dialog-btn-neutral" onclick="closeRescheduleModal()">Cancel</button>
+                    <button type="submit" class="dialog-btn dialog-btn-primary">Confirm New Schedule</button>
                 </div>
             </form>
         </div>
@@ -274,42 +368,240 @@
 
 @push('scripts')
 <script>
-    function openInfoModal(name, service, date, time, remarks, email) {
-        document.getElementById('mName').innerText = name;
-        document.getElementById('mService').innerText = service;
-        document.getElementById('mDateTime').innerText = date + ' at ' + time;
-        document.getElementById('mNotes').innerText = remarks;
-        document.getElementById('mEmail').innerText = email;
+    const appointmentsBaseUrl = @json(url($basePrefix . '/appointments'));
+
+    function safeText(value) {
+        return (value ?? '').toString().trim() || '-';
+    }
+
+    function formatSchedule(date, time) {
+        const rawDate = (date || '').toString().trim();
+        const rawTime = (time || '').toString().trim();
+
+        if (!rawDate && !rawTime) {
+            return '-';
+        }
+
+        const normalizedTime = rawTime && rawTime.length === 5 ? rawTime + ':00' : rawTime;
+        const parsed = rawDate ? new Date(rawDate + 'T' + (normalizedTime || '00:00:00')) : null;
+
+        if (parsed && !Number.isNaN(parsed.getTime())) {
+            const datePart = parsed.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' });
+            const timePart = parsed.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+            return datePart + ' at ' + timePart;
+        }
+
+        return rawTime ? rawDate + ' at ' + rawTime : rawDate;
+    }
+
+    function getRowDataFromElement(element) {
+        const row = element ? element.closest('tr') : null;
+        if (!row) {
+            return { name: '', service: '', date: '', time: '' };
+        }
+
+        const name = row.querySelector('.student-name')?.textContent?.trim() || '';
+        const service = row.cells?.[2]?.textContent?.trim() || '';
+        const dateNode = row.cells?.[3]?.querySelector('div');
+        const timeNode = row.cells?.[3]?.querySelectorAll('div')?.[1];
+        const date = dateNode?.textContent?.trim() || '';
+        const time = timeNode?.textContent?.trim() || '';
+
+        return { name, service, date, time };
+    }
+
+    function openInfoModal(triggerOrName, service, date, time, remarks, email) {
+        let payload = {
+            name: triggerOrName,
+            service,
+            date,
+            time,
+            remarks,
+            email
+        };
+
+        if (triggerOrName && typeof triggerOrName === 'object' && triggerOrName.dataset) {
+            payload = {
+                name: triggerOrName.dataset.name,
+                service: triggerOrName.dataset.service,
+                date: triggerOrName.dataset.date,
+                time: triggerOrName.dataset.time,
+                remarks: triggerOrName.dataset.remarks,
+                email: triggerOrName.dataset.email
+            };
+        }
+
+        document.getElementById('mName').innerText = safeText(payload.name);
+        document.getElementById('mService').innerText = safeText(payload.service);
+        document.getElementById('mDateTime').innerText = formatSchedule(payload.date, payload.time);
+        document.getElementById('mNotes').innerText = safeText(payload.remarks);
+        document.getElementById('mEmail').innerText = safeText(payload.email);
         document.getElementById('infoModal').style.display = 'flex';
     }
 
-    function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
+    function closeInfoModal() {
+        document.getElementById('infoModal').style.display = 'none';
+    }
 
-    function openRescheduleModal(id, currentDate, currentTime) {
-        var form = document.getElementById('rescheduleForm');
-        form.action = '{{ url($basePrefix . "/appointments") }}/' + id + '/reschedule';
-        document.getElementById('rDate').value = currentDate;
-        document.getElementById('rTime').value = currentTime;
+    function openStatusActionModal(trigger) {
+        const fallback = getRowDataFromElement(trigger);
+        const href = trigger?.getAttribute?.('href') || '';
+        const statusTarget = trigger?.dataset?.statusTarget || (href.includes('/Approved') ? 'Approved' : 'Cancelled');
+        const matches = href.match(/\/appointments\/(\d+)\/(Approved|Cancelled)/i);
+        const id = trigger?.dataset?.id || (matches ? matches[1] : '');
+        const actionUrl = id ? (appointmentsBaseUrl + '/' + id + '/' + statusTarget) : href;
+
+        const name = trigger?.dataset?.name || fallback.name;
+        const service = trigger?.dataset?.service || fallback.service;
+        const date = trigger?.dataset?.date || fallback.date;
+        const time = trigger?.dataset?.time || fallback.time;
+
+        const isApprove = statusTarget === 'Approved';
+        document.getElementById('statusActionTitle').innerText = isApprove ? 'Approve Appointment' : 'Reject Appointment';
+        document.getElementById('statusActionSubtitle').innerText = isApprove
+            ? 'This will mark the appointment as approved and notify the workflow.'
+            : 'This will reject the appointment request and mark it as cancelled.';
+        document.getElementById('sName').innerText = safeText(name);
+        document.getElementById('sService').innerText = safeText(service);
+        document.getElementById('sDateTime').innerText = formatSchedule(date, time);
+
+        const confirmBtn = document.getElementById('statusActionConfirm');
+        confirmBtn.href = actionUrl;
+        confirmBtn.innerText = isApprove ? 'Confirm Approval' : 'Confirm Rejection';
+        confirmBtn.className = 'dialog-btn ' + (isApprove ? 'dialog-btn-approve' : 'dialog-btn-reject');
+
+        document.getElementById('statusActionModal').style.display = 'flex';
+    }
+
+    function closeStatusActionModal() {
+        document.getElementById('statusActionModal').style.display = 'none';
+    }
+
+    function openRescheduleModal(triggerOrId, currentDate, currentTime) {
+        const form = document.getElementById('rescheduleForm');
+        let id = '';
+        let date = currentDate || '';
+        let time = currentTime || '';
+        let name = '';
+        let service = '';
+
+        if (triggerOrId && typeof triggerOrId === 'object' && triggerOrId.dataset) {
+            id = triggerOrId.dataset.id || '';
+            name = triggerOrId.dataset.name || '';
+            service = triggerOrId.dataset.service || '';
+            date = triggerOrId.dataset.date || '';
+            time = triggerOrId.dataset.time || '';
+
+            if (!id) {
+                const fallback = getRowDataFromElement(triggerOrId);
+                name = fallback.name;
+                service = fallback.service;
+                date = date || fallback.date;
+                time = time || fallback.time;
+
+                const href = triggerOrId.closest('td')?.querySelector('a.btn-approve')?.getAttribute('href') || '';
+                const matches = href.match(/\/appointments\/(\d+)\/Approved/i);
+                id = matches ? matches[1] : '';
+            }
+        } else {
+            id = (triggerOrId ?? '').toString();
+            const lookupTrigger = document.querySelector('a.btn-approve[href$="/' + id + '/Approved"]');
+            const fallback = getRowDataFromElement(lookupTrigger);
+            name = fallback.name;
+            service = fallback.service;
+            date = date || fallback.date;
+            time = time || fallback.time;
+        }
+
+        if (!id) {
+            return;
+        }
+
+        form.action = appointmentsBaseUrl + '/' + id + '/reschedule';
+        document.getElementById('rName').innerText = safeText(name);
+        document.getElementById('rService').innerText = safeText(service);
+        document.getElementById('rCurrentSchedule').innerText = formatSchedule(date, time);
+        document.getElementById('rDate').value = date;
+        document.getElementById('rTime').value = (time || '').toString().slice(0, 5);
+        document.getElementById('rDate').setAttribute('min', new Date().toISOString().slice(0, 10));
         document.getElementById('rescheduleModal').style.display = 'flex';
     }
 
-    function closeRescheduleModal() { document.getElementById('rescheduleModal').style.display = 'none'; }
-
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('infoModal')) closeInfoModal();
-        if (event.target == document.getElementById('rescheduleModal')) closeRescheduleModal();
+    function closeRescheduleModal() {
+        document.getElementById('rescheduleModal').style.display = 'none';
     }
 
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        let filter = this.value.toUpperCase();
-        let tr = document.getElementById("apptTable").getElementsByTagName("tr");
-        for (let i = 1; i < tr.length; i++) {
-            let td = tr[i].getElementsByTagName("td")[0];
-            if (td) {
-                let txtValue = td.getElementsByClassName("student-name")[0].textContent || td.getElementsByClassName("student-name")[0].innerText;
-                tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            }
+    document.addEventListener('click', function(event) {
+        const infoModal = document.getElementById('infoModal');
+        const statusModal = document.getElementById('statusActionModal');
+        const rescheduleModal = document.getElementById('rescheduleModal');
+
+        if (event.target === infoModal) {
+            closeInfoModal();
         }
+        if (event.target === statusModal) {
+            closeStatusActionModal();
+        }
+        if (event.target === rescheduleModal) {
+            closeRescheduleModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeInfoModal();
+            closeStatusActionModal();
+            closeRescheduleModal();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toUpperCase();
+                const tr = document.getElementById('apptTable').getElementsByTagName('tr');
+                for (let i = 1; i < tr.length; i++) {
+                    const td = tr[i].getElementsByTagName('td')[0];
+                    if (td) {
+                        const nameNode = td.getElementsByClassName('student-name')[0];
+                        const txtValue = nameNode ? (nameNode.textContent || nameNode.innerText) : '';
+                        tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? '' : 'none';
+                    }
+                }
+            });
+        }
+
+        document.querySelectorAll('a.btn-approve, a.btn-cancel, button.btn-reject').forEach((el) => {
+            el.removeAttribute('onclick');
+            el.addEventListener('click', function(event) {
+                event.preventDefault();
+                openStatusActionModal(this);
+            });
+        });
+
+        document.querySelectorAll('button.btn-reschedule').forEach((el) => {
+            const inlineHandler = el.getAttribute('onclick') || '';
+            if (!el.dataset.id) {
+                const matches = inlineHandler.match(/openRescheduleModal\('([^']+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\)/);
+                if (matches) {
+                    el.dataset.id = matches[1];
+                    el.dataset.date = matches[2];
+                    el.dataset.time = matches[3];
+                }
+            }
+
+            if (!el.dataset.name || !el.dataset.service) {
+                const fallback = getRowDataFromElement(el);
+                el.dataset.name = el.dataset.name || fallback.name;
+                el.dataset.service = el.dataset.service || fallback.service;
+            }
+
+            el.removeAttribute('onclick');
+            el.addEventListener('click', function() {
+                openRescheduleModal(this);
+            });
+        });
     });
 </script>
 @endpush

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
@@ -93,6 +94,21 @@ class AppointmentController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
+        $selectedDate = Carbon::parse($request->date)->startOfDay();
+        $today = Carbon::today();
+        if ($selectedDate->lt($today)) {
+            return redirect()->back()->withInput()->with('error', 'Past dates are not available.');
+        }
+
+        if ($selectedDate->isWeekend()) {
+            return redirect()->back()->withInput()->with('error', 'Appointments are available from Monday to Friday only.');
+        }
+
+        $selectedDateTime = Carbon::parse($request->date . ' ' . $request->time);
+        if ($selectedDateTime->lt(Carbon::now())) {
+            return redirect()->back()->withInput()->with('error', 'Please choose a future appointment time.');
+        }
+
         // Prevent overlapping appointments
         $exists = Appointment::where('date', $request->date)
                              ->where('time', $request->time)
@@ -141,6 +157,97 @@ class AppointmentController extends Controller
         $appointment->save(); // Dito lang dapat magtatapos ang command.
 
         return redirect()->back()->with('success', 'Appointment request submitted! Please wait for admin approval.');
+    }
+
+    public function availability(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $selectedDate = Carbon::parse($request->date)->startOfDay();
+        $today = Carbon::today();
+
+        if ($selectedDate->lt($today)) {
+            return response()->json([
+                'date' => $selectedDate->toDateString(),
+                'available' => false,
+                'reason' => 'past_date',
+                'message' => 'Past dates are not available.',
+                'slots' => [],
+            ]);
+        }
+
+        if ($selectedDate->isWeekend()) {
+            return response()->json([
+                'date' => $selectedDate->toDateString(),
+                'available' => false,
+                'reason' => 'weekend',
+                'message' => 'Appointments are available from Monday to Friday only.',
+                'slots' => [],
+            ]);
+        }
+
+        $takenTimes = Appointment::whereDate('date', $selectedDate->toDateString())
+            ->where('status', '!=', 'Cancelled')
+            ->pluck('time')
+            ->map(function ($time) {
+                return Carbon::parse($time)->format('H:i');
+            })
+            ->values()
+            ->all();
+
+        $dailyBookedCount = Appointment::whereDate('date', $selectedDate->toDateString())
+            ->where('status', '!=', 'Cancelled')
+            ->count();
+
+        if ($dailyBookedCount >= 10) {
+            return response()->json([
+                'date' => $selectedDate->toDateString(),
+                'available' => false,
+                'reason' => 'fully_booked',
+                'message' => 'This date is fully booked.',
+                'slots' => [],
+            ]);
+        }
+
+        $takenLookup = array_fill_keys($takenTimes, true);
+        $slots = [];
+        $now = Carbon::now();
+        $dailyCount = 0;
+
+        for ($hour = 8; $hour <= 19; $hour++) {
+            foreach ([0, 30] as $minute) {
+                if ($hour === 19 && $minute > 0) {
+                    continue;
+                }
+
+                $slotTime = Carbon::createFromTime($hour, $minute, 0);
+                $slotValue = $slotTime->format('H:i');
+                $slotDateTime = Carbon::parse($selectedDate->toDateString() . ' ' . $slotValue);
+                $isTaken = isset($takenLookup[$slotValue]);
+                $isPastTime = $slotDateTime->lt($now);
+                $isAvailable = !$isTaken && !$isPastTime;
+
+                if ($isAvailable) {
+                    $dailyCount++;
+                }
+
+                $slots[] = [
+                    'value' => $slotValue,
+                    'label' => $slotTime->format('g:i A'),
+                    'available' => $isAvailable,
+                ];
+            }
+        }
+
+        return response()->json([
+            'date' => $selectedDate->toDateString(),
+            'available' => $dailyCount > 0,
+            'reason' => $dailyCount > 0 ? null : 'fully_booked',
+            'message' => $dailyCount > 0 ? null : 'No available time slots for this date.',
+            'slots' => $slots,
+        ]);
     }
     // -------------------------------
     // 4. STUDENT ACCOUNT

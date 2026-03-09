@@ -49,6 +49,7 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class])->group(func
         Route::get('/student/faq', [AppointmentController::class, 'faq']);
         Route::get('/student/history', [AppointmentController::class, 'history']);
         Route::post('/student/appointments/store', [AppointmentController::class, 'store']);
+        Route::get('/student/appointments/availability', [AppointmentController::class, 'availability'])->name('student.appointments.availability');
         Route::post('/student/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
         Route::post('/student/update-contact', [AppointmentController::class, 'updateContact'])->name('student.updateContact');
 
@@ -78,6 +79,7 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
     Route::get('/student/faq', [AppointmentController::class, 'faq']);
     Route::get('/student/history', [AppointmentController::class, 'history']);
     Route::post('/student/appointments/store', [AppointmentController::class, 'store']);
+    Route::get('/student/appointments/availability', [AppointmentController::class, 'availability'])->name('student.appointments.availability.legacy');
     Route::post('/student/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
     Route::post('/student/update-contact', [AppointmentController::class, 'updateContact'])->name('student.updateContact');
 

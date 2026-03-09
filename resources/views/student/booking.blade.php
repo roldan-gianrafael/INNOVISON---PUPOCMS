@@ -62,6 +62,51 @@
     }
 
     textarea.form-control { resize: vertical; min-height: 100px; }
+    .time-display-input {
+        background: #f8fafc;
+        cursor: default;
+    }
+    .time-slots {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px;
+        margin-top: 4px;
+    }
+    .time-slot-btn {
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #334155;
+        border-radius: 8px;
+        padding: 10px 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .time-slot-btn:hover {
+        border-color: #8B0000;
+        color: #8B0000;
+    }
+    .time-slot-btn.selected {
+        background: #8B0000;
+        border-color: #8B0000;
+        color: #ffffff;
+    }
+    .time-slot-btn:disabled {
+        background: #f8fafc;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+        cursor: not-allowed;
+    }
+    .time-slot-hint {
+        display: block;
+        margin-top: 8px;
+        font-size: 12px;
+        color: #64748b;
+    }
+    .date-picker-only {
+        caret-color: transparent;
+    }
 
     .btn-submit {
         background: #8B0000;
@@ -175,18 +220,33 @@
                     <div class="input-group">
                         <label class="input-label">Preferred Date</label>
                         <div class="input-wrapper">
-                            <input type="date" name="date" class="form-control" required value="{{ old('date') }}">
+                            <input
+                                id="preferredDate"
+                                type="date"
+                                name="date"
+                                class="form-control date-picker-only"
+                                required
+                                min="{{ now()->toDateString() }}"
+                                value="{{ old('date') }}"
+                                autocomplete="off">
                         </div>
+                        <small class="time-slot-hint" id="dateHint">Choose a date to load available schedules.</small>
                     </div>
 
                     <div class="input-group">
                         <label class="input-label">Preferred Time</label>
                         <div class="input-wrapper">
-                            <input type="time" name="time" class="form-control" min="08:00" max="19:00" required value="{{ old('time') }}">
+                            <input id="preferredTimeDisplay" type="text" class="form-control time-display-input" readonly placeholder="Select a date first">
+                            <input id="preferredTimeInput" type="hidden" name="time" value="{{ old('time') }}" required>
                         </div>
                     </div>
                 </div>
-                
+
+                <div class="input-group">
+                    <div id="timeSlots" class="time-slots" aria-live="polite"></div>
+                    <small class="time-slot-hint" id="timeSlotsHint">Select a date to view available time slots.</small>
+                </div>
+                 
                 <div class="input-group">
                     <label class="input-label">Service Type</label>
                     <div class="input-wrapper">
@@ -261,3 +321,194 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('preferredDate');
+        const timeInput = document.getElementById('preferredTimeInput');
+        const timeDisplay = document.getElementById('preferredTimeDisplay');
+        const timeSlots = document.getElementById('timeSlots');
+        const slotsHint = document.getElementById('timeSlotsHint');
+        const dateHint = document.getElementById('dateHint');
+        const availabilityUrl = @json(url('/student/appointments/availability'));
+
+        if (!dateInput || !timeInput || !timeDisplay || !timeSlots || !slotsHint) {
+            return;
+        }
+
+        function normalizeTime(raw) {
+            if (!raw) return '';
+            const text = String(raw).trim();
+            return text.length >= 5 ? text.slice(0, 5) : text;
+        }
+
+        function formatTimeLabel(value) {
+            if (!value) return '';
+            const parts = value.split(':');
+            const hour = Number(parts[0] || 0);
+            const minute = Number(parts[1] || 0);
+            const dt = new Date();
+            dt.setHours(hour, minute, 0, 0);
+            return dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        }
+
+        function setSelectedTime(value) {
+            const normalized = normalizeTime(value);
+            timeInput.value = normalized;
+            timeDisplay.value = normalized ? formatTimeLabel(normalized) : '';
+            timeDisplay.placeholder = normalized
+                ? ''
+                : (dateInput.value ? 'Choose an available time' : 'Select a date first');
+
+            timeSlots.querySelectorAll('.time-slot-btn').forEach(function (btn) {
+                btn.classList.toggle('selected', btn.dataset.value === normalized);
+            });
+        }
+
+        function renderMessage(message) {
+            timeSlots.innerHTML = '';
+            slotsHint.textContent = message;
+            setSelectedTime('');
+        }
+
+        function renderSlots(slots, preselectedTime) {
+            timeSlots.innerHTML = '';
+            const selected = normalizeTime(preselectedTime);
+            let availableCount = 0;
+
+            (slots || []).forEach(function (slot) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'time-slot-btn';
+                btn.dataset.value = slot.value;
+                btn.textContent = slot.label;
+
+                if (!slot.available) {
+                    btn.disabled = true;
+                } else {
+                    availableCount++;
+                    btn.addEventListener('click', function () {
+                        setSelectedTime(slot.value);
+                    });
+                }
+
+                if (slot.available && selected && slot.value === selected) {
+                    btn.classList.add('selected');
+                }
+
+                timeSlots.appendChild(btn);
+            });
+
+            if (availableCount === 0) {
+                slotsHint.textContent = 'No available time slots for this date.';
+                setSelectedTime('');
+                return;
+            }
+
+            if (selected && slots.some(function (slot) { return slot.available && slot.value === selected; })) {
+                setSelectedTime(selected);
+            } else {
+                setSelectedTime('');
+            }
+
+            slotsHint.textContent = 'Select one available time slot.';
+        }
+
+        function isWeekendDate(value) {
+            if (!value) return false;
+            const parsed = new Date(value + 'T00:00:00');
+            const day = parsed.getDay();
+            return day === 0 || day === 6;
+        }
+
+        async function loadAvailability(dateValue, preselectedTime) {
+            if (!dateValue) {
+                renderMessage('Select a date to view available time slots.');
+                return;
+            }
+
+            slotsHint.textContent = 'Loading available time slots...';
+            timeSlots.innerHTML = '';
+
+            try {
+                const response = await fetch(availabilityUrl + '?date=' + encodeURIComponent(dateValue), {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Unable to load available schedules.');
+                }
+
+                if (!data.available && (!data.slots || data.slots.length === 0)) {
+                    renderMessage(data.message || 'No available time slots for this date.');
+                    return;
+                }
+
+                renderSlots(data.slots, preselectedTime);
+
+                if (data.message) {
+                    slotsHint.textContent = data.message;
+                }
+            } catch (error) {
+                renderMessage(error.message || 'Unable to load available schedules right now.');
+            }
+        }
+
+        function openNativePicker() {
+            if (typeof dateInput.showPicker === 'function') {
+                try {
+                    dateInput.showPicker();
+                } catch (error) {
+                    // Browser blocks showPicker unless in direct user gesture.
+                }
+            }
+        }
+
+        dateInput.addEventListener('focus', openNativePicker);
+        dateInput.addEventListener('click', openNativePicker);
+        dateInput.addEventListener('keydown', function (event) {
+            const blockedKeys = ['Backspace', 'Delete'];
+            const printableKey = event.key && event.key.length === 1;
+            if (printableKey || blockedKeys.includes(event.key)) {
+                event.preventDefault();
+            }
+        });
+        dateInput.addEventListener('paste', function (event) {
+            event.preventDefault();
+        });
+
+        dateInput.addEventListener('change', function () {
+            dateInput.setCustomValidity('');
+            if (isWeekendDate(dateInput.value)) {
+                if (dateHint) {
+                    dateHint.textContent = 'Weekends are unavailable. Please choose Monday to Friday.';
+                }
+                renderMessage('Appointments are available from Monday to Friday only.');
+                dateInput.setCustomValidity('Please choose a weekday appointment date.');
+                dateInput.reportValidity();
+                return;
+            }
+            if (dateHint) {
+                dateHint.textContent = 'Date selected. Now choose an available time slot.';
+            }
+            loadAvailability(dateInput.value, '');
+        });
+
+        const initialDate = dateInput.value;
+        const initialTime = normalizeTime(timeInput.value);
+        if (initialTime) {
+            timeInput.value = initialTime;
+        }
+
+        if (initialDate) {
+            loadAvailability(initialDate, initialTime);
+        } else {
+            renderMessage('Select a date to view available time slots.');
+        }
+    });
+</script>
+@endpush

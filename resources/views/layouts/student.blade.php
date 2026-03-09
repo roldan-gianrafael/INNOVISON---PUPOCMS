@@ -154,8 +154,37 @@
 
         /* --- 3. MOBILE MENU --- */
         @media (max-width: 768px) {
+            .nav-toggle {
+                margin-left: auto;
+            }
+
+            .main-nav {
+                width: 0;
+            }
+
             .nav-list {
                 gap: 16px;
+                padding: 14px 16px;
+                background: #ffffff;
+                border-bottom: 1px solid var(--border);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+                max-height: calc(100vh - var(--header-height) - 10px);
+                overflow-y: auto;
+            }
+
+            .nav-list li {
+                width: 100%;
+            }
+
+            .nav-list li a:not(.logout-btn) {
+                color: #1f2937;
+                width: 100%;
+                display: block;
+                padding: 8px 0;
+            }
+
+            .nav-list li a:not(.logout-btn)::after {
+                display: none;
             }
 
             .nav-list li .theme-toggle-btn {
@@ -433,7 +462,7 @@
                 box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5);
             }
 
-            html[data-theme="dark"] .nav-list a {
+            html[data-theme="dark"] .nav-list li a:not(.logout-btn) {
                 color: #f3f4f6 !important;
             }
         }

@@ -163,6 +163,12 @@
             }
 
             .nav-list {
+                display: none;
+                position: absolute;
+                top: var(--header-height);
+                left: 0;
+                right: 0;
+                flex-direction: column;
                 gap: 16px;
                 padding: 14px 16px;
                 background: #ffffff;
@@ -170,6 +176,10 @@
                 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
                 max-height: calc(100vh - var(--header-height) - 10px);
                 overflow-y: auto;
+            }
+
+            .nav-list.show {
+                display: flex;
             }
 
             .nav-list li {
@@ -533,14 +543,39 @@
             const storageKey = 'student_theme';
 
             if (navToggle && navList) {
+                const closeMobileMenu = () => navList.classList.remove('show');
+
                 navToggle.addEventListener('click', () => {
                     navList.classList.toggle('show');
                 });
 
-                navList.querySelectorAll('a, button').forEach((el) => {
-                    el.addEventListener('click', () => {
-                        navList.classList.remove('show');
-                    });
+                navList.addEventListener('click', (event) => {
+                    const target = event.target.closest('a, button');
+                    if (!target) {
+                        return;
+                    }
+
+                    closeMobileMenu();
+                });
+
+                document.addEventListener('click', (event) => {
+                    const clickedInsideMenu = navList.contains(event.target);
+                    const clickedToggle = navToggle.contains(event.target);
+                    if (!clickedInsideMenu && !clickedToggle) {
+                        closeMobileMenu();
+                    }
+                });
+
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        closeMobileMenu();
+                    }
+                });
+
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 768) {
+                        closeMobileMenu();
+                    }
                 });
             }
 

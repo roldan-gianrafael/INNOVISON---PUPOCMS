@@ -19,6 +19,18 @@
     <link rel="stylesheet" href="{{ asset('css/booking.css') }}">
     
     <style>
+        img,
+        svg,
+        video,
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        main {
+            width: 100%;
+        }
+
         /* --- 1. HEADER SPACING FIX --- */
         .site-header .header-inner {
             max-width: 100% !important; /* Force full width */
@@ -156,6 +168,28 @@
             .nav-list li .logout-btn {
                 margin-left: 0;
                 width: 100%;
+            }
+
+            main table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .site-header .header-inner {
+                padding-left: 22px;
+                padding-right: 22px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .site-header .header-inner {
+                padding-left: 14px;
+                padding-right: 14px;
             }
         }
     </style>

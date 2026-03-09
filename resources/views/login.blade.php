@@ -92,6 +92,7 @@
         }
         .form-group input:focus { outline: none; border-color: var(--accent); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .mini-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
         .btn-submit {
             width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
@@ -127,6 +128,63 @@
         .switch-form span { color: var(--accent); cursor: pointer; font-weight: 700; text-decoration: underline; }
 
         .lp-foot { text-align: center; padding: 24px; font-size: 13px; color: rgba(255, 255, 255, 0.6); }
+
+        @media (max-width: 768px) {
+            body {
+                background-attachment: scroll;
+            }
+
+            .logo-header {
+                padding: 12px 14px;
+            }
+
+            .logo-title {
+                font-size: 16px;
+            }
+
+            .lp-container {
+                padding: 14px;
+            }
+
+            .login-box {
+                padding: 28px 18px;
+                border-radius: 16px;
+                max-width: 100%;
+            }
+
+            .form-row,
+            .mini-form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .modal-overlay {
+                align-items: flex-end;
+            }
+
+            .modal-content {
+                width: 100%;
+                max-width: 100%;
+                max-height: 92vh;
+                padding: 24px 16px 20px;
+                border-radius: 18px 18px 0 0;
+            }
+
+            .modal-close {
+                top: 10px;
+                right: 14px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .logo-subtitle {
+                font-size: 10px;
+            }
+
+            .btn-submit {
+                padding: 12px;
+            }
+        }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -236,7 +294,7 @@
                   </div>
                   <div class="form-group">
                       <label>YEAR & SECTION</label>
-                      <div class="form-row" style="grid-template-columns: 1fr 1fr;">
+                      <div class="mini-form-row">
                           <input type="text" name="year" placeholder="Year" required>
                           <input type="text" name="section" placeholder="Sec" required>
                       </div>

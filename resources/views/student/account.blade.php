@@ -123,6 +123,15 @@
     .status-badge.cancelled { background: #fee2e2; color: #b91c1c; }
     .status-badge.completed { background: #dbeafe; color: #1e40af; }
 
+    .profile-grid-3,
+    .profile-grid-2 {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    .profile-grid-3 { grid-template-columns: 2fr 1fr 1fr; }
+    .profile-grid-2 { grid-template-columns: 1fr 1fr; }
+
     /* --- SIDEBAR WIDGETS --- */
     .widget-card {
         background: #fff;
@@ -186,16 +195,31 @@
         .hero-stats { gap: 20px; flex-wrap: wrap; }
     }
 
+    @media (max-width: 760px) {
+        .profile-hero {
+            padding: 24px 18px;
+            gap: 18px;
+        }
+        .hero-name {
+            font-size: 24px;
+        }
+        .profile-grid-3,
+        .profile-grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+
   
     /* --- HEALTH PROFILE STATUS WIDGET --- */
     .health-status-card {
-        background: #fff;
+        background: var(--card-bg, #fff);
         border-radius: 12px;
         padding: 24px;
         box-shadow: 0 4px 15px rgba(139, 0, 0, 0.08);
         border: 1px solid #fce7e7;
         margin-bottom: 24px;
         text-align: center;
+        color: var(--text-main, #1e293b);
     }
     .health-status-title {
         font-size: 14px;
@@ -205,11 +229,48 @@
         margin-bottom: 15px;
         display: block;
     }
+    .health-status-summary {
+        margin-bottom: 15px;
+    }
+    .health-status-state {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+    .health-status-state.issued { background: #dcfce7; color: #166534; }
+    .health-status-state.pending { background: #fffbeb; color: #92400e; }
+    .health-status-state.incomplete { background: #fef2f2; color: #991b1b; }
+    .health-status-message {
+        font-size: 13px;
+        color: var(--text-main, #1e293b);
+        margin: 8px 0 0;
+        line-height: 1.45;
+    }
+    .health-status-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .health-status-link {
+        font-size: 12px;
+        color: var(--text-light, #64748b);
+        text-decoration: underline;
+        text-align: center;
+    }
+    .health-status-note {
+        font-size: 12px;
+        color: var(--text-light, #64748b);
+        margin-top: 10px;
+        display: block;
+    }
     .btn-print-form {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
         width: 100%;
         padding: 12px;
         background: #8B0000;
@@ -225,11 +286,25 @@
         box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
         color: white;
     }
-    .status-indicator {
-        font-size: 12px;
-        color: #64748b;
-        margin-top: 10px;
-        display: block;
+    .btn-print-form.approved { background: #059669; }
+    .btn-print-form.pending { background: #8f2724; }
+    .btn-print-form.incomplete { background: #800000; }
+    .btn-print-form.disabled {
+        background: #dd4b4b;
+        cursor: not-allowed;
+        font-size: 11px;
+        opacity: 0.85;
+    }
+    html[data-theme="dark"] .health-status-card {
+        border-color: var(--border);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    }
+    html[data-theme="dark"] .health-status-title {
+        color: #fca5a5;
+    }
+    html[data-theme="dark"] .health-status-link,
+    html[data-theme="dark"] .health-status-note {
+        color: var(--text-light, #a9b4c4);
     }
 </style>
 @endpush
@@ -349,7 +424,7 @@
 
             {{-- NEW: Health Form Quick Access Div --}}
             <div class="health-status-card">
-    <span class="health-status-title">🩺 Health Information Record</span>
+    <span class="health-status-title">Health Information Record</span>
     
     @if($user->is_health_profile_completed)
         @php
@@ -358,54 +433,54 @@
 
         @if($status == 'Issued')
             {{-- CASE 1: APPROVED --}}
-            <div style="margin-bottom: 15px;">
-                <span style="font-size: 32px;">📜</span>
-                <p style="font-size: 14px; color: #065f46; font-weight: bold; margin: 5px 0;">
+            <div class="health-status-summary">
+                <span class="health-status-state issued">Approved</span>
+                <p class="health-status-message">
                     Your health profile is now approved and ready for printing.
                 </p>
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <a href="{{ route('print.health.form') }}" class="btn-print-form" style="background: #059669;">
-                    <span>🖨️</span> PRINT APPROVED FORM
+            <div class="health-status-actions">
+                <a href="{{ route('print.health.form') }}" class="btn-print-form approved">
+                    Print Approved Form
                 </a>
         
-                <a href="{{ route('student.view.health.profile') }}" style="font-size: 12px; color: #64748b; text-decoration: underline; text-align: center;">
+                <a href="{{ route('student.view.health.profile') }}" class="health-status-link">
                     View Record Details
                 </a>
             </div>
-            <span class="status-indicator">✅ Valid for Academic Year 2025-2026</span>
+            <span class="health-status-note">Valid for Academic Year 2025-2026</span>
 
         @else
            
-            <div style="margin-bottom: 15px;">
-                <span style="font-size: 32px;">⏳</span>
-                <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">
+            <div class="health-status-summary">
+                <span class="health-status-state pending">Pending Review</span>
+                <p class="health-status-message">
                     Your profile has been submitted and is currently <strong>awaiting medical review</strong>.
                 </p>
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <a href="{{ route('print.health.form') }}" class="btn-print-form" style="background: #8f2724;">
-                    <span>👁️</span> VIEW SUBMITTED FORM
+            <div class="health-status-actions">
+                <a href="{{ route('print.health.form') }}" class="btn-print-form pending">
+                    View Submitted Form
                 </a>
-                <button class="btn-print-form" style="background: #dd4b4b; cursor: not-allowed; font-size: 11px;" disabled>
-                    🖨️ PRINTING DISABLED (PENDING)
+                <button class="btn-print-form disabled" disabled>
+                    Printing Disabled (Pending)
                 </button>
             </div>
-            <span class="status-indicator">⏳ Physician's signature is required to print.</span>
+            <span class="health-status-note">Physician signature is required to print.</span>
         @endif
 
     @else
         {{-- CASE 3: NOT COMPLETED --}}
-        <div style="margin-bottom: 15px; opacity: 0.6;">
-            <span style="font-size: 32px;">📝</span>
-            <p style="font-size: 13px; color: #1e293b; margin: 5px 0;">You haven't completed your health profile yet.</p>
+        <div class="health-status-summary">
+            <span class="health-status-state incomplete">Not Completed</span>
+            <p class="health-status-message">You haven't completed your health profile yet.</p>
         </div>
-        <a href="{{ route('student.health.form') }}" class="btn-print-form" style="background: #800000;">
-            COMPLETE FORM NOW
+        <a href="{{ route('student.health.form') }}" class="btn-print-form incomplete">
+            Complete Form Now
         </a>
-        <span class="status-indicator">⚠️ Required for clinic consultations.</span>
+        <span class="health-status-note">Required for clinic consultations.</span>
     @endif
 </div>
             
@@ -417,7 +492,7 @@
     <form action="{{ route('student.updateContact') }}" method="POST">
         @csrf
         
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div class="profile-grid-3">
             <div>
                 <label class="input-label">Course</label>
                 <input type="text" class="form-control" value="{{ $user->course }}" readonly style="background-color: #f8fafc;">
@@ -432,7 +507,7 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div class="profile-grid-2">
             <div>
                 <label class="input-label">Gender</label>
                 <input type="text" class="form-control" value="{{ $user->gender }}" readonly style="background-color: #f8fafc;">
@@ -443,7 +518,7 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div class="profile-grid-2">
             <div>
                 <label class="input-label">Height (cm)</label>
                 <input type="number" step="0.1" name="height" class="form-control editable-input" value="{{ old('height', $user->height) }}" disabled>

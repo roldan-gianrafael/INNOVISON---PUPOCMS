@@ -26,8 +26,13 @@
         flex-wrap: wrap;
     }
 
-    .booking-form-section { flex: 2; padding: 40px; border-right: 1px solid #f1f5f9; min-width: 350px; }
-    .booking-info-section { flex: 1; padding: 40px; background: #fcfcfc; min-width: 300px; }
+    .booking-form-section { flex: 2; padding: 40px; border-right: 1px solid #f1f5f9; min-width: 0; }
+    .booking-info-section { flex: 1; padding: 40px; background: #fcfcfc; min-width: 0; }
+    .booking-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
 
     /* --- FORM STYLING --- */
     .form-section-title { color: #20343a; font-size: 20px; font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
@@ -91,6 +96,18 @@
         .booking-card { flex-direction: column; }
         .booking-form-section { border-right: none; border-bottom: 1px solid #f1f5f9; }
     }
+
+    @media (max-width: 680px) {
+        .page-title { font-size: 26px; }
+        .booking-form-section,
+        .booking-info-section {
+            padding: 24px 16px;
+        }
+        .booking-grid-2 {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
 </style>
 @endpush
 
@@ -131,7 +148,7 @@
             <form id="bookingForm" method="POST" action="/student/appointments/store" autocomplete="off">
                 @csrf 
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="booking-grid-2">
                     <div class="input-group">
                         <label class="input-label">Full Name</label>
                         <div class="input-wrapper">
@@ -154,7 +171,7 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="booking-grid-2">
                     <div class="input-group">
                         <label class="input-label">Preferred Date</label>
                         <div class="input-wrapper">

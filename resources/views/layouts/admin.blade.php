@@ -426,11 +426,17 @@
             flex: 1;
             min-width: 0;
             overflow-y: auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 14px;
             color: #3c0f18;
             background: linear-gradient(180deg, rgba(140, 72, 89, 0.22) 0%, rgba(98, 33, 47, 0.26) 100%);
             border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: var(--radius-xl);
+        }
+
+        .main table {
+            width: 100%;
         }
 
         .main::-webkit-scrollbar,
@@ -555,6 +561,13 @@
             .sidebar .sidebar-label {
                 opacity: 1;
                 transform: translateX(0);
+            }
+
+            .main table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
             }
         }
 

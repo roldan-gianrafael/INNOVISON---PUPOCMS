@@ -81,6 +81,24 @@
 
         .header-left {
             min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-brand-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.32);
+            padding: 2px;
+            flex-shrink: 0;
+        }
+
+        .header-copy {
+            min-width: 0;
         }
 
         .header-kicker {
@@ -274,13 +292,13 @@
         }
 
         .sidebar-logo img {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
             background: #fff;
             border: 1px solid rgba(255, 255, 255, 0.28);
             object-fit: cover;
-            padding: 3px;
+            padding: 2px;
         }
 
         .sidebar-logo-title {
@@ -542,6 +560,11 @@
 
             .header-subtitle {
                 display: none;
+            }
+
+            .header-brand-avatar {
+                width: 44px;
+                height: 44px;
             }
 
             .admin-user-meta {
@@ -1063,6 +1086,7 @@
     $displayName = optional($authUser)->name ?? 'Clinic User';
     $welcomeName = $displayName === 'Admin Account' ? 'Nurse Joyce' : $displayName;
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
+    $brandLogo = asset('images/pup_logo.png');
     $roleLabelMap = [
         'super_admin' => 'Super Admin',
         'admin' => 'Admin',
@@ -1073,9 +1097,12 @@
 
 <header class="admin-header">
     <div class="header-left">
-        <p class="header-kicker">{{ $isStudentAssistant ? 'Clinic Assistant Console' : 'Clinic Administration' }}</p>
-        <h1 class="header-title">Welcome back, <span>{{ $welcomeName }}</span></h1>
-        <p class="header-subtitle">Monitor operations and patient flow in one clear workspace.</p>
+        <img src="{{ $brandLogo }}" alt="Clinic Logo" class="header-brand-avatar">
+        <div class="header-copy">
+            <p class="header-kicker">{{ $isStudentAssistant ? 'Clinic Assistant Console' : 'Clinic Administration' }}</p>
+            <h1 class="header-title">Welcome back, <span>{{ $welcomeName }}</span></h1>
+            <p class="header-subtitle">Monitor operations and patient flow in one clear workspace.</p>
+        </div>
     </div>
 
     <div class="header-right">
@@ -1111,7 +1138,7 @@
   
   <aside class="sidebar" id="adminSidebar">
     <div class="sidebar-logo">
-      <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
+      <img src="{{ $brandLogo }}" alt="Clinic Logo">
       <div class="sidebar-logo-text">
         <div class="sidebar-logo-title">PUP TAGUIG</div>
         <div class="sidebar-logo-sub">{{ $isStudentAssistant ? 'Clinic Assistant' : 'Clinic Admin' }}</div>

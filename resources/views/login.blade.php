@@ -152,6 +152,45 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
+        .login-loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.68);
+            backdrop-filter: blur(4px);
+        }
+        .login-loading-overlay.show {
+            display: flex;
+        }
+        .login-loading-card {
+            text-align: center;
+            color: #ffffff;
+            background: rgba(15, 23, 42, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            padding: 18px 20px;
+            min-width: 180px;
+        }
+        .login-loading-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            background: #ffffff;
+            padding: 2px;
+            animation: loginLogoBounce 0.85s ease-in-out infinite;
+            margin-bottom: 8px;
+        }
+        .login-loading-text {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
         @media (max-width: 768px) {
             body {
                 background-attachment: scroll;
@@ -209,6 +248,10 @@
             }
         }
 
+        @keyframes loginLogoBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -239,7 +282,7 @@
             </div>
         @endif
 
-        <form action="{{ url('/login-action') }}" method="POST">
+        <form id="loginForm" action="{{ url('/login-action') }}" method="POST">
             @csrf
             <div class="form-group">
                 <label>EMAIL ADDRESS</label>
@@ -251,7 +294,7 @@
                 <input type="password" name="password" placeholder="" required>
             </div>
 
-            <button type="submit" class="btn-submit">Login to Portal</button>
+            <button id="loginSubmitBtn" type="submit" class="btn-submit">Login to Portal</button>
         </form>
 
         <div class="switch-form">
@@ -340,6 +383,13 @@
       </div>
   </div>
 
+  <div id="loginLoadingOverlay" class="login-loading-overlay" aria-hidden="true">
+      <div class="login-loading-card">
+          <img src="{{ asset('images/pup_logo.png') }}" alt="Loading" class="login-loading-logo">
+          <div class="login-loading-text">Signing in...</div>
+      </div>
+  </div>
+
   <footer class="lp-foot">
       <span>&copy; 1998-{{ now()->year }} <strong>Polytechnic University of the Philippines</strong></span>
       <span class="sep">|</span>
@@ -357,6 +407,29 @@
               event.target.style.display = 'none';
           }
       }
+
+      (function () {
+          const loginForm = document.getElementById('loginForm');
+          const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+          const loadingOverlay = document.getElementById('loginLoadingOverlay');
+          let isSubmitting = false;
+
+          if (!loginForm || !loginSubmitBtn || !loadingOverlay) {
+              return;
+          }
+
+          loginForm.addEventListener('submit', function () {
+              if (isSubmitting) {
+                  return;
+              }
+
+              isSubmitting = true;
+              loadingOverlay.classList.add('show');
+              loadingOverlay.setAttribute('aria-hidden', 'false');
+              loginSubmitBtn.disabled = true;
+              loginSubmitBtn.textContent = 'Signing in...';
+          });
+      })();
   </script>
 
 </body>

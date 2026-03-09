@@ -8,6 +8,16 @@
         align-items: center;
         justify-content: center;
         padding: 16px;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.24s ease, visibility 0.24s ease;
+    }
+
+    .terms-gate-overlay.is-visible {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
     }
 
     .terms-gate-modal {
@@ -186,8 +196,12 @@
                 continueBtn.disabled = !agreeInput.checked;
             }
 
-            document.body.classList.add('terms-gate-lock');
             syncContinueState();
+
+            setTimeout(function () {
+                overlay.classList.add('is-visible');
+                document.body.classList.add('terms-gate-lock');
+            }, 500);
 
             agreeInput.addEventListener('change', syncContinueState);
 

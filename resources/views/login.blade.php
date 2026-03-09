@@ -127,7 +127,30 @@
         .switch-form { margin-top: 20px; font-size: 14px; color: var(--text-light); }
         .switch-form span { color: var(--accent); cursor: pointer; font-weight: 700; text-decoration: underline; }
 
-        .lp-foot { text-align: center; padding: 24px; font-size: 13px; color: rgba(255, 255, 255, 0.6); }
+        .lp-foot {
+            background: rgba(17, 24, 39, 0.92);
+            border-top: 2px solid #8B0000;
+            text-align: center;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .lp-foot a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .lp-foot a:hover {
+            text-decoration: underline;
+        }
+        .lp-foot .sep {
+            color: rgba(255, 255, 255, 0.5);
+        }
 
         @media (max-width: 768px) {
             body {
@@ -317,7 +340,13 @@
       </div>
   </div>
 
-  <footer class="lp-foot">© 2026 PUP Taguig — Online Clinic System</footer>
+  <footer class="lp-foot">
+      <span>&copy; 1998-{{ now()->year }} <strong>Polytechnic University of the Philippines</strong></span>
+      <span class="sep">|</span>
+      <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+      <span class="sep">|</span>
+      <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+  </footer>
 
   <script>
       function openModal(id) { document.getElementById(id).style.display = 'flex'; }

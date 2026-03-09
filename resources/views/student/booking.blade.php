@@ -104,8 +104,118 @@
         font-size: 12px;
         color: #64748b;
     }
-    .date-picker-only {
-        caret-color: transparent;
+    .date-picker-wrapper {
+        position: relative;
+    }
+    .date-display-input {
+        background: #fff;
+        cursor: pointer;
+    }
+    .date-picker-toggle {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        color: #334155;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 10px;
+        cursor: pointer;
+    }
+    .date-picker-toggle:hover {
+        border-color: #8B0000;
+        color: #8B0000;
+    }
+    .date-picker-panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        width: 320px;
+        max-width: min(100vw - 40px, 320px);
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+        padding: 12px;
+        z-index: 60;
+    }
+    .date-picker-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .date-picker-nav {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        border-radius: 8px;
+        color: #334155;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+    }
+    .date-picker-nav:hover:not(:disabled) {
+        border-color: #8B0000;
+        color: #8B0000;
+    }
+    .date-picker-nav:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+    .date-picker-month {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .date-picker-weekdays,
+    .date-picker-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+    }
+    .date-picker-weekdays span {
+        text-align: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        padding: 4px 0;
+    }
+    .calendar-day,
+    .calendar-empty {
+        height: 36px;
+        border-radius: 8px;
+    }
+    .calendar-empty {
+        display: block;
+    }
+    .calendar-day {
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #1e293b;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .calendar-day:hover:not(:disabled) {
+        border-color: #8B0000;
+        color: #8B0000;
+    }
+    .calendar-day:disabled {
+        background: #f8fafc;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
+    .calendar-day.selected {
+        background: #8B0000;
+        border-color: #8B0000;
+        color: #fff;
     }
 
     .btn-submit {
@@ -337,16 +447,27 @@
                 <div class="booking-grid-2">
                     <div class="input-group">
                         <label class="input-label">Preferred Date</label>
-                        <div class="input-wrapper">
-                            <input
-                                id="preferredDate"
-                                type="date"
-                                name="date"
-                                class="form-control date-picker-only"
-                                required
-                                min="{{ now()->toDateString() }}"
-                                value="{{ old('date') }}"
-                                autocomplete="off">
+                        <div class="input-wrapper date-picker-wrapper">
+                            <input id="preferredDate" type="hidden" name="date" value="{{ old('date') }}" required>
+                            <input id="preferredDateDisplay" type="text" class="form-control date-display-input" placeholder="Select a date" readonly>
+                            <button type="button" class="date-picker-toggle" id="preferredDateToggle">Pick</button>
+                            <div class="date-picker-panel" id="datePickerPanel" hidden>
+                                <div class="date-picker-header">
+                                    <button type="button" class="date-picker-nav" id="calendarPrev" aria-label="Previous month">&lt;</button>
+                                    <div class="date-picker-month" id="calendarMonthLabel">Month 2026</div>
+                                    <button type="button" class="date-picker-nav" id="calendarNext" aria-label="Next month">&gt;</button>
+                                </div>
+                                <div class="date-picker-weekdays">
+                                    <span>Sun</span>
+                                    <span>Mon</span>
+                                    <span>Tue</span>
+                                    <span>Wed</span>
+                                    <span>Thu</span>
+                                    <span>Fri</span>
+                                    <span>Sat</span>
+                                </div>
+                                <div class="date-picker-days" id="calendarDays"></div>
+                            </div>
                         </div>
                         <small class="time-slot-hint" id="dateHint">Choose a date to load available schedules.</small>
                     </div>
@@ -445,7 +566,7 @@
         <div class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="appointmentConfirmationTitle">
             <button type="button" class="confirmation-close" id="appointmentConfirmationClose" aria-label="Close confirmation">x</button>
             <h2 class="confirmation-title" id="appointmentConfirmationTitle">Appointment Submitted</h2>
-            <p class="confirmation-subtitle">Your request has been received and is now waiting for clinic approval.</p>
+            <p class="confirmation-subtitle">Your request has been received. Go to your profile to check your appointment status and updates.</p>
 
             <div class="confirmation-grid">
                 <div class="confirmation-item">
@@ -467,8 +588,8 @@
             </div>
 
             <div class="confirmation-actions">
-                <a href="/student/account" class="confirmation-btn confirmation-btn-secondary">View My Appointments</a>
-                <button type="button" class="confirmation-btn confirmation-btn-primary" id="appointmentConfirmationDone">Done</button>
+                <button type="button" class="confirmation-btn confirmation-btn-secondary" id="appointmentConfirmationDone">Stay Here</button>
+                <a href="/student/account" class="confirmation-btn confirmation-btn-primary">Go To My Profile</a>
             </div>
         </div>
     </div>
@@ -478,7 +599,15 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const bookingForm = document.getElementById('bookingForm');
         const dateInput = document.getElementById('preferredDate');
+        const dateDisplayInput = document.getElementById('preferredDateDisplay');
+        const dateToggle = document.getElementById('preferredDateToggle');
+        const datePickerPanel = document.getElementById('datePickerPanel');
+        const calendarMonthLabel = document.getElementById('calendarMonthLabel');
+        const calendarDays = document.getElementById('calendarDays');
+        const calendarPrev = document.getElementById('calendarPrev');
+        const calendarNext = document.getElementById('calendarNext');
         const timeInput = document.getElementById('preferredTimeInput');
         const timeDisplay = document.getElementById('preferredTimeDisplay');
         const timeSlots = document.getElementById('timeSlots');
@@ -486,8 +615,62 @@
         const dateHint = document.getElementById('dateHint');
         const availabilityUrl = @json(url('/student/appointments/availability'));
 
-        if (!dateInput || !timeInput || !timeDisplay || !timeSlots || !slotsHint) {
+        if (!dateInput || !dateDisplayInput || !dateToggle || !datePickerPanel || !calendarMonthLabel || !calendarDays || !calendarPrev || !calendarNext || !timeInput || !timeDisplay || !timeSlots || !slotsHint) {
             return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        function pad2(value) {
+            return String(value).padStart(2, '0');
+        }
+
+        function parseDateValue(value) {
+            if (!value) return null;
+            const parts = String(value).split('-');
+            if (parts.length !== 3) return null;
+
+            const year = Number(parts[0]);
+            const month = Number(parts[1]);
+            const day = Number(parts[2]);
+            if (!year || !month || !day) return null;
+
+            const parsed = new Date(year, month - 1, day);
+            if (
+                parsed.getFullYear() !== year ||
+                parsed.getMonth() !== month - 1 ||
+                parsed.getDate() !== day
+            ) {
+                return null;
+            }
+
+            parsed.setHours(0, 0, 0, 0);
+            return parsed;
+        }
+
+        function toDateValue(dateObj) {
+            return dateObj.getFullYear() + '-' + pad2(dateObj.getMonth() + 1) + '-' + pad2(dateObj.getDate());
+        }
+
+        function formatDateDisplay(value) {
+            const parsed = parseDateValue(value);
+            if (!parsed) return '';
+            return parsed.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' });
+        }
+
+        function isWeekendDateObj(dateObj) {
+            const day = dateObj.getDay();
+            return day === 0 || day === 6;
+        }
+
+        function isPastDateObj(dateObj) {
+            return dateObj.getTime() < today.getTime();
+        }
+
+        function isSelectableDateObj(dateObj) {
+            return !isPastDateObj(dateObj) && !isWeekendDateObj(dateObj);
         }
 
         function normalizeTime(raw) {
@@ -517,6 +700,80 @@
             timeSlots.querySelectorAll('.time-slot-btn').forEach(function (btn) {
                 btn.classList.toggle('selected', btn.dataset.value === normalized);
             });
+        }
+
+        function closeDatePanel() {
+            datePickerPanel.hidden = true;
+        }
+
+        function renderCalendar() {
+            const year = viewMonth.getFullYear();
+            const month = viewMonth.getMonth();
+            const firstOfMonth = new Date(year, month, 1);
+            const firstWeekDay = firstOfMonth.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            calendarMonthLabel.textContent = viewMonth.toLocaleDateString([], { month: 'long', year: 'numeric' });
+            calendarDays.innerHTML = '';
+
+            for (let i = 0; i < firstWeekDay; i++) {
+                const emptyCell = document.createElement('span');
+                emptyCell.className = 'calendar-empty';
+                calendarDays.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDate = new Date(year, month, day);
+                dayDate.setHours(0, 0, 0, 0);
+                const dateValue = toDateValue(dayDate);
+                const dayButton = document.createElement('button');
+
+                dayButton.type = 'button';
+                dayButton.className = 'calendar-day';
+                dayButton.textContent = String(day);
+
+                const selectable = isSelectableDateObj(dayDate);
+                if (!selectable) {
+                    dayButton.disabled = true;
+                    dayButton.title = isWeekendDateObj(dayDate)
+                        ? 'Weekends are unavailable.'
+                        : 'Past dates are unavailable.';
+                } else {
+                    dayButton.addEventListener('click', function () {
+                        dateInput.value = dateValue;
+                        dateDisplayInput.value = formatDateDisplay(dateValue);
+                        if (dateHint) {
+                            dateHint.textContent = 'Date selected. Now choose an available time slot.';
+                        }
+                        loadAvailability(dateValue, '');
+                        renderCalendar();
+                        closeDatePanel();
+                    });
+                }
+
+                if (dateInput.value === dateValue) {
+                    dayButton.classList.add('selected');
+                }
+
+                calendarDays.appendChild(dayButton);
+            }
+
+            const renderedCells = firstWeekDay + daysInMonth;
+            const trailingCells = renderedCells % 7 === 0 ? 0 : (7 - (renderedCells % 7));
+            for (let i = 0; i < trailingCells; i++) {
+                const emptyCell = document.createElement('span');
+                emptyCell.className = 'calendar-empty';
+                calendarDays.appendChild(emptyCell);
+            }
+
+            const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
+            const viewingMonthStart = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1).getTime();
+            calendarPrev.disabled = viewingMonthStart <= currentMonthStart;
+        }
+
+        function openDatePanel() {
+            datePickerPanel.hidden = false;
+            renderCalendar();
         }
 
         function renderMessage(message) {
@@ -611,44 +868,43 @@
             }
         }
 
-        function openNativePicker() {
-            if (typeof dateInput.showPicker === 'function') {
-                try {
-                    dateInput.showPicker();
-                } catch (error) {
-                    // Browser blocks showPicker unless in direct user gesture.
-                }
+        dateToggle.addEventListener('click', function () {
+            if (datePickerPanel.hidden) {
+                openDatePanel();
+            } else {
+                closeDatePanel();
             }
-        }
+        });
 
-        dateInput.addEventListener('focus', openNativePicker);
-        dateInput.addEventListener('click', openNativePicker);
-        dateInput.addEventListener('keydown', function (event) {
-            const blockedKeys = ['Backspace', 'Delete'];
-            const printableKey = event.key && event.key.length === 1;
-            if (printableKey || blockedKeys.includes(event.key)) {
+        dateDisplayInput.addEventListener('click', function () {
+            openDatePanel();
+        });
+        dateDisplayInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
+                openDatePanel();
             }
         });
-        dateInput.addEventListener('paste', function (event) {
-            event.preventDefault();
-        });
 
-        dateInput.addEventListener('change', function () {
-            dateInput.setCustomValidity('');
-            if (isWeekendDate(dateInput.value)) {
-                if (dateHint) {
-                    dateHint.textContent = 'Weekends are unavailable. Please choose Monday to Friday.';
-                }
-                renderMessage('Appointments are available from Monday to Friday only.');
-                dateInput.setCustomValidity('Please choose a weekday appointment date.');
-                dateInput.reportValidity();
+        calendarPrev.addEventListener('click', function () {
+            if (calendarPrev.disabled) {
                 return;
             }
-            if (dateHint) {
-                dateHint.textContent = 'Date selected. Now choose an available time slot.';
+            viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1);
+            renderCalendar();
+        });
+        calendarNext.addEventListener('click', function () {
+            viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1);
+            renderCalendar();
+        });
+
+        document.addEventListener('click', function (event) {
+            const clickedInsidePanel = datePickerPanel.contains(event.target);
+            const clickedDisplay = dateDisplayInput.contains(event.target);
+            const clickedToggle = dateToggle.contains(event.target);
+            if (!clickedInsidePanel && !clickedDisplay && !clickedToggle) {
+                closeDatePanel();
             }
-            loadAvailability(dateInput.value, '');
         });
 
         const initialDate = dateInput.value;
@@ -657,11 +913,45 @@
             timeInput.value = initialTime;
         }
 
-        if (initialDate) {
+        if (initialDate && parseDateValue(initialDate) && isSelectableDateObj(parseDateValue(initialDate))) {
+            const parsedInitial = parseDateValue(initialDate);
+            viewMonth = new Date(parsedInitial.getFullYear(), parsedInitial.getMonth(), 1);
+            dateDisplayInput.value = formatDateDisplay(initialDate);
             loadAvailability(initialDate, initialTime);
         } else {
+            dateInput.value = '';
+            dateDisplayInput.value = '';
             renderMessage('Select a date to view available time slots.');
+            if (dateHint) {
+                dateHint.textContent = 'Weekends and past dates are unavailable.';
+            }
         }
+
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', function (event) {
+                let isValid = true;
+
+                if (!dateInput.value) {
+                    isValid = false;
+                    if (dateHint) {
+                        dateHint.textContent = 'Please choose an available weekday date.';
+                    }
+                    openDatePanel();
+                }
+
+                if (!timeInput.value) {
+                    isValid = false;
+                    slotsHint.textContent = 'Please select one available time slot.';
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            });
+        }
+
+        renderCalendar();
 
         const confirmationOverlay = document.getElementById('appointmentConfirmationOverlay');
         const confirmationClose = document.getElementById('appointmentConfirmationClose');

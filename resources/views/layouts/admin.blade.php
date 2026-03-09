@@ -1188,6 +1188,8 @@
     <p class="assistant-note">Medical responses are for initial triage support only, not a confirmed diagnosis. For emergencies, call local emergency services immediately.</p>
 </section>
 
+@include('partials.post_login_terms_gate')
+
 @stack('scripts')
 
 <script>

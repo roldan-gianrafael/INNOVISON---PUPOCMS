@@ -28,6 +28,7 @@ class LoginController extends Controller
   
     if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
         $request->session()->regenerate();
+        $request->session()->flash('show_terms_modal', true);
         
         if (Auth::user()->user_role === 'admin') {
             return redirect('/admin/dashboard');

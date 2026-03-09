@@ -533,6 +533,8 @@
         @yield('content')
     </main>
 
+    @include('partials.post_login_terms_gate')
+
     @stack('scripts')
     
     <script>

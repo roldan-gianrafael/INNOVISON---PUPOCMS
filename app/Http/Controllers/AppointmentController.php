@@ -156,7 +156,14 @@ class AppointmentController extends Controller
         $appointment->user_type       = Appointment::normalizeUserType($user->user_role);
         $appointment->save(); // Dito lang dapat magtatapos ang command.
 
-        return redirect()->back()->with('success', 'Appointment request submitted! Please wait for admin approval.');
+        return redirect()->back()
+            ->with('success', 'Appointment request submitted! Please wait for admin approval.')
+            ->with('appointment_confirmation', [
+                'service' => $appointment->service,
+                'date' => Carbon::parse($appointment->date)->format('M d, Y'),
+                'time' => Carbon::parse($appointment->time)->format('g:i A'),
+                'status' => $appointment->status,
+            ]);
     }
 
     public function availability(Request $request)

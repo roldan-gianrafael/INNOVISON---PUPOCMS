@@ -137,6 +137,114 @@
     .note-widget { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 8px; color: #92400e; font-size: 14px; line-height: 1.6; }
     .note-header { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 8px; color: #b45309; }
 
+    .confirmation-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 1100;
+    }
+    .confirmation-modal {
+        width: min(520px, 100%);
+        background: #ffffff;
+        border-radius: 16px;
+        border-top: 5px solid #8B0000;
+        box-shadow: 0 18px 35px rgba(15, 23, 42, 0.25);
+        padding: 24px;
+        position: relative;
+    }
+    .confirmation-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 4px 8px;
+    }
+    .confirmation-title {
+        margin: 0 0 8px 0;
+        color: #8B0000;
+        font-size: 24px;
+        font-weight: 800;
+    }
+    .confirmation-subtitle {
+        margin: 0 0 18px 0;
+        color: #475569;
+        font-size: 14px;
+    }
+    .confirmation-grid {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+    .confirmation-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px 14px;
+        background: #f8fafc;
+    }
+    .confirmation-label {
+        display: block;
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-weight: 700;
+    }
+    .confirmation-value {
+        color: #1e293b;
+        font-size: 15px;
+        font-weight: 700;
+    }
+    .confirmation-status {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 5px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #fff3cd;
+        color: #b45309;
+    }
+    .confirmation-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+    .confirmation-btn {
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .confirmation-btn-primary {
+        background: #8B0000;
+        color: #fff;
+    }
+    .confirmation-btn-primary:hover {
+        background: #70131B;
+    }
+    .confirmation-btn-secondary {
+        background: #fff;
+        color: #8B0000;
+        border-color: #8B0000;
+    }
+    .confirmation-btn-secondary:hover {
+        background: #fff5f5;
+    }
+
     @media (max-width: 900px) {
         .booking-card { flex-direction: column; }
         .booking-form-section { border-right: none; border-bottom: 1px solid #f1f5f9; }
@@ -151,6 +259,16 @@
         .booking-grid-2 {
             grid-template-columns: 1fr;
             gap: 12px;
+        }
+        .confirmation-modal {
+            padding: 18px;
+        }
+        .confirmation-actions {
+            justify-content: stretch;
+        }
+        .confirmation-btn {
+            width: 100%;
+            text-align: center;
         }
     }
 </style>
@@ -320,6 +438,41 @@
         </div>
     </div>
 </div>
+
+@if(session('appointment_confirmation'))
+    @php($confirmation = session('appointment_confirmation'))
+    <div class="confirmation-overlay" id="appointmentConfirmationOverlay">
+        <div class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="appointmentConfirmationTitle">
+            <button type="button" class="confirmation-close" id="appointmentConfirmationClose" aria-label="Close confirmation">x</button>
+            <h2 class="confirmation-title" id="appointmentConfirmationTitle">Appointment Submitted</h2>
+            <p class="confirmation-subtitle">Your request has been received and is now waiting for clinic approval.</p>
+
+            <div class="confirmation-grid">
+                <div class="confirmation-item">
+                    <span class="confirmation-label">Service</span>
+                    <span class="confirmation-value">{{ $confirmation['service'] ?? '-' }}</span>
+                </div>
+                <div class="confirmation-item">
+                    <span class="confirmation-label">Preferred Date</span>
+                    <span class="confirmation-value">{{ $confirmation['date'] ?? '-' }}</span>
+                </div>
+                <div class="confirmation-item">
+                    <span class="confirmation-label">Preferred Time</span>
+                    <span class="confirmation-value">{{ $confirmation['time'] ?? '-' }}</span>
+                </div>
+                <div class="confirmation-item">
+                    <span class="confirmation-label">Current Status</span>
+                    <span class="confirmation-status">{{ $confirmation['status'] ?? 'Pending' }}</span>
+                </div>
+            </div>
+
+            <div class="confirmation-actions">
+                <a href="/student/account" class="confirmation-btn confirmation-btn-secondary">View My Appointments</a>
+                <button type="button" class="confirmation-btn confirmation-btn-primary" id="appointmentConfirmationDone">Done</button>
+            </div>
+        </div>
+    </div>
+@endif
 @endsection
 
 @push('scripts')
@@ -508,6 +661,33 @@
             loadAvailability(initialDate, initialTime);
         } else {
             renderMessage('Select a date to view available time slots.');
+        }
+
+        const confirmationOverlay = document.getElementById('appointmentConfirmationOverlay');
+        const confirmationClose = document.getElementById('appointmentConfirmationClose');
+        const confirmationDone = document.getElementById('appointmentConfirmationDone');
+
+        if (confirmationOverlay) {
+            const closeConfirmation = function () {
+                confirmationOverlay.style.display = 'none';
+            };
+
+            if (confirmationClose) {
+                confirmationClose.addEventListener('click', closeConfirmation);
+            }
+            if (confirmationDone) {
+                confirmationDone.addEventListener('click', closeConfirmation);
+            }
+            confirmationOverlay.addEventListener('click', function (event) {
+                if (event.target === confirmationOverlay) {
+                    closeConfirmation();
+                }
+            });
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && confirmationOverlay.style.display !== 'none') {
+                    closeConfirmation();
+                }
+            });
         }
     });
 </script>

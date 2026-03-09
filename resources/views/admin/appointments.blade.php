@@ -39,6 +39,7 @@
     .status.approved { background: #dcfce7; color: #15803d; }
     .status.cancelled { background: #fee2e2; color: #b91c1c; }
     .status.completed { background: #e0f2fe; color: #0369a1; }
+    .status.missed { background: #ffedd5; color: #9a3412; }
     
     /* Type Badges */
     .type-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid; }
@@ -74,6 +75,9 @@
 
     .btn-reschedule { background: #f9eef0; color: #7a1b28; border: 1px solid #f0d6dc; }
     .btn-reschedule:hover { background: #f4dde3; }
+
+    .btn-missed { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
+    .btn-missed:hover { background: #ffedd5; }
 
     .btn-reject,
     .btn-cancel { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
@@ -164,6 +168,13 @@
     }
     .dialog-btn-reject:hover {
         background: #991b1b;
+    }
+    .dialog-btn-warning {
+        background: #b45309;
+        color: #fff;
+    }
+    .dialog-btn-warning:hover {
+        background: #92400e;
     }
 
     /* Form Inputs for Reschedule */
@@ -292,9 +303,10 @@
                             
                             @elseif($appt->status == 'Approved')
                                 @php
-                                    $apptDate = \Carbon\Carbon::parse($appt->date)->startOfDay();
-                                    $today = \Carbon\Carbon::today();
-                                    $isFuture = $apptDate->gt($today);
+                                    $scheduledAt = \Carbon\Carbon::parse($appt->date . ' ' . $appt->time);
+                                    $now = \Carbon\Carbon::now();
+                                    $isFuture = $scheduledAt->isFuture();
+                                    $showMissedAction = $now->greaterThan($scheduledAt);
                                 @endphp
 
                                 @if($isFuture)
@@ -303,6 +315,15 @@
                                 @else
                                     <a href="{{ url($basePrefix . '/walkin/form/' . $appt->student_id) }}?source=online" class="btn-action btn-consult" style="background: #0d6efd; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; margin-right: 5px; display: inline-flex; align-items: center; gap: 5px;">
                                         Consult</a>
+                                    @if($showMissedAction)
+                                        <a
+                                            href="{{ url($basePrefix . '/appointments/' . $appt->id . '/' . rawurlencode('Missed Scheduled')) }}"
+                                            class="btn-action btn-missed"
+                                            title="Mark as Missed Scheduled"
+                                            data-status-target="Missed Scheduled">
+                                            Missed Scheduled
+                                        </a>
+                                    @endif
                                 @endif
                             @endif
                             </div>
@@ -446,10 +467,11 @@
     function openStatusActionModal(trigger) {
         const fallback = getRowDataFromElement(trigger);
         const href = trigger?.getAttribute?.('href') || '';
-        const statusTarget = trigger?.dataset?.statusTarget || (href.includes('/Approved') ? 'Approved' : 'Cancelled');
-        const matches = href.match(/\/appointments\/(\d+)\/(Approved|Cancelled)/i);
+        const matches = href.match(/\/appointments\/(\d+)\/([^/?#]+)/i);
+        const decodedStatus = matches ? decodeURIComponent(matches[2]) : '';
+        const statusTarget = trigger?.dataset?.statusTarget || decodedStatus || (href.includes('/Approved') ? 'Approved' : 'Cancelled');
         const id = trigger?.dataset?.id || (matches ? matches[1] : '');
-        const actionUrl = id ? (appointmentsBaseUrl + '/' + id + '/' + statusTarget) : href;
+        const actionUrl = id ? (appointmentsBaseUrl + '/' + id + '/' + encodeURIComponent(statusTarget)) : href;
 
         const name = trigger?.dataset?.name || fallback.name;
         const service = trigger?.dataset?.service || fallback.service;
@@ -457,18 +479,26 @@
         const time = trigger?.dataset?.time || fallback.time;
 
         const isApprove = statusTarget === 'Approved';
-        document.getElementById('statusActionTitle').innerText = isApprove ? 'Approve Appointment' : 'Reject Appointment';
+        const isReject = statusTarget === 'Cancelled';
+        const isMissed = statusTarget === 'Missed Scheduled';
+        document.getElementById('statusActionTitle').innerText = isApprove
+            ? 'Approve Appointment'
+            : (isMissed ? 'Mark Appointment as Missed' : 'Reject Appointment');
         document.getElementById('statusActionSubtitle').innerText = isApprove
             ? 'This will mark the appointment as approved and notify the workflow.'
-            : 'This will reject the appointment request and mark it as cancelled.';
+            : (isMissed
+                ? 'Use this when the scheduled appointment time has passed and the patient did not show up.'
+                : 'This will reject the appointment request and mark it as cancelled.');
         document.getElementById('sName').innerText = safeText(name);
         document.getElementById('sService').innerText = safeText(service);
         document.getElementById('sDateTime').innerText = formatSchedule(date, time);
 
         const confirmBtn = document.getElementById('statusActionConfirm');
         confirmBtn.href = actionUrl;
-        confirmBtn.innerText = isApprove ? 'Confirm Approval' : 'Confirm Rejection';
-        confirmBtn.className = 'dialog-btn ' + (isApprove ? 'dialog-btn-approve' : 'dialog-btn-reject');
+        confirmBtn.innerText = isApprove
+            ? 'Confirm Approval'
+            : (isMissed ? 'Confirm Missed Status' : 'Confirm Rejection');
+        confirmBtn.className = 'dialog-btn ' + (isApprove ? 'dialog-btn-approve' : (isMissed ? 'dialog-btn-warning' : 'dialog-btn-reject'));
 
         document.getElementById('statusActionModal').style.display = 'flex';
     }
@@ -572,7 +602,7 @@
             });
         }
 
-        document.querySelectorAll('a.btn-approve, a.btn-cancel, button.btn-reject').forEach((el) => {
+        document.querySelectorAll('a.btn-approve, a.btn-cancel, a.btn-missed, button.btn-reject').forEach((el) => {
             el.removeAttribute('onclick');
             el.addEventListener('click', function(event) {
                 event.preventDefault();

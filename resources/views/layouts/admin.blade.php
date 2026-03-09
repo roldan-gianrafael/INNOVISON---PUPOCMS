@@ -1061,6 +1061,7 @@
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
     $assistantEndpoint = $isStudentAssistant ? route('assistant.intent') : route('admin.assistant.intent');
     $displayName = optional($authUser)->name ?? 'Clinic User';
+    $welcomeName = $displayName === 'Admin Account' ? 'Nurse Joyce' : $displayName;
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
     $roleLabelMap = [
         'super_admin' => 'Super Admin',
@@ -1073,7 +1074,7 @@
 <header class="admin-header">
     <div class="header-left">
         <p class="header-kicker">{{ $isStudentAssistant ? 'Clinic Assistant Console' : 'Clinic Administration' }}</p>
-        <h1 class="header-title">Welcome back, <span>{{ $displayName }}</span></h1>
+        <h1 class="header-title">Welcome back, <span>{{ $welcomeName }}</span></h1>
         <p class="header-subtitle">Monitor operations and patient flow in one clear workspace.</p>
     </div>
 

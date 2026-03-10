@@ -1072,9 +1072,9 @@
 <body>
 @php
     $authUser = auth()->user();
-    $currentRole = strtolower((string) (optional($authUser)->user_role ?? ''));
+    $currentRole = \App\Models\User::normalizeRole(optional($authUser)->user_role ?? '');
     $isStudentAssistant = $currentRole === 'student_assistant';
-    $isAdminLike = in_array($currentRole, ['admin', 'super_admin'], true);
+    $isAdminLike = $currentRole === \App\Models\User::ROLE_SUPER_ADMIN;
     $dashboardUrl = $isStudentAssistant ? url('/assistant/dashboard') : url('/admin/dashboard');
     $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
     $inventoryUrl = $isStudentAssistant ? url('/assistant/inventory') : url('/admin/inventory');
@@ -1084,12 +1084,11 @@
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
     $assistantEndpoint = $isStudentAssistant ? route('assistant.intent') : route('admin.assistant.intent');
     $displayName = optional($authUser)->name ?? 'Clinic User';
-    $welcomeName = $displayName === 'Admin Account' ? 'Nurse Joyce' : $displayName;
+    $welcomeName = in_array($displayName, ['Admin Account', 'Super Admin Account'], true) ? 'Nurse Joyce' : $displayName;
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
     $brandLogo = asset('images/clinic_logo.png');
     $roleLabelMap = [
         'super_admin' => 'Super Admin',
-        'admin' => 'Admin',
         'student_assistant' => 'Student Assistant',
     ];
     $displayRole = $roleLabelMap[$currentRole] ?? ucfirst($currentRole ?: 'user');

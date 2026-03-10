@@ -9,6 +9,7 @@ use App\Http\Controllers\MedicalConditionController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\StudentAssistantController;
 use App\Http\Controllers\WalkInController;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -70,16 +71,16 @@ Route::post('/student/store-health-form', [AppointmentController::class, 'storeH
 Route::get('/student/print-health-form', [AppointmentController::class, 'printHealthForm'])->name('print.health.form');
 Route::get('/account', [AppointmentController::class, 'index'])->name('account');
 Route::get('/health-records', [AdminController::class, 'viewHealth'])
-    ->middleware('role:admin,super_admin,student_assistant')
+    ->middleware('role:super_admin,student_assistant')
     ->name('admin.health_records');
 Route::get('/health-profile/{id}', [AdminController::class, 'showHealth'])
-    ->middleware('role:admin,super_admin,student_assistant')
+    ->middleware('role:super_admin,student_assistant')
     ->name('admin.show_health');
 Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage'])
-    ->middleware('role:admin,super_admin')
+    ->middleware('role:super_admin')
     ->name('admin.sign_page');
 Route::put('/health-profile/{id}/update', [AdminController::class, 'updateClearance'])
-    ->middleware('role:admin,super_admin')
+    ->middleware('role:super_admin')
     ->name('admin.update_clearance');
 
     Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
@@ -104,8 +105,8 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
 
     Route::get('/fetch-user/{student_id}', [AppointmentController::class, 'fetchUser']);
 
-    // Shared Admin Routes (Admin/Super Admin/Student Assistant)
-    Route::middleware('role:admin,super_admin,student_assistant')->group(function () {
+    // Shared admin workspace routes (Super Admin/Student Assistant)
+    Route::middleware('role:super_admin,student_assistant')->group(function () {
         Route::post('/admin/assistant/intent', [AdminAssistantController::class, 'handle'])->name('admin.assistant.intent');
         Route::post('/assistant/intent', [AdminAssistantController::class, 'handle'])->name('assistant.intent');
 
@@ -128,12 +129,12 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
         Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])
-            ->middleware('role:admin,super_admin')
+            ->middleware('role:super_admin')
             ->name('admin.logs');
     });
 
-    // Admin-only routes (Admin/Super Admin)
-    Route::middleware('role:admin,super_admin')->group(function () {
+    // Super Admin-only routes
+    Route::middleware('role:super_admin')->group(function () {
         Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
         Route::put('/admin/settings/update', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
         Route::put('/admin/profile/update', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
@@ -181,15 +182,21 @@ Route::get('/dev-login/{id}', function ($id) {
         abort(404);
     }
 
-    $user = \App\Models\User::find($id);
+    $user = User::find($id);
     if ($user) {
+        $originalRole = strtolower((string) ($user->user_role ?? ''));
+        $normalizedRole = User::normalizeRole($user->user_role);
+        if ($normalizedRole !== $originalRole) {
+            $user->user_role = $normalizedRole;
+            $user->save();
+        }
+
         Auth::login($user);
 
-        $role = strtolower((string) ($user->user_role ?? ''));
-        if (in_array($role, ['admin', 'super_admin'], true)) {
+        if ($normalizedRole === User::ROLE_SUPER_ADMIN) {
             return redirect('/admin/dashboard')->with('success', 'Logged in as ' . $user->name);
         }
-        if ($role === 'student_assistant') {
+        if ($normalizedRole === User::ROLE_STUDENT_ASSISTANT) {
             return redirect('/assistant/dashboard')->with('success', 'Logged in as ' . $user->name);
         }
 

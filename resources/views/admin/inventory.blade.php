@@ -43,8 +43,8 @@
 
 @section('content')
     @php
-        $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
-        $canManageInventory = in_array($role, ['admin', 'super_admin'], true);
+        $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
+        $canManageInventory = $role === \App\Models\User::ROLE_SUPER_ADMIN;
     @endphp
 
     <div class="controls">

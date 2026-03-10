@@ -13,9 +13,20 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     public const ROLE_STUDENT = 'student';
-    public const ROLE_ADMIN = 'admin';
     public const ROLE_SUPER_ADMIN = 'super_admin';
     public const ROLE_STUDENT_ASSISTANT = 'student_assistant';
+
+    public static function normalizeRole(?string $role): string
+    {
+        $normalizedRole = strtolower(trim((string) $role));
+
+        // Legacy role alias: "admin" now maps to super admin privileges.
+        if ($normalizedRole === 'admin') {
+            return self::ROLE_SUPER_ADMIN;
+        }
+
+        return $normalizedRole;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -90,10 +101,10 @@ class User extends Authenticatable
 
     public function hasRole($roles): bool
     {
-        $currentRole = strtolower((string) ($this->user_role ?? ''));
+        $currentRole = self::normalizeRole($this->user_role);
         $roles = is_array($roles) ? $roles : [$roles];
         $roles = array_map(function ($role) {
-            return strtolower(trim((string) $role));
+            return self::normalizeRole((string) $role);
         }, $roles);
 
         return in_array($currentRole, $roles, true);
@@ -101,7 +112,7 @@ class User extends Authenticatable
 
     public function isAdminLike(): bool
     {
-        return $this->hasRole([self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN]);
+        return $this->hasRole(self::ROLE_SUPER_ADMIN);
     }
 
     public function isStudentAssistant(): bool

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -73,7 +74,7 @@ class AdminAssistantController extends Controller
             if (!$isAdminLike) {
                 return [
                     'type' => 'answer',
-                    'message' => 'Manage MAR is restricted to Admin and Super Admin accounts.',
+                    'message' => 'Manage MAR is restricted to Super Admin accounts.',
                 ];
             }
             $url = url('/admin/reports/manage-mar?month=' . $month);
@@ -115,7 +116,7 @@ class AdminAssistantController extends Controller
             if (!$isAdminLike) {
                 return [
                     'type' => 'answer',
-                    'message' => 'Settings access is restricted to Admin and Super Admin accounts.',
+                    'message' => 'Settings access is restricted to Super Admin accounts.',
                 ];
             }
             return $this->redirectIntent('Opening settings.', url('/admin/settings'));
@@ -317,8 +318,8 @@ class AdminAssistantController extends Controller
 
     private function isAdminLikeUser(): bool
     {
-        $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
-        return in_array($role, ['admin', 'super_admin'], true);
+        $role = User::normalizeRole(optional(auth()->user())->user_role ?? '');
+        return $role === User::ROLE_SUPER_ADMIN;
     }
 }
 

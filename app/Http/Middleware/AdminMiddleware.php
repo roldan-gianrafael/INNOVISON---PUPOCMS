@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,8 +15,8 @@ class AdminMiddleware
             abort(403, 'Unauthorized');
         }
 
-        $role = strtolower((string) (Auth::user()->user_role ?? ''));
-        if (!in_array($role, ['admin', 'super_admin'], true)) {
+        $role = User::normalizeRole(Auth::user()->user_role ?? '');
+        if ($role !== User::ROLE_SUPER_ADMIN) {
             abort(403, 'Unauthorized');
         }
 

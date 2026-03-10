@@ -31,7 +31,7 @@ class CreateUsersTable extends Migration
         
         // System Specifics (Dito yung request mo)
         $table->string('barcode')->nullable(); // Ang barcode data ng student
-        $table->string('user_role')->default('student'); // e.g., admin, student, staff
+        $table->string('user_role')->default('student'); // e.g., super_admin, student, student_assistant
         $table->string('user_type')->nullable(); // e.g., nurse, doctor, regular_student
         
         $table->string('password');

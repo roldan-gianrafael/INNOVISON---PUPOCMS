@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +15,9 @@ class RoleMiddleware
             abort(403, 'Unauthorized');
         }
 
-        $currentRole = strtolower((string) (Auth::user()->user_role ?? ''));
+        $currentRole = User::normalizeRole(Auth::user()->user_role ?? '');
         $allowedRoles = array_map(function ($role) {
-            return strtolower(trim((string) $role));
+            return User::normalizeRole((string) $role);
         }, $roles);
 
         if (!in_array($currentRole, $allowedRoles, true)) {

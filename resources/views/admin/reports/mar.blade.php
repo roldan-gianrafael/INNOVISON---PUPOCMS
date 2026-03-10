@@ -30,8 +30,8 @@
 
 @section('content')
 @php
-    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
-    $isAdminLike = in_array($role, ['admin', 'super_admin'], true);
+    $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
+    $isAdminLike = $role === \App\Models\User::ROLE_SUPER_ADMIN;
     $reportsHomeUrl = $role === 'student_assistant' ? url('/assistant/reports') : url('/admin/reports');
 @endphp
 

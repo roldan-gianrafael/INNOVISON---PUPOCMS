@@ -18,8 +18,8 @@ class AdminController extends Controller
 {
     private function canSignHealthClearance(): bool
     {
-        $role = strtolower((string) (optional(Auth::user())->user_role ?? ''));
-        return in_array($role, ['admin', 'super_admin'], true);
+        $role = User::normalizeRole(optional(Auth::user())->user_role ?? '');
+        return $role === User::ROLE_SUPER_ADMIN;
     }
 
     private function logActivity(string $action, string $description, ?string $module = null, ?string $eventType = null): void
@@ -533,10 +533,10 @@ public function updateClearance(Request $request, $id)
 }
 
 // 7. AUDIT TRAIL CONTROLLER
-public function indexLogs(Request $request)
+    public function indexLogs(Request $request)
     {
-        $currentRole = strtolower((string) (optional(Auth::user())->user_role ?? ''));
-        if (!in_array($currentRole, ['admin', 'super_admin'], true)) {
+        $currentRole = User::normalizeRole(optional(Auth::user())->user_role ?? '');
+        if ($currentRole !== User::ROLE_SUPER_ADMIN) {
             abort(403, 'Unauthorized');
         }
 

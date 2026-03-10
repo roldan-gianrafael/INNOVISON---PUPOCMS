@@ -65,7 +65,7 @@
 
     <section class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3>Admin Profile</h3>
+            <h3>Super Admin Profile</h3>
             <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
         </div>
 
@@ -74,13 +74,13 @@
         </p>
 
         <div class="form-group">
-            <label>Admin Name</label>
-            <input type="text" class="form-control" value="{{ $admin->name ?? 'Admin' }}" disabled>
+            <label>Super Admin Name</label>
+            <input type="text" class="form-control" value="{{ $admin->name ?? 'Super Admin' }}" disabled>
         </div>
 
         <div class="form-group">
             <label>Email</label>
-            <input type="email" class="form-control" value="{{ $admin->email ?? 'admin@pup.edu.ph' }}" disabled>
+            <input type="email" class="form-control" value="{{ $admin->email ?? 'superadmin@pup.edu.ph' }}" disabled>
         </div>
     </section>
 
@@ -142,7 +142,7 @@
                 @csrf @method('PUT')
 
                 <div class="form-group">
-                    <label>Admin Name</label>
+                    <label>Super Admin Name</label>
                     <input type="text" name="name" class="form-control" value="{{ $admin->name ?? '' }}" required>
                 </div>
 

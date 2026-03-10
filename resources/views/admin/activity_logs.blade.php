@@ -299,7 +299,7 @@
 @section('content')
 @php
     $roleLabelMap = [
-        'admin' => 'Admin',
+        'admin' => 'Super Admin (Legacy)',
         'super_admin' => 'Super Admin',
         'student_assistant' => 'Student Assistant',
         'student' => 'Student',

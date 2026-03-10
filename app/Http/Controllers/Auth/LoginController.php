@@ -79,13 +79,22 @@ class LoginController extends Controller
         $request->session()->regenerate();
         $request->session()->flash('show_terms_modal', true);
         $this->recordAuthEvent($request, 'Login', 'User logged in successfully.');
-        
-        if (Auth::user()->user_role === 'admin') {
+
+        /** @var \App\Models\User $authenticatedUser */
+        $authenticatedUser = Auth::user();
+        $originalRole = strtolower((string) ($authenticatedUser->user_role ?? ''));
+        $normalizedRole = User::normalizeRole($authenticatedUser->user_role);
+
+        if ($normalizedRole !== $originalRole) {
+            $authenticatedUser->user_role = $normalizedRole;
+            $authenticatedUser->save();
+        }
+
+        if ($normalizedRole === User::ROLE_SUPER_ADMIN) {
             return redirect('/admin/dashboard');
         }
-        if ($user->user_role === 'student_assistant') {
-            
-        return redirect('/admin/dashboard');
+        if ($normalizedRole === User::ROLE_STUDENT_ASSISTANT) {
+            return redirect('/assistant/dashboard');
         }
         return redirect('/student/home');
     }

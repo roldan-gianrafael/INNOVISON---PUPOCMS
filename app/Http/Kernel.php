@@ -63,5 +63,6 @@ class Kernel extends HttpKernel
         // ✅ Admin middleware alias added
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
+        'audit' => \App\Http\Middleware\AuditTrailMiddleware::class,
     ];
 }

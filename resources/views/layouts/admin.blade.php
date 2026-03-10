@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -1169,6 +1169,9 @@
       @if($isAdminLike)
           <a href="{{ $assistantAccountsUrl }}" class="{{ Request::is('admin/student-assistants*') ? 'active' : '' }}">
             <span class="sidebar-short">SA</span><span class="sidebar-label">Student Assistants</span>
+          </a>
+          <a href="{{ route('admin.logs') }}" class="{{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
+            <span class="sidebar-short">AT</span><span class="sidebar-label">Audit Trail</span>
           </a>
           <a href="{{ $settingsUrl }}" class="{{ Request::is('admin/settings*') ? 'active' : '' }}">
             <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>

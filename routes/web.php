@@ -21,7 +21,7 @@ Route::post('/login-action', [LoginController::class, 'login']);
 Route::post('/register-action', [RegisterController::class, 'register']);
 
 // --- PROTECTED ROUTES (Login required) ---
-Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class])->group(function () {
+Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class, 'audit'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Student-only routes
@@ -127,7 +127,9 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::get('/admin/reports/inventory-summary', [AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
         Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
-        Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])->name('admin.logs');
+        Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])
+            ->middleware('role:admin,super_admin')
+            ->name('admin.logs');
     });
 
     // Admin-only routes (Admin/Super Admin)

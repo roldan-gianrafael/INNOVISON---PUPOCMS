@@ -22,6 +22,30 @@ class AdminController extends Controller
         return in_array($role, ['admin', 'super_admin'], true);
     }
 
+    private function logActivity(string $action, string $description, ?string $module = null, ?string $eventType = null): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return;
+        }
+
+        ActivityLog::create([
+            'user_id' => $user->id,
+            'user_name' => $user->name ?? $user->email ?? 'Unknown User',
+            'user_role' => strtolower((string) ($user->user_role ?? '')),
+            'action' => $action,
+            'module' => $module,
+            'event_type' => $eventType,
+            'description' => $description,
+            'route_name' => optional(request()->route())->getName(),
+            'http_method' => strtoupper((string) request()->method()),
+            'request_path' => '/' . ltrim((string) request()->path(), '/'),
+            'status_code' => 200,
+            'ip_address' => request()->ip(),
+            'user_agent' => substr((string) request()->userAgent(), 0, 255),
+        ]);
+    }
+
     // ==========================================
     //  PART 1: VIEW METHODS (Loading the Pages)
     // ==========================================
@@ -508,13 +532,133 @@ public function updateClearance(Request $request, $id)
     ));
 }
 
-// 7.LOG CONTROLLER
-public function indexLogs()
+// 7. AUDIT TRAIL CONTROLLER
+public function indexLogs(Request $request)
     {
-        
-        $logs = ActivityLog::latest()->paginate(20);
+        $currentRole = strtolower((string) (optional(Auth::user())->user_role ?? ''));
+        if (!in_array($currentRole, ['admin', 'super_admin'], true)) {
+            abort(403, 'Unauthorized');
+        }
 
-        return view('admin.activity_logs', compact('logs'));
+        $query = ActivityLog::query();
+
+        $search = trim((string) $request->input('q', ''));
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                $builder->where('user_name', 'like', "%{$search}%")
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('module', 'like', "%{$search}%")
+                    ->orWhere('route_name', 'like', "%{$search}%")
+                    ->orWhere('request_path', 'like', "%{$search}%")
+                    ->orWhere('ip_address', 'like', "%{$search}%");
+            });
+        }
+
+        $actorRole = trim((string) $request->input('actor_role', ''));
+        if ($actorRole !== '') {
+            $query->where('user_role', strtolower($actorRole));
+        }
+
+        $eventType = trim((string) $request->input('event_type', ''));
+        if ($eventType !== '') {
+            $query->where('event_type', strtolower($eventType));
+        }
+
+        $module = trim((string) $request->input('module', ''));
+        if ($module !== '') {
+            $query->where('module', $module);
+        }
+
+        $httpMethod = strtoupper(trim((string) $request->input('http_method', '')));
+        if ($httpMethod !== '') {
+            $query->where('http_method', $httpMethod);
+        }
+
+        $statusClass = trim((string) $request->input('status_class', ''));
+        if ($statusClass === 'success') {
+            $query->where(function ($builder) {
+                $builder->whereNull('status_code')
+                    ->orWhere('status_code', '<', 400);
+            });
+        } elseif ($statusClass === 'error') {
+            $query->where('status_code', '>=', 400);
+        }
+
+        $dateFrom = trim((string) $request->input('date_from', ''));
+        if ($dateFrom !== '') {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        $dateTo = trim((string) $request->input('date_to', ''));
+        if ($dateTo !== '') {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        $perPage = (int) $request->input('per_page', 25);
+        if (!in_array($perPage, [25, 50, 100], true)) {
+            $perPage = 25;
+        }
+
+        $logs = (clone $query)
+            ->orderByDesc('created_at')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $totalEvents = (clone $query)->count();
+        $todayEvents = (clone $query)->whereDate('created_at', Carbon::today())->count();
+        $uniqueActors = (clone $query)
+            ->whereNotNull('user_id')
+            ->distinct('user_id')
+            ->count('user_id');
+        $failedEvents = (clone $query)->where('status_code', '>=', 400)->count();
+
+        $roleBreakdown = (clone $query)
+            ->selectRaw("COALESCE(NULLIF(user_role, ''), 'unknown') as role, COUNT(*) as total")
+            ->groupBy('role')
+            ->orderByDesc('total')
+            ->get();
+
+        $moduleBreakdown = (clone $query)
+            ->selectRaw("COALESCE(NULLIF(module, ''), 'Uncategorized') as module_name, COUNT(*) as total")
+            ->groupBy('module_name')
+            ->orderByDesc('total')
+            ->limit(6)
+            ->get();
+
+        $roleOptions = ActivityLog::query()
+            ->whereNotNull('user_role')
+            ->where('user_role', '!=', '')
+            ->distinct()
+            ->orderBy('user_role')
+            ->pluck('user_role');
+
+        $eventTypeOptions = ActivityLog::query()
+            ->whereNotNull('event_type')
+            ->where('event_type', '!=', '')
+            ->distinct()
+            ->orderBy('event_type')
+            ->pluck('event_type');
+
+        $moduleOptions = ActivityLog::query()
+            ->whereNotNull('module')
+            ->where('module', '!=', '')
+            ->distinct()
+            ->orderBy('module')
+            ->pluck('module');
+
+        return view('admin.activity_logs', compact(
+            'logs',
+            'totalEvents',
+            'todayEvents',
+            'uniqueActors',
+            'failedEvents',
+            'roleBreakdown',
+            'moduleBreakdown',
+            'roleOptions',
+            'eventTypeOptions',
+            'moduleOptions'
+        ));
     }
 
 }

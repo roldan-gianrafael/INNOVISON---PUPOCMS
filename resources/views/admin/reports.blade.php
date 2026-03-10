@@ -168,13 +168,15 @@
             <div class="report-badge">All Reports</div>
         </a>
 
-        <a href="{{ route('admin.logs') }}" class="report-card">
-            <div>
-                <div class="report-label">System Monitoring</div>
-                <div class="report-main-title">System Logs</div>
-            </div>
-            <div class="report-badge">Logs</div>
-        </a>
+        @if($role !== 'student_assistant')
+            <a href="{{ route('admin.logs') }}" class="report-card">
+                <div>
+                    <div class="report-label">System Monitoring</div>
+                    <div class="report-main-title">Audit Trail</div>
+                </div>
+                <div class="report-badge">Restricted</div>
+            </a>
+        @endif
 
     </div>
 

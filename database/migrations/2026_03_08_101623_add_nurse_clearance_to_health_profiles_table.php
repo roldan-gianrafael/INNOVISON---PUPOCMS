@@ -16,7 +16,7 @@ class AddNurseClearanceToHealthProfilesTable extends Migration
     Schema::table('health_profiles', function (Blueprint $table) {
    
         $table->string('clearance_status')->nullable()->after('vaccine_history');
-        $table->text('pending_reason')->nullable()->after('physician_signature');
+        $table->text('pending_reason')->nullable()->after('clearance_status');
         $table->timestamp('verified_at')->nullable()->after('pending_reason');
     });
 }

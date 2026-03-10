@@ -105,7 +105,7 @@
 
 @section('content')
 @php
-    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $reportsHomeUrl = $role === 'student_assistant' ? url('/assistant/reports') : url('/admin/reports');
 @endphp
 <div class="summary-container">

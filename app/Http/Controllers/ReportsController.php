@@ -55,7 +55,7 @@ class ReportsController extends Controller
 //for changing category
 public function update(Request $request, $id)
 {
-    $request->validate(['category_id' => 'required|exists:mar_categories,id']);
+    $request->validate(['category_id' => 'required|exists:categories,id']);
     
     $condition = MedicalConditions::findOrFail($id);
     $condition->update([

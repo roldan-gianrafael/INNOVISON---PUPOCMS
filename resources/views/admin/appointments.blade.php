@@ -218,7 +218,7 @@
 
 @section('content')
     @php
-        $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+        $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
         $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
     @endphp
 

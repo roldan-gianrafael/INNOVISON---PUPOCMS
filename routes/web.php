@@ -60,16 +60,7 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class, 'audit'])->g
         Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
     });
 
-    Route::get('/student/home', function () {
-        return view('student.home');
-    });
-
-// Route para ipakita ang form
-    // 1. Route para ipakita ang blankong form
-Route::get('/student/health-form', [AppointmentController::class, 'showHealthForm'])->name('health.form');
-Route::post('/student/store-health-form', [AppointmentController::class, 'storeHealthForm'])->name('store.health.form');
-Route::get('/student/print-health-form', [AppointmentController::class, 'printHealthForm'])->name('print.health.form');
-Route::get('/account', [AppointmentController::class, 'index'])->name('account');
+    Route::get('/account', [AppointmentController::class, 'index'])->name('account');
 Route::get('/health-records', [AdminController::class, 'viewHealth'])
     ->middleware('role:super_admin,student_assistant')
     ->name('admin.health_records');
@@ -82,20 +73,6 @@ Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage']
 Route::put('/health-profile/{id}/update', [AdminController::class, 'updateClearance'])
     ->middleware('role:super_admin')
     ->name('admin.update_clearance');
-
-    Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
-    Route::get('/student/account', [AppointmentController::class, 'account']);
-    Route::get('/student/faq', [AppointmentController::class, 'faq']);
-    Route::get('/student/history', [AppointmentController::class, 'history']);
-    Route::post('/student/appointments/store', [AppointmentController::class, 'store']);
-    Route::get('/student/appointments/availability', [AppointmentController::class, 'availability'])->name('student.appointments.availability.legacy');
-    Route::post('/student/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
-    Route::post('/student/update-contact', [AppointmentController::class, 'updateContact'])->name('student.updateContact');
-
-    Route::get('/student/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.register');
-    Route::post('/student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');
-    Route::post('/student/barcode-validate', [AppointmentController::class, 'validateBarcodeScan'])->name('barcode.validate');
-    Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
 
     // Legacy barcode endpoints kept for compatibility
     Route::get('/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.legacy.register');

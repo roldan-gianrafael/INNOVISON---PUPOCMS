@@ -109,7 +109,7 @@
 
 @section('content')
 @php
-    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $dashboardUrl = $role === 'student_assistant' ? url('/assistant/dashboard') : url('/admin/dashboard');
     $marUrl = $role === 'student_assistant' ? url('/assistant/reports/mar') : url('/admin/reports/mar');
     $inventorySummaryUrl = $role === 'student_assistant' ? url('/assistant/reports/inventory-summary') : url('/admin/reports/inventory-summary');

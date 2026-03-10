@@ -45,8 +45,10 @@
 
 @section('content')
 @php
-    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
+    $walkinStoreRoute = $role === 'student_assistant' ? 'assistant.walkin.store' : 'walkin.store';
+    $walkinIndexRoute = $role === 'student_assistant' ? 'assistant.walkin.index' : 'walkin.index';
 @endphp
 
 <div class="patient-header card">
@@ -81,7 +83,7 @@
     </div>
 </div>
 
-<form action="{{ route('walkin.store') }}" method="POST">
+<form action="{{ route($walkinStoreRoute) }}" method="POST">
     @csrf
     <input type="hidden" name="student_id" value="{{ $student->student_id }}">
     <input type="hidden" name="user_role" value="{{ $student->role }}">
@@ -220,7 +222,7 @@
         
         <div style="display: flex; gap: 15px; margin-top: 10px;">
             <button type="submit" class="btn-save">Save & Finalize Consultation</button>
-            <a href="{{ route('walkin.index') }}" style="text-decoration: none; padding: 12px; color: #64748b; font-weight: 600; font-size: 14px;">Cancel</a>
+            <a href="{{ route($walkinIndexRoute) }}" style="text-decoration: none; padding: 12px; color: #64748b; font-weight: 600; font-size: 14px;">Cancel</a>
         </div>
     </div>
 </form>

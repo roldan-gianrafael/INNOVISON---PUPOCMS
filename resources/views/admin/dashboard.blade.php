@@ -260,7 +260,7 @@
 
 @section('content')
 @php
-    $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
+    $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $appointmentsUrl = $role === 'student_assistant' ? url('/assistant/appointments') : url('/admin/appointments');
 @endphp
 <div class="dashboard-container">

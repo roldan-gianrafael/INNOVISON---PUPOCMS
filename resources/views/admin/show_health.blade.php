@@ -4,53 +4,7 @@
 
 @push('styles')
 <style>
-    /* --- PRINT SETTINGS --- */
-@media print {
-    /* 1. Itago lahat ng admin elements at buttons */
-    header, footer, nav, .sidebar, .navbar, .no-print, 
-    .main-header, .main-sidebar, .btn, .content-header { 
-        display: none !important; 
-    }
-
-    /* 2. Siguraduhin na walang background at margin ang body */
-    body { 
-        visibility: hidden; 
-        background: white !important; 
-        margin: 0 !important; 
-        padding: 0 !important;
-    }
-
-    /* 3. Ipakita lang ang form container */
-    .print-container, .print-container * { 
-        visibility: visible; 
-    }
-
-    /* 4. I-dikit sa pinakataas ang container */
-    .print-container { 
-        position: absolute !important; 
-        left: 0 !important; 
-        top: 0 !important; 
-        width: 100% !important; 
-        margin: 0 !important; 
-        /* Dito mo kontrolin ang layo sa gilid at taas ng papel */
-        padding: 0.2in 0.5in !important; 
-        box-shadow: none !important;
-        line-height: 1.2;
-        border: none !important;
-    }
-
-    /* 5. Force the page size and REMOVE default browser margins */
-    @page { 
-        size: 8.5in 13in; 
-        margin: 0 !important; /* Ginawang 0 para mawala ang 0.81 gap */
-    }
-}
-        
-        .row { margin-bottom: 4px !important; }
-        .section-header { margin-top: 12px !important; }
-    }
-
-    /* --- SCREEN VIEW --- */
+    /* --- SCREEN VIEW (Para sa Monitor) --- */
     body { background-color: #e2e8f0; }
 
     .print-container {
@@ -66,13 +20,63 @@
         box-sizing: border-box;
     }
 
+    /* --- PRINT SETTINGS (Para sa Papel) --- */
+    @media print {
+        /* 1. ITAGO ANG MGA ADMIN ELEMENTS */
+        .sidebar, .admin-header, .sidebar-toggle, .theme-toggle-admin, 
+        .assistant-panel, .no-print, .nav-links, footer {
+            display: none !important;
+        }
+
+        /* 2. I-RESET ANG MGA WRAPPERS PARA MAG-FULL WIDTH */
+        .wrapper, .content-wrapper, .main, .content, .container-fluid {
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            width: 100% !important;
+            background: white !important;
+            border: none !important;
+        }
+
+        /* 3. ANG FORM MISMO - I-FORCE SA TAAS NG PAPEL */
+        .print-container {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 8.5in !important; 
+            padding: 0.2in 0.5in !important;
+            z-index: 9999 !important;
+            background: white !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            visibility: visible !important;
+        }
+
+        /* Siguraduhin na lahat ng bata sa loob ng container ay visible */
+        .print-container * {
+            visibility: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Re-apply flex para hindi masira ang layout ng rows */
+        .print-container .row { display: flex !important; flex-direction: row !important; }
+        .print-container .header-section { display: flex !important; }
+        .print-container .check-item { display: flex !important; }
+
+        /* 4. PAGE SETUP (LONG BOND PAPER) */
+        @page { 
+            size: 8.5in 13in; 
+            margin: 0 !important; 
+        }
+    }
+
+    /* --- Iyong Existing CSS Elements (Header, Row, Table, etc.) --- */
     .header-section { display: flex; align-items: center; position: relative; margin-bottom: 8px; }
-    .logo { width: 80px; height: 80px; margin-right: 15px; margin-left: 50px;} /* Pinalaki rin ang logo konti */
+    .logo { width: 80px; height: 80px; margin-right: 15px; margin-left: 50px;} 
     .header-text p { margin: 0; line-height: 1.3; }
-    
-    /* Font Size Updates (+2) */
-    .univ-name { font-size: 15px; font-weight: bold; } /* From 13px */
-    .dept-name { font-size: 17px; font-weight: bold; } /* From 15px */
+    .univ-name { font-size: 15px; font-weight: bold; } 
+    .dept-name { font-size: 17px; font-weight: bold; } 
 
     .photo-box {
         position: absolute; right: 0; top: 0;
@@ -83,39 +87,27 @@
     }
     .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 
-    .form-title { text-align: center; font-weight: bold; font-style: italic; font-size: 16px; margin: 18px 0;  } /* From 14px */
-    .section-header { font-weight: bold; font-style: italic; margin-top: 12px; text-transform: uppercase; font-size: 13px; padding-left: 5px; } /* From 11px */
+    .form-title { text-align: center; font-weight: bold; font-style: italic; font-size: 16px; margin: 18px 0; } 
+    .section-header { font-weight: bold; font-style: italic; margin-top: 12px; text-transform: uppercase; font-size: 13px; padding-left: 5px; } 
 
     .row { display: flex; margin-bottom: 6px; gap: 10px; align-items: baseline; }
-    .field { border-bottom: 1px solid #000; flex: 1; padding-left: 5px; min-height: 18px; font-size: 14px; font-weight: bold; color: #000; } /* From 12px */
-    .label { font-weight: bold; white-space: nowrap; font-size: 13px; } /* From 11px */
-    .labels {  white-space: nowrap; font-size: 13px; } /* From 11px */
+    .field { border-bottom: 1px solid #000; flex: 1; padding-left: 5px; min-height: 18px; font-size: 14px; font-weight: bold; color: #000; } 
+    .label { font-weight: bold; white-space: nowrap; font-size: 13px; } 
 
     .checkbox-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 8px 0 8px 20px; }
-    .check-item { display: flex; align-items: center; gap: 6px; font-size: 12px; } /* From 10px */
+    .check-item { display: flex; align-items: center; gap: 6px; font-size: 12px; } 
     .box-ui { width: 13px; height: 13px; border: 1px solid #000; display: inline-block; text-align: center; line-height: 12px; font-weight: bold; }
 
     .vax-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    .vax-table th, .vax-table td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 12px; } /* From 10px */
+    .vax-table th, .vax-table td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 12px; } 
     
-    .cert-text { font-style: italic; font-size: 11px; text-align: justify; margin-top: 15px; line-height: 1.3; } /* From 9px */
+    .cert-text { font-style: italic; font-size: 11px; text-align: justify; margin-top: 15px; line-height: 1.3; } 
     .signature-row { display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-end; }
     .sig-block { width: 35%; text-align: center; }
     .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
-    /* --- I-update ang sig-line sa <style> section --- */
-.sig-line { 
-    border-bottom: 1px solid #000; /* Ginawang bottom border para sa ibabaw ang text */
-    font-size: 11px; 
-    font-weight: bold; 
-    text-transform: uppercase;
-    min-height: 15px;
-    margin-bottom: 2px;
-}
-.sig-label {
-    font-size: 9px;
-    font-weight: bold;
-    color: #000;
-}
+    
+    .sig-line { border-bottom: 1px solid #000; font-size: 11px; font-weight: bold; text-transform: uppercase; min-height: 15px; margin-bottom: 2px; }
+    .sig-label { font-size: 9px; font-weight: bold; color: #000; }
 </style>
 @endpush
 

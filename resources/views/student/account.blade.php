@@ -370,7 +370,7 @@
                     <span>🖨️</span> PRINT APPROVED FORM
                 </a>
         
-                <a href="{{ route('student.view.health.profile') }}" style="font-size: 12px; color: #64748b; text-decoration: underline; text-align: center;">
+                <a href="{{ route('print.health.form') }}" style="font-size: 12px; color: #64748b; text-decoration: underline; text-align: center;">
                     View Record Details
                 </a>
             </div>

@@ -144,6 +144,16 @@ class LoginController extends Controller
             $query['redirect_uri'] = $redirectUri;
         }
 
+        $responseType = trim((string) config('services.idp.authorize_response_type', 'code'));
+        if ($responseType !== '') {
+            $query['response_type'] = $responseType;
+        }
+
+        $scope = trim((string) config('services.idp.authorize_scope', ''));
+        if ($scope !== '') {
+            $query['scope'] = $scope;
+        }
+
         return $authorizeUrl . '?' . http_build_query($query);
     }
 

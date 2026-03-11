@@ -127,7 +127,7 @@ class LoginController extends Controller
         $secure = (bool) config('services.idp.cookie_secure', true);
         $sameSite = $this->normalizeCookieSameSite();
 
-        $accessCookieName = trim((string) config('services.idp.access_cookie_name', 'ocms_access_token'));
+        $accessCookieName = trim((string) config('services.idp.access_cookie_name', 'access_token'));
         if ($accessCookieName !== '' && $accessToken !== null && $accessToken !== '') {
             $response->cookie(
                 $accessCookieName,
@@ -142,7 +142,7 @@ class LoginController extends Controller
             );
         }
 
-        $refreshCookieName = trim((string) config('services.idp.refresh_cookie_name', 'ocms_refresh_token'));
+        $refreshCookieName = trim((string) config('services.idp.refresh_cookie_name', 'refresh_token'));
         if ($refreshCookieName !== '' && $refreshToken !== null && $refreshToken !== '') {
             $response->cookie(
                 $refreshCookieName,
@@ -676,28 +676,8 @@ class LoginController extends Controller
         $request->session()->flash('show_terms_modal', true);
         $this->recordAuthEvent($request, 'Login', 'User logged in successfully via IDP authorization code flow.', $user);
 
-<<<<<<< Updated upstream
-        /** @var \App\Models\User $authenticatedUser */
-        $authenticatedUser = Auth::user();
-        $originalRole = strtolower((string) ($authenticatedUser->user_role ?? ''));
-        $normalizedRole = User::normalizeRole($authenticatedUser->user_role);
-
-        if ($normalizedRole !== $originalRole) {
-            $authenticatedUser->user_role = $normalizedRole;
-            $authenticatedUser->save();
-        }
-
-        if ($normalizedRole === User::ROLE_SUPER_ADMIN) {
-            return redirect('/admin/dashboard');
-        }
-        if ($normalizedRole === User::ROLE_STUDENT_ASSISTANT) {
-            return redirect('/assistant/dashboard');
-        }
-        return redirect('/student/home');
-=======
         $redirectResponse = redirect($this->redirectPathByRole($user->user_role));
         return $this->attachIdpCookies($redirectResponse, $accessToken, $refreshToken);
->>>>>>> Stashed changes
     }
 
     public function logout(Request $request)

@@ -43,7 +43,7 @@ return [
         'redirect_uri' => env('IDP_REDIRECT_URI'),
         'authorize_path' => env('IDP_AUTHORIZE_PATH', '/auth/authorize'),
         'token_path' => env('IDP_TOKEN_PATH', '/auth/token'),
-        'profile_paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('IDP_PROFILE_PATHS', '/auth/me,/userinfo'))))),
+        'profile_paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('IDP_PROFILE_PATHS', '/me,/auth/me,/userinfo'))))),
         'validate_token_path' => env('IDP_VALIDATE_TOKEN_PATH', '/api/validate-token'),
         'role_prefix' => env('IDP_ROLE_PREFIX', 'OCMS:'),
         'access_cookie_name' => env('IDP_ACCESS_COOKIE_NAME', 'access_token'),

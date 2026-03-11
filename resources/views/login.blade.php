@@ -282,106 +282,117 @@
             </div>
         @endif
 
-        <form id="loginForm" action="{{ url('/login-action') }}" method="POST">
-            @csrf
-            <div class="form-group">
-                <label>EMAIL ADDRESS</label>
-                <input type="email" name="email" value="{{ old('email') }}" placeholder="" required>
+        @if(config('services.idp.enabled'))
+            <a href="{{ route('login') }}" class="btn-submit" style="display:block; text-decoration:none; text-align:center;">
+                Continue with Identity Provider
+            </a>
+            <p style="margin-top: 12px; font-size: 12px;">
+                Centralized sign-in is enabled for this system.
+            </p>
+        @else
+            <form id="loginForm" action="{{ url('/login-action') }}" method="POST">
+                @csrf
+                <div class="form-group">
+                    <label>EMAIL ADDRESS</label>
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="" required>
+                </div>
+
+                <div class="form-group">
+                    <label>PASSWORD</label>
+                    <input type="password" name="password" placeholder="" required>
+                </div>
+
+                <button id="loginSubmitBtn" type="submit" class="btn-submit">Login to Portal</button>
+            </form>
+
+            <div class="switch-form">
+                Don't have an account? <span onclick="openModal('registerModal')">Create Account</span>
             </div>
-
-            <div class="form-group">
-                <label>PASSWORD</label>
-                <input type="password" name="password" placeholder="" required>
-            </div>
-
-            <button id="loginSubmitBtn" type="submit" class="btn-submit">Login to Portal</button>
-        </form>
-
-        <div class="switch-form">
-            Don't have an account? <span onclick="openModal('registerModal')">Create Account</span>
-        </div>
+        @endif
     </div>
   </main>
 
-  <div id="registerModal" class="modal-overlay">
-      <div class="modal-content">
-          <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
-          <h2 style="color: var(--accent); font-weight: 800; margin-bottom: 5px;">Student Registration</h2>
-          <p style="color: var(--text-light); margin-bottom: 25px; font-size: 14px;">Please fill out the form to create your medical profile.</p>
-          
-          <form action="{{ url('/register-action') }}" method="POST">
-              @csrf
-              <div class="form-row">
-                  <div class="form-group">
-                      <label>FIRST NAME</label>
-                      <input type="text" name="first_name" required>
-                  </div>
-                  <div class="form-group">
-                      <label>LAST NAME</label>
-                      <input type="text" name="last_name" required>
-                  </div>
-              </div>
-
-              <div class="form-row">
-                  <div class="form-group">
-                      <label>STUDENT ID</label>
-                      <input type="text" name="student_id" placeholder="202X-XXXXX-TG-0" required>
-                  </div>
-                  <div class="form-group">
-                      <label>DATE OF BIRTH</label>
-                      <input type="date" name="DOB" required>
-                  </div>
-              </div>
-
-              <div class="form-group">
-                  <label>EMAIL ADDRESS</label>
-                  <input type="email" name="email" required>
-              </div>
-
-              <div class="form-row">
-                  <div class="form-group">
-                      <label>COURSE</label>
-                      <select name="course" required>
-                        <option value="BSBAHRM">Bachelor of Science in Business Administration - Human Resourse Management</option>
-                        <option value="BSBAMM">Bachelor of Science in Business Administration - Marketing Management</option>
-                        <option value="BSED-English">Bachelor of Science in Education - English</option>
-                        <option value="BSED-Math">Bachelor of Science in Education - Mathematics</option>
-                        <option value="BSECE">Bachelor of Science in Electronic Engineering</option>
-                        <option value="BSEME">Bachelor of Science in Mechanical Mathematics</option>
-                        <option value="BSIT">Bachelor of Science in Information Technology</option>
-                        <option value="BSOA">Bachelor of Science in Office Administration</option>
-                        <option value="BSPSYCH">Bachelor of Science in Psychology</option>
-                        <option value="DIT">Diploma in Information Technology</option>
-                        <option value="DOMT">Diploma in Office Management and Technology</option>
-                        <option value="FACULTY">Faculty</option>
-                    
-                          
-                      </select>
-                  </div>
-                  <div class="form-group">
-                      <label>YEAR & SECTION</label>
-                      <div class="mini-form-row">
-                          <input type="text" name="year" placeholder="Year" required>
-                          <input type="text" name="section" placeholder="Sec" required>
+  @unless(config('services.idp.enabled'))
+      <div id="registerModal" class="modal-overlay">
+          <div class="modal-content">
+              <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
+              <h2 style="color: var(--accent); font-weight: 800; margin-bottom: 5px;">Student Registration</h2>
+              <p style="color: var(--text-light); margin-bottom: 25px; font-size: 14px;">Please fill out the form to create your medical profile.</p>
+              
+              <form action="{{ url('/register-action') }}" method="POST">
+                  @csrf
+                  <div class="form-row">
+                      <div class="form-group">
+                          <label>FIRST NAME</label>
+                          <input type="text" name="first_name" required>
+                      </div>
+                      <div class="form-group">
+                          <label>LAST NAME</label>
+                          <input type="text" name="last_name" required>
                       </div>
                   </div>
-              </div>
 
-              <div class="form-row">
-                  <div class="form-group">
-                      <label>PASSWORD</label>
-                      <input type="password" name="password" required>
+                  <div class="form-row">
+                      <div class="form-group">
+                          <label>STUDENT ID</label>
+                          <input type="text" name="student_id" placeholder="202X-XXXXX-TG-0" required>
+                      </div>
+                      <div class="form-group">
+                          <label>DATE OF BIRTH</label>
+                          <input type="date" name="DOB" required>
+                      </div>
                   </div>
-                  <div class="form-group">
-                      <label>CONFIRM PASSWORD</label>
-                      <input type="password" name="password_confirmation" required>
-                  </div>
-              </div>
 
-              <button type="submit" class="btn-submit">Register Account</button>
-          </form>
+                  <div class="form-group">
+                      <label>EMAIL ADDRESS</label>
+                      <input type="email" name="email" required>
+                  </div>
+
+                  <div class="form-row">
+                      <div class="form-group">
+                          <label>COURSE</label>
+                          <select name="course" required>
+                            <option value="BSBAHRM">Bachelor of Science in Business Administration - Human Resourse Management</option>
+                            <option value="BSBAMM">Bachelor of Science in Business Administration - Marketing Management</option>
+                            <option value="BSED-English">Bachelor of Science in Education - English</option>
+                            <option value="BSED-Math">Bachelor of Science in Education - Mathematics</option>
+                            <option value="BSECE">Bachelor of Science in Electronic Engineering</option>
+                            <option value="BSEME">Bachelor of Science in Mechanical Mathematics</option>
+                            <option value="BSIT">Bachelor of Science in Information Technology</option>
+                            <option value="BSOA">Bachelor of Science in Office Administration</option>
+                            <option value="BSPSYCH">Bachelor of Science in Psychology</option>
+                            <option value="DIT">Diploma in Information Technology</option>
+                            <option value="DOMT">Diploma in Office Management and Technology</option>
+                            <option value="FACULTY">Faculty</option>
+                        
+                              
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <label>YEAR & SECTION</label>
+                          <div class="mini-form-row">
+                              <input type="text" name="year" placeholder="Year" required>
+                              <input type="text" name="section" placeholder="Sec" required>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="form-row">
+                      <div class="form-group">
+                          <label>PASSWORD</label>
+                          <input type="password" name="password" required>
+                      </div>
+                      <div class="form-group">
+                          <label>CONFIRM PASSWORD</label>
+                          <input type="password" name="password_confirmation" required>
+                      </div>
+                  </div>
+
+                  <button type="submit" class="btn-submit">Register Account</button>
+              </form>
+          </div>
       </div>
-  </div>
+  @endunless
 
   <div id="loginLoadingOverlay" class="login-loading-overlay" aria-hidden="true">
       <div class="login-loading-card">

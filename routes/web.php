@@ -15,9 +15,10 @@ use Illuminate\Support\Facades\Route;
 
 // --- PUBLIC ROUTES (No login required) ---
 Route::get('/', function () {
-    return view('login');
+    return redirect()->route('login');
 });
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::get('/auth/callback', [LoginController::class, 'handleIdpCallback'])->name('auth.callback');
 Route::post('/login-action', [LoginController::class, 'login']);
 Route::post('/register-action', [RegisterController::class, 'register']);
 

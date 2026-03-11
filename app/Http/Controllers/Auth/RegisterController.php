@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Auth;
 class RegisterController extends Controller
 {
     public function register(Request $request) {
+    if ((bool) config('services.idp.enabled', false)) {
+        abort(403, 'Local registration is disabled while centralized login is enabled.');
+    }
+
     $request->validate([
         'first_name' => 'required|string|max:255',
         'last_name'  => 'required|string|max:255',

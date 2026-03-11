@@ -35,4 +35,24 @@ return [
         'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
     ],
 
+    'idp' => [
+        'enabled' => (bool) env('IDP_ENABLED', false),
+        'base_url' => rtrim((string) env('IDP_BASE_URL', ''), '/'),
+        'client_id' => env('IDP_CLIENT_ID'),
+        'client_secret' => env('IDP_CLIENT_SECRET'),
+        'redirect_uri' => env('IDP_REDIRECT_URI'),
+        'authorize_path' => env('IDP_AUTHORIZE_PATH', '/auth/authorize'),
+        'token_path' => env('IDP_TOKEN_PATH', '/auth/token'),
+        'profile_paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('IDP_PROFILE_PATHS', '/auth/me,/userinfo'))))),
+        'validate_token_path' => env('IDP_VALIDATE_TOKEN_PATH', '/api/validate-token'),
+        'role_prefix' => env('IDP_ROLE_PREFIX', 'OCMS:'),
+        'access_cookie_name' => env('IDP_ACCESS_COOKIE_NAME', 'access_token'),
+        'refresh_cookie_name' => env('IDP_REFRESH_COOKIE_NAME', 'refresh_token'),
+        'access_cookie_minutes' => (int) env('IDP_ACCESS_COOKIE_MINUTES', 60),
+        'refresh_cookie_minutes' => (int) env('IDP_REFRESH_COOKIE_MINUTES', 10080),
+        'cookie_secure' => (bool) env('IDP_COOKIE_SECURE', true),
+        'cookie_same_site' => env('IDP_COOKIE_SAME_SITE', 'Lax'),
+        'logout_url' => env('IDP_LOGOUT_URL'),
+    ],
+
 ];

@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\User;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -49,37 +53,630 @@ class LoginController extends Controller
         ]);
     }
 
-    public function login(Request $request) 
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    private function useIdpAuth(): bool
+    {
+        return (bool) config('services.idp.enabled', false);
+    }
 
+    private function redirectPathByRole(string $role): string
+    {
+        $normalizedRole = User::normalizeRole($role);
 
-    $user = \App\Models\User::where('email', $request->email)->first();
+        if ($normalizedRole === User::ROLE_SUPERADMIN) {
+            return '/admin/dashboard';
+        }
 
-    if (!$user) {
+        if ($normalizedRole === User::ROLE_ADMIN) {
+            return '/assistant/dashboard';
+        }
+
+        return '/student/home';
+    }
+
+    private function idpUrl(string $path): ?string
+    {
+        $baseUrl = trim((string) config('services.idp.base_url', ''));
+        if ($baseUrl === '') {
+            return null;
+        }
+
+        if (Str::startsWith($path, ['http://', 'https://'])) {
+            return $path;
+        }
+
+        return rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
+    }
+
+    private function buildAuthorizeUrl(): ?string
+    {
+        $clientId = trim((string) config('services.idp.client_id', ''));
+        if ($clientId === '') {
+            return null;
+        }
+
+        $authorizePath = trim((string) config('services.idp.authorize_path', '/auth/authorize'));
+        $authorizeUrl = $this->idpUrl($authorizePath);
+        if ($authorizeUrl === null) {
+            return null;
+        }
+
+        $query = [
+            'client_id' => $clientId,
+        ];
+
+        $redirectUri = trim((string) config('services.idp.redirect_uri', ''));
+        if ($redirectUri !== '') {
+            $query['redirect_uri'] = $redirectUri;
+        }
+
+        return $authorizeUrl . '?' . http_build_query($query);
+    }
+
+    private function normalizeCookieSameSite(): string
+    {
+        $sameSite = strtolower(trim((string) config('services.idp.cookie_same_site', 'lax')));
+        if (!in_array($sameSite, ['lax', 'strict', 'none'], true)) {
+            return 'lax';
+        }
+
+        return $sameSite;
+    }
+
+    private function attachIdpCookies(RedirectResponse $response, ?string $accessToken, ?string $refreshToken): RedirectResponse
+    {
+        $secure = (bool) config('services.idp.cookie_secure', true);
+        $sameSite = $this->normalizeCookieSameSite();
+
+        $accessCookieName = trim((string) config('services.idp.access_cookie_name', 'ocms_access_token'));
+        if ($accessCookieName !== '' && $accessToken !== null && $accessToken !== '') {
+            $response->cookie(
+                $accessCookieName,
+                $accessToken,
+                (int) config('services.idp.access_cookie_minutes', 60),
+                '/',
+                null,
+                $secure,
+                true,
+                false,
+                $sameSite
+            );
+        }
+
+        $refreshCookieName = trim((string) config('services.idp.refresh_cookie_name', 'ocms_refresh_token'));
+        if ($refreshCookieName !== '' && $refreshToken !== null && $refreshToken !== '') {
+            $response->cookie(
+                $refreshCookieName,
+                $refreshToken,
+                (int) config('services.idp.refresh_cookie_minutes', 10080),
+                '/',
+                null,
+                $secure,
+                true,
+                false,
+                $sameSite
+            );
+        }
+
+        return $response;
+    }
+
+    private function clearIdpCookies(RedirectResponse $response): RedirectResponse
+    {
+        $secure = (bool) config('services.idp.cookie_secure', true);
+        $sameSite = $this->normalizeCookieSameSite();
+
+        foreach (['access_cookie_name', 'refresh_cookie_name'] as $cookieKey) {
+            $cookieName = trim((string) config('services.idp.' . $cookieKey, ''));
+            if ($cookieName === '') {
+                continue;
+            }
+
+            $response->cookie(
+                $cookieName,
+                '',
+                -60,
+                '/',
+                null,
+                $secure,
+                true,
+                false,
+                $sameSite
+            );
+        }
+
+        return $response;
+    }
+
+    private function exchangeCodeForTokens(string $code): ?array
+    {
+        $tokenPath = trim((string) config('services.idp.token_path', '/auth/token'));
+        $tokenUrl = $this->idpUrl($tokenPath);
+        if ($tokenUrl === null) {
+            return null;
+        }
+
+        $payload = [
+            'client_id' => trim((string) config('services.idp.client_id', '')),
+            'client_secret' => trim((string) config('services.idp.client_secret', '')),
+            'code' => $code,
+        ];
+
+        $redirectUri = trim((string) config('services.idp.redirect_uri', ''));
+        if ($redirectUri !== '') {
+            $payload['redirect_uri'] = $redirectUri;
+        }
+
+        if ($payload['client_id'] === '' || $payload['client_secret'] === '') {
+            return null;
+        }
+
+        $formResponse = Http::acceptJson()->timeout(20)->asForm()->post($tokenUrl, $payload);
+        if ($formResponse->successful() && is_array($formResponse->json())) {
+            return $formResponse->json();
+        }
+
+        $jsonResponse = Http::acceptJson()->timeout(20)->post($tokenUrl, $payload);
+        if ($jsonResponse->successful() && is_array($jsonResponse->json())) {
+            return $jsonResponse->json();
+        }
+
+        return null;
+    }
+
+    private function hasIdentityFields(array $payload): bool
+    {
+        foreach (['email', 'role', 'roles', 'user_role', 'student_number', 'student_id', 'name', 'first_name', 'last_name', 'user_id', 'id'] as $key) {
+            $value = data_get($payload, $key);
+            if (is_string($value) && trim($value) !== '') {
+                return true;
+            }
+
+            if (is_numeric($value)) {
+                return true;
+            }
+
+            if (is_array($value) && !empty($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function extractProfilePayload(array $payload): ?array
+    {
+        $candidates = [
+            data_get($payload, 'user'),
+            data_get($payload, 'profile'),
+            data_get($payload, 'data.user'),
+            data_get($payload, 'data.profile'),
+            data_get($payload, 'data'),
+            $payload,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+
+            if ($this->hasIdentityFields($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private function fetchProfileFromIdp(string $accessToken): ?array
+    {
+        $profilePaths = (array) config('services.idp.profile_paths', []);
+        $validateTokenPath = trim((string) config('services.idp.validate_token_path', ''));
+
+        foreach ($profilePaths as $path) {
+            $path = trim((string) $path);
+            if ($path === '') {
+                continue;
+            }
+
+            $url = $this->idpUrl($path);
+            if ($url === null) {
+                continue;
+            }
+
+            $response = Http::acceptJson()->timeout(20)->withToken($accessToken)->get($url);
+            if (!$response->successful() || !is_array($response->json())) {
+                continue;
+            }
+
+            $profile = $this->extractProfilePayload($response->json());
+            if ($profile !== null) {
+                return $profile;
+            }
+        }
+
+        if ($validateTokenPath !== '') {
+            $validateUrl = $this->idpUrl($validateTokenPath);
+            if ($validateUrl !== null) {
+                $response = Http::acceptJson()->timeout(20)->post($validateUrl, [
+                    'token' => $accessToken,
+                ]);
+
+                if ($response->successful() && is_array($response->json())) {
+                    $profile = $this->extractProfilePayload($response->json());
+                    if ($profile !== null) {
+                        return $profile;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function extractRawRoles(array $profile): array
+    {
+        $sources = [
+            data_get($profile, 'role'),
+            data_get($profile, 'user_role'),
+            data_get($profile, 'roles'),
+            data_get($profile, 'authorities'),
+            data_get($profile, 'permissions'),
+            data_get($profile, 'data.role'),
+            data_get($profile, 'data.roles'),
+        ];
+
+        $roles = [];
+        foreach ($sources as $source) {
+            if (is_string($source)) {
+                foreach (explode(',', $source) as $role) {
+                    $trimmed = trim($role);
+                    if ($trimmed !== '') {
+                        $roles[] = $trimmed;
+                    }
+                }
+                continue;
+            }
+
+            if (is_array($source)) {
+                foreach ($source as $role) {
+                    if (is_string($role) && trim($role) !== '') {
+                        $roles[] = trim($role);
+                    }
+                }
+            }
+        }
+
+        return array_values(array_unique($roles));
+    }
+
+    private function mapIdpRolesToLocal(array $roles): string
+    {
+        $normalizedRoles = [];
+        $rolePrefix = strtolower(trim((string) config('services.idp.role_prefix', 'OCMS:')));
+        if ($rolePrefix !== '' && !Str::endsWith($rolePrefix, ':')) {
+            $rolePrefix .= ':';
+        }
+
+        foreach ($roles as $role) {
+            $normalized = strtolower(trim((string) $role));
+            if ($normalized === '') {
+                continue;
+            }
+
+            $normalizedRoles[] = $normalized;
+
+            if ($rolePrefix !== '' && Str::startsWith($normalized, $rolePrefix)) {
+                $normalizedRoles[] = substr($normalized, strlen($rolePrefix));
+            }
+
+            if (Str::startsWith($normalized, 'ocms:')) {
+                $normalizedRoles[] = substr($normalized, 5);
+            }
+        }
+
+        $normalizedRoles = array_values(array_unique(array_filter($normalizedRoles)));
+
+        if (in_array('superadmin', $normalizedRoles, true) || in_array('super_admin', $normalizedRoles, true)) {
+            return User::ROLE_SUPERADMIN;
+        }
+
+        if (in_array('admin', $normalizedRoles, true)) {
+            return User::ROLE_ADMIN;
+        }
+
+        return User::ROLE_STUDENT;
+    }
+
+    private function firstNonEmptyScalar(array $payload, array $keys): ?string
+    {
+        foreach ($keys as $key) {
+            $value = data_get($payload, $key);
+            if (is_string($value) && trim($value) !== '') {
+                return trim($value);
+            }
+
+            if (is_numeric($value)) {
+                return (string) $value;
+            }
+        }
+
+        return null;
+    }
+
+    private function splitName(string $fullName): array
+    {
+        $clean = trim(preg_replace('/\s+/', ' ', $fullName));
+        if ($clean === '') {
+            return ['IDP', 'User', 'IDP User'];
+        }
+
+        $parts = explode(' ', $clean);
+        if (count($parts) === 1) {
+            return [$parts[0], 'User', trim($parts[0] . ' User')];
+        }
+
+        $firstName = array_shift($parts);
+        $lastName = implode(' ', $parts);
+
+        return [$firstName, $lastName, trim($firstName . ' ' . $lastName)];
+    }
+
+    private function normalizeStudentIdSeed(?string $seed): string
+    {
+        $value = trim((string) $seed);
+        if ($value === '') {
+            return 'idp-' . Str::lower(Str::random(10));
+        }
+
+        $value = preg_replace('/\s+/', '-', $value);
+        $value = preg_replace('/[^A-Za-z0-9\-_]/', '', $value);
+
+        if ($value === '') {
+            return 'idp-' . Str::lower(Str::random(10));
+        }
+
+        return $value;
+    }
+
+    private function resolveUniqueStudentId(string $seed, ?int $ignoreUserId = null): string
+    {
+        $base = $this->normalizeStudentIdSeed($seed);
+        $candidate = $base;
+        $counter = 1;
+
+        while (User::query()
+            ->where('student_id', $candidate)
+            ->when($ignoreUserId !== null, fn ($query) => $query->where('id', '!=', $ignoreUserId))
+            ->exists()) {
+            $candidate = $base . '-' . $counter;
+            $counter++;
+        }
+
+        return $candidate;
+    }
+
+    private function resolveUniqueEmail(string $seed, ?int $ignoreUserId = null): string
+    {
+        $email = strtolower(trim($seed));
+        if ($email === '' || !str_contains($email, '@')) {
+            $email = 'idp-' . Str::lower(Str::random(12)) . '@idp.local';
+        }
+
+        $localPart = Str::before($email, '@');
+        $domain = Str::after($email, '@');
+        if ($domain === '') {
+            $domain = 'idp.local';
+        }
+
+        $candidate = $localPart . '@' . $domain;
+        $counter = 1;
+
+        while (User::query()
+            ->where('email', $candidate)
+            ->when($ignoreUserId !== null, fn ($query) => $query->where('id', '!=', $ignoreUserId))
+            ->exists()) {
+            $candidate = $localPart . '+' . $counter . '@' . $domain;
+            $counter++;
+        }
+
+        return $candidate;
+    }
+
+    private function upsertLocalUserFromIdpProfile(array $profile): User
+    {
+        $emailSeed = $this->firstNonEmptyScalar($profile, ['email', 'mail', 'username', 'user.email']) ?? '';
+        $studentIdSeed = $this->firstNonEmptyScalar($profile, ['student_number', 'student_id', 'studentNo', 'user_id', 'id']) ?? '';
+        $firstName = $this->firstNonEmptyScalar($profile, ['first_name', 'firstname', 'given_name']) ?? '';
+        $lastName = $this->firstNonEmptyScalar($profile, ['last_name', 'lastname', 'family_name']) ?? '';
+        $displayName = $this->firstNonEmptyScalar($profile, ['name', 'full_name', 'display_name']) ?? '';
+
+        if ($displayName === '' && ($firstName !== '' || $lastName !== '')) {
+            $displayName = trim($firstName . ' ' . $lastName);
+        }
+
+        if ($displayName === '' && $emailSeed !== '' && str_contains($emailSeed, '@')) {
+            $displayName = Str::title(str_replace(['.', '_', '-'], ' ', (string) Str::before($emailSeed, '@')));
+        }
+
+        [$splitFirstName, $splitLastName, $fullName] = $this->splitName($displayName);
+        $firstName = $firstName !== '' ? $firstName : $splitFirstName;
+        $lastName = $lastName !== '' ? $lastName : $splitLastName;
+
+        $role = $this->mapIdpRolesToLocal($this->extractRawRoles($profile));
+
+        $normalizedEmailSeed = trim(strtolower($emailSeed));
+        $existingUser = null;
+
+        if ($normalizedEmailSeed !== '' && str_contains($normalizedEmailSeed, '@')) {
+            $existingUser = User::query()->where('email', $normalizedEmailSeed)->first();
+        }
+
+        if (!$existingUser && $studentIdSeed !== '') {
+            $existingUser = User::query()->where('student_id', $studentIdSeed)->first();
+        }
+
+        if ($existingUser) {
+            $existingUser->email = $this->resolveUniqueEmail(
+                $normalizedEmailSeed !== '' ? $normalizedEmailSeed : (string) $existingUser->email,
+                (int) $existingUser->id
+            );
+            $existingUser->first_name = $firstName !== '' ? $firstName : ($existingUser->first_name ?: 'IDP');
+            $existingUser->last_name = $lastName !== '' ? $lastName : ($existingUser->last_name ?: 'User');
+            $existingUser->name = trim($fullName !== '' ? $fullName : ($existingUser->first_name . ' ' . $existingUser->last_name));
+            $existingUser->user_role = $role;
+
+            $shouldUpdateStudentId = trim((string) $existingUser->student_id) === '' || Str::startsWith(strtolower((string) $existingUser->student_id), 'idp-');
+            if ($studentIdSeed !== '' && $shouldUpdateStudentId) {
+                $existingUser->student_id = $this->resolveUniqueStudentId($studentIdSeed, (int) $existingUser->id);
+            } elseif (trim((string) $existingUser->student_id) === '') {
+                $existingUser->student_id = $this->resolveUniqueStudentId('idp-' . $existingUser->id, (int) $existingUser->id);
+            }
+
+            if (trim((string) $existingUser->password) === '') {
+                $existingUser->password = Hash::make(Str::random(40));
+            }
+
+            if (empty($existingUser->user_type)) {
+                $existingUser->user_type = $role === User::ROLE_STUDENT ? 'Regular' : 'Assistant';
+            }
+
+            $existingUser->save();
+            return $existingUser;
+        }
+
+        $studentId = $this->resolveUniqueStudentId($studentIdSeed !== '' ? $studentIdSeed : ('idp-' . Str::lower(Str::random(10))));
+        $email = $this->resolveUniqueEmail(
+            $normalizedEmailSeed !== '' ? $normalizedEmailSeed : ($studentId . '@idp.local')
+        );
+
+        $user = User::create([
+            'student_id' => $studentId,
+            'first_name' => $firstName !== '' ? $firstName : 'IDP',
+            'last_name' => $lastName !== '' ? $lastName : 'User',
+            'name' => $fullName !== '' ? $fullName : trim(($firstName ?: 'IDP') . ' ' . ($lastName ?: 'User')),
+            'email' => $email,
+            'user_role' => $role,
+            'password' => Hash::make(Str::random(40)),
+        ]);
+
+        if (empty($user->user_type)) {
+            $user->user_type = $role === User::ROLE_STUDENT ? 'Regular' : 'Assistant';
+            $user->save();
+        }
+
+        return $user;
+    }
+
+    public function login(Request $request)
+    {
+        if ($this->useIdpAuth()) {
+            return redirect('/login?idp_error=1')->withErrors([
+                'idp' => 'Centralized login is enabled. Use the identity provider sign-in flow.',
+            ]);
+        }
+
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            $this->recordAuthEvent(
+                $request,
+                'Login Failed',
+                'Login attempt failed because email is not registered.',
+                null,
+                404,
+                'error'
+            );
+
+            return back()->withErrors([
+                'email' => 'This email is not registered in our system.',
+            ])->withInput();
+        }
+
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $request->session()->regenerate();
+            $request->session()->flash('show_terms_modal', true);
+            $this->recordAuthEvent($request, 'Login', 'User logged in successfully.');
+
+            /** @var \App\Models\User $authenticatedUser */
+            $authenticatedUser = Auth::user();
+            $normalizedRole = User::normalizeRole($authenticatedUser->user_role);
+
+            if ($normalizedRole !== strtolower((string) ($authenticatedUser->user_role ?? ''))) {
+                $authenticatedUser->user_role = $normalizedRole;
+                $authenticatedUser->save();
+            }
+
+            return redirect($this->redirectPathByRole($normalizedRole));
+        }
+
         $this->recordAuthEvent(
             $request,
             'Login Failed',
-            'Login attempt failed because email is not registered.',
-            null,
-            404,
+            'Login attempt failed because password is incorrect.',
+            $user,
+            401,
             'error'
         );
 
         return back()->withErrors([
-            'email' => 'This email is not registered in our system.',
+            'password' => 'Incorrect password. Please try again.',
         ])->withInput();
     }
 
-  
-    if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+    public function handleIdpCallback(Request $request): RedirectResponse
+    {
+        if (!$this->useIdpAuth()) {
+            return redirect('/login');
+        }
+
+        $code = trim((string) $request->query('code', ''));
+        if ($code === '') {
+            return redirect('/login?idp_error=1')->withErrors([
+                'idp' => 'Missing authorization code from the identity provider.',
+            ]);
+        }
+
+        $tokenPayload = $this->exchangeCodeForTokens($code);
+        if ($tokenPayload === null) {
+            return redirect('/login?idp_error=1')->withErrors([
+                'idp' => 'Token exchange failed. Please try signing in again.',
+            ]);
+        }
+
+        $accessToken = trim((string) ($tokenPayload['access_token'] ?? ''));
+        $refreshToken = trim((string) ($tokenPayload['refresh_token'] ?? ''));
+        if ($accessToken === '') {
+            return redirect('/login?idp_error=1')->withErrors([
+                'idp' => 'Identity provider did not return an access token.',
+            ]);
+        }
+
+        $profile = $this->extractProfilePayload($tokenPayload);
+        if ($profile === null) {
+            $profile = $this->fetchProfileFromIdp($accessToken);
+        }
+
+        if ($profile === null) {
+            return redirect('/login?idp_error=1')->withErrors([
+                'idp' => 'Unable to retrieve your profile from the identity provider.',
+            ]);
+        }
+
+        $user = $this->upsertLocalUserFromIdpProfile($profile);
+        $user->user_role = User::normalizeRole($user->user_role);
+        $user->save();
+
+        Auth::login($user);
         $request->session()->regenerate();
         $request->session()->flash('show_terms_modal', true);
-        $this->recordAuthEvent($request, 'Login', 'User logged in successfully.');
+        $this->recordAuthEvent($request, 'Login', 'User logged in successfully via IDP authorization code flow.', $user);
 
+<<<<<<< Updated upstream
         /** @var \App\Models\User $authenticatedUser */
         $authenticatedUser = Auth::user();
         $originalRole = strtolower((string) ($authenticatedUser->user_role ?? ''));
@@ -97,38 +694,49 @@ class LoginController extends Controller
             return redirect('/assistant/dashboard');
         }
         return redirect('/student/home');
+=======
+        $redirectResponse = redirect($this->redirectPathByRole($user->user_role));
+        return $this->attachIdpCookies($redirectResponse, $accessToken, $refreshToken);
+>>>>>>> Stashed changes
     }
 
-    $this->recordAuthEvent(
-        $request,
-        'Login Failed',
-        'Login attempt failed because password is incorrect.',
-        $user,
-        401,
-        'error'
-    );
+    public function logout(Request $request)
+    {
+        if (Auth::check()) {
+            $this->recordAuthEvent($request, 'Logout', 'User logged out from the system.');
+        }
 
-    return back()->withErrors([
-        'password' => 'Incorrect password. Please try again.',
-    ])->withInput();
-}
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-public function logout(Request $request)
-{
-    if (Auth::check()) {
-        $this->recordAuthEvent($request, 'Logout', 'User logged out from the system.');
+        $logoutUrl = trim((string) config('services.idp.logout_url', ''));
+        $response = $logoutUrl !== '' ? redirect()->away($logoutUrl) : redirect('/login');
+
+        return $this->clearIdpCookies($response);
     }
 
-    Auth::logout();
+    public function showLoginForm(Request $request)
+    {
+        if (Auth::check()) {
+            return redirect($this->redirectPathByRole((string) optional(Auth::user())->user_role));
+        }
 
-    $request->session()->invalidate(); 
-    $request->session()->regenerateToken(); 
+        if ($this->useIdpAuth()) {
+            if ($request->boolean('idp_error')) {
+                return view('login');
+            }
 
-    return redirect('/login'); 
-}
-public function showLoginForm()
-{
+            $authorizeUrl = $this->buildAuthorizeUrl();
+            if ($authorizeUrl === null) {
+                return view('login')->withErrors([
+                    'idp' => 'Identity provider login is enabled but not configured.',
+                ]);
+            }
 
-    return view('login'); 
-}
+            return redirect()->away($authorizeUrl);
+        }
+
+        return view('login');
+    }
 }

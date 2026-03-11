@@ -14,6 +14,41 @@ use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
+    private function studentRoleValue(): string
+    {
+        if (defined(User::class . '::ROLE_STUDENT')) {
+            return (string) constant(User::class . '::ROLE_STUDENT');
+        }
+
+        return 'student';
+    }
+
+    private function adminRoleValue(): string
+    {
+        if (defined(User::class . '::ROLE_ADMIN')) {
+            return (string) constant(User::class . '::ROLE_ADMIN');
+        }
+
+        if (defined(User::class . '::ROLE_STUDENT_ASSISTANT')) {
+            return (string) constant(User::class . '::ROLE_STUDENT_ASSISTANT');
+        }
+
+        return 'admin';
+    }
+
+    private function superAdminRoleValue(): string
+    {
+        if (defined(User::class . '::ROLE_SUPERADMIN')) {
+            return (string) constant(User::class . '::ROLE_SUPERADMIN');
+        }
+
+        if (defined(User::class . '::ROLE_SUPER_ADMIN')) {
+            return (string) constant(User::class . '::ROLE_SUPER_ADMIN');
+        }
+
+        return 'superadmin';
+    }
+
     private function recordAuthEvent(
         Request $request,
         string $action,
@@ -62,11 +97,11 @@ class LoginController extends Controller
     {
         $normalizedRole = User::normalizeRole($role);
 
-        if ($normalizedRole === User::ROLE_SUPERADMIN) {
+        if ($normalizedRole === User::normalizeRole($this->superAdminRoleValue())) {
             return '/admin/dashboard';
         }
 
-        if ($normalizedRole === User::ROLE_ADMIN) {
+        if ($normalizedRole === User::normalizeRole($this->adminRoleValue())) {
             return '/assistant/dashboard';
         }
 
@@ -377,14 +412,14 @@ class LoginController extends Controller
         $normalizedRoles = array_values(array_unique(array_filter($normalizedRoles)));
 
         if (in_array('superadmin', $normalizedRoles, true) || in_array('super_admin', $normalizedRoles, true)) {
-            return User::ROLE_SUPERADMIN;
+            return $this->superAdminRoleValue();
         }
 
         if (in_array('admin', $normalizedRoles, true)) {
-            return User::ROLE_ADMIN;
+            return $this->adminRoleValue();
         }
 
-        return User::ROLE_STUDENT;
+        return $this->studentRoleValue();
     }
 
     private function firstNonEmptyScalar(array $payload, array $keys): ?string
@@ -537,7 +572,7 @@ class LoginController extends Controller
             }
 
             if (empty($existingUser->user_type)) {
-                $existingUser->user_type = $role === User::ROLE_STUDENT ? 'Regular' : 'Assistant';
+                $existingUser->user_type = User::normalizeRole($role) === User::normalizeRole($this->studentRoleValue()) ? 'Regular' : 'Assistant';
             }
 
             $existingUser->save();
@@ -560,7 +595,7 @@ class LoginController extends Controller
         ]);
 
         if (empty($user->user_type)) {
-            $user->user_type = $role === User::ROLE_STUDENT ? 'Regular' : 'Assistant';
+            $user->user_type = User::normalizeRole($role) === User::normalizeRole($this->studentRoleValue()) ? 'Regular' : 'Assistant';
             $user->save();
         }
 

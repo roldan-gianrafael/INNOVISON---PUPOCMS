@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class LoginController extends Controller
@@ -248,8 +249,14 @@ class LoginController extends Controller
         ];
 
         $redirectUri = trim((string) config('services.idp.redirect_uri', ''));
-        if ($redirectUri !== '') {
+        $includeRedirectUri = (bool) config('services.idp.token_include_redirect_uri', false);
+        if ($includeRedirectUri && $redirectUri !== '') {
             $payload['redirect_uri'] = $redirectUri;
+        }
+
+        $grantType = trim((string) config('services.idp.token_grant_type', ''));
+        if ($grantType !== '') {
+            $payload['grant_type'] = $grantType;
         }
 
         if ($payload['client_id'] === '' || $payload['client_secret'] === '') {
@@ -260,11 +267,21 @@ class LoginController extends Controller
         if ($formResponse->successful() && is_array($formResponse->json())) {
             return $formResponse->json();
         }
+        Log::warning('IDP token exchange failed (form request).', [
+            'token_url' => $tokenUrl,
+            'status' => $formResponse->status(),
+            'body' => Str::limit((string) $formResponse->body(), 1200),
+        ]);
 
         $jsonResponse = Http::acceptJson()->timeout(20)->post($tokenUrl, $payload);
         if ($jsonResponse->successful() && is_array($jsonResponse->json())) {
             return $jsonResponse->json();
         }
+        Log::warning('IDP token exchange failed (json request).', [
+            'token_url' => $tokenUrl,
+            'status' => $jsonResponse->status(),
+            'body' => Str::limit((string) $jsonResponse->body(), 1200),
+        ]);
 
         return null;
     }

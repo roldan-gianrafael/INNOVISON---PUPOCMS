@@ -20,9 +20,13 @@ class User extends Authenticatable
     {
         $normalizedRole = strtolower(trim((string) $role));
 
-        // Legacy role alias: "admin" now maps to super admin privileges.
-        if ($normalizedRole === 'admin') {
+        // Accept common role aliases from older data/IDP payloads.
+        if (in_array($normalizedRole, ['admin', 'superadmin'], true)) {
             return self::ROLE_SUPER_ADMIN;
+        }
+
+        if (in_array($normalizedRole, ['assistant', 'studentassistant'], true)) {
+            return self::ROLE_STUDENT_ASSISTANT;
         }
 
         return $normalizedRole;

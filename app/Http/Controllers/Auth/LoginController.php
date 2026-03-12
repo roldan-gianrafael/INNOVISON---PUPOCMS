@@ -365,9 +365,9 @@ class LoginController extends Controller
             data_get($profile, 'user_role'),
             data_get($profile, 'roles'),
             data_get($profile, 'authorities'),
-            data_get($profile, 'permissions'),
             data_get($profile, 'data.role'),
             data_get($profile, 'data.roles'),
+            data_get($profile, 'data.authorities'),
         ];
 
         $roles = [];
@@ -394,39 +394,130 @@ class LoginController extends Controller
         return array_values(array_unique($roles));
     }
 
-    private function mapIdpRolesToLocal(array $roles): string
+    private function configuredIdpRolePrefix(): string
     {
-        $normalizedRoles = [];
         $rolePrefix = strtolower(trim((string) config('services.idp.role_prefix', 'OCMS:')));
         if ($rolePrefix !== '' && !Str::endsWith($rolePrefix, ':')) {
             $rolePrefix .= ':';
         }
 
-        foreach ($roles as $role) {
-            $normalized = strtolower(trim((string) $role));
-            if ($normalized === '') {
-                continue;
-            }
+        return $rolePrefix;
+    }
 
-            $normalizedRoles[] = $normalized;
-
-            if ($rolePrefix !== '' && Str::startsWith($normalized, $rolePrefix)) {
-                $normalizedRoles[] = substr($normalized, strlen($rolePrefix));
-            }
-
-            if (Str::startsWith($normalized, 'ocms:')) {
-                $normalizedRoles[] = substr($normalized, 5);
-            }
+    private function parseIdpRoleToken(string $role): array
+    {
+        $normalized = strtolower(trim((string) $role));
+        if ($normalized === '') {
+            return ['', false];
         }
 
-        $normalizedRoles = array_values(array_unique(array_filter($normalizedRoles)));
+        $isScoped = false;
+        $rolePrefix = $this->configuredIdpRolePrefix();
+        if ($rolePrefix !== '' && Str::startsWith($normalized, $rolePrefix)) {
+            $normalized = substr($normalized, strlen($rolePrefix));
+            $isScoped = true;
+        } elseif (Str::startsWith($normalized, 'ocms:')) {
+            $normalized = substr($normalized, 5);
+            $isScoped = true;
+        }
+
+        return [trim($normalized), $isScoped];
+    }
+
+    private function normalizeIdpRoleToken(string $role): string
+    {
+        [$normalized] = $this->parseIdpRoleToken($role);
+        return $normalized;
+    }
+
+    private function mapSingleIdpRoleToLocal(string $role): ?string
+    {
+        $normalized = $this->normalizeIdpRoleToken($role);
+        if ($normalized === '') {
+            return null;
+        }
+
+        if (in_array($normalized, ['superadmin', 'super_admin'], true)) {
+            return $this->superAdminRoleValue();
+        }
+
+        if (in_array($normalized, ['admin', 'student_assistant', 'assistant', 'studentassistant'], true)) {
+            return $this->adminRoleValue();
+        }
+
+        if ($normalized === 'student') {
+            return $this->studentRoleValue();
+        }
+
+        return null;
+    }
+
+    private function resolveLocalRoleFromTokens(array $normalizedRoles): ?string
+    {
+        $normalizedRoles = array_values(array_unique(array_filter(array_map('trim', $normalizedRoles))));
+        if (empty($normalizedRoles)) {
+            return null;
+        }
+
+        $hasAdmin = count(array_intersect($normalizedRoles, ['admin', 'student_assistant', 'assistant', 'studentassistant'])) > 0;
+        if ($hasAdmin) {
+            return $this->adminRoleValue();
+        }
+
+        if (in_array('student', $normalizedRoles, true)) {
+            return $this->studentRoleValue();
+        }
 
         if (in_array('superadmin', $normalizedRoles, true) || in_array('super_admin', $normalizedRoles, true)) {
             return $this->superAdminRoleValue();
         }
 
-        if (in_array('admin', $normalizedRoles, true)) {
-            return $this->adminRoleValue();
+        return null;
+    }
+
+    private function mapIdpRolesToLocal(array $roles, ?string $preferredRole = null): string
+    {
+        $normalizedRoles = [];
+        $scopedRoles = [];
+
+        foreach ($roles as $role) {
+            [$normalized, $isScoped] = $this->parseIdpRoleToken((string) $role);
+            if ($normalized === '') {
+                continue;
+            }
+
+            $normalizedRoles[] = $normalized;
+            if ($isScoped) {
+                $scopedRoles[] = $normalized;
+            }
+        }
+
+        // Least-privilege: when OCMS-scoped roles are present, ignore unscoped/global roles.
+        $scopedMappedRole = $this->resolveLocalRoleFromTokens($scopedRoles);
+        if ($scopedMappedRole !== null) {
+            return $scopedMappedRole;
+        }
+
+        if ($preferredRole !== null) {
+            [, $preferredIsScoped] = $this->parseIdpRoleToken($preferredRole);
+            if ($preferredIsScoped) {
+                $preferredMappedRole = $this->mapSingleIdpRoleToLocal($preferredRole);
+                if ($preferredMappedRole !== null) {
+                    return $preferredMappedRole;
+                }
+            }
+        }
+
+        $mappedFromRoles = $this->resolveLocalRoleFromTokens($normalizedRoles);
+        if ($mappedFromRoles !== null) {
+            return $mappedFromRoles;
+        }
+
+        if ($preferredRole !== null) {
+            $preferredMappedRole = $this->mapSingleIdpRoleToLocal($preferredRole);
+            if ($preferredMappedRole !== null) {
+                return $preferredMappedRole;
+            }
         }
 
         return $this->studentRoleValue();
@@ -547,7 +638,15 @@ class LoginController extends Controller
         $firstName = $firstName !== '' ? $firstName : $splitFirstName;
         $lastName = $lastName !== '' ? $lastName : $splitLastName;
 
-        $role = $this->mapIdpRolesToLocal($this->extractRawRoles($profile));
+        $preferredRole = $this->firstNonEmptyScalar($profile, [
+            'role',
+            'user_role',
+            'primary_role',
+            'data.role',
+            'user.role',
+            'data.user.role',
+        ]);
+        $role = $this->mapIdpRolesToLocal($this->extractRawRoles($profile), $preferredRole);
 
         $normalizedEmailSeed = trim(strtolower($emailSeed));
         $existingUser = null;
@@ -701,9 +800,10 @@ class LoginController extends Controller
             ]);
         }
 
-        $profile = $this->extractProfilePayload($tokenPayload);
+        // Prefer profile fetched from IDP user-info endpoints over token payload fields.
+        $profile = $this->fetchProfileFromIdp($accessToken);
         if ($profile === null) {
-            $profile = $this->fetchProfileFromIdp($accessToken);
+            $profile = $this->extractProfilePayload($tokenPayload);
         }
 
         if ($profile === null) {

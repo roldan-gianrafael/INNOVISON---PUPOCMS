@@ -254,10 +254,11 @@ class LoginController extends Controller
             $payload['redirect_uri'] = $redirectUri;
         }
 
-        $grantType = trim((string) config('services.idp.token_grant_type', ''));
-        if ($grantType !== '') {
-            $payload['grant_type'] = $grantType;
+        $grantType = trim((string) config('services.idp.token_grant_type', 'authorization_code'));
+        if ($grantType === '') {
+            $grantType = 'authorization_code';
         }
+        $payload['grant_type'] = $grantType;
 
         if ($payload['client_id'] === '' || $payload['client_secret'] === '') {
             return null;
@@ -271,7 +272,30 @@ class LoginController extends Controller
             'token_url' => $tokenUrl,
             'status' => $formResponse->status(),
             'body' => Str::limit((string) $formResponse->body(), 1200),
+            'payload_flags' => [
+                'has_code' => isset($payload['code']) && $payload['code'] !== '',
+                'has_grant_type' => isset($payload['grant_type']) && $payload['grant_type'] !== '',
+                'has_redirect_uri' => isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '',
+            ],
         ]);
+
+        // Compatibility retry: some IDP setups require redirect_uri on token exchange even if
+        // authorize request omitted redirect_uri.
+        if (!isset($payload['redirect_uri']) && $redirectUri !== '') {
+            $retryPayload = $payload;
+            $retryPayload['redirect_uri'] = $redirectUri;
+
+            $retryFormResponse = Http::acceptJson()->timeout(20)->asForm()->post($tokenUrl, $retryPayload);
+            if ($retryFormResponse->successful() && is_array($retryFormResponse->json())) {
+                return $retryFormResponse->json();
+            }
+
+            Log::warning('IDP token exchange retry failed (form with redirect_uri).', [
+                'token_url' => $tokenUrl,
+                'status' => $retryFormResponse->status(),
+                'body' => Str::limit((string) $retryFormResponse->body(), 1200),
+            ]);
+        }
 
         $jsonResponse = Http::acceptJson()->timeout(20)->post($tokenUrl, $payload);
         if ($jsonResponse->successful() && is_array($jsonResponse->json())) {

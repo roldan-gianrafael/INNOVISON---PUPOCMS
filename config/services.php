@@ -47,7 +47,7 @@ return [
         'authorize_scope' => env('IDP_AUTHORIZE_SCOPE', ''),
         'token_path' => env('IDP_TOKEN_PATH', '/api/v1/auth/token'),
         'token_include_redirect_uri' => filter_var(env('IDP_TOKEN_INCLUDE_REDIRECT_URI', false), FILTER_VALIDATE_BOOL),
-        'token_grant_type' => env('IDP_TOKEN_GRANT_TYPE', ''),
+        'token_grant_type' => env('IDP_TOKEN_GRANT_TYPE', 'authorization_code'),
         'profile_paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('IDP_PROFILE_PATHS', '/me,/auth/me,/userinfo'))))),
         'validate_token_path' => env('IDP_VALIDATE_TOKEN_PATH', '/api/validate-token'),
         'role_prefix' => env('IDP_ROLE_PREFIX', 'OCMS:'),

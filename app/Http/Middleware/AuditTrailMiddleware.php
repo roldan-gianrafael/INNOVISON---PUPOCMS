@@ -185,7 +185,7 @@ class AuditTrailMiddleware
         } elseif (str_contains($source, 'report')) {
             $subjectType = 'report';
         } elseif (str_contains($source, 'student-assistant')) {
-            $subjectType = 'student_assistant';
+            $subjectType = 'admin';
         }
 
         return [$subjectType, $subjectId];

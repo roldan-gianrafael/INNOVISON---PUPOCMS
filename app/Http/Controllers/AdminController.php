@@ -19,7 +19,7 @@ class AdminController extends Controller
     private function canSignHealthClearance(): bool
     {
         $role = User::normalizeRole(optional(Auth::user())->user_role ?? '');
-        return $role === User::ROLE_SUPER_ADMIN;
+        return $role === User::ROLE_SUPERADMIN;
     }
 
     private function logActivity(string $action, string $description, ?string $module = null, ?string $eventType = null): void
@@ -536,7 +536,7 @@ public function updateClearance(Request $request, $id)
     public function indexLogs(Request $request)
     {
         $currentRole = User::normalizeRole(optional(Auth::user())->user_role ?? '');
-        if ($currentRole !== User::ROLE_SUPER_ADMIN) {
+        if ($currentRole !== User::ROLE_SUPERADMIN) {
             abort(403, 'Unauthorized');
         }
 

@@ -14,7 +14,7 @@ class StudentAssistantController extends Controller
     public function index()
     {
         $assistants = User::query()
-            ->where('user_role', User::ROLE_STUDENT_ASSISTANT)
+            ->whereIn('user_role', [User::ROLE_ADMIN, 'student_assistant', 'assistant', 'studentassistant'])
             ->latest()
             ->get();
 
@@ -38,7 +38,7 @@ class StudentAssistantController extends Controller
             'name' => trim($validated['first_name'] . ' ' . $validated['last_name']),
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'user_role' => User::ROLE_STUDENT_ASSISTANT,
+            'user_role' => User::ROLE_ADMIN,
             'user_type' => 'Assistant',
         ]);
 
@@ -64,7 +64,7 @@ class StudentAssistantController extends Controller
         $assistant->last_name = $validated['last_name'];
         $assistant->name = trim($validated['first_name'] . ' ' . $validated['last_name']);
         $assistant->email = $validated['email'];
-        $assistant->user_role = User::ROLE_STUDENT_ASSISTANT;
+        $assistant->user_role = User::ROLE_ADMIN;
         $assistant->user_type = $assistant->user_type ?: 'Assistant';
 
         if (!empty($validated['password'])) {

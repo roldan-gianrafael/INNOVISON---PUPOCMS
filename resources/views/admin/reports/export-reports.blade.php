@@ -3,7 +3,7 @@
 @section('content')
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
-    $printReportUrl = $role === 'student_assistant' ? url('/assistant/reports/print-reports') : url('/admin/reports/print-reports');
+    $printReportUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/print-reports') : url('/admin/reports/print-reports');
 @endphp
 <style>
     /* Main Container */

@@ -46,9 +46,9 @@
 @section('content')
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
-    $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
-    $walkinStoreRoute = $role === 'student_assistant' ? 'assistant.walkin.store' : 'walkin.store';
-    $walkinIndexRoute = $role === 'student_assistant' ? 'assistant.walkin.index' : 'walkin.index';
+    $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
+    $walkinStoreRoute = $role === \App\Models\User::ROLE_ADMIN ? 'assistant.walkin.store' : 'walkin.store';
+    $walkinIndexRoute = $role === \App\Models\User::ROLE_ADMIN ? 'assistant.walkin.index' : 'walkin.index';
 @endphp
 
 <div class="patient-header card">

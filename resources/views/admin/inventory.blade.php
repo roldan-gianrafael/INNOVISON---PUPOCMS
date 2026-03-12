@@ -44,7 +44,7 @@
 @section('content')
     @php
         $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
-        $canManageInventory = $role === \App\Models\User::ROLE_SUPER_ADMIN;
+        $canManageInventory = $role === \App\Models\User::ROLE_SUPERADMIN;
     @endphp
 
     <div class="controls">

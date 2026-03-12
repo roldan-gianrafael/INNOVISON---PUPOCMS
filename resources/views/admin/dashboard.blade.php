@@ -261,7 +261,7 @@
 @section('content')
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
-    $appointmentsUrl = $role === 'student_assistant' ? url('/assistant/appointments') : url('/admin/appointments');
+    $appointmentsUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/appointments') : url('/admin/appointments');
 @endphp
 <div class="dashboard-container">
     @php

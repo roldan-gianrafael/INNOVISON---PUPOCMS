@@ -219,7 +219,7 @@
 @section('content')
     @php
         $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
-        $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
+        $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
     @endphp
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">

@@ -243,7 +243,8 @@
         letter-spacing: 0.03em;
     }
 
-    .audit-role-admin { background: #fee2e2; color: #991b1b; }
+    .audit-role-admin { background: #dbeafe; color: #1e40af; }
+    .audit-role-superadmin { background: #ede9fe; color: #5b21b6; }
     .audit-role-super_admin { background: #ede9fe; color: #5b21b6; }
     .audit-role-student_assistant { background: #dbeafe; color: #1e40af; }
     .audit-role-student { background: #dcfce7; color: #166534; }
@@ -299,9 +300,10 @@
 @section('content')
 @php
     $roleLabelMap = [
-        'admin' => 'Super Admin (Legacy)',
-        'super_admin' => 'Super Admin',
-        'student_assistant' => 'Student Assistant',
+        'superadmin' => 'Super Admin',
+        'admin' => 'Admin',
+        'super_admin' => 'Super Admin (Legacy)',
+        'student_assistant' => 'Admin (Legacy)',
         'student' => 'Student',
         'unknown' => 'Unknown',
     ];

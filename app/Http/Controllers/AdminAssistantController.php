@@ -313,13 +313,13 @@ class AdminAssistantController extends Controller
     private function resolveWorkspaceBasePath(): string
     {
         $role = strtolower((string) (optional(auth()->user())->user_role ?? ''));
-        return $role === 'student_assistant' ? '/assistant' : '/admin';
+        return User::normalizeRole($role) === User::ROLE_ADMIN ? '/assistant' : '/admin';
     }
 
     private function isAdminLikeUser(): bool
     {
         $role = User::normalizeRole(optional(auth()->user())->user_role ?? '');
-        return $role === User::ROLE_SUPER_ADMIN;
+        return $role === User::ROLE_SUPERADMIN;
     }
 }
 

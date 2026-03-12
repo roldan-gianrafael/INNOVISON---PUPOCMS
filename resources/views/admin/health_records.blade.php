@@ -85,8 +85,8 @@
 @section('content')
     @php
         $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
-        $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
-        $canSignHealth = $role === \App\Models\User::ROLE_SUPER_ADMIN;
+        $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
+        $canSignHealth = $role === \App\Models\User::ROLE_SUPERADMIN;
     @endphp
 
     {{-- Header with Search --}}

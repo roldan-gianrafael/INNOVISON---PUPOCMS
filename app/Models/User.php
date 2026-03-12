@@ -13,23 +13,20 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     public const ROLE_STUDENT = 'student';
-    public const ROLE_SUPER_ADMIN = 'super_admin';
-    public const ROLE_STUDENT_ASSISTANT = 'student_assistant';
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_SUPERADMIN = 'superadmin';
+    public const ROLE_SUPER_ADMIN = self::ROLE_SUPERADMIN; // Backward-compatible alias.
+    public const ROLE_STUDENT_ASSISTANT = self::ROLE_ADMIN; // Backward-compatible alias.
 
     public static function normalizeRole(?string $role): string
     {
         $normalizedRole = strtolower(trim((string) $role));
 
-        // Accept common role aliases from older data/IDP payloads.
-        if (in_array($normalizedRole, ['admin', 'superadmin'], true)) {
-            return self::ROLE_SUPER_ADMIN;
-        }
-
-        if (in_array($normalizedRole, ['assistant', 'studentassistant'], true)) {
-            return self::ROLE_STUDENT_ASSISTANT;
-        }
-
-        return $normalizedRole;
+        return match ($normalizedRole) {
+            'superadmin', 'super_admin' => self::ROLE_SUPERADMIN,
+            'admin', 'student_assistant', 'studentassistant', 'assistant' => self::ROLE_ADMIN,
+            default => $normalizedRole,
+        };
     }
 
     /**
@@ -116,12 +113,12 @@ class User extends Authenticatable
 
     public function isAdminLike(): bool
     {
-        return $this->hasRole(self::ROLE_SUPER_ADMIN);
+        return $this->hasRole(self::ROLE_SUPERADMIN);
     }
 
     public function isStudentAssistant(): bool
     {
-        return $this->hasRole(self::ROLE_STUDENT_ASSISTANT);
+        return $this->hasRole(self::ROLE_ADMIN);
     }
     public function healthProfile() {
     return $this->hasOne(HealthProfile::class);

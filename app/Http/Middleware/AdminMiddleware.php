@@ -16,7 +16,7 @@ class AdminMiddleware
         }
 
         $role = User::normalizeRole(Auth::user()->user_role ?? '');
-        if ($role !== User::ROLE_SUPER_ADMIN) {
+        if ($role !== User::ROLE_SUPERADMIN) {
             abort(403, 'Unauthorized');
         }
 

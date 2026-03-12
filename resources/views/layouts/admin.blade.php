@@ -1073,8 +1073,8 @@
 @php
     $authUser = auth()->user();
     $currentRole = \App\Models\User::normalizeRole(optional($authUser)->user_role ?? '');
-    $isStudentAssistant = $currentRole === 'student_assistant';
-    $isAdminLike = $currentRole === \App\Models\User::ROLE_SUPER_ADMIN;
+    $isStudentAssistant = $currentRole === \App\Models\User::ROLE_ADMIN;
+    $isAdminLike = $currentRole === \App\Models\User::ROLE_SUPERADMIN;
     $dashboardUrl = $isStudentAssistant ? url('/assistant/dashboard') : url('/admin/dashboard');
     $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
     $inventoryUrl = $isStudentAssistant ? url('/assistant/inventory') : url('/admin/inventory');
@@ -1088,8 +1088,10 @@
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
     $brandLogo = asset('images/clinic_logo.png');
     $roleLabelMap = [
-        'super_admin' => 'Super Admin',
-        'student_assistant' => 'Student Assistant',
+        'superadmin' => 'Super Admin',
+        'admin' => 'Admin',
+        'super_admin' => 'Super Admin (Legacy)',
+        'student_assistant' => 'Admin (Legacy)',
     ];
     $displayRole = $roleLabelMap[$currentRole] ?? ucfirst($currentRole ?: 'user');
 @endphp

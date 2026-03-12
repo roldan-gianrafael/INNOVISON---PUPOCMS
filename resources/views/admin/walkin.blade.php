@@ -73,7 +73,7 @@
 @section('content')
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
-    $basePrefix = $role === 'student_assistant' ? '/assistant' : '/admin';
+    $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
 @endphp
 
 @if(session('consultation_done'))

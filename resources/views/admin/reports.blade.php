@@ -110,10 +110,10 @@
 @section('content')
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
-    $dashboardUrl = $role === 'student_assistant' ? url('/assistant/dashboard') : url('/admin/dashboard');
-    $marUrl = $role === 'student_assistant' ? url('/assistant/reports/mar') : url('/admin/reports/mar');
-    $inventorySummaryUrl = $role === 'student_assistant' ? url('/assistant/reports/inventory-summary') : url('/admin/reports/inventory-summary');
-    $exportHubUrl = $role === 'student_assistant' ? url('/assistant/reports/export-hub') : url('/admin/reports/export-hub');
+    $dashboardUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/dashboard') : url('/admin/dashboard');
+    $marUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/mar') : url('/admin/reports/mar');
+    $inventorySummaryUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/inventory-summary') : url('/admin/reports/inventory-summary');
+    $exportHubUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/export-hub') : url('/admin/reports/export-hub');
 @endphp
 <div class="dashboard-container">
 
@@ -168,7 +168,7 @@
             <div class="report-badge">All Reports</div>
         </a>
 
-        @if($role !== 'student_assistant')
+        @if($role !== \App\Models\User::ROLE_ADMIN)
             <a href="{{ route('admin.logs') }}" class="report-card">
                 <div>
                     <div class="report-label">System Monitoring</div>

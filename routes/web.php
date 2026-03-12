@@ -63,16 +63,16 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class, 'audit'])->g
 
     Route::get('/account', [AppointmentController::class, 'index'])->name('account');
 Route::get('/health-records', [AdminController::class, 'viewHealth'])
-    ->middleware('role:super_admin,student_assistant')
+    ->middleware('role:superadmin,admin')
     ->name('admin.health_records');
 Route::get('/health-profile/{id}', [AdminController::class, 'showHealth'])
-    ->middleware('role:super_admin,student_assistant')
+    ->middleware('role:superadmin,admin')
     ->name('admin.show_health');
 Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage'])
-    ->middleware('role:super_admin')
+    ->middleware('role:superadmin')
     ->name('admin.sign_page');
 Route::put('/health-profile/{id}/update', [AdminController::class, 'updateClearance'])
-    ->middleware('role:super_admin')
+    ->middleware('role:superadmin')
     ->name('admin.update_clearance');
 
     // Legacy barcode endpoints kept for compatibility
@@ -83,8 +83,8 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
 
     Route::get('/fetch-user/{student_id}', [AppointmentController::class, 'fetchUser']);
 
-    // Shared admin workspace routes (Super Admin/Student Assistant)
-    Route::middleware('role:super_admin,student_assistant')->group(function () {
+    // Shared admin workspace routes (Super Admin/Admin)
+    Route::middleware('role:superadmin,admin')->group(function () {
         Route::post('/admin/assistant/intent', [AdminAssistantController::class, 'handle'])->name('admin.assistant.intent');
         Route::post('/assistant/intent', [AdminAssistantController::class, 'handle'])->name('assistant.intent');
 
@@ -107,12 +107,12 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
         Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])
-            ->middleware('role:super_admin')
+            ->middleware('role:superadmin')
             ->name('admin.logs');
     });
 
     // Super Admin-only routes
-    Route::middleware('role:super_admin')->group(function () {
+    Route::middleware('role:superadmin')->group(function () {
         Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
         Route::put('/admin/settings/update', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
         Route::put('/admin/profile/update', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
@@ -132,8 +132,8 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::delete('/admin/student-assistants/{assistant}', [StudentAssistantController::class, 'destroy'])->name('admin.student-assistants.destroy');
     });
 
-    // Student Assistant prefixed entry points (same modules, different UI context)
-    Route::middleware('role:student_assistant')->prefix('assistant')->name('assistant.')->group(function () {
+    // Admin prefixed entry points (same modules, different UI context)
+    Route::middleware('role:admin')->prefix('assistant')->name('assistant.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
         Route::get('/appointments/{id}/{status}', [AdminController::class, 'updateStatus'])->name('appointments.status');
@@ -171,10 +171,10 @@ Route::get('/dev-login/{id}', function ($id) {
 
         Auth::login($user);
 
-        if ($normalizedRole === User::ROLE_SUPER_ADMIN) {
+        if ($normalizedRole === User::ROLE_SUPERADMIN) {
             return redirect('/admin/dashboard')->with('success', 'Logged in as ' . $user->name);
         }
-        if ($normalizedRole === User::ROLE_STUDENT_ASSISTANT) {
+        if ($normalizedRole === User::ROLE_ADMIN) {
             return redirect('/assistant/dashboard')->with('success', 'Logged in as ' . $user->name);
         }
 

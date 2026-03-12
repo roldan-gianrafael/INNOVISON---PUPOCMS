@@ -140,7 +140,8 @@ class LoginController extends Controller
         ];
 
         $redirectUri = trim((string) config('services.idp.redirect_uri', ''));
-        if ($redirectUri !== '') {
+        $includeRedirectUri = (bool) config('services.idp.authorize_include_redirect_uri', false);
+        if ($includeRedirectUri && $redirectUri !== '') {
             $query['redirect_uri'] = $redirectUri;
         }
 

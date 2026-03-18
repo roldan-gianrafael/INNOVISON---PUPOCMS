@@ -98,36 +98,6 @@
 @endpush
 
 @section('content')
-    <div id="session-checker" 
-     data-has-profile="{{ Auth::user()->is_health_profile_completed ? 'true' : 'false' }}">
-</div>
-
-<div id="healthFormModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(10px);">
-    <div style="background: #fff; padding: 45px; border-radius: 24px; max-width: 500px; width: 90%; text-align: center; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: slideUp 0.5s ease-out;">
-        
-        <div style="background: #fff1f2; width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; border: 4px solid #fecdd3;">
-            <svg style="width: 45px; height: 45px; fill: #8B0000;" viewBox="0 0 24 24">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z"/>
-            </svg>
-        </div>
-
-        <h2 style="color: #1e293b; font-weight: 800; font-size: 28px; margin-bottom: 15px; letter-spacing: -0.5px;">Medical Requirement</h2>
-        
-        <p style="color: #475569; line-height: 1.6; margin-bottom: 35px; font-size: 16px;">
-            Hi <strong>{{ Auth::user()->first_name }}</strong>! To access clinic services, all students (especially new enrollees) must submit their <strong>Health Information Form (HIF)</strong>.
-        </p>
-
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <a href="{{ url('/student/health-form') }}" style="background: #8B0000; color: #fff; padding: 18px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 17px; transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(139, 0, 0, 0.4);">
-                Fill Up Health Information Form
-            </a>
-            <p style="color: #94a3b8; font-size: 13px; font-style: italic;">
-                * This form is mandatory for clinic consultations and medical records.
-            </p>
-        </div>
-    </div>
-</div>
-
     <svg style="display: none;">
       <symbol id="avatar-placeholder" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="12" fill="#e2e8f0"/>
@@ -271,22 +241,4 @@
       </div>
     </footer>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const checker = document.getElementById('session-checker');
-        const hasProfile = checker.getAttribute('data-has-profile') === 'true';
-
-        // Kung wala pang profile (false), lilitaw ang modal pagkatapos ng 1.5 seconds
-        if (!hasProfile) {
-            setTimeout(() => {
-                const modal = document.getElementById('healthFormModal');
-                if(modal) {
-                    modal.style.display = 'flex';
-                    // Disable scrolling sa background para hindi sila makatakas
-                    document.body.style.overflow = 'hidden'; 
-                }
-            }, 1500);
-        }
-    });
-</script>
 @endsection

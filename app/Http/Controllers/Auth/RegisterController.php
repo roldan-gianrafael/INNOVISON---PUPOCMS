@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class RegisterController extends Controller
 {
@@ -27,7 +28,7 @@ class RegisterController extends Controller
         'password'   => 'required|min:6|confirmed',
     ]);
 
-    $user = User::create([
+    $payload = [
         'first_name' => $request->first_name,
         'last_name'  => $request->last_name,
         'name'       => $request->first_name . ' ' . $request->last_name, // Automated concatenation
@@ -38,9 +39,14 @@ class RegisterController extends Controller
         'year'       => $request->year,
         'section'    => $request->section,
         'user_role'  => 'student', // Default role
-        'user_type'  => 'Regular', // Default type
         'password'   => Hash::make($request->password),
-    ]);
+    ];
+
+    if (Schema::hasColumn('users', 'user_type')) {
+        $payload['user_type'] = 'Regular'; // Default type
+    }
+
+    $user = User::create($payload);
 
     Auth::login($user);
     return redirect('/student/home');

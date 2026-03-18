@@ -11,10 +11,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
+    private function usersTableHasUserTypeColumn(): bool
+    {
+        static $hasColumn;
+
+        if ($hasColumn === null) {
+            $hasColumn = Schema::hasColumn('users', 'user_type');
+        }
+
+        return $hasColumn;
+    }
+
     private function studentRoleValue(): string
     {
         if (defined(User::class . '::ROLE_STUDENT')) {
@@ -722,7 +734,7 @@ class LoginController extends Controller
                 $existingUser->password = Hash::make(Str::random(40));
             }
 
-            if (empty($existingUser->user_type)) {
+            if ($this->usersTableHasUserTypeColumn() && empty($existingUser->user_type)) {
                 $existingUser->user_type = User::normalizeRole($role) === User::normalizeRole($this->studentRoleValue()) ? 'Regular' : 'Assistant';
             }
 
@@ -745,7 +757,7 @@ class LoginController extends Controller
             'password' => Hash::make(Str::random(40)),
         ]);
 
-        if (empty($user->user_type)) {
+        if ($this->usersTableHasUserTypeColumn() && empty($user->user_type)) {
             $user->user_type = User::normalizeRole($role) === User::normalizeRole($this->studentRoleValue()) ? 'Regular' : 'Assistant';
             $user->save();
         }

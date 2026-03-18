@@ -15,8 +15,22 @@ use Illuminate\Support\Facades\Route;
 
 // --- PUBLIC ROUTES (No login required) ---
 Route::get('/', function () {
-    return redirect()->route('login');
-});
+    if (Auth::check()) {
+        $role = User::normalizeRole((string) optional(Auth::user())->user_role);
+
+        if ($role === User::ROLE_SUPERADMIN) {
+            return redirect('/admin/dashboard');
+        }
+
+        if ($role === User::ROLE_ADMIN) {
+            return redirect('/assistant/dashboard');
+        }
+
+        return redirect('/student/home');
+    }
+
+    return view('landing');
+})->name('landing');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/auth/callback', [LoginController::class, 'handleIdpCallback'])->name('auth.callback');
 Route::post('/login-action', [LoginController::class, 'login']);

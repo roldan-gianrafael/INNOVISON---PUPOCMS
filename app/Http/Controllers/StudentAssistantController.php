@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
 class StudentAssistantController extends Controller
@@ -31,7 +32,7 @@ class StudentAssistantController extends Controller
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
-        User::create([
+        $payload = [
             'student_id' => $validated['student_id'],
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
@@ -39,8 +40,13 @@ class StudentAssistantController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'user_role' => User::ROLE_ADMIN,
-            'user_type' => 'Assistant',
-        ]);
+        ];
+
+        if (Schema::hasColumn('users', 'user_type')) {
+            $payload['user_type'] = 'Assistant';
+        }
+
+        User::create($payload);
 
         return redirect()->route('admin.student-assistants.index')->with('success', 'Student assistant account created.');
     }
@@ -65,7 +71,9 @@ class StudentAssistantController extends Controller
         $assistant->name = trim($validated['first_name'] . ' ' . $validated['last_name']);
         $assistant->email = $validated['email'];
         $assistant->user_role = User::ROLE_ADMIN;
-        $assistant->user_type = $assistant->user_type ?: 'Assistant';
+        if (Schema::hasColumn('users', 'user_type')) {
+            $assistant->user_type = $assistant->user_type ?: 'Assistant';
+        }
 
         if (!empty($validated['password'])) {
             $assistant->password = Hash::make($validated['password']);

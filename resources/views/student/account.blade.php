@@ -445,7 +445,7 @@
                     Print Approved Form
                 </a>
         
-                <a href="{{ route('student.view.health.profile') }}" class="health-status-link">
+                <a href="" class="health-status-link">
                     View Record Details
                 </a>
             </div>
@@ -477,7 +477,7 @@
             <span class="health-status-state incomplete">Not Completed</span>
             <p class="health-status-message">You haven't completed your health profile yet.</p>
         </div>
-        <a href="{{ route('student.health.form') }}" class="btn-print-form incomplete">
+        <a href="{{ route('health.form') }}" class="btn-print-form incomplete">
             Complete Form Now
         </a>
         <span class="health-status-note">Required for clinic consultations.</span>

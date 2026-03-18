@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -25,13 +26,15 @@ return new class extends Migration
 
         // Repair accounts that were accidentally promoted by old role-merge migration.
         // Assistant profiles should stay on "admin", not "superadmin".
-        DB::table('users')
-            ->whereRaw('LOWER(user_role) = ?', ['superadmin'])
-            ->whereRaw("LOWER(COALESCE(user_type, '')) = ?", ['assistant'])
-            ->update([
-                'user_role' => 'admin',
-                'updated_at' => now(),
-            ]);
+        if (Schema::hasColumn('users', 'user_type')) {
+            DB::table('users')
+                ->whereRaw('LOWER(user_role) = ?', ['superadmin'])
+                ->whereRaw("LOWER(COALESCE(user_type, '')) = ?", ['assistant'])
+                ->update([
+                    'user_role' => 'admin',
+                    'updated_at' => now(),
+                ]);
+        }
     }
 
     public function down(): void

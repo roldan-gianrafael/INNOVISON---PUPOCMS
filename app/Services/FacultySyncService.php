@@ -24,6 +24,8 @@ class FacultySyncService
         $signature = hash_hmac('sha256', $systemId . $timestamp . $nonce, $secretKey);
 
         return [
+            'X-System-Id' => $systemId,
+            'X-HMAC-System-Id' => $systemId,
             'X-HMAC-Signature' => $signature,
             'X-HMAC-Timestamp' => $timestamp,
             'X-HMAC-Nonce' => $nonce,
@@ -39,6 +41,7 @@ class FacultySyncService
         }
 
         $response = Http::acceptJson()
+            ->retry(2, 300)
             ->timeout((int) config('services.pupt_flss.timeout', 30))
             ->withHeaders($this->generateHmacHeaders())
             ->get($baseUrl);

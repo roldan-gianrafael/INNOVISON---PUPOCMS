@@ -60,4 +60,16 @@ return [
         'logout_url' => env('IDP_LOGOUT_URL'),
     ],
 
+    'external_admin_profile' => [
+        'api_key' => env('EXTERNAL_ADMIN_PROFILE_API_KEY'),
+        'header' => env('EXTERNAL_ADMIN_PROFILE_HEADER', 'X-External-Api-Key'),
+    ],
+
+    'pupt_flss' => [
+        'faculty_profiles_url' => env('PUPT_FLSS_FACULTY_PROFILES_URL', 'https://flss-backend-api-d9eecxcnhpccdpdk.southeastasia-01.azurewebsites.net/api/v1/faculty-profiles'),
+        'system_id' => env('PUPT_FLSS_SYSTEM_ID', 'ocms'),
+        'secret_key' => env('PUPT_FLSS_SECRET_KEY'),
+        'timeout' => (int) env('PUPT_FLSS_TIMEOUT', 30),
+    ],
+
 ];

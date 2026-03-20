@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Http\Controllers\AdminAssistantController;
 use App\Http\Controllers\AdminController;
@@ -197,3 +197,4 @@ Route::get('/dev-login/{id}', function ($id) {
 
     return 'User not found!';
 });
+

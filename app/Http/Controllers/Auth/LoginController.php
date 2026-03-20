@@ -171,6 +171,21 @@ class LoginController extends Controller
         return $authorizeUrl . '?' . http_build_query($query);
     }
 
+    public function debugAuthorizeUrl(Request $request)
+    {
+        if (!config('app.debug')) {
+            abort(404);
+        }
+
+        return response()->json([
+            'authorize_url' => $this->buildAuthorizeUrl(),
+            'idp_enabled' => $this->useIdpAuth(),
+            'redirect_uri' => config('services.idp.redirect_uri'),
+            'authorize_path' => config('services.idp.authorize_path'),
+            'response_type' => config('services.idp.authorize_response_type'),
+        ]);
+    }
+
     private function normalizeCookieSameSite(): string
     {
         $sameSite = strtolower(trim((string) config('services.idp.cookie_same_site', 'lax')));

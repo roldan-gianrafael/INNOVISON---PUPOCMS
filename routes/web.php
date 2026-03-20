@@ -33,7 +33,6 @@ Route::get('/', function () {
 })->name('landing');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/auth/callback', [LoginController::class, 'handleIdpCallback'])->name('auth.callback');
-Route::get('/debug/idp-authorize-url', [LoginController::class, 'debugAuthorizeUrl'])->name('debug.idp.authorize-url');
 Route::post('/login-action', [LoginController::class, 'login']);
 Route::post('/register-action', [RegisterController::class, 'register']);
 

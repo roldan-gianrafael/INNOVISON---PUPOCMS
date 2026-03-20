@@ -278,70 +278,64 @@ class LoginController extends Controller
             return null;
         }
 
-        $attempts = [
-            [
-                'label' => 'form request',
-                'request' => fn () => Http::acceptJson()->timeout(20)->asForm()->post($tokenUrl, $payload),
+        $authMethod = $this->idpTokenAuthMethod();
+        $response = $this->performTokenExchangeRequest($tokenUrl, $payload, $clientId, $clientSecret, $authMethod);
+        if ($response->successful() && is_array($response->json())) {
+            return $response->json();
+        }
+
+        Log::warning('IDP token exchange failed.', [
+            'token_url' => $tokenUrl,
+            'auth_method' => $authMethod,
+            'status' => $response->status(),
+            'body' => Str::limit((string) $response->body(), 1200),
+            'payload_flags' => [
+                'has_code' => isset($payload['code']) && $payload['code'] !== '',
+                'has_grant_type' => isset($payload['grant_type']) && $payload['grant_type'] !== '',
+                'has_redirect_uri' => isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '',
             ],
-        ];
-
-        if (!isset($payload['redirect_uri']) && $redirectUri !== '') {
-            $retryPayload = $payload;
-            $retryPayload['redirect_uri'] = $redirectUri;
-            $attempts[] = [
-                'label' => 'form with redirect_uri',
-                'request' => fn () => Http::acceptJson()->timeout(20)->asForm()->post($tokenUrl, $retryPayload),
-            ];
-        }
-
-        $basicAuthPayload = $payload;
-        unset($basicAuthPayload['client_secret']);
-        $attempts[] = [
-            'label' => 'form basic auth',
-            'request' => fn () => Http::acceptJson()
-                ->timeout(20)
-                ->withBasicAuth($clientId, $clientSecret)
-                ->asForm()
-                ->post($tokenUrl, $basicAuthPayload),
-        ];
-
-        if (isset($basicAuthPayload['redirect_uri'])) {
-            $noRedirectPayload = $basicAuthPayload;
-            unset($noRedirectPayload['redirect_uri']);
-            $attempts[] = [
-                'label' => 'form basic auth without redirect_uri',
-                'request' => fn () => Http::acceptJson()
-                    ->timeout(20)
-                    ->withBasicAuth($clientId, $clientSecret)
-                    ->asForm()
-                    ->post($tokenUrl, $noRedirectPayload),
-            ];
-        }
-
-        $attempts[] = [
-            'label' => 'json request',
-            'request' => fn () => Http::acceptJson()->timeout(20)->post($tokenUrl, $payload),
-        ];
-
-        foreach ($attempts as $attempt) {
-            $response = $attempt['request']();
-            if ($response->successful() && is_array($response->json())) {
-                return $response->json();
-            }
-
-            Log::warning('IDP token exchange failed (' . $attempt['label'] . ').', [
-                'token_url' => $tokenUrl,
-                'status' => $response->status(),
-                'body' => Str::limit((string) $response->body(), 1200),
-                'payload_flags' => [
-                    'has_code' => isset($payload['code']) && $payload['code'] !== '',
-                    'has_grant_type' => isset($payload['grant_type']) && $payload['grant_type'] !== '',
-                    'has_redirect_uri' => isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '',
-                ],
-            ]);
-        }
+        ]);
 
         return null;
+    }
+
+    private function idpTokenAuthMethod(): string
+    {
+        $method = strtolower(trim((string) config('services.idp.token_auth_method', 'client_secret_post')));
+
+        if (!in_array($method, ['client_secret_post', 'client_secret_basic', 'json'], true)) {
+            return 'client_secret_post';
+        }
+
+        return $method;
+    }
+
+    private function performTokenExchangeRequest(
+        string $tokenUrl,
+        array $payload,
+        string $clientId,
+        string $clientSecret,
+        string $authMethod
+    ) {
+        $request = Http::acceptJson()->timeout(20);
+
+        if ($authMethod === 'client_secret_basic') {
+            $basicPayload = $payload;
+            unset($basicPayload['client_secret']);
+
+            return $request
+                ->withBasicAuth($clientId, $clientSecret)
+                ->asForm()
+                ->post($tokenUrl, $basicPayload);
+        }
+
+        if ($authMethod === 'json') {
+            return $request->post($tokenUrl, $payload);
+        }
+
+        return $request
+            ->asForm()
+            ->post($tokenUrl, $payload);
     }
 
     private function hasIdentityFields(array $payload): bool
@@ -853,7 +847,7 @@ class LoginController extends Controller
         Log::info('IDP callback reached.', [
             'has_code' => $request->query->has('code'),
             'query_keys' => array_keys($request->query()),
-            'full_url' => $request->fullUrl(),
+            'path' => $request->path(),
         ]);
 
         if (!$this->useIdpAuth()) {

@@ -850,19 +850,32 @@ class LoginController extends Controller
 
     public function handleIdpCallback(Request $request): RedirectResponse
     {
+        Log::info('IDP callback reached.', [
+            'has_code' => $request->query->has('code'),
+            'query_keys' => array_keys($request->query()),
+            'full_url' => $request->fullUrl(),
+        ]);
+
         if (!$this->useIdpAuth()) {
+            Log::warning('IDP callback aborted because IDP auth is disabled.');
             return redirect('/login');
         }
 
         $code = trim((string) $request->query('code', ''));
         if ($code === '') {
+            Log::warning('IDP callback missing authorization code.');
             return redirect('/login?idp_error=1')->withErrors([
                 'idp' => 'Missing authorization code from the identity provider.',
             ]);
         }
 
+        Log::info('IDP callback received authorization code.', [
+            'code_length' => strlen($code),
+        ]);
+
         $tokenPayload = $this->exchangeCodeForTokens($code);
         if ($tokenPayload === null) {
+            Log::warning('IDP callback token exchange returned no payload.');
             return redirect('/login?idp_error=1')->withErrors([
                 'idp' => 'Token exchange failed. Please try signing in again.',
             ]);
@@ -871,26 +884,46 @@ class LoginController extends Controller
         $accessToken = trim((string) ($tokenPayload['access_token'] ?? ''));
         $refreshToken = trim((string) ($tokenPayload['refresh_token'] ?? ''));
         if ($accessToken === '') {
+            Log::warning('IDP callback token payload did not contain an access token.', [
+                'payload_keys' => array_keys($tokenPayload),
+            ]);
             return redirect('/login?idp_error=1')->withErrors([
                 'idp' => 'Identity provider did not return an access token.',
             ]);
         }
 
+        Log::info('IDP callback token exchange succeeded.', [
+            'has_refresh_token' => $refreshToken !== '',
+            'payload_keys' => array_keys($tokenPayload),
+        ]);
+
         // Prefer profile fetched from IDP user-info endpoints over token payload fields.
         $profile = $this->fetchProfileFromIdp($accessToken);
         if ($profile === null) {
+            Log::warning('IDP profile fetch returned null; falling back to token payload.');
             $profile = $this->extractProfilePayload($tokenPayload);
         }
 
         if ($profile === null) {
+            Log::warning('IDP callback could not resolve a profile payload.');
             return redirect('/login?idp_error=1')->withErrors([
                 'idp' => 'Unable to retrieve your profile from the identity provider.',
             ]);
         }
 
+        Log::info('IDP callback resolved profile payload.', [
+            'profile_keys' => array_keys($profile),
+        ]);
+
         $user = $this->upsertLocalUserFromIdpProfile($profile);
         $user->user_role = User::normalizeRole($user->user_role);
         $user->save();
+
+        Log::info('IDP callback upserted local user.', [
+            'user_id' => $user->id,
+            'user_role' => $user->user_role,
+            'email' => $user->email,
+        ]);
 
         Auth::login($user);
         $request->session()->regenerate();

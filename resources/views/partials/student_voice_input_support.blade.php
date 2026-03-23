@@ -316,11 +316,16 @@
 
             window.setTimeout(function () {
                 const activeElement = document.activeElement;
-                if (field.closest('.voice-field-wrap')?.contains(activeElement)) {
+                if (isEligibleField(activeElement)) {
+                    activeField = activeElement;
+                    activeButton = activeField.closest('.voice-field-wrap')?.querySelector('.voice-field-inline-mic') ?? null;
+                    setActiveWrapper(activeField);
                     return;
                 }
 
                 if (!isListening) {
+                    activeField = null;
+                    activeButton = null;
                     setActiveWrapper(null);
                 }
             }, 0);

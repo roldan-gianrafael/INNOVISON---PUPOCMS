@@ -487,7 +487,7 @@
 
             {{-- Full Profile Widget --}}
             <div class="widget-card">
-    <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Full Medical & Academic Profile</div>
+    <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Full Medical, Academic, and Designee Profile</div>
     
     <form action="{{ route('student.updateContact') }}" method="POST">
         @csrf
@@ -538,8 +538,6 @@
         </div>
 
         @if(!empty($linkedAdminProfile))
-            <div class="section-title" style="font-size: 16px; margin: 20px 0 15px;">Designee Profile Information</div>
-
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">First Name</label>

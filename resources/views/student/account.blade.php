@@ -495,20 +495,22 @@
             <input type="hidden" name="admin_profile_id" value="{{ $linkedAdminProfile->admin_id }}">
         @endif
         
-        <div class="profile-grid-3">
-            <div>
-                <label class="input-label">Course</label>
-                <input type="text" class="form-control" value="{{ $user->course }}" readonly style="background-color: #f8fafc;">
+        @if(empty($linkedAdminProfile))
+            <div class="profile-grid-3">
+                <div>
+                    <label class="input-label">Course</label>
+                    <input type="text" class="form-control" value="{{ $user->course }}" readonly style="background-color: #f8fafc;">
+                </div>
+                <div>
+                    <label class="input-label">Year</label>
+                    <input type="text" name="year" class="form-control editable-input" value="{{ old('year', $user->year) }}" disabled>
+                </div>
+                <div>
+                    <label class="input-label">Section</label>
+                    <input type="text" name="section" class="form-control editable-input" value="{{ old('section', $user->section) }}" disabled>
+                </div>
             </div>
-            <div>
-                <label class="input-label">Year</label>
-                <input type="text" name="year" class="form-control editable-input" value="{{ old('year', $user->year) }}" disabled>
-            </div>
-            <div>
-                <label class="input-label">Section</label>
-                <input type="text" name="section" class="form-control editable-input" value="{{ old('section', $user->section) }}" disabled>
-            </div>
-        </div>
+        @endif
 
         <div class="profile-grid-2">
             <div>
@@ -521,16 +523,18 @@
             </div>
         </div>
 
-        <div class="profile-grid-2">
-            <div>
-                <label class="input-label">Height (cm)</label>
-                <input type="number" step="0.1" name="height" class="form-control editable-input" value="{{ old('height', $user->height) }}" disabled>
+        @if(empty($linkedAdminProfile))
+            <div class="profile-grid-2">
+                <div>
+                    <label class="input-label">Height (cm)</label>
+                    <input type="number" step="0.1" name="height" class="form-control editable-input" value="{{ old('height', $user->height) }}" disabled>
+                </div>
+                <div>
+                    <label class="input-label">Weight (kg)</label>
+                    <input type="number" step="0.1" name="weight" class="form-control editable-input" value="{{ old('weight', $user->weight) }}" disabled>
+                </div>
             </div>
-            <div>
-                <label class="input-label">Weight (kg)</label>
-                <input type="number" step="0.1" name="weight" class="form-control editable-input" value="{{ old('weight', $user->weight) }}" disabled>
-            </div>
-        </div>
+        @endif
 
         <div style="margin-bottom: 15px;">
             <label class="input-label">Contact Number</label>
@@ -603,19 +607,19 @@
             </div>
         @endif
 
-        <div id="editActionContainer">
+        <div id="profileActionBar">
             <button type="button" id="editBtn" onclick="enableEditing()" style="width: 100%; padding: 12px; background: #8B0000; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
                 Edit Profile
             </button>
-        </div>
 
-        <div id="saveAction" style="display: none; gap: 10px;">
-            <button type="submit" style="flex: 1; padding: 12px; background: #8B0000; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                Save Changes
-            </button>
-            <button type="button" onclick="window.location.reload()" style="flex: 1; padding: 12px; background: #cbd5e1; color: #1e293b; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                Cancel
-            </button>
+            <div id="saveAction" style="display: none; gap: 10px;">
+                <button type="submit" style="flex: 1; padding: 12px; background: #8B0000; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    Save Changes
+                </button>
+                <button type="button" onclick="window.location.reload()" style="flex: 1; padding: 12px; background: #cbd5e1; color: #1e293b; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
         </div>
     </form>
 </div>

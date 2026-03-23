@@ -394,11 +394,13 @@ class AppointmentController extends Controller
         return redirect()->back()->with('error', 'User session not found.');
     }
 
+    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+
     // 2. I-validate ang lahat ng fields (Contact, Year, Section, etc.)
     $validated = $request->validate([
         'contact_no' => ['required', 'regex:/^[0-9]{10,13}$/'],
-        'year'       => ['required', 'string', 'max:10'],
-        'section'    => ['required', 'string', 'max:10'],
+        'year'       => empty($linkedAdminProfile) ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
+        'section'    => empty($linkedAdminProfile) ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
         'height'     => ['nullable', 'numeric'],
         'weight'     => ['nullable', 'numeric'],
         'admin_profile_id' => ['nullable', 'integer', 'exists:admins,admin_id'],
@@ -419,16 +421,14 @@ class AppointmentController extends Controller
 
     // 3. I-track ang changes para sa Log (Optional: Para alam ng Admin kung ano ang binago)
     $oldYear = $user->year;
-    $newYear = $validated['year'];
+    $newYear = $validated['year'] ?? $user->year;
 
     // 4. I-save ang mga bagong data
     $user->contact_no = $validated['contact_no'];
-    $user->year = $validated['year'];
-    $user->section = $validated['section'];
-    $user->height = $validated['height'];
-    $user->weight = $validated['weight'];
-
-    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+    $user->year = $validated['year'] ?? $user->year;
+    $user->section = $validated['section'] ?? $user->section;
+    $user->height = $validated['height'] ?? $user->height;
+    $user->weight = $validated['weight'] ?? $user->weight;
     if ($linkedAdminProfile && isset($validated['admin_profile_id']) && (int) $validated['admin_profile_id'] === (int) $linkedAdminProfile->admin_id) {
         $linkedAdminProfile->first_name = $validated['first_name'] ?? $linkedAdminProfile->first_name;
         $linkedAdminProfile->last_name = $validated['last_name'] ?? $linkedAdminProfile->last_name;

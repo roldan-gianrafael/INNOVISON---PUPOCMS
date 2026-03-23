@@ -487,7 +487,7 @@
 
             {{-- Full Profile Widget --}}
             <div class="widget-card">
-    <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Full Medical, Academic, and Designee Profile</div>
+    <div class="section-title" style="font-size: 16px; margin-bottom: 15px;"> Profile Information</div>
     
     <form action="{{ route('student.updateContact') }}" method="POST">
         @csrf

@@ -290,4 +290,5 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleAllergies();
 });
 </script>
-   
+
+@include('partials.student_voice_input_support')

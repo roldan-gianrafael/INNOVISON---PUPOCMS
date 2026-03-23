@@ -5,8 +5,13 @@
         width: 100%;
     }
 
-    .voice-field-wrap .form-control.editable-input,
-    .voice-field-wrap textarea.editable-input {
+    .voice-field-wrap input[type="text"],
+    .voice-field-wrap input[type="email"],
+    .voice-field-wrap input[type="tel"],
+    .voice-field-wrap input[type="number"],
+    .voice-field-wrap input[type="search"],
+    .voice-field-wrap input:not([type]),
+    .voice-field-wrap textarea {
         padding-right: 44px;
     }
 
@@ -73,12 +78,13 @@
         }
 
         const supportedSelector = [
-            'textarea.editable-input',
-            'input.editable-input[type="text"]',
-            'input.editable-input[type="email"]',
-            'input.editable-input[type="tel"]',
-            'input.editable-input[type="number"]',
-            'input.editable-input:not([type])'
+            'textarea',
+            'input[type="text"]',
+            'input[type="email"]',
+            'input[type="tel"]',
+            'input[type="number"]',
+            'input[type="search"]',
+            'input:not([type])'
         ].join(',');
 
         const recognition = new SpeechRecognition();
@@ -108,7 +114,7 @@
         }
 
         function isEligibleField(field) {
-            return !!field && field.matches(supportedSelector) && !field.readOnly;
+            return !!field && field.matches(supportedSelector) && !field.readOnly && !field.disabled;
         }
 
         function micIconSvg() {

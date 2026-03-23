@@ -535,7 +535,12 @@
 
     @include('partials.post_login_terms_gate')
 
-    @if(Request::is('student/account') || Request::is('student/booking'))
+    @if(
+        Request::is('student/account') ||
+        Request::is('student/booking') ||
+        Request::is('student/faq') ||
+        Request::is('student/health-form')
+    )
         @include('partials.student_voice_input_support')
     @endif
 

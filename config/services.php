@@ -49,6 +49,8 @@ return [
         'token_auth_method' => env('IDP_TOKEN_AUTH_METHOD', 'client_secret_post'),
         'token_include_redirect_uri' => filter_var(env('IDP_TOKEN_INCLUDE_REDIRECT_URI', false), FILTER_VALIDATE_BOOL),
         'token_grant_type' => env('IDP_TOKEN_GRANT_TYPE', 'authorization_code'),
+        'use_pkce' => filter_var(env('IDP_USE_PKCE', true), FILTER_VALIDATE_BOOL),
+        'pkce_challenge_method' => env('IDP_PKCE_CHALLENGE_METHOD', 'S256'),
         'profile_paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('IDP_PROFILE_PATHS', '/me,/auth/me,/userinfo'))))),
         'validate_token_path' => env('IDP_VALIDATE_TOKEN_PATH', '/api/validate-token'),
         'role_prefix' => env('IDP_ROLE_PREFIX', 'OCMS:'),

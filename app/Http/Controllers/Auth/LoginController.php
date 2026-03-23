@@ -171,6 +171,35 @@ class LoginController extends Controller
         return $authorizeUrl . '?' . http_build_query($query);
     }
 
+    private function useIdpPkce(): bool
+    {
+        return (bool) config('services.idp.use_pkce', true);
+    }
+
+    private function idpPkceChallengeMethod(): string
+    {
+        $method = strtoupper(trim((string) config('services.idp.pkce_challenge_method', 'S256')));
+        if (!in_array($method, ['S256', 'PLAIN'], true)) {
+            return 'S256';
+        }
+
+        return $method;
+    }
+
+    private function buildPkceVerifier(): string
+    {
+        return rtrim(strtr(base64_encode(random_bytes(64)), '+/', '-_'), '=');
+    }
+
+    private function buildPkceChallenge(string $verifier): string
+    {
+        if ($this->idpPkceChallengeMethod() === 'PLAIN') {
+            return $verifier;
+        }
+
+        return rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '=');
+    }
+
     private function normalizeCookieSameSite(): string
     {
         $sameSite = strtolower(trim((string) config('services.idp.cookie_same_site', 'lax')));
@@ -268,6 +297,11 @@ class LoginController extends Controller
             $payload['redirect_uri'] = $redirectUri;
         }
 
+        $pkceVerifier = session('idp_pkce_verifier');
+        if ($this->useIdpPkce() && is_string($pkceVerifier) && trim($pkceVerifier) !== '') {
+            $payload['code_verifier'] = trim($pkceVerifier);
+        }
+
         $grantType = trim((string) config('services.idp.token_grant_type', 'authorization_code'));
         if ($grantType === '') {
             $grantType = 'authorization_code';
@@ -309,6 +343,7 @@ class LoginController extends Controller
                         'has_code' => isset($attemptPayload['code']) && $attemptPayload['code'] !== '',
                         'has_grant_type' => isset($attemptPayload['grant_type']) && $attemptPayload['grant_type'] !== '',
                         'has_redirect_uri' => isset($attemptPayload['redirect_uri']) && $attemptPayload['redirect_uri'] !== '',
+                        'has_code_verifier' => isset($attemptPayload['code_verifier']) && $attemptPayload['code_verifier'] !== '',
                     ],
                 ]);
             }
@@ -887,6 +922,7 @@ class LoginController extends Controller
         ]);
 
         $tokenPayload = $this->exchangeCodeForTokens($code);
+        $request->session()->forget('idp_pkce_verifier');
         if ($tokenPayload === null) {
             Log::warning('IDP callback token exchange returned no payload.');
             return redirect('/login?idp_error=1')->withErrors([
@@ -974,10 +1010,26 @@ class LoginController extends Controller
                 return view('login');
             }
 
+            $pkceVerifier = null;
+            if ($this->useIdpPkce()) {
+                $pkceVerifier = $this->buildPkceVerifier();
+                $request->session()->put('idp_pkce_verifier', $pkceVerifier);
+            } else {
+                $request->session()->forget('idp_pkce_verifier');
+            }
+
             $authorizeUrl = $this->buildAuthorizeUrl();
             if ($authorizeUrl === null) {
                 return view('login')->withErrors([
                     'idp' => 'Identity provider login is enabled but not configured.',
+                ]);
+            }
+
+            if ($pkceVerifier !== null) {
+                $separator = str_contains($authorizeUrl, '?') ? '&' : '?';
+                $authorizeUrl .= $separator . http_build_query([
+                    'code_challenge' => $this->buildPkceChallenge($pkceVerifier),
+                    'code_challenge_method' => $this->idpPkceChallengeMethod(),
                 ]);
             }
 

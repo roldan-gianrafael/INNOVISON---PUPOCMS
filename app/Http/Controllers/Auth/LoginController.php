@@ -746,19 +746,42 @@ class LoginController extends Controller
     private function resolveRoleFromSyncedAdminProfile(?string $email): ?string
     {
         $normalizedEmail = strtolower(trim((string) $email));
-        if ($normalizedEmail === '' || !str_contains($normalizedEmail, '@') || !Admin::hasColumn('email_address')) {
+        if ($normalizedEmail === '' || !str_contains($normalizedEmail, '@')) {
+            return null;
+        }
+
+        $emailColumns = array_values(array_filter([
+            Admin::hasColumn('email') ? 'email' : null,
+            Admin::hasColumn('email_address') ? 'email_address' : null,
+        ]));
+
+        if (empty($emailColumns)) {
             return null;
         }
 
         $adminProfile = Admin::query()
-            ->whereRaw('LOWER(email_address) = ?', [$normalizedEmail])
+            ->where(function ($query) use ($emailColumns, $normalizedEmail) {
+                foreach ($emailColumns as $index => $column) {
+                    $method = $index === 0 ? 'whereRaw' : 'orWhereRaw';
+                    $query->{$method}('LOWER(' . $column . ') = ?', [$normalizedEmail]);
+                }
+            })
             ->first();
 
         if (!$adminProfile) {
             return null;
         }
 
-        $profileRole = strtolower(trim((string) ($adminProfile->role ?? '')));
+        $profileRole = '';
+        foreach (['access_level', 'role', 'user_role', 'admin_role'] as $column) {
+            if (Admin::hasColumn($column)) {
+                $profileRole = strtolower(trim((string) $adminProfile->getAttribute($column)));
+                if ($profileRole !== '') {
+                    break;
+                }
+            }
+        }
+
         if (in_array($profileRole, ['superadmin', 'super_admin'], true)) {
             return $this->superAdminRoleValue();
         }

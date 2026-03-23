@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -742,6 +743,29 @@ class LoginController extends Controller
         return $candidate;
     }
 
+    private function resolveRoleFromSyncedAdminProfile(?string $email): ?string
+    {
+        $normalizedEmail = strtolower(trim((string) $email));
+        if ($normalizedEmail === '' || !str_contains($normalizedEmail, '@') || !Admin::hasColumn('email_address')) {
+            return null;
+        }
+
+        $adminProfile = Admin::query()
+            ->whereRaw('LOWER(email_address) = ?', [$normalizedEmail])
+            ->first();
+
+        if (!$adminProfile) {
+            return null;
+        }
+
+        $profileRole = strtolower(trim((string) ($adminProfile->role ?? '')));
+        if (in_array($profileRole, ['superadmin', 'super_admin'], true)) {
+            return $this->superAdminRoleValue();
+        }
+
+        return $this->adminRoleValue();
+    }
+
     private function upsertLocalUserFromIdpProfile(array $profile): User
     {
         $emailSeed = $this->firstNonEmptyScalar($profile, ['email', 'mail', 'username', 'user.email']) ?? '';
@@ -771,6 +795,13 @@ class LoginController extends Controller
             'data.user.role',
         ]);
         $role = $this->mapIdpRolesToLocal($this->extractRawRoles($profile), $preferredRole);
+        $fallbackAdminRole = $this->resolveRoleFromSyncedAdminProfile($emailSeed);
+        if (
+            User::normalizeRole($role) === User::ROLE_STUDENT &&
+            $fallbackAdminRole !== null
+        ) {
+            $role = $fallbackAdminRole;
+        }
 
         $normalizedEmailSeed = trim(strtolower($emailSeed));
         $existingUser = null;

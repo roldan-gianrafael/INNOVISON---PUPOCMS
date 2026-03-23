@@ -549,18 +549,18 @@
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">First Name</label>
-                    <input type="text" name="first_name" class="form-control editable-input" value="{{ old('first_name', $linkedAdminProfile->first_name) }}" disabled>
+                    <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $linkedAdminProfile->first_name) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Last Name</label>
-                    <input type="text" name="last_name" class="form-control editable-input" value="{{ old('last_name', $linkedAdminProfile->last_name) }}" disabled>
+                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $linkedAdminProfile->last_name) }}" disabled>
                 </div>
             </div>
 
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Email</label>
-                    <input type="email" name="email" class="form-control editable-input" value="{{ old('email', $linkedAdminProfile->email) }}" disabled>
+                    <input type="email" name="email" class="form-control" value="{{ old('email', $linkedAdminProfile->email) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Contact Number</label>
@@ -571,11 +571,11 @@
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Birthday</label>
-                    <input type="date" name="birthday" class="form-control editable-input" value="{{ old('birthday', $linkedAdminProfile->birthday) }}" disabled>
+                    <input type="date" name="birthday" class="form-control" value="{{ old('birthday', $linkedAdminProfile->birthday) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Gender</label>
-                    <input type="text" name="gender" class="form-control editable-input" value="{{ old('gender', $linkedAdminProfile->gender) }}" disabled>
+                    <input type="text" name="gender" class="form-control" value="{{ old('gender', $linkedAdminProfile->gender) }}" disabled>
                 </div>
             </div>
 

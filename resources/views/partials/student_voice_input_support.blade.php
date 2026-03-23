@@ -297,6 +297,17 @@
             setActiveWrapper(activeField);
         });
 
+        document.addEventListener('pointerdown', function (event) {
+            const field = event.target.closest(supportedSelector);
+            if (!isEligibleField(field)) {
+                return;
+            }
+
+            activeField = field;
+            activeButton = activeField.closest('.voice-field-wrap')?.querySelector('.voice-field-inline-mic') ?? null;
+            setActiveWrapper(activeField);
+        });
+
         document.addEventListener('focusout', function (event) {
             const field = event.target;
             if (!field || !field.closest('.voice-field-wrap')) {

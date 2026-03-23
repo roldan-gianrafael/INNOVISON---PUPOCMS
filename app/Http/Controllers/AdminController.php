@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Admin;
 use App\Models\User;
 use App\Models\Appointment;
 use App\Models\ActivityLog;
@@ -17,41 +16,6 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
-    private function resolveExternalAdminProfile(?User $user): ?Admin
-    {
-        if (!$user) {
-            return null;
-        }
-
-        $email = trim(strtolower((string) $user->email));
-        $emailColumns = array_values(array_filter([
-            Admin::hasColumn('email') ? 'email' : null,
-            Admin::hasColumn('email_address') ? 'email_address' : null,
-        ]));
-
-        if ($email !== '' && !empty($emailColumns)) {
-            $matchedByEmail = Admin::query()
-                ->where(function ($query) use ($emailColumns, $email) {
-                    foreach ($emailColumns as $index => $column) {
-                        $method = $index === 0 ? 'whereRaw' : 'orWhereRaw';
-                        $query->{$method}('LOWER(' . $column . ') = ?', [$email]);
-                    }
-                })
-                ->first();
-
-            if ($matchedByEmail) {
-                return $matchedByEmail;
-            }
-        }
-
-        $name = trim((string) $user->name);
-        if ($name !== '' && Admin::hasColumn('name')) {
-            return Admin::query()->where('name', $name)->first();
-        }
-
-        return null;
-    }
-
     private function canSignHealthClearance(): bool
     {
         $role = User::normalizeRole(optional(Auth::user())->user_role ?? '');
@@ -251,10 +215,9 @@ public function updateClearance(Request $request, $id)
     public function settings()
     {
         $admin = Auth::user();
-        $externalAdminProfile = $this->resolveExternalAdminProfile($admin);
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
-        return view('admin.settings', compact('admin', 'settings', 'externalAdminProfile'));
+        return view('admin.settings', compact('admin', 'settings'));
     }
 
     // ==========================================
@@ -407,47 +370,17 @@ public function updateClearance(Request $request, $id)
     public function updateProfile(Request $request)
 {
     $request->validate([
-        'admin_id' => 'required|exists:admins,admin_id',
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
+        'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
-        'birthday' => 'nullable|date',
-        'age' => 'nullable|integer|min:0',
-        'gender' => 'nullable|string|max:255',
-        'civil_status' => 'nullable|string|max:255',
-        'address' => 'nullable|string|max:1000',
-        'emergency_contact_person' => 'nullable|string|max:255',
-        'emergency_contact_no' => 'nullable|string|max:255',
-        'office' => 'nullable|string|max:255',
-        'access_level' => 'nullable|string|max:255',
         'password' => 'nullable|string|min:6|confirmed',
     ]);
     
     /** @var \App\Models\User $user */
     $user = Auth::user();
-    $adminProfile = Admin::query()->findOrFail($request->admin_id);
     
 
     $passwordChanged = $request->filled('password') ? ' (Password was also updated)' : '';
-    $fullName = trim($request->first_name . ' ' . $request->last_name);
-
-    $adminProfile->first_name = $request->first_name;
-    $adminProfile->last_name = $request->last_name;
-    $adminProfile->email = $request->email;
-    $adminProfile->birthday = $request->birthday;
-    $adminProfile->age = $request->age;
-    $adminProfile->gender = $request->gender;
-    $adminProfile->civil_status = $request->civil_status;
-    $adminProfile->address = $request->address;
-    $adminProfile->emergency_contact_person = $request->emergency_contact_person;
-    $adminProfile->emergency_contact_no = $request->emergency_contact_no;
-    $adminProfile->office = $request->office;
-    $adminProfile->access_level = $request->access_level;
-    $adminProfile->save();
-
-    $user->first_name = $request->first_name;
-    $user->last_name = $request->last_name;
-    $user->name = $fullName;
+    $user->name = $request->name;
     $user->email = $request->email;
 
     if ($request->filled('password')) {

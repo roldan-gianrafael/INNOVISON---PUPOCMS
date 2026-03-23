@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
 use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -521,7 +520,7 @@ class LoginController extends Controller
 
     private function configuredIdpRolePrefix(): string
     {
-        $rolePrefix = strtolower(trim((string) config('services.idp.role_prefix', 'OCMS:')));
+        $rolePrefix = strtolower(trim((string) config('services.idp.role_prefix', '')));
         if ($rolePrefix !== '' && !Str::endsWith($rolePrefix, ':')) {
             $rolePrefix .= ':';
         }
@@ -540,6 +539,9 @@ class LoginController extends Controller
         $rolePrefix = $this->configuredIdpRolePrefix();
         if ($rolePrefix !== '' && Str::startsWith($normalized, $rolePrefix)) {
             $normalized = substr($normalized, strlen($rolePrefix));
+            $isScoped = true;
+        } elseif (Str::startsWith($normalized, 'cms:')) {
+            $normalized = substr($normalized, 4);
             $isScoped = true;
         } elseif (Str::startsWith($normalized, 'ocms:')) {
             $normalized = substr($normalized, 5);
@@ -603,34 +605,14 @@ class LoginController extends Controller
     private function mapIdpRolesToLocal(array $roles, ?string $preferredRole = null): string
     {
         $normalizedRoles = [];
-        $scopedRoles = [];
 
         foreach ($roles as $role) {
-            [$normalized, $isScoped] = $this->parseIdpRoleToken((string) $role);
+            [$normalized] = $this->parseIdpRoleToken((string) $role);
             if ($normalized === '') {
                 continue;
             }
 
             $normalizedRoles[] = $normalized;
-            if ($isScoped) {
-                $scopedRoles[] = $normalized;
-            }
-        }
-
-        // Least-privilege: when OCMS-scoped roles are present, ignore unscoped/global roles.
-        $scopedMappedRole = $this->resolveLocalRoleFromTokens($scopedRoles);
-        if ($scopedMappedRole !== null) {
-            return $scopedMappedRole;
-        }
-
-        if ($preferredRole !== null) {
-            [, $preferredIsScoped] = $this->parseIdpRoleToken($preferredRole);
-            if ($preferredIsScoped) {
-                $preferredMappedRole = $this->mapSingleIdpRoleToLocal($preferredRole);
-                if ($preferredMappedRole !== null) {
-                    return $preferredMappedRole;
-                }
-            }
         }
 
         $mappedFromRoles = $this->resolveLocalRoleFromTokens($normalizedRoles);
@@ -743,52 +725,6 @@ class LoginController extends Controller
         return $candidate;
     }
 
-    private function resolveRoleFromSyncedAdminProfile(?string $email): ?string
-    {
-        $normalizedEmail = strtolower(trim((string) $email));
-        if ($normalizedEmail === '' || !str_contains($normalizedEmail, '@')) {
-            return null;
-        }
-
-        $emailColumns = array_values(array_filter([
-            Admin::hasColumn('email') ? 'email' : null,
-            Admin::hasColumn('email_address') ? 'email_address' : null,
-        ]));
-
-        if (empty($emailColumns)) {
-            return null;
-        }
-
-        $adminProfile = Admin::query()
-            ->where(function ($query) use ($emailColumns, $normalizedEmail) {
-                foreach ($emailColumns as $index => $column) {
-                    $method = $index === 0 ? 'whereRaw' : 'orWhereRaw';
-                    $query->{$method}('LOWER(' . $column . ') = ?', [$normalizedEmail]);
-                }
-            })
-            ->first();
-
-        if (!$adminProfile) {
-            return null;
-        }
-
-        $profileRole = '';
-        foreach (['access_level', 'role', 'user_role', 'admin_role'] as $column) {
-            if (Admin::hasColumn($column)) {
-                $profileRole = strtolower(trim((string) $adminProfile->getAttribute($column)));
-                if ($profileRole !== '') {
-                    break;
-                }
-            }
-        }
-
-        if (in_array($profileRole, ['superadmin', 'super_admin'], true)) {
-            return $this->superAdminRoleValue();
-        }
-
-        return $this->adminRoleValue();
-    }
-
     private function upsertLocalUserFromIdpProfile(array $profile): User
     {
         $emailSeed = $this->firstNonEmptyScalar($profile, ['email', 'mail', 'username', 'user.email']) ?? '';
@@ -818,13 +754,6 @@ class LoginController extends Controller
             'data.user.role',
         ]);
         $role = $this->mapIdpRolesToLocal($this->extractRawRoles($profile), $preferredRole);
-        $fallbackAdminRole = $this->resolveRoleFromSyncedAdminProfile($emailSeed);
-        if (
-            User::normalizeRole($role) === User::ROLE_STUDENT &&
-            $fallbackAdminRole !== null
-        ) {
-            $role = $fallbackAdminRole;
-        }
 
         $normalizedEmailSeed = trim(strtolower($emailSeed));
         $existingUser = null;

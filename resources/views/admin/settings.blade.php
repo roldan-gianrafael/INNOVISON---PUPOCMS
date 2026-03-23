@@ -64,6 +64,58 @@
     @endif
 
     <section class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 12px;">
+            <div>
+                <h3 style="margin-bottom: 6px;">Synced Admin Profile</h3>
+                <p style="margin: 0; font-size: 13px; color: #64748b;">
+                    External faculty/admin profile matched to your current account.
+                </p>
+            </div>
+            <span style="padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; {{ $externalAdminProfile ? 'background:#dcfce7; color:#166534;' : 'background:#fee2e2; color:#991b1b;' }}">
+                {{ $externalAdminProfile ? 'Connected' : 'Not Linked' }}
+            </span>
+        </div>
+
+        @if($externalAdminProfile)
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                <div class="form-group">
+                    <label>Admin ID</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->admin_id }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->name ?: trim(($externalAdminProfile->first_name ?? '') . ' ' . ($externalAdminProfile->last_name ?? '')) }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->email_address ?? '' }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->role ?? '' }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Office</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->offices ?? '' }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->contact_no ?? '' }}" disabled>
+                </div>
+            </div>
+        @else
+            <div class="alert alert-error" style="margin-bottom:0;">
+                No synced admin profile matched your logged-in email <strong>{{ $admin->email ?? 'N/A' }}</strong>.
+            </div>
+        @endif
+    </section>
+
+    <section class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3>Super Admin Profile</h3>
             <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>

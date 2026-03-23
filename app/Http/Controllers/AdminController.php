@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Admin;
 use App\Models\User;
 use App\Models\Appointment;
 use App\Models\ActivityLog;
@@ -16,6 +17,31 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    private function resolveExternalAdminProfile(?User $user): ?Admin
+    {
+        if (!$user) {
+            return null;
+        }
+
+        $email = trim(strtolower((string) $user->email));
+        if ($email !== '' && Admin::hasColumn('email_address')) {
+            $matchedByEmail = Admin::query()
+                ->whereRaw('LOWER(email_address) = ?', [$email])
+                ->first();
+
+            if ($matchedByEmail) {
+                return $matchedByEmail;
+            }
+        }
+
+        $name = trim((string) $user->name);
+        if ($name !== '' && Admin::hasColumn('name')) {
+            return Admin::query()->where('name', $name)->first();
+        }
+
+        return null;
+    }
+
     private function canSignHealthClearance(): bool
     {
         $role = User::normalizeRole(optional(Auth::user())->user_role ?? '');
@@ -215,9 +241,10 @@ public function updateClearance(Request $request, $id)
     public function settings()
     {
         $admin = Auth::user();
+        $externalAdminProfile = $this->resolveExternalAdminProfile($admin);
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
-        return view('admin.settings', compact('admin', 'settings'));
+        return view('admin.settings', compact('admin', 'settings', 'externalAdminProfile'));
     }
 
     // ==========================================

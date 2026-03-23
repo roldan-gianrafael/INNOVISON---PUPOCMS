@@ -1,6 +1,8 @@
 <style>
     .voice-field-wrap {
         position: relative;
+        display: block;
+        width: 100%;
     }
 
     .voice-field-wrap .form-control.editable-input,
@@ -25,12 +27,19 @@
         cursor: pointer;
         transition: background 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
         padding: 0;
+        opacity: 0;
+        pointer-events: none;
     }
 
     .voice-field-inline-mic svg {
         width: 13px;
         height: 13px;
         fill: currentColor;
+    }
+
+    .voice-field-wrap.active .voice-field-inline-mic {
+        opacity: 0.5;
+        pointer-events: auto;
     }
 
     .voice-field-inline-mic:hover,
@@ -51,7 +60,7 @@
     }
 
     .voice-field-wrap textarea + .voice-field-inline-mic {
-        top: 14px;
+        top: 10px;
         transform: none;
     }
 </style>
@@ -82,6 +91,21 @@
         let activeButton = null;
         let isListening = false;
         let lastTranscript = '';
+
+        function setActiveWrapper(field) {
+            document.querySelectorAll('.voice-field-wrap.active').forEach(function (wrapper) {
+                if (!field || !wrapper.contains(field)) {
+                    wrapper.classList.remove('active');
+                }
+            });
+
+            if (field) {
+                const wrapper = field.closest('.voice-field-wrap');
+                if (wrapper) {
+                    wrapper.classList.add('active');
+                }
+            }
+        }
 
         function isEligibleField(field) {
             return !!field && field.matches(supportedSelector) && !field.readOnly;
@@ -174,7 +198,7 @@
                 return;
             }
 
-            const wrapper = document.createElement('span');
+            const wrapper = document.createElement('div');
             wrapper.className = 'voice-field-wrap';
             field.parentNode.insertBefore(wrapper, field);
             wrapper.appendChild(field);
@@ -200,6 +224,7 @@
 
                 activeField = field;
                 activeButton = button;
+                setActiveWrapper(field);
                 field.focus({ preventScroll: true });
 
                 try {
@@ -253,6 +278,35 @@
             };
 
             window.alert(messageMap[event.error] || 'Voice input could not start. Please try again.');
+        });
+
+        document.addEventListener('focusin', function (event) {
+            if (!isEligibleField(event.target)) {
+                setActiveWrapper(null);
+                return;
+            }
+
+            activeField = event.target;
+            activeButton = activeField.closest('.voice-field-wrap')?.querySelector('.voice-field-inline-mic') ?? null;
+            setActiveWrapper(activeField);
+        });
+
+        document.addEventListener('focusout', function (event) {
+            const field = event.target;
+            if (!field || !field.closest('.voice-field-wrap')) {
+                return;
+            }
+
+            window.setTimeout(function () {
+                const activeElement = document.activeElement;
+                if (field.closest('.voice-field-wrap')?.contains(activeElement)) {
+                    return;
+                }
+
+                if (!isListening) {
+                    setActiveWrapper(null);
+                }
+            }, 0);
         });
 
         document.addEventListener('DOMContentLoaded', initializeVoiceFields);

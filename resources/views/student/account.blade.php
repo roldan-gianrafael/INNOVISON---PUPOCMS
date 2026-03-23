@@ -310,6 +310,12 @@
 @endpush
 
 @section('content')
+@php
+    $linkedAccessLevel = strtolower(trim((string) optional($linkedAdminProfile)->access_level));
+    $linkedRoleLabel = !empty($linkedAdminProfile)
+        ? (str_contains($linkedAccessLevel, 'faculty') ? 'Faculty' : 'Admin')
+        : null;
+@endphp
 <div class="container" style="padding: 40px 20px;">
 
     @if(session('success'))
@@ -330,10 +336,15 @@
         </div>
         <div class="hero-info">
             <h1 class="hero-name">{{ $user->name }} <span class="hero-badge">Active</span></h1>
-            <div class="hero-course">
+            <div class="hero-course" @if($linkedRoleLabel) style="display: none;" @endif>
                 {{ $user->student_id }} • {{ $user->course ?? 'BS Information Technology' }}
             </div>
-            
+            @if($linkedRoleLabel)
+                <div class="hero-course">
+                    {{ $user->student_id }} - {{ $linkedRoleLabel }}
+                </div>
+            @endif
+
             <div class="hero-stats">
                 <div class="stat-item">
                     <span class="stat-val">{{ $pendingCount ?? 0 }}</span>
@@ -582,7 +593,7 @@
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Age</label>
-                    <input type="number" name="age" class="form-control editable-input" value="{{ old('age', $linkedAdminProfile->age) }}" disabled>
+                    <input type="number" name="age" class="form-control" value="{{ old('age', $linkedAdminProfile->age) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Civil Status</label>

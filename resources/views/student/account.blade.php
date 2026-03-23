@@ -512,16 +512,18 @@
             </div>
         @endif
 
-        <div class="profile-grid-2">
-            <div>
-                <label class="input-label">Gender</label>
-                <input type="text" class="form-control" value="{{ $user->gender }}" readonly style="background-color: #f8fafc;">
+        @if(empty($linkedAdminProfile))
+            <div class="profile-grid-2">
+                <div>
+                    <label class="input-label">Gender</label>
+                    <input type="text" class="form-control" value="{{ $user->gender }}" readonly style="background-color: #f8fafc;">
+                </div>
+                <div>
+                    <label class="input-label">Birthday (DOB)</label>
+                    <input type="text" class="form-control" value="{{ $user->DOB }}" readonly style="background-color: #f8fafc;">
+                </div>
             </div>
-            <div>
-                <label class="input-label">Birthday (DOB)</label>
-                <input type="text" class="form-control" value="{{ $user->DOB }}" readonly style="background-color: #f8fafc;">
-            </div>
-        </div>
+        @endif
 
         @if(empty($linkedAdminProfile))
             <div class="profile-grid-2">
@@ -536,10 +538,12 @@
             </div>
         @endif
 
-        <div style="margin-bottom: 15px;">
-            <label class="input-label">Contact Number</label>
-            <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $user->contact_no) }}" disabled>
-        </div>
+        @if(empty($linkedAdminProfile))
+            <div style="margin-bottom: 15px;">
+                <label class="input-label">Contact Number</label>
+                <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $user->contact_no) }}" disabled>
+            </div>
+        @endif
 
         @if(!empty($linkedAdminProfile))
             <div class="profile-grid-2">
@@ -559,16 +563,23 @@
                     <input type="email" name="email" class="form-control editable-input" value="{{ old('email', $linkedAdminProfile->email) }}" disabled>
                 </div>
                 <div>
-                    <label class="input-label">Birthday</label>
-                    <input type="date" name="birthday" class="form-control editable-input" value="{{ old('birthday', $linkedAdminProfile->birthday) }}" disabled>
+                    <label class="input-label">Contact Number</label>
+                    <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $user->contact_no) }}" disabled>
                 </div>
             </div>
 
-            <div class="profile-grid-3">
+            <div class="profile-grid-2">
+                <div>
+                    <label class="input-label">Birthday</label>
+                    <input type="date" name="birthday" class="form-control editable-input" value="{{ old('birthday', $linkedAdminProfile->birthday) }}" disabled>
+                </div>
                 <div>
                     <label class="input-label">Gender</label>
                     <input type="text" name="gender" class="form-control editable-input" value="{{ old('gender', $linkedAdminProfile->gender) }}" disabled>
                 </div>
+            </div>
+
+            <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Age</label>
                     <input type="number" name="age" class="form-control editable-input" value="{{ old('age', $linkedAdminProfile->age) }}" disabled>
@@ -629,11 +640,13 @@
 
 <script>
 function enableEditing() {
-    // 1. I-enable lahat ng inputs na may class 'editable-input'
-    const inputs = document.querySelectorAll('.editable-input');
+    // 1. I-enable lahat ng editable fields sa profile form
+    const form = document.querySelector('form[action="{{ route('student.updateContact') }}"]');
+    const inputs = form ? form.querySelectorAll('.editable-input') : [];
     
     inputs.forEach(input => {
-        input.removeAttribute('disabled');
+        input.disabled = false;
+        input.readOnly = false;
         input.style.borderColor = '#8B0000'; 
         input.style.backgroundColor = '#fff';
     });

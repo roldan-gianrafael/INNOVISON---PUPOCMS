@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Admin;
 use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,22 @@ use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
+    private function resolveLinkedAdminProfile(?User $user): ?Admin
+    {
+        if (!$user || !Admin::hasColumn('email')) {
+            return null;
+        }
+
+        $email = trim(strtolower((string) $user->email));
+        if ($email === '') {
+            return null;
+        }
+
+        return Admin::query()
+            ->whereRaw('LOWER(email) = ?', [$email])
+            ->first();
+    }
+
     private function normalizeBarcodeValue(?string $value): string
     {
         return strtoupper((string) preg_replace('/[^A-Za-z0-9]/', '', $value ?? ''));
@@ -306,6 +323,8 @@ class AppointmentController extends Controller
     $notifications = collect($notifications);
 
     // 5. Return view user
+    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+
     return view('student.account', compact(
         'user', 
         'appointments', 
@@ -313,7 +332,8 @@ class AppointmentController extends Controller
         'approvedCount', 
         'completedCount', 
         'cancelledCount', 
-        'notifications'
+        'notifications',
+        'linkedAdminProfile'
     ));
 }
 
@@ -381,6 +401,18 @@ class AppointmentController extends Controller
         'section'    => ['required', 'string', 'max:10'],
         'height'     => ['nullable', 'numeric'],
         'weight'     => ['nullable', 'numeric'],
+        'admin_profile_id' => ['nullable', 'integer', 'exists:admins,admin_id'],
+        'first_name' => ['nullable', 'string', 'max:255'],
+        'last_name' => ['nullable', 'string', 'max:255'],
+        'email' => ['nullable', 'email', 'max:255'],
+        'birthday' => ['nullable', 'date'],
+        'age' => ['nullable', 'integer', 'min:0'],
+        'gender' => ['nullable', 'string', 'max:255'],
+        'civil_status' => ['nullable', 'string', 'max:255'],
+        'address' => ['nullable', 'string', 'max:1000'],
+        'emergency_contact_person' => ['nullable', 'string', 'max:255'],
+        'emergency_contact_no' => ['nullable', 'string', 'max:255'],
+        'office' => ['nullable', 'string', 'max:255'],
     ], [
         'contact_no.regex' => 'Contact number must be 10 to 13 digits.',
     ]);
@@ -395,6 +427,28 @@ class AppointmentController extends Controller
     $user->section = $validated['section'];
     $user->height = $validated['height'];
     $user->weight = $validated['weight'];
+
+    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+    if ($linkedAdminProfile && isset($validated['admin_profile_id']) && (int) $validated['admin_profile_id'] === (int) $linkedAdminProfile->admin_id) {
+        $linkedAdminProfile->first_name = $validated['first_name'] ?? $linkedAdminProfile->first_name;
+        $linkedAdminProfile->last_name = $validated['last_name'] ?? $linkedAdminProfile->last_name;
+        $linkedAdminProfile->email = $validated['email'] ?? $linkedAdminProfile->email;
+        $linkedAdminProfile->birthday = $validated['birthday'] ?? $linkedAdminProfile->birthday;
+        $linkedAdminProfile->age = $validated['age'] ?? $linkedAdminProfile->age;
+        $linkedAdminProfile->gender = $validated['gender'] ?? $linkedAdminProfile->gender;
+        $linkedAdminProfile->civil_status = $validated['civil_status'] ?? $linkedAdminProfile->civil_status;
+        $linkedAdminProfile->address = $validated['address'] ?? $linkedAdminProfile->address;
+        $linkedAdminProfile->emergency_contact_person = $validated['emergency_contact_person'] ?? $linkedAdminProfile->emergency_contact_person;
+        $linkedAdminProfile->emergency_contact_no = $validated['emergency_contact_no'] ?? $linkedAdminProfile->emergency_contact_no;
+        $linkedAdminProfile->office = $validated['office'] ?? $linkedAdminProfile->office;
+        $linkedAdminProfile->save();
+
+        $user->first_name = $validated['first_name'] ?? $user->first_name;
+        $user->last_name = $validated['last_name'] ?? $user->last_name;
+        $user->name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: $user->name;
+        $user->email = $validated['email'] ?? $user->email;
+    }
+
     $user->save();
 
     // 5. SYSTEM LOG ---
@@ -402,12 +456,12 @@ class AppointmentController extends Controller
         'user_id'     => $user->id,
         'user_name'   => $user->name,
         'action'      => 'Profile Update',
-        'description' => "Updated profile: Year ($oldYear to $newYear), Section, and Medical Info.",
+        'description' => "Updated profile: Year ($oldYear to $newYear), Section, Medical Info, and linked designee info when available.",
         'ip_address'  => $request->ip(),
         'user_agent'  => $request->userAgent(),
     ]);
 
-    return redirect()->back()->with('success', 'Profile and academic details updated successfully.');
+    return redirect()->back()->with('success', 'Profile details updated successfully.');
 }
 
     // -------------------------------

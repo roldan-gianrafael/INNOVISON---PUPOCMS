@@ -278,23 +278,41 @@ class LoginController extends Controller
             return null;
         }
 
-        $authMethod = $this->idpTokenAuthMethod();
-        $response = $this->performTokenExchangeRequest($tokenUrl, $payload, $clientId, $clientSecret, $authMethod);
-        if ($response->successful() && is_array($response->json())) {
-            return $response->json();
+        $configuredMethod = $this->idpTokenAuthMethod();
+        $authMethods = array_values(array_unique(array_filter([
+            $configuredMethod,
+            'client_secret_basic',
+            'client_secret_post',
+            'json',
+        ])));
+
+        $payloadVariants = [$payload];
+        if (isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '') {
+            $withoutRedirectUri = $payload;
+            unset($withoutRedirectUri['redirect_uri']);
+            $payloadVariants[] = $withoutRedirectUri;
         }
 
-        Log::warning('IDP token exchange failed.', [
-            'token_url' => $tokenUrl,
-            'auth_method' => $authMethod,
-            'status' => $response->status(),
-            'body' => Str::limit((string) $response->body(), 1200),
-            'payload_flags' => [
-                'has_code' => isset($payload['code']) && $payload['code'] !== '',
-                'has_grant_type' => isset($payload['grant_type']) && $payload['grant_type'] !== '',
-                'has_redirect_uri' => isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '',
-            ],
-        ]);
+        foreach ($authMethods as $authMethod) {
+            foreach ($payloadVariants as $attemptPayload) {
+                $response = $this->performTokenExchangeRequest($tokenUrl, $attemptPayload, $clientId, $clientSecret, $authMethod);
+                if ($response->successful() && is_array($response->json())) {
+                    return $response->json();
+                }
+
+                Log::warning('IDP token exchange failed.', [
+                    'token_url' => $tokenUrl,
+                    'auth_method' => $authMethod,
+                    'status' => $response->status(),
+                    'body' => Str::limit((string) $response->body(), 1200),
+                    'payload_flags' => [
+                        'has_code' => isset($attemptPayload['code']) && $attemptPayload['code'] !== '',
+                        'has_grant_type' => isset($attemptPayload['grant_type']) && $attemptPayload['grant_type'] !== '',
+                        'has_redirect_uri' => isset($attemptPayload['redirect_uri']) && $attemptPayload['redirect_uri'] !== '',
+                    ],
+                ]);
+            }
+        }
 
         return null;
     }
@@ -321,6 +339,7 @@ class LoginController extends Controller
 
         if ($authMethod === 'client_secret_basic') {
             $basicPayload = $payload;
+            unset($basicPayload['client_id']);
             unset($basicPayload['client_secret']);
 
             return $request

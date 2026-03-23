@@ -24,9 +24,19 @@ class AdminController extends Controller
         }
 
         $email = trim(strtolower((string) $user->email));
-        if ($email !== '' && Admin::hasColumn('email_address')) {
+        $emailColumns = array_values(array_filter([
+            Admin::hasColumn('email') ? 'email' : null,
+            Admin::hasColumn('email_address') ? 'email_address' : null,
+        ]));
+
+        if ($email !== '' && !empty($emailColumns)) {
             $matchedByEmail = Admin::query()
-                ->whereRaw('LOWER(email_address) = ?', [$email])
+                ->where(function ($query) use ($emailColumns, $email) {
+                    foreach ($emailColumns as $index => $column) {
+                        $method = $index === 0 ? 'whereRaw' : 'orWhereRaw';
+                        $query->{$method}('LOWER(' . $column . ') = ?', [$email]);
+                    }
+                })
                 ->first();
 
             if ($matchedByEmail) {
@@ -397,18 +407,47 @@ public function updateClearance(Request $request, $id)
     public function updateProfile(Request $request)
 {
     $request->validate([
-        'name' => 'required|string|max:255',
+        'admin_id' => 'required|exists:admins,admin_id',
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
+        'birthday' => 'nullable|date',
+        'age' => 'nullable|integer|min:0',
+        'gender' => 'nullable|string|max:255',
+        'civil_status' => 'nullable|string|max:255',
+        'address' => 'nullable|string|max:1000',
+        'emergency_contact_person' => 'nullable|string|max:255',
+        'emergency_contact_no' => 'nullable|string|max:255',
+        'office' => 'nullable|string|max:255',
+        'access_level' => 'nullable|string|max:255',
         'password' => 'nullable|string|min:6|confirmed',
     ]);
     
     /** @var \App\Models\User $user */
     $user = Auth::user();
+    $adminProfile = Admin::query()->findOrFail($request->admin_id);
     
 
     $passwordChanged = $request->filled('password') ? ' (Password was also updated)' : '';
+    $fullName = trim($request->first_name . ' ' . $request->last_name);
 
-    $user->name = $request->name;
+    $adminProfile->first_name = $request->first_name;
+    $adminProfile->last_name = $request->last_name;
+    $adminProfile->email = $request->email;
+    $adminProfile->birthday = $request->birthday;
+    $adminProfile->age = $request->age;
+    $adminProfile->gender = $request->gender;
+    $adminProfile->civil_status = $request->civil_status;
+    $adminProfile->address = $request->address;
+    $adminProfile->emergency_contact_person = $request->emergency_contact_person;
+    $adminProfile->emergency_contact_no = $request->emergency_contact_no;
+    $adminProfile->office = $request->office;
+    $adminProfile->access_level = $request->access_level;
+    $adminProfile->save();
+
+    $user->first_name = $request->first_name;
+    $user->last_name = $request->last_name;
+    $user->name = $fullName;
     $user->email = $request->email;
 
     if ($request->filled('password')) {
@@ -422,7 +461,7 @@ public function updateClearance(Request $request, $id)
         'user_id'     => $user->id,
         'user_name'   => $user->name,
         'action'      => 'Security Update', 
-        'description' => "User updated their primary profile info: Name/Email{$passwordChanged}.",
+        'description' => "User updated admin profile info: Name/Email{$passwordChanged}.",
         'ip_address'  => $request->ip(),
         'user_agent'  => $request->userAgent(),
     ]);

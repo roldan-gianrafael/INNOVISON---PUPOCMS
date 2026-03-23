@@ -66,9 +66,9 @@
     <section class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 12px;">
             <div>
-                <h3 style="margin-bottom: 6px;">Synced Admin Profile</h3>
+                <h3 style="margin-bottom: 6px;">Admin Profile</h3>
                 <p style="margin: 0; font-size: 13px; color: #64748b;">
-                    External faculty/admin profile matched to your current account.
+                    Profile details stored in the local admins table for this account.
                 </p>
             </div>
             <span style="padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; {{ $externalAdminProfile ? 'background:#dcfce7; color:#166534;' : 'background:#fee2e2; color:#991b1b;' }}">
@@ -90,50 +90,63 @@
 
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="text" class="form-control" value="{{ $externalAdminProfile->email_address ?? '' }}" disabled>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->email ?? '' }}" disabled>
                 </div>
 
                 <div class="form-group">
-                    <label>Role</label>
-                    <input type="text" class="form-control" value="{{ $externalAdminProfile->role ?? '' }}" disabled>
+                    <label>Access Level</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->access_level ?? '' }}" disabled>
                 </div>
 
                 <div class="form-group">
                     <label>Office</label>
-                    <input type="text" class="form-control" value="{{ $externalAdminProfile->offices ?? '' }}" disabled>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->office ?? '' }}" disabled>
                 </div>
 
                 <div class="form-group">
-                    <label>Contact Number</label>
-                    <input type="text" class="form-control" value="{{ $externalAdminProfile->contact_no ?? '' }}" disabled>
+                    <label>Birthday</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->birthday ?? '' }}" disabled>
                 </div>
+
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->age ?? '' }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->gender ?? '' }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Civil Status</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->civil_status ?? '' }}" disabled>
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Address</label>
+                    <textarea class="form-control" rows="2" disabled>{{ $externalAdminProfile->address ?? '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Emergency Contact Person</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->emergency_contact_person ?? '' }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Emergency Contact Number</label>
+                    <input type="text" class="form-control" value="{{ $externalAdminProfile->emergency_contact_no ?? '' }}" disabled>
+                </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 18px;">
+                <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
             </div>
         @else
             <div class="alert alert-error" style="margin-bottom:0;">
-                No synced admin profile matched your logged-in email <strong>{{ $admin->email ?? 'N/A' }}</strong>.
+                No admin profile matched your logged-in email <strong>{{ $admin->email ?? 'N/A' }}</strong>.
             </div>
         @endif
-    </section>
-
-    <section class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3>Super Admin Profile</h3>
-            <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
-        </div>
-
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">
-            These fields are read-only. Click the edit button above to make changes.
-        </p>
-
-        <div class="form-group">
-            <label>Super Admin Name</label>
-            <input type="text" class="form-control" value="{{ $admin->name ?? 'Super Admin' }}" disabled>
-        </div>
-
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" value="{{ $admin->email ?? 'superadmin@pup.edu.ph' }}" disabled>
-        </div>
     </section>
 
     <form action="{{ url('/admin/settings/update') }}" method="POST">
@@ -192,15 +205,76 @@
             
             <form action="{{ url('/admin/profile/update') }}" method="POST">
                 @csrf @method('PUT')
+                <input type="hidden" name="admin_id" value="{{ $externalAdminProfile->admin_id ?? '' }}">
 
-                <div class="form-group">
-                    <label>Super Admin Name</label>
-                    <input type="text" name="name" class="form-control" value="{{ $admin->name ?? '' }}" required>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" class="form-control" value="{{ $externalAdminProfile->first_name ?? $admin->first_name ?? '' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" class="form-control" value="{{ $externalAdminProfile->last_name ?? $admin->last_name ?? '' }}" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" class="form-control" value="{{ $admin->email ?? '' }}" required>
+                    <input type="email" name="email" class="form-control" value="{{ $externalAdminProfile->email ?? $admin->email ?? '' }}" required>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Birthday</label>
+                        <input type="date" name="birthday" class="form-control" value="{{ $externalAdminProfile->birthday ?? '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" name="age" class="form-control" value="{{ $externalAdminProfile->age ?? '' }}" min="0">
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <input type="text" name="gender" class="form-control" value="{{ $externalAdminProfile->gender ?? '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Civil Status</label>
+                        <input type="text" name="civil_status" class="form-control" value="{{ $externalAdminProfile->civil_status ?? '' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea name="address" class="form-control" rows="2">{{ $externalAdminProfile->address ?? '' }}</textarea>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Emergency Contact Person</label>
+                        <input type="text" name="emergency_contact_person" class="form-control" value="{{ $externalAdminProfile->emergency_contact_person ?? '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Emergency Contact Number</label>
+                        <input type="text" name="emergency_contact_no" class="form-control" value="{{ $externalAdminProfile->emergency_contact_no ?? '' }}">
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Office</label>
+                        <input type="text" name="office" class="form-control" value="{{ $externalAdminProfile->office ?? '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Access Level</label>
+                        <input type="text" name="access_level" class="form-control" value="{{ $externalAdminProfile->access_level ?? '' }}">
+                    </div>
                 </div>
 
                 <div style="border-top: 1px solid #eee; margin: 15px 0; padding-top: 15px;">
@@ -230,6 +304,9 @@
 @push('scripts')
 <script>
     function openProfileModal() {
+        @if(!$externalAdminProfile)
+        return;
+        @endif
         document.getElementById('profileModal').style.display = 'flex';
     }
     function closeProfileModal() {

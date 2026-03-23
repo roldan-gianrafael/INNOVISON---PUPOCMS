@@ -276,48 +276,62 @@ class LoginController extends Controller
             return null;
         }
 
-        $formResponse = Http::acceptJson()->timeout(20)->asForm()->post($tokenUrl, $payload);
-        if ($formResponse->successful() && is_array($formResponse->json())) {
-            return $formResponse->json();
+        $attempts = [];
+        $attempts[] = [
+            'label' => 'form request (configured payload)',
+            'payload' => $payload,
+            'as_form' => true,
+        ];
+
+        // Compatibility fallback: some IDP setups reject redirect_uri on token exchange even when
+        // it was sent during authorization, while others require it. Try both before changing
+        // the request content type.
+        if (isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '') {
+            $withoutRedirectUri = $payload;
+            unset($withoutRedirectUri['redirect_uri']);
+            $attempts[] = [
+                'label' => 'form request (without redirect_uri)',
+                'payload' => $withoutRedirectUri,
+                'as_form' => true,
+            ];
+        } elseif ($redirectUri !== '') {
+            $withRedirectUri = $payload;
+            $withRedirectUri['redirect_uri'] = $redirectUri;
+            $attempts[] = [
+                'label' => 'form request (with redirect_uri)',
+                'payload' => $withRedirectUri,
+                'as_form' => true,
+            ];
         }
-        Log::warning('IDP token exchange failed (form request).', [
-            'token_url' => $tokenUrl,
-            'status' => $formResponse->status(),
-            'body' => Str::limit((string) $formResponse->body(), 1200),
-            'payload_flags' => [
-                'has_code' => isset($payload['code']) && $payload['code'] !== '',
-                'has_grant_type' => isset($payload['grant_type']) && $payload['grant_type'] !== '',
-                'has_redirect_uri' => isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '',
-            ],
-        ]);
 
-        // Compatibility retry: some IDP setups require redirect_uri on token exchange even if
-        // authorize request omitted redirect_uri.
-        if (!isset($payload['redirect_uri']) && $redirectUri !== '') {
-            $retryPayload = $payload;
-            $retryPayload['redirect_uri'] = $redirectUri;
+        $attempts[] = [
+            'label' => 'json request',
+            'payload' => $payload,
+            'as_form' => false,
+        ];
 
-            $retryFormResponse = Http::acceptJson()->timeout(20)->asForm()->post($tokenUrl, $retryPayload);
-            if ($retryFormResponse->successful() && is_array($retryFormResponse->json())) {
-                return $retryFormResponse->json();
+        foreach ($attempts as $attempt) {
+            $requestBuilder = Http::acceptJson()->timeout(20);
+            $response = $attempt['as_form']
+                ? $requestBuilder->asForm()->post($tokenUrl, $attempt['payload'])
+                : $requestBuilder->post($tokenUrl, $attempt['payload']);
+
+            if ($response->successful() && is_array($response->json())) {
+                return $response->json();
             }
 
-            Log::warning('IDP token exchange retry failed (form with redirect_uri).', [
+            Log::warning('IDP token exchange failed.', [
+                'attempt' => $attempt['label'],
                 'token_url' => $tokenUrl,
-                'status' => $retryFormResponse->status(),
-                'body' => Str::limit((string) $retryFormResponse->body(), 1200),
+                'status' => $response->status(),
+                'body' => Str::limit((string) $response->body(), 1200),
+                'payload_flags' => [
+                    'has_code' => isset($attempt['payload']['code']) && $attempt['payload']['code'] !== '',
+                    'has_grant_type' => isset($attempt['payload']['grant_type']) && $attempt['payload']['grant_type'] !== '',
+                    'has_redirect_uri' => isset($attempt['payload']['redirect_uri']) && $attempt['payload']['redirect_uri'] !== '',
+                ],
             ]);
         }
-
-        $jsonResponse = Http::acceptJson()->timeout(20)->post($tokenUrl, $payload);
-        if ($jsonResponse->successful() && is_array($jsonResponse->json())) {
-            return $jsonResponse->json();
-        }
-        Log::warning('IDP token exchange failed (json request).', [
-            'token_url' => $tokenUrl,
-            'status' => $jsonResponse->status(),
-            'body' => Str::limit((string) $jsonResponse->body(), 1200),
-        ]);
 
         return null;
     }

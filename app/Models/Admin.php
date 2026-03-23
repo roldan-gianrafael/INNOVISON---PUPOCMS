@@ -10,12 +10,25 @@ class Admin extends Model
     protected $table = 'admins';
     protected $primaryKey = 'admin_id';
 
-    public $timestamps = false;
+    public $timestamps = true;
     public $incrementing = true;
 
     protected $keyType = 'int';
 
     protected $guarded = [];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Admin $admin) {
+            $firstName = trim((string) $admin->first_name);
+            $lastName = trim((string) $admin->last_name);
+            $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+
+            if ($fullName !== '' && static::hasColumn('name')) {
+                $admin->name = $fullName;
+            }
+        });
+    }
 
     public static function availableColumns(): array
     {

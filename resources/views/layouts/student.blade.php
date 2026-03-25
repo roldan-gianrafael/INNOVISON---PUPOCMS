@@ -25,15 +25,6 @@
     <link rel="stylesheet" href="{{ asset('css/booking.css') }}">
     
     <style>
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        ) {
-            display: none !important;
-        }
-
         img,
         svg,
         video,
@@ -649,24 +640,56 @@
                     return;
                 }
 
-                const triggerSelectors = [
-                    '#sienna-accessibility-button',
-                    '.sienna-accessibility-button',
-                    '.sienna-accessibility-trigger',
-                    '[data-sienna-accessibility-trigger]',
-                    'button[aria-label*="accessibility" i]:not(#studentAccessibilityLaunch)',
-                    'button[title*="accessibility" i]:not(#studentAccessibilityLaunch)'
-                ];
-
                 function findSiennaTrigger() {
-                    for (const selector of triggerSelectors) {
+                    const selectorMatches = [
+                        '#sienna-accessibility-button',
+                        '.sienna-accessibility-button',
+                        '.sienna-accessibility-trigger',
+                        '[data-sienna-accessibility-trigger]',
+                        'button[aria-label*="accessibility" i]:not(#studentAccessibilityLaunch)',
+                        'button[title*="accessibility" i]:not(#studentAccessibilityLaunch)',
+                        '[role="button"][aria-label*="accessibility" i]'
+                    ];
+
+                    for (const selector of selectorMatches) {
                         const candidate = document.querySelector(selector);
                         if (candidate) {
                             return candidate;
                         }
                     }
 
-                    return null;
+                    const fallbackCandidates = Array.from(document.querySelectorAll('button, [role="button"], div'))
+                        .filter((element) => {
+                            if (element.id === 'studentAccessibilityLaunch') {
+                                return false;
+                            }
+
+                            const label = [
+                                element.getAttribute('aria-label'),
+                                element.getAttribute('title'),
+                                element.textContent
+                            ].join(' ').toLowerCase();
+
+                            const style = window.getComputedStyle(element);
+                            const looksFloating = style.position === 'fixed' || style.position === 'sticky';
+
+                            return looksFloating && label.includes('access');
+                        });
+
+                    return fallbackCandidates[0] || null;
+                }
+
+                function hideSiennaTrigger() {
+                    const trigger = findSiennaTrigger();
+                    if (!trigger) {
+                        return;
+                    }
+
+                    trigger.style.position = 'fixed';
+                    trigger.style.left = '-9999px';
+                    trigger.style.opacity = '0';
+                    trigger.style.pointerEvents = 'none';
+                    trigger.setAttribute('aria-hidden', 'true');
                 }
 
                 accessibilityLaunchBtn.addEventListener('click', () => {
@@ -677,6 +700,17 @@
                     }
 
                     trigger.click();
+                });
+
+                hideSiennaTrigger();
+
+                const observer = new MutationObserver(() => {
+                    hideSiennaTrigger();
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
                 });
             }
 

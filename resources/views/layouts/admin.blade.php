@@ -862,15 +862,6 @@
             border-color: rgba(128, 0, 0, 0.34);
         }
 
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        ) {
-            display: none !important;
-        }
-
         html[data-theme="light"] .admin-user {
             border-color: rgba(128, 0, 0, 0.24);
             background: rgba(255, 255, 255, 0.78);
@@ -1338,24 +1329,56 @@
             return;
         }
 
-        const triggerSelectors = [
-            '#sienna-accessibility-button',
-            '.sienna-accessibility-button',
-            '.sienna-accessibility-trigger',
-            '[data-sienna-accessibility-trigger]',
-            'button[aria-label*="accessibility" i]:not(#adminAccessibilityLaunch)',
-            'button[title*="accessibility" i]:not(#adminAccessibilityLaunch)'
-        ];
-
         function findSiennaTrigger() {
-            for (const selector of triggerSelectors) {
+            const selectorMatches = [
+                '#sienna-accessibility-button',
+                '.sienna-accessibility-button',
+                '.sienna-accessibility-trigger',
+                '[data-sienna-accessibility-trigger]',
+                'button[aria-label*="accessibility" i]:not(#adminAccessibilityLaunch)',
+                'button[title*="accessibility" i]:not(#adminAccessibilityLaunch)',
+                '[role="button"][aria-label*="accessibility" i]'
+            ];
+
+            for (const selector of selectorMatches) {
                 const candidate = document.querySelector(selector);
                 if (candidate) {
                     return candidate;
                 }
             }
 
-            return null;
+            const fallbackCandidates = Array.from(document.querySelectorAll('button, [role="button"], div'))
+                .filter((element) => {
+                    if (element.id === 'adminAccessibilityLaunch') {
+                        return false;
+                    }
+
+                    const label = [
+                        element.getAttribute('aria-label'),
+                        element.getAttribute('title'),
+                        element.textContent
+                    ].join(' ').toLowerCase();
+
+                    const style = window.getComputedStyle(element);
+                    const looksFloating = style.position === 'fixed' || style.position === 'sticky';
+
+                    return looksFloating && label.includes('access');
+                });
+
+            return fallbackCandidates[0] || null;
+        }
+
+        function hideSiennaTrigger() {
+            const trigger = findSiennaTrigger();
+            if (!trigger) {
+                return;
+            }
+
+            trigger.style.position = 'fixed';
+            trigger.style.left = '-9999px';
+            trigger.style.opacity = '0';
+            trigger.style.pointerEvents = 'none';
+            trigger.setAttribute('aria-hidden', 'true');
         }
 
         launchButton.addEventListener('click', function () {
@@ -1366,6 +1389,17 @@
             }
 
             trigger.click();
+        });
+
+        hideSiennaTrigger();
+
+        const observer = new MutationObserver(function () {
+            hideSiennaTrigger();
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
         });
     }
 

@@ -8,6 +8,7 @@
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
         position="bottom_right"
+        offset="24,96"
         defer
     ></script>
     <script>

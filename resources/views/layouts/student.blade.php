@@ -6,7 +6,7 @@
     <title>@yield('title') - PUP Taguig Clinic</title>
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
-        position="bottom_right"
+        position="bottom-right"
         offset="24,96"
         size="small"
         defer

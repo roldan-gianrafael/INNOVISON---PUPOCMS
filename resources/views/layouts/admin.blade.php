@@ -7,7 +7,7 @@
     <title>@yield('title') - PUPT Admin</title>
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
-        position="bottom_right"
+        position="bottom-right"
         offset="24,96"
         defer
     ></script>

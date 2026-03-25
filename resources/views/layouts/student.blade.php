@@ -31,52 +31,6 @@
             .sienna-accessibility-trigger,
             [data-sienna-accessibility-trigger]
         ) {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            color: #8b0000 !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        ):hover {
-            background: transparent !important;
-            color: #6f0000 !important;
-        }
-
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        ) svg {
-            fill: #8b0000 !important;
-            stroke: #8b0000 !important;
-        }
-
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        ) svg circle,
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        ) .circle,
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        ) [class*="circle"] {
             display: none !important;
         }
 
@@ -148,6 +102,7 @@
         }
 
         .nav-list li .theme-toggle-btn,
+        .nav-list li .accessibility-toggle-btn,
         .nav-list li .logout-btn {
             margin-left: 12px;
             padding: 8px 16px;
@@ -167,7 +122,8 @@
             min-height: 34px;
         }
 
-        .nav-list li .theme-toggle-btn {
+        .nav-list li .theme-toggle-btn,
+        .nav-list li .accessibility-toggle-btn {
             font-family: inherit;
             width: 36px;
             height: 36px;
@@ -178,7 +134,8 @@
             line-height: 0;
         }
 
-        .nav-list li .theme-toggle-btn svg {
+        .nav-list li .theme-toggle-btn svg,
+        .nav-list li .accessibility-toggle-btn svg {
             width: 18px;
             height: 18px;
             display: block;
@@ -198,6 +155,7 @@
         }
 
         .nav-list li .theme-toggle-btn:hover,
+        .nav-list li .accessibility-toggle-btn:hover,
         .nav-list li .logout-btn:hover {
             background: rgba(255, 255, 255, 0.24);
             border-color: rgba(255, 255, 255, 0.65);
@@ -208,6 +166,7 @@
         }
 
         .nav-list li .theme-toggle-btn:focus-visible,
+        .nav-list li .accessibility-toggle-btn:focus-visible,
         .nav-list li .logout-btn:focus-visible {
             outline: 2px solid #ffc107;
             outline-offset: 2px;
@@ -258,7 +217,8 @@
                 display: none;
             }
 
-            .nav-list li .theme-toggle-btn {
+            .nav-list li .theme-toggle-btn,
+            .nav-list li .accessibility-toggle-btn {
                 margin-left: 0;
                 width: 40px;
                 height: 40px;
@@ -327,6 +287,7 @@
         }
 
         html[data-theme="dark"] .nav-list li .theme-toggle-btn,
+        html[data-theme="dark"] .nav-list li .accessibility-toggle-btn,
         html[data-theme="dark"] .nav-list li .logout-btn {
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 255, 255, 0.4);
@@ -334,6 +295,7 @@
         }
 
         html[data-theme="dark"] .nav-list li .theme-toggle-btn:hover,
+        html[data-theme="dark"] .nav-list li .accessibility-toggle-btn:hover,
         html[data-theme="dark"] .nav-list li .logout-btn:hover {
             background: rgba(255, 255, 255, 0.22);
         }
@@ -573,6 +535,18 @@
                             </svg>
                         </button>
                     </li>
+                    <li>
+                        <button type="button" id="studentAccessibilityLaunch" class="accessibility-toggle-btn" aria-label="Accessibility options" title="Accessibility options">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="5" r="2"></circle>
+                                <path d="M12 7v5"></path>
+                                <path d="M8 10h8"></path>
+                                <path d="M10 22l2-6 2 6"></path>
+                                <path d="M9 12l-3 3"></path>
+                                <path d="M15 12l3 3"></path>
+                            </svg>
+                        </button>
+                    </li>
                     
                     <li>
                         <a href="#" class="logout-btn" 
@@ -612,6 +586,7 @@
             const navToggle = document.querySelector('.nav-toggle');
             const navList = document.querySelector('.nav-list');
             const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const accessibilityLaunchBtn = document.getElementById('studentAccessibilityLaunch');
             const storageKey = 'student_theme';
 
             if (navToggle && navList) {
@@ -668,6 +643,44 @@
 
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
             setTheme(currentTheme);
+
+            function initAccessibilityLaunch() {
+                if (!accessibilityLaunchBtn) {
+                    return;
+                }
+
+                const triggerSelectors = [
+                    '#sienna-accessibility-button',
+                    '.sienna-accessibility-button',
+                    '.sienna-accessibility-trigger',
+                    '[data-sienna-accessibility-trigger]',
+                    'button[aria-label*="accessibility" i]:not(#studentAccessibilityLaunch)',
+                    'button[title*="accessibility" i]:not(#studentAccessibilityLaunch)'
+                ];
+
+                function findSiennaTrigger() {
+                    for (const selector of triggerSelectors) {
+                        const candidate = document.querySelector(selector);
+                        if (candidate) {
+                            return candidate;
+                        }
+                    }
+
+                    return null;
+                }
+
+                accessibilityLaunchBtn.addEventListener('click', () => {
+                    const trigger = findSiennaTrigger();
+                    if (!trigger) {
+                        console.warn('Accessibility widget trigger not found yet.');
+                        return;
+                    }
+
+                    trigger.click();
+                });
+            }
+
+            initAccessibilityLaunch();
 
             if (themeToggleBtn) {
                 themeToggleBtn.addEventListener('click', () => {

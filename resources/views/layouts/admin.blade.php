@@ -867,6 +867,42 @@
             background: rgba(255, 255, 255, 0.78);
         }
 
+        :where(
+            [class*="sienna"][role="dialog"],
+            [class*="sienna"][role="menu"],
+            [id*="sienna"][role="dialog"],
+            [id*="sienna"][role="menu"],
+            [class*="sienna-menu"],
+            [class*="sienna-panel"],
+            [id*="sienna-menu"],
+            [id*="sienna-panel"]
+        ) {
+            background: linear-gradient(180deg, #7f1d2d 0%, #4b5563 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            color: #f8fafc !important;
+            box-shadow: 0 18px 38px rgba(15, 23, 42, 0.35) !important;
+        }
+
+        :where(
+            [class*="sienna-menu"],
+            [class*="sienna-panel"],
+            [id*="sienna-menu"],
+            [id*="sienna-panel"]
+        ) :is(button, [role="button"], input, select) {
+            background: rgba(255, 255, 255, 0.12) !important;
+            border-color: rgba(255, 255, 255, 0.22) !important;
+            color: #f8fafc !important;
+        }
+
+        :where(
+            [class*="sienna-menu"],
+            [class*="sienna-panel"],
+            [id*="sienna-menu"],
+            [id*="sienna-panel"]
+        ) :is(button, [role="button"]):hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+
         html[data-theme="light"] .admin-user-name {
             color: #4f1220;
         }
@@ -1381,6 +1417,37 @@
             trigger.setAttribute('aria-hidden', 'true');
         }
 
+        function themeSiennaMenu() {
+            const candidates = document.querySelectorAll('[class*="sienna"], [id*="sienna"]');
+            candidates.forEach((element) => {
+                const style = window.getComputedStyle(element);
+                const role = (element.getAttribute('role') || '').toLowerCase();
+                const isTrigger = element === findSiennaTrigger();
+                const looksPanel =
+                    !isTrigger &&
+                    (
+                        role === 'dialog' ||
+                        role === 'menu' ||
+                        ((style.position === 'fixed' || style.position === 'absolute') && element.clientWidth >= 220 && element.clientHeight >= 180)
+                    );
+
+                if (!looksPanel) {
+                    return;
+                }
+
+                element.style.background = 'linear-gradient(180deg, #7f1d2d 0%, #4b5563 100%)';
+                element.style.border = '1px solid rgba(255,255,255,0.18)';
+                element.style.color = '#f8fafc';
+                element.style.boxShadow = '0 18px 38px rgba(15, 23, 42, 0.35)';
+
+                element.querySelectorAll('button, [role="button"], input, select').forEach((control) => {
+                    control.style.background = 'rgba(255,255,255,0.12)';
+                    control.style.borderColor = 'rgba(255,255,255,0.22)';
+                    control.style.color = '#f8fafc';
+                });
+            });
+        }
+
         launchButton.addEventListener('click', function () {
             const trigger = findSiennaTrigger();
             if (!trigger) {
@@ -1392,9 +1459,11 @@
         });
 
         hideSiennaTrigger();
+        themeSiennaMenu();
 
         const observer = new MutationObserver(function () {
             hideSiennaTrigger();
+            themeSiennaMenu();
         });
 
         observer.observe(document.body, {

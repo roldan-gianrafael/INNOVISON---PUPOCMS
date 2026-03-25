@@ -7,7 +7,7 @@
     <title>@yield('title') - PUPT Admin</title>
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
-        position="top_right"
+        position="bottom_right"
         defer
     ></script>
     <script>
@@ -1203,16 +1203,6 @@
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="12" cy="12" r="4"></circle>
                 <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-            </svg>
-        </button>
-        <button type="button" class="accessibility-launch-admin" id="adminAccessibilityLaunch" aria-label="Accessibility options" title="Accessibility options">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="5" r="2"></circle>
-                <path d="M12 7v5"></path>
-                <path d="M8 10h8"></path>
-                <path d="M10 22l2-6 2 6"></path>
-                <path d="M9 12l-3 3"></path>
-                <path d="M15 12l3 3"></path>
             </svg>
         </button>
         <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">AI Assistant</button>

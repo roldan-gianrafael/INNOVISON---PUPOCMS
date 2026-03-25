@@ -6,7 +6,7 @@
     <title>@yield('title') - PUP Taguig Clinic</title>
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
-        position="top_right"
+        position="bottom_right"
         size="small"
         defer
     ></script>
@@ -573,19 +573,6 @@
                             </svg>
                         </button>
                     </li>
-                    <li>
-                        <button type="button" id="studentAccessibilityLaunch" class="accessibility-toggle-btn" aria-label="Accessibility options" title="Accessibility options">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="12" cy="5" r="2"></circle>
-                                <path d="M12 7v5"></path>
-                                <path d="M8 10h8"></path>
-                                <path d="M10 22l2-6 2 6"></path>
-                                <path d="M9 12l-3 3"></path>
-                                <path d="M15 12l3 3"></path>
-                            </svg>
-                        </button>
-                    </li>
-                    
                     <li>
                         <a href="#" class="logout-btn" 
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

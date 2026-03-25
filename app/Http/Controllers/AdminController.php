@@ -380,7 +380,6 @@ public function updateClearance(Request $request, $id)
     
 
     $passwordChanged = $request->filled('password') ? ' (Password was also updated)' : '';
-
     $user->name = $request->name;
     $user->email = $request->email;
 
@@ -395,7 +394,7 @@ public function updateClearance(Request $request, $id)
         'user_id'     => $user->id,
         'user_name'   => $user->name,
         'action'      => 'Security Update', 
-        'description' => "User updated their primary profile info: Name/Email{$passwordChanged}.",
+        'description' => "User updated admin profile info: Name/Email{$passwordChanged}.",
         'ip_address'  => $request->ip(),
         'user_agent'  => $request->userAgent(),
     ]);

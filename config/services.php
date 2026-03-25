@@ -46,18 +46,34 @@ return [
         'authorize_response_type' => env('IDP_AUTHORIZE_RESPONSE_TYPE', 'code'),
         'authorize_scope' => env('IDP_AUTHORIZE_SCOPE', ''),
         'token_path' => env('IDP_TOKEN_PATH', '/api/v1/auth/token'),
+        'token_auth_method' => env('IDP_TOKEN_AUTH_METHOD', 'client_secret_post'),
         'token_include_redirect_uri' => filter_var(env('IDP_TOKEN_INCLUDE_REDIRECT_URI', false), FILTER_VALIDATE_BOOL),
         'token_grant_type' => env('IDP_TOKEN_GRANT_TYPE', 'authorization_code'),
+        'use_pkce' => filter_var(env('IDP_USE_PKCE', true), FILTER_VALIDATE_BOOL),
+        'pkce_challenge_method' => env('IDP_PKCE_CHALLENGE_METHOD', 'S256'),
         'profile_paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('IDP_PROFILE_PATHS', '/me,/auth/me,/userinfo'))))),
         'validate_token_path' => env('IDP_VALIDATE_TOKEN_PATH', '/api/validate-token'),
-        'role_prefix' => env('IDP_ROLE_PREFIX', 'OCMS:'),
+        'role_prefix' => env('IDP_ROLE_PREFIX', ''),
         'access_cookie_name' => env('IDP_ACCESS_COOKIE_NAME', 'access_token'),
         'refresh_cookie_name' => env('IDP_REFRESH_COOKIE_NAME', 'refresh_token'),
         'access_cookie_minutes' => (int) env('IDP_ACCESS_COOKIE_MINUTES', 60),
         'refresh_cookie_minutes' => (int) env('IDP_REFRESH_COOKIE_MINUTES', 10080),
         'cookie_secure' => filter_var(env('IDP_COOKIE_SECURE', true), FILTER_VALIDATE_BOOL),
         'cookie_same_site' => env('IDP_COOKIE_SAME_SITE', 'Lax'),
+        'logout_path' => env('IDP_LOGOUT_PATH', '/logout'),
         'logout_url' => env('IDP_LOGOUT_URL'),
+    ],
+
+    'external_admin_profile' => [
+        'api_key' => env('EXTERNAL_ADMIN_PROFILE_API_KEY'),
+        'header' => env('EXTERNAL_ADMIN_PROFILE_HEADER', 'X-External-Api-Key'),
+    ],
+
+    'pupt_flss' => [
+        'faculty_profiles_url' => env('PUPT_FLSS_FACULTY_PROFILES_URL', 'https://flss-backend-api-d9eecxcnhpccdpdk.southeastasia-01.azurewebsites.net/api/v1/faculty-profiles'),
+        'system_id' => env('PUPT_FLSS_SYSTEM_ID', 'ocms'),
+        'secret_key' => env('PUPT_FLSS_SECRET_KEY'),
+        'timeout' => (int) env('PUPT_FLSS_TIMEOUT', 30),
     ],
 
 ];

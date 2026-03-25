@@ -64,5 +64,6 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'audit' => \App\Http\Middleware\AuditTrailMiddleware::class,
+        'external.api' => \App\Http\Middleware\AuthenticateExternalApiRequest::class,
     ];
 }

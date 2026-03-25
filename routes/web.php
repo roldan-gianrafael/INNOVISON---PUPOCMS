@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Http\Controllers\AdminAssistantController;
 use App\Http\Controllers\AdminController;
@@ -53,6 +53,9 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class, 'audit'])->g
 
         // 1. Route para ipakita ang blankong form
         Route::get('/student/health-form', [AppointmentController::class, 'showHealthForm'])->name('health.form');
+        Route::get('/student/health-form-legacy', function () {
+            return redirect()->route('health.form');
+        })->name('student.health.form');
 
         // 2. Route para i-save ang data (Dito galing ang form submit)
         Route::post('/student/store-health-form', [AppointmentController::class, 'storeHealthForm'])->name('store.health.form');
@@ -197,3 +200,4 @@ Route::get('/dev-login/{id}', function ($id) {
 
     return 'User not found!';
 });
+

@@ -171,6 +171,35 @@ class LoginController extends Controller
         return $authorizeUrl . '?' . http_build_query($query);
     }
 
+    private function useIdpPkce(): bool
+    {
+        return (bool) config('services.idp.use_pkce', true);
+    }
+
+    private function idpPkceChallengeMethod(): string
+    {
+        $method = strtoupper(trim((string) config('services.idp.pkce_challenge_method', 'S256')));
+        if (!in_array($method, ['S256', 'PLAIN'], true)) {
+            return 'S256';
+        }
+
+        return $method;
+    }
+
+    private function buildPkceVerifier(): string
+    {
+        return rtrim(strtr(base64_encode(random_bytes(64)), '+/', '-_'), '=');
+    }
+
+    private function buildPkceChallenge(string $verifier): string
+    {
+        if ($this->idpPkceChallengeMethod() === 'PLAIN') {
+            return $verifier;
+        }
+
+        return rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '=');
+    }
+
     private function normalizeCookieSameSite(): string
     {
         $sameSite = strtolower(trim((string) config('services.idp.cookie_same_site', 'lax')));
@@ -254,9 +283,11 @@ class LoginController extends Controller
             return null;
         }
 
+        $clientId = trim((string) config('services.idp.client_id', ''));
+        $clientSecret = trim((string) config('services.idp.client_secret', ''));
         $payload = [
-            'client_id' => trim((string) config('services.idp.client_id', '')),
-            'client_secret' => trim((string) config('services.idp.client_secret', '')),
+            'client_id' => $clientId,
+            'client_secret' => $clientSecret,
             'code' => $code,
         ];
 
@@ -266,72 +297,63 @@ class LoginController extends Controller
             $payload['redirect_uri'] = $redirectUri;
         }
 
+        $pkceVerifier = session('idp_pkce_verifier');
+        if ($this->useIdpPkce() && is_string($pkceVerifier) && trim($pkceVerifier) !== '') {
+            $payload['code_verifier'] = trim($pkceVerifier);
+        }
+
         $grantType = trim((string) config('services.idp.token_grant_type', 'authorization_code'));
         if ($grantType === '') {
             $grantType = 'authorization_code';
         }
         $payload['grant_type'] = $grantType;
 
-        if ($payload['client_id'] === '' || $payload['client_secret'] === '') {
+        if ($clientId === '' || $clientSecret === '') {
             return null;
         }
 
-        $attempts = [];
-        $attempts[] = [
-            'label' => 'form request (configured payload)',
-            'payload' => $payload,
-            'as_form' => true,
-        ];
-
-        // Compatibility fallback: some IDP setups reject redirect_uri on token exchange even when
-        // it was sent during authorization, while others require it. Try both before changing
-        // the request content type.
-        if (isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '') {
-            $withoutRedirectUri = $payload;
-            unset($withoutRedirectUri['redirect_uri']);
-            $attempts[] = [
-                'label' => 'form request (without redirect_uri)',
-                'payload' => $withoutRedirectUri,
-                'as_form' => true,
-            ];
-        } elseif ($redirectUri !== '') {
-            $withRedirectUri = $payload;
-            $withRedirectUri['redirect_uri'] = $redirectUri;
-            $attempts[] = [
-                'label' => 'form request (with redirect_uri)',
-                'payload' => $withRedirectUri,
-                'as_form' => true,
-            ];
+        $formResponse = Http::acceptJson()->timeout(20)->asForm()->post($tokenUrl, $payload);
+        if ($formResponse->successful() && is_array($formResponse->json())) {
+            return $formResponse->json();
         }
+        Log::warning('IDP token exchange failed (form request).', [
+            'token_url' => $tokenUrl,
+            'status' => $formResponse->status(),
+            'body' => Str::limit((string) $formResponse->body(), 1200),
+            'payload_flags' => [
+                'has_code' => isset($payload['code']) && $payload['code'] !== '',
+                'has_grant_type' => isset($payload['grant_type']) && $payload['grant_type'] !== '',
+                'has_redirect_uri' => isset($payload['redirect_uri']) && $payload['redirect_uri'] !== '',
+            ],
+        ]);
 
-        $attempts[] = [
-            'label' => 'json request',
-            'payload' => $payload,
-            'as_form' => false,
-        ];
+        // Compatibility retry: some IDP setups require redirect_uri on token exchange even if
+        // authorize request omitted redirect_uri.
+        if (!isset($payload['redirect_uri']) && $redirectUri !== '') {
+            $retryPayload = $payload;
+            $retryPayload['redirect_uri'] = $redirectUri;
 
-        foreach ($attempts as $attempt) {
-            $requestBuilder = Http::acceptJson()->timeout(20);
-            $response = $attempt['as_form']
-                ? $requestBuilder->asForm()->post($tokenUrl, $attempt['payload'])
-                : $requestBuilder->post($tokenUrl, $attempt['payload']);
-
-            if ($response->successful() && is_array($response->json())) {
-                return $response->json();
+            $retryFormResponse = Http::acceptJson()->timeout(20)->asForm()->post($tokenUrl, $retryPayload);
+            if ($retryFormResponse->successful() && is_array($retryFormResponse->json())) {
+                return $retryFormResponse->json();
             }
 
-            Log::warning('IDP token exchange failed.', [
-                'attempt' => $attempt['label'],
+            Log::warning('IDP token exchange retry failed (form with redirect_uri).', [
                 'token_url' => $tokenUrl,
-                'status' => $response->status(),
-                'body' => Str::limit((string) $response->body(), 1200),
-                'payload_flags' => [
-                    'has_code' => isset($attempt['payload']['code']) && $attempt['payload']['code'] !== '',
-                    'has_grant_type' => isset($attempt['payload']['grant_type']) && $attempt['payload']['grant_type'] !== '',
-                    'has_redirect_uri' => isset($attempt['payload']['redirect_uri']) && $attempt['payload']['redirect_uri'] !== '',
-                ],
+                'status' => $retryFormResponse->status(),
+                'body' => Str::limit((string) $retryFormResponse->body(), 1200),
             ]);
         }
+
+        $jsonResponse = Http::acceptJson()->timeout(20)->post($tokenUrl, $payload);
+        if ($jsonResponse->successful() && is_array($jsonResponse->json())) {
+            return $jsonResponse->json();
+        }
+        Log::warning('IDP token exchange failed (json request).', [
+            'token_url' => $tokenUrl,
+            'status' => $jsonResponse->status(),
+            'body' => Str::limit((string) $jsonResponse->body(), 1200),
+        ]);
 
         return null;
     }
@@ -464,7 +486,7 @@ class LoginController extends Controller
 
     private function configuredIdpRolePrefix(): string
     {
-        $rolePrefix = strtolower(trim((string) config('services.idp.role_prefix', 'OCMS:')));
+        $rolePrefix = strtolower(trim((string) config('services.idp.role_prefix', '')));
         if ($rolePrefix !== '' && !Str::endsWith($rolePrefix, ':')) {
             $rolePrefix .= ':';
         }
@@ -483,6 +505,9 @@ class LoginController extends Controller
         $rolePrefix = $this->configuredIdpRolePrefix();
         if ($rolePrefix !== '' && Str::startsWith($normalized, $rolePrefix)) {
             $normalized = substr($normalized, strlen($rolePrefix));
+            $isScoped = true;
+        } elseif (Str::startsWith($normalized, 'cms:')) {
+            $normalized = substr($normalized, 4);
             $isScoped = true;
         } elseif (Str::startsWith($normalized, 'ocms:')) {
             $normalized = substr($normalized, 5);
@@ -546,34 +571,14 @@ class LoginController extends Controller
     private function mapIdpRolesToLocal(array $roles, ?string $preferredRole = null): string
     {
         $normalizedRoles = [];
-        $scopedRoles = [];
 
         foreach ($roles as $role) {
-            [$normalized, $isScoped] = $this->parseIdpRoleToken((string) $role);
+            [$normalized] = $this->parseIdpRoleToken((string) $role);
             if ($normalized === '') {
                 continue;
             }
 
             $normalizedRoles[] = $normalized;
-            if ($isScoped) {
-                $scopedRoles[] = $normalized;
-            }
-        }
-
-        // Least-privilege: when OCMS-scoped roles are present, ignore unscoped/global roles.
-        $scopedMappedRole = $this->resolveLocalRoleFromTokens($scopedRoles);
-        if ($scopedMappedRole !== null) {
-            return $scopedMappedRole;
-        }
-
-        if ($preferredRole !== null) {
-            [, $preferredIsScoped] = $this->parseIdpRoleToken($preferredRole);
-            if ($preferredIsScoped) {
-                $preferredMappedRole = $this->mapSingleIdpRoleToLocal($preferredRole);
-                if ($preferredMappedRole !== null) {
-                    return $preferredMappedRole;
-                }
-            }
         }
 
         $mappedFromRoles = $this->resolveLocalRoleFromTokens($normalizedRoles);
@@ -842,19 +847,33 @@ class LoginController extends Controller
 
     public function handleIdpCallback(Request $request): RedirectResponse
     {
+        Log::info('IDP callback reached.', [
+            'has_code' => $request->query->has('code'),
+            'query_keys' => array_keys($request->query()),
+            'path' => $request->path(),
+        ]);
+
         if (!$this->useIdpAuth()) {
+            Log::warning('IDP callback aborted because IDP auth is disabled.');
             return redirect('/login');
         }
 
         $code = trim((string) $request->query('code', ''));
         if ($code === '') {
+            Log::warning('IDP callback missing authorization code.');
             return redirect('/login?idp_error=1')->withErrors([
                 'idp' => 'Missing authorization code from the identity provider.',
             ]);
         }
 
+        Log::info('IDP callback received authorization code.', [
+            'code_length' => strlen($code),
+        ]);
+
         $tokenPayload = $this->exchangeCodeForTokens($code);
+        $request->session()->forget('idp_pkce_verifier');
         if ($tokenPayload === null) {
+            Log::warning('IDP callback token exchange returned no payload.');
             return redirect('/login?idp_error=1')->withErrors([
                 'idp' => 'Token exchange failed. Please try signing in again.',
             ]);
@@ -863,26 +882,46 @@ class LoginController extends Controller
         $accessToken = trim((string) ($tokenPayload['access_token'] ?? ''));
         $refreshToken = trim((string) ($tokenPayload['refresh_token'] ?? ''));
         if ($accessToken === '') {
+            Log::warning('IDP callback token payload did not contain an access token.', [
+                'payload_keys' => array_keys($tokenPayload),
+            ]);
             return redirect('/login?idp_error=1')->withErrors([
                 'idp' => 'Identity provider did not return an access token.',
             ]);
         }
 
+        Log::info('IDP callback token exchange succeeded.', [
+            'has_refresh_token' => $refreshToken !== '',
+            'payload_keys' => array_keys($tokenPayload),
+        ]);
+
         // Prefer profile fetched from IDP user-info endpoints over token payload fields.
         $profile = $this->fetchProfileFromIdp($accessToken);
         if ($profile === null) {
+            Log::warning('IDP profile fetch returned null; falling back to token payload.');
             $profile = $this->extractProfilePayload($tokenPayload);
         }
 
         if ($profile === null) {
+            Log::warning('IDP callback could not resolve a profile payload.');
             return redirect('/login?idp_error=1')->withErrors([
                 'idp' => 'Unable to retrieve your profile from the identity provider.',
             ]);
         }
 
+        Log::info('IDP callback resolved profile payload.', [
+            'profile_keys' => array_keys($profile),
+        ]);
+
         $user = $this->upsertLocalUserFromIdpProfile($profile);
         $user->user_role = User::normalizeRole($user->user_role);
         $user->save();
+
+        Log::info('IDP callback upserted local user.', [
+            'user_id' => $user->id,
+            'user_role' => $user->user_role,
+            'email' => $user->email,
+        ]);
 
         Auth::login($user);
         $request->session()->regenerate();
@@ -904,6 +943,11 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         $logoutUrl = trim((string) config('services.idp.logout_url', ''));
+        if ($logoutUrl === '') {
+            $logoutPath = trim((string) config('services.idp.logout_path', '/logout'));
+            $logoutUrl = $logoutPath !== '' ? (string) ($this->idpUrl($logoutPath) ?? '') : '';
+        }
+
         $response = $logoutUrl !== '' ? redirect()->away($logoutUrl) : redirect('/login');
 
         return $this->clearIdpCookies($response);
@@ -920,10 +964,26 @@ class LoginController extends Controller
                 return view('login');
             }
 
+            $pkceVerifier = null;
+            if ($this->useIdpPkce()) {
+                $pkceVerifier = $this->buildPkceVerifier();
+                $request->session()->put('idp_pkce_verifier', $pkceVerifier);
+            } else {
+                $request->session()->forget('idp_pkce_verifier');
+            }
+
             $authorizeUrl = $this->buildAuthorizeUrl();
             if ($authorizeUrl === null) {
                 return view('login')->withErrors([
                     'idp' => 'Identity provider login is enabled but not configured.',
+                ]);
+            }
+
+            if ($pkceVerifier !== null) {
+                $separator = str_contains($authorizeUrl, '?') ? '&' : '?';
+                $authorizeUrl .= $separator . http_build_query([
+                    'code_challenge' => $this->buildPkceChallenge($pkceVerifier),
+                    'code_challenge_method' => $this->idpPkceChallengeMethod(),
                 ]);
             }
 

@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - PUPT Admin</title>
+    <script
+        src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
+        position="top_right"
+        defer
+    ></script>
     <script>
         (function() {
             try {
@@ -781,6 +786,43 @@
             display: block;
         }
 
+        .accessibility-launch-admin {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            padding: 0;
+        }
+
+        .accessibility-launch-admin:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.42);
+            transform: translateY(-1px);
+        }
+
+        .accessibility-launch-admin:focus-visible {
+            outline: 2px solid var(--pup-gold);
+            outline-offset: 2px;
+        }
+
+        .accessibility-launch-admin svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: block;
+        }
+
         html[data-theme="light"] body {
             background:
                 radial-gradient(circle at -10% -10%, rgba(128, 0, 0, 0.06) 0%, transparent 42%),
@@ -808,6 +850,7 @@
         }
 
         html[data-theme="light"] .assistant-launch,
+        html[data-theme="light"] .accessibility-launch-admin,
         html[data-theme="light"] .theme-toggle-admin,
         html[data-theme="light"] .sidebar-toggle {
             background: rgba(128, 0, 0, 0.08);
@@ -816,6 +859,7 @@
         }
 
         html[data-theme="light"] .assistant-launch:hover,
+        html[data-theme="light"] .accessibility-launch-admin:hover,
         html[data-theme="light"] .theme-toggle-admin:hover,
         html[data-theme="light"] .sidebar-toggle:hover {
             background: rgba(128, 0, 0, 0.14);
@@ -825,6 +869,53 @@
         html[data-theme="light"] .admin-user {
             border-color: rgba(128, 0, 0, 0.24);
             background: rgba(255, 255, 255, 0.78);
+        }
+
+        :where(
+            [class*="sienna"][role="dialog"],
+            [class*="sienna"][role="menu"],
+            [id*="sienna"][role="dialog"],
+            [id*="sienna"][role="menu"],
+            [class*="sienna-menu"],
+            [class*="sienna-panel"],
+            [id*="sienna-menu"],
+            [id*="sienna-panel"]
+        ) {
+            background: linear-gradient(180deg, #7f1d2d 0%, #4b5563 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            color: #f8fafc !important;
+            box-shadow: 0 18px 38px rgba(15, 23, 42, 0.35) !important;
+        }
+
+        :where(
+            [class*="sienna-menu"],
+            [class*="sienna-panel"],
+            [id*="sienna-menu"],
+            [id*="sienna-panel"]
+        ) :is(header, [class*="header"], [class*="title"], [class*="top"]):first-child {
+            background: linear-gradient(135deg, #8b0000 0%, #6b7280 100%) !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+        }
+
+        :where(
+            [class*="sienna-menu"],
+            [class*="sienna-panel"],
+            [id*="sienna-menu"],
+            [id*="sienna-panel"]
+        ) :is(button, [role="button"], input, select) {
+            background: rgba(255, 255, 255, 0.12) !important;
+            border-color: rgba(255, 255, 255, 0.22) !important;
+            color: #f8fafc !important;
+        }
+
+        :where(
+            [class*="sienna-menu"],
+            [class*="sienna-panel"],
+            [id*="sienna-menu"],
+            [id*="sienna-panel"]
+        ) :is(button, [role="button"]):hover {
+            background: rgba(255, 255, 255, 0.2) !important;
         }
 
         html[data-theme="light"] .admin-user-name {
@@ -1114,6 +1205,16 @@
                 <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
             </svg>
         </button>
+        <button type="button" class="accessibility-launch-admin" id="adminAccessibilityLaunch" aria-label="Accessibility options" title="Accessibility options">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="5" r="2"></circle>
+                <path d="M12 7v5"></path>
+                <path d="M8 10h8"></path>
+                <path d="M10 22l2-6 2 6"></path>
+                <path d="M9 12l-3 3"></path>
+                <path d="M15 12l3 3"></path>
+            </svg>
+        </button>
         <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">AI Assistant</button>
 
         <div class="profile-wrap">
@@ -1270,6 +1371,183 @@
             } catch (error) {
                 console.warn('Theme preference was not saved.', error);
             }
+        });
+    }
+
+    function initAccessibilityLaunch() {
+        const launchButton = document.getElementById('adminAccessibilityLaunch');
+        if (!launchButton) {
+            return;
+        }
+
+        function findSiennaTrigger() {
+            const selectorMatches = [
+                '#sienna-accessibility-button',
+                '.sienna-accessibility-button',
+                '.sienna-accessibility-trigger',
+                '[data-sienna-accessibility-trigger]',
+                'button[aria-label*="accessibility" i]:not(#adminAccessibilityLaunch)',
+                'button[title*="accessibility" i]:not(#adminAccessibilityLaunch)',
+                '[role="button"][aria-label*="accessibility" i]'
+            ];
+
+            for (const selector of selectorMatches) {
+                const candidate = document.querySelector(selector);
+                if (candidate) {
+                    return candidate;
+                }
+            }
+
+            const fallbackCandidates = Array.from(document.querySelectorAll('button, [role="button"], div'))
+                .filter((element) => {
+                    if (element.id === 'adminAccessibilityLaunch') {
+                        return false;
+                    }
+
+                    const label = [
+                        element.getAttribute('aria-label'),
+                        element.getAttribute('title'),
+                        element.textContent
+                    ].join(' ').toLowerCase();
+
+                    const style = window.getComputedStyle(element);
+                    const looksFloating = style.position === 'fixed' || style.position === 'sticky';
+
+                    return looksFloating && label.includes('access');
+                });
+
+            return fallbackCandidates[0] || null;
+        }
+
+        function hideSiennaTrigger() {
+            const trigger = findSiennaTrigger();
+            if (!trigger) {
+                return;
+            }
+
+            trigger.style.position = 'fixed';
+            trigger.style.left = '-9999px';
+            trigger.style.opacity = '0';
+            trigger.style.pointerEvents = 'none';
+            trigger.setAttribute('aria-hidden', 'true');
+        }
+
+        function themeSiennaMenu() {
+            const candidates = document.querySelectorAll('[class*="sienna"], [id*="sienna"]');
+            candidates.forEach((element) => {
+                const style = window.getComputedStyle(element);
+                const role = (element.getAttribute('role') || '').toLowerCase();
+                const isTrigger = element === findSiennaTrigger();
+                const looksPanel =
+                    !isTrigger &&
+                    (
+                        role === 'dialog' ||
+                        role === 'menu' ||
+                        ((style.position === 'fixed' || style.position === 'absolute') && element.clientWidth >= 220 && element.clientHeight >= 180)
+                    );
+
+                if (!looksPanel) {
+                    return;
+                }
+
+                element.style.background = 'linear-gradient(180deg, #7f1d2d 0%, #4b5563 100%)';
+                element.style.border = '1px solid rgba(255,255,255,0.18)';
+                element.style.color = '#f8fafc';
+                element.style.boxShadow = '0 18px 38px rgba(15, 23, 42, 0.35)';
+
+                const header = element.querySelector('header, [class*="header"], [class*="title"], [class*="top"]');
+                if (header) {
+                    header.style.background = 'linear-gradient(135deg, #8b0000 0%, #6b7280 100%)';
+                    header.style.color = '#ffffff';
+                    header.style.borderBottom = '1px solid rgba(255,255,255,0.16)';
+                }
+
+                element.querySelectorAll('button, [role="button"], input, select').forEach((control) => {
+                    control.style.background = 'rgba(255,255,255,0.12)';
+                    control.style.borderColor = 'rgba(255,255,255,0.22)';
+                    control.style.color = '#f8fafc';
+                });
+            });
+        }
+
+        function injectSiennaShadowStyles() {
+            const hosts = Array.from(document.querySelectorAll('body *')).filter((element) => element.shadowRoot);
+
+            hosts.forEach((host) => {
+                const shadowRoot = host.shadowRoot;
+                if (!shadowRoot || shadowRoot.getElementById('customSiennaTheme')) {
+                    return;
+                }
+
+                const text = shadowRoot.textContent || '';
+                const html = shadowRoot.innerHTML || '';
+                const combined = (text + ' ' + html).toLowerCase();
+                if (!combined.includes('access') && !combined.includes('sienna')) {
+                    return;
+                }
+
+                const style = document.createElement('style');
+                style.id = 'customSiennaTheme';
+                style.textContent = `
+                    :host, * {
+                        --sienna-primary: #7f1d2d !important;
+                        --sienna-secondary: #4b5563 !important;
+                    }
+                    header,
+                    [class*="header"],
+                    [class*="title"],
+                    [class*="top"] {
+                        background: linear-gradient(135deg, #8b0000 0%, #6b7280 100%) !important;
+                        color: #ffffff !important;
+                        border-bottom: 1px solid rgba(255,255,255,0.16) !important;
+                    }
+                    [role="dialog"],
+                    [role="menu"],
+                    .menu,
+                    .panel,
+                    .popover,
+                    .container {
+                        background: linear-gradient(180deg, #7f1d2d 0%, #4b5563 100%) !important;
+                        color: #f8fafc !important;
+                        border-color: rgba(255,255,255,0.18) !important;
+                    }
+                    button,
+                    [role="button"],
+                    input,
+                    select {
+                        background: rgba(255,255,255,0.12) !important;
+                        color: #f8fafc !important;
+                        border-color: rgba(255,255,255,0.22) !important;
+                    }
+                `;
+
+                shadowRoot.appendChild(style);
+            });
+        }
+
+        launchButton.addEventListener('click', function () {
+            const trigger = findSiennaTrigger();
+            if (!trigger) {
+                console.warn('Accessibility widget trigger not found yet.');
+                return;
+            }
+
+            trigger.click();
+        });
+
+        hideSiennaTrigger();
+        themeSiennaMenu();
+        injectSiennaShadowStyles();
+
+        const observer = new MutationObserver(function () {
+            hideSiennaTrigger();
+            themeSiennaMenu();
+            injectSiennaShadowStyles();
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
         });
     }
 
@@ -1447,6 +1725,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
         initThemeToggle();
+        initAccessibilityLaunch();
     });
 </script>
 

@@ -1,55 +1,96 @@
 <!doctype html>
 <html lang="en">
 <head>
+<<<<<<< ours
+<<<<<<< ours
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Online Clinic - Welcome</title>
   <link rel="stylesheet" href="{{ asset('styles.css') }}">
+=======
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PUP Online Clinic | Welcome</title>
+    <link rel="stylesheet" href="{{ asset('styles.css') }}">
+>>>>>>> theirs
 </head>
 <body>
-  <div class="logo-header">
-    <div class="logo-brand">
-      <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="logo-icon">
-      <div class="logo-text">
-        <div class="logo-title">PUP TAGUIG</div>
-        <div class="logo-subtitle">ONLINE CLINIC</div>
-      </div>
-    </div>
-  </div>
+    <main class="landing-shell" aria-labelledby="welcomeTitle">
+        <section class="landing-panel">
+            <header class="landing-header">
+                <div class="brand-wrap" aria-label="Polytechnic University of the Philippines Online Clinic branding">
+                    <img src="{{ asset('images/pup_logo.png') }}" alt="PUP logo" class="brand-logo">
+                    <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic logo" class="brand-logo clinic-logo">
+                </div>
+                <p class="brand-eyebrow">Polytechnic University of the Philippines</p>
+                <h1 id="welcomeTitle">Online Clinic Portal</h1>
+                <p class="brand-subtitle">Choose your portal to continue.</p>
+            </header>
 
-  <main class="lp-container">
-    <header class="lp-hero" role="banner" aria-labelledby="welcomeTitle">
-      <h1 id="welcomeTitle">Welcome to the Online Clinic</h1>
-      <p class="lp-sub">Quick access for Students and Faculty - book consultations and manage appointments.</p>
-    </header>
+            <section class="role-grid" aria-label="Choose your portal type">
+                <button class="role-card" data-target="{{ route('login') }}?role=student" aria-label="Continue as Student">
+                    <span class="role-badge">Student</span>
+                    <p class="role-description">Book consultations, manage appointments, and view your health profile.</p>
+                    <span class="role-cta">Continue</span>
+                </button>
 
-    <section class="role-section" aria-label="Choose your role">
-      <div class="role-grid">
-        <button class="role-card" data-target="{{ route('login') }}?role=student" aria-label="Go to Student Login">
-          <div class="card-icon" aria-hidden="true">
-            <img src="{{ asset('images/students-icon.jpg') }}" alt="" class="card-icon-img">
-          </div>
-          <div class="card-body">
-            <div class="card-title">Student</div>
-            <div class="card-sub">Access your clinic dashboard and book appointments</div>
-          </div>
-        </button>
+                <button class="role-card" data-target="{{ route('login') }}?role=admin" aria-label="Continue as Admin">
+                    <span class="role-badge">Admin</span>
+                    <p class="role-description">Manage appointments, inventory, reports, and clinic operations.</p>
+                    <span class="role-cta">Continue</span>
+                </button>
+            </section>
+        </section>
 
-        <button class="role-card" data-target="{{ route('login') }}?role=faculty" aria-label="Go to Faculty/Admin Login">
-          <div class="card-icon" aria-hidden="true">
-            <img src="{{ asset('images/faculty-icon.webp') }}" alt="" class="card-icon-img">
-          </div>
-          <div class="card-body">
-            <div class="card-title">Faculty</div>
-            <div class="card-sub">Clinic administration and appointment management</div>
-          </div>
-        </button>
-      </div>
-    </section>
+        <footer class="landing-footer">&copy; <span id="year"></span> PUP Online Clinic</footer>
+    </main>
 
+<<<<<<< ours
     <footer class="lp-foot">&copy; <span id="year"></span> PUP Taguig - Online Clinic</footer>
   </main>
 
   <script src="{{ asset('scripts.js') }}" defer></script>
+=======
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PUP Online Clinic | Welcome</title>
+    <link rel="stylesheet" href="{{ asset('styles.css') }}">
+</head>
+<body>
+    <main class="landing-shell" aria-labelledby="welcomeTitle">
+        <section class="landing-panel">
+            <header class="landing-header">
+                <div class="brand-wrap" aria-label="Polytechnic University of the Philippines Online Clinic branding">
+                    <img src="{{ asset('images/pup_logo.png') }}" alt="PUP logo" class="brand-logo">
+                    <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic logo" class="brand-logo clinic-logo">
+                </div>
+                <p class="brand-eyebrow">Polytechnic University of the Philippines</p>
+                <h1 id="welcomeTitle">Online Clinic Portal</h1>
+                <p class="brand-subtitle">Choose your portal to continue.</p>
+            </header>
+
+            <section class="role-grid" aria-label="Choose your portal type">
+                <button class="role-card" data-target="{{ route('login') }}?role=student" aria-label="Continue as Student">
+                    <span class="role-badge">Student</span>
+                    <p class="role-description">Book consultations, manage appointments, and view your health profile.</p>
+                    <span class="role-cta">Continue</span>
+                </button>
+
+                <button class="role-card" data-target="{{ route('login') }}?role=admin" aria-label="Continue as Admin">
+                    <span class="role-badge">Admin</span>
+                    <p class="role-description">Manage appointments, inventory, reports, and clinic operations.</p>
+                    <span class="role-cta">Continue</span>
+                </button>
+            </section>
+        </section>
+
+        <footer class="landing-footer">&copy; <span id="year"></span> PUP Online Clinic</footer>
+    </main>
+
+    <script src="{{ asset('scripts.js') }}" defer></script>
+>>>>>>> theirs
+=======
+    <script src="{{ asset('scripts.js') }}" defer></script>
+>>>>>>> theirs
 </body>
 </html>

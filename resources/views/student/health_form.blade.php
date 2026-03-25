@@ -145,16 +145,19 @@
             <label class="form-label">Others (Pls. Indicate):</label>
             <input type="text" name="other_illness" class="form-control">
         </div>
+        <div class="row mt-4">
         <div class="col-md-12 mt-3">
             <label class="form-label">2. Chest X-Ray Result</label>
             <input type="file" name="chest_xray_result" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
             <small class="text-muted">Upload JPG, PNG, or PDF if available.</small>
         </div>
+        </div>
+          <div class="row mt-4">
         <div class="col-md-12 mt-3">
                     <label class="form-label">3. Medical Certificate</label>
                     <input type="file" name="medical_certificate" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
                     <small class="text-muted">Upload JPG, PNG, or PDF if you have a medical certificate.</small>
-                </div>
+                </div></div>
     </div>
 
     <div class="row mt-4">

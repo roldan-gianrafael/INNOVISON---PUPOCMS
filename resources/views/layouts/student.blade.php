@@ -4,7 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title') - PUP Taguig Clinic</title>
-    <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js" defer></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
+        position="top_right"
+        size="small"
+        defer
+    ></script>
     <script>
         (function() {
             try {
@@ -20,6 +25,27 @@
     <link rel="stylesheet" href="{{ asset('css/booking.css') }}">
     
     <style>
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        ) {
+            background: #8b0000 !important;
+            border-color: #8b0000 !important;
+            color: #ffffff !important;
+        }
+
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        ):hover {
+            background: #6f0000 !important;
+            border-color: #6f0000 !important;
+        }
+
         img,
         svg,
         video,

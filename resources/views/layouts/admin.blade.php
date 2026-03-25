@@ -782,43 +782,6 @@
             display: block;
         }
 
-        .accessibility-launch-admin {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-            padding: 0;
-        }
-
-        .accessibility-launch-admin:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.42);
-            transform: translateY(-1px);
-        }
-
-        .accessibility-launch-admin:focus-visible {
-            outline: 2px solid var(--pup-gold);
-            outline-offset: 2px;
-        }
-
-        .accessibility-launch-admin svg {
-            width: 18px;
-            height: 18px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            display: block;
-        }
-
         html[data-theme="light"] body {
             background:
                 radial-gradient(circle at -10% -10%, rgba(128, 0, 0, 0.06) 0%, transparent 42%),
@@ -846,7 +809,6 @@
         }
 
         html[data-theme="light"] .assistant-launch,
-        html[data-theme="light"] .accessibility-launch-admin,
         html[data-theme="light"] .theme-toggle-admin,
         html[data-theme="light"] .sidebar-toggle {
             background: rgba(128, 0, 0, 0.08);
@@ -855,11 +817,19 @@
         }
 
         html[data-theme="light"] .assistant-launch:hover,
-        html[data-theme="light"] .accessibility-launch-admin:hover,
         html[data-theme="light"] .theme-toggle-admin:hover,
         html[data-theme="light"] .sidebar-toggle:hover {
             background: rgba(128, 0, 0, 0.14);
             border-color: rgba(128, 0, 0, 0.34);
+        }
+
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        ) {
+            display: none !important;
         }
 
         html[data-theme="light"] .admin-user {
@@ -1154,16 +1124,6 @@
                 <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
             </svg>
         </button>
-        <button type="button" class="accessibility-launch-admin" id="adminAccessibilityLaunch" aria-label="Accessibility options" title="Accessibility options">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="5" r="2"></circle>
-                <path d="M12 7v5"></path>
-                <path d="M8 10h8"></path>
-                <path d="M10 22l2-6 2 6"></path>
-                <path d="M9 12l-3 3"></path>
-                <path d="M15 12l3 3"></path>
-            </svg>
-        </button>
         <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">AI Assistant</button>
 
         <div class="profile-wrap">
@@ -1320,65 +1280,6 @@
             } catch (error) {
                 console.warn('Theme preference was not saved.', error);
             }
-        });
-    }
-
-    function initAccessibilityLaunch() {
-        const launchButton = document.getElementById('adminAccessibilityLaunch');
-        if (!launchButton) {
-            return;
-        }
-
-        const triggerSelectors = [
-            '#sienna-accessibility-button',
-            '.sienna-accessibility-button',
-            '.sienna-accessibility-trigger',
-            '[data-sienna-accessibility-trigger]',
-            'button[aria-label*="accessibility" i]:not(#adminAccessibilityLaunch)',
-            'button[title*="accessibility" i]:not(#adminAccessibilityLaunch)'
-        ];
-
-        function findSiennaTrigger() {
-            for (const selector of triggerSelectors) {
-                const candidate = document.querySelector(selector);
-                if (candidate) {
-                    return candidate;
-                }
-            }
-
-            return null;
-        }
-
-        function hideDefaultSiennaTrigger() {
-            const trigger = findSiennaTrigger();
-            if (!trigger) {
-                return;
-            }
-
-            trigger.style.display = 'none';
-            trigger.setAttribute('aria-hidden', 'true');
-            trigger.setAttribute('tabindex', '-1');
-        }
-
-        launchButton.addEventListener('click', function () {
-            const trigger = findSiennaTrigger();
-            if (!trigger) {
-                console.warn('Accessibility widget trigger not found yet.');
-                return;
-            }
-
-            trigger.click();
-        });
-
-        hideDefaultSiennaTrigger();
-
-        const observer = new MutationObserver(function () {
-            hideDefaultSiennaTrigger();
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
         });
     }
 
@@ -1556,7 +1457,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
         initThemeToggle();
-        initAccessibilityLaunch();
     });
 </script>
 

@@ -888,6 +888,17 @@
             [class*="sienna-panel"],
             [id*="sienna-menu"],
             [id*="sienna-panel"]
+        ) :is(header, [class*="header"], [class*="title"], [class*="top"]):first-child {
+            background: linear-gradient(135deg, #8b0000 0%, #6b7280 100%) !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+        }
+
+        :where(
+            [class*="sienna-menu"],
+            [class*="sienna-panel"],
+            [id*="sienna-menu"],
+            [id*="sienna-panel"]
         ) :is(button, [role="button"], input, select) {
             background: rgba(255, 255, 255, 0.12) !important;
             border-color: rgba(255, 255, 255, 0.22) !important;
@@ -1440,6 +1451,13 @@
                 element.style.color = '#f8fafc';
                 element.style.boxShadow = '0 18px 38px rgba(15, 23, 42, 0.35)';
 
+                const header = element.querySelector('header, [class*="header"], [class*="title"], [class*="top"]');
+                if (header) {
+                    header.style.background = 'linear-gradient(135deg, #8b0000 0%, #6b7280 100%)';
+                    header.style.color = '#ffffff';
+                    header.style.borderBottom = '1px solid rgba(255,255,255,0.16)';
+                }
+
                 element.querySelectorAll('button, [role="button"], input, select').forEach((control) => {
                     control.style.background = 'rgba(255,255,255,0.12)';
                     control.style.borderColor = 'rgba(255,255,255,0.22)';
@@ -1470,6 +1488,14 @@
                     :host, * {
                         --sienna-primary: #7f1d2d !important;
                         --sienna-secondary: #4b5563 !important;
+                    }
+                    header,
+                    [class*="header"],
+                    [class*="title"],
+                    [class*="top"] {
+                        background: linear-gradient(135deg, #8b0000 0%, #6b7280 100%) !important;
+                        color: #ffffff !important;
+                        border-bottom: 1px solid rgba(255,255,255,0.16) !important;
                     }
                     [role="dialog"],
                     [role="menu"],

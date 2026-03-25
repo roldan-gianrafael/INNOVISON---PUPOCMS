@@ -146,7 +146,7 @@
             <input type="text" name="other_illness" class="form-control">
         </div>
         <div class="col-md-12 mt-3">
-            <label class="form-label">Chest X-Ray Result</label>
+            <label class="form-label">2. Chest X-Ray Result</label>
             <input type="file" name="chest_xray_result" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
             <small class="text-muted">Upload JPG, PNG, or PDF if available.</small>
         </div>
@@ -154,7 +154,7 @@
 
     <div class="row mt-4">
         <div class="col-12 mb-2">
-            <label class="form-label">2. Do you have disability?</label>
+            <label class="form-label">3. Do you have disability?</label>
             <div class="form-check form-check-inline ms-3">
                 <input class="form-check-input disability-radio" type="radio" name="has_disability" value="None" id="disabilityNo">
                 <label class="form-check-label" for="disabilityNo">None</label>
@@ -174,7 +174,7 @@
 
     <div class="row mt-4">
         <div class="col-12">
-            <label class="form-label">3. Additional Information for Students and Medical Conditions:</label>
+            <label class="form-label">4. Additional Information for Students and Medical Conditions:</label>
             <p class="text-muted small italic">As a Parent/ Guardian, I would like to declare that my child has history of allergies to the following:</p>
             
             <div class="row">
@@ -206,7 +206,7 @@
                     <input type="text" name="other_med_allergies" class="form-control" placeholder="Others: Specify">
                 </div>
                 <div class="col-md-12 mt-3">
-                    <label class="form-label">Medical Certificate</label>
+                    <label class="form-label">4. Medical Certificate</label>
                     <input type="file" name="medical_certificate" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
                     <small class="text-muted">Upload JPG, PNG, or PDF if you have a medical certificate.</small>
                 </div>

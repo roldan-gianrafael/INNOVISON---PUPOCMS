@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // --- PUBLIC ROUTES (No login required) ---
+<<<<<<< ours
 Route::get('/', function () {
     if (Auth::check()) {
         $role = User::normalizeRole((string) optional(Auth::user())->user_role);
@@ -31,6 +32,9 @@ Route::get('/', function () {
 
     return view('landing');
 })->name('landing');
+=======
+Route::view('/', 'landing')->name('landing');
+>>>>>>> theirs
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/auth/callback', [LoginController::class, 'handleIdpCallback'])->name('auth.callback');
 Route::post('/login-action', [LoginController::class, 'login']);

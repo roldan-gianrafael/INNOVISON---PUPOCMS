@@ -1,73 +1,176 @@
-/* styles.css - Shared visual styles for the landing page and admin placeholder */
-:root{
-  --accent: #8B3A3A; /* primary burgundy color */
-  --accent-dark: #6B0000; /* darker burgundy */
-  --accent-light: #A85050; /* lighter burgundy */
-  --bg: #ffffff;
-  --muted: #f6f7f7;
-  --text: #122; 
-  --soft-shadow: 0 12px 30px rgba(16,24,28,0.06);
+:root {
+    --pup-maroon: #7a1f2b;
+    --pup-maroon-deep: #5a111b;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --ring: rgba(122, 31, 43, 0.28);
+    --shadow-soft: 0 16px 32px rgba(15, 23, 42, 0.2);
 }
 
-/* Base reset */
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;color:var(--text);background:linear-gradient(rgba(0,0,0,0.75),rgba(107,0,0,0.75)),url('/images/PUPBG.jpg');background-size:cover;background-position:center;background-attachment:fixed}
-
-/* Logo Header */
-.logo-header{background:#6B0000;padding:12px 24px;border-bottom:3px solid rgba(0,0,0,0.3);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
-.logo-brand{display:flex;align-items:center;gap:12px;max-width:1100px;margin:0 auto}
-.logo-icon{width:48px;height:48px;object-fit:contain}
-.logo-text{display:flex;flex-direction:column;justify-content:center}
-.logo-title{font-size:16px;font-weight:800;color:#fff;letter-spacing:0.5px;line-height:1.2}
-.logo-subtitle{font-size:16px;color:#f0d9d9;letter-spacing:0.3px;margin-top:2px;line-height:1.2}
-
-.lp-container{max-width:1100px;margin:36px auto;padding:0 20px}
-
-/* Hero */
-.lp-hero{text-align:center;padding:36px 12px;background:transparent;color:#fff;margin-bottom:30px}
-.lp-hero h1{margin:0;font-size:36px;letter-spacing:0.2px;color:#fff;font-weight:900;text-shadow:2px 2px 4px rgba(0,0,0,0.5)}
-.lp-sub{margin-top:12px;color:#fff;font-size:16px;text-shadow:1px 1px 3px rgba(0,0,0,0.5)}
-
-/* Role selection */
-.role-section{margin-top:26px}
-.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:600px;margin:0 auto}
-.role-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 22px;aspect-ratio:1/1;border-radius:14px;background:#8B3A3A;box-shadow:var(--soft-shadow);border:1px solid rgba(107,0,0,0.3);cursor:pointer;transition:transform 220ms ease,box-shadow 220ms ease,border-color 220ms ease;color:#fff;isolation:isolate}
-.role-card:focus{outline:3px solid rgba(139,58,58,0.3);outline-offset:4px}
-.role-card:hover{transform:translateY(-6px);background:#6B0000;box-shadow:0 20px 40px rgba(107,0,0,0.3);border-color:rgba(107,0,0,0.5)}
-.card-icon{
-  width:116px;
-  height:116px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.card-icon-img{
-  width:112%;
-  height:112%;
-  object-fit:contain;
-  mix-blend-mode:multiply;
-  filter:grayscale(1) contrast(1.5) brightness(0.36) drop-shadow(0 4px 8px rgba(0,0,0,0.55));
-}
-.card-body{display:flex;flex-direction:column;text-align:center}
-.card-title{font-weight:800;font-size:18px;color:#fff}
-.card-sub{color:#f0d9d9;margin-top:6px;font-size:13px}
-
-/* Footer */
-.lp-foot{text-align:center;color:#8B3A3A;margin-top:28px;font-size:13px;font-weight:600}
-
-/* Responsive */
-@media(max-width:720px){
-  .role-grid{grid-template-columns:1fr;}
-  .lp-hero h1{font-size:22px}
+* {
+    box-sizing: border-box;
 }
 
-/* Admin placeholder page styles reuse */
-.admin-wrap{max-width:900px;margin:40px auto;padding:18px}
-.admin-header{padding:20px;border-radius:12px;background:var(--bg);box-shadow:var(--soft-shadow);border:1px solid rgba(0,0,0,0.04)}
-.admin-header h1{margin:0;color:var(--accent)}
+html,
+body {
+    min-height: 100%;
+}
 
-/* Utility */
-.visually-hidden{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--text-primary);
+    background:
+        linear-gradient(150deg, rgba(8, 12, 25, 0.66), rgba(122, 31, 43, 0.62)),
+        url('/images/PUPBG.jpg') center/cover fixed no-repeat;
+}
 
-/* End of styles */
+.landing-shell {
+    width: min(980px, 92vw);
+    margin: 5vh auto;
+}
+
+.landing-panel {
+    backdrop-filter: blur(2px);
+    background: linear-gradient(170deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.06));
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 24px;
+    padding: clamp(1.4rem, 2.4vw, 2.2rem);
+    box-shadow: var(--shadow-soft);
+}
+
+.landing-header {
+    text-align: center;
+    margin-bottom: 1.7rem;
+}
+
+.brand-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.brand-logo {
+    width: clamp(62px, 8vw, 84px);
+    height: clamp(62px, 8vw, 84px);
+    object-fit: contain;
+    filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.24));
+}
+
+.clinic-logo {
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.88);
+    padding: 0.35rem;
+}
+
+.brand-eyebrow {
+    margin: 1rem 0 0.25rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #f1f5f9;
+}
+
+h1 {
+    margin: 0;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-size: clamp(1.65rem, 3vw, 2.35rem);
+}
+
+.brand-subtitle {
+    margin: 0.45rem 0 0;
+    font-size: 0.98rem;
+    color: rgba(241, 245, 249, 0.92);
+}
+
+.role-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.role-card {
+    appearance: none;
+    border: 1px solid rgba(122, 31, 43, 0.18);
+    border-radius: 18px;
+    background: var(--card-bg);
+    color: inherit;
+    text-align: left;
+    padding: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    display: grid;
+    gap: 0.8rem;
+    min-height: 190px;
+}
+
+.role-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(122, 31, 43, 0.45);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.15);
+}
+
+.role-card:focus-visible {
+    outline: 4px solid var(--ring);
+    outline-offset: 2px;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    border-radius: 999px;
+    padding: 0.32rem 0.8rem;
+    font-weight: 700;
+    font-size: 0.83rem;
+    letter-spacing: 0.03em;
+    color: #fff;
+    background: linear-gradient(135deg, var(--pup-maroon), var(--pup-maroon-deep));
+}
+
+.role-description {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+
+.role-cta {
+    margin-top: auto;
+    font-weight: 700;
+    color: var(--pup-maroon);
+}
+
+.landing-footer {
+    margin-top: 0.85rem;
+    text-align: center;
+    color: rgba(248, 250, 252, 0.9);
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+}
+
+@media (max-width: 760px) {
+    .landing-shell {
+        margin: 2.2vh auto;
+    }
+
+    .landing-panel {
+        border-radius: 16px;
+    }
+
+    .role-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .role-card {
+        min-height: unset;
+    }
+}

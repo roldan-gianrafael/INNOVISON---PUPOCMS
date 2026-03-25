@@ -759,6 +759,53 @@
                     });
                 }
 
+                function injectSiennaShadowStyles() {
+                    const hosts = Array.from(document.querySelectorAll('body *')).filter((element) => element.shadowRoot);
+
+                    hosts.forEach((host) => {
+                        const shadowRoot = host.shadowRoot;
+                        if (!shadowRoot || shadowRoot.getElementById('customSiennaTheme')) {
+                            return;
+                        }
+
+                        const text = shadowRoot.textContent || '';
+                        const html = shadowRoot.innerHTML || '';
+                        const combined = (text + ' ' + html).toLowerCase();
+                        if (!combined.includes('access') && !combined.includes('sienna')) {
+                            return;
+                        }
+
+                        const style = document.createElement('style');
+                        style.id = 'customSiennaTheme';
+                        style.textContent = `
+                            :host, * {
+                                --sienna-primary: #7f1d2d !important;
+                                --sienna-secondary: #4b5563 !important;
+                            }
+                            [role="dialog"],
+                            [role="menu"],
+                            .menu,
+                            .panel,
+                            .popover,
+                            .container {
+                                background: linear-gradient(180deg, #7f1d2d 0%, #4b5563 100%) !important;
+                                color: #f8fafc !important;
+                                border-color: rgba(255,255,255,0.18) !important;
+                            }
+                            button,
+                            [role="button"],
+                            input,
+                            select {
+                                background: rgba(255,255,255,0.12) !important;
+                                color: #f8fafc !important;
+                                border-color: rgba(255,255,255,0.22) !important;
+                            }
+                        `;
+
+                        shadowRoot.appendChild(style);
+                    });
+                }
+
                 accessibilityLaunchBtn.addEventListener('click', () => {
                     const trigger = findSiennaTrigger();
                     if (!trigger) {
@@ -771,10 +818,12 @@
 
                 hideSiennaTrigger();
                 themeSiennaMenu();
+                injectSiennaShadowStyles();
 
                 const observer = new MutationObserver(() => {
                     hideSiennaTrigger();
                     themeSiennaMenu();
+                    injectSiennaShadowStyles();
                 });
 
                 observer.observe(document.body, {

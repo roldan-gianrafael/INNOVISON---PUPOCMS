@@ -976,13 +976,7 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        $logoutUrl = trim((string) config('services.idp.logout_url', ''));
-        if ($logoutUrl === '') {
-            $logoutPath = trim((string) config('services.idp.logout_path', '/logout'));
-            $logoutUrl = $logoutPath !== '' ? (string) ($this->idpUrl($logoutPath) ?? '') : '';
-        }
-
-        $response = $logoutUrl !== '' ? redirect()->away($logoutUrl) : redirect('/login');
+        $response = redirect('/');
 
         return $this->clearIdpCookies($response);
     }

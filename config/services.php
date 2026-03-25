@@ -60,6 +60,7 @@ return [
         'refresh_cookie_minutes' => (int) env('IDP_REFRESH_COOKIE_MINUTES', 10080),
         'cookie_secure' => filter_var(env('IDP_COOKIE_SECURE', true), FILTER_VALIDATE_BOOL),
         'cookie_same_site' => env('IDP_COOKIE_SAME_SITE', 'Lax'),
+        'logout_path' => env('IDP_LOGOUT_PATH', '/logout'),
         'logout_url' => env('IDP_LOGOUT_URL'),
     ],
 

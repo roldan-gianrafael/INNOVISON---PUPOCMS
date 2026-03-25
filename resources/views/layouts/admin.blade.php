@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - PUPT Admin</title>
-    <script src="{{ asset('js/sienna-accessibility-custom.umd.js') }}" defer></script>
+    <script
+        src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
+        position="top_right"
+        defer
+    ></script>
     <script>
         (function() {
             try {

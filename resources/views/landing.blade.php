@@ -269,6 +269,13 @@
     </style>
 </head>
 <body>
+    @php
+        $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
+        $idpClientId = trim((string) config('services.idp.client_id', ''));
+        $portalLoginUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
+            ? $idpBaseUrl . '/login?' . http_build_query(['client_id' => $idpClientId])
+            : route('login');
+    @endphp
     <main class="page">
         <section class="content" aria-label="PUP Taguig online clinic role selection">
             <header class="brand">
@@ -282,14 +289,14 @@
             </header>
 
             <div class="cards">
-                <a href="{{ route('login') }}" class="role-card" aria-label="Open student portal">
+                <a href="{{ $portalLoginUrl }}" class="role-card" aria-label="Open student portal">
                     <div class="role-icon">S</div>
                     <h2>Student</h2>
                     <p>Access appointments, health forms, account details, and the services built for enrolled students.</p>
                     <span class="role-link">Open Student Portal</span>
                 </a>
 
-                <a href="{{ route('login') }}" class="role-card" aria-label="Open admin portal">
+                <a href="{{ $portalLoginUrl }}" class="role-card" aria-label="Open admin portal">
                     <div class="role-icon">A</div>
                     <h2>Admin</h2>
                     <p>Manage appointments, monitor records, review clinic activity, and handle administrative workflows.</p>

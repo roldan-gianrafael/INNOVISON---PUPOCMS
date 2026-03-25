@@ -282,8 +282,16 @@
             </div>
         @endif
 
+        @php
+            $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
+            $idpClientId = trim((string) config('services.idp.client_id', ''));
+            $portalLoginUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
+                ? $idpBaseUrl . '/login?' . http_build_query(['client_id' => $idpClientId])
+                : route('login');
+        @endphp
+
         @if(config('services.idp.enabled'))
-            <a href="{{ route('login') }}" class="btn-submit" style="display:block; text-decoration:none; text-align:center;">
+            <a href="{{ $portalLoginUrl }}" class="btn-submit" style="display:block; text-decoration:none; text-align:center;">
                 Continue with Identity Provider
             </a>
             <p style="margin-top: 12px; font-size: 12px;">

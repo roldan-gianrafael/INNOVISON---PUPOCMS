@@ -634,10 +634,13 @@ public function storeHealthForm(Request $request)
         // Medical History
         'medical_history'   => 'nullable|array', 
         'has_illness'       => 'required|string',
+        'chest_xray_result' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:4096',
         'has_disability'    => 'required|string',
+        'pwd_id_proof'      => 'required_if:has_disability,Yes|file|mimes:jpeg,jpg,png,pdf|max:4096',
         
         // Allergies
         'medicine_allergies' => 'nullable|array',
+        'medical_certificate' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:4096',
         
         // Signature
         'digital_signature' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -651,6 +654,15 @@ public function storeHealthForm(Request $request)
         // Gagamit ng 'public' disk para ma-access ng 'storage:link'
         $photoPath = $request->file('student_photo')->store('health_profiles/photos', 'public');
         $sigPath = $request->file('digital_signature')->store('health_profiles/signatures', 'public');
+        $chestXrayPath = $request->hasFile('chest_xray_result')
+            ? $request->file('chest_xray_result')->store('health_profiles/chest_xray_results', 'public')
+            : null;
+        $pwdIdProofPath = $request->hasFile('pwd_id_proof')
+            ? $request->file('pwd_id_proof')->store('health_profiles/pwd_id_proofs', 'public')
+            : null;
+        $medicalCertificatePath = $request->hasFile('medical_certificate')
+            ? $request->file('medical_certificate')->store('health_profiles/medical_certificates', 'public')
+            : null;
 
         // 3. LOGIC: I-save ang data sa health_profiles table
         \App\Models\HealthProfile::updateOrCreate(
@@ -672,14 +684,17 @@ public function storeHealthForm(Request $request)
                 'has_illness'        => $request->has_illness,
                 'medical_history'    => $request->medical_history, 
                 'other_illness'      => $request->other_illness,
+                'chest_xray_result'  => $chestXrayPath,
                 'has_disability'     => $request->has_disability,
                 'disability_type'    => $request->disability_type,
+                'pwd_id_proof'       => $pwdIdProofPath,
 
                 // Section 3
                 'food_allergies'      => $request->food_allergies,
                 'no_allergies'        => $request->has('no_allergies'),
                 'medicine_allergies'  => $request->medicine_allergies,
                 'other_med_allergies' => $request->other_med_allergies,
+                'medical_certificate' => $medicalCertificatePath,
 
                 // Part III: COVID Vax
                 'vaccine_history' => [

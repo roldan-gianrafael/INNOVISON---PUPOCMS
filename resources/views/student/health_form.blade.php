@@ -145,6 +145,11 @@
             <label class="form-label">Others (Pls. Indicate):</label>
             <input type="text" name="other_illness" class="form-control">
         </div>
+        <div class="col-md-12 mt-3">
+            <label class="form-label">Chest X-Ray Result</label>
+            <input type="file" name="chest_xray_result" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+            <small class="text-muted">Upload JPG, PNG, or PDF if available.</small>
+        </div>
     </div>
 
     <div class="row mt-4">
@@ -159,6 +164,11 @@
                 <label class="form-check-label" for="disabilityYes">if Yes, What type?</label>
             </div>
             <input type="text" name="disability_type" id="disability_type" class="form-control d-inline-block w-50 ms-2" placeholder="Specify disability">
+        </div>
+        <div class="col-12 mt-3" id="pwdProofWrapper" style="display: none;">
+            <label class="form-label">PWD ID / Proof</label>
+            <input type="file" name="pwd_id_proof" id="pwd_id_proof" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+            <small class="text-muted">Required when disability is marked Yes.</small>
         </div>
     </div>
 
@@ -194,6 +204,11 @@
                 @endforeach
                 <div class="col-md-12 mt-2">
                     <input type="text" name="other_med_allergies" class="form-control" placeholder="Others: Specify">
+                </div>
+                <div class="col-md-12 mt-3">
+                    <label class="form-label">Medical Certificate</label>
+                    <input type="file" name="medical_certificate" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+                    <small class="text-muted">Upload JPG, PNG, or PDF if you have a medical certificate.</small>
                 </div>
             </div>
         </div>
@@ -252,11 +267,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. Disability Logic
     const disabilityRadios = document.querySelectorAll('.disability-radio');
     const disabilityType = document.getElementById('disability_type');
+    const pwdProofWrapper = document.getElementById('pwdProofWrapper');
+    const pwdIdProof = document.getElementById('pwd_id_proof');
 
     function toggleDisability() {
         const isNone = document.getElementById('disabilityNo').checked;
+        const isYes = document.getElementById('disabilityYes').checked;
         disabilityType.disabled = isNone;
         if (isNone) disabilityType.value = '';
+        pwdProofWrapper.style.display = isYes ? 'block' : 'none';
+        pwdIdProof.required = isYes;
+        pwdIdProof.disabled = !isYes;
+        if (!isYes) {
+            pwdIdProof.value = '';
+        }
     }
 
     // 3. Allergies Logic

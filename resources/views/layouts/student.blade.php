@@ -31,9 +31,12 @@
             .sienna-accessibility-trigger,
             [data-sienna-accessibility-trigger]
         ) {
-            background: #8b0000 !important;
-            border-color: #8b0000 !important;
-            color: #ffffff !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #8b0000 !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
         }
 
         :where(
@@ -42,8 +45,39 @@
             .sienna-accessibility-trigger,
             [data-sienna-accessibility-trigger]
         ):hover {
-            background: #6f0000 !important;
-            border-color: #6f0000 !important;
+            background: transparent !important;
+            color: #6f0000 !important;
+        }
+
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        ) svg {
+            fill: #8b0000 !important;
+            stroke: #8b0000 !important;
+        }
+
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        ) svg circle,
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        ) .circle,
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        ) [class*="circle"] {
+            display: none !important;
         }
 
         img,

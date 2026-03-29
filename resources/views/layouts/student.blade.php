@@ -7,7 +7,7 @@
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
         data-asw-position="bottom-right"
-        data-asw-offset="24,180"
+        data-asw-offset="24,12"
         data-asw-size="small"
         defer
     ></script>

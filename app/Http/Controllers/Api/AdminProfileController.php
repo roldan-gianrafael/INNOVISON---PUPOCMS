@@ -102,9 +102,16 @@ class AdminProfileController extends Controller
         return $this->show($admin_id);
     }
 
+    public function externalUpdate(Request $request, $admin_id): JsonResponse
+    {
+        $request->merge(['admin_id' => $admin_id]);
+
+        return $this->update($request);
+    }
+
     private function resolveLookup(Request $request): ?array
     {
-        foreach (['admin_id', 'email', 'email_address', 'contact_no'] as $column) {
+        foreach (['admin_id', 'email', 'email_address', 'contact_no', 'emergency_contact_no'] as $column) {
             $value = trim((string) $request->query($column, ''));
             if ($value !== '') {
                 return [$column, $value];
@@ -131,6 +138,7 @@ class AdminProfileController extends Controller
             'gender' => 'nullable|string|max:255',
             'civil_status' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
+            'contact_no' => 'nullable|string|max:255',
             'emergency_contact_person' => 'nullable|string|max:255',
             'emergency_contact_no' => 'nullable|string|max:255',
             'office' => 'nullable|string|max:255',
@@ -157,6 +165,15 @@ class AdminProfileController extends Controller
         $payload = collect($validated)
             ->except('admin_id')
             ->all();
+
+        if (
+            array_key_exists('contact_no', $payload) &&
+            !Admin::hasColumn('contact_no') &&
+            Admin::hasColumn('emergency_contact_no')
+        ) {
+            $payload['emergency_contact_no'] = $payload['contact_no'];
+            unset($payload['contact_no']);
+        }
 
         $admin->fill($this->filterSupportedColumns($payload));
         $admin->save();
@@ -201,7 +218,7 @@ class AdminProfileController extends Controller
             'email' => ['email', 'email_address'],
             'office' => ['office', 'offices'],
             'address' => ['address'],
-            'contact_no' => ['contact_no'],
+            'contact_no' => ['contact_no', 'emergency_contact_no'],
             'emergency_contact_person' => ['emergency_contact_person'],
             'emergency_contact_no' => ['emergency_contact_no'],
             'age' => ['age'],

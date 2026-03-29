@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware('external.api')->group(function () {
     Route::get('/external/admins', [AdminProfileController::class, 'index']);
     Route::get('/external/admins/{admin_id}', [AdminProfileController::class, 'externalShow']);
+    Route::put('/external/admins/{admin_id}', [AdminProfileController::class, 'externalUpdate']);
     Route::get('/external/admin-profile', [AdminProfileController::class, 'lookup']);
 });
 

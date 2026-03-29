@@ -682,11 +682,15 @@
 
             function forceAccessibilityButtonTheme() {
                 document.querySelectorAll('.asw-menu-btn').forEach((button) => {
-                    button.style.background = '#800000';
-                    button.style.backgroundImage = 'none';
-                    button.style.border = '2px solid #800000';
-                    button.style.outline = 'none';
-                    button.style.boxShadow = '0 10px 24px rgba(128, 0, 0, 0.28)';
+                    button.style.setProperty('background', '#800000', 'important');
+                    button.style.setProperty('background-image', 'none', 'important');
+                    button.style.setProperty('border', '2px solid #800000', 'important');
+                    button.style.setProperty('outline', 'none', 'important');
+                    button.style.setProperty('box-shadow', '0 10px 24px rgba(128, 0, 0, 0.28)', 'important');
+                    button.querySelectorAll('svg').forEach((icon) => {
+                        icon.style.setProperty('fill', '#ffffff', 'important');
+                        icon.style.setProperty('background', 'transparent', 'important');
+                    });
                 });
             }
 

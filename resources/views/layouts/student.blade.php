@@ -80,6 +80,12 @@
             box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
         }
 
+        :where(.asw-menu-btn:hover),
+        :where(.asw-menu-btn:focus-visible) {
+            background: #800000 !important;
+            background-image: none !important;
+        }
+
         img,
         svg,
         video,
@@ -669,6 +675,13 @@
             const accessibilityLaunchBtn = document.getElementById('studentAccessibilityLaunch');
             const storageKey = 'student_theme';
 
+            function forceAccessibilityButtonTheme() {
+                document.querySelectorAll('.asw-menu-btn').forEach((button) => {
+                    button.style.background = '#800000';
+                    button.style.backgroundImage = 'none';
+                });
+            }
+
             if (navToggle && navList) {
                 const closeMobileMenu = () => navList.classList.remove('show');
 
@@ -726,6 +739,7 @@
 
             function initAccessibilityLaunch() {
                 if (!accessibilityLaunchBtn) {
+                    forceAccessibilityButtonTheme();
                     return;
                 }
 
@@ -887,11 +901,13 @@
                 hideSiennaTrigger();
                 themeSiennaMenu();
                 injectSiennaShadowStyles();
+                forceAccessibilityButtonTheme();
 
                 const observer = new MutationObserver(() => {
                     hideSiennaTrigger();
                     themeSiennaMenu();
                     injectSiennaShadowStyles();
+                    forceAccessibilityButtonTheme();
                 });
 
                 observer.observe(document.body, {

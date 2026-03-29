@@ -82,6 +82,12 @@
             box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
         }
 
+        :where(.asw-menu-btn:hover),
+        :where(.asw-menu-btn:focus-visible) {
+            background: #800000 !important;
+            background-image: none !important;
+        }
+
         :root {
             --bg: #2a0e16;
             --bg-grad-1: #5b1a2a;
@@ -1426,6 +1432,7 @@
 
     function initAccessibilityLaunch() {
         const launchButton = document.getElementById('adminAccessibilityLaunch');
+        forceAccessibilityButtonTheme();
         if (!launchButton) {
             return;
         }
@@ -1588,11 +1595,13 @@
         hideSiennaTrigger();
         themeSiennaMenu();
         injectSiennaShadowStyles();
+        forceAccessibilityButtonTheme();
 
         const observer = new MutationObserver(function () {
             hideSiennaTrigger();
             themeSiennaMenu();
             injectSiennaShadowStyles();
+            forceAccessibilityButtonTheme();
         });
 
         observer.observe(document.body, {
@@ -1730,6 +1739,13 @@
             }
             panel.classList.add('open');
             recognition.start();
+        });
+    }
+
+    function forceAccessibilityButtonTheme() {
+        document.querySelectorAll('.asw-menu-btn').forEach(function (button) {
+            button.style.background = '#800000';
+            button.style.backgroundImage = 'none';
         });
     }
 

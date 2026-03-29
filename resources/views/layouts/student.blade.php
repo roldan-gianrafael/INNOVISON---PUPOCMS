@@ -806,19 +806,6 @@
                     return fallbackCandidates[0] || null;
                 }
 
-                function hideSiennaTrigger() {
-                    const trigger = findSiennaTrigger();
-                    if (!trigger) {
-                        return;
-                    }
-
-                    trigger.style.position = 'fixed';
-                    trigger.style.left = '-9999px';
-                    trigger.style.opacity = '0';
-                    trigger.style.pointerEvents = 'none';
-                    trigger.setAttribute('aria-hidden', 'true');
-                }
-
                 function themeSiennaMenu() {
                     const candidates = document.querySelectorAll('[class*="sienna"], [id*="sienna"]');
                     candidates.forEach((element) => {
@@ -912,13 +899,11 @@
                     });
                 }
 
-                hideSiennaTrigger();
                 themeSiennaMenu();
                 injectSiennaShadowStyles();
                 forceAccessibilityButtonTheme();
 
                 const observer = new MutationObserver(() => {
-                    hideSiennaTrigger();
                     themeSiennaMenu();
                     injectSiennaShadowStyles();
                     forceAccessibilityButtonTheme();

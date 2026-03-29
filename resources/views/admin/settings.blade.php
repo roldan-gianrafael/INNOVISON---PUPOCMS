@@ -43,8 +43,12 @@
     .btn-edit:hover { background: #cbd5e1; }
 
     /* Modal */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 450px; max-width: 90%; }
+    .modal-overlay { display: none; position: fixed; inset: 0; padding: 24px 16px; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: flex-start; overflow-y: auto; }
+    .modal-box { background: #fff; padding: 24px; border-radius: 16px; width: min(920px, 100%); max-width: 96vw; max-height: calc(100vh - 48px); overflow-y: auto; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .modal-header h3 { margin: 0; }
+    .modal-body { padding-bottom: 8px; }
+    .modal-actions { position: sticky; bottom: -24px; display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; margin-left: -24px; margin-right: -24px; margin-bottom: -24px; padding: 16px 24px 24px; background: linear-gradient(to top, #ffffff 78%, rgba(255,255,255,0.92) 92%, rgba(255,255,255,0)); border-top: 1px solid #e2e8f0; }
     
     /* Alerts */
     .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 600; }
@@ -55,6 +59,28 @@
         .profile-grid,
         .profile-grid-wide {
             grid-template-columns: 1fr;
+        }
+
+        .modal-overlay {
+            padding: 12px;
+        }
+
+        .modal-box {
+            padding: 18px;
+            max-height: calc(100vh - 24px);
+        }
+
+        .modal-actions {
+            bottom: -18px;
+            margin-left: -18px;
+            margin-right: -18px;
+            margin-bottom: -18px;
+            padding: 14px 18px 18px;
+            flex-wrap: wrap;
+        }
+
+        .modal-actions button {
+            width: 100%;
         }
     }
 </style>
@@ -196,106 +222,112 @@
 
     <div id="profileModal" class="modal-overlay">
         <div class="modal-box">
-            <h3 style="margin-top:0;">Edit Profile</h3>
+            <div class="modal-header">
+                <h3>Edit Profile</h3>
+            </div>
             
             <form action="{{ url('/admin/profile/update') }}" method="POST">
                 @csrf @method('PUT')
+                <div class="modal-body">
 
-                <div class="profile-grid-wide">
-                    <div class="form-group">
-                        <label>Admin ID</label>
-                        <input type="text" class="form-control" value="{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}" disabled>
+                    <div class="profile-grid-wide">
+                        <div class="form-group">
+                            <label>Admin ID</label>
+                            <input type="text" class="form-control" value="{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $cmsProfile['first_name'] ?? '') }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Middle Name</label>
+                            <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name', $cmsProfile['middle_name'] ?? '') }}" placeholder="Middle name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $cmsProfile['last_name'] ?? '') }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Suffix Name</label>
+                            <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $cmsProfile['suffix_name'] ?? '') }}" placeholder="Jr., Sr., III">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" class="form-control" value="{{ old('email', $cmsProfile['email'] ?? ($admin->email ?? '')) }}" required>
+                        </div>
+                    </div>
+
+                    <div class="profile-grid">
+                        <div class="form-group">
+                            <label>Birthday</label>
+                            <input type="date" id="cmsBirthdayInput" name="birthday" class="form-control" value="{{ old('birthday', $cmsProfile['birthday'] ?? '') }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="text" id="cmsAgeInput" class="form-control" value="{{ old('age', $cmsProfile['age'] ?? '') }}" readonly>
+                            <p class="readonly-helper">Auto-calculated from birthday.</p>
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $cmsProfile['first_name'] ?? '') }}" required>
+                        <label>Address</label>
+                        <input type="text" name="address" class="form-control" value="{{ old('address', $cmsProfile['address'] ?? '') }}">
                     </div>
 
                     <div class="form-group">
-                        <label>Middle Name</label>
-                        <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name', $cmsProfile['middle_name'] ?? '') }}" placeholder="Middle name">
+                        <label>Contact Number</label>
+                        <input type="text" name="contact_number" class="form-control" value="{{ old('contact_number', $cmsProfile['contact_number'] ?? '') }}">
+                    </div>
+
+                    <div class="profile-grid">
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <input type="text" name="gender" class="form-control" value="{{ old('gender', $cmsProfile['gender'] ?? '') }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Civil Status</label>
+                            <input type="text" name="civil_status" class="form-control" value="{{ old('civil_status', $cmsProfile['civil_status'] ?? '') }}">
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $cmsProfile['last_name'] ?? '') }}" required>
+                        <label>Emergency Contact Person</label>
+                        <input type="text" name="emergency_contact_person" class="form-control" value="{{ old('emergency_contact_person', $cmsProfile['emergency_contact_person'] ?? '') }}">
                     </div>
 
                     <div class="form-group">
-                        <label>Suffix Name</label>
-                        <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $cmsProfile['suffix_name'] ?? '') }}" placeholder="Jr., Sr., III">
+                        <label>Emergency Contact No.</label>
+                        <input type="text" name="emergency_contact_no" class="form-control" value="{{ old('emergency_contact_no', $cmsProfile['emergency_contact_no'] ?? ($cmsProfile['contact_number'] ?? '')) }}">
                     </div>
 
                     <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ old('email', $cmsProfile['email'] ?? ($admin->email ?? '')) }}" required>
+                        <label>Office</label>
+                        <input type="text" name="office" class="form-control" value="{{ old('office', $cmsProfile['office'] ?? 'Admission Office') }}">
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Birthday</label>
-                    <input type="date" id="cmsBirthdayInput" name="birthday" class="form-control" value="{{ old('birthday', $cmsProfile['birthday'] ?? '') }}">
-                </div>
-
-                <div class="form-group">
-                    <label>Age</label>
-                    <input type="text" id="cmsAgeInput" class="form-control" value="{{ old('age', $cmsProfile['age'] ?? '') }}" readonly>
-                    <p class="readonly-helper">Auto-calculated from birthday.</p>
-                </div>
-
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" name="address" class="form-control" value="{{ old('address', $cmsProfile['address'] ?? '') }}">
-                </div>
-
-                <div class="form-group">
-                    <label>Contact Number</label>
-                    <input type="text" name="contact_number" class="form-control" value="{{ old('contact_number', $cmsProfile['contact_number'] ?? '') }}">
-                </div>
-
-                <div class="profile-grid">
-                    <div class="form-group">
-                        <label>Gender</label>
-                        <input type="text" name="gender" class="form-control" value="{{ old('gender', $cmsProfile['gender'] ?? '') }}">
+                    <div style="border-top: 1px solid #eee; margin: 15px 0; padding-top: 15px;">
+                        <label style="font-size: 12px; color: #888;">Change Password (Optional)</label>
                     </div>
 
                     <div class="form-group">
-                        <label>Civil Status</label>
-                        <input type="text" name="civil_status" class="form-control" value="{{ old('civil_status', $cmsProfile['civil_status'] ?? '') }}">
+                        <label>New Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" name="password_confirmation" class="form-control" placeholder="Retype password">
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Emergency Contact Person</label>
-                    <input type="text" name="emergency_contact_person" class="form-control" value="{{ old('emergency_contact_person', $cmsProfile['emergency_contact_person'] ?? '') }}">
-                </div>
-
-                <div class="form-group">
-                    <label>Emergency Contact No.</label>
-                    <input type="text" name="emergency_contact_no" class="form-control" value="{{ old('emergency_contact_no', $cmsProfile['emergency_contact_no'] ?? ($cmsProfile['contact_number'] ?? '')) }}">
-                </div>
-
-                <div class="form-group">
-                    <label>Office</label>
-                    <input type="text" name="office" class="form-control" value="{{ old('office', $cmsProfile['office'] ?? 'Admission Office') }}">
-                </div>
-
-                <div style="border-top: 1px solid #eee; margin: 15px 0; padding-top: 15px;">
-                    <label style="font-size: 12px; color: #888;">Change Password (Optional)</label>
-                </div>
-
-                <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current">
-                </div>
-
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" name="password_confirmation" class="form-control" placeholder="Retype password">
-                </div>
-
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div class="modal-actions">
                     <button type="button" onclick="closeProfileModal()" style="background: #eee; border:none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Cancel</button>
                     <button type="submit" class="btn-save">Save Profile</button>
                 </div>

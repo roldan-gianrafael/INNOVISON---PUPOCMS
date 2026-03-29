@@ -1755,7 +1755,7 @@
             button.style.setProperty('outline', 'none', 'important');
             button.style.setProperty('box-shadow', '0 10px 24px rgba(128, 0, 0, 0.28)', 'important');
             button.querySelectorAll('svg').forEach(function (icon) {
-                icon.style.setProperty('fill', '#ffffff', 'important');
+                icon.style.setProperty('fill', '#4a0404', 'important');
                 icon.style.setProperty('background', 'transparent', 'important');
             });
         });

@@ -1085,6 +1085,37 @@
             border-color: rgba(128, 0, 0, 0.16);
         }
 
+        html[data-theme="light"] .main,
+        html[data-theme="light"] .main h1,
+        html[data-theme="light"] .main h2,
+        html[data-theme="light"] .main h3,
+        html[data-theme="light"] .main h4,
+        html[data-theme="light"] .main h5,
+        html[data-theme="light"] .main h6,
+        html[data-theme="light"] .main p,
+        html[data-theme="light"] .main label,
+        html[data-theme="light"] .main small,
+        html[data-theme="light"] .main strong,
+        html[data-theme="light"] .main td,
+        html[data-theme="light"] .main th,
+        html[data-theme="light"] .main li,
+        html[data-theme="light"] .main dt,
+        html[data-theme="light"] .main dd,
+        html[data-theme="light"] .main legend {
+            color: #111827;
+        }
+
+        html[data-theme="light"] .main input,
+        html[data-theme="light"] .main select,
+        html[data-theme="light"] .main textarea {
+            color: #111827;
+        }
+
+        html[data-theme="light"] .main input::placeholder,
+        html[data-theme="light"] .main textarea::placeholder {
+            color: #6b7280;
+        }
+
         html[data-theme="light"] .profile-dropdown {
             background: #fff4f7;
             border-color: #d5a4af;

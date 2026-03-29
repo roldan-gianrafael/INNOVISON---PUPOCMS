@@ -8,7 +8,7 @@
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
         data-asw-position="bottom-right"
-        data-asw-offset="24,140"
+        data-asw-offset="24,180"
         defer
     ></script>
     <script>
@@ -43,22 +43,12 @@
             }
         }
 
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        ) {
+        :where(.asw-menu-btn) {
             position: fixed;
             overflow: visible !important;
         }
 
-        :where(
-            #sienna-accessibility-button,
-            .sienna-accessibility-button,
-            .sienna-accessibility-trigger,
-            [data-sienna-accessibility-trigger]
-        )::after {
+        :where(.asw-menu-btn)::after {
             content: "";
             position: absolute;
             inset: -6px;

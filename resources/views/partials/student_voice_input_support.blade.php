@@ -239,8 +239,28 @@
             field.dataset.voiceMicReady = 'true';
         }
 
-        function initializeVoiceFields() {
-            document.querySelectorAll(supportedSelector).forEach(ensureMicForField);
+        function initializeVoiceFields(root) {
+            const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+            scope.querySelectorAll(supportedSelector).forEach(ensureMicForField);
+        }
+
+        function handleFieldActivation(field) {
+            if (!field || !field.matches(supportedSelector)) {
+                return;
+            }
+
+            if (!field.dataset.voiceMicReady && isEligibleField(field)) {
+                ensureMicForField(field);
+            }
+
+            if (!isEligibleField(field)) {
+                setActiveWrapper(null);
+                return;
+            }
+
+            activeField = field;
+            activeButton = activeField.closest('.voice-field-wrap')?.querySelector('.voice-field-inline-mic') ?? null;
+            setActiveWrapper(activeField);
         }
 
         recognition.addEventListener('start', function () {
@@ -282,25 +302,12 @@
         });
 
         document.addEventListener('focusin', function (event) {
-            if (!isEligibleField(event.target)) {
-                setActiveWrapper(null);
-                return;
-            }
-
-            activeField = event.target;
-            activeButton = activeField.closest('.voice-field-wrap')?.querySelector('.voice-field-inline-mic') ?? null;
-            setActiveWrapper(activeField);
+            handleFieldActivation(event.target);
         });
 
         document.addEventListener('pointerdown', function (event) {
             const field = event.target.closest(supportedSelector);
-            if (!isEligibleField(field)) {
-                return;
-            }
-
-            activeField = field;
-            activeButton = activeField.closest('.voice-field-wrap')?.querySelector('.voice-field-inline-mic') ?? null;
-            setActiveWrapper(activeField);
+            handleFieldActivation(field);
         });
 
         document.addEventListener('focusout', function (event) {
@@ -326,7 +333,40 @@
             }, 0);
         });
 
-        document.addEventListener('DOMContentLoaded', initializeVoiceFields);
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (!(node instanceof Element)) {
+                            return;
+                        }
+
+                        if (node.matches?.(supportedSelector)) {
+                            ensureMicForField(node);
+                        }
+
+                        initializeVoiceFields(node);
+                    });
+                }
+
+                if (mutation.type === 'attributes' && mutation.target instanceof Element && mutation.target.matches(supportedSelector)) {
+                    if (isEligibleField(mutation.target) && !mutation.target.dataset.voiceMicReady) {
+                        ensureMicForField(mutation.target);
+                    }
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['disabled', 'readonly']
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeVoiceFields();
+        });
         initializeVoiceFields();
     })();
 </script>

@@ -103,6 +103,7 @@ class AdminController extends Controller
         $results = [];
         $apiResponseMeta = null;
         $errorMessage = null;
+        $errorDetails = null;
 
         if ($search !== '') {
             $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
@@ -144,11 +145,13 @@ class AdminController extends Controller
 
                     if (!$response->successful()) {
                         $errorMessage = 'The API request returned an error response.';
+                        $errorDetails = trim((string) $response->body());
                     } elseif (empty($results)) {
                         $errorMessage = 'No matching records were found for the current search.';
                     }
                 } catch (\Throwable $exception) {
                     $errorMessage = 'Unable to reach the external API right now: ' . $exception->getMessage();
+                    $errorDetails = $exception->getMessage();
                 }
             }
         }
@@ -158,6 +161,7 @@ class AdminController extends Controller
             'results' => $results,
             'apiResponseMeta' => $apiResponseMeta,
             'errorMessage' => $errorMessage,
+            'errorDetails' => $errorDetails,
         ]);
     }
 

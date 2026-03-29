@@ -224,6 +224,12 @@
 
         @if($errorMessage)
             <div class="api-alert">{{ $errorMessage }}</div>
+            @if(!empty($errorDetails))
+                <details class="api-raw-toggle">
+                    <summary>Show error details</summary>
+                    <div class="api-json">{{ $errorDetails }}</div>
+                </details>
+            @endif
         @endif
     </section>
 

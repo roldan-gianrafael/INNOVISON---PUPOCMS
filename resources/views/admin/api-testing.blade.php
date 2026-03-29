@@ -254,7 +254,23 @@
                         <div class="api-result-grid">
                             <div class="api-field">
                                 <small>ID</small>
-                                <strong>{{ $result['identifier'] }}</strong>
+                                <strong>{{ $result['admin_id'] ?? $result['identifier'] }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>First Name</small>
+                                <strong>{{ $result['first_name'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Middle Name</small>
+                                <strong>{{ $result['middle_name'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Last Name</small>
+                                <strong>{{ $result['last_name'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Suffix Name</small>
+                                <strong>{{ $result['suffix_name'] ?? 'N/A' }}</strong>
                             </div>
                             <div class="api-field">
                                 <small>Email</small>
@@ -265,12 +281,24 @@
                                 <strong>{{ $result['birthday'] }}</strong>
                             </div>
                             <div class="api-field">
+                                <small>Age</small>
+                                <strong>{{ $result['age'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Gender</small>
+                                <strong>{{ $result['gender'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Civil Status</small>
+                                <strong>{{ $result['civil_status'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
                                 <small>Name</small>
                                 <strong>{{ $result['name'] }}</strong>
                             </div>
                             <div class="api-field">
-                                <small>Role</small>
-                                <strong>{{ $result['role'] }}</strong>
+                                <small>Access Level</small>
+                                <strong>{{ $result['access_level'] ?? $result['role'] }}</strong>
                             </div>
                             <div class="api-field">
                                 <small>Office</small>
@@ -283,6 +311,18 @@
                             <div class="api-field">
                                 <small>Status</small>
                                 <strong>{{ $result['status'] }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Emergency Contact Person</small>
+                                <strong>{{ $result['emergency_contact_person'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Emergency Contact No</small>
+                                <strong>{{ $result['emergency_contact_no'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Last Updated</small>
+                                <strong>{{ $result['last_updated'] ?? 'N/A' }}</strong>
                             </div>
                             <div class="api-field" style="grid-column: 1 / -1;">
                                 <small>Address</small>

@@ -116,9 +116,22 @@ class AdminController extends Controller
         $resolvedStatus = $linkedAdmin?->status ?? ($isStudentAssistant ? null : 'active');
         $resolvedAddress = $linkedAdmin?->address;
         $resolvedContactNumber = $linkedAdmin?->contact_no ?? $linkedAdmin?->emergency_contact_no;
+        $resolvedFirstName = $linkedAdmin?->first_name ?: ($user->first_name ?? '');
+        $resolvedMiddleName = $linkedAdmin?->middle_name;
+        $resolvedLastName = $linkedAdmin?->last_name ?: ($user->last_name ?? '');
+        $resolvedSuffixName = $linkedAdmin?->suffix_name;
+        $resolvedName = trim(implode(' ', array_filter([
+            $resolvedFirstName,
+            $resolvedMiddleName,
+            $resolvedLastName,
+            $resolvedSuffixName,
+        ])));
 
         return [
-            'name' => $linkedAdmin?->name ?: ($user->name ?? ''),
+            'admin_id' => $linkedAdmin?->admin_id,
+            'name' => $resolvedName !== '' ? $resolvedName : ($linkedAdmin?->name ?: ($user->name ?? '')),
+            'first_name' => $resolvedFirstName,
+            'last_name' => $resolvedLastName,
             'email' => $linkedAdmin?->email ?: ($linkedAdmin?->email_address ?: ($user->email ?? '')),
             'middle_name' => $linkedAdmin?->middle_name,
             'suffix_name' => $linkedAdmin?->suffix_name,
@@ -126,6 +139,11 @@ class AdminController extends Controller
             'age' => $age,
             'address' => $resolvedAddress,
             'contact_number' => $resolvedContactNumber,
+            'emergency_contact_person' => $linkedAdmin?->emergency_contact_person,
+            'emergency_contact_no' => $linkedAdmin?->emergency_contact_no,
+            'office' => $linkedAdmin?->office,
+            'gender' => $linkedAdmin?->gender,
+            'civil_status' => $linkedAdmin?->civil_status,
             'role' => $resolvedRole,
             'status' => $resolvedStatus,
             'source' => $isSuperadmin ? 'admins' : ($isStudentAssistant ? 'external_pending' : 'display_only'),
@@ -362,16 +380,26 @@ class AdminController extends Controller
 
             return [
                 'identifier' => (string) ($fields['admin_id'] ?? 'N/A'),
+                'admin_id' => (string) ($fields['admin_id'] ?? 'N/A'),
                 'name' => $name !== '' ? $name : 'N/A',
+                'first_name' => (string) ($fields['first_name'] ?? 'N/A'),
+                'middle_name' => (string) ($fields['middle_name'] ?? 'N/A'),
+                'last_name' => (string) ($fields['last_name'] ?? 'N/A'),
+                'suffix_name' => (string) ($fields['suffix_name'] ?? 'N/A'),
                 'email' => (string) ($fields['email'] ?? $fields['email_address'] ?? 'N/A'),
                 'birthday' => (string) ($fields['birthday'] ?? 'N/A'),
+                'age' => (string) ($fields['age'] ?? 'N/A'),
+                'gender' => (string) ($fields['gender'] ?? 'N/A'),
+                'civil_status' => (string) ($fields['civil_status'] ?? 'N/A'),
                 'role' => (string) ($fields['access_level'] ?? $fields['role'] ?? 'N/A'),
+                'access_level' => (string) ($fields['access_level'] ?? $fields['role'] ?? 'N/A'),
                 'office' => (string) ($fields['office'] ?? 'N/A'),
                 'contact_number' => (string) ($fields['contact_no'] ?? $fields['emergency_contact_no'] ?? 'N/A'),
                 'address' => (string) ($fields['address'] ?? 'N/A'),
                 'status' => (string) ($fields['status'] ?? 'N/A'),
-                'middle_name' => (string) ($fields['middle_name'] ?? 'N/A'),
-                'suffix_name' => (string) ($fields['suffix_name'] ?? 'N/A'),
+                'emergency_contact_person' => (string) ($fields['emergency_contact_person'] ?? 'N/A'),
+                'emergency_contact_no' => (string) ($fields['emergency_contact_no'] ?? 'N/A'),
+                'last_updated' => (string) ($fields['updated_at'] ?? 'N/A'),
                 'fields' => $fields,
             ];
         })->values()->all();
@@ -428,16 +456,26 @@ class AdminController extends Controller
 
             $normalized[] = [
                 'identifier' => $identifier !== '' ? $identifier : 'N/A',
+                'admin_id' => trim((string) ($item['admin_id'] ?? $item['id'] ?? '')) ?: 'N/A',
                 'name' => $name !== '' ? $name : 'N/A',
+                'first_name' => trim((string) ($item['first_name'] ?? '')) ?: 'N/A',
+                'middle_name' => trim((string) ($item['middle_name'] ?? '')) ?: 'N/A',
+                'last_name' => trim((string) ($item['last_name'] ?? '')) ?: 'N/A',
+                'suffix_name' => trim((string) ($item['suffix_name'] ?? '')) ?: 'N/A',
                 'email' => $email !== '' ? $email : 'N/A',
                 'birthday' => $birthday !== '' ? $birthday : 'N/A',
+                'age' => trim((string) ($item['age'] ?? '')) ?: 'N/A',
+                'gender' => trim((string) ($item['gender'] ?? $profile['gender'] ?? '')) ?: 'N/A',
+                'civil_status' => trim((string) ($item['civil_status'] ?? '')) ?: 'N/A',
                 'role' => $role !== '' ? $role : 'N/A',
+                'access_level' => trim((string) ($item['access_level'] ?? $item['role'] ?? '')) ?: ($role !== '' ? $role : 'N/A'),
                 'office' => $office !== '' ? $office : 'N/A',
                 'contact_number' => $contactNumber !== '' ? $contactNumber : 'N/A',
                 'address' => $address !== '' ? $address : 'N/A',
                 'status' => $status !== '' ? $status : 'N/A',
-                'middle_name' => trim((string) ($item['middle_name'] ?? '')) ?: 'N/A',
-                'suffix_name' => trim((string) ($item['suffix_name'] ?? '')) ?: 'N/A',
+                'emergency_contact_person' => trim((string) ($item['emergency_contact_person'] ?? '')) ?: 'N/A',
+                'emergency_contact_no' => trim((string) ($item['emergency_contact_no'] ?? '')) ?: 'N/A',
+                'last_updated' => trim((string) ($item['last_updated'] ?? $item['updated_at'] ?? '')) ?: 'N/A',
                 'fields' => $item,
             ];
         }
@@ -740,13 +778,19 @@ public function updateClearance(Request $request, $id)
     public function updateProfile(Request $request)
 {
     $request->validate([
-        'name' => 'required|string|max:255',
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
         'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore(Auth::id())],
         'middle_name' => 'nullable|string|max:255',
         'suffix_name' => 'nullable|string|max:50',
         'birthday' => 'nullable|date',
         'address' => 'nullable|string|max:255',
         'contact_number' => 'nullable|string|max:30',
+        'gender' => 'nullable|string|max:255',
+        'civil_status' => 'nullable|string|max:255',
+        'emergency_contact_person' => 'nullable|string|max:255',
+        'emergency_contact_no' => 'nullable|string|max:255',
+        'office' => 'nullable|string|max:255',
         'role' => 'nullable|string|max:255',
         'status' => 'nullable|in:active,inactive',
         'password' => 'nullable|string|min:6|confirmed',
@@ -759,7 +803,14 @@ public function updateClearance(Request $request, $id)
     
 
     $passwordChanged = $request->filled('password') ? ' (Password was also updated)' : '';
-    $user->name = $request->name;
+    $user->first_name = $request->first_name;
+    $user->last_name = $request->last_name;
+    $user->name = trim(implode(' ', array_filter([
+        $request->first_name,
+        $request->middle_name,
+        $request->last_name,
+        $request->suffix_name,
+    ])));
     $user->email = $request->email;
 
     if (!$isStudentAssistant && $request->filled('role')) {
@@ -784,30 +835,24 @@ public function updateClearance(Request $request, $id)
             $linkedAdminProfile = new Admin();
         }
 
-        [$firstName, $middleName, $lastName, $suffixName] = $this->splitDisplayName((string) $request->name);
-
         if (Admin::hasColumn('first_name')) {
-            $linkedAdminProfile->first_name = $firstName;
+            $linkedAdminProfile->first_name = $request->first_name;
         }
 
         if (Admin::hasColumn('middle_name')) {
-            $linkedAdminProfile->middle_name = $request->middle_name !== null && $request->middle_name !== ''
-                ? $request->middle_name
-                : $middleName;
+            $linkedAdminProfile->middle_name = $request->middle_name;
         }
 
         if (Admin::hasColumn('last_name')) {
-            $linkedAdminProfile->last_name = $lastName;
+            $linkedAdminProfile->last_name = $request->last_name;
         }
 
         if (Admin::hasColumn('suffix_name')) {
-            $linkedAdminProfile->suffix_name = $request->suffix_name !== null && $request->suffix_name !== ''
-                ? $request->suffix_name
-                : $suffixName;
+            $linkedAdminProfile->suffix_name = $request->suffix_name;
         }
 
         if (Admin::hasColumn('name')) {
-            $linkedAdminProfile->name = $request->name;
+            $linkedAdminProfile->name = $user->name;
         }
 
         if (Admin::hasColumn('email')) {
@@ -832,10 +877,26 @@ public function updateClearance(Request $request, $id)
             $linkedAdminProfile->address = $request->address;
         }
 
-        if (Admin::hasColumn('contact_no')) {
+        if (Admin::hasColumn('gender')) {
+            $linkedAdminProfile->gender = $request->gender;
+        }
+
+        if (Admin::hasColumn('civil_status')) {
+            $linkedAdminProfile->civil_status = $request->civil_status;
+        }
+
+        if (Admin::hasColumn('emergency_contact_person')) {
+            $linkedAdminProfile->emergency_contact_person = $request->emergency_contact_person;
+        }
+
+        if (Admin::hasColumn('emergency_contact_no')) {
+            $linkedAdminProfile->emergency_contact_no = $request->emergency_contact_no ?: $request->contact_number;
+        } elseif (Admin::hasColumn('contact_no')) {
             $linkedAdminProfile->contact_no = $request->contact_number;
-        } elseif (Admin::hasColumn('emergency_contact_no')) {
-            $linkedAdminProfile->emergency_contact_no = $request->contact_number;
+        }
+
+        if (Admin::hasColumn('office')) {
+            $linkedAdminProfile->office = $request->office;
         }
 
         if (Admin::hasColumn('access_level')) {

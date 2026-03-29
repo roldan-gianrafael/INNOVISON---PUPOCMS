@@ -15,6 +15,7 @@
     }
     .card h3 { margin-top: 0; color: #8B0000; margin-bottom: 20px; font-size: 18px; }
     .profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
+    .profile-grid-wide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 18px; }
     .profile-note { padding: 12px 14px; border-radius: 10px; background: #f8fafc; color: #64748b; font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
     .pill-status { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; text-transform:capitalize; }
     .pill-status.active { background:#dcfce7; color:#166534; }
@@ -51,7 +52,8 @@
     .alert-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
     @media (max-width: 768px) {
-        .profile-grid {
+        .profile-grid,
+        .profile-grid-wide {
             grid-template-columns: 1fr;
         }
     }
@@ -82,63 +84,62 @@
             <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
         </div>
 
-        
-
-        <div class="profile-grid">
+        <div class="profile-grid-wide">
             <div class="form-group">
-                <label>Name</label>
-                <input type="text" class="form-control" value="{{ $cmsProfile['name'] ?? ($admin->name ?? 'Admin User') }}" disabled>
+                <label>Admin ID</label>
+                <input type="text" class="form-control" value="{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}" disabled>
             </div>
-
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-control" value="{{ $cmsProfile['email'] ?? ($admin->email ?? '') }}" disabled>
+                <label>First Name</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['first_name'] ?? 'N/A' }}" disabled>
             </div>
-
             <div class="form-group">
                 <label>Middle Name</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['middle_name'] ?? 'N/A' }}" disabled>
             </div>
-
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['last_name'] ?? 'N/A' }}" disabled>
+            </div>
             <div class="form-group">
                 <label>Suffix Name</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['suffix_name'] ?? 'N/A' }}" disabled>
             </div>
-
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" value="{{ $cmsProfile['email'] ?? ($admin->email ?? '') }}" disabled>
+            </div>
             <div class="form-group">
                 <label>Birthday</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['birthday'] ?? 'N/A' }}" disabled>
             </div>
-
             <div class="form-group">
                 <label>Age</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['age'] ?? 'N/A' }}" disabled>
             </div>
-
             <div class="form-group">
+                <label>Gender</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['gender'] ?? 'N/A' }}" disabled>
+            </div>
+            <div class="form-group">
+                <label>Civil Status</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['civil_status'] ?? 'N/A' }}" disabled>
+            </div>
+            <div class="form-group">
+                <label>Emergency Contact Person</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['emergency_contact_person'] ?? 'N/A' }}" disabled>
+            </div>
+            <div class="form-group">
+                <label>Emergency Contact No.</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['emergency_contact_no'] ?? ($cmsProfile['contact_number'] ?? 'N/A') }}" disabled>
+            </div>
+            <div class="form-group">
+                <label>Office</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['office'] ?? 'Admission Office' }}" disabled>
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
                 <label>Address</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['address'] ?? 'N/A' }}" disabled>
-            </div>
-
-            <div class="form-group">
-                <label>Contact Number</label>
-                <input type="text" class="form-control" value="{{ $cmsProfile['contact_number'] ?? 'N/A' }}" disabled>
-            </div>
-
-            <div class="form-group">
-                <label>Role</label>
-                <input type="text" class="form-control" value="{{ $cmsProfile['role'] ?? \App\Models\User::normalizeRole($admin->user_role ?? '') }}" disabled>
-            </div>
-
-            <div class="form-group">
-                <label>Status</label>
-                <div>
-                    @php
-                        $statusValue = strtolower((string) ($cmsProfile['status'] ?? 'pending'));
-                        $statusClass = in_array($statusValue, ['active', 'inactive'], true) ? $statusValue : 'pending';
-                    @endphp
-                    <span class="pill-status {{ $statusClass }}">{{ $cmsProfile['status'] ?? 'Pending' }}</span>
-                </div>
             </div>
         </div>
     </section>
@@ -200,24 +201,36 @@
             <form action="{{ url('/admin/profile/update') }}" method="POST">
                 @csrf @method('PUT')
 
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" class="form-control" value="{{ old('name', $cmsProfile['name'] ?? ($admin->name ?? '')) }}" required>
-                </div>
+                <div class="profile-grid-wide">
+                    <div class="form-group">
+                        <label>Admin ID</label>
+                        <input type="text" class="form-control" value="{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}" disabled>
+                    </div>
 
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" value="{{ old('email', $cmsProfile['email'] ?? ($admin->email ?? '')) }}" required>
-                </div>
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $cmsProfile['first_name'] ?? '') }}" required>
+                    </div>
 
-                <div class="form-group">
-                    <label>Middle Name</label>
-                    <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name', $cmsProfile['middle_name'] ?? '') }}" placeholder="Middle name">
-                </div>
+                    <div class="form-group">
+                        <label>Middle Name</label>
+                        <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name', $cmsProfile['middle_name'] ?? '') }}" placeholder="Middle name">
+                    </div>
 
-                <div class="form-group">
-                    <label>Suffix Name</label>
-                    <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $cmsProfile['suffix_name'] ?? '') }}" placeholder="Jr., Sr., III">
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $cmsProfile['last_name'] ?? '') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Suffix Name</label>
+                        <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $cmsProfile['suffix_name'] ?? '') }}" placeholder="Jr., Sr., III">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ old('email', $cmsProfile['email'] ?? ($admin->email ?? '')) }}" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -241,27 +254,31 @@
                     <input type="text" name="contact_number" class="form-control" value="{{ old('contact_number', $cmsProfile['contact_number'] ?? '') }}">
                 </div>
 
-                <div class="form-group">
-                    <label>Role</label>
-                    <select name="role" class="form-control">
-                        @php
-                            $selectedRole = old('role', strtolower((string) ($cmsProfile['role'] ?? \App\Models\User::normalizeRole($admin->user_role ?? 'admin'))));
-                        @endphp
-                        <option value="superadmin" @selected($selectedRole === 'superadmin')>Superadmin</option>
-                        <option value="admin" @selected($selectedRole === 'admin')>Admin</option>
-                        <option value="student_assistant" @selected(in_array($selectedRole, ['student_assistant', 'assistant', 'studentassistant'], true))>Student Assistant</option>
-                    </select>
+                <div class="profile-grid">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <input type="text" name="gender" class="form-control" value="{{ old('gender', $cmsProfile['gender'] ?? '') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Civil Status</label>
+                        <input type="text" name="civil_status" class="form-control" value="{{ old('civil_status', $cmsProfile['civil_status'] ?? '') }}">
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Status</label>
-                    @php
-                        $selectedStatus = old('status', strtolower((string) ($cmsProfile['status'] ?? 'active')));
-                    @endphp
-                    <select name="status" class="form-control">
-                        <option value="active" @selected($selectedStatus === 'active')>Active</option>
-                        <option value="inactive" @selected($selectedStatus === 'inactive')>Inactive</option>
-                    </select>
+                    <label>Emergency Contact Person</label>
+                    <input type="text" name="emergency_contact_person" class="form-control" value="{{ old('emergency_contact_person', $cmsProfile['emergency_contact_person'] ?? '') }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Emergency Contact No.</label>
+                    <input type="text" name="emergency_contact_no" class="form-control" value="{{ old('emergency_contact_no', $cmsProfile['emergency_contact_no'] ?? ($cmsProfile['contact_number'] ?? '')) }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Office</label>
+                    <input type="text" name="office" class="form-control" value="{{ old('office', $cmsProfile['office'] ?? 'Admission Office') }}">
                 </div>
 
                 <div style="border-top: 1px solid #eee; margin: 15px 0; padding-top: 15px;">

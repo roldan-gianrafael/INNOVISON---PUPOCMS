@@ -65,16 +65,16 @@
                 transform: rotate(0deg);
             }
             20% {
-                transform: rotate(10deg);
+                transform: translateY(-1.5px);
             }
             40% {
-                transform: rotate(-8deg);
+                transform: translateY(1.5px);
             }
             60% {
-                transform: rotate(10deg);
+                transform: translateY(-1px);
             }
             80% {
-                transform: rotate(-4deg);
+                transform: translateY(1px);
             }
         }
 
@@ -119,7 +119,8 @@
         }
 
         :where(.asw-menu-btn .asw-wave-arm) {
-            transform-origin: 14px 10px;
+            transform-box: fill-box;
+            transform-origin: center;
             animation: accessibilityIconWave 2.4s ease-in-out infinite;
         }
 

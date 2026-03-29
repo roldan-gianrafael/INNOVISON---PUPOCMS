@@ -67,7 +67,7 @@
             overflow: visible !important;
             background: #800000 !important;
             background-image: none !important;
-            border: 2px solid #800000 !important;
+            border: 2px solid #5f0012 !important;
             outline: none !important;
             box-shadow: 0 10px 24px rgba(128, 0, 0, 0.28) !important;
         }
@@ -89,7 +89,7 @@
         :where(.asw-menu-btn:focus-visible) {
             background: #800000 !important;
             background-image: none !important;
-            border-color: #800000 !important;
+            border-color: #5f0012 !important;
             outline: none !important;
         }
 
@@ -1751,7 +1751,7 @@
         document.querySelectorAll('.asw-menu-btn').forEach(function (button) {
             button.style.setProperty('background', '#800000', 'important');
             button.style.setProperty('background-image', 'none', 'important');
-            button.style.setProperty('border', '2px solid #800000', 'important');
+            button.style.setProperty('border', '2px solid #5f0012', 'important');
             button.style.setProperty('outline', 'none', 'important');
             button.style.setProperty('box-shadow', '0 10px 24px rgba(128, 0, 0, 0.28)', 'important');
             button.querySelectorAll('svg').forEach(function (icon) {

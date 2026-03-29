@@ -5,44 +5,35 @@ namespace App\Services;
 use App\Models\Admin;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class FacultySyncService
 {
-    public function generateHmacHeaders(?string $mode = null): array
+    public function generateHmacHeaders(string $method, string $url, string $body = '', string $nonce = ''): array
     {
-        $systemId = (string) config('services.pupt_flss.system_id');
         $secretKey = (string) config('services.pupt_flss.secret_key');
         $timestamp = (string) now()->timestamp;
-        $nonce = Str::random(16);
 
         if ($secretKey === '') {
             throw new RuntimeException('PUPT-FLSS HMAC credentials are not configured.');
         }
 
-        $mode = $mode ?: 'timestamp_nonce';
+        $normalizedMethod = strtoupper(trim($method));
+        $message = implode('|', [
+            $normalizedMethod,
+            $url,
+            $body,
+            $timestamp,
+            $nonce,
+        ]);
+        $signature = hash_hmac('sha256', $message, $secretKey);
 
-        $signaturePayload = match ($mode) {
-            'system_timestamp_nonce' => $systemId . $timestamp . $nonce,
-            'timestamp_nonce_system' => $timestamp . $nonce . $systemId,
-            default => $timestamp . $nonce,
-        };
-
-        $signature = hash_hmac('sha256', $signaturePayload, $secretKey);
-
-        $headers = [
+        return [
+            // FLSS expects a hex-encoded HMAC SHA-256 signature.
             'X-HMAC-Signature' => $signature,
             'X-HMAC-Timestamp' => $timestamp,
             'X-HMAC-Nonce' => $nonce,
         ];
-
-        if (in_array($mode, ['system_timestamp_nonce', 'timestamp_nonce_system'], true) && $systemId !== '') {
-            $headers['X-System-Id'] = $systemId;
-            $headers['X-HMAC-System-Id'] = $systemId;
-        }
-
-        return $headers;
     }
 
     public function fetchFaculties(): array
@@ -54,31 +45,10 @@ class FacultySyncService
         }
 
         $timeout = (int) config('services.pupt_flss.timeout', 30);
-        $response = null;
-        $modes = [
-            'timestamp_nonce',
-            'system_timestamp_nonce',
-            'timestamp_nonce_system',
-        ];
-
-        foreach ($modes as $index => $mode) {
-            $response = Http::acceptJson()
-                ->timeout($timeout)
-                ->withHeaders($this->generateHmacHeaders($mode))
-                ->get($baseUrl);
-
-            if ($response->successful()) {
-                break;
-            }
-
-            if ($index < count($modes) - 1) {
-                usleep(300000);
-            }
-        }
-
-        if ($response === null) {
-            throw new RuntimeException('PUPT-FLSS faculty request did not return a response.');
-        }
+        $response = Http::acceptJson()
+            ->timeout($timeout)
+            ->withHeaders($this->generateHmacHeaders('GET', $baseUrl))
+            ->get($baseUrl);
 
         if (!$response->successful()) {
             throw new RequestException($response);

@@ -142,7 +142,7 @@ class AdminController extends Controller
                         $client = $client->withHeaders([$apiHeader => $apiKey]);
                         $authMode = 'custom-header';
                     } elseif ($facultyEndpoint !== '' && $endpoint === $facultyEndpoint) {
-                        $client = $client->withHeaders($facultySyncService->generateHmacHeaders());
+                        $client = $client->withHeaders($facultySyncService->generateHmacHeaders('GET', $endpoint));
                         $authMode = 'faculty-hmac';
                     }
 

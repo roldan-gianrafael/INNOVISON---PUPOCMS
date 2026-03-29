@@ -32,19 +32,14 @@
         cursor: pointer;
         transition: background 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
         padding: 0;
-        opacity: 0;
-        pointer-events: none;
+        opacity: 0.5;
+        pointer-events: auto;
     }
 
     .voice-field-inline-mic svg {
         width: 13px;
         height: 13px;
         fill: currentColor;
-    }
-
-    .voice-field-wrap.active .voice-field-inline-mic {
-        opacity: 0.5;
-        pointer-events: auto;
     }
 
     .voice-field-inline-mic:hover,

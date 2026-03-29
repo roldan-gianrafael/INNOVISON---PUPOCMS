@@ -7,8 +7,8 @@
     <title>@yield('title') - PUPT Admin</title>
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
-        position="bottom-right"
-        offset="24,96"
+        data-asw-position="bottom-right"
+        data-asw-offset="24,96"
         defer
     ></script>
     <script>
@@ -1316,6 +1316,7 @@
 </section>
 
 @include('partials.post_login_terms_gate')
+@include('partials.student_voice_input_support')
 
 @stack('scripts')
 

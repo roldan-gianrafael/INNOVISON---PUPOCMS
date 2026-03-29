@@ -93,6 +93,16 @@
             outline: none !important;
         }
 
+        :where(.asw-menu-btn svg) {
+            fill: #4a0404 !important;
+            stroke: #4a0404 !important;
+        }
+
+        :where(.asw-menu-btn svg path:not([fill="none"])) {
+            fill: #4a0404 !important;
+            stroke: #4a0404 !important;
+        }
+
         :root {
             --bg: #2a0e16;
             --bg-grad-1: #5b1a2a;
@@ -1756,7 +1766,12 @@
             button.style.setProperty('box-shadow', '0 10px 24px rgba(128, 0, 0, 0.28)', 'important');
             button.querySelectorAll('svg').forEach(function (icon) {
                 icon.style.setProperty('fill', '#4a0404', 'important');
+                icon.style.setProperty('stroke', '#4a0404', 'important');
                 icon.style.setProperty('background', 'transparent', 'important');
+            });
+            button.querySelectorAll('svg path:not([fill="none"])').forEach(function (path) {
+                path.style.setProperty('fill', '#4a0404', 'important');
+                path.style.setProperty('stroke', '#4a0404', 'important');
             });
         });
     }

@@ -72,14 +72,25 @@ class AdminController extends Controller
     {
         $name = trim($name);
         if ($name === '') {
-            return ['', ''];
+            return ['', '', ''];
         }
 
-        $parts = preg_split('/\s+/', $name, 2) ?: [$name];
-        $firstName = $parts[0] ?? '';
-        $lastName = $parts[1] ?? '';
+        $suffixes = ['jr', 'jr.', 'sr', 'sr.', 'ii', 'iii', 'iv', 'v'];
+        $parts = preg_split('/\s+/', $name) ?: [$name];
+        $suffix = '';
 
-        return [$firstName, $lastName];
+        if (count($parts) > 1) {
+            $lastPart = strtolower((string) end($parts));
+            if (in_array($lastPart, $suffixes, true)) {
+                $suffix = (string) array_pop($parts);
+            }
+        }
+
+        $parts = array_values($parts);
+        $firstName = $parts[0] ?? '';
+        $lastName = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
+
+        return [$firstName, $lastName, $suffix];
     }
 
     private function buildCmsAdminProfile(User $user): array
@@ -108,6 +119,7 @@ class AdminController extends Controller
         return [
             'name' => $linkedAdmin?->name ?: ($user->name ?? ''),
             'email' => $linkedAdmin?->email ?: ($linkedAdmin?->email_address ?: ($user->email ?? '')),
+            'suffix_name' => $linkedAdmin?->suffix_name,
             'birthday' => $birthday,
             'age' => $age,
             'address' => $resolvedAddress,
@@ -356,6 +368,7 @@ class AdminController extends Controller
                 'contact_number' => (string) ($fields['contact_no'] ?? $fields['emergency_contact_no'] ?? 'N/A'),
                 'address' => (string) ($fields['address'] ?? 'N/A'),
                 'status' => (string) ($fields['status'] ?? 'N/A'),
+                'suffix_name' => (string) ($fields['suffix_name'] ?? 'N/A'),
                 'fields' => $fields,
             ];
         })->values()->all();
@@ -420,6 +433,7 @@ class AdminController extends Controller
                 'contact_number' => $contactNumber !== '' ? $contactNumber : 'N/A',
                 'address' => $address !== '' ? $address : 'N/A',
                 'status' => $status !== '' ? $status : 'N/A',
+                'suffix_name' => trim((string) ($item['suffix_name'] ?? '')) ?: 'N/A',
                 'fields' => $item,
             ];
         }
@@ -724,6 +738,7 @@ public function updateClearance(Request $request, $id)
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore(Auth::id())],
+        'suffix_name' => 'nullable|string|max:50',
         'birthday' => 'nullable|date',
         'address' => 'nullable|string|max:255',
         'contact_number' => 'nullable|string|max:30',
@@ -764,7 +779,7 @@ public function updateClearance(Request $request, $id)
             $linkedAdminProfile = new Admin();
         }
 
-        [$firstName, $lastName] = $this->splitDisplayName((string) $request->name);
+        [$firstName, $lastName, $suffixName] = $this->splitDisplayName((string) $request->name);
 
         if (Admin::hasColumn('first_name')) {
             $linkedAdminProfile->first_name = $firstName;
@@ -772,6 +787,12 @@ public function updateClearance(Request $request, $id)
 
         if (Admin::hasColumn('last_name')) {
             $linkedAdminProfile->last_name = $lastName;
+        }
+
+        if (Admin::hasColumn('suffix_name')) {
+            $linkedAdminProfile->suffix_name = $request->suffix_name !== null && $request->suffix_name !== ''
+                ? $request->suffix_name
+                : $suffixName;
         }
 
         if (Admin::hasColumn('name')) {

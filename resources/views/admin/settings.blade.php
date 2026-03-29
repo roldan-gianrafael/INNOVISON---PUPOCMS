@@ -96,6 +96,11 @@
             </div>
 
             <div class="form-group">
+                <label>Suffix Name</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['suffix_name'] ?? 'N/A' }}" disabled>
+            </div>
+
+            <div class="form-group">
                 <label>Birthday</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['birthday'] ?? 'N/A' }}" disabled>
             </div>
@@ -198,6 +203,11 @@
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" name="email" class="form-control" value="{{ old('email', $cmsProfile['email'] ?? ($admin->email ?? '')) }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Suffix Name</label>
+                    <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $cmsProfile['suffix_name'] ?? '') }}" placeholder="Jr., Sr., III">
                 </div>
 
                 <div class="form-group">

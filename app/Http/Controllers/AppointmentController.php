@@ -406,6 +406,7 @@ class AppointmentController extends Controller
         'admin_profile_id' => ['nullable', 'integer', 'exists:admins,admin_id'],
         'first_name' => ['nullable', 'string', 'max:255'],
         'last_name' => ['nullable', 'string', 'max:255'],
+        'suffix_name' => ['nullable', 'string', 'max:50'],
         'email' => ['nullable', 'email', 'max:255'],
         'birthday' => ['nullable', 'date'],
         'age' => ['nullable', 'integer', 'min:0'],
@@ -432,6 +433,7 @@ class AppointmentController extends Controller
     if ($linkedAdminProfile && isset($validated['admin_profile_id']) && (int) $validated['admin_profile_id'] === (int) $linkedAdminProfile->admin_id) {
         $linkedAdminProfile->first_name = $validated['first_name'] ?? $linkedAdminProfile->first_name;
         $linkedAdminProfile->last_name = $validated['last_name'] ?? $linkedAdminProfile->last_name;
+        $linkedAdminProfile->suffix_name = $validated['suffix_name'] ?? $linkedAdminProfile->suffix_name;
         $linkedAdminProfile->email = $validated['email'] ?? $linkedAdminProfile->email;
         $linkedAdminProfile->birthday = $validated['birthday'] ?? $linkedAdminProfile->birthday;
         $linkedAdminProfile->age = $validated['age'] ?? $linkedAdminProfile->age;
@@ -612,7 +614,9 @@ public function showHealthForm()
     if ($user->DOB) {
         $calculatedAge = \Carbon\Carbon::parse($user->DOB)->age;
     }
-    return view('student.health_form', compact('user', 'calculatedAge'));
+    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+
+    return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile'));
 }
 
 

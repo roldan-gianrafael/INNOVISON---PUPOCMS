@@ -22,7 +22,8 @@ class Admin extends Model
         static::saving(function (Admin $admin) {
             $firstName = trim((string) $admin->first_name);
             $lastName = trim((string) $admin->last_name);
-            $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+            $suffixName = trim((string) $admin->suffix_name);
+            $fullName = trim(implode(' ', array_filter([$firstName, $lastName, $suffixName])));
 
             if ($fullName !== '' && static::hasColumn('name')) {
                 $admin->name = $fullName;

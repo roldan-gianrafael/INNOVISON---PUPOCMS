@@ -568,6 +568,11 @@
                 </div>
             </div>
 
+            <div style="margin-bottom: 15px;">
+                <label class="input-label">Suffix Name</label>
+                <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $linkedAdminProfile->suffix_name) }}" disabled>
+            </div>
+
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Email</label>

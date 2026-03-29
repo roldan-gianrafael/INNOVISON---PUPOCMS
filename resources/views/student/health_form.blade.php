@@ -35,11 +35,15 @@
             <div class="row">
                 <div class="col-md-7 mb-3">
                     <label class="form-label">Full Name</label>
-                    <input type="text" class="form-control bg-light" value="{{ Auth::user()->name }}" readonly>
+                    <input type="text" class="form-control bg-light" value="{{ trim(implode(' ', array_filter([Auth::user()->name, optional($linkedAdminProfile)->suffix_name]))) }}" readonly>
                 </div>
                 <div class="col-md-5 mb-3">
                     <label class="form-label">PUP Student No.</label>
                     <input type="text" class="form-control bg-light" value="{{ Auth::user()->student_id }}" readonly>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Suffix Name</label>
+                    <input type="text" class="form-control bg-light" value="{{ optional($linkedAdminProfile)->suffix_name }}" readonly>
                 </div>
                 <div class="col-md-8 mb-3">
                     <label class="form-label">Home Address</label>

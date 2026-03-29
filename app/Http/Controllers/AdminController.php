@@ -17,9 +17,110 @@ use Illuminate\Support\Facades\Http;
 use App\Models\HealthProfile;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
+    private function isStudentAssistantAccount(User $user): bool
+    {
+        $userType = strtolower(trim((string) ($user->user_type ?? '')));
+        return in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true);
+    }
+
+    private function isSuperadminAccount(User $user): bool
+    {
+        return User::normalizeRole($user->user_role) === User::ROLE_SUPERADMIN;
+    }
+
+    private function findLinkedAdminProfile(User $user): ?Admin
+    {
+        return $this->findLinkedAdminProfileByEmails([
+            trim((string) ($user->email ?? '')),
+        ]);
+    }
+
+    private function findLinkedAdminProfileByEmails(array $emails): ?Admin
+    {
+        if (!Schema::hasTable('admins')) {
+            return null;
+        }
+
+        $emails = array_values(array_filter(array_unique(array_map(static function ($value) {
+            return trim((string) $value);
+        }, $emails))));
+
+        if ($emails === []) {
+            return null;
+        }
+
+        $query = Admin::query();
+
+        $query->where(function ($builder) use ($emails) {
+            if (Admin::hasColumn('email')) {
+                $builder->orWhereIn('email', $emails);
+            }
+
+            if (Admin::hasColumn('email_address')) {
+                $builder->orWhereIn('email_address', $emails);
+            }
+        });
+
+        return $query->first();
+    }
+
+    private function splitDisplayName(string $name): array
+    {
+        $name = trim($name);
+        if ($name === '') {
+            return ['', ''];
+        }
+
+        $parts = preg_split('/\s+/', $name, 2) ?: [$name];
+        $firstName = $parts[0] ?? '';
+        $lastName = $parts[1] ?? '';
+
+        return [$firstName, $lastName];
+    }
+
+    private function buildCmsAdminProfile(User $user): array
+    {
+        $isStudentAssistant = $this->isStudentAssistantAccount($user);
+        $isSuperadmin = $this->isSuperadminAccount($user);
+        $linkedAdmin = $isSuperadmin ? $this->findLinkedAdminProfile($user) : null;
+
+        $birthday = $linkedAdmin?->birthday;
+        $age = null;
+        if ($birthday) {
+            try {
+                $age = Carbon::parse($birthday)->age;
+            } catch (\Throwable $exception) {
+                $age = null;
+            }
+        }
+
+        $resolvedRole = $linkedAdmin?->access_level
+            ?? ($isStudentAssistant ? 'student_assistant' : User::normalizeRole($user->user_role));
+
+        $resolvedStatus = $linkedAdmin?->status ?? ($isStudentAssistant ? null : 'active');
+        $resolvedAddress = $linkedAdmin?->address;
+        $resolvedContactNumber = $linkedAdmin?->contact_no ?? $linkedAdmin?->emergency_contact_no;
+
+        return [
+            'name' => $linkedAdmin?->name ?: ($user->name ?? ''),
+            'email' => $linkedAdmin?->email ?: ($linkedAdmin?->email_address ?: ($user->email ?? '')),
+            'birthday' => $birthday,
+            'age' => $age,
+            'address' => $resolvedAddress,
+            'contact_number' => $resolvedContactNumber,
+            'role' => $resolvedRole,
+            'status' => $resolvedStatus,
+            'source' => $isSuperadmin ? 'admins' : ($isStudentAssistant ? 'external_pending' : 'display_only'),
+            'is_student_assistant' => $isStudentAssistant,
+            'is_superadmin' => $isSuperadmin,
+            'has_local_admin_profile' => (bool) $linkedAdmin,
+        ];
+    }
+
     private function canSignHealthClearance(): bool
     {
         $role = User::normalizeRole(optional(Auth::user())->user_role ?? '');
@@ -443,7 +544,9 @@ public function updateClearance(Request $request, $id)
         $admin = Auth::user();
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
-        return view('admin.settings', compact('admin', 'settings'));
+        $cmsProfile = $admin ? $this->buildCmsAdminProfile($admin) : [];
+
+        return view('admin.settings', compact('admin', 'settings', 'cmsProfile'));
     }
 
     // ==========================================
@@ -597,17 +700,28 @@ public function updateClearance(Request $request, $id)
 {
     $request->validate([
         'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
+        'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore(Auth::id())],
+        'birthday' => 'nullable|date',
+        'address' => 'nullable|string|max:255',
+        'contact_number' => 'nullable|string|max:30',
+        'role' => 'nullable|string|max:255',
+        'status' => 'nullable|in:active,inactive',
         'password' => 'nullable|string|min:6|confirmed',
     ]);
     
     /** @var \App\Models\User $user */
     $user = Auth::user();
+    $isStudentAssistant = $this->isStudentAssistantAccount($user);
+    $originalEmail = (string) $user->email;
     
 
     $passwordChanged = $request->filled('password') ? ' (Password was also updated)' : '';
     $user->name = $request->name;
     $user->email = $request->email;
+
+    if (!$isStudentAssistant && $request->filled('role')) {
+        $user->user_role = User::normalizeRole($request->role);
+    }
 
     if ($request->filled('password')) {
         $user->password = bcrypt($request->password);
@@ -615,17 +729,89 @@ public function updateClearance(Request $request, $id)
     
     $user->save();
 
+    $profileMessageSuffix = '';
+
+    if ($this->isSuperadminAccount($user) && Schema::hasTable('admins')) {
+        $linkedAdminProfile = $this->findLinkedAdminProfileByEmails([
+            $originalEmail,
+            $request->email,
+        ]);
+
+        if (!$linkedAdminProfile) {
+            $linkedAdminProfile = new Admin();
+        }
+
+        [$firstName, $lastName] = $this->splitDisplayName((string) $request->name);
+
+        if (Admin::hasColumn('first_name')) {
+            $linkedAdminProfile->first_name = $firstName;
+        }
+
+        if (Admin::hasColumn('last_name')) {
+            $linkedAdminProfile->last_name = $lastName;
+        }
+
+        if (Admin::hasColumn('name')) {
+            $linkedAdminProfile->name = $request->name;
+        }
+
+        if (Admin::hasColumn('email')) {
+            $linkedAdminProfile->email = $request->email;
+        }
+
+        if (Admin::hasColumn('email_address')) {
+            $linkedAdminProfile->email_address = $request->email;
+        }
+
+        if (Admin::hasColumn('birthday')) {
+            $linkedAdminProfile->birthday = $request->birthday;
+        }
+
+        if (Admin::hasColumn('age')) {
+            $linkedAdminProfile->age = $request->filled('birthday')
+                ? Carbon::parse($request->birthday)->age
+                : null;
+        }
+
+        if (Admin::hasColumn('address')) {
+            $linkedAdminProfile->address = $request->address;
+        }
+
+        if (Admin::hasColumn('contact_no')) {
+            $linkedAdminProfile->contact_no = $request->contact_number;
+        } elseif (Admin::hasColumn('emergency_contact_no')) {
+            $linkedAdminProfile->emergency_contact_no = $request->contact_number;
+        }
+
+        if (Admin::hasColumn('access_level')) {
+            $linkedAdminProfile->access_level = $request->role;
+        } elseif (Admin::hasColumn('role')) {
+            $linkedAdminProfile->role = $request->role;
+        }
+
+        if (Admin::hasColumn('status')) {
+            $linkedAdminProfile->status = $request->status;
+        }
+
+        $linkedAdminProfile->save();
+        $profileMessageSuffix = ' CMS admin profile saved locally for the superadmin account.';
+    } elseif ($isStudentAssistant) {
+        $profileMessageSuffix = ' Student assistant profile sync is pending external API integration, so extra profile fields remain temporary.';
+    } else {
+        $profileMessageSuffix = ' Extra CMS profile fields are display-only for admin accounts right now and were not saved.';
+    }
+
     // --- LOGS CODES ---
     \App\Models\ActivityLog::create([
         'user_id'     => $user->id,
         'user_name'   => $user->name,
         'action'      => 'Security Update', 
-        'description' => "User updated admin profile info: Name/Email{$passwordChanged}.",
+        'description' => "User updated admin profile info: Name/Email{$passwordChanged}. Source email before update: {$originalEmail}.",
         'ip_address'  => $request->ip(),
         'user_agent'  => $request->userAgent(),
     ]);
 
-    return redirect()->back()->with('success', 'Profile updated successfully.');
+    return redirect()->back()->with('success', 'Profile updated successfully.' . $profileMessageSuffix);
 }
 
     // --- 4. EXPORTS (CSV) ---

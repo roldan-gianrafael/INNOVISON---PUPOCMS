@@ -14,6 +14,13 @@
         margin-bottom: 24px;
     }
     .card h3 { margin-top: 0; color: #8B0000; margin-bottom: 20px; font-size: 18px; }
+    .profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
+    .profile-note { padding: 12px 14px; border-radius: 10px; background: #f8fafc; color: #64748b; font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
+    .pill-status { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; text-transform:capitalize; }
+    .pill-status.active { background:#dcfce7; color:#166534; }
+    .pill-status.inactive { background:#fee2e2; color:#991b1b; }
+    .pill-status.pending { background:#e2e8f0; color:#334155; }
+    .readonly-helper { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
     /* Forms */
     .form-group { margin-bottom: 16px; }
@@ -42,6 +49,12 @@
     .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 600; }
     .alert-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
     .alert-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+    @media (max-width: 768px) {
+        .profile-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 @endpush
 
@@ -69,18 +82,62 @@
             <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
         </div>
 
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">
-            These fields are read-only. Click the edit button above to make changes.
-        </p>
-
-        <div class="form-group">
-            <label>Name</label>
-            <input type="text" class="form-control" value="{{ $admin->name ?? 'Admin User' }}" disabled>
+        <div class="profile-note">
+            @if(!empty($cmsProfile['is_superadmin']))
+                This superadmin profile is linked to the local <code>admins</code> table. Changes made here will update that single CMS admin record.
+            @elseif(!empty($cmsProfile['is_student_assistant']))
+                Student assistant profile sync to the external system is not connected yet, so the extra CMS profile fields below are temporary placeholders for now.
+            @else
+                These CMS profile fields are display-only for regular admin accounts right now. Only the superadmin profile is stored in the local <code>admins</code> table.
+            @endif
         </div>
 
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" value="{{ $admin->email ?? '' }}" disabled>
+        <div class="profile-grid">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['name'] ?? ($admin->name ?? 'Admin User') }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" value="{{ $cmsProfile['email'] ?? ($admin->email ?? '') }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Birthday</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['birthday'] ?? 'N/A' }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Age</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['age'] ?? 'N/A' }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['address'] ?? 'N/A' }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['contact_number'] ?? 'N/A' }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Role</label>
+                <input type="text" class="form-control" value="{{ $cmsProfile['role'] ?? \App\Models\User::normalizeRole($admin->user_role ?? '') }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <div>
+                    @php
+                        $statusValue = strtolower((string) ($cmsProfile['status'] ?? 'pending'));
+                        $statusClass = in_array($statusValue, ['active', 'inactive'], true) ? $statusValue : 'pending';
+                    @endphp
+                    <span class="pill-status {{ $statusClass }}">{{ $cmsProfile['status'] ?? 'Pending' }}</span>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -143,12 +200,56 @@
 
                 <div class="form-group">
                     <label>Name</label>
-                    <input type="text" name="name" class="form-control" value="{{ $admin->name ?? '' }}" required>
+                    <input type="text" name="name" class="form-control" value="{{ old('name', $cmsProfile['name'] ?? ($admin->name ?? '')) }}" required>
                 </div>
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" class="form-control" value="{{ $admin->email ?? '' }}" required>
+                    <input type="email" name="email" class="form-control" value="{{ old('email', $cmsProfile['email'] ?? ($admin->email ?? '')) }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Birthday</label>
+                    <input type="date" id="cmsBirthdayInput" name="birthday" class="form-control" value="{{ old('birthday', $cmsProfile['birthday'] ?? '') }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="text" id="cmsAgeInput" class="form-control" value="{{ old('age', $cmsProfile['age'] ?? '') }}" readonly>
+                    <p class="readonly-helper">Auto-calculated from birthday.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" name="address" class="form-control" value="{{ old('address', $cmsProfile['address'] ?? '') }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" name="contact_number" class="form-control" value="{{ old('contact_number', $cmsProfile['contact_number'] ?? '') }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="role" class="form-control">
+                        @php
+                            $selectedRole = old('role', strtolower((string) ($cmsProfile['role'] ?? \App\Models\User::normalizeRole($admin->user_role ?? 'admin'))));
+                        @endphp
+                        <option value="superadmin" @selected($selectedRole === 'superadmin')>Superadmin</option>
+                        <option value="admin" @selected($selectedRole === 'admin')>Admin</option>
+                        <option value="student_assistant" @selected(in_array($selectedRole, ['student_assistant', 'assistant', 'studentassistant'], true))>Student Assistant</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    @php
+                        $selectedStatus = old('status', strtolower((string) ($cmsProfile['status'] ?? 'active')));
+                    @endphp
+                    <select name="status" class="form-control">
+                        <option value="active" @selected($selectedStatus === 'active')>Active</option>
+                        <option value="inactive" @selected($selectedStatus === 'inactive')>Inactive</option>
+                    </select>
                 </div>
 
                 <div style="border-top: 1px solid #eee; margin: 15px 0; padding-top: 15px;">
@@ -179,6 +280,7 @@
 <script>
     function openProfileModal() {
         document.getElementById('profileModal').style.display = 'flex';
+        syncCmsAge();
     }
     function closeProfileModal() {
         document.getElementById('profileModal').style.display = 'none';
@@ -186,5 +288,43 @@
     window.onclick = function(e) {
         if(e.target == document.getElementById('profileModal')) closeProfileModal();
     }
+
+    function syncCmsAge() {
+        const birthdayInput = document.getElementById('cmsBirthdayInput');
+        const ageInput = document.getElementById('cmsAgeInput');
+
+        if (!birthdayInput || !ageInput) {
+            return;
+        }
+
+        if (!birthdayInput.value) {
+            ageInput.value = '';
+            return;
+        }
+
+        const birthday = new Date(birthdayInput.value + 'T00:00:00');
+        if (Number.isNaN(birthday.getTime())) {
+            ageInput.value = '';
+            return;
+        }
+
+        const today = new Date();
+        let age = today.getFullYear() - birthday.getFullYear();
+        const monthDiff = today.getMonth() - birthday.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+            age -= 1;
+        }
+
+        ageInput.value = age >= 0 ? age : '';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const birthdayInput = document.getElementById('cmsBirthdayInput');
+        if (birthdayInput) {
+            birthdayInput.addEventListener('change', syncCmsAge);
+            syncCmsAge();
+        }
+    });
 </script>
 @endpush

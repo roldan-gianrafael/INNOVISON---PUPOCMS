@@ -65,6 +65,9 @@
             overflow: visible !important;
             background: #800000 !important;
             background-image: none !important;
+            border: 2px solid #800000 !important;
+            outline: none !important;
+            box-shadow: 0 10px 24px rgba(128, 0, 0, 0.28) !important;
         }
 
         :where(.asw-menu-btn)::after {
@@ -84,6 +87,8 @@
         :where(.asw-menu-btn:focus-visible) {
             background: #800000 !important;
             background-image: none !important;
+            border-color: #800000 !important;
+            outline: none !important;
         }
 
         img,
@@ -679,6 +684,9 @@
                 document.querySelectorAll('.asw-menu-btn').forEach((button) => {
                     button.style.background = '#800000';
                     button.style.backgroundImage = 'none';
+                    button.style.border = '2px solid #800000';
+                    button.style.outline = 'none';
+                    button.style.boxShadow = '0 10px 24px rgba(128, 0, 0, 0.28)';
                 });
             }
 

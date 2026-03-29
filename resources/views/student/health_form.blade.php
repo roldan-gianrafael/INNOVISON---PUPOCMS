@@ -6,13 +6,33 @@
     <title>Fill Up - Student Health Information Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7f6; padding: 40px 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f4f7f6; padding: 40px 0; font-family: 'Segoe UI', sans-serif; color: #000; }
         .form-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; }
         .section-title { background-color: #800000; color: white; padding: 12px; margin-top: 30px; border-radius: 6px; font-weight: bold; text-transform: uppercase; font-size: 0.95rem; }
-        .form-label { font-weight: 600; font-size: 0.9rem; color: #333; }
-        .sub-label { font-size: 0.85rem; font-style: italic; color: #666; margin-bottom: 15px; display: block; }
+        .form-label { font-weight: 600; font-size: 0.9rem; color: #000; }
+        .sub-label { font-size: 0.85rem; font-style: italic; color: #000; margin-bottom: 15px; display: block; }
         .vax-table th { background-color: #f8f9fa; font-size: 0.85rem; text-align: center; }
         .upload-box { border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #fafafa; }
+        .health-upload-field {
+            border: 2px solid #800000;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: #fff;
+            color: #000;
+        }
+        .health-upload-field:focus {
+            border-color: #5c0000;
+            box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.15);
+        }
+        .health-upload-helper {
+            color: #000 !important;
+            display: block;
+            margin-top: 6px;
+            font-size: 0.82rem;
+        }
+        .text-muted {
+            color: #000 !important;
+        }
     </style>
 </head>
 <body>
@@ -20,9 +40,9 @@
 <div class="container">
     <div class="form-card">
         <h2 class="text-center fw-bold" style="color: #800000;">MEDICAL SERVICES DEPARTMENT</h2>
-        <h5 class="text-center text-muted mb-5">Student Health Information Entry</h5>
+        <h5 class="text-center mb-5" style="color: #000;">Student Health Information Entry</h5>
 
-        <p class="mb-0 text-muted" style="font-size: 0.9rem;">
+        <p class="mb-0" style="font-size: 0.9rem; color: #000;">
                     <strong>Instruction:</strong> Please provide complete and truthful information. Type <b>"N/A"</b> or <b>"NONE"</b> for fields that do not apply to you. Do not leave any field blank to ensure successful submission.
                 </p>
         <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
@@ -152,15 +172,15 @@
         <div class="row mt-4">
         <div class="col-md-12 mt-3">
             <label class="form-label">2. Chest X-Ray Result</label>
-            <input type="file" name="chest_xray_result" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
-            <small class="text-muted">Upload JPG, PNG, or PDF if available.</small>
+            <input type="file" name="chest_xray_result" class="form-control health-upload-field" accept=".jpg,.jpeg,.png,.pdf">
+            <small class="health-upload-helper">Upload JPG, PNG, or PDF if available.</small>
         </div>
         </div>
           <div class="row mt-4">
         <div class="col-md-12 mt-3">
                     <label class="form-label">3. Medical Certificate</label>
-                    <input type="file" name="medical_certificate" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
-                    <small class="text-muted">Upload JPG, PNG, or PDF if you have a medical certificate.</small>
+                    <input type="file" name="medical_certificate" class="form-control health-upload-field" accept=".jpg,.jpeg,.png,.pdf">
+                    <small class="health-upload-helper">Upload JPG, PNG, or PDF if you have a medical certificate.</small>
                 </div></div>
     </div>
 

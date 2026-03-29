@@ -377,6 +377,7 @@ class AdminController extends Controller
         $records = $query->orderBy($orderColumn)->limit(20)->get()->map(function (Admin $admin) {
             $fields = $admin->toArray();
             $name = trim((string) ($fields['name'] ?? trim(($fields['first_name'] ?? '') . ' ' . ($fields['middle_name'] ?? '') . ' ' . ($fields['last_name'] ?? '') . ' ' . ($fields['suffix_name'] ?? ''))));
+            $resolvedStatus = $this->resolveLocalAdminApiTestingStatus($fields);
 
             return [
                 'identifier' => (string) ($fields['admin_id'] ?? 'N/A'),
@@ -396,7 +397,7 @@ class AdminController extends Controller
                 'office' => (string) ($fields['office'] ?? 'N/A'),
                 'contact_number' => (string) ($fields['contact_no'] ?? $fields['emergency_contact_no'] ?? 'N/A'),
                 'address' => (string) ($fields['address'] ?? 'N/A'),
-                'status' => (string) ($fields['status'] ?? 'N/A'),
+                'status' => $resolvedStatus,
                 'emergency_contact_person' => (string) ($fields['emergency_contact_person'] ?? 'N/A'),
                 'emergency_contact_no' => (string) ($fields['emergency_contact_no'] ?? 'N/A'),
                 'last_updated' => (string) ($fields['updated_at'] ?? 'N/A'),
@@ -405,6 +406,49 @@ class AdminController extends Controller
         })->values()->all();
 
         return $records;
+    }
+
+    private function resolveLocalAdminApiTestingStatus(array $fields): string
+    {
+        $rawStatus = trim((string) ($fields['status'] ?? ''));
+        if ($rawStatus !== '') {
+            return $rawStatus;
+        }
+
+        if (!Schema::hasTable('users')) {
+            return 'N/A';
+        }
+
+        $emails = array_values(array_filter(array_unique(array_map(static function ($value) {
+            return trim((string) $value);
+        }, [
+            $fields['email'] ?? null,
+            $fields['email_address'] ?? null,
+        ]))));
+
+        if ($emails === []) {
+            return 'N/A';
+        }
+
+        $linkedUser = User::query()->whereIn('email', $emails)->first();
+        if (!$linkedUser) {
+            return 'inactive';
+        }
+
+        foreach (['status', 'account_status'] as $column) {
+            if (Schema::hasColumn('users', $column)) {
+                $value = trim((string) $linkedUser->getAttribute($column));
+                if ($value !== '') {
+                    return strtolower($value);
+                }
+            }
+        }
+
+        if (Schema::hasColumn('users', 'is_active')) {
+            return (bool) $linkedUser->getAttribute('is_active') ? 'active' : 'inactive';
+        }
+
+        return 'active';
     }
 
     private function normalizeApiTestingResults($payload, string $search): array
@@ -441,7 +485,7 @@ class AdminController extends Controller
             $office = trim((string) ($item['office'] ?? $item['offices'] ?? $item['department'] ?? ''));
             $contactNumber = trim((string) ($item['contact_no'] ?? $item['contact_number'] ?? $item['phone'] ?? $item['mobile'] ?? ''));
             $address = trim((string) ($item['address'] ?? $item['home_address'] ?? $this->formatApiTestingAddress($profileAddress)));
-            $status = trim((string) ($item['status'] ?? ''));
+            $status = trim((string) ($item['status'] ?? ($item['is_active'] ?? '')));
 
             $haystack = strtolower(implode(' ', array_filter([
                 $name,
@@ -472,7 +516,7 @@ class AdminController extends Controller
                 'office' => $office !== '' ? $office : 'N/A',
                 'contact_number' => $contactNumber !== '' ? $contactNumber : 'N/A',
                 'address' => $address !== '' ? $address : 'N/A',
-                'status' => $status !== '' ? $status : 'N/A',
+                'status' => $this->normalizeApiTestingStatusValue($status),
                 'emergency_contact_person' => trim((string) ($item['emergency_contact_person'] ?? '')) ?: 'N/A',
                 'emergency_contact_no' => trim((string) ($item['emergency_contact_no'] ?? '')) ?: 'N/A',
                 'last_updated' => trim((string) ($item['last_updated'] ?? $item['updated_at'] ?? '')) ?: 'N/A',
@@ -498,6 +542,24 @@ class AdminController extends Controller
         ])));
 
         return implode(', ', $parts);
+    }
+
+    private function normalizeApiTestingStatusValue($status): string
+    {
+        if (is_bool($status)) {
+            return $status ? 'active' : 'inactive';
+        }
+
+        $normalized = strtolower(trim((string) $status));
+        if ($normalized === '') {
+            return 'N/A';
+        }
+
+        return match ($normalized) {
+            '1', 'true', 'active', 'enabled' => 'active',
+            '0', 'false', 'inactive', 'disabled' => 'inactive',
+            default => $normalized,
+        };
     }
 
     public function viewHealth()

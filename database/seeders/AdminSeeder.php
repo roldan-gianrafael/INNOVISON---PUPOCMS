@@ -50,6 +50,15 @@ class AdminSeeder extends Seeder
                 'office' => 'Registrar',
                 'access_level' => 'admin',
             ],
+            [
+                'admin_id' => 3,
+                'first_name' => 'Joyce',
+                'middle_name' => null,
+                'last_name' => 'Lim',
+                'suffix_name' => null,
+                'email' => 'nursejoyce@gmail.com',
+                'office' => 'Clinic Office',
+            ],
         ];
 
         foreach ($records as $record) {

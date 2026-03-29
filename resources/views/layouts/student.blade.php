@@ -806,6 +806,22 @@
                     return fallbackCandidates[0] || null;
                 }
 
+                function showSiennaTrigger() {
+                    const trigger = findSiennaTrigger();
+                    if (!trigger) {
+                        return;
+                    }
+
+                    trigger.style.removeProperty('left');
+                    trigger.style.removeProperty('right');
+                    trigger.style.removeProperty('top');
+                    trigger.style.removeProperty('bottom');
+                    trigger.style.removeProperty('opacity');
+                    trigger.style.removeProperty('pointer-events');
+                    trigger.removeAttribute('aria-hidden');
+                    trigger.style.position = 'fixed';
+                }
+
                 function themeSiennaMenu() {
                     const candidates = document.querySelectorAll('[class*="sienna"], [id*="sienna"]');
                     candidates.forEach((element) => {
@@ -899,11 +915,13 @@
                     });
                 }
 
+                showSiennaTrigger();
                 themeSiennaMenu();
                 injectSiennaShadowStyles();
                 forceAccessibilityButtonTheme();
 
                 const observer = new MutationObserver(() => {
+                    showSiennaTrigger();
                     themeSiennaMenu();
                     injectSiennaShadowStyles();
                     forceAccessibilityButtonTheme();

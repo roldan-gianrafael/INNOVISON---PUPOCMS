@@ -12,20 +12,17 @@ class FacultySyncService
 {
     public function generateHmacHeaders(): array
     {
-        $systemId = (string) config('services.pupt_flss.system_id');
         $secretKey = (string) config('services.pupt_flss.secret_key');
         $timestamp = (string) now()->timestamp;
         $nonce = Str::random(16);
 
-        if ($systemId === '' || $secretKey === '') {
+        if ($secretKey === '') {
             throw new RuntimeException('PUPT-FLSS HMAC credentials are not configured.');
         }
 
-        $signature = hash_hmac('sha256', $systemId . $timestamp . $nonce, $secretKey);
+        $signature = hash_hmac('sha256', $timestamp . $nonce, $secretKey);
 
         return [
-            'X-System-Id' => $systemId,
-            'X-HMAC-System-Id' => $systemId,
             'X-HMAC-Signature' => $signature,
             'X-HMAC-Timestamp' => $timestamp,
             'X-HMAC-Nonce' => $nonce,

@@ -812,14 +812,14 @@
                         return;
                     }
 
-                    trigger.style.removeProperty('left');
-                    trigger.style.removeProperty('right');
-                    trigger.style.removeProperty('top');
-                    trigger.style.removeProperty('bottom');
                     trigger.style.removeProperty('opacity');
                     trigger.style.removeProperty('pointer-events');
                     trigger.removeAttribute('aria-hidden');
                     trigger.style.position = 'fixed';
+                    trigger.style.left = 'auto';
+                    trigger.style.right = '24px';
+                    trigger.style.top = 'auto';
+                    trigger.style.bottom = '12px';
                 }
 
                 function themeSiennaMenu() {

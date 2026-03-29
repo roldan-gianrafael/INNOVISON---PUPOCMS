@@ -95,12 +95,16 @@
 
         :where(.asw-menu-btn svg) {
             fill: #ffffff !important;
-            stroke: #ffffff !important;
+            stroke: none !important;
         }
 
         :where(.asw-menu-btn svg path:not([fill="none"])) {
             fill: #ffffff !important;
-            stroke: #ffffff !important;
+            stroke: none !important;
+        }
+
+        :where(.asw-menu-btn svg path[fill="none"]) {
+            stroke: none !important;
         }
 
         :root {
@@ -1766,12 +1770,15 @@
             button.style.setProperty('box-shadow', '0 10px 24px rgba(128, 0, 0, 0.28)', 'important');
             button.querySelectorAll('svg').forEach(function (icon) {
                 icon.style.setProperty('fill', '#ffffff', 'important');
-                icon.style.setProperty('stroke', '#ffffff', 'important');
+                icon.style.setProperty('stroke', 'none', 'important');
                 icon.style.setProperty('background', 'transparent', 'important');
             });
             button.querySelectorAll('svg path:not([fill="none"])').forEach(function (path) {
                 path.style.setProperty('fill', '#ffffff', 'important');
-                path.style.setProperty('stroke', '#ffffff', 'important');
+                path.style.setProperty('stroke', 'none', 'important');
+            });
+            button.querySelectorAll('svg path[fill="none"]').forEach(function (path) {
+                path.style.setProperty('stroke', 'none', 'important');
             });
         });
     }

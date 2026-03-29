@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Admin;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -62,31 +61,10 @@ class FacultySyncService
     public function sync(): array
     {
         $faculties = $this->fetchFaculties();
-        $synced = 0;
-
-        foreach ($faculties as $faculty) {
-            if (!is_array($faculty)) {
-                continue;
-            }
-
-            $adminId = trim((string) ($faculty['faculty_code'] ?? ''));
-            if ($adminId === '') {
-                continue;
-            }
-
-            $attributes = $this->buildAdminAttributes($faculty);
-
-            Admin::query()->updateOrCreate(
-                ['admin_id' => $adminId],
-                $attributes
-            );
-
-            $synced++;
-        }
 
         return [
             'fetched' => count($faculties),
-            'synced' => $synced,
+            'synced' => 0,
         ];
     }
 
@@ -114,57 +92,6 @@ class FacultySyncService
 
         return [];
     }
-
-    private function buildAdminAttributes(array $faculty): array
-    {
-        $attributes = [
-            'admin_id' => (string) ($faculty['faculty_code'] ?? ''),
-            'email_address' => $faculty['email'] ?? null,
-            'name' => trim(implode(' ', array_filter([
-                $faculty['first_name'] ?? null,
-                $faculty['last_name'] ?? null,
-            ]))),
-            'role' => $faculty['faculty_type'] ?? null,
-        ];
-
-        $optionalMap = [
-            'first_name' => 'first_name',
-            'last_name' => 'last_name',
-            'offices' => 'offices',
-            'address' => 'address',
-            'contact_no' => 'contact_no',
-            'emergency_contact_person' => 'emergency_contact_person',
-            'emergency_contact_no' => 'emergency_contact_no',
-            'age' => 'age',
-            'gender' => 'gender',
-            'birthday' => 'birthday',
-            'civil_status' => 'civil_status',
-            'status' => 'status',
-            'is_active' => 'is_active',
-        ];
-
-        foreach ($optionalMap as $localColumn => $remoteField) {
-            if (array_key_exists($remoteField, $faculty)) {
-                $attributes[$localColumn] = $faculty[$remoteField];
-            }
-        }
-
-        return $this->filterSupportedColumns($attributes);
-    }
-
-    private function filterSupportedColumns(array $attributes): array
-    {
-        $filtered = [];
-
-        foreach ($attributes as $column => $value) {
-            if (Admin::hasColumn($column)) {
-                $filtered[$column] = $value;
-            }
-        }
-
-        return $filtered;
-    }
-
     private function isList(array $value): bool
     {
         if (function_exists('array_is_list')) {

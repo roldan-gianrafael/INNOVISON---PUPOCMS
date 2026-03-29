@@ -10,7 +10,7 @@ class SyncFacultyProfiles extends Command
 {
     protected $signature = 'faculty:sync';
 
-    protected $description = 'Sync faculty profiles from the PUPT-FLSS API into the local admins table.';
+    protected $description = 'Fetch faculty profiles from the PUPT-FLSS API to verify external faculty access.';
 
     public function handle(FacultySyncService $facultySyncService): int
     {
@@ -22,9 +22,9 @@ class SyncFacultyProfiles extends Command
             return self::FAILURE;
         }
 
-        $this->info('Faculty sync completed successfully.');
+        $this->info('Faculty fetch completed successfully.');
         $this->line('Faculties fetched: ' . $result['fetched']);
-        $this->line('Admins synced: ' . $result['synced']);
+        $this->line('Local admins synced: ' . $result['synced']);
 
         return self::SUCCESS;
     }

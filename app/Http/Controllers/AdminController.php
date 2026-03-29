@@ -383,14 +383,20 @@ class AdminController extends Controller
                 continue;
             }
 
+            $profile = isset($item['profile']) && is_array($item['profile'])
+                ? $item['profile']
+                : [];
+            $profileAddress = isset($profile['address']) && is_array($profile['address'])
+                ? $profile['address']
+                : [];
             $name = trim((string) ($item['name'] ?? trim(($item['first_name'] ?? '') . ' ' . ($item['last_name'] ?? ''))));
             $email = trim((string) ($item['email'] ?? $item['email_address'] ?? ''));
-            $identifier = trim((string) ($item['id'] ?? $item['admin_id'] ?? $item['student_id'] ?? $item['employee_id'] ?? ''));
-            $birthday = trim((string) ($item['birthday'] ?? $item['dob'] ?? $item['date_of_birth'] ?? ''));
+            $identifier = trim((string) ($item['faculty_code'] ?? $item['faculty_id'] ?? $item['id'] ?? $item['admin_id'] ?? $item['student_id'] ?? $item['employee_id'] ?? ''));
+            $birthday = trim((string) ($item['birthday'] ?? $profile['birthday'] ?? $item['dob'] ?? $item['date_of_birth'] ?? ''));
             $role = trim((string) ($item['faculty_type'] ?? $item['role'] ?? $item['access_level'] ?? $item['designation'] ?? ''));
             $office = trim((string) ($item['office'] ?? $item['offices'] ?? $item['department'] ?? ''));
             $contactNumber = trim((string) ($item['contact_no'] ?? $item['contact_number'] ?? $item['phone'] ?? $item['mobile'] ?? ''));
-            $address = trim((string) ($item['address'] ?? $item['home_address'] ?? ''));
+            $address = trim((string) ($item['address'] ?? $item['home_address'] ?? $this->formatApiTestingAddress($profileAddress)));
             $status = trim((string) ($item['status'] ?? ''));
 
             $haystack = strtolower(implode(' ', array_filter([
@@ -419,6 +425,23 @@ class AdminController extends Controller
         }
 
         return array_slice($normalized, 0, 20);
+    }
+
+    private function formatApiTestingAddress(array $address): string
+    {
+        $parts = array_values(array_filter(array_map(static function ($value) {
+            return trim((string) $value);
+        }, [
+            $address['house_num'] ?? null,
+            $address['street'] ?? null,
+            $address['barangay'] ?? null,
+            $address['city'] ?? null,
+            $address['province'] ?? null,
+            $address['country'] ?? null,
+            $address['zipcode'] ?? null,
+        ])));
+
+        return implode(', ', $parts);
     }
 
     public function viewHealth()

@@ -40,11 +40,34 @@ class FacultySyncService
             throw new RuntimeException('PUPT-FLSS faculty profiles URL is not configured.');
         }
 
-        $response = Http::acceptJson()
-            ->retry(2, 300)
-            ->timeout((int) config('services.pupt_flss.timeout', 30))
-            ->withHeaders($this->generateHmacHeaders())
-            ->get($baseUrl);
+        $timeout = (int) config('services.pupt_flss.timeout', 30);
+        $maxAttempts = 3;
+        $response = null;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            $response = Http::acceptJson()
+                ->timeout($timeout)
+                ->withHeaders($this->generateHmacHeaders())
+                ->get($baseUrl);
+
+            if ($response->successful()) {
+                break;
+            }
+
+            // Do not retry authorization failures because the remote API may
+            // treat a repeated nonce as a replay attack.
+            if (in_array($response->status(), [401, 403], true)) {
+                break;
+            }
+
+            if ($attempt < $maxAttempts) {
+                usleep(300000);
+            }
+        }
+
+        if ($response === null) {
+            throw new RuntimeException('PUPT-FLSS faculty request did not return a response.');
+        }
 
         if (!$response->successful()) {
             throw new RequestException($response);

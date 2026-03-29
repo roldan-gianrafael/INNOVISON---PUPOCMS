@@ -92,13 +92,17 @@
         }
 
         :where(.asw-menu-btn svg) {
-            fill: #4a0404 !important;
-            stroke: #4a0404 !important;
+            fill: #ffffff !important;
+            stroke: none !important;
         }
 
         :where(.asw-menu-btn svg path:not([fill="none"])) {
-            fill: #4a0404 !important;
-            stroke: #4a0404 !important;
+            fill: #ffffff !important;
+            stroke: none !important;
+        }
+
+        :where(.asw-menu-btn svg path[fill="none"]) {
+            stroke: none !important;
         }
 
         img,
@@ -698,13 +702,16 @@
                     button.style.setProperty('outline', 'none', 'important');
                     button.style.setProperty('box-shadow', '0 10px 24px rgba(128, 0, 0, 0.28)', 'important');
                     button.querySelectorAll('svg').forEach((icon) => {
-                        icon.style.setProperty('fill', '#4a0404', 'important');
-                        icon.style.setProperty('stroke', '#4a0404', 'important');
+                        icon.style.setProperty('fill', '#ffffff', 'important');
+                        icon.style.setProperty('stroke', 'none', 'important');
                         icon.style.setProperty('background', 'transparent', 'important');
                     });
                     button.querySelectorAll('svg path:not([fill="none"])').forEach((path) => {
-                        path.style.setProperty('fill', '#4a0404', 'important');
-                        path.style.setProperty('stroke', '#4a0404', 'important');
+                        path.style.setProperty('fill', '#ffffff', 'important');
+                        path.style.setProperty('stroke', 'none', 'important');
+                    });
+                    button.querySelectorAll('svg path[fill="none"]').forEach((path) => {
+                        path.style.setProperty('stroke', 'none', 'important');
                     });
                 });
             }

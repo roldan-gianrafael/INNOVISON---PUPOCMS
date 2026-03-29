@@ -94,13 +94,13 @@
         }
 
         :where(.asw-menu-btn svg) {
-            fill: #4a0404 !important;
-            stroke: #4a0404 !important;
+            fill: #ffffff !important;
+            stroke: #ffffff !important;
         }
 
         :where(.asw-menu-btn svg path:not([fill="none"])) {
-            fill: #4a0404 !important;
-            stroke: #4a0404 !important;
+            fill: #ffffff !important;
+            stroke: #ffffff !important;
         }
 
         :root {
@@ -1765,13 +1765,13 @@
             button.style.setProperty('outline', 'none', 'important');
             button.style.setProperty('box-shadow', '0 10px 24px rgba(128, 0, 0, 0.28)', 'important');
             button.querySelectorAll('svg').forEach(function (icon) {
-                icon.style.setProperty('fill', '#4a0404', 'important');
-                icon.style.setProperty('stroke', '#4a0404', 'important');
+                icon.style.setProperty('fill', '#ffffff', 'important');
+                icon.style.setProperty('stroke', '#ffffff', 'important');
                 icon.style.setProperty('background', 'transparent', 'important');
             });
             button.querySelectorAll('svg path:not([fill="none"])').forEach(function (path) {
-                path.style.setProperty('fill', '#4a0404', 'important');
-                path.style.setProperty('stroke', '#4a0404', 'important');
+                path.style.setProperty('fill', '#ffffff', 'important');
+                path.style.setProperty('stroke', '#ffffff', 'important');
             });
         });
     }

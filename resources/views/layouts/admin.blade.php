@@ -937,11 +937,11 @@
 
         html[data-theme="light"] .header-kicker,
         html[data-theme="light"] .header-subtitle {
-            color: #7d4b5a;
+            color: #111827;
         }
 
         html[data-theme="light"] .header-title {
-            color: #4f1220;
+            color: #111827;
         }
 
         html[data-theme="light"] .header-title span {
@@ -1018,11 +1018,11 @@
         }
 
         html[data-theme="light"] .admin-user-name {
-            color: #4f1220;
+            color: #111827;
         }
 
         html[data-theme="light"] .admin-user-role {
-            color: #7d4b5a;
+            color: #111827;
         }
 
         html[data-theme="light"] .sidebar {

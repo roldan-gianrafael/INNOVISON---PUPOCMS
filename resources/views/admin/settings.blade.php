@@ -82,15 +82,7 @@
             <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
         </div>
 
-        <div class="profile-note">
-            @if(!empty($cmsProfile['is_superadmin']))
-                This superadmin profile is linked to the local <code>admins</code> table. Changes made here will update that single CMS admin record.
-            @elseif(!empty($cmsProfile['is_student_assistant']))
-                Student assistant profile sync to the external system is not connected yet, so the extra CMS profile fields below are temporary placeholders for now.
-            @else
-                These CMS profile fields are display-only for regular admin accounts right now. Only the superadmin profile is stored in the local <code>admins</code> table.
-            @endif
-        </div>
+        
 
         <div class="profile-grid">
             <div class="form-group">

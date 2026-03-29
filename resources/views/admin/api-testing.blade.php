@@ -175,18 +175,18 @@
     <section class="api-testing-card">
         <div class="api-testing-head">
             <h2>For API Testing</h2>
-            <p>Temporary admin tool for checking if another site’s API is reachable and returning profile information.</p>
+            <p>Temporary admin tool for checking if another site's API is reachable and returning faculty profile information.</p>
         </div>
 
         <form method="GET" class="api-search-form">
             <div>
-                <label for="search">Search by name, email, or ID</label>
+                <label for="search">Search faculty by name, email, or ID</label>
                 <input
                     type="text"
                     id="search"
                     name="search"
                     value="{{ $search }}"
-                    placeholder="Try a name, email address, or identifier"
+                    placeholder="Try a faculty name, email address, or identifier"
                 >
             </div>
             <button type="submit">Search API</button>
@@ -197,6 +197,9 @@
                 Endpoint: <strong>{{ $apiResponseMeta['endpoint'] }}</strong>
                 · Status: <strong>{{ $apiResponseMeta['status'] }}</strong>
                 · Matches: <strong>{{ $apiResponseMeta['result_count'] }}</strong>
+                @if(!empty($apiResponseMeta['auth_mode']))
+                · Auth: <strong>{{ $apiResponseMeta['auth_mode'] }}</strong>
+                @endif
             </p>
         @endif
 
@@ -228,6 +231,26 @@
                                 <small>Name</small>
                                 <strong>{{ $result['name'] }}</strong>
                             </div>
+                            <div class="api-field">
+                                <small>Role</small>
+                                <strong>{{ $result['role'] }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Office</small>
+                                <strong>{{ $result['office'] }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Contact Number</small>
+                                <strong>{{ $result['contact_number'] }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Status</small>
+                                <strong>{{ $result['status'] }}</strong>
+                            </div>
+                            <div class="api-field" style="grid-column: 1 / -1;">
+                                <small>Address</small>
+                                <strong>{{ $result['address'] }}</strong>
+                            </div>
                         </div>
 
                         <div class="api-json">{{ json_encode($result['fields'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
@@ -235,7 +258,7 @@
                 @endforeach
             </div>
         @else
-            <p class="api-empty">Search results will appear here once you enter a name, email, or ID.</p>
+            <p class="api-empty">Search results will appear here once you enter a faculty name, email, or ID.</p>
         @endif
     </section>
 </div>

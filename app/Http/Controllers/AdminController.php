@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\ActivityLog;
 use App\Models\Item;
 use App\Models\Setting;
+use App\Services\FacultySyncService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
@@ -96,7 +97,7 @@ class AdminController extends Controller
         ));
     }
 
-    public function apiTesting(Request $request)
+    public function apiTesting(Request $request, FacultySyncService $facultySyncService)
     {
         $search = trim((string) $request->query('search', ''));
         $results = [];
@@ -104,7 +105,9 @@ class AdminController extends Controller
         $errorMessage = null;
 
         if ($search !== '') {
-            $endpoint = trim((string) config('services.temp_api_testing.url', ''));
+            $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
+            $facultyEndpoint = trim((string) config('services.pupt_flss.faculty_profiles_url', ''));
+            $endpoint = $configuredTempEndpoint !== '' ? $configuredTempEndpoint : $facultyEndpoint;
 
             if ($endpoint === '') {
                 $errorMessage = 'Temporary API testing URL is not configured yet.';
@@ -117,6 +120,8 @@ class AdminController extends Controller
                     $apiHeader = trim((string) config('services.temp_api_testing.header', 'X-External-Api-Key'));
                     if ($apiKey !== '') {
                         $client = $client->withHeaders([$apiHeader => $apiKey]);
+                    } elseif ($facultyEndpoint !== '' && $endpoint === $facultyEndpoint) {
+                        $client = $client->withHeaders($facultySyncService->generateHmacHeaders());
                     }
 
                     $response = $client->get($endpoint, [
@@ -132,6 +137,9 @@ class AdminController extends Controller
                         'ok' => $response->successful(),
                         'endpoint' => $endpoint,
                         'result_count' => count($results),
+                        'auth_mode' => $apiKey !== ''
+                            ? 'custom-header'
+                            : (($facultyEndpoint !== '' && $endpoint === $facultyEndpoint) ? 'faculty-hmac' : 'none'),
                     ];
 
                     if (!$response->successful()) {
@@ -177,6 +185,11 @@ class AdminController extends Controller
             $email = trim((string) ($item['email'] ?? $item['email_address'] ?? ''));
             $identifier = trim((string) ($item['id'] ?? $item['admin_id'] ?? $item['student_id'] ?? $item['employee_id'] ?? ''));
             $birthday = trim((string) ($item['birthday'] ?? $item['dob'] ?? $item['date_of_birth'] ?? ''));
+            $role = trim((string) ($item['faculty_type'] ?? $item['role'] ?? $item['access_level'] ?? $item['designation'] ?? ''));
+            $office = trim((string) ($item['office'] ?? $item['offices'] ?? $item['department'] ?? ''));
+            $contactNumber = trim((string) ($item['contact_no'] ?? $item['contact_number'] ?? $item['phone'] ?? $item['mobile'] ?? ''));
+            $address = trim((string) ($item['address'] ?? $item['home_address'] ?? ''));
+            $status = trim((string) ($item['status'] ?? ''));
 
             $haystack = strtolower(implode(' ', array_filter([
                 $name,
@@ -194,6 +207,11 @@ class AdminController extends Controller
                 'name' => $name !== '' ? $name : 'N/A',
                 'email' => $email !== '' ? $email : 'N/A',
                 'birthday' => $birthday !== '' ? $birthday : 'N/A',
+                'role' => $role !== '' ? $role : 'N/A',
+                'office' => $office !== '' ? $office : 'N/A',
+                'contact_number' => $contactNumber !== '' ? $contactNumber : 'N/A',
+                'address' => $address !== '' ? $address : 'N/A',
+                'status' => $status !== '' ? $status : 'N/A',
                 'fields' => $item,
             ];
         }

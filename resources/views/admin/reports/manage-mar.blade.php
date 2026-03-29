@@ -15,13 +15,56 @@
     .manage-section { background: #fdfdfd; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 10px; }
     .btn-save { background: #70131B; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
     .form-control { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
+    .manage-form {
+        display: grid;
+        grid-template-columns: minmax(280px, 1.35fr) minmax(220px, 1.65fr) auto;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: start;
+    }
+    .category-select,
+    .condition-input,
+    .modal-select {
+        min-height: 44px;
+        line-height: 1.3;
+    }
+    .category-select,
+    .modal-select {
+        padding-right: 36px;
+    }
+    .manage-form .btn-save {
+        min-height: 44px;
+        white-space: nowrap;
+        align-self: stretch;
+    }
+    .table-action-cell {
+        text-align: center;
+        white-space: nowrap;
+    }
+    .table-action-wrap {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
 
     /* Modal Styles for .btn-change */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-.modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+.modal-box { background: #fff; padding: 24px; border-radius: 12px; width: min(560px, calc(100vw - 32px)); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
 .btn-change { background: #8f2230; color: white; border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-right: 5px; }
 .btn-cancel { background: #e2e8f0; color: #475569; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 .btn-filter { background: #70131B; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    @media (max-width: 900px) {
+        .manage-form {
+            grid-template-columns: 1fr;
+        }
+
+        .manage-form .btn-save {
+            width: 100%;
+        }
+    }
  </style>
 @endpush
 
@@ -34,18 +77,18 @@
 
 <div class="card manage-section">
     <h3>Manage Medical Conditions (Sub-categories)</h3>
-    <p style="font-size: 13px; color: #64748b;">Add or remove medical conditions under Categories A-E.</p>
+    <p style="font-size: 13px; color: #64748b;">Add or remove medical conditions under Categories A-N.</p>
     
-    <form action="{{ route('conditions.store') }}" method="POST" style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <form action="{{ route('conditions.store') }}" method="POST" class="manage-form">
         @csrf
-        <select name="category_id" class="form-control" style="flex: 1;" required>
+        <select name="category_id" class="form-control category-select" required>
             <option value="">Select Category</option>
             @foreach($categoryList as $c)
                 <option value="{{ $c->id }}">Category {{ $c->code }} - {{ $c->name }}</option>
             @endforeach
         </select>
 
-        <input type="text" name="name" class="form-control" style="flex: 2;" placeholder="Condition Name (e.g. Fever)" required>
+        <input type="text" name="name" class="form-control condition-input" placeholder="Condition Name (e.g. Fever)" required>
         
         <button type="submit" class="btn-save">Add New</button>
     </form>
@@ -69,17 +112,19 @@
 
 
     <td>{{ $cond->name }}</td>
-    <td style="text-align: center; display: flex; justify-content: center; gap: 5px;">
-        <button type="button" class="btn-change" 
-                onclick="openChangeModal('{{ $cond->id }}', '{{ $cond->category_id }}', '{{ $cond->name }}')">
-            Change
-        </button>
+    <td class="table-action-cell">
+        <div class="table-action-wrap">
+            <button type="button" class="btn-change" 
+                    onclick="openChangeModal('{{ $cond->id }}', '{{ $cond->category_id }}', '{{ $cond->name }}')">
+                Change
+            </button>
 
-        <form action="{{ route('conditions.destroy', $cond->id) }}" method="POST" onsubmit="return confirm('Delete this condition?')">
-            @csrf 
-            @method('DELETE')
-            <button type="submit" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight: bold; font-size: 12px; padding: 4px 0;">Remove</button>
-        </form>
+            <form action="{{ route('conditions.destroy', $cond->id) }}" method="POST" onsubmit="return confirm('Delete this condition?')">
+                @csrf 
+                @method('DELETE')
+                <button type="submit" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight: bold; font-size: 12px; padding: 4px 0;">Remove</button>
+            </form>
+        </div>
     </td>
 </tr>
 @empty
@@ -98,7 +143,7 @@
             @method('PUT')
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 5px;">NEW CATEGORY</label>
-                <select name="category_id" id="modalCategoryId" class="form-control" required>
+                <select name="category_id" id="modalCategoryId" class="form-control modal-select" required>
                     @foreach($categoryList as $c)
                         <option value="{{ $c->id }}">Category {{ $c->code }} - {{ $c->name }}</option>
                     @endforeach

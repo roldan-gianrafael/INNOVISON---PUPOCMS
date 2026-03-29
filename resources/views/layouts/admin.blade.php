@@ -1359,9 +1359,6 @@
     <span class="sidebar-short">HR</span>
     <span class="sidebar-label">Student Health Form</span>
     </a>
-     <a href="{{ $apiTestingUrl }}" class="{{ (Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
-        <span class="sidebar-short">FT</span><span class="sidebar-label">For API Testing</span>
-      </a>
       @if($isAdminLike)
           <a href="{{ $assistantAccountsUrl }}" class="{{ Request::is('admin/student-assistants*') ? 'active' : '' }}">
             <span class="sidebar-short">SA</span><span class="sidebar-label">Student Assistants</span>
@@ -1373,6 +1370,9 @@
             <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>
           </a>
       @endif
+      <a href="{{ $apiTestingUrl }}" class="{{ (Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
+        <span class="sidebar-short">FT</span><span class="sidebar-label">For API Testing</span>
+      </a>
 
     </nav>
 

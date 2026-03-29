@@ -10,8 +10,9 @@ use RuntimeException;
 
 class FacultySyncService
 {
-    public function generateHmacHeaders(): array
+    public function generateHmacHeaders(?string $mode = null): array
     {
+        $systemId = (string) config('services.pupt_flss.system_id');
         $secretKey = (string) config('services.pupt_flss.secret_key');
         $timestamp = (string) now()->timestamp;
         $nonce = Str::random(16);
@@ -20,13 +21,28 @@ class FacultySyncService
             throw new RuntimeException('PUPT-FLSS HMAC credentials are not configured.');
         }
 
-        $signature = hash_hmac('sha256', $timestamp . $nonce, $secretKey);
+        $mode = $mode ?: 'timestamp_nonce';
 
-        return [
+        $signaturePayload = match ($mode) {
+            'system_timestamp_nonce' => $systemId . $timestamp . $nonce,
+            'timestamp_nonce_system' => $timestamp . $nonce . $systemId,
+            default => $timestamp . $nonce,
+        };
+
+        $signature = hash_hmac('sha256', $signaturePayload, $secretKey);
+
+        $headers = [
             'X-HMAC-Signature' => $signature,
             'X-HMAC-Timestamp' => $timestamp,
             'X-HMAC-Nonce' => $nonce,
         ];
+
+        if (in_array($mode, ['system_timestamp_nonce', 'timestamp_nonce_system'], true) && $systemId !== '') {
+            $headers['X-System-Id'] = $systemId;
+            $headers['X-HMAC-System-Id'] = $systemId;
+        }
+
+        return $headers;
     }
 
     public function fetchFaculties(): array
@@ -38,26 +54,24 @@ class FacultySyncService
         }
 
         $timeout = (int) config('services.pupt_flss.timeout', 30);
-        $maxAttempts = 3;
         $response = null;
+        $modes = [
+            'timestamp_nonce',
+            'system_timestamp_nonce',
+            'timestamp_nonce_system',
+        ];
 
-        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+        foreach ($modes as $index => $mode) {
             $response = Http::acceptJson()
                 ->timeout($timeout)
-                ->withHeaders($this->generateHmacHeaders())
+                ->withHeaders($this->generateHmacHeaders($mode))
                 ->get($baseUrl);
 
             if ($response->successful()) {
                 break;
             }
 
-            // Do not retry authorization failures because the remote API may
-            // treat a repeated nonce as a replay attack.
-            if (in_array($response->status(), [401, 403], true)) {
-                break;
-            }
-
-            if ($attempt < $maxAttempts) {
+            if ($index < count($modes) - 1) {
                 usleep(300000);
             }
         }

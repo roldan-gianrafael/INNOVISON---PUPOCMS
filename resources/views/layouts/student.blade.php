@@ -60,21 +60,15 @@
             }
         }
 
-        @keyframes accessibilityIconWave {
+        @keyframes accessibilityIconBounce {
             0%, 100% {
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
-            20% {
-                transform: translateY(-2.5px);
-            }
-            40% {
-                transform: translateY(2.5px);
+            30% {
+                transform: translateY(-2px) scale(1.06);
             }
             60% {
-                transform: translateY(-2px);
-            }
-            80% {
-                transform: translateY(2px);
+                transform: translateY(0) scale(0.98);
             }
         }
 
@@ -116,17 +110,13 @@
         :where(.asw-menu-btn svg) {
             fill: #ffffff !important;
             stroke: none !important;
-        }
-
-        :where(.asw-menu-btn .asw-wave-arm) {
-            transform-box: fill-box;
+            animation: accessibilityIconBounce 1.5s ease-in-out infinite;
             transform-origin: center;
-            animation: accessibilityIconWave 1.4s ease-in-out infinite;
             will-change: transform;
         }
 
-        :where(.asw-menu-btn .asw-wave-arm:nth-of-type(2)) {
-            animation-delay: 0.15s;
+        :where(.asw-menu-btn .asw-wave-arm) {
+            animation: none !important;
         }
 
         :where(.asw-menu-btn svg path:not([fill="none"])) {

@@ -48,7 +48,7 @@
     @endphp
 
     <div class="controls">
-        <h2 style="margin:0; color:#ffffff;">Clinic Inventory</h2>
+        <h2 style="margin:0; color:#000000;">Clinic Inventory</h2>
         @if($canManageInventory)
             <button class="btn-add" onclick="openModal()">+ Add New Item</button>
         @endif

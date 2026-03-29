@@ -691,7 +691,6 @@
             const navToggle = document.querySelector('.nav-toggle');
             const navList = document.querySelector('.nav-list');
             const themeToggleBtn = document.getElementById('themeToggleBtn');
-            const accessibilityLaunchBtn = document.getElementById('studentAccessibilityLaunch');
             const storageKey = 'student_theme';
 
             function forceAccessibilityButtonTheme() {
@@ -772,19 +771,14 @@
             setTheme(currentTheme);
 
             function initAccessibilityLaunch() {
-                if (!accessibilityLaunchBtn) {
-                    forceAccessibilityButtonTheme();
-                    return;
-                }
-
                 function findSiennaTrigger() {
                     const selectorMatches = [
                         '#sienna-accessibility-button',
                         '.sienna-accessibility-button',
                         '.sienna-accessibility-trigger',
                         '[data-sienna-accessibility-trigger]',
-                        'button[aria-label*="accessibility" i]:not(#studentAccessibilityLaunch)',
-                        'button[title*="accessibility" i]:not(#studentAccessibilityLaunch)',
+                        'button[aria-label*="accessibility" i]',
+                        'button[title*="accessibility" i]',
                         '[role="button"][aria-label*="accessibility" i]'
                     ];
 
@@ -797,10 +791,6 @@
 
                     const fallbackCandidates = Array.from(document.querySelectorAll('button, [role="button"], div'))
                         .filter((element) => {
-                            if (element.id === 'studentAccessibilityLaunch') {
-                                return false;
-                            }
-
                             const label = [
                                 element.getAttribute('aria-label'),
                                 element.getAttribute('title'),
@@ -921,16 +911,6 @@
                         shadowRoot.appendChild(style);
                     });
                 }
-
-                accessibilityLaunchBtn.addEventListener('click', () => {
-                    const trigger = findSiennaTrigger();
-                    if (!trigger) {
-                        console.warn('Accessibility widget trigger not found yet.');
-                        return;
-                    }
-
-                    trigger.click();
-                });
 
                 hideSiennaTrigger();
                 themeSiennaMenu();

@@ -319,3 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+@include('partials.student_voice_input_support')
+</body>
+</html>
+

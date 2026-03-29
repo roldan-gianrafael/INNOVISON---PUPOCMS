@@ -43,20 +43,43 @@
             }
         }
 
+        @keyframes accessibilityRingColorShift {
+            0% {
+                border-color: rgb(255, 0, 0);
+                box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+            }
+            33% {
+                border-color: rgb(255, 215, 0);
+                box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+            }
+            66% {
+                border-color: rgb(0, 191, 255);
+                box-shadow: 0 0 0 2px rgba(0, 191, 255, 0.2);
+            }
+            100% {
+                border-color: rgb(255, 0, 0);
+                box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+            }
+        }
+
         :where(.asw-menu-btn) {
             position: fixed;
             overflow: visible !important;
+            background: #800000 !important;
+            background-image: none !important;
         }
 
         :where(.asw-menu-btn)::after {
             content: "";
             position: absolute;
             inset: -6px;
-            border: 3px solid rgba(255, 193, 7, 0.95);
+            border: 3px solid rgb(255, 0, 0);
             border-radius: 999px;
             pointer-events: none;
-            animation: accessibilityPulseRing 1.9s ease-out infinite;
-            box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.18);
+            animation:
+                accessibilityPulseRing 1.9s ease-out infinite,
+                accessibilityRingColorShift 3.2s linear infinite;
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
         }
 
         :root {

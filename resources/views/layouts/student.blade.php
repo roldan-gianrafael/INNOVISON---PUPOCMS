@@ -62,19 +62,19 @@
 
         @keyframes accessibilityIconWave {
             0%, 100% {
-                transform: rotate(0deg);
+                transform: translateY(0);
             }
             20% {
-                transform: translateY(-1.5px);
+                transform: translateY(-2.5px);
             }
             40% {
-                transform: translateY(1.5px);
+                transform: translateY(2.5px);
             }
             60% {
-                transform: translateY(-1px);
+                transform: translateY(-2px);
             }
             80% {
-                transform: translateY(1px);
+                transform: translateY(2px);
             }
         }
 
@@ -121,7 +121,12 @@
         :where(.asw-menu-btn .asw-wave-arm) {
             transform-box: fill-box;
             transform-origin: center;
-            animation: accessibilityIconWave 2.4s ease-in-out infinite;
+            animation: accessibilityIconWave 1.4s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        :where(.asw-menu-btn .asw-wave-arm:nth-of-type(2)) {
+            animation-delay: 0.15s;
         }
 
         :where(.asw-menu-btn svg path:not([fill="none"])) {

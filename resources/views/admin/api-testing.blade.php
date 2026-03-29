@@ -143,8 +143,27 @@
         color: #f8fafc;
     }
 
+    .api-raw-toggle {
+        margin-top: 16px;
+    }
+
+    .api-raw-toggle summary {
+        cursor: pointer;
+        font-weight: 700;
+        color: #7f1d2d;
+        list-style: none;
+    }
+
+    .api-raw-toggle summary::-webkit-details-marker {
+        display: none;
+    }
+
+    html[data-theme="dark"] .api-raw-toggle summary {
+        color: #f3d6da;
+    }
+
     .api-json {
-        margin-top: 18px;
+        margin-top: 12px;
         border-radius: 16px;
         padding: 16px;
         background: #111827;
@@ -195,10 +214,10 @@
         @if($apiResponseMeta)
             <p class="api-testing-meta" style="margin-top: 16px;">
                 Endpoint: <strong>{{ $apiResponseMeta['endpoint'] }}</strong>
-                · Status: <strong>{{ $apiResponseMeta['status'] }}</strong>
-                · Matches: <strong>{{ $apiResponseMeta['result_count'] }}</strong>
+                | Status: <strong>{{ $apiResponseMeta['status'] }}</strong>
+                | Matches: <strong>{{ $apiResponseMeta['result_count'] }}</strong>
                 @if(!empty($apiResponseMeta['auth_mode']))
-                · Auth: <strong>{{ $apiResponseMeta['auth_mode'] }}</strong>
+                | Auth: <strong>{{ $apiResponseMeta['auth_mode'] }}</strong>
                 @endif
             </p>
         @endif
@@ -253,7 +272,10 @@
                             </div>
                         </div>
 
-                        <div class="api-json">{{ json_encode($result['fields'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                        <details class="api-raw-toggle">
+                            <summary>Show raw response</summary>
+                            <div class="api-json">{{ json_encode($result['fields'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                        </details>
                     </article>
                 @endforeach
             </div>

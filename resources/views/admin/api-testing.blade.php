@@ -47,7 +47,7 @@
 
     .api-search-form {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: 220px minmax(0, 1fr) auto;
         gap: 14px;
         align-items: end;
         margin-top: 18px;
@@ -64,7 +64,8 @@
         color: #f8fafc;
     }
 
-    .api-search-form input {
+    .api-search-form input,
+    .api-search-form select {
         width: 100%;
         border-radius: 16px;
         border: 1px solid rgba(127, 29, 45, 0.2);
@@ -199,13 +200,21 @@
 
         <form method="GET" class="api-search-form">
             <div>
-                <label for="search">Search faculty by name, email, or ID</label>
+                <label for="source">API Source</label>
+                <select id="source" name="source">
+                    <option value="faculty" {{ ($source ?? 'faculty') === 'faculty' ? 'selected' : '' }}>Faculty API</option>
+                    <option value="admin_api" {{ ($source ?? 'faculty') === 'admin_api' ? 'selected' : '' }}>Our Admin API</option>
+                    <option value="custom" {{ ($source ?? 'faculty') === 'custom' ? 'selected' : '' }}>Custom Temp API</option>
+                </select>
+            </div>
+            <div>
+                <label for="search">Search by name, email, or ID</label>
                 <input
                     type="text"
                     id="search"
                     name="search"
                     value="{{ $search }}"
-                    placeholder="Try a faculty name, email address, or identifier"
+                    placeholder="Try a name, email address, or identifier"
                 >
             </div>
             <button type="submit">Search API</button>
@@ -218,6 +227,9 @@
                 | Matches: <strong>{{ $apiResponseMeta['result_count'] }}</strong>
                 @if(!empty($apiResponseMeta['auth_mode']))
                 | Auth: <strong>{{ $apiResponseMeta['auth_mode'] }}</strong>
+                @endif
+                @if(!empty($apiResponseMeta['source']))
+                | Source: <strong>{{ $apiResponseMeta['source'] }}</strong>
                 @endif
             </p>
         @endif
@@ -286,7 +298,7 @@
                 @endforeach
             </div>
         @else
-            <p class="api-empty">Search results will appear here once you enter a faculty name, email, or ID.</p>
+            <p class="api-empty">Search results will appear here once you choose a source and enter a name, email, or ID.</p>
         @endif
     </section>
 </div>

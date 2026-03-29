@@ -11,6 +11,49 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminProfileController extends Controller
 {
+    public function index(Request $request): JsonResponse
+    {
+        if (!Schema::hasTable('admins')) {
+            return $this->errorResponse('Admins table was not found.', 404);
+        }
+
+        $query = Admin::query();
+        $search = trim((string) $request->query('search', ''));
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                foreach (['admin_id', 'name', 'first_name', 'last_name', 'email', 'email_address', 'office', 'access_level', 'role'] as $column) {
+                    if (!Admin::hasColumn($column)) {
+                        continue;
+                    }
+
+                    if ($column === 'admin_id') {
+                        $builder->orWhere($column, 'like', '%' . $search . '%');
+                    } else {
+                        $builder->orWhere($column, 'like', '%' . $search . '%');
+                    }
+                }
+            });
+        }
+
+        foreach (['admin_id', 'email', 'email_address', 'access_level', 'role'] as $column) {
+            $value = trim((string) $request->query($column, ''));
+            if ($value !== '' && Admin::hasColumn($column)) {
+                $query->where($column, $value);
+            }
+        }
+
+        $limit = max(1, min((int) $request->query('limit', 25), 100));
+        $admins = $query->orderBy($this->defaultOrderColumn())
+            ->limit($limit)
+            ->get()
+            ->map(fn (Admin $admin) => $this->transformAdmin($admin))
+            ->values()
+            ->all();
+
+        return $this->successResponse($admins, 'Admin profiles retrieved successfully.');
+    }
+
     public function lookup(Request $request): JsonResponse
     {
         if (!Schema::hasTable('admins')) {
@@ -52,6 +95,11 @@ class AdminProfileController extends Controller
         }
 
         return $this->successResponse($this->transformAdmin($admin), 'Admin profile retrieved successfully.');
+    }
+
+    public function externalShow($admin_id): JsonResponse
+    {
+        return $this->show($admin_id);
     }
 
     private function resolveLookup(Request $request): ?array
@@ -185,6 +233,17 @@ class AdminProfileController extends Controller
         }
 
         return $filtered;
+    }
+
+    private function defaultOrderColumn(): string
+    {
+        foreach (['name', 'first_name', 'admin_id', 'id'] as $column) {
+            if (Admin::hasColumn($column)) {
+                return $column;
+            }
+        }
+
+        return 'admin_id';
     }
 
     private function successResponse($data, string $message, int $status = 200): JsonResponse

@@ -100,15 +100,25 @@ class AdminController extends Controller
     public function apiTesting(Request $request, FacultySyncService $facultySyncService)
     {
         $search = trim((string) $request->query('search', ''));
+        $source = trim((string) $request->query('source', 'faculty'));
         $results = [];
         $apiResponseMeta = null;
         $errorMessage = null;
         $errorDetails = null;
 
         if ($search !== '') {
-            $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
             $facultyEndpoint = trim((string) config('services.pupt_flss.faculty_profiles_url', ''));
-            $endpoint = $configuredTempEndpoint !== '' ? $configuredTempEndpoint : $facultyEndpoint;
+            $internalAdminEndpoint = url('/api/external/admins');
+            $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
+
+            if ($source === 'admin_api') {
+                $endpoint = $internalAdminEndpoint;
+            } elseif ($source === 'custom' && $configuredTempEndpoint !== '') {
+                $endpoint = $configuredTempEndpoint;
+            } else {
+                $source = 'faculty';
+                $endpoint = $configuredTempEndpoint !== '' ? $configuredTempEndpoint : $facultyEndpoint;
+            }
 
             if ($endpoint === '') {
                 $errorMessage = 'Temporary API testing URL is not configured yet.';
@@ -119,10 +129,21 @@ class AdminController extends Controller
 
                     $apiKey = trim((string) config('services.temp_api_testing.api_key', ''));
                     $apiHeader = trim((string) config('services.temp_api_testing.header', 'X-External-Api-Key'));
-                    if ($apiKey !== '') {
+                    $authMode = 'none';
+
+                    if ($source === 'admin_api') {
+                        $internalApiKey = trim((string) config('services.external_admin_profile.api_key', ''));
+                        $internalApiHeader = trim((string) config('services.external_admin_profile.header', 'X-External-Api-Key'));
+                        if ($internalApiKey !== '') {
+                            $client = $client->withHeaders([$internalApiHeader => $internalApiKey]);
+                            $authMode = 'internal-api-key';
+                        }
+                    } elseif ($apiKey !== '') {
                         $client = $client->withHeaders([$apiHeader => $apiKey]);
+                        $authMode = 'custom-header';
                     } elseif ($facultyEndpoint !== '' && $endpoint === $facultyEndpoint) {
                         $client = $client->withHeaders($facultySyncService->generateHmacHeaders());
+                        $authMode = 'faculty-hmac';
                     }
 
                     $response = $client->get($endpoint, [
@@ -138,9 +159,8 @@ class AdminController extends Controller
                         'ok' => $response->successful(),
                         'endpoint' => $endpoint,
                         'result_count' => count($results),
-                        'auth_mode' => $apiKey !== ''
-                            ? 'custom-header'
-                            : (($facultyEndpoint !== '' && $endpoint === $facultyEndpoint) ? 'faculty-hmac' : 'none'),
+                        'auth_mode' => $authMode,
+                        'source' => $source,
                     ];
 
                     if (!$response->successful()) {
@@ -158,6 +178,7 @@ class AdminController extends Controller
 
         return view('admin.api-testing', [
             'search' => $search,
+            'source' => $source,
             'results' => $results,
             'apiResponseMeta' => $apiResponseMeta,
             'errorMessage' => $errorMessage,

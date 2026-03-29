@@ -8,7 +8,7 @@
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
         data-asw-position="bottom-right"
-        data-asw-offset="24,96"
+        data-asw-offset="24,140"
         defer
     ></script>
     <script>
@@ -28,6 +28,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
+        @keyframes accessibilityPulseRing {
+            0% {
+                transform: scale(1);
+                opacity: 0.95;
+            }
+            70% {
+                transform: scale(1.22);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1.22);
+                opacity: 0;
+            }
+        }
+
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        ) {
+            position: fixed;
+            overflow: visible !important;
+        }
+
+        :where(
+            #sienna-accessibility-button,
+            .sienna-accessibility-button,
+            .sienna-accessibility-trigger,
+            [data-sienna-accessibility-trigger]
+        )::after {
+            content: "";
+            position: absolute;
+            inset: -6px;
+            border: 3px solid rgba(255, 193, 7, 0.95);
+            border-radius: 999px;
+            pointer-events: none;
+            animation: accessibilityPulseRing 1.9s ease-out infinite;
+            box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.18);
+        }
+
         :root {
             --bg: #2a0e16;
             --bg-grad-1: #5b1a2a;

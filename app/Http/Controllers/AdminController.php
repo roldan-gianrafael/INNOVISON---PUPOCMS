@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\ActivityLog;
 use App\Models\Item;
 use App\Models\Setting;
+use App\Models\Admin;
 use App\Services\FacultySyncService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use App\Models\HealthProfile;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class AdminController extends Controller
 {
@@ -124,6 +126,31 @@ class AdminController extends Controller
                 $errorMessage = 'Temporary API testing URL is not configured yet.';
             } else {
                 try {
+                    if ($source === 'admin_api') {
+                        $results = $this->searchLocalAdminsForApiTesting($search);
+                        $apiResponseMeta = [
+                            'status' => 200,
+                            'ok' => true,
+                            'endpoint' => $internalAdminEndpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'internal-query',
+                            'source' => $source,
+                        ];
+
+                        if (empty($results)) {
+                            $errorMessage = 'No matching records were found for the current search.';
+                        }
+
+                        return view('admin.api-testing', [
+                            'search' => $search,
+                            'source' => $source,
+                            'results' => $results,
+                            'apiResponseMeta' => $apiResponseMeta,
+                            'errorMessage' => $errorMessage,
+                            'errorDetails' => $errorDetails,
+                        ]);
+                    }
+
                     $client = Http::timeout((int) config('services.temp_api_testing.timeout', 20))
                         ->acceptJson();
 
@@ -184,6 +211,55 @@ class AdminController extends Controller
             'errorMessage' => $errorMessage,
             'errorDetails' => $errorDetails,
         ]);
+    }
+
+    private function searchLocalAdminsForApiTesting(string $search): array
+    {
+        if (!Schema::hasTable('admins')) {
+            return [];
+        }
+
+        $query = Admin::query();
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                foreach (['admin_id', 'name', 'first_name', 'last_name', 'email', 'email_address', 'office', 'access_level', 'role'] as $column) {
+                    if (!Admin::hasColumn($column)) {
+                        continue;
+                    }
+
+                    $builder->orWhere($column, 'like', '%' . $search . '%');
+                }
+            });
+        }
+
+        $orderColumn = 'admin_id';
+        foreach (['name', 'first_name', 'admin_id'] as $candidateColumn) {
+            if (Admin::hasColumn($candidateColumn)) {
+                $orderColumn = $candidateColumn;
+                break;
+            }
+        }
+
+        $records = $query->orderBy($orderColumn)->limit(20)->get()->map(function (Admin $admin) {
+            $fields = $admin->toArray();
+            $name = trim((string) ($fields['name'] ?? trim(($fields['first_name'] ?? '') . ' ' . ($fields['last_name'] ?? ''))));
+
+            return [
+                'identifier' => (string) ($fields['admin_id'] ?? 'N/A'),
+                'name' => $name !== '' ? $name : 'N/A',
+                'email' => (string) ($fields['email'] ?? $fields['email_address'] ?? 'N/A'),
+                'birthday' => (string) ($fields['birthday'] ?? 'N/A'),
+                'role' => (string) ($fields['access_level'] ?? $fields['role'] ?? 'N/A'),
+                'office' => (string) ($fields['office'] ?? 'N/A'),
+                'contact_number' => (string) ($fields['contact_no'] ?? $fields['emergency_contact_no'] ?? 'N/A'),
+                'address' => (string) ($fields['address'] ?? 'N/A'),
+                'status' => (string) ($fields['status'] ?? 'N/A'),
+                'fields' => $fields,
+            ];
+        })->values()->all();
+
+        return $records;
     }
 
     private function normalizeApiTestingResults($payload, string $search): array

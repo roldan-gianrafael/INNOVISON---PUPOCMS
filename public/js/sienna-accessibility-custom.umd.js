@@ -165,7 +165,7 @@ var SiennaAccessibility=(()=>{var Mt=Object.create;var xe=Object.defineProperty;
         }
         .asw-structure-header {
             padding: 15px 20px;
-            background: linear-gradient(135deg, #8b0000 0%, #6B7280 100%);
+            background: linear-gradient(135deg, #8b0000 0%, #5cda14 100%);
             color: #fff;
             display: flex;
             justify-content: space-between;

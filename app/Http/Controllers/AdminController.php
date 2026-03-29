@@ -72,7 +72,7 @@ class AdminController extends Controller
     {
         $name = trim($name);
         if ($name === '') {
-            return ['', '', ''];
+            return ['', '', '', ''];
         }
 
         $suffixes = ['jr', 'jr.', 'sr', 'sr.', 'ii', 'iii', 'iv', 'v'];
@@ -88,9 +88,10 @@ class AdminController extends Controller
 
         $parts = array_values($parts);
         $firstName = $parts[0] ?? '';
-        $lastName = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
+        $middleName = count($parts) > 2 ? implode(' ', array_slice($parts, 1, -1)) : '';
+        $lastName = count($parts) > 1 ? ($parts[count($parts) - 1] ?? '') : '';
 
-        return [$firstName, $lastName, $suffix];
+        return [$firstName, $middleName, $lastName, $suffix];
     }
 
     private function buildCmsAdminProfile(User $user): array
@@ -119,6 +120,7 @@ class AdminController extends Controller
         return [
             'name' => $linkedAdmin?->name ?: ($user->name ?? ''),
             'email' => $linkedAdmin?->email ?: ($linkedAdmin?->email_address ?: ($user->email ?? '')),
+            'middle_name' => $linkedAdmin?->middle_name,
             'suffix_name' => $linkedAdmin?->suffix_name,
             'birthday' => $birthday,
             'age' => $age,
@@ -336,7 +338,7 @@ class AdminController extends Controller
 
         if ($search !== '') {
             $query->where(function ($builder) use ($search) {
-                foreach (['admin_id', 'name', 'first_name', 'last_name', 'email', 'email_address', 'office', 'access_level', 'role'] as $column) {
+                foreach (['admin_id', 'name', 'first_name', 'middle_name', 'last_name', 'email', 'email_address', 'office', 'access_level', 'role'] as $column) {
                     if (!Admin::hasColumn($column)) {
                         continue;
                     }
@@ -356,7 +358,7 @@ class AdminController extends Controller
 
         $records = $query->orderBy($orderColumn)->limit(20)->get()->map(function (Admin $admin) {
             $fields = $admin->toArray();
-            $name = trim((string) ($fields['name'] ?? trim(($fields['first_name'] ?? '') . ' ' . ($fields['last_name'] ?? ''))));
+            $name = trim((string) ($fields['name'] ?? trim(($fields['first_name'] ?? '') . ' ' . ($fields['middle_name'] ?? '') . ' ' . ($fields['last_name'] ?? '') . ' ' . ($fields['suffix_name'] ?? ''))));
 
             return [
                 'identifier' => (string) ($fields['admin_id'] ?? 'N/A'),
@@ -368,6 +370,7 @@ class AdminController extends Controller
                 'contact_number' => (string) ($fields['contact_no'] ?? $fields['emergency_contact_no'] ?? 'N/A'),
                 'address' => (string) ($fields['address'] ?? 'N/A'),
                 'status' => (string) ($fields['status'] ?? 'N/A'),
+                'middle_name' => (string) ($fields['middle_name'] ?? 'N/A'),
                 'suffix_name' => (string) ($fields['suffix_name'] ?? 'N/A'),
                 'fields' => $fields,
             ];
@@ -402,7 +405,7 @@ class AdminController extends Controller
             $profileAddress = isset($profile['address']) && is_array($profile['address'])
                 ? $profile['address']
                 : [];
-            $name = trim((string) ($item['name'] ?? trim(($item['first_name'] ?? '') . ' ' . ($item['last_name'] ?? ''))));
+            $name = trim((string) ($item['name'] ?? trim(($item['first_name'] ?? '') . ' ' . ($item['middle_name'] ?? '') . ' ' . ($item['last_name'] ?? '') . ' ' . ($item['suffix_name'] ?? ''))));
             $email = trim((string) ($item['email'] ?? $item['email_address'] ?? ''));
             $identifier = trim((string) ($item['faculty_code'] ?? $item['faculty_id'] ?? $item['id'] ?? $item['admin_id'] ?? $item['student_id'] ?? $item['employee_id'] ?? ''));
             $birthday = trim((string) ($item['birthday'] ?? $profile['birthday'] ?? $item['dob'] ?? $item['date_of_birth'] ?? ''));
@@ -433,6 +436,7 @@ class AdminController extends Controller
                 'contact_number' => $contactNumber !== '' ? $contactNumber : 'N/A',
                 'address' => $address !== '' ? $address : 'N/A',
                 'status' => $status !== '' ? $status : 'N/A',
+                'middle_name' => trim((string) ($item['middle_name'] ?? '')) ?: 'N/A',
                 'suffix_name' => trim((string) ($item['suffix_name'] ?? '')) ?: 'N/A',
                 'fields' => $item,
             ];
@@ -738,6 +742,7 @@ public function updateClearance(Request $request, $id)
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore(Auth::id())],
+        'middle_name' => 'nullable|string|max:255',
         'suffix_name' => 'nullable|string|max:50',
         'birthday' => 'nullable|date',
         'address' => 'nullable|string|max:255',
@@ -779,10 +784,16 @@ public function updateClearance(Request $request, $id)
             $linkedAdminProfile = new Admin();
         }
 
-        [$firstName, $lastName, $suffixName] = $this->splitDisplayName((string) $request->name);
+        [$firstName, $middleName, $lastName, $suffixName] = $this->splitDisplayName((string) $request->name);
 
         if (Admin::hasColumn('first_name')) {
             $linkedAdminProfile->first_name = $firstName;
+        }
+
+        if (Admin::hasColumn('middle_name')) {
+            $linkedAdminProfile->middle_name = $request->middle_name !== null && $request->middle_name !== ''
+                ? $request->middle_name
+                : $middleName;
         }
 
         if (Admin::hasColumn('last_name')) {

@@ -563,14 +563,20 @@
                     <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $linkedAdminProfile->first_name) }}" disabled>
                 </div>
                 <div>
-                    <label class="input-label">Last Name</label>
-                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $linkedAdminProfile->last_name) }}" disabled>
+                    <label class="input-label">Middle Name</label>
+                    <input type="text" name="middle_name" class="form-control editable-input" value="{{ old('middle_name', $linkedAdminProfile->middle_name) }}" disabled>
                 </div>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label class="input-label">Suffix Name</label>
-                <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $linkedAdminProfile->suffix_name) }}" disabled>
+            <div class="profile-grid-2">
+                <div>
+                    <label class="input-label">Last Name</label>
+                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $linkedAdminProfile->last_name) }}" disabled>
+                </div>
+                <div>
+                    <label class="input-label">Suffix Name</label>
+                    <input type="text" name="suffix_name" class="form-control editable-input" value="{{ old('suffix_name', $linkedAdminProfile->suffix_name) }}" disabled>
+                </div>
             </div>
 
             <div class="profile-grid-2">

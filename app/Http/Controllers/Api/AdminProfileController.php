@@ -22,7 +22,7 @@ class AdminProfileController extends Controller
 
         if ($search !== '') {
             $query->where(function ($builder) use ($search) {
-                foreach (['admin_id', 'name', 'first_name', 'last_name', 'suffix_name', 'email', 'email_address', 'office', 'access_level', 'role'] as $column) {
+                foreach (['admin_id', 'name', 'first_name', 'middle_name', 'last_name', 'suffix_name', 'email', 'email_address', 'office', 'access_level', 'role'] as $column) {
                     if (!Admin::hasColumn($column)) {
                         continue;
                     }
@@ -131,6 +131,7 @@ class AdminProfileController extends Controller
             'admin_id' => 'required|exists:admins,admin_id',
             'email' => 'nullable|email',
             'first_name' => 'nullable|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'suffix_name' => 'nullable|string|max:50',
             'birthday' => 'nullable|date',
@@ -195,6 +196,7 @@ class AdminProfileController extends Controller
         if (!isset($data['name'])) {
             $name = trim(implode(' ', array_filter([
                 $this->pickFirstAvailableValue($admin, ['first_name']),
+                $this->pickFirstAvailableValue($admin, ['middle_name']),
                 $this->pickFirstAvailableValue($admin, ['last_name']),
                 $this->pickFirstAvailableValue($admin, ['suffix_name']),
             ])));
@@ -212,6 +214,7 @@ class AdminProfileController extends Controller
         return [
             'admin_id' => ['admin_id', 'id'],
             'first_name' => ['first_name'],
+            'middle_name' => ['middle_name'],
             'last_name' => ['last_name'],
             'suffix_name' => ['suffix_name'],
             'name' => ['name', 'full_name'],

@@ -116,7 +116,10 @@
         :where(.asw-menu-btn svg) {
             fill: #ffffff !important;
             stroke: none !important;
-            transform-origin: 50% 28%;
+        }
+
+        :where(.asw-menu-btn .asw-wave-arm) {
+            transform-origin: 14px 10px;
             animation: accessibilityIconWave 2.4s ease-in-out infinite;
         }
 

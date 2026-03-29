@@ -69,6 +69,13 @@ return [
         'header' => env('EXTERNAL_ADMIN_PROFILE_HEADER', 'X-External-Api-Key'),
     ],
 
+    'temp_api_testing' => [
+        'url' => env('TEMP_API_TESTING_URL'),
+        'api_key' => env('TEMP_API_TESTING_API_KEY'),
+        'header' => env('TEMP_API_TESTING_HEADER', 'X-External-Api-Key'),
+        'timeout' => (int) env('TEMP_API_TESTING_TIMEOUT', 20),
+    ],
+
     'pupt_flss' => [
         'faculty_profiles_url' => env('PUPT_FLSS_FACULTY_PROFILES_URL', 'https://flss-backend-api-d9eecxcnhpccdpdk.southeastasia-01.azurewebsites.net/api/v1/faculty-profiles'),
         'system_id' => env('PUPT_FLSS_SYSTEM_ID', 'ocms'),

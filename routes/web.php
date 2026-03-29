@@ -109,6 +109,7 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::get('/admin/reports/inventory-summary', [AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
         Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
+        Route::get('/admin/api-testing', [AdminController::class, 'apiTesting'])->name('admin.api-testing');
         Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])
             ->middleware('role:superadmin')
             ->name('admin.logs');
@@ -154,6 +155,7 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::get('/reports/inventory-summary', [AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
         Route::get('/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
+        Route::get('/api-testing', [AdminController::class, 'apiTesting'])->name('api-testing');
     });
 }); // End protected routes
 

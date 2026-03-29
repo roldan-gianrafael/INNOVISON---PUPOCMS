@@ -1171,6 +1171,7 @@
     $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
     $inventoryUrl = $isStudentAssistant ? url('/assistant/inventory') : url('/admin/inventory');
     $reportsUrl = $isStudentAssistant ? url('/assistant/reports') : url('/admin/reports');
+    $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
     $settingsUrl = url('/admin/settings');
     $assistantAccountsUrl = url('/admin/student-assistants');
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
@@ -1252,6 +1253,9 @@
       <a href="{{ $reportsUrl }}" class="{{ (Request::is('admin/reports*') || Request::is('assistant/reports*')) ? 'active' : '' }}">
         <span class="sidebar-short">RP</span><span class="sidebar-label">Reports</span>
       </a>
+      <a href="{{ $apiTestingUrl }}" class="{{ (Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
+        <span class="sidebar-short">FT</span><span class="sidebar-label">For API Testing</span>
+      </a>
       <a href="{{ $walkinUrl }}" class="{{ (Request::is('admin/walkin*') || Request::is('assistant/walkin*')) ? 'active' : '' }}">
         <span class="sidebar-short">WK</span><span class="sidebar-label">Walk-in</span>
       </a>
@@ -1264,7 +1268,7 @@
             <span class="sidebar-short">SA</span><span class="sidebar-label">Student Assistants</span>
           </a>
           <a href="{{ route('admin.logs') }}" class="{{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
-            <span class="sidebar-short">AT</span><span class="sidebar-label">Audit Trail</span>
+            <span class="sidebar-short">LG</span><span class="sidebar-label">Audit Trail</span>
           </a>
           <a href="{{ $settingsUrl }}" class="{{ Request::is('admin/settings*') ? 'active' : '' }}">
             <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>

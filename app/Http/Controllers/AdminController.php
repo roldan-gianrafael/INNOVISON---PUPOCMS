@@ -11,6 +11,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use App\Models\HealthProfile;
 use Carbon\Carbon;
 
@@ -94,6 +95,112 @@ class AdminController extends Controller
             'monthlyCompleted'
         ));
     }
+
+    public function apiTesting(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+        $results = [];
+        $apiResponseMeta = null;
+        $errorMessage = null;
+
+        if ($search !== '') {
+            $endpoint = trim((string) config('services.temp_api_testing.url', ''));
+
+            if ($endpoint === '') {
+                $errorMessage = 'Temporary API testing URL is not configured yet.';
+            } else {
+                try {
+                    $client = Http::timeout((int) config('services.temp_api_testing.timeout', 20))
+                        ->acceptJson();
+
+                    $apiKey = trim((string) config('services.temp_api_testing.api_key', ''));
+                    $apiHeader = trim((string) config('services.temp_api_testing.header', 'X-External-Api-Key'));
+                    if ($apiKey !== '') {
+                        $client = $client->withHeaders([$apiHeader => $apiKey]);
+                    }
+
+                    $response = $client->get($endpoint, [
+                        'search' => $search,
+                        'query' => $search,
+                        'q' => $search,
+                    ]);
+
+                    $payload = $response->json();
+                    $results = $this->normalizeApiTestingResults($payload, $search);
+                    $apiResponseMeta = [
+                        'status' => $response->status(),
+                        'ok' => $response->successful(),
+                        'endpoint' => $endpoint,
+                        'result_count' => count($results),
+                    ];
+
+                    if (!$response->successful()) {
+                        $errorMessage = 'The API request returned an error response.';
+                    } elseif (empty($results)) {
+                        $errorMessage = 'No matching records were found for the current search.';
+                    }
+                } catch (\Throwable $exception) {
+                    $errorMessage = 'Unable to reach the external API right now: ' . $exception->getMessage();
+                }
+            }
+        }
+
+        return view('admin.api-testing', [
+            'search' => $search,
+            'results' => $results,
+            'apiResponseMeta' => $apiResponseMeta,
+            'errorMessage' => $errorMessage,
+        ]);
+    }
+
+    private function normalizeApiTestingResults($payload, string $search): array
+    {
+        if (!is_array($payload)) {
+            return [];
+        }
+
+        $records = $payload['data'] ?? $payload['results'] ?? $payload['records'] ?? $payload;
+        if (!is_array($records)) {
+            return [];
+        }
+
+        $items = array_is_list($records) ? $records : [$records];
+        $needle = strtolower($search);
+        $normalized = [];
+
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $name = trim((string) ($item['name'] ?? trim(($item['first_name'] ?? '') . ' ' . ($item['last_name'] ?? ''))));
+            $email = trim((string) ($item['email'] ?? $item['email_address'] ?? ''));
+            $identifier = trim((string) ($item['id'] ?? $item['admin_id'] ?? $item['student_id'] ?? $item['employee_id'] ?? ''));
+            $birthday = trim((string) ($item['birthday'] ?? $item['dob'] ?? $item['date_of_birth'] ?? ''));
+
+            $haystack = strtolower(implode(' ', array_filter([
+                $name,
+                $email,
+                $identifier,
+                json_encode($item),
+            ])));
+
+            if ($needle !== '' && !str_contains($haystack, $needle)) {
+                continue;
+            }
+
+            $normalized[] = [
+                'identifier' => $identifier !== '' ? $identifier : 'N/A',
+                'name' => $name !== '' ? $name : 'N/A',
+                'email' => $email !== '' ? $email : 'N/A',
+                'birthday' => $birthday !== '' ? $birthday : 'N/A',
+                'fields' => $item,
+            ];
+        }
+
+        return array_slice($normalized, 0, 20);
+    }
+
     public function viewHealth()
     {
         // Kukunin natin ang lahat ng records mula sa health_profile table

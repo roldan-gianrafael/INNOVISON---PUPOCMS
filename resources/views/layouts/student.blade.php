@@ -62,6 +62,10 @@
 
         :where(.asw-menu-btn) {
             position: fixed;
+            left: auto !important;
+            right: 24px !important;
+            top: auto !important;
+            bottom: 12px !important;
             overflow: visible !important;
             background: #800000 !important;
             background-image: none !important;

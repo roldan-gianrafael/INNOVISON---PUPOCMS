@@ -305,7 +305,7 @@
             <tr>
                 <td>{{ $item->id }}</td>
                 <td class="text-left">{{ $item->name }}</td>
-                <td>{{ $item->category }}</td>
+                <td>{{ $item->medicine_type}}</td>
                 <td>{{ $item->quantity }}</td> {{-- Since matic bumabawas, current qty na ang starting natin --}}
                 <td>0</td> {{-- Placeholder: 0 muna dahil walang consumed column --}}
                 <td style="font-weight: bold;">{{ $item->quantity }}</td>

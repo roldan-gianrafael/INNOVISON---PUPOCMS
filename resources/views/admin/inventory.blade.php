@@ -60,7 +60,7 @@
                 <tr>    
                     <th>Item Name</th>
                     <th>Category</th>
-                    <th>Quantity</th>
+                    <th>Quantity & Dates</th>
                     <th>Stock Status</th>
                     <th>{{ $canManageInventory ? 'Actions' : 'Access' }}</th>
                 </tr>
@@ -75,7 +75,17 @@
                                 <small style="display:block; color:#64748b; font-style: italic;">({{ $item->medicine_type }})</small>
                             @endif
                         </td>
-                        <td>{{ $item->quantity }}</td>
+                        <td>
+                            <div style="font-weight: 700;">{{ $item->quantity }} units</div>
+                            <small style="display:block; color:#64748b; margin-top:4px;">
+                                📅 Added: {{ $item->date_added ? \Carbon\Carbon::parse($item->date_added)->format('M d, Y') : 'N/A' }}
+                            </small>
+                            @if($item->category == 'Medicine' && $item->expiration_date)
+                                <small style="display:block; color: {{ \Carbon\Carbon::parse($item->expiration_date)->isPast() ? '#b91c1c' : '#c2410c' }}; font-weight:600;">
+                                    ⌛ Exp: {{ \Carbon\Carbon::parse($item->expiration_date)->format('M d, Y') }}
+                                </small>
+                            @endif
+                        </td>
                         <td>
                             @if($item->quantity == 0)
                                 <span class="status out">Out of Stock</span>
@@ -88,7 +98,7 @@
                         <td>
                             @if($canManageInventory)
                                 <button class="btn-icon btn-edit" 
-                                    onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}', '{{ $item->medicine_type }}')">
+                                    onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}', '{{ $item->medicine_type }}', '{{ $item->date_added }}', '{{ $item->expiration_date }}')">
                                     Edit
                                 </button>
 
@@ -124,23 +134,35 @@
 
                     <div class="form-group">
                         <label>Category</label>
-                        <select name="category" id="iCategory" class="form-control" onchange="toggleMedicineType()">
+                        <select name="category" id="iCategory" class="form-control" onchange="toggleMedicineFields()">
                             <option value="Medicine">Medicine</option>
                             <option value="Equipment">Equipment</option>
                             <option value="Supplies">Supplies</option>
                         </select>
                     </div>
 
-                    <div class="form-group" id="medicineTypeGroup" style="display: none;">
-                        <label>Medicine Type</label>
-                        <select name="medicine_type" id="iMedicineType" class="form-control">
-                            <option value="">-- Select Type --</option>
-                            <option value="Antibiotic">Antibiotic</option>
-                            <option value="Asthma">For Asthma</option>
-                            <option value="Analgesic">Analgesic</option>
-                            <option value="Antipyretic">Antipyretic</option>
-                            <option value="Others">Others</option>
-                        </select>
+                    <div id="medicineFields" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Medicine Type</label>
+                            <select name="medicine_type" id="iMedicineType" class="form-control">
+                                <option value="">-- Select Type --</option>
+                                <option value="Antibiotic">Antibiotic</option>
+                                <option value="Asthma">For Asthma</option>
+                                <option value="Analgesic">Analgesic</option>
+                                <option value="Antipyretic">Antipyretic</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Expiration Date</label>
+                            <input type="date" name="expiration_date" id="iExpDate" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date Added</label>
+                        <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
                     </div>
 
                     <div class="form-group">
@@ -161,18 +183,22 @@
 @push('scripts')
 <script>
     const itemModal = document.getElementById('itemModal');
-    const medicineGroup = document.getElementById('medicineTypeGroup');
+    const medicineFields = document.getElementById('medicineFields');
     const medicineSelect = document.getElementById('iMedicineType');
+    const expDateInput = document.getElementById('iExpDate');
 
-    function toggleMedicineType() {
+    function toggleMedicineFields() {
         const category = document.getElementById('iCategory').value;
         if (category === 'Medicine') {
-            medicineGroup.style.display = 'block';
+            medicineFields.style.display = 'block';
             medicineSelect.setAttribute('required', 'required');
+            expDateInput.setAttribute('required', 'required');
         } else {
-            medicineGroup.style.display = 'none';
+            medicineFields.style.display = 'none';
             medicineSelect.removeAttribute('required');
+            expDateInput.removeAttribute('required');
             medicineSelect.value = ''; 
+            expDateInput.value = '';
         }
     }
 
@@ -187,10 +213,13 @@
         document.getElementById('iName').value = '';
         document.getElementById('iCategory').value = 'Medicine';
         document.getElementById('iQty').value = '';
-        toggleMedicineType();
+        document.getElementById('iDateAdded').value = new Date().toISOString().split('T')[0]; // Set today as default
+        document.getElementById('iExpDate').value = '';
+        
+        toggleMedicineFields();
     }
 
-    function editItem(id, name, category, qty, medicineType) {
+    function editItem(id, name, category, qty, medicineType, dateAdded, expDate) {
         if (!itemModal) return;
         itemModal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Edit Item';
@@ -201,11 +230,12 @@
         document.getElementById('iName').value = name;
         document.getElementById('iCategory').value = category;
         document.getElementById('iQty').value = qty;
+        document.getElementById('iDateAdded').value = dateAdded;
         
-        // Fill and show medicine type if applicable
-        toggleMedicineType();
+        toggleMedicineFields();
         if(category === 'Medicine') {
             document.getElementById('iMedicineType').value = medicineType;
+            document.getElementById('iExpDate').value = expDate;
         }
     }
 

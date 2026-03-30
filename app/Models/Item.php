@@ -14,6 +14,13 @@ class Item extends Model
         'category',
         'medicine_type',
         'quantity',
+        'date_added',      
+        'expiration_date',
         'description'
     ];
+
+    protected $casts = [
+    'date_added' => 'date',
+    'expiration_date' => 'date',
+];
 }

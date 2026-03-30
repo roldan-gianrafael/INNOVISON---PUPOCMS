@@ -112,10 +112,6 @@
 
         <div class="profile-grid-wide">
             <div class="form-group">
-                <label>Admin ID</label>
-                <input type="text" class="form-control" value="{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}" disabled>
-            </div>
-            <div class="form-group">
                 <label>First Name</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['first_name'] ?? 'N/A' }}" disabled>
             </div>

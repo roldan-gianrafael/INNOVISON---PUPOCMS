@@ -69,7 +69,12 @@
                 @forelse($items as $item)
                     <tr>
                         <td style="font-weight: 600;">{{ $item->name }}</td>
-                        <td>{{ $item->category }}</td>
+                        <td>
+                            {{ $item->category }}
+                            @if($item->category == 'Medicine' && $item->medicine_type)
+                                <small style="display:block; color:#64748b; font-style: italic;">({{ $item->medicine_type }})</small>
+                            @endif
+                        </td>
                         <td>{{ $item->quantity }}</td>
                         <td>
                             @if($item->quantity == 0)
@@ -83,7 +88,7 @@
                         <td>
                             @if($canManageInventory)
                                 <button class="btn-icon btn-edit" 
-                                    onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}')">
+                                    onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}', '{{ $item->medicine_type }}')">
                                     Edit
                                 </button>
 
@@ -110,17 +115,31 @@
                 
                 <form id="itemForm" method="POST" action="{{ url('/admin/inventory/store') }}">
                     @csrf
-                    <div id="methodField"></div> <div class="form-group">
+                    <div id="methodField"></div> 
+                    
+                    <div class="form-group">
                         <label>Item Name</label>
                         <input name="name" id="iName" class="form-control" required placeholder="e.g. Paracetamol">
                     </div>
 
                     <div class="form-group">
                         <label>Category</label>
-                        <select name="category" id="iCategory" class="form-control">
-                            <option>Medicine</option>
-                            <option>Equipment</option>
-                            <option>Supplies</option>
+                        <select name="category" id="iCategory" class="form-control" onchange="toggleMedicineType()">
+                            <option value="Medicine">Medicine</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Supplies">Supplies</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="medicineTypeGroup" style="display: none;">
+                        <label>Medicine Type</label>
+                        <select name="medicine_type" id="iMedicineType" class="form-control">
+                            <option value="">-- Select Type --</option>
+                            <option value="Antibiotic">Antibiotic</option>
+                            <option value="Asthma">For Asthma</option>
+                            <option value="Analgesic">Analgesic</option>
+                            <option value="Antipyretic">Antipyretic</option>
+                            <option value="Others">Others</option>
                         </select>
                     </div>
 
@@ -137,38 +156,57 @@
             </div>
         </div>
     @endif
-
 @endsection
 
 @push('scripts')
 <script>
     const itemModal = document.getElementById('itemModal');
+    const medicineGroup = document.getElementById('medicineTypeGroup');
+    const medicineSelect = document.getElementById('iMedicineType');
+
+    function toggleMedicineType() {
+        const category = document.getElementById('iCategory').value;
+        if (category === 'Medicine') {
+            medicineGroup.style.display = 'block';
+            medicineSelect.setAttribute('required', 'required');
+        } else {
+            medicineGroup.style.display = 'none';
+            medicineSelect.removeAttribute('required');
+            medicineSelect.value = ''; 
+        }
+    }
 
     function openModal() {
         if (!itemModal) return;
         itemModal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Add New Item';
         document.getElementById('itemForm').action = "{{ url('/admin/inventory/store') }}";
-        document.getElementById('methodField').innerHTML = ''; // Clear PUT method
+        document.getElementById('methodField').innerHTML = ''; 
         
-        // Clear inputs
+        // Reset inputs
         document.getElementById('iName').value = '';
+        document.getElementById('iCategory').value = 'Medicine';
         document.getElementById('iQty').value = '';
+        toggleMedicineType();
     }
 
-    function editItem(id, name, category, qty) {
+    function editItem(id, name, category, qty, medicineType) {
         if (!itemModal) return;
         itemModal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Edit Item';
         document.getElementById('itemForm').action = "/admin/inventory/" + id;
         
-        // Add PUT method for update
         document.getElementById('methodField').innerHTML = '<input type="hidden" name="_method" value="PUT">';
 
-        // Fill inputs
         document.getElementById('iName').value = name;
         document.getElementById('iCategory').value = category;
         document.getElementById('iQty').value = qty;
+        
+        // Fill and show medicine type if applicable
+        toggleMedicineType();
+        if(category === 'Medicine') {
+            document.getElementById('iMedicineType').value = medicineType;
+        }
     }
 
     function closeModal() {

@@ -741,24 +741,31 @@ public function updateClearance(Request $request, $id)
     }
 
     // --- 2. INVENTORY ACTIONS ---
-    public function storeItem(Request $request)
+   public function storeItem(Request $request)
 {
-  
-    $item = Item::create($request->all());
+    // 1. Prepare data (Ensures medicine_type is null if not a medicine)
+    $data = $request->all();
+    if ($request->category !== 'Medicine') {
+        $data['medicine_type'] = null;
+    }
+
+    $item = Item::create($data);
 
     // 2. LOGS CODES
+    // We include the medicine type in the description if it exists
+    $typeInfo = $item->medicine_type ? " ({$item->medicine_type})" : "";
+
     \App\Models\ActivityLog::create([
         'user_id'     => auth()->id(),
         'user_name'   => auth()->user()->name,
         'action'      => 'Inventory Update', 
-        'description' => "Added new item: " . $item->item_name . " (Qty: " . $item->quantity . ")", 
-   
+        'description' => "Added new item: " . $item->name . $typeInfo . " (Qty: " . $item->quantity . ")", 
         'ip_address'  => request()->ip(),
         'user_agent'  => request()->userAgent(),
     ]);
 
-     return redirect()->back()->with('success', 'New item added to inventory.');
-    }
+    return redirect()->back()->with('success', 'New item added to inventory.');
+}
 
     public function updateItem($id, Request $request)
 {

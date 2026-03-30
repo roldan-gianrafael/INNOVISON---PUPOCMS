@@ -13,7 +13,7 @@
         border: 1px solid #f0f0f0;
     }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th { text-align: left; padding: 12px 16px; border-bottom: 2px solid #f1f5f9; color: #64748b; text-transform: uppercase; font-size: 12px; }
+    th { text-align: left; padding: 12px 16px; border-bottom: 2px solid #f1f5f9; color: #000000; text-transform: uppercase; font-size: 12px; }
     td { padding: 16px; border-bottom: 1px solid #f8fafc; font-size: 14px; color: #334155; }
 
     /* Controls */

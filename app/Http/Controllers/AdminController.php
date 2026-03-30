@@ -743,23 +743,24 @@ public function updateClearance(Request $request, $id)
     // --- 2. INVENTORY ACTIONS ---
    public function storeItem(Request $request)
 {
-    // 1. Prepare data (Ensures medicine_type is null if not a medicine)
+    // 1. Prepare data and sanitize medicine-specific fields
     $data = $request->all();
     if ($request->category !== 'Medicine') {
         $data['medicine_type'] = null;
+        $data['expiration_date'] = null;
     }
 
     $item = Item::create($data);
 
     // 2. LOGS CODES
-    // We include the medicine type in the description if it exists
     $typeInfo = $item->medicine_type ? " ({$item->medicine_type})" : "";
+    $expInfo = $item->expiration_date ? " | Exp: " . $item->expiration_date->format('M d, Y') : "";
 
     \App\Models\ActivityLog::create([
         'user_id'     => auth()->id(),
         'user_name'   => auth()->user()->name,
         'action'      => 'Inventory Update', 
-        'description' => "Added new item: " . $item->name . $typeInfo . " (Qty: " . $item->quantity . ")", 
+        'description' => "Added new item: " . $item->name . $typeInfo . " (Qty: " . $item->quantity . ")" . $expInfo, 
         'ip_address'  => request()->ip(),
         'user_agent'  => request()->userAgent(),
     ]);
@@ -767,41 +768,48 @@ public function updateClearance(Request $request, $id)
     return redirect()->back()->with('success', 'New item added to inventory.');
 }
 
-    public function updateItem($id, Request $request)
+public function updateItem($id, Request $request)
 {
     $item = Item::find($id);
+    
     if ($item) {
-      
-        $oldName = $item->item_name; 
+        $oldName = $item->name; // Using 'name' as per your blade file
         
-        $item->update($request->all());
+        // 1. Prepare and sanitize data for update
+        $data = $request->all();
+        if ($request->category !== 'Medicine') {
+            $data['medicine_type'] = null;
+            $data['expiration_date'] = null;
+        }
 
-        // LOGS CODES
+        $item->update($data);
+
+        // 2. LOGS CODES
         \App\Models\ActivityLog::create([
             'user_id'     => auth()->id(),
             'user_name'   => auth()->user()->name,
             'action'      => 'Inventory Edited', 
-            'description' => "Updated Item: $oldName (ID: #$id). New Qty: " . $item->quantity,
+            'description' => "Updated Item: $oldName (ID: #$id). New Qty: " . $item->quantity . ($item->expiration_date ? " | New Exp: " . $item->expiration_date->format('M d, Y') : ""),
             'ip_address'  => request()->ip(),
             'user_agent'  => request()->userAgent(),
         ]);
 
         return redirect()->back()->with('success', 'Item updated successfully.');
     }
+    
     return redirect()->back()->with('error', 'Item not found.');
 }
 
-   public function deleteItem($id)
+public function deleteItem($id)
 {
-  
     $item = Item::find($id);
 
     if ($item) {
-        $itemName = $item->item_name; 
+        $itemName = $item->name; 
 
         $item->delete();
 
-        // 3. LOGS CODES
+        // LOGS CODES
         \App\Models\ActivityLog::create([
             'user_id'     => auth()->id(),
             'user_name'   => auth()->user()->name,
@@ -816,7 +824,6 @@ public function updateClearance(Request $request, $id)
 
     return redirect()->back()->with('error', 'Item not found.');
 }
-
     // --- 3. SETTINGS & PROFILE ---
     public function updateSettings(Request $request)
     {

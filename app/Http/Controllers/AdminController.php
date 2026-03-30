@@ -284,6 +284,15 @@ class AdminController extends Controller
                         ]);
                     }
 
+                    // --- START OF INTEGRATED SEARCH FIX ---
+                    // 1. Build the full URL with the search query first
+                    $queryParams = [
+                        'search' => $search,
+                        'query'  => $search,
+                        'q'      => $search,
+                    ];
+                    $fullUrlWithQuery = $endpoint . (str_contains($endpoint, '?') ? '&' : '?') . http_build_query($queryParams);
+
                     $client = Http::timeout((int) config('services.temp_api_testing.timeout', 20))
                         ->acceptJson();
 
@@ -302,15 +311,14 @@ class AdminController extends Controller
                         $client = $client->withHeaders([$apiHeader => $apiKey]);
                         $authMode = 'custom-header';
                     } elseif ($facultyEndpoint !== '' && $endpoint === $facultyEndpoint) {
-                        $client = $client->withHeaders($facultySyncService->generateHmacHeaders('GET', $endpoint));
+                        // FIX: Pass the full URL (including search) to the HMAC generator
+                        $client = $client->withHeaders($facultySyncService->generateHmacHeaders('GET', $fullUrlWithQuery));
                         $authMode = 'faculty-hmac';
                     }
 
-                    $response = $client->get($endpoint, [
-                        'search' => $search,
-                        'query' => $search,
-                        'q' => $search,
-                    ]);
+                    // FIX: Execute the request using the full URL
+                    $response = $client->get($fullUrlWithQuery);
+                    // --- END OF INTEGRATED SEARCH FIX ---
 
                     $payload = $response->json();
                     $results = $this->normalizeApiTestingResults($payload, $search);

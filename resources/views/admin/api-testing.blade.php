@@ -179,7 +179,8 @@
         gap: 12px;
     }
 
-    .admin-option-item {
+    .admin-option-item,
+    .faculty-option-item {
         width: 100%;
         text-align: left;
         border: 1px solid rgba(127, 29, 45, 0.16);
@@ -190,33 +191,38 @@
         transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     }
 
-    .admin-option-item:hover {
+    .admin-option-item:hover,
+    .faculty-option-item:hover {
         transform: translateY(-1px);
         border-color: rgba(127, 29, 45, 0.28);
         box-shadow: 0 12px 24px rgba(127, 29, 45, 0.08);
     }
 
-    .admin-option-name {
+    .admin-option-name,
+    .faculty-option-name {
         margin: 0;
         font-size: 18px;
         font-weight: 800;
         color: #7f1d2d;
     }
 
-    .admin-option-email {
+    .admin-option-email,
+    .faculty-option-email {
         margin-top: 4px;
         font-size: 13px;
         color: #6b7280;
     }
 
-    .admin-option-meta {
+    .admin-option-meta,
+    .faculty-option-meta {
         margin-top: 10px;
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
     }
 
-    .admin-option-chip {
+    .admin-option-chip,
+    .faculty-option-chip {
         display: inline-flex;
         align-items: center;
         padding: 6px 10px;
@@ -266,32 +272,79 @@
         background: rgba(255, 255, 255, 0.96);
     }
 
-    html[data-theme="dark"] .admin-option-item {
+    .faculty-autofill-panel {
+        margin-top: 20px;
+        border-radius: 20px;
+        padding: 20px;
+        background: rgba(127, 29, 45, 0.05);
+        border: 1px solid rgba(127, 29, 45, 0.12);
+    }
+
+    .faculty-autofill-panel h3 {
+        margin: 0 0 14px;
+        color: #7f1d2d;
+    }
+
+    .faculty-autofill-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .faculty-autofill-field label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+    }
+
+    .faculty-autofill-field input {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(127, 29, 45, 0.16);
+        padding: 12px 14px;
+        font-size: 14px;
+        color: #111827;
+        background: rgba(255, 255, 255, 0.96);
+    }
+
+    html[data-theme="dark"] .admin-option-item,
+    html[data-theme="dark"] .faculty-option-item {
         background: linear-gradient(180deg, rgba(59, 24, 33, 0.96), rgba(35, 17, 25, 0.98));
         border-color: rgba(255, 255, 255, 0.08);
     }
 
-    html[data-theme="dark"] .admin-option-name {
+    html[data-theme="dark"] .admin-option-name,
+    html[data-theme="dark"] .faculty-option-name {
         color: #f3d6da;
     }
 
     html[data-theme="dark"] .admin-option-email,
-    html[data-theme="dark"] .admin-autofill-field label {
+    html[data-theme="dark"] .faculty-option-email,
+    html[data-theme="dark"] .admin-autofill-field label,
+    html[data-theme="dark"] .faculty-autofill-field label {
         color: #cbd5e1;
     }
 
     html[data-theme="dark"] .admin-option-chip,
-    html[data-theme="dark"] .admin-autofill-panel {
+    html[data-theme="dark"] .faculty-option-chip,
+    html[data-theme="dark"] .admin-autofill-panel,
+    html[data-theme="dark"] .faculty-autofill-panel {
         background: rgba(255, 255, 255, 0.05);
         color: #f8fafc;
         border-color: rgba(255, 255, 255, 0.08);
     }
 
-    html[data-theme="dark"] .admin-autofill-panel h3 {
+    html[data-theme="dark"] .admin-autofill-panel h3,
+    html[data-theme="dark"] .faculty-autofill-panel h3 {
         color: #f3d6da;
     }
 
-    html[data-theme="dark"] .admin-autofill-field input {
+    html[data-theme="dark"] .admin-autofill-field input,
+    html[data-theme="dark"] .faculty-autofill-field input {
         background: rgba(18, 18, 18, 0.55);
         border-color: rgba(255, 255, 255, 0.08);
         color: #f8fafc;
@@ -313,6 +366,10 @@
         }
 
         .admin-autofill-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .faculty-autofill-grid {
             grid-template-columns: 1fr;
         }
     }

@@ -1639,14 +1639,25 @@
                     $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
                 @endphp
                 <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : '' }}">
-                    <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
-                    <div class="medicine-alert-item-meta">
-                        <span class="medicine-alert-chip">Stock: {{ $medicineAlert->quantity }} units</span>
-                        <span class="medicine-alert-chip">Exp: {{ optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A' }}</span>
-                        <span class="medicine-alert-chip">
-                            {{ $isExpired ? 'Expired' : ($daysLeft !== null ? $daysLeft . ' day(s) left' : 'Near expiry') }}
-                        </span>
+                    <div class="medicine-alert-content">
+                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
+                        <div class="medicine-alert-item-meta">
+                            <span class="medicine-alert-chip">Stock: {{ $medicineAlert->quantity }} units</span>
+                            <span class="medicine-alert-chip">Exp: {{ optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A' }}</span>
+                            <span class="medicine-alert-chip">
+                                {{ $isExpired ? 'Expired' : ($daysLeft !== null ? $daysLeft . ' day(s) left' : 'Near expiry') }}
+                            </span>
+                        </div>
                     </div>
+
+                    @if($isExpired)
+                        <button type="button" 
+                                class="medicine-remove-btn" 
+                                onclick="removeExpiredItem({{ $medicineAlert->id }}, this)" 
+                                title="Remove expired item">
+                            &times;
+                        </button>
+                    @endif
                 </article>
             @endforeach
         </div>

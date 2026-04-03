@@ -108,6 +108,182 @@
             stroke: none !important;
         }
 
+        .medicine-alert-fab {
+            position: fixed;
+            right: 96px;
+            bottom: 12px;
+            z-index: 499999;
+            width: 58px;
+            height: 58px;
+            border-radius: 999px;
+            border: 2px solid #5f0012;
+            background: linear-gradient(145deg, #8b0000, #5f0012);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 24px rgba(128, 0, 0, 0.24);
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .medicine-alert-fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(128, 0, 0, 0.3);
+        }
+
+        .medicine-alert-fab svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .medicine-alert-badge {
+            position: absolute;
+            top: -5px;
+            right: -3px;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: #ffb81c;
+            color: #4a1500;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff4d4;
+        }
+
+        .medicine-alert-panel {
+            position: fixed;
+            right: 96px;
+            bottom: 82px;
+            z-index: 499998;
+            width: min(360px, calc(100vw - 32px));
+            border-radius: 20px;
+            background: rgba(255, 248, 249, 0.98);
+            border: 1px solid rgba(128, 0, 0, 0.14);
+            box-shadow: 0 22px 48px rgba(15, 23, 42, 0.18);
+            padding: 18px;
+            display: none;
+        }
+
+        .medicine-alert-panel.is-open {
+            display: block;
+        }
+
+        .medicine-alert-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .medicine-alert-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #7f1d2d;
+        }
+
+        .medicine-alert-subtitle {
+            margin: 4px 0 0;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .medicine-alert-list {
+            display: grid;
+            gap: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .medicine-alert-item {
+            border-radius: 16px;
+            padding: 12px 14px;
+            background: rgba(127, 29, 45, 0.06);
+            border: 1px solid rgba(127, 29, 45, 0.08);
+        }
+
+        .medicine-alert-item.is-expired {
+            background: rgba(185, 28, 28, 0.08);
+            border-color: rgba(185, 28, 28, 0.14);
+        }
+
+        .medicine-alert-item-name {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .medicine-alert-item-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .medicine-alert-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid rgba(127, 29, 45, 0.12);
+            color: #334155;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .medicine-alert-empty {
+            margin: 0;
+            color: #475569;
+            font-size: 13px;
+        }
+
+        html[data-theme="dark"] .medicine-alert-panel {
+            background: rgba(35, 17, 25, 0.97);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-theme="dark"] .medicine-alert-title {
+            color: #f3d6da;
+        }
+
+        html[data-theme="dark"] .medicine-alert-subtitle,
+        html[data-theme="dark"] .medicine-alert-empty {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .medicine-alert-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-theme="dark"] .medicine-alert-item.is-expired {
+            background: rgba(185, 28, 28, 0.18);
+            border-color: rgba(252, 165, 165, 0.18);
+        }
+
+        html[data-theme="dark"] .medicine-alert-item-name {
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .medicine-alert-chip {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+        }
+
         :root {
             --bg: #2a0e16;
             --bg-grad-1: #5b1a2a;
@@ -687,6 +863,20 @@
 
             .header-title {
                 font-size: 18px;
+            }
+
+            .medicine-alert-fab {
+                right: 78px;
+                bottom: 12px;
+                width: 48px;
+                height: 48px;
+            }
+
+            .medicine-alert-panel {
+                right: 12px;
+                left: 12px;
+                bottom: 72px;
+                width: auto;
             }
         }
 
@@ -1298,6 +1488,14 @@
         'student_assistant' => 'Admin (Legacy)',
     ];
     $displayRole = $roleLabelMap[$currentRole] ?? ucfirst($currentRole ?: 'user');
+    $medicineAlerts = \App\Models\Item::query()
+        ->where('category', 'Medicine')
+        ->whereNotNull('expiration_date')
+        ->whereDate('expiration_date', '<=', now()->addDays(30)->toDateString())
+        ->orderBy('expiration_date')
+        ->limit(8)
+        ->get();
+    $medicineAlertCount = $medicineAlerts->count();
 @endphp
 
 <header class="admin-header">
@@ -1406,6 +1604,49 @@
     @csrf
 </form>
 
+<button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts" title="Medicine expiry alerts">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M10 2h4"></path>
+        <path d="M9 2h6v3a2 2 0 0 1-.6 1.4l-1.2 1.2a6.5 6.5 0 1 1-2.4 0L9.6 6.4A2 2 0 0 1 9 5V2Z"></path>
+        <path d="M9 14h6"></path>
+    </svg>
+    @if($medicineAlertCount > 0)
+        <span class="medicine-alert-badge">{{ $medicineAlertCount }}</span>
+    @endif
+</button>
+
+<section class="medicine-alert-panel" id="medicineAlertPanel" aria-live="polite">
+    <div class="medicine-alert-head">
+        <div>
+            <p class="medicine-alert-title">Medicine Alerts</p>
+            <p class="medicine-alert-subtitle">Near-expiry medicines and current stock levels.</p>
+        </div>
+    </div>
+
+    @if($medicineAlertCount > 0)
+        <div class="medicine-alert-list">
+            @foreach($medicineAlerts as $medicineAlert)
+                @php
+                    $isExpired = optional($medicineAlert->expiration_date)->isPast();
+                    $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
+                @endphp
+                <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : '' }}">
+                    <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
+                    <div class="medicine-alert-item-meta">
+                        <span class="medicine-alert-chip">Stock: {{ $medicineAlert->quantity }} units</span>
+                        <span class="medicine-alert-chip">Exp: {{ optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A' }}</span>
+                        <span class="medicine-alert-chip">
+                            {{ $isExpired ? 'Expired' : ($daysLeft !== null ? $daysLeft . ' day(s) left' : 'Near expiry') }}
+                        </span>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+    @else
+        <p class="medicine-alert-empty">No medicines are near expiry within the next 30 days.</p>
+    @endif
+</section>
+
 <section id="assistantPanel" class="assistant-panel" aria-live="polite">
     <div class="assistant-head">
         <div>
@@ -1479,6 +1720,30 @@
                 localStorage.setItem(storageKey, nextTheme);
             } catch (error) {
                 console.warn('Theme preference was not saved.', error);
+            }
+        });
+    }
+
+    function initMedicineAlerts() {
+        const toggle = document.getElementById('medicineAlertToggle');
+        const panel = document.getElementById('medicineAlertPanel');
+
+        if (!toggle || !panel) {
+            return;
+        }
+
+        toggle.addEventListener('click', function (event) {
+            event.stopPropagation();
+            panel.classList.toggle('is-open');
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!panel.classList.contains('is-open')) {
+                return;
+            }
+
+            if (!panel.contains(event.target) && !toggle.contains(event.target)) {
+                panel.classList.remove('is-open');
             }
         });
     }
@@ -1859,6 +2124,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
         initThemeToggle();
+        initMedicineAlerts();
         initAccessibilityLaunch();
     });
 </script>

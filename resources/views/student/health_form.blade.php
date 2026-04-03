@@ -77,6 +77,14 @@
                     <label class="form-label">School Year</label>
                     <input type="text" name="school_year" class="form-control" value="2025-2026">
                 </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Height</label>
+                    <input type="text" name="height" class="form-control" value="cm">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Weight</label>
+                    <input type="text" name="weight" class="form-control" value="kg">
+                </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">

@@ -12,6 +12,9 @@ class FacultySyncService
     {
         $secretKey = (string) config('services.pupt_flss.secret_key');
         $timestamp = (string) now()->timestamp;
+        $normalizedUrl = trim($url);
+        $normalizedBody = (string) $body;
+        $normalizedNonce = (string) $nonce;
 
         if ($secretKey === '') {
             throw new RuntimeException('PUPT-FLSS HMAC credentials are not configured.');
@@ -20,22 +23,27 @@ class FacultySyncService
         $normalizedMethod = strtoupper(trim($method));
         $message = implode('|', [
             $normalizedMethod,
-            $url,
-            $body,
+            $normalizedUrl,
+            $normalizedBody,
             $timestamp,
-            $nonce,
+            $normalizedNonce,
         ]);
         $signature = hash_hmac('sha256', $message, $secretKey);
 
-        return [
+        $headers = [
             // FLSS expects a hex-encoded HMAC SHA-256 signature.
             'X-HMAC-Signature' => $signature,
             'X-HMAC-Timestamp' => $timestamp,
-            'X-HMAC-Nonce' => $nonce,
         ];
+
+        if ($normalizedNonce !== '') {
+            $headers['X-HMAC-Nonce'] = $normalizedNonce;
+        }
+
+        return $headers;
     }
 
-    public function fetchFaculties(): array
+    public function fetchFaculties(?string $search = null): array
     {
         $baseUrl = trim((string) config('services.pupt_flss.faculty_profiles_url'));
 
@@ -43,11 +51,21 @@ class FacultySyncService
             throw new RuntimeException('PUPT-FLSS faculty profiles URL is not configured.');
         }
 
+        $queryParams = [];
+        $search = trim((string) $search);
+        if ($search !== '') {
+            $queryParams['search'] = $search;
+        }
+
+        $requestUrl = $queryParams === []
+            ? $baseUrl
+            : $baseUrl . (str_contains($baseUrl, '?') ? '&' : '?') . http_build_query($queryParams);
+
         $timeout = (int) config('services.pupt_flss.timeout', 30);
         $response = Http::acceptJson()
             ->timeout($timeout)
-            ->withHeaders($this->generateHmacHeaders('GET', $baseUrl))
-            ->get($baseUrl);
+            ->withHeaders($this->generateHmacHeaders('GET', $requestUrl))
+            ->get($requestUrl);
 
         if (!$response->successful()) {
             throw new RequestException($response);

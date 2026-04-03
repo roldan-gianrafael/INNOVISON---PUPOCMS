@@ -474,18 +474,14 @@
                 </div>
             </div>
 
-        @elseif(($source ?? '') === 'faculty')
+       @elseif(($source ?? '') === 'faculty')
     <div class="admin-option-list">
-        {{-- Mapapansin sa JSON mo na ang data ay nasa $results['fields']['faculties'] --}}
-        @php
-            $facultyList = $results['fields']['faculties'] ?? [];
-        @endphp
-
-        @foreach($facultyList as $faculty)
+        {{-- Isang linya lang para ituro sa tamang array --}}
+        @foreach($results['fields']['faculties'] ?? [] as $faculty)
             <button
                 type="button"
                 class="faculty-option-item"
-                {{-- Mapping base sa actual JSON keys --}}
+                {{-- Dito natin kinuha yung data mula sa loob ng faculty object --}}
                 data-first-name="{{ $faculty['first_name'] ?? '' }}"
                 data-last-name="{{ $faculty['last_name'] ?? '' }}"
                 data-suffix-name="{{ $faculty['suffix_name'] ?? '' }}"
@@ -494,21 +490,11 @@
                 data-office="{{ $faculty['department'] ?? 'N/A' }}"
                 data-identifier="{{ $faculty['faculty_code'] ?? '' }}"
             >
-                <p class="faculty-option-name">
-                    {{ ($faculty['first_name'] ?? '') . ' ' . ($faculty['last_name'] ?? '') }}
-                </p>
-                <div class="faculty-option-email">{{ $faculty['email'] ?? 'No Email' }}</div>
+                <p class="faculty-option-name">{{ ($faculty['first_name'] ?? '') . ' ' . ($faculty['last_name'] ?? '') }}</p>
+                <div class="faculty-option-email">{{ $faculty['email'] ?? 'N/A' }}</div>
                 <div class="faculty-option-meta">
                     <span class="faculty-option-chip">ID: {{ $faculty['faculty_code'] ?? 'N/A' }}</span>
-                    <span class="faculty-option-chip">Type: {{ $faculty['faculty_type'] ?? 'N/A' }}</span>
-                    <span class="faculty-option-chip">Status: {{ $faculty['status'] ?? 'N/A' }}</span>
                 </div>
-
-                {{-- Raw Response per item --}}
-                <details class="api-raw-toggle" style="margin-top: 10px;">
-                    <summary onclick="event.stopPropagation()">Show raw response</summary>
-                    <div class="api-json">{{ json_encode($faculty, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
-                </details>
             </button>
         @endforeach
     </div>

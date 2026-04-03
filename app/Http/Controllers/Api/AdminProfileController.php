@@ -54,6 +54,38 @@ class AdminProfileController extends Controller
         return $this->successResponse($admins, 'Admin profiles retrieved successfully.');
     }
 
+    public function options(Request $request): JsonResponse
+    {
+        if (!Schema::hasTable('admins')) {
+            return $this->errorResponse('Admins table was not found.', 404);
+        }
+
+        $query = Admin::query();
+        $search = trim((string) $request->query('search', ''));
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                foreach (['admin_id', 'first_name', 'last_name', 'suffix_name', 'email', 'email_address'] as $column) {
+                    if (!Admin::hasColumn($column)) {
+                        continue;
+                    }
+
+                    $builder->orWhere($column, 'like', '%' . $search . '%');
+                }
+            });
+        }
+
+        $limit = max(1, min((int) $request->query('limit', 100), 250));
+        $admins = $query->orderBy($this->defaultOrderColumn())
+            ->limit($limit)
+            ->get()
+            ->map(fn (Admin $admin) => $this->transformAdminOption($admin))
+            ->values()
+            ->all();
+
+        return $this->successResponse($admins, 'Administrator options retrieved successfully.');
+    }
+
     public function lookup(Request $request): JsonResponse
     {
         if (!Schema::hasTable('admins')) {
@@ -207,6 +239,18 @@ class AdminProfileController extends Controller
         }
 
         return $data;
+    }
+
+    private function transformAdminOption(Admin $admin): array
+    {
+        return [
+            'id' => $this->pickFirstAvailableValue($admin, ['admin_id', 'id']),
+            'first_name' => $this->pickFirstAvailableValue($admin, ['first_name']) ?? '',
+            'last_name' => $this->pickFirstAvailableValue($admin, ['last_name']) ?? '',
+            'suffix_name' => $this->pickFirstAvailableValue($admin, ['suffix_name']),
+            'email' => $this->pickFirstAvailableValue($admin, ['email', 'email_address']) ?? '',
+            'status' => $this->pickFirstAvailableValue($admin, ['status', 'is_active']) ?? 'N/A',
+        ];
     }
 
     private function responseFieldMap(): array

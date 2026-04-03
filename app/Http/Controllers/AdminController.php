@@ -244,10 +244,13 @@ class AdminController extends Controller
         if ($search !== '') {
             $facultyEndpoint = trim((string) config('services.pupt_flss.faculty_profiles_url', ''));
             $internalAdminEndpoint = url('/api/external/admins');
+            $internalAdminOptionsEndpoint = url('/api/external/admins/options');
             $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
 
             if ($source === 'admin_api') {
                 $endpoint = $internalAdminEndpoint;
+            } elseif ($source === 'admin_options') {
+                $endpoint = $internalAdminOptionsEndpoint;
             } elseif ($source === 'custom' && $configuredTempEndpoint !== '') {
                 $endpoint = $configuredTempEndpoint;
             } else {
@@ -265,6 +268,31 @@ class AdminController extends Controller
                             'status' => 200,
                             'ok' => true,
                             'endpoint' => $internalAdminEndpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'internal-query',
+                            'source' => $source,
+                        ];
+
+                        if (empty($results)) {
+                            $errorMessage = 'No matching records were found for the current search.';
+                        }
+
+                        return view('admin.api-testing', [
+                            'search' => $search,
+                            'source' => $source,
+                            'results' => $results,
+                            'apiResponseMeta' => $apiResponseMeta,
+                            'errorMessage' => $errorMessage,
+                            'errorDetails' => $errorDetails,
+                        ]);
+                    }
+
+                    if ($source === 'admin_options') {
+                        $results = $this->searchLocalAdminOptionsForApiTesting($search);
+                        $apiResponseMeta = [
+                            'status' => 200,
+                            'ok' => true,
+                            'endpoint' => $internalAdminOptionsEndpoint,
                             'result_count' => count($results),
                             'auth_mode' => 'internal-query',
                             'source' => $source,
@@ -414,6 +442,82 @@ class AdminController extends Controller
         })->values()->all();
 
         return $records;
+    }
+
+    private function searchLocalAdminOptionsForApiTesting(string $search): array
+    {
+        if (!Schema::hasTable('admins')) {
+            return [];
+        }
+
+        $query = Admin::query();
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                foreach (['admin_id', 'first_name', 'last_name', 'suffix_name', 'email', 'email_address'] as $column) {
+                    if (!Admin::hasColumn($column)) {
+                        continue;
+                    }
+
+                    $builder->orWhere($column, 'like', '%' . $search . '%');
+                }
+            });
+        }
+
+        return $query->orderBy($this->resolveAdminApiTestingOrderColumn())
+            ->limit(50)
+            ->get()
+            ->map(function (Admin $admin) {
+                $fields = $admin->toArray();
+                $firstName = (string) ($fields['first_name'] ?? 'N/A');
+                $lastName = (string) ($fields['last_name'] ?? 'N/A');
+                $suffixName = $fields['suffix_name'] ?? null;
+
+                return [
+                    'identifier' => (string) ($fields['admin_id'] ?? 'N/A'),
+                    'admin_id' => (string) ($fields['admin_id'] ?? 'N/A'),
+                    'name' => trim(implode(' ', array_filter([$firstName, $lastName, $suffixName]))) ?: 'N/A',
+                    'first_name' => $firstName,
+                    'middle_name' => 'N/A',
+                    'last_name' => $lastName,
+                    'suffix_name' => $suffixName ?: 'N/A',
+                    'email' => (string) ($fields['email'] ?? $fields['email_address'] ?? 'N/A'),
+                    'birthday' => 'N/A',
+                    'age' => 'N/A',
+                    'gender' => 'N/A',
+                    'civil_status' => 'N/A',
+                    'role' => 'N/A',
+                    'access_level' => 'N/A',
+                    'office' => 'N/A',
+                    'contact_number' => 'N/A',
+                    'address' => 'N/A',
+                    'status' => $this->resolveLocalAdminApiTestingStatus($fields),
+                    'emergency_contact_person' => 'N/A',
+                    'emergency_contact_no' => 'N/A',
+                    'last_updated' => (string) ($fields['updated_at'] ?? 'N/A'),
+                    'fields' => [
+                        'id' => (string) ($fields['admin_id'] ?? 'N/A'),
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'suffix_name' => $suffixName,
+                        'email' => (string) ($fields['email'] ?? $fields['email_address'] ?? 'N/A'),
+                        'status' => $this->resolveLocalAdminApiTestingStatus($fields),
+                    ],
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function resolveAdminApiTestingOrderColumn(): string
+    {
+        foreach (['first_name', 'name', 'admin_id'] as $candidateColumn) {
+            if (Admin::hasColumn($candidateColumn)) {
+                return $candidateColumn;
+            }
+        }
+
+        return 'admin_id';
     }
 
     private function resolveLocalAdminApiTestingStatus(array $fields): string

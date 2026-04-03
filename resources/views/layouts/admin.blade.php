@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - PUPT Admin</title>
     <script
-        src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
+        src="{{ asset('js/sienna-accessibility-custom.umd.js') }}?v={{ filemtime(public_path('js/sienna-accessibility-custom.umd.js')) }}"
         data-asw-position="bottom-right"
         data-asw-offset="24,12"
         defer

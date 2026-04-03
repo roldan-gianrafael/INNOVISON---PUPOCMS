@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title') - PUP Taguig Clinic</title>
     <script
-        src="{{ asset('js/sienna-accessibility-custom.umd.js') }}"
+        src="{{ asset('js/sienna-accessibility-custom.umd.js') }}?v={{ filemtime(public_path('js/sienna-accessibility-custom.umd.js')) }}"
         data-asw-position="bottom-right"
         data-asw-offset="24,12"
         data-asw-size="small"

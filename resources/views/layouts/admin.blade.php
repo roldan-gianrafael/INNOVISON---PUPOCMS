@@ -1502,23 +1502,6 @@
     font-size: 1rem;
 }
 
-/* The Remove Button */
-.medicine-remove-btn {
-    background: #dc3545; /* Red warning */
-    color: white;
-    border: none;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: background 0.2s;
-    white-space: nowrap; /* Prevents text from wrapping */
-}
-
-.medicine-remove-btn:hover {
-    background: #a71d2a;
-}
-
 /* Red indicator for expired items */
 .is-expired {
     border-right: 4px solid #dc3545; /* Visual cue on the right edge */
@@ -1532,16 +1515,24 @@
 }
 
 .medicine-see-more-link {
+    background: none;
+    border: none;
+    padding: 0;
     color: #800000; /* PUP Maroon */
     font-size: 0.85rem;
     font-weight: bold;
     text-decoration: none;
     transition: color 0.2s, text-decoration 0.2s;
+    cursor: pointer;
 }
 
 .medicine-see-more-link:hover {
     color: #a71d2a;
     text-decoration: underline;
+}
+
+.medicine-alert-item.is-hidden {
+    display: none;
 }
 
 /* Ensure the list has a max height if there are many items */
@@ -1584,8 +1575,10 @@
         ->orderBy('expiration_date');
     $medicineAlertCount = (clone $medicineAlertsQuery)->count();
     $medicineAlerts = $medicineAlertsQuery
-        ->limit(2)
+        ->limit(8)
         ->get();
+    $medicineAlertPreview = $medicineAlerts->take(2);
+    $medicineAlertOverflow = $medicineAlerts->slice(2)->values();
 @endphp
 
 <header class="admin-header">
@@ -1716,8 +1709,8 @@
             </div>
         </div>
 
-        <div class="medicine-alert-list">
-            @foreach($medicineAlerts as $medicineAlert)
+        <div class="medicine-alert-list" id="medicineAlertList">
+            @foreach($medicineAlertPreview as $medicineAlert)
                 @php
                     $isExpired = optional($medicineAlert->expiration_date)->isPast();
                     $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
@@ -1730,14 +1723,6 @@
                             class="medicine-alert-item-name"
                             style="text-decoration: none;"
                         >{{ $medicineAlert->name }}</a>
-                        @if($isExpired)
-                            <button type="button" 
-                                    class="medicine-remove-btn" 
-                                    onclick="removeExpiredItem({{ $medicineAlert->id }}, this)" 
-                                    title="Remove expired item">
-                                &times; Remove
-                            </button>
-                        @endif
                     </div>
                     
                     <div class="medicine-alert-item-meta">
@@ -1753,12 +1738,37 @@
             
 
             @endforeach
+            @foreach($medicineAlertOverflow as $medicineAlert)
+                @php
+                    $isExpired = optional($medicineAlert->expiration_date)->isPast();
+                    $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
+                @endphp
+            <article class="medicine-alert-item is-hidden {{ $isExpired ? 'is-expired' : '' }}" data-medicine-alert-extra="true">
+                <div class="medicine-alert-content" style="width: 100%;">
+                    <div class="medicine-alert-name-row">
+                        <a
+                            href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
+                            class="medicine-alert-item-name"
+                            style="text-decoration: none;"
+                        >{{ $medicineAlert->name }}</a>
+                    </div>
+
+                    <div class="medicine-alert-item-meta">
+                        <span class="medicine-alert-chip">Stock: {{ $medicineAlert->quantity }} units</span>
+                        <span class="medicine-alert-chip">Exp: {{ optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A' }}</span>
+                        <span class="medicine-alert-chip">
+                            {{ $isExpired ? 'Expired' : ($daysLeft !== null ? $daysLeft . ' day(s) left' : 'Near expiry') }}
+                        </span>
+                    </div>
+                </div>
+            </article>
+            @endforeach
         </div>
         @if($medicineAlertCount > 2)
         <div class="medicine-alert-more-wrapper">
-            <a href="{{ $inventoryUrl }}" class="medicine-see-more-link">
+            <button type="button" class="medicine-see-more-link" id="medicineAlertMoreBtn">
                 Show more ({{ $medicineAlertCount - 2 }})
-            </a>
+            </button>
         </div>
     @endif
     </section>
@@ -1847,6 +1857,8 @@
     function initMedicineAlerts() {
         const toggle = document.getElementById('medicineAlertToggle');
         const panel = document.getElementById('medicineAlertPanel');
+        const moreButton = document.getElementById('medicineAlertMoreBtn');
+        const hiddenItems = Array.from(document.querySelectorAll('[data-medicine-alert-extra="true"]'));
 
         if (!toggle || !panel) {
             return;
@@ -1856,37 +1868,39 @@
             const rect = toggle.getBoundingClientRect();
             const sampleX = Math.max(1, Math.floor(rect.left + rect.width / 2));
             const sampleY = Math.max(1, Math.floor(rect.top + rect.height / 2));
-            const previousVisibility = toggle.style.visibility;
-            const previousPointerEvents = toggle.style.pointerEvents;
+            const sampledElements = document.elementsFromPoint(sampleX, sampleY);
 
-            toggle.style.visibility = 'hidden';
-            toggle.style.pointerEvents = 'none';
-
-            let sampledElement = document.elementFromPoint(sampleX, sampleY);
-
-            toggle.style.visibility = previousVisibility;
-            toggle.style.pointerEvents = previousPointerEvents;
-
-            const resolveBackgroundColor = function (element) {
-                let current = element;
-
-                while (current && current !== document.documentElement) {
-                    const bg = window.getComputedStyle(current).backgroundColor;
-                    if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-                        return bg;
+            const resolveBackgroundColor = function (elements) {
+                for (const element of elements) {
+                    if (!element || element === toggle || element === panel || toggle.contains(element) || panel.contains(element)) {
+                        continue;
                     }
-                    current = current.parentElement;
+
+                    let current = element;
+                    while (current && current !== document.documentElement) {
+                        if (current === toggle || current === panel || toggle.contains(current) || panel.contains(current)) {
+                            break;
+                        }
+
+                        const computed = window.getComputedStyle(current);
+                        const bg = computed.backgroundColor;
+                        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+                            return bg;
+                        }
+                        current = current.parentElement;
+                    }
                 }
 
-                return window.getComputedStyle(document.body).backgroundColor || 'rgb(255, 255, 255)';
+                const theme = document.documentElement.getAttribute('data-theme');
+                return theme === 'dark' ? 'rgb(42, 14, 22)' : 'rgb(255, 255, 255)';
             };
 
-            const color = resolveBackgroundColor(sampledElement);
+            const color = resolveBackgroundColor(sampledElements);
             const matches = color.match(/\d+/g) || [];
             const [r, g, b] = matches.slice(0, 3).map(Number);
             const luminance = (0.2126 * (r || 255)) + (0.7152 * (g || 255)) + (0.0722 * (b || 255));
 
-            if (luminance < 110) {
+            if (luminance < 135) {
                 toggle.setAttribute('data-surface-tone', 'dark');
             } else {
                 toggle.removeAttribute('data-surface-tone');
@@ -1907,6 +1921,15 @@
                 panel.classList.remove('is-open');
             }
         });
+
+        if (moreButton && hiddenItems.length > 0) {
+            moreButton.addEventListener('click', function () {
+                hiddenItems.forEach(function (item) {
+                    item.classList.remove('is-hidden');
+                });
+                moreButton.closest('.medicine-alert-more-wrapper')?.remove();
+            });
+        }
 
         updateMedicineAlertTone();
         window.addEventListener('scroll', updateMedicineAlertTone, { passive: true });

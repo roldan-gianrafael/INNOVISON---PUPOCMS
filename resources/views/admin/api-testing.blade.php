@@ -174,6 +174,129 @@
         line-height: 1.5;
     }
 
+    .admin-option-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .admin-option-item {
+        width: 100%;
+        text-align: left;
+        border: 1px solid rgba(127, 29, 45, 0.16);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 244, 246, 0.98));
+        border-radius: 18px;
+        padding: 16px 18px;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .admin-option-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(127, 29, 45, 0.28);
+        box-shadow: 0 12px 24px rgba(127, 29, 45, 0.08);
+    }
+
+    .admin-option-name {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 800;
+        color: #7f1d2d;
+    }
+
+    .admin-option-email {
+        margin-top: 4px;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .admin-option-meta {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .admin-option-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(127, 29, 45, 0.08);
+        color: #7f1d2d;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .admin-autofill-panel {
+        margin-top: 20px;
+        border-radius: 20px;
+        padding: 20px;
+        background: rgba(127, 29, 45, 0.05);
+        border: 1px solid rgba(127, 29, 45, 0.12);
+    }
+
+    .admin-autofill-panel h3 {
+        margin: 0 0 14px;
+        color: #7f1d2d;
+    }
+
+    .admin-autofill-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .admin-autofill-field label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+    }
+
+    .admin-autofill-field input {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(127, 29, 45, 0.16);
+        padding: 12px 14px;
+        font-size: 14px;
+        color: #111827;
+        background: rgba(255, 255, 255, 0.96);
+    }
+
+    html[data-theme="dark"] .admin-option-item {
+        background: linear-gradient(180deg, rgba(59, 24, 33, 0.96), rgba(35, 17, 25, 0.98));
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="dark"] .admin-option-name {
+        color: #f3d6da;
+    }
+
+    html[data-theme="dark"] .admin-option-email,
+    html[data-theme="dark"] .admin-autofill-field label {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .admin-option-chip,
+    html[data-theme="dark"] .admin-autofill-panel {
+        background: rgba(255, 255, 255, 0.05);
+        color: #f8fafc;
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="dark"] .admin-autofill-panel h3 {
+        color: #f3d6da;
+    }
+
+    html[data-theme="dark"] .admin-autofill-field input {
+        background: rgba(18, 18, 18, 0.55);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #f8fafc;
+    }
+
     @media (max-width: 900px) {
         .api-result-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -186,6 +309,10 @@
         }
 
         .api-result-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-autofill-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -248,96 +375,145 @@
 
     <section class="api-testing-card">
         @if(!empty($results))
-            <div class="api-results">
-                @foreach($results as $result)
-                    <article class="api-result-card">
-                        <h3 style="margin: 0; color: #7f1d2d;">{{ $result['name'] }}</h3>
-                        <div class="api-result-grid">
-                            <div class="api-field">
-                                <small>ID</small>
-                                <strong>{{ $result['admin_id'] ?? $result['identifier'] }}</strong>
+            @if(($source ?? '') === 'admin_options')
+                <div class="admin-option-list">
+                    @foreach($results as $result)
+                        <button
+                            type="button"
+                            class="admin-option-item"
+                            data-first-name="{{ $result['first_name'] ?? '' }}"
+                            data-last-name="{{ $result['last_name'] ?? '' }}"
+                            data-suffix-name="{{ $result['suffix_name'] === 'N/A' ? '' : ($result['suffix_name'] ?? '') }}"
+                            data-email="{{ $result['email'] ?? '' }}"
+                            data-status="{{ $result['status'] ?? '' }}"
+                        >
+                            <p class="admin-option-name">{{ $result['name'] }}</p>
+                            <div class="admin-option-email">{{ $result['email'] }}</div>
+                            <div class="admin-option-meta">
+                                <span class="admin-option-chip">ID: {{ $result['admin_id'] ?? $result['identifier'] }}</span>
+                                <span class="admin-option-chip">Status: {{ $result['status'] }}</span>
                             </div>
-                            <div class="api-field">
-                                <small>First Name</small>
-                                <strong>{{ $result['first_name'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Middle Name</small>
-                                <strong>{{ $result['middle_name'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Last Name</small>
-                                <strong>{{ $result['last_name'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Suffix Name</small>
-                                <strong>{{ $result['suffix_name'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Email</small>
-                                <strong>{{ $result['email'] }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Birthday</small>
-                                <strong>{{ $result['birthday'] }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Age</small>
-                                <strong>{{ $result['age'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Gender</small>
-                                <strong>{{ $result['gender'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Civil Status</small>
-                                <strong>{{ $result['civil_status'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Name</small>
-                                <strong>{{ $result['name'] }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Access Level</small>
-                                <strong>{{ $result['access_level'] ?? $result['role'] }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Office</small>
-                                <strong>{{ $result['office'] }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Contact Number</small>
-                                <strong>{{ $result['contact_number'] }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Status</small>
-                                <strong>{{ $result['status'] }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Emergency Contact Person</small>
-                                <strong>{{ $result['emergency_contact_person'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Emergency Contact No</small>
-                                <strong>{{ $result['emergency_contact_no'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field">
-                                <small>Last Updated</small>
-                                <strong>{{ $result['last_updated'] ?? 'N/A' }}</strong>
-                            </div>
-                            <div class="api-field" style="grid-column: 1 / -1;">
-                                <small>Address</small>
-                                <strong>{{ $result['address'] }}</strong>
-                            </div>
-                        </div>
+                        </button>
+                    @endforeach
+                </div>
 
-                        <details class="api-raw-toggle">
-                            <summary>Show raw response</summary>
-                            <div class="api-json">{{ json_encode($result['fields'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
-                        </details>
-                    </article>
-                @endforeach
-            </div>
+                <div class="admin-autofill-panel">
+                    <h3>Selected Admin</h3>
+                    <div class="admin-autofill-grid">
+                        <div class="admin-autofill-field">
+                            <label for="selectedFirstName">First Name</label>
+                            <input type="text" id="selectedFirstName" readonly>
+                        </div>
+                        <div class="admin-autofill-field">
+                            <label for="selectedLastName">Last Name</label>
+                            <input type="text" id="selectedLastName" readonly>
+                        </div>
+                        <div class="admin-autofill-field">
+                            <label for="selectedSuffixName">Suffix Name</label>
+                            <input type="text" id="selectedSuffixName" readonly>
+                        </div>
+                        <div class="admin-autofill-field">
+                            <label for="selectedEmail">Email</label>
+                            <input type="text" id="selectedEmail" readonly>
+                        </div>
+                        <div class="admin-autofill-field">
+                            <label for="selectedStatus">Status</label>
+                            <input type="text" id="selectedStatus" readonly>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="api-results">
+                    @foreach($results as $result)
+                        <article class="api-result-card">
+                            <h3 style="margin: 0; color: #7f1d2d;">{{ $result['name'] }}</h3>
+                            <div class="api-result-grid">
+                                <div class="api-field">
+                                    <small>ID</small>
+                                    <strong>{{ $result['admin_id'] ?? $result['identifier'] }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>First Name</small>
+                                    <strong>{{ $result['first_name'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Middle Name</small>
+                                    <strong>{{ $result['middle_name'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Last Name</small>
+                                    <strong>{{ $result['last_name'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Suffix Name</small>
+                                    <strong>{{ $result['suffix_name'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Email</small>
+                                    <strong>{{ $result['email'] }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Birthday</small>
+                                    <strong>{{ $result['birthday'] }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Age</small>
+                                    <strong>{{ $result['age'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Gender</small>
+                                    <strong>{{ $result['gender'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Civil Status</small>
+                                    <strong>{{ $result['civil_status'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Name</small>
+                                    <strong>{{ $result['name'] }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Access Level</small>
+                                    <strong>{{ $result['access_level'] ?? $result['role'] }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Office</small>
+                                    <strong>{{ $result['office'] }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Contact Number</small>
+                                    <strong>{{ $result['contact_number'] }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Status</small>
+                                    <strong>{{ $result['status'] }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Emergency Contact Person</small>
+                                    <strong>{{ $result['emergency_contact_person'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Emergency Contact No</small>
+                                    <strong>{{ $result['emergency_contact_no'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field">
+                                    <small>Last Updated</small>
+                                    <strong>{{ $result['last_updated'] ?? 'N/A' }}</strong>
+                                </div>
+                                <div class="api-field" style="grid-column: 1 / -1;">
+                                    <small>Address</small>
+                                    <strong>{{ $result['address'] }}</strong>
+                                </div>
+                            </div>
+
+                            <details class="api-raw-toggle">
+                                <summary>Show raw response</summary>
+                                <div class="api-json">{{ json_encode($result['fields'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                            </details>
+                        </article>
+                    @endforeach
+                </div>
+            @endif
         @else
             <p class="api-empty">Search results will appear here once you choose a source and enter a name, email, or ID.</p>
         @endif
@@ -368,6 +544,26 @@
 
             hasAutoSubmitted = true;
             form.requestSubmit();
+        });
+
+        document.querySelectorAll('.admin-option-item').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const firstName = document.getElementById('selectedFirstName');
+                const lastName = document.getElementById('selectedLastName');
+                const suffixName = document.getElementById('selectedSuffixName');
+                const email = document.getElementById('selectedEmail');
+                const status = document.getElementById('selectedStatus');
+
+                if (!firstName || !lastName || !suffixName || !email || !status) {
+                    return;
+                }
+
+                firstName.value = button.dataset.firstName || '';
+                lastName.value = button.dataset.lastName || '';
+                suffixName.value = button.dataset.suffixName || '';
+                email.value = button.dataset.email || '';
+                status.value = button.dataset.status || '';
+            });
         });
     });
 </script>

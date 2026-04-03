@@ -315,7 +315,7 @@ class AdminController extends Controller
                     }
 
                     if ($source === 'faculty') {
-                        $faculties = $facultySyncService->fetchFaculties();
+                        $faculties = $facultySyncService->fetchFaculties($search);
                         $payload = ['faculties' => $faculties];
                         $results = $this->normalizeApiTestingResults($payload, $search);
                         $apiResponseMeta = [

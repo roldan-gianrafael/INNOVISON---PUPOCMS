@@ -393,6 +393,17 @@
                 </select>
             </div>
             <div>
+                <label for="system">External System</label>
+                <select id="system" name="system">
+                    <option value="">Choose system</option>
+                    @foreach(($availableSystems ?? []) as $systemOption)
+                        <option value="{{ $systemOption }}" {{ ($selectedSystem ?? '') === $systemOption ? 'selected' : '' }}>
+                            {{ strtoupper(str_replace('_', ' ', $systemOption)) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
                 <label for="search">Search by name, email, or ID</label>
                 <input
                     type="text"
@@ -416,7 +427,20 @@
                 @if(!empty($apiResponseMeta['source']))
                 | Source: <strong>{{ $apiResponseMeta['source'] }}</strong>
                 @endif
+                @if(!empty($apiResponseMeta['system']))
+                | System: <strong>{{ $apiResponseMeta['system'] }}</strong>
+                @endif
             </p>
+            @if(!empty($apiResponseMeta['header_name']) || !empty($apiResponseMeta['system_header_name']) || !empty($apiResponseMeta['api_key_preview']))
+                <p class="api-testing-meta" style="margin-top: 8px;">
+                    @if(!empty($apiResponseMeta['system_header_name']))
+                    {{ $apiResponseMeta['system_header_name'] }}: <strong>{{ $apiResponseMeta['system'] ?? 'N/A' }}</strong>
+                    @endif
+                    @if(!empty($apiResponseMeta['header_name']))
+                    | {{ $apiResponseMeta['header_name'] }}: <strong>{{ $apiResponseMeta['api_key_preview'] ?? 'configured' }}</strong>
+                    @endif
+                </p>
+            @endif
         @endif
 
         @if($errorMessage)
@@ -554,8 +578,9 @@
         const form = document.getElementById('apiTestingForm');
         const sourceField = document.getElementById('source');
         const searchField = document.getElementById('search');
+        const systemField = document.getElementById('system');
 
-        if (!form || !sourceField || !searchField) return;
+        if (!form || !sourceField || !searchField || !systemField) return;
 
         let hasAutoSubmitted = false;
 
@@ -569,6 +594,17 @@
             hasAutoSubmitted = true;
             form.requestSubmit();
         });
+
+        sourceField.addEventListener('change', function () {
+            const needsSystem = ['admin_api', 'admin_options'].includes(sourceField.value);
+            systemField.disabled = !needsSystem;
+
+            if (!needsSystem) {
+                systemField.value = '';
+            }
+        });
+
+        systemField.disabled = !['admin_api', 'admin_options'].includes(sourceField.value);
 
         // Handler para sa Admin Options & Admin API (Unified)
         const handleAdminSelection = (button) => {

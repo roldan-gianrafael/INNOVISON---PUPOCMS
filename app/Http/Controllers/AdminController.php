@@ -236,6 +236,8 @@ class AdminController extends Controller
     {
         $search = trim((string) $request->query('search', ''));
         $source = trim((string) $request->query('source', 'faculty'));
+        $availableSystems = $this->externalApiTestingSystems();
+        $selectedSystem = trim((string) $request->query('system', ($availableSystems[0] ?? '')));
         $results = [];
         $apiResponseMeta = null;
         $errorMessage = null;
@@ -265,23 +267,34 @@ class AdminController extends Controller
             } else {
                 try {
                     if ($source === 'admin_api') {
+                        [$systemIsValid, $systemMeta, $systemError] = $this->resolveExternalApiTestingSystemMeta($selectedSystem);
+                        if (!$systemIsValid) {
+                            $errorMessage = $systemError;
+                        } else {
                         $results = $this->searchLocalAdminsForApiTesting($search);
                         $apiResponseMeta = [
                             'status' => 200,
                             'ok' => true,
                             'endpoint' => $internalAdminEndpoint,
                             'result_count' => count($results),
-                            'auth_mode' => 'internal-query',
+                            'auth_mode' => 'system-key-check',
                             'source' => $source,
+                            'system' => $systemMeta['system'],
+                            'header_name' => $systemMeta['header_name'],
+                            'system_header_name' => $systemMeta['system_header_name'],
+                            'api_key_preview' => $systemMeta['api_key_preview'],
                         ];
 
                         if (empty($results)) {
                             $errorMessage = 'No matching records were found for the current search.';
                         }
+                        }
 
                         return view('admin.api-testing', [
                             'search' => $search,
                             'source' => $source,
+                            'selectedSystem' => $selectedSystem,
+                            'availableSystems' => $availableSystems,
                             'results' => $results,
                             'apiResponseMeta' => $apiResponseMeta,
                             'errorMessage' => $errorMessage,
@@ -290,23 +303,34 @@ class AdminController extends Controller
                     }
 
                     if ($source === 'admin_options') {
+                        [$systemIsValid, $systemMeta, $systemError] = $this->resolveExternalApiTestingSystemMeta($selectedSystem);
+                        if (!$systemIsValid) {
+                            $errorMessage = $systemError;
+                        } else {
                         $results = $this->searchLocalAdminOptionsForApiTesting($search);
                         $apiResponseMeta = [
                             'status' => 200,
                             'ok' => true,
                             'endpoint' => $internalAdminOptionsEndpoint,
                             'result_count' => count($results),
-                            'auth_mode' => 'internal-query',
+                            'auth_mode' => 'system-key-check',
                             'source' => $source,
+                            'system' => $systemMeta['system'],
+                            'header_name' => $systemMeta['header_name'],
+                            'system_header_name' => $systemMeta['system_header_name'],
+                            'api_key_preview' => $systemMeta['api_key_preview'],
                         ];
 
                         if (empty($results)) {
                             $errorMessage = 'No matching records were found for the current search.';
                         }
+                        }
 
                         return view('admin.api-testing', [
                             'search' => $search,
                             'source' => $source,
+                            'selectedSystem' => $selectedSystem,
+                            'availableSystems' => $availableSystems,
                             'results' => $results,
                             'apiResponseMeta' => $apiResponseMeta,
                             'errorMessage' => $errorMessage,
@@ -380,11 +404,45 @@ class AdminController extends Controller
         return view('admin.api-testing', [
             'search' => $search,
             'source' => $source,
+            'selectedSystem' => $selectedSystem,
+            'availableSystems' => $availableSystems,
             'results' => $results,
             'apiResponseMeta' => $apiResponseMeta,
             'errorMessage' => $errorMessage,
             'errorDetails' => $errorDetails,
         ]);
+    }
+
+    private function externalApiTestingSystems(): array
+    {
+        return collect(config('services.external_admin_profile.system_keys', []))
+            ->keys()
+            ->filter(fn ($value) => trim((string) $value) !== '')
+            ->values()
+            ->all();
+    }
+
+    private function resolveExternalApiTestingSystemMeta(string $selectedSystem): array
+    {
+        $system = strtolower(trim($selectedSystem));
+        $systemKeys = collect(config('services.external_admin_profile.system_keys', []))
+            ->mapWithKeys(fn ($value, $key) => [strtolower(trim((string) $key)) => trim((string) $value)]);
+
+        if ($system === '') {
+            return [false, null, 'Choose an external system first to test the API key configuration.'];
+        }
+
+        $apiKey = (string) $systemKeys->get($system, '');
+        if ($apiKey === '') {
+            return [false, null, 'No API key is configured for the selected external system.'];
+        }
+
+        return [true, [
+            'system' => $system,
+            'header_name' => trim((string) config('services.external_admin_profile.header', 'X-External-Api-Key')),
+            'system_header_name' => trim((string) config('services.external_admin_profile.system_header', 'X-External-System')),
+            'api_key_preview' => substr($apiKey, 0, 8) . '...' . substr($apiKey, -6),
+        ], null];
     }
 
     private function searchLocalAdminsForApiTesting(string $search): array

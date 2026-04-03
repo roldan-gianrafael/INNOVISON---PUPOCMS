@@ -79,11 +79,11 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Height</label>
-                    <input type="text" name="height" class="form-control" value="cm">
+                    <input type="text" name="height" class="form-control" placeholder="cm">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Weight</label>
-                    <input type="text" name="weight" class="form-control" value="kg">
+                    <input type="text" name="weight" class="form-control" placeholder="kg">
                 </div>
             </div>
         </div>

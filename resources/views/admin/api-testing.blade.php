@@ -639,64 +639,61 @@
         const sourceField = document.getElementById('source');
         const searchField = document.getElementById('search');
 
-        if (!form || !sourceField || !searchField) {
-            return;
-        }
+        if (!form || !sourceField || !searchField) return;
 
         let hasAutoSubmitted = false;
 
+        // Auto-submit logic kapag nag-focus sa search field for specific sources
         searchField.addEventListener('focus', function () {
             const source = sourceField.value;
-            const shouldAutoLoad = source === 'admin_api' || source === 'admin_options';
+            const shouldAutoLoad = ['admin_api', 'admin_options'].includes(source);
 
-            if (!shouldAutoLoad || searchField.value.trim() !== '' || hasAutoSubmitted) {
-                return;
-            }
+            if (!shouldAutoLoad || searchField.value.trim() !== '' || hasAutoSubmitted) return;
 
             hasAutoSubmitted = true;
             form.requestSubmit();
         });
 
-        document.querySelectorAll('.admin-option-item').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const firstName = document.getElementById('selectedFirstName');
-                const lastName = document.getElementById('selectedLastName');
-                const suffixName = document.getElementById('selectedSuffixName');
-                const email = document.getElementById('selectedEmail');
-                const status = document.getElementById('selectedStatus');
+        // Handler para sa Admin Options & Admin API (Unified)
+        const handleAdminSelection = (button) => {
+            const fields = {
+                'selectedFirstName': button.dataset.firstName,
+                'selectedLastName': button.dataset.lastName,
+                'selectedSuffixName': button.dataset.suffixName,
+                'selectedEmail': button.dataset.email,
+                'selectedStatus': button.dataset.status
+            };
 
-                if (!firstName || !lastName || !suffixName || !email || !status) {
-                    return;
-                }
-
-                firstName.value = button.dataset.firstName || '';
-                lastName.value = button.dataset.lastName || '';
-                suffixName.value = button.dataset.suffixName || '';
-                email.value = button.dataset.email || '';
-                status.value = button.dataset.status || '';
+            Object.keys(fields).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = fields[id] || '';
             });
-        });
+        };
 
-        document.querySelectorAll('.faculty-option-item').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const firstName = document.getElementById('selectedFacultyFirstName');
-                const lastName = document.getElementById('selectedFacultyLastName');
-                const suffixName = document.getElementById('selectedFacultySuffixName');
-                const email = document.getElementById('selectedFacultyEmail');
-                const status = document.getElementById('selectedFacultyStatus');
-                const office = document.getElementById('selectedFacultyOffice');
+        // Handler para sa Faculty Selection
+        const handleFacultySelection = (button) => {
+            const fields = {
+                'selectedFacultyFirstName': button.dataset.firstName,
+                'selectedFacultyLastName': button.dataset.lastName,
+                'selectedFacultySuffixName': button.dataset.suffixName,
+                'selectedFacultyEmail': button.dataset.email,
+                'selectedFacultyStatus': button.dataset.status,
+                'selectedFacultyOffice': button.dataset.office
+            };
 
-                if (!firstName || !lastName || !suffixName || !email || !status || !office) {
-                    return;
-                }
-
-                firstName.value = button.dataset.firstName || '';
-                lastName.value = button.dataset.lastName || '';
-                suffixName.value = button.dataset.suffixName || '';
-                email.value = button.dataset.email || '';
-                status.value = button.dataset.status || '';
-                office.value = button.dataset.office || '';
+            Object.keys(fields).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = fields[id] || '';
             });
+        };
+
+        // Event Delegation para mas malinis at gumana kahit dynamic ang results
+        document.addEventListener('click', function (e) {
+            const adminBtn = e.target.closest('.admin-option-item');
+            const facultyBtn = e.target.closest('.faculty-option-item');
+
+            if (adminBtn) handleAdminSelection(adminBtn);
+            if (facultyBtn) handleFacultySelection(facultyBtn);
         });
     });
 </script>

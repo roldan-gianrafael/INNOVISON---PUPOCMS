@@ -198,7 +198,7 @@
             <p>Temporary admin tool for checking if another site's API is reachable and returning faculty profile information.</p>
         </div>
 
-        <form method="GET" class="api-search-form">
+        <form method="GET" class="api-search-form" id="apiTestingForm">
             <div>
                 <label for="source">API Source</label>
                 <select id="source" name="source">
@@ -344,3 +344,31 @@
     </section>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('apiTestingForm');
+        const sourceField = document.getElementById('source');
+        const searchField = document.getElementById('search');
+
+        if (!form || !sourceField || !searchField) {
+            return;
+        }
+
+        let hasAutoSubmitted = false;
+
+        searchField.addEventListener('focus', function () {
+            const source = sourceField.value;
+            const shouldAutoLoad = source === 'admin_api' || source === 'admin_options';
+
+            if (!shouldAutoLoad || searchField.value.trim() !== '' || hasAutoSubmitted) {
+                return;
+            }
+
+            hasAutoSubmitted = true;
+            form.requestSubmit();
+        });
+    });
+</script>
+@endpush

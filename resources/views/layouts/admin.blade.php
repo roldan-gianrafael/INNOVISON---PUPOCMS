@@ -1726,15 +1726,16 @@
                 </div>
             </article>
             
-@if($medicineAlertCount > 2)
+
+            @endforeach
+        </div>
+        @if($medicineAlertCount > 2)
         <div class="medicine-alert-more-wrapper">
             <a href="{{ $inventoryUrl }}" class="medicine-see-more-link">
                 See More ({{ $medicineAlertCount - $medicineAlerts->count() }} more items)
             </a>
         </div>
     @endif
-            @endforeach
-        </div>
     </section>
 @endif
 

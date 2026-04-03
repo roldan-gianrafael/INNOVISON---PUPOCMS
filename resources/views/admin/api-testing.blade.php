@@ -475,49 +475,56 @@
             </div>
 
         @elseif(($source ?? '') === 'faculty')
-            <div class="admin-option-list">
-                @foreach($results as $result)
-                    <button
-                        type="button"
-                        class="faculty-option-item"
-                        data-first-name="{{ ($result['first_name'] ?? '') === 'N/A' ? '' : ($result['first_name'] ?? '') }}"
-                        data-last-name="{{ ($result['last_name'] ?? '') === 'N/A' ? '' : ($result['last_name'] ?? '') }}"
-                        data-suffix-name="{{ ($result['suffix_name'] ?? '') === 'N/A' ? '' : ($result['suffix_name'] ?? '') }}"
-                        data-email="{{ ($result['email'] ?? '') === 'N/A' ? '' : ($result['email'] ?? '') }}"
-                        data-status="{{ ($result['status'] ?? '') === 'N/A' ? '' : ($result['status'] ?? '') }}"
-                        data-office="{{ ($result['office'] ?? '') === 'N/A' ? '' : ($result['office'] ?? '') }}"
-                        data-identifier="{{ $result['identifier'] ?? '' }}"
-                    >
-                        <p class="faculty-option-name">{{ $result['name'] ?? 'N/A' }}</p>
-                        <div class="faculty-option-email">{{ $result['email'] ?? 'N/A' }}</div>
-                        <div class="faculty-option-meta">
-                            <span class="faculty-option-chip">ID: {{ $result['identifier'] ?? 'N/A' }}</span>
-                            <span class="faculty-option-chip">Office: {{ $result['office'] ?? 'N/A' }}</span>
-                            <span class="faculty-option-chip">Status: {{ $result['status'] ?? 'N/A' }}</span>
-                        </div>
+    <div class="admin-option-list">
+        {{-- Mapapansin sa JSON mo na ang data ay nasa $results['fields']['faculties'] --}}
+        @php
+            $facultyList = $results['fields']['faculties'] ?? [];
+        @endphp
 
-                        {{-- ITO YUNG NAWAWALA: Raw Response para sa Faculty --}}
-                        <details class="api-raw-toggle" style="margin-top: 10px;">
-                            <summary onclick="event.stopPropagation()">Show raw response</summary>
-                            <div class="api-json">{{ json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
-                        </details>
-                    </button>
-                @endforeach
-            </div>
-
-            {{-- Selected Faculty Panel --}}
-            <div class="faculty-autofill-panel">
-                <h3>Selected Faculty</h3>
-                <div class="faculty-autofill-grid">
-                    <div class="faculty-autofill-field"><label>First Name</label><input type="text" id="selectedFacultyFirstName" readonly></div>
-                    <div class="faculty-autofill-field"><label>Last Name</label><input type="text" id="selectedFacultyLastName" readonly></div>
-                    <div class="faculty-autofill-field"><label>Suffix Name</label><input type="text" id="selectedFacultySuffixName" readonly></div>
-                    <div class="faculty-autofill-field"><label>Email</label><input type="text" id="selectedFacultyEmail" readonly></div>
-                    <div class="faculty-autofill-field"><label>Status</label><input type="text" id="selectedFacultyStatus" readonly></div>
-                    <div class="faculty-autofill-field"><label>Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
+        @foreach($facultyList as $faculty)
+            <button
+                type="button"
+                class="faculty-option-item"
+                {{-- Mapping base sa actual JSON keys --}}
+                data-first-name="{{ $faculty['first_name'] ?? '' }}"
+                data-last-name="{{ $faculty['last_name'] ?? '' }}"
+                data-suffix-name="{{ $faculty['suffix_name'] ?? '' }}"
+                data-email="{{ $faculty['email'] ?? '' }}"
+                data-status="{{ $faculty['status'] ?? '' }}"
+                data-office="{{ $faculty['department'] ?? 'N/A' }}"
+                data-identifier="{{ $faculty['faculty_code'] ?? '' }}"
+            >
+                <p class="faculty-option-name">
+                    {{ ($faculty['first_name'] ?? '') . ' ' . ($faculty['last_name'] ?? '') }}
+                </p>
+                <div class="faculty-option-email">{{ $faculty['email'] ?? 'No Email' }}</div>
+                <div class="faculty-option-meta">
+                    <span class="faculty-option-chip">ID: {{ $faculty['faculty_code'] ?? 'N/A' }}</span>
+                    <span class="faculty-option-chip">Type: {{ $faculty['faculty_type'] ?? 'N/A' }}</span>
+                    <span class="faculty-option-chip">Status: {{ $faculty['status'] ?? 'N/A' }}</span>
                 </div>
-            </div>
 
+                {{-- Raw Response per item --}}
+                <details class="api-raw-toggle" style="margin-top: 10px;">
+                    <summary onclick="event.stopPropagation()">Show raw response</summary>
+                    <div class="api-json">{{ json_encode($faculty, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                </details>
+            </button>
+        @endforeach
+    </div>
+
+    {{-- Selected Faculty Panel (Keep this as is, your JS will handle the fill) --}}
+    <div class="faculty-autofill-panel">
+        <h3>Selected Faculty</h3>
+        <div class="faculty-autofill-grid">
+            <div class="faculty-autofill-field"><label>First Name</label><input type="text" id="selectedFacultyFirstName" readonly></div>
+            <div class="faculty-autofill-field"><label>Last Name</label><input type="text" id="selectedFacultyLastName" readonly></div>
+            <div class="faculty-autofill-field"><label>Suffix Name</label><input type="text" id="selectedFacultySuffixName" readonly></div>
+            <div class="faculty-autofill-field"><label>Email</label><input type="text" id="selectedFacultyEmail" readonly></div>
+            <div class="faculty-autofill-field"><label>Status</label><input type="text" id="selectedFacultyStatus" readonly></div>
+            <div class="faculty-autofill-field"><label>Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
+        </div>
+    </div>
         @else
             {{-- Unified Display for Other APIs (Custom / Admin API) --}}
             <div class="api-results">

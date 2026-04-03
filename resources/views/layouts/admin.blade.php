@@ -127,6 +127,17 @@
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
 
+        .medicine-alert-fab[data-surface-tone="dark"] {
+            background: linear-gradient(145deg, #d1d5db, #9ca3af);
+            border-color: #6b7280;
+            color: #5f0012;
+            box-shadow: 0 10px 24px rgba(100, 116, 139, 0.26);
+        }
+
+        .medicine-alert-fab[data-surface-tone="dark"]:hover {
+            box-shadow: 0 14px 28px rgba(100, 116, 139, 0.3);
+        }
+
         .medicine-alert-fab:hover {
             transform: translateY(-2px);
             box-shadow: 0 14px 28px rgba(128, 0, 0, 0.3);
@@ -136,6 +147,15 @@
             width: 30px; /* Slightly larger to account for the border thickness */
             height: 30px;
             display: block;
+        }
+
+        .medicine-alert-fab[data-surface-tone="dark"] svg path:first-child {
+            fill: #5f0012 !important;
+        }
+
+        .medicine-alert-fab[data-surface-tone="dark"] svg path:last-child {
+            fill: #7f1d2d !important;
+            stroke: #ffffff !important;
         }
 
         /* Ensure the path inside handles its own colors from the HTML attributes */
@@ -1557,14 +1577,15 @@
         'student_assistant' => 'Admin (Legacy)',
     ];
     $displayRole = $roleLabelMap[$currentRole] ?? ucfirst($currentRole ?: 'user');
-    $medicineAlerts = \App\Models\Item::query()
+    $medicineAlertsQuery = \App\Models\Item::query()
         ->where('category', 'Medicine')
         ->whereNotNull('expiration_date')
         ->whereDate('expiration_date', '<=', now()->addDays(30)->toDateString())
-        ->orderBy('expiration_date')
-        ->limit(8)
+        ->orderBy('expiration_date');
+    $medicineAlertCount = (clone $medicineAlertsQuery)->count();
+    $medicineAlerts = $medicineAlertsQuery
+        ->limit(2)
         ->get();
-    $medicineAlertCount = $medicineAlerts->count();
 @endphp
 
 <header class="admin-header">
@@ -1704,7 +1725,11 @@
             <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : '' }}">
                 <div class="medicine-alert-content" style="width: 100%;">
                     <div class="medicine-alert-name-row">
-                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
+                        <a
+                            href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
+                            class="medicine-alert-item-name"
+                            style="text-decoration: none;"
+                        >{{ $medicineAlert->name }}</a>
                         @if($isExpired)
                             <button type="button" 
                                     class="medicine-remove-btn" 
@@ -1732,7 +1757,7 @@
         @if($medicineAlertCount > 2)
         <div class="medicine-alert-more-wrapper">
             <a href="{{ $inventoryUrl }}" class="medicine-see-more-link">
-                See More ({{ $medicineAlertCount - $medicineAlerts->count() }} )
+                Show more ({{ $medicineAlertCount - 2 }})
             </a>
         </div>
     @endif
@@ -1762,7 +1787,10 @@
 </section>
 
 @include('partials.post_login_terms_gate')
+@hasSection('disable_voice_inputs')
+@else
 @include('partials.student_voice_input_support')
+@endif
 
 @stack('scripts')
 
@@ -1824,6 +1852,47 @@
             return;
         }
 
+        const updateMedicineAlertTone = function () {
+            const rect = toggle.getBoundingClientRect();
+            const sampleX = Math.max(1, Math.floor(rect.left + rect.width / 2));
+            const sampleY = Math.max(1, Math.floor(rect.top + rect.height / 2));
+            const previousVisibility = toggle.style.visibility;
+            const previousPointerEvents = toggle.style.pointerEvents;
+
+            toggle.style.visibility = 'hidden';
+            toggle.style.pointerEvents = 'none';
+
+            let sampledElement = document.elementFromPoint(sampleX, sampleY);
+
+            toggle.style.visibility = previousVisibility;
+            toggle.style.pointerEvents = previousPointerEvents;
+
+            const resolveBackgroundColor = function (element) {
+                let current = element;
+
+                while (current && current !== document.documentElement) {
+                    const bg = window.getComputedStyle(current).backgroundColor;
+                    if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+                        return bg;
+                    }
+                    current = current.parentElement;
+                }
+
+                return window.getComputedStyle(document.body).backgroundColor || 'rgb(255, 255, 255)';
+            };
+
+            const color = resolveBackgroundColor(sampledElement);
+            const matches = color.match(/\d+/g) || [];
+            const [r, g, b] = matches.slice(0, 3).map(Number);
+            const luminance = (0.2126 * (r || 255)) + (0.7152 * (g || 255)) + (0.0722 * (b || 255));
+
+            if (luminance < 110) {
+                toggle.setAttribute('data-surface-tone', 'dark');
+            } else {
+                toggle.removeAttribute('data-surface-tone');
+            }
+        };
+
         toggle.addEventListener('click', function (event) {
             event.stopPropagation();
             panel.classList.toggle('is-open');
@@ -1838,6 +1907,10 @@
                 panel.classList.remove('is-open');
             }
         });
+
+        updateMedicineAlertTone();
+        window.addEventListener('scroll', updateMedicineAlertTone, { passive: true });
+        window.addEventListener('resize', updateMedicineAlertTone);
     }
 
     function initAccessibilityLaunch() {

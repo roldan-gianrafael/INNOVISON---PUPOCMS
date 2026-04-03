@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'For API Testing')
+@section('disable_voice_inputs', 'true')
 
 @section('content')
 <style>

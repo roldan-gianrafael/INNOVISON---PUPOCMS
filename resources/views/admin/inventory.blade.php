@@ -35,6 +35,16 @@
     .btn-icon { padding: 6px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; margin-right: 4px; }
     .btn-edit { background: #fff3f5; color: #70131B; border: 1px solid #f0d7dc; }
     .btn-delete { background: #fee2e2; color: #b91c1c; }
+    .inventory-row-highlight {
+        background: #fff7cc;
+        outline: 2px solid #f59e0b;
+        box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.25);
+        animation: inventoryHighlightPulse 1.4s ease-in-out 3;
+    }
+    @keyframes inventoryHighlightPulse {
+        0%, 100% { background: #fff7cc; }
+        50% { background: #fde68a; }
+    }
 
     /* Modal */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
@@ -49,6 +59,7 @@
     @php
         $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
         $canManageInventory = $role === \App\Models\User::ROLE_SUPERADMIN;
+        $highlightItemId = (string) request()->query('highlight_item', '');
     @endphp
 
     <div class="controls">
@@ -71,7 +82,10 @@
             </thead>
             <tbody>
                 @forelse($items as $item)
-                    <tr>
+                    <tr
+                        id="inventory-item-{{ $item->id }}"
+                        class="{{ $highlightItemId !== '' && $highlightItemId === (string) $item->id ? 'inventory-row-highlight' : '' }}"
+                    >
                         <td style="font-weight: 600;">{{ $item->name }}</td>
                         <td>
                             {{ $item->category }}
@@ -190,6 +204,7 @@
     const medicineFields = document.getElementById('medicineFields');
     const medicineSelect = document.getElementById('iMedicineType');
     const expDateInput = document.getElementById('iExpDate');
+    const highlightedRow = document.querySelector('.inventory-row-highlight');
 
     function toggleMedicineFields() {
         const category = document.getElementById('iCategory').value;
@@ -252,6 +267,12 @@
         if (itemModal && event.target == itemModal) {
             closeModal();
         }
+    }
+
+    if (highlightedRow) {
+        setTimeout(function () {
+            highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 180);
     }
 </script>
 @endpush

@@ -1535,6 +1535,14 @@
     display: none;
 }
 
+.medicine-alert-extra-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(127, 29, 45, 0.18);
+}
+
 /* Ensure the list has a max height if there are many items */
 .medicine-alert-list {
     max-height: 400px;
@@ -1738,6 +1746,9 @@
             
 
             @endforeach
+        </div>
+        @if($medicineAlertOverflow->isNotEmpty())
+        <div class="medicine-alert-extra-list" id="medicineAlertExtraList">
             @foreach($medicineAlertOverflow as $medicineAlert)
                 @php
                     $isExpired = optional($medicineAlert->expiration_date)->isPast();
@@ -1764,6 +1775,7 @@
             </article>
             @endforeach
         </div>
+        @endif
         @if($medicineAlertCount > 2)
         <div class="medicine-alert-more-wrapper">
             <button type="button" class="medicine-see-more-link" id="medicineAlertMoreBtn">
@@ -1923,11 +1935,27 @@
         });
 
         if (moreButton && hiddenItems.length > 0) {
-            moreButton.addEventListener('click', function () {
-                hiddenItems.forEach(function (item) {
+            moreButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const nextItems = hiddenItems.filter(function (item) {
+                    return item.classList.contains('is-hidden');
+                }).slice(0, 2);
+
+                nextItems.forEach(function (item) {
                     item.classList.remove('is-hidden');
                 });
-                moreButton.closest('.medicine-alert-more-wrapper')?.remove();
+
+                const remaining = hiddenItems.filter(function (item) {
+                    return item.classList.contains('is-hidden');
+                }).length;
+
+                if (remaining > 0) {
+                    moreButton.textContent = 'Show more (' + remaining + ')';
+                } else {
+                    moreButton.closest('.medicine-alert-more-wrapper')?.remove();
+                }
             });
         }
 

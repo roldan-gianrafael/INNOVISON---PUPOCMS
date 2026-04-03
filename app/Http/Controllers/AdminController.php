@@ -314,58 +314,61 @@ class AdminController extends Controller
                         ]);
                     }
 
-                    // --- START OF INTEGRATED SEARCH FIX ---
-                    // 1. Build the full URL with the search query first
-                    $queryParams = [
-                        'search' => $search,
-                        'query'  => $search,
-                        'q'      => $search,
-                    ];
-                    $fullUrlWithQuery = $endpoint . (str_contains($endpoint, '?') ? '&' : '?') . http_build_query($queryParams);
+                    if ($source === 'faculty') {
+                        $faculties = $facultySyncService->fetchFaculties();
+                        $payload = ['faculties' => $faculties];
+                        $results = $this->normalizeApiTestingResults($payload, $search);
+                        $apiResponseMeta = [
+                            'status' => 200,
+                            'ok' => true,
+                            'endpoint' => $facultyEndpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'faculty-hmac',
+                            'source' => $source,
+                        ];
 
-                    $client = Http::timeout((int) config('services.temp_api_testing.timeout', 20))
-                        ->acceptJson();
-
-                    $apiKey = trim((string) config('services.temp_api_testing.api_key', ''));
-                    $apiHeader = trim((string) config('services.temp_api_testing.header', 'X-External-Api-Key'));
-                    $authMode = 'none';
-
-                    if ($source === 'admin_api') {
-                        $internalApiKey = trim((string) config('services.external_admin_profile.api_key', ''));
-                        $internalApiHeader = trim((string) config('services.external_admin_profile.header', 'X-External-Api-Key'));
-                        if ($internalApiKey !== '') {
-                            $client = $client->withHeaders([$internalApiHeader => $internalApiKey]);
-                            $authMode = 'internal-api-key';
+                        if (empty($results)) {
+                            $errorMessage = 'No matching records were found for the current search.';
                         }
-                    } elseif ($apiKey !== '') {
-                        $client = $client->withHeaders([$apiHeader => $apiKey]);
-                        $authMode = 'custom-header';
-                    } elseif ($facultyEndpoint !== '' && $endpoint === $facultyEndpoint) {
-                        // FIX: Pass the full URL (including search) to the HMAC generator
-                        $client = $client->withHeaders($facultySyncService->generateHmacHeaders('GET', $fullUrlWithQuery));
-                        $authMode = 'faculty-hmac';
-                    }
+                    } else {
+                        $queryParams = [
+                            'search' => $search,
+                            'query'  => $search,
+                            'q'      => $search,
+                        ];
+                        $fullUrlWithQuery = $endpoint . (str_contains($endpoint, '?') ? '&' : '?') . http_build_query($queryParams);
 
-                    // FIX: Execute the request using the full URL
-                    $response = $client->get($fullUrlWithQuery);
-                    // --- END OF INTEGRATED SEARCH FIX ---
+                        $client = Http::timeout((int) config('services.temp_api_testing.timeout', 20))
+                            ->acceptJson();
 
-                    $payload = $response->json();
-                    $results = $this->normalizeApiTestingResults($payload, $search);
-                    $apiResponseMeta = [
-                        'status' => $response->status(),
-                        'ok' => $response->successful(),
-                        'endpoint' => $endpoint,
-                        'result_count' => count($results),
-                        'auth_mode' => $authMode,
-                        'source' => $source,
-                    ];
+                        $apiKey = trim((string) config('services.temp_api_testing.api_key', ''));
+                        $apiHeader = trim((string) config('services.temp_api_testing.header', 'X-External-Api-Key'));
+                        $authMode = 'none';
 
-                    if (!$response->successful()) {
-                        $errorMessage = 'The API request returned an error response.';
-                        $errorDetails = trim((string) $response->body());
-                    } elseif (empty($results)) {
-                        $errorMessage = 'No matching records were found for the current search.';
+                        if ($apiKey !== '') {
+                            $client = $client->withHeaders([$apiHeader => $apiKey]);
+                            $authMode = 'custom-header';
+                        }
+
+                        $response = $client->get($fullUrlWithQuery);
+
+                        $payload = $response->json();
+                        $results = $this->normalizeApiTestingResults($payload, $search);
+                        $apiResponseMeta = [
+                            'status' => $response->status(),
+                            'ok' => $response->successful(),
+                            'endpoint' => $endpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => $authMode,
+                            'source' => $source,
+                        ];
+
+                        if (!$response->successful()) {
+                            $errorMessage = 'The API request returned an error response.';
+                            $errorDetails = trim((string) $response->body());
+                        } elseif (empty($results)) {
+                            $errorMessage = 'No matching records were found for the current search.';
+                        }
                     }
                 } catch (\Throwable $exception) {
                     $errorMessage = 'Unable to reach the external API right now: ' . $exception->getMessage();

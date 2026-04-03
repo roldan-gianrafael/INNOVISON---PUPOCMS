@@ -288,7 +288,7 @@
 
         <div class="stat-card">
             <div>
-                <div class="stat-label">Upcoming</div>
+                <div class="stat-label">Approved</div>
                 <div class="stat-value">{{ $upcoming }}</div>
             </div>
             <div class="stat-badge badge-success">Scheduled</div>

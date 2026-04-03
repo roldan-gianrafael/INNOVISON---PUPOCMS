@@ -277,9 +277,14 @@
     visibility: visible;
 }
 
+        .medicine-alert-item.is-near-expiry {
+            background: rgba(254, 240, 138, 0.55);
+            border-color: rgba(245, 158, 11, 0.26);
+        }
+
         .medicine-alert-item.is-expired {
-            background: rgba(185, 28, 28, 0.08);
-            border-color: rgba(185, 28, 28, 0.14);
+            background: rgba(254, 226, 226, 0.88);
+            border-color: rgba(220, 38, 38, 0.22);
         }
 
         .medicine-alert-item-name {
@@ -333,9 +338,14 @@
             border-color: rgba(255, 255, 255, 0.08);
         }
 
+        html[data-theme="dark"] .medicine-alert-item.is-near-expiry {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: rgba(253, 224, 71, 0.22);
+        }
+
         html[data-theme="dark"] .medicine-alert-item.is-expired {
             background: rgba(185, 28, 28, 0.18);
-            border-color: rgba(252, 165, 165, 0.18);
+            border-color: rgba(252, 165, 165, 0.22);
         }
 
         html[data-theme="dark"] .medicine-alert-item-name {
@@ -1540,9 +1550,13 @@
     font-size: 1rem;
 }
 
-/* Red indicator for expired items */
+/* Alert state indicators */
+.is-near-expiry {
+    border-right: 4px solid #f59e0b;
+}
+
 .is-expired {
-    border-right: 4px solid #dc3545; /* Visual cue on the right edge */
+    border-right: 4px solid #dc3545;
     background: rgba(220, 53, 69, 0.05);
 }
 .medicine-alert-more-wrapper {
@@ -1579,6 +1593,14 @@
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px dashed rgba(127, 29, 45, 0.18);
+}
+
+html[data-theme="dark"] .medicine-see-more-link {
+    color: #ffffff;
+}
+
+html[data-theme="dark"] .medicine-see-more-link:hover {
+    color: #f8fafc;
 }
 
 /* Ensure the list has a max height if there are many items */
@@ -1761,7 +1783,7 @@
                     $isExpired = optional($medicineAlert->expiration_date)->isPast();
                     $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
                 @endphp
-            <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : '' }}">
+            <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : 'is-near-expiry' }}">
                 <a
                     href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
                     class="medicine-alert-item-link"
@@ -1794,7 +1816,7 @@
                     $isExpired = optional($medicineAlert->expiration_date)->isPast();
                     $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
                 @endphp
-            <article class="medicine-alert-item is-hidden {{ $isExpired ? 'is-expired' : '' }}" data-medicine-alert-extra="true">
+            <article class="medicine-alert-item is-hidden {{ $isExpired ? 'is-expired' : 'is-near-expiry' }}" data-medicine-alert-extra="true">
                 <a
                     href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
                     class="medicine-alert-item-link"

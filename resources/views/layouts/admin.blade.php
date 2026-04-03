@@ -1466,6 +1466,21 @@
                 display: none;
             }
         }
+        .medicine-remove-btn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    margin-left: 10px;
+}
     </style>
 </head>
 <body>

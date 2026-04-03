@@ -479,6 +479,60 @@
                         </div>
                     </div>
                 </div>
+            @elseif(($source ?? '') === 'faculty')
+                <div class="admin-option-list">
+                    @foreach($results as $result)
+                        <button
+                            type="button"
+                            class="faculty-option-item"
+                            data-first-name="{{ $result['first_name'] === 'N/A' ? '' : ($result['first_name'] ?? '') }}"
+                            data-last-name="{{ $result['last_name'] === 'N/A' ? '' : ($result['last_name'] ?? '') }}"
+                            data-suffix-name="{{ $result['suffix_name'] === 'N/A' ? '' : ($result['suffix_name'] ?? '') }}"
+                            data-email="{{ $result['email'] === 'N/A' ? '' : ($result['email'] ?? '') }}"
+                            data-status="{{ $result['status'] === 'N/A' ? '' : ($result['status'] ?? '') }}"
+                            data-office="{{ $result['office'] === 'N/A' ? '' : ($result['office'] ?? '') }}"
+                            data-identifier="{{ $result['identifier'] ?? '' }}"
+                        >
+                            <p class="faculty-option-name">{{ $result['name'] }}</p>
+                            <div class="faculty-option-email">{{ $result['email'] }}</div>
+                            <div class="faculty-option-meta">
+                                <span class="faculty-option-chip">ID: {{ $result['identifier'] }}</span>
+                                <span class="faculty-option-chip">Office: {{ $result['office'] }}</span>
+                                <span class="faculty-option-chip">Status: {{ $result['status'] }}</span>
+                            </div>
+                        </button>
+                    @endforeach
+                </div>
+
+                <div class="faculty-autofill-panel">
+                    <h3>Selected Faculty</h3>
+                    <div class="faculty-autofill-grid">
+                        <div class="faculty-autofill-field">
+                            <label for="selectedFacultyFirstName">First Name</label>
+                            <input type="text" id="selectedFacultyFirstName" readonly>
+                        </div>
+                        <div class="faculty-autofill-field">
+                            <label for="selectedFacultyLastName">Last Name</label>
+                            <input type="text" id="selectedFacultyLastName" readonly>
+                        </div>
+                        <div class="faculty-autofill-field">
+                            <label for="selectedFacultySuffixName">Suffix Name</label>
+                            <input type="text" id="selectedFacultySuffixName" readonly>
+                        </div>
+                        <div class="faculty-autofill-field">
+                            <label for="selectedFacultyEmail">Email</label>
+                            <input type="text" id="selectedFacultyEmail" readonly>
+                        </div>
+                        <div class="faculty-autofill-field">
+                            <label for="selectedFacultyStatus">Status</label>
+                            <input type="text" id="selectedFacultyStatus" readonly>
+                        </div>
+                        <div class="faculty-autofill-field">
+                            <label for="selectedFacultyOffice">Office</label>
+                            <input type="text" id="selectedFacultyOffice" readonly>
+                        </div>
+                    </div>
+                </div>
             @else
                 <div class="api-results">
                     @foreach($results as $result)
@@ -620,6 +674,28 @@
                 suffixName.value = button.dataset.suffixName || '';
                 email.value = button.dataset.email || '';
                 status.value = button.dataset.status || '';
+            });
+        });
+
+        document.querySelectorAll('.faculty-option-item').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const firstName = document.getElementById('selectedFacultyFirstName');
+                const lastName = document.getElementById('selectedFacultyLastName');
+                const suffixName = document.getElementById('selectedFacultySuffixName');
+                const email = document.getElementById('selectedFacultyEmail');
+                const status = document.getElementById('selectedFacultyStatus');
+                const office = document.getElementById('selectedFacultyOffice');
+
+                if (!firstName || !lastName || !suffixName || !email || !status || !office) {
+                    return;
+                }
+
+                firstName.value = button.dataset.firstName || '';
+                lastName.value = button.dataset.lastName || '';
+                suffixName.value = button.dataset.suffixName || '';
+                email.value = button.dataset.email || '';
+                status.value = button.dataset.status || '';
+                office.value = button.dataset.office || '';
             });
         });
     });

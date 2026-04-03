@@ -1640,15 +1640,15 @@
                 @endphp
                 <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : '' }}">
                     <div class="medicine-alert-content">
-                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>  
-                        @if($isExpired)
+                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}  @if($isExpired)
                         <button type="button" 
                                 class="medicine-remove-btn" 
                                 onclick="removeExpiredItem({{ $medicineAlert->id }}, this)" 
                                 title="Remove expired item">
                             &times; 
                         </button>
-                    @endif
+                    @endif</p>  
+                       
                         <div class="medicine-alert-item-meta">
                             <span class="medicine-alert-chip">Stock: {{ $medicineAlert->quantity }} units</span>
                             <span class="medicine-alert-chip">Exp: {{ optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A' }}</span>

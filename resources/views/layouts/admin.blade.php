@@ -62,18 +62,6 @@
             }
         }
 
-        @keyframes accessibilityIconBounce {
-            0%, 100% {
-                transform: translateY(0) scale(1);
-            }
-            30% {
-                transform: translateY(-2px) scale(1.06);
-            }
-            60% {
-                transform: translateY(0) scale(0.98);
-            }
-        }
-
         :where(.asw-menu-btn) {
             position: fixed;
             overflow: visible !important;
@@ -108,13 +96,7 @@
         :where(.asw-menu-btn svg) {
             fill: #ffffff !important;
             stroke: none !important;
-            animation: accessibilityIconBounce 1.5s ease-in-out infinite;
             transform-origin: center;
-            will-change: transform;
-        }
-
-        :where(.asw-menu-btn .asw-wave-arm) {
-            animation: none !important;
         }
 
         :where(.asw-menu-btn svg path:not([fill="none"])) {

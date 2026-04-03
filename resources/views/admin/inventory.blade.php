@@ -41,9 +41,19 @@
         box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.25);
         animation: inventoryHighlightPulse 1.4s ease-in-out 3;
     }
+    .inventory-row-highlight-expired {
+        background: #fee2e2;
+        outline: 2px solid #dc2626;
+        box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.25);
+        animation: inventoryHighlightPulseExpired 1.4s ease-in-out 3;
+    }
     @keyframes inventoryHighlightPulse {
         0%, 100% { background: #fff7cc; }
         50% { background: #fde68a; }
+    }
+    @keyframes inventoryHighlightPulseExpired {
+        0%, 100% { background: #fee2e2; }
+        50% { background: #fecaca; }
     }
 
     /* Modal */
@@ -82,9 +92,16 @@
             </thead>
             <tbody>
                 @forelse($items as $item)
+                    @php
+                        $isHighlightedItem = $highlightItemId !== '' && $highlightItemId === (string) $item->id;
+                        $isExpiredMedicine = $item->category == 'Medicine' && $item->expiration_date && \Carbon\Carbon::parse($item->expiration_date)->isPast();
+                        $highlightClass = $isHighlightedItem
+                            ? ($isExpiredMedicine ? 'inventory-row-highlight-expired' : 'inventory-row-highlight')
+                            : '';
+                    @endphp
                     <tr
                         id="inventory-item-{{ $item->id }}"
-                        class="{{ $highlightItemId !== '' && $highlightItemId === (string) $item->id ? 'inventory-row-highlight' : '' }}"
+                        class="{{ $highlightClass }}"
                     >
                         <td style="font-weight: 600;">{{ $item->name }}</td>
                         <td>

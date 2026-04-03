@@ -241,7 +241,9 @@ class AdminController extends Controller
         $errorMessage = null;
         $errorDetails = null;
 
-        if ($search !== '') {
+        $canRunWithoutSearch = in_array($source, ['admin_api', 'admin_options'], true);
+
+        if ($search !== '' || $canRunWithoutSearch) {
             $facultyEndpoint = trim((string) config('services.pupt_flss.faculty_profiles_url', ''));
             $internalAdminEndpoint = url('/api/external/admins');
             $internalAdminOptionsEndpoint = url('/api/external/admins/options');

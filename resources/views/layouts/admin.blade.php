@@ -255,6 +255,39 @@
             color: #475569;
             font-size: 13px;
         }
+        .medicine-alert-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 10px;
+        }
+
+        .medicine-remove-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            margin-left: 10px;
+        }
+
+        .medicine-remove-btn:hover {
+            background: #cc0000;
+        }
+
+        /* Red tint for expired items to make the remove button stand out */
+        .is-expired {
+            background-color: rgba(255, 0, 0, 0.05);
+            border-left: 4px solid #ff4d4d;
+        }
 
         html[data-theme="dark"] .medicine-alert-panel {
             background: rgba(35, 17, 25, 0.97);
@@ -1640,7 +1673,15 @@
                 @endphp
                 <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : '' }}">
                     <div class="medicine-alert-content">
-                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
+                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>  
+                        @if($isExpired)
+                        <button type="button" 
+                                class="medicine-remove-btn" 
+                                onclick="removeExpiredItem({{ $medicineAlert->id }}, this)" 
+                                title="Remove expired item">
+                            &times;
+                        </button>
+                    @endif
                         <div class="medicine-alert-item-meta">
                             <span class="medicine-alert-chip">Stock: {{ $medicineAlert->quantity }} units</span>
                             <span class="medicine-alert-chip">Exp: {{ optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A' }}</span>
@@ -1650,14 +1691,7 @@
                         </div>
                     </div>
 
-                    @if($isExpired)
-                        <button type="button" 
-                                class="medicine-remove-btn" 
-                                onclick="removeExpiredItem({{ $medicineAlert->id }}, this)" 
-                                title="Remove expired item">
-                            &times;
-                        </button>
-                    @endif
+                   
                 </article>
             @endforeach
         </div>

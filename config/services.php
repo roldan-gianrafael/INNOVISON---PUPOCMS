@@ -67,6 +67,11 @@ return [
     'external_admin_profile' => [
         'api_key' => env('EXTERNAL_ADMIN_PROFILE_API_KEY'),
         'header' => env('EXTERNAL_ADMIN_PROFILE_HEADER', 'X-External-Api-Key'),
+        'system_header' => env('EXTERNAL_ADMIN_PROFILE_SYSTEM_HEADER', 'X-External-System'),
+        'system_keys' => array_filter(
+            json_decode((string) env('EXTERNAL_ADMIN_PROFILE_SYSTEM_KEYS', '{}'), true) ?: [],
+            fn ($value) => is_string($value) && trim($value) !== ''
+        ),
     ],
 
     'temp_api_testing' => [

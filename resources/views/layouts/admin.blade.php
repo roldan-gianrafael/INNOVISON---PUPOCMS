@@ -1645,7 +1645,7 @@
                                 class="medicine-remove-btn" 
                                 onclick="removeExpiredItem({{ $medicineAlert->id }}, this)" 
                                 title="Remove expired item">
-                            &times; 
+                            &times; Remove 
                         </button>
                     @endif</p>  
                        

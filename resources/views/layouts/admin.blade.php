@@ -232,12 +232,50 @@
             overflow-y: auto;
         }
 
-        .medicine-alert-item {
-            border-radius: 16px;
-            padding: 12px 14px;
-            background: rgba(127, 29, 45, 0.06);
-            border: 1px solid rgba(127, 29, 45, 0.08);
-        }
+.medicine-alert-item {
+    border-radius: 16px;
+    padding: 12px 14px;
+    background: rgba(127, 29, 45, 0.06);
+    border: 1px solid rgba(127, 29, 45, 0.08);
+}
+
+.medicine-alert-item-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.medicine-alert-item-link:hover .medicine-alert-item-name {
+    text-decoration: underline;
+}
+
+.medicine-alert-item-link[data-hover-hint]:hover {
+    cursor: pointer;
+}
+
+.medicine-hover-hint {
+    position: fixed;
+    z-index: 500001;
+    pointer-events: none;
+    transform: translate(14px, 14px);
+    background: rgba(17, 24, 39, 0.92);
+    color: #f8fafc;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.22);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+}
+
+.medicine-hover-hint.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
 
         .medicine-alert-item.is-expired {
             background: rgba(185, 28, 28, 0.08);
@@ -1724,13 +1762,14 @@
                     $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
                 @endphp
             <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : '' }}">
+                <a
+                    href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
+                    class="medicine-alert-item-link"
+                    data-hover-hint="Press to enter"
+                >
                 <div class="medicine-alert-content" style="width: 100%;">
                     <div class="medicine-alert-name-row">
-                        <a
-                            href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
-                            class="medicine-alert-item-name"
-                            style="text-decoration: none;"
-                        >{{ $medicineAlert->name }}</a>
+                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
                     </div>
                     
                     <div class="medicine-alert-item-meta">
@@ -1742,6 +1781,7 @@
                     </div>
                     
                 </div>
+                </a>
             </article>
             
 
@@ -1755,13 +1795,14 @@
                     $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
                 @endphp
             <article class="medicine-alert-item is-hidden {{ $isExpired ? 'is-expired' : '' }}" data-medicine-alert-extra="true">
+                <a
+                    href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
+                    class="medicine-alert-item-link"
+                    data-hover-hint="Press to enter"
+                >
                 <div class="medicine-alert-content" style="width: 100%;">
                     <div class="medicine-alert-name-row">
-                        <a
-                            href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
-                            class="medicine-alert-item-name"
-                            style="text-decoration: none;"
-                        >{{ $medicineAlert->name }}</a>
+                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
                     </div>
 
                     <div class="medicine-alert-item-meta">
@@ -1772,6 +1813,7 @@
                         </span>
                     </div>
                 </div>
+                </a>
             </article>
             @endforeach
         </div>
@@ -1785,6 +1827,8 @@
     @endif
     </section>
 @endif
+
+<div id="medicineHoverHint" class="medicine-hover-hint" aria-hidden="true">Press to enter</div>
 
 <section id="assistantPanel" class="assistant-panel" aria-live="polite">
     <div class="assistant-head">
@@ -1871,6 +1915,8 @@
         const panel = document.getElementById('medicineAlertPanel');
         const moreButton = document.getElementById('medicineAlertMoreBtn');
         const hiddenItems = Array.from(document.querySelectorAll('[data-medicine-alert-extra="true"]'));
+        const hoverHint = document.getElementById('medicineHoverHint');
+        const hintTargets = Array.from(document.querySelectorAll('.medicine-alert-item-link[data-hover-hint]'));
 
         if (!toggle || !panel) {
             return;
@@ -1956,6 +2002,27 @@
                 } else {
                     moreButton.closest('.medicine-alert-more-wrapper')?.remove();
                 }
+            });
+        }
+
+        if (hoverHint && hintTargets.length > 0) {
+            const moveHint = function (event) {
+                hoverHint.style.left = event.clientX + 'px';
+                hoverHint.style.top = event.clientY + 'px';
+            };
+
+            hintTargets.forEach(function (target) {
+                target.addEventListener('mouseenter', function (event) {
+                    hoverHint.textContent = target.dataset.hoverHint || 'Press to enter';
+                    hoverHint.classList.add('is-visible');
+                    moveHint(event);
+                });
+
+                target.addEventListener('mousemove', moveHint);
+
+                target.addEventListener('mouseleave', function () {
+                    hoverHint.classList.remove('is-visible');
+                });
             });
         }
 

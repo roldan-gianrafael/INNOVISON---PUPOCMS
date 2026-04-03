@@ -133,13 +133,19 @@
         }
 
         .medicine-alert-fab svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+            width: 30px; /* Slightly larger to account for the border thickness */
+            height: 30px;
+            display: block;
+        }
+
+        /* Ensure the path inside handles its own colors from the HTML attributes */
+        .medicine-alert-fab svg path {
+            transition: transform 0.2s ease;
+        }
+
+        /* Optional: Slight pulse effect to the warning triangle when hovering */
+        .medicine-alert-fab:hover svg {
+            transform: scale(1.1);
         }
 
         .medicine-alert-badge {
@@ -1606,9 +1612,14 @@
 
 @if($medicineAlertCount > 0)
     <button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts">
-        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width: 28px; height: 28px; fill: #ffffff;">
-            <path d="M416.7 51.5c-44.1-44.1-115.7-44.1-159.8 0L193.3 115l159.8 159.8 63.6-63.6c44.1-44.1 44.1-115.6 0-159.7zM159.4 148.9L44.5 263.8c-44.1 44.1-44.1 115.7 0 159.8s115.7 44.1 159.8 0l114.9-114.9-159.8-159.8z"/>
-            <path d="M495.4 416.6l-114.3-206c-13.4-24.1-48.4-24.1-61.7 0L205 416.6c-13.1 23.5 3.9 52.3 30.9 52.3h228.6c27 0 44-28.8 30.9-52.3zM350.2 432.1c-10.1 0-18.2-8.1-18.2-18.2s8.1-18.2 18.2-18.2 18.2 8.1 18.2 18.2-8.1 18.2-18.2 18.2zm18.2-64.1c0 10.1-8.1 18.2-18.2 18.2s-18.2-8.1-18.2-18.2V288.5c0-10.1 8.1-18.2 18.2-18.2s18.2 8.1 18.2 18.2v79.5z"/>
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <path d="M416.7 51.5c-44.1-44.1-115.7-44.1-159.8 0L193.3 115l159.8 159.8 63.6-63.6c44.1-44.1 44.1-115.6 0-159.7zM159.4 148.9L44.5 263.8c-44.1 44.1-44.1 115.7 0 159.8s115.7 44.1 159.8 0l114.9-114.9-159.8-159.8z" fill="#ffffff" stroke="none"/>
+            
+            <path d="M495.4 416.6l-114.3-206c-13.4-24.1-48.4-24.1-61.7 0L205 416.6c-13.1 23.5 3.9 52.3 30.9 52.3h228.6c27 0 44-28.8 30.9-52.3zM350.2 432.1c-10.1 0-18.2-8.1-18.2-18.2s8.1-18.2 18.2-18.2 18.2 8.1 18.2 18.2-8.1 18.2-18.2 18.2zm18.2-64.1c0 10.1-8.1 18.2-18.2 18.2s-18.2-8.1-18.2-18.2V288.5c0-10.1 8.1-18.2 18.2-18.2s18.2 8.1 18.2 18.2v79.5z" 
+                  fill="#ffffff" 
+                  stroke="#000000" 
+                  stroke-width="20" 
+                  stroke-linejoin="round"/>
         </svg>
         <span class="medicine-alert-badge">{{ $medicineAlertCount }}</span>
     </button>

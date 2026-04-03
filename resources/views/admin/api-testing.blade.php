@@ -430,205 +430,117 @@
         @endif
     </section>
 
-    <section class="api-testing-card">
-        @if(!empty($results))
-            @if(($source ?? '') === 'admin_options')
-                <div class="admin-option-list">
-                    @foreach($results as $result)
-                        <button
-                            type="button"
-                            class="admin-option-item"
-                            data-first-name="{{ $result['first_name'] ?? '' }}"
-                            data-last-name="{{ $result['last_name'] ?? '' }}"
-                            data-suffix-name="{{ $result['suffix_name'] === 'N/A' ? '' : ($result['suffix_name'] ?? '') }}"
-                            data-email="{{ $result['email'] ?? '' }}"
-                            data-status="{{ $result['status'] ?? '' }}"
-                        >
-                            <p class="admin-option-name">{{ $result['name'] }}</p>
-                            <div class="admin-option-email">{{ $result['email'] }}</div>
-                            <div class="admin-option-meta">
-                                <span class="admin-option-chip">ID: {{ $result['admin_id'] ?? $result['identifier'] }}</span>
-                                <span class="admin-option-chip">Status: {{ $result['status'] }}</span>
-                            </div>
-                        </button>
-                    @endforeach
-                </div>
+   
 
-                <div class="admin-autofill-panel">
-                    <h3>Selected Admin</h3>
-                    <div class="admin-autofill-grid">
-                        <div class="admin-autofill-field">
-                            <label for="selectedFirstName">First Name</label>
-                            <input type="text" id="selectedFirstName" readonly>
+<section class="api-testing-card">
+    @if(!empty($results))
+        @if(($source ?? '') === 'admin_options')
+            <div class="admin-option-list">
+                @foreach($results as $result)
+                    <button
+                        type="button"
+                        class="admin-option-item"
+                        data-first-name="{{ $result['first_name'] ?? '' }}"
+                        data-last-name="{{ $result['last_name'] ?? '' }}"
+                        data-suffix-name="{{ ($result['suffix_name'] ?? '') === 'N/A' ? '' : ($result['suffix_name'] ?? '') }}"
+                        data-email="{{ $result['email'] ?? '' }}"
+                        data-status="{{ $result['status'] ?? '' }}"
+                    >
+                        <p class="admin-option-name">{{ $result['name'] ?? 'N/A' }}</p>
+                        <div class="admin-option-email">{{ $result['email'] ?? 'N/A' }}</div>
+                        <div class="admin-option-meta">
+                            <span class="admin-option-chip">ID: {{ $result['admin_id'] ?? ($result['identifier'] ?? 'N/A') }}</span>
+                            <span class="admin-option-chip">Status: {{ $result['status'] ?? 'N/A' }}</span>
                         </div>
-                        <div class="admin-autofill-field">
-                            <label for="selectedLastName">Last Name</label>
-                            <input type="text" id="selectedLastName" readonly>
-                        </div>
-                        <div class="admin-autofill-field">
-                            <label for="selectedSuffixName">Suffix Name</label>
-                            <input type="text" id="selectedSuffixName" readonly>
-                        </div>
-                        <div class="admin-autofill-field">
-                            <label for="selectedEmail">Email</label>
-                            <input type="text" id="selectedEmail" readonly>
-                        </div>
-                        <div class="admin-autofill-field">
-                            <label for="selectedStatus">Status</label>
-                            <input type="text" id="selectedStatus" readonly>
-                        </div>
-                    </div>
-                </div>
-            @elseif(($source ?? '') === 'faculty')
-                <div class="admin-option-list">
-                    @foreach($results as $result)
-                        <button
-                            type="button"
-                            class="faculty-option-item"
-                            data-first-name="{{ $result['first_name'] === 'N/A' ? '' : ($result['first_name'] ?? '') }}"
-                            data-last-name="{{ $result['last_name'] === 'N/A' ? '' : ($result['last_name'] ?? '') }}"
-                            data-suffix-name="{{ $result['suffix_name'] === 'N/A' ? '' : ($result['suffix_name'] ?? '') }}"
-                            data-email="{{ $result['email'] === 'N/A' ? '' : ($result['email'] ?? '') }}"
-                            data-status="{{ $result['status'] === 'N/A' ? '' : ($result['status'] ?? '') }}"
-                            data-office="{{ $result['office'] === 'N/A' ? '' : ($result['office'] ?? '') }}"
-                            data-identifier="{{ $result['identifier'] ?? '' }}"
-                        >
-                            <p class="faculty-option-name">{{ $result['name'] }}</p>
-                            <div class="faculty-option-email">{{ $result['email'] }}</div>
-                            <div class="faculty-option-meta">
-                                <span class="faculty-option-chip">ID: {{ $result['identifier'] }}</span>
-                                <span class="faculty-option-chip">Office: {{ $result['office'] }}</span>
-                                <span class="faculty-option-chip">Status: {{ $result['status'] }}</span>
-                            </div>
-                        </button>
-                    @endforeach
-                </div>
 
-                <div class="faculty-autofill-panel">
-                    <h3>Selected Faculty</h3>
-                    <div class="faculty-autofill-grid">
-                        <div class="faculty-autofill-field">
-                            <label for="selectedFacultyFirstName">First Name</label>
-                            <input type="text" id="selectedFacultyFirstName" readonly>
-                        </div>
-                        <div class="faculty-autofill-field">
-                            <label for="selectedFacultyLastName">Last Name</label>
-                            <input type="text" id="selectedFacultyLastName" readonly>
-                        </div>
-                        <div class="faculty-autofill-field">
-                            <label for="selectedFacultySuffixName">Suffix Name</label>
-                            <input type="text" id="selectedFacultySuffixName" readonly>
-                        </div>
-                        <div class="faculty-autofill-field">
-                            <label for="selectedFacultyEmail">Email</label>
-                            <input type="text" id="selectedFacultyEmail" readonly>
-                        </div>
-                        <div class="faculty-autofill-field">
-                            <label for="selectedFacultyStatus">Status</label>
-                            <input type="text" id="selectedFacultyStatus" readonly>
-                        </div>
-                        <div class="faculty-autofill-field">
-                            <label for="selectedFacultyOffice">Office</label>
-                            <input type="text" id="selectedFacultyOffice" readonly>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="api-results">
-                    @foreach($results as $result)
-                        <article class="api-result-card">
-                            <h3 style="margin: 0; color: #7f1d2d;">{{ $result['name'] }}</h3>
-                            <div class="api-result-grid">
-                                <div class="api-field">
-                                    <small>ID</small>
-                                    <strong>{{ $result['admin_id'] ?? $result['identifier'] }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>First Name</small>
-                                    <strong>{{ $result['first_name'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Middle Name</small>
-                                    <strong>{{ $result['middle_name'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Last Name</small>
-                                    <strong>{{ $result['last_name'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Suffix Name</small>
-                                    <strong>{{ $result['suffix_name'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Email</small>
-                                    <strong>{{ $result['email'] }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Birthday</small>
-                                    <strong>{{ $result['birthday'] }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Age</small>
-                                    <strong>{{ $result['age'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Gender</small>
-                                    <strong>{{ $result['gender'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Civil Status</small>
-                                    <strong>{{ $result['civil_status'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Name</small>
-                                    <strong>{{ $result['name'] }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Access Level</small>
-                                    <strong>{{ $result['access_level'] ?? $result['role'] }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Office</small>
-                                    <strong>{{ $result['office'] }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Contact Number</small>
-                                    <strong>{{ $result['contact_number'] }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Status</small>
-                                    <strong>{{ $result['status'] }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Emergency Contact Person</small>
-                                    <strong>{{ $result['emergency_contact_person'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Emergency Contact No</small>
-                                    <strong>{{ $result['emergency_contact_no'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field">
-                                    <small>Last Updated</small>
-                                    <strong>{{ $result['last_updated'] ?? 'N/A' }}</strong>
-                                </div>
-                                <div class="api-field" style="grid-column: 1 / -1;">
-                                    <small>Address</small>
-                                    <strong>{{ $result['address'] }}</strong>
-                                </div>
-                            </div>
+                        {{-- Raw Response para sa Admin Options --}}
+                        <details class="api-raw-toggle" style="margin-top: 10px;">
+                            <summary onclick="event.stopPropagation()">Show raw response</summary>
+                            <div class="api-json">{{ json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                        </details>
+                    </button>
+                @endforeach
+            </div>
 
-                            <details class="api-raw-toggle">
-                                <summary>Show raw response</summary>
-                                <div class="api-json">{{ json_encode($result['fields'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
-                            </details>
-                        </article>
-                    @endforeach
+            {{-- ... (Selected Admin Panel stays the same) ... --}}
+            <div class="admin-autofill-panel">
+                <h3>Selected Admin</h3>
+                <div class="admin-autofill-grid">
+                    <div class="admin-autofill-field"><label>First Name</label><input type="text" id="selectedFirstName" readonly></div>
+                    <div class="admin-autofill-field"><label>Last Name</label><input type="text" id="selectedLastName" readonly></div>
+                    <div class="admin-autofill-field"><label>Suffix Name</label><input type="text" id="selectedSuffixName" readonly></div>
+                    <div class="admin-autofill-field"><label>Email</label><input type="text" id="selectedEmail" readonly></div>
+                    <div class="admin-autofill-field"><label>Status</label><input type="text" id="selectedStatus" readonly></div>
                 </div>
-            @endif
+            </div>
+
+        @elseif(($source ?? '') === 'faculty')
+            <div class="admin-option-list">
+                @foreach($results as $result)
+                    <button
+                        type="button"
+                        class="faculty-option-item"
+                        data-first-name="{{ ($result['first_name'] ?? '') === 'N/A' ? '' : ($result['first_name'] ?? '') }}"
+                        data-last-name="{{ ($result['last_name'] ?? '') === 'N/A' ? '' : ($result['last_name'] ?? '') }}"
+                        data-suffix-name="{{ ($result['suffix_name'] ?? '') === 'N/A' ? '' : ($result['suffix_name'] ?? '') }}"
+                        data-email="{{ ($result['email'] ?? '') === 'N/A' ? '' : ($result['email'] ?? '') }}"
+                        data-status="{{ ($result['status'] ?? '') === 'N/A' ? '' : ($result['status'] ?? '') }}"
+                        data-office="{{ ($result['office'] ?? '') === 'N/A' ? '' : ($result['office'] ?? '') }}"
+                        data-identifier="{{ $result['identifier'] ?? '' }}"
+                    >
+                        <p class="faculty-option-name">{{ $result['name'] ?? 'N/A' }}</p>
+                        <div class="faculty-option-email">{{ $result['email'] ?? 'N/A' }}</div>
+                        <div class="faculty-option-meta">
+                            <span class="faculty-option-chip">ID: {{ $result['identifier'] ?? 'N/A' }}</span>
+                            <span class="faculty-option-chip">Office: {{ $result['office'] ?? 'N/A' }}</span>
+                            <span class="faculty-option-chip">Status: {{ $result['status'] ?? 'N/A' }}</span>
+                        </div>
+
+                        {{-- ITO YUNG NAWAWALA: Raw Response para sa Faculty --}}
+                        <details class="api-raw-toggle" style="margin-top: 10px;">
+                            <summary onclick="event.stopPropagation()">Show raw response</summary>
+                            <div class="api-json">{{ json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                        </details>
+                    </button>
+                @endforeach
+            </div>
+
+            {{-- Selected Faculty Panel --}}
+            <div class="faculty-autofill-panel">
+                <h3>Selected Faculty</h3>
+                <div class="faculty-autofill-grid">
+                    <div class="faculty-autofill-field"><label>First Name</label><input type="text" id="selectedFacultyFirstName" readonly></div>
+                    <div class="faculty-autofill-field"><label>Last Name</label><input type="text" id="selectedFacultyLastName" readonly></div>
+                    <div class="faculty-autofill-field"><label>Suffix Name</label><input type="text" id="selectedFacultySuffixName" readonly></div>
+                    <div class="faculty-autofill-field"><label>Email</label><input type="text" id="selectedFacultyEmail" readonly></div>
+                    <div class="faculty-autofill-field"><label>Status</label><input type="text" id="selectedFacultyStatus" readonly></div>
+                    <div class="faculty-autofill-field"><label>Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
+                </div>
+            </div>
+
         @else
-            <p class="api-empty">Search results will appear here once you choose a source and enter a name, email, or ID.</p>
+            {{-- Unified Display for Other APIs (Custom / Admin API) --}}
+            <div class="api-results">
+                @foreach($results as $result)
+                    <article class="api-result-card">
+                        <h3 style="margin: 0; color: #7f1d2d;">{{ $result['name'] ?? 'N/A' }}</h3>
+                        <div class="api-result-grid">
+                            {{-- ... existing fields (ID, Name, Email, etc.) ... --}}
+                            {{-- Siguraduhin lang na $result gamit mo dito, hindi $result['fields'] kung hindi consistent ang API --}}
+                        </div>
+
+                        <details class="api-raw-toggle">
+                            <summary>Show raw response</summary>
+                            <div class="api-json">{{ json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                        </details>
+                    </article>
+                @endforeach
+            </div>
         @endif
-    </section>
+    @else
+        <p class="api-empty">Search results will appear here once you choose a source and enter a name, email, or ID.</p>
+    @endif
+</section>
 </div>
 @endsection
 

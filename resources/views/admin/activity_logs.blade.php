@@ -16,6 +16,10 @@
         box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
         padding: 18px;
     }
+    .audit-card,
+    .audit-card *:not(.audit-role-badge):not(.audit-event-badge):not(.audit-status-badge):not(.audit-btn-primary) {
+        color: #111827;
+    }
 
     .audit-head {
         display: flex;
@@ -34,7 +38,7 @@
 
     .audit-subtitle {
         margin: 6px 0 0;
-        color: #64748b;
+        color: #111827;
         font-size: 13px;
     }
 
@@ -52,7 +56,7 @@
     }
 
     .audit-stat-label {
-        color: #64748b;
+        color: #111827;
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -79,7 +83,7 @@
     }
 
     .audit-filter-label {
-        color: #334155;
+        color: #111827;
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -169,7 +173,7 @@
     }
 
     .audit-mini-label {
-        color: #334155;
+        color: #111827;
         font-size: 12px;
         font-weight: 700;
     }

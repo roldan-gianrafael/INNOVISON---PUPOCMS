@@ -13,6 +13,10 @@
         border: 1px solid #f0f0f0;
         height: 100%; /* Para pantay ang taas nila */
     }
+    .card,
+    .card *:not(.status):not(.btn-action):not(.btn-sign) {
+        color: #111827;
+    }
     
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     
@@ -20,7 +24,7 @@
         text-align: left;
         font-size: 12px;
         font-weight: 800;
-        color: #64748b;
+        color: #111827;
         text-transform: uppercase;
         padding: 12px 16px;
         border-bottom: 2px solid #f1f5f9;
@@ -30,7 +34,7 @@
         padding: 16px;
         border-bottom: 1px solid #f8fafc;
         font-size: 14px;
-        color: #334155;
+        color: #111827;
         vertical-align: middle;
     }
 
@@ -91,9 +95,9 @@
 
     {{-- Header with Search --}}
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="margin:0; color:#ffffff;">Student Health Records</h2>
+        <h2 style="margin:0; color:#111827;">Student Health Records</h2>
         <input type="text" id="recordSearch" placeholder="Search by student name or ID..." 
-               style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 350px;">
+               style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 350px; color:#111827;">
     </div>
 
     {{-- Summary Cards - Hardcoded Side by Side --}}

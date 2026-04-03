@@ -12,9 +12,13 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         border: 1px solid #f0f0f0;
     }
+    .card,
+    .card *:not(.status):not(.btn-add):not(.btn-icon) {
+        color: #111827;
+    }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     th { text-align: left; padding: 12px 16px; border-bottom: 2px solid #f1f5f9; color: #000000; text-transform: uppercase; font-size: 12px; }
-    td { padding: 16px; border-bottom: 1px solid #f8fafc; font-size: 14px; color: #334155; }
+    td { padding: 16px; border-bottom: 1px solid #f8fafc; font-size: 14px; color: #111827; }
 
     /* Controls */
     .controls { display: flex; justify-content: space-between; margin-bottom: 20px; }
@@ -36,8 +40,8 @@
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
     .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 400px; }
     .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600; color: #64748b; }
-    .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600; color: #111827; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; color: #111827; }
 </style>
 @endpush
 

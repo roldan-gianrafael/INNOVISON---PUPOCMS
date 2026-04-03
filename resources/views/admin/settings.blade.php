@@ -13,10 +13,14 @@
         border: 1px solid #f0f0f0;
         margin-bottom: 24px;
     }
+    .card,
+    .card *:not(.pill-status):not(.btn-save) {
+        color: #111827;
+    }
     .card h3 { margin-top: 0; color: #8B0000; margin-bottom: 20px; font-size: 18px; }
     .profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
     .profile-grid-wide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 18px; }
-    .profile-note { padding: 12px 14px; border-radius: 10px; background: #f8fafc; color: #64748b; font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
+    .profile-note { padding: 12px 14px; border-radius: 10px; background: #f8fafc; color: #111827; font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
     .pill-status { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; text-transform:capitalize; }
     .pill-status.active { background:#dcfce7; color:#166534; }
     .pill-status.inactive { background:#fee2e2; color:#991b1b; }
@@ -25,15 +29,15 @@
 
     /* Forms */
     .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; color: #64748b; }
-    .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #334155; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; color: #111827; }
+    .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #111827; }
     .form-control:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
 
     /* Switches */
     .switch-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px; border-radius: 8px; transition: 0.2s; }
     .switch-row:hover { background: #f8fafc; }
     .switch-row input { width: 16px; height: 16px; accent-color: #8B0000; cursor: pointer; }
-    .switch-label { font-size: 14px; font-weight: 600; color: #334155; cursor: pointer; flex: 1; }
+    .switch-label { font-size: 14px; font-weight: 600; color: #111827; cursor: pointer; flex: 1; }
 
     /* Buttons */
     .btn-save { background: #8B0000; color: white; padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }

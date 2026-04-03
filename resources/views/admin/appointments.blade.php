@@ -15,11 +15,17 @@
     
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     
+    h2,
+    .card,
+    .card *:not(.status):not(.type-badge):not(.btn-action):not(.dialog-btn):not(.btn-add-walkin) {
+        color: #111827;
+    }
+
     th {
         text-align: left;
         font-size: 12px;
         font-weight: 800;
-        color: #64748b;
+        color: #111827;
         text-transform: uppercase;
         padding: 12px 16px;
         border-bottom: 2px solid #f1f5f9;
@@ -29,7 +35,7 @@
         padding: 16px;
         border-bottom: 1px solid #f8fafc;
         font-size: 14px;
-        color: #334155;
+        color: #111827;
         vertical-align: middle;
     }
 
@@ -109,8 +115,8 @@
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
     .modal-row { margin-bottom: 12px; }
-    .modal-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
-    .modal-val { font-size: 15px; color: #334155; font-weight: 500; }
+    .modal-label { font-size: 12px; font-weight: 700; color: #111827; text-transform: uppercase; }
+    .modal-val { font-size: 15px; color: #111827; font-weight: 500; }
     .modal-title {
         margin-top: 0;
         border-bottom: 1px solid #eee;
@@ -119,7 +125,7 @@
     }
     .modal-subtitle {
         font-size: 14px;
-        color: #64748b;
+        color: #111827;
         margin-bottom: 16px;
     }
     .dialog-actions {
@@ -223,9 +229,9 @@
     @endphp
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="margin:0; color:#ffffff;">Appointments</h2>
+        <h2 style="margin:0; color:#111827;">Appointments</h2>
         <input type="text" id="searchInput" placeholder="Search by name..." 
-               style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 300px;">
+               style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 300px; color:#111827;">
     </div>
 
     <div class="action-header">
@@ -252,7 +258,7 @@
                     <tr>
                         <td>
                             <div style="font-weight: 700;" class="student-name">{{ $appt->name }}</div>
-                            <div style="font-size: 12px; color: #94a3b8;">{{ $appt->student_id }}</div>
+                            <div style="font-size: 12px; color: #111827;">{{ $appt->student_id }}</div>
                         </td>
                        <td>
     @php

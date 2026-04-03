@@ -1604,26 +1604,24 @@
     @csrf
 </form>
 
-<button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts" title="Medicine expiry alerts">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M10 2h4"></path>
-        <path d="M9 2h6v3a2 2 0 0 1-.6 1.4l-1.2 1.2a6.5 6.5 0 1 1-2.4 0L9.6 6.4A2 2 0 0 1 9 5V2Z"></path>
-        <path d="M9 14h6"></path>
-    </svg>
-    @if($medicineAlertCount > 0)
+@if($medicineAlertCount > 0)
+    <button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts" title="Medicine expiry alerts">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 2h4"></path>
+            <path d="M9 2h6v3a2 2 0 0 1-.6 1.4l-1.2 1.2a6.5 6.5 0 1 1-2.4 0L9.6 6.4A2 2 0 0 1 9 5V2Z"></path>
+            <path d="M9 14h6"></path>
+        </svg>
         <span class="medicine-alert-badge">{{ $medicineAlertCount }}</span>
-    @endif
-</button>
+    </button>
 
-<section class="medicine-alert-panel" id="medicineAlertPanel" aria-live="polite">
-    <div class="medicine-alert-head">
-        <div>
-            <p class="medicine-alert-title">Medicine Alerts</p>
-            <p class="medicine-alert-subtitle">Near-expiry medicines and current stock levels.</p>
+    <section class="medicine-alert-panel" id="medicineAlertPanel" aria-live="polite">
+        <div class="medicine-alert-head">
+            <div>
+                <p class="medicine-alert-title">Medicine Alerts</p>
+                <p class="medicine-alert-subtitle">Near-expiry medicines and current stock levels.</p>
+            </div>
         </div>
-    </div>
 
-    @if($medicineAlertCount > 0)
         <div class="medicine-alert-list">
             @foreach($medicineAlerts as $medicineAlert)
                 @php
@@ -1642,10 +1640,8 @@
                 </article>
             @endforeach
         </div>
-    @else
-        <p class="medicine-alert-empty">No medicines are near expiry within the next 30 days.</p>
-    @endif
-</section>
+    </section>
+@endif
 
 <section id="assistantPanel" class="assistant-panel" aria-live="polite">
     <div class="assistant-head">

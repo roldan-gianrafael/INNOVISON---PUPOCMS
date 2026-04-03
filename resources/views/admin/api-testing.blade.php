@@ -476,12 +476,11 @@
 
        @elseif(($source ?? '') === 'faculty')
     <div class="admin-option-list">
-        {{-- Isang linya lang para ituro sa tamang array --}}
+        {{-- Target the correct array depth --}}
         @foreach($results['fields']['faculties'] ?? [] as $faculty)
             <button
                 type="button"
-                class="faculty-option-item"
-                {{-- Dito natin kinuha yung data mula sa loob ng faculty object --}}
+                class="admin-option-item" {{-- Ginamit ko yung class ng admin para sa styling --}}
                 data-first-name="{{ $faculty['first_name'] ?? '' }}"
                 data-last-name="{{ $faculty['last_name'] ?? '' }}"
                 data-suffix-name="{{ $faculty['suffix_name'] ?? '' }}"
@@ -490,25 +489,37 @@
                 data-office="{{ $faculty['department'] ?? 'N/A' }}"
                 data-identifier="{{ $faculty['faculty_code'] ?? '' }}"
             >
-                <p class="faculty-option-name">{{ ($faculty['first_name'] ?? '') . ' ' . ($faculty['last_name'] ?? '') }}</p>
-                <div class="faculty-option-email">{{ $faculty['email'] ?? 'N/A' }}</div>
-                <div class="faculty-option-meta">
-                    <span class="faculty-option-chip">ID: {{ $faculty['faculty_code'] ?? 'N/A' }}</span>
+                {{-- Match Admin's naming and layout --}}
+                <p class="admin-option-name">
+                    {{ ($faculty['first_name'] ?? '') }} {{ ($faculty['last_name'] ?? '') }}
+                </p>
+                <div class="admin-option-email">{{ $faculty['email'] ?? 'N/A' }}</div>
+                
+                <div class="admin-option-meta">
+                    <span class="admin-option-chip">ID: {{ $faculty['faculty_code'] ?? 'N/A' }}</span>
+                    <span class="admin-option-chip">Office: {{ $faculty['department'] ?? 'N/A' }}</span>
+                    <span class="admin-option-chip">Status: {{ $faculty['status'] ?? 'Active' }}</span>
                 </div>
+
+                {{-- Raw Response Toggle --}}
+                <details class="api-raw-toggle" style="margin-top: 10px;">
+                    <summary onclick="event.stopPropagation()">Show raw response</summary>
+                    <div class="api-json">{{ json_encode($faculty, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                </details>
             </button>
         @endforeach
     </div>
 
-    {{-- Selected Faculty Panel (Keep this as is, your JS will handle the fill) --}}
+    {{-- Selected Faculty Panel --}}
     <div class="faculty-autofill-panel">
-        <h3>Selected Faculty</h3>
+        <h3>Selected Faculty Details</h3>
         <div class="faculty-autofill-grid">
             <div class="faculty-autofill-field"><label>First Name</label><input type="text" id="selectedFacultyFirstName" readonly></div>
             <div class="faculty-autofill-field"><label>Last Name</label><input type="text" id="selectedFacultyLastName" readonly></div>
             <div class="faculty-autofill-field"><label>Suffix Name</label><input type="text" id="selectedFacultySuffixName" readonly></div>
             <div class="faculty-autofill-field"><label>Email</label><input type="text" id="selectedFacultyEmail" readonly></div>
             <div class="faculty-autofill-field"><label>Status</label><input type="text" id="selectedFacultyStatus" readonly></div>
-            <div class="faculty-autofill-field"><label>Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
+            <div class="faculty-autofill-field"><label>Department/Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
         </div>
     </div>
         @else

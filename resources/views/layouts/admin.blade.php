@@ -866,10 +866,10 @@
             }
 
             .medicine-alert-fab {
-                right: 78px;
-                bottom: 12px;
-                width: 48px;
-                height: 48px;
+                width: 28px; 
+                height: 28px;
+                fill: #ffffff;
+                stroke: none;  
             }
 
             .medicine-alert-panel {
@@ -1605,11 +1605,10 @@
 </form>
 
 @if($medicineAlertCount > 0)
-    <button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts" title="Medicine expiry alerts">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M10 2h4"></path>
-            <path d="M9 2h6v3a2 2 0 0 1-.6 1.4l-1.2 1.2a6.5 6.5 0 1 1-2.4 0L9.6 6.4A2 2 0 0 1 9 5V2Z"></path>
-            <path d="M9 14h6"></path>
+    <button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width: 28px; height: 28px; fill: #ffffff;">
+            <path d="M416.7 51.5c-44.1-44.1-115.7-44.1-159.8 0L193.3 115l159.8 159.8 63.6-63.6c44.1-44.1 44.1-115.6 0-159.7zM159.4 148.9L44.5 263.8c-44.1 44.1-44.1 115.7 0 159.8s115.7 44.1 159.8 0l114.9-114.9-159.8-159.8z"/>
+            <path d="M495.4 416.6l-114.3-206c-13.4-24.1-48.4-24.1-61.7 0L205 416.6c-13.1 23.5 3.9 52.3 30.9 52.3h228.6c27 0 44-28.8 30.9-52.3zM350.2 432.1c-10.1 0-18.2-8.1-18.2-18.2s8.1-18.2 18.2-18.2 18.2 8.1 18.2 18.2-8.1 18.2-18.2 18.2zm18.2-64.1c0 10.1-8.1 18.2-18.2 18.2s-18.2-8.1-18.2-18.2V288.5c0-10.1 8.1-18.2 18.2-18.2s18.2 8.1 18.2 18.2v79.5z"/>
         </svg>
         <span class="medicine-alert-badge">{{ $medicineAlertCount }}</span>
     </button>

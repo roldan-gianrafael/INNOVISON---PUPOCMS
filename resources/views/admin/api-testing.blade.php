@@ -547,6 +547,7 @@
     <div class="faculty-autofill-panel">
         <h3>Selected Faculty Details</h3>
         <div class="faculty-autofill-grid">
+            <div class="faculty-autofill-field"><label>Faculty ID</label><input type="text" id="selectedFacultyIdentifier" readonly></div>
             <div class="faculty-autofill-field"><label>First Name</label><input type="text" id="selectedFacultyFirstName" readonly></div>
             <div class="faculty-autofill-field"><label>Last Name</label><input type="text" id="selectedFacultyLastName" readonly></div>
             <div class="faculty-autofill-field"><label>Suffix Name</label><input type="text" id="selectedFacultySuffixName" readonly></div>
@@ -639,6 +640,7 @@
         // Handler para sa Faculty Selection
         const handleFacultySelection = (button) => {
             const fields = {
+                'selectedFacultyIdentifier': button.dataset.identifier,
                 'selectedFacultyFirstName': button.dataset.firstName,
                 'selectedFacultyLastName': button.dataset.lastName,
                 'selectedFacultySuffixName': button.dataset.suffixName,
@@ -661,6 +663,11 @@
             if (adminBtn) handleAdminSelection(adminBtn);
             if (facultyBtn) handleFacultySelection(facultyBtn);
         });
+
+        const firstFacultyButton = document.querySelector('.faculty-option-item');
+        if (firstFacultyButton) {
+            handleFacultySelection(firstFacultyButton);
+        }
     });
 </script>
 @endpush

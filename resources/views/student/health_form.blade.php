@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fill Up - Student Health Information Form</title>
+    <script
+        src="{{ asset('js/sienna-accessibility-custom.umd.js') }}?v={{ filemtime(public_path('js/sienna-accessibility-custom.umd.js')) }}"
+        data-asw-position="bottom-right"
+        data-asw-offset="24,12"
+        data-asw-size="small"
+        defer
+    ></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
@@ -53,6 +60,26 @@
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 16px;
+        }
+        :where(.asw-menu-btn) {
+            position: fixed;
+            left: auto !important;
+            right: 20px !important;
+            top: auto !important;
+            bottom: 14px !important;
+            background: #800000 !important;
+            background-image: none !important;
+            border: 2px solid #5f0012 !important;
+            outline: none !important;
+            box-shadow: 0 10px 24px rgba(128, 0, 0, 0.28) !important;
+        }
+        :where(.asw-menu-btn svg),
+        :where(.asw-menu-btn svg path:not([fill="none"])) {
+            fill: #ffffff !important;
+            stroke: none !important;
+        }
+        :where(.asw-menu-btn svg path[fill="none"]) {
+            stroke: none !important;
         }
         .step-card {
             position: relative;
@@ -143,10 +170,7 @@
             line-height: 1.3;
         }
         .intro-panel {
-            display: grid;
-            grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
-            gap: 18px;
-            align-items: stretch;
+            display: block;
         }
         .intro-copy,
         .intro-upload {
@@ -177,6 +201,21 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 16px;
+        }
+        .verification-upload-shell {
+            margin-top: 22px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(128, 0, 0, 0.12);
+        }
+        .privacy-copy {
+            margin-top: 18px;
+            text-align: center;
+            color: var(--clinic-muted);
+            font-size: 0.92rem;
+            line-height: 1.7;
+            max-width: 760px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .section-title {
             background: transparent;
@@ -362,9 +401,6 @@
             color: #ffffff;
         }
         @media (max-width: 992px) {
-            .intro-panel {
-                grid-template-columns: 1fr;
-            }
             .stepper-track {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -374,11 +410,33 @@
                 padding: 18px 0 28px;
             }
             .form-card {
-                padding: 20px;
+                padding: 16px;
                 border-radius: 20px;
             }
-            .upload-grid,
+            .stepper-shell {
+                top: 10px;
+                padding: 14px;
+                border-radius: 18px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
             .stepper-track {
+                display: flex;
+                gap: 12px;
+                min-width: max-content;
+            }
+            .step-card {
+                width: 250px;
+                min-height: 78px;
+                padding: 14px 15px;
+            }
+            .step-copy small {
+                font-size: 10px;
+            }
+            .step-copy strong {
+                font-size: 13px;
+            }
+            .upload-grid {
                 grid-template-columns: 1fr;
             }
             .cta-row {
@@ -393,6 +451,9 @@
             .btn-health-secondary,
             .btn-health-submit {
                 width: 100%;
+            }
+            .privacy-copy {
+                font-size: 0.86rem;
             }
         }
     </style>
@@ -496,33 +557,6 @@
                     Please provide complete and truthful information. Type <strong>N/A</strong> or <strong>NONE</strong>
                     for fields that do not apply to you. Required fields are marked with a maroon asterisk.
                 </p>
-            </div>
-            <div class="intro-upload">
-                <h3>Required Uploads</h3>
-                <div class="upload-grid">
-                    <div class="upload-box">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 7h4l2-2h4l2 2h4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z"></path>
-                            <circle cx="12" cy="13" r="3"></circle>
-                        </svg>
-                        <div>
-                            <strong>Upload 2x2 Picture</strong>
-                            <span>JPEG / PNG</span>
-                        </div>
-                        <input type="file" name="student_photo" class="form-control form-control-sm" accept="image/*" required>
-                    </div>
-                    <div class="upload-box">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 20h9"></path>
-                            <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-                        </svg>
-                        <div>
-                            <strong>Draw or Upload Digital Signature</strong>
-                            <span>PNG / JPG</span>
-                        </div>
-                        <input type="file" name="digital_signature" class="form-control form-control-sm" accept="image/*" required>
-                    </div>
-                </div>
             </div>
         </div>
         <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
@@ -765,15 +799,44 @@
 
     <section class="form-step" data-step="4">
     <div class="section-title">Step 4. Verification & Uploads</div>
-    <p class="section-hint">Review your entries, confirm your supporting documents, and continue to submission.</p>
+    <p class="section-hint">Review your entries, confirm the required uploads, and submit your health profile once everything looks correct.</p>
     <div class="step4-note-box">
         <h4>Upload Instructions</h4>
         <ul>
             <li>Upload a clear 2x2 picture in JPEG or PNG format.</li>
             <li>Upload a clear digital signature in PNG or JPG format.</li>
-            <li>For best results, use a transparent signature image. You may use <strong>remove.bg</strong> to remove the background before uploading.</li>
+            <li>For best results, use a transparent digital signature image. You may use <strong>remove.bg</strong> to remove the background before uploading.</li>
             <li>Make sure the uploaded files are readable and belong to the student account holder.</li>
         </ul>
+    </div>
+    <div class="verification-upload-shell">
+        <div class="intro-upload">
+            <h3>Required Uploads</h3>
+            <div class="upload-grid">
+                <div class="upload-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 7h4l2-2h4l2 2h4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z"></path>
+                        <circle cx="12" cy="13" r="3"></circle>
+                    </svg>
+                    <div>
+                        <strong>Upload 2x2 Picture</strong>
+                        <span>JPEG / PNG</span>
+                    </div>
+                    <input type="file" name="student_photo" class="form-control form-control-sm" accept="image/*" required>
+                </div>
+                <div class="upload-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                    </svg>
+                    <div>
+                        <strong>Draw or Upload Digital Signature</strong>
+                        <span>PNG / JPG</span>
+                    </div>
+                    <input type="file" name="digital_signature" class="form-control form-control-sm" accept="image/*" required>
+                </div>
+            </div>
+        </div>
     </div>
     </section>
 
@@ -785,6 +848,9 @@
             <button type="submit" class="btn-health-submit" id="submitStepBtn" style="display:none;">Submit Health Profile</button>
         </div>
     </div>
+    <p class="privacy-copy">
+        We value your privacy. All information provided in this form is processed in compliance with data protection standards and is used solely for university clearance.
+    </p>
 </form>
 </div>
 
@@ -1014,6 +1080,21 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleDisability();
     toggleAllergies();
     renderStep(1);
+
+    function forceAccessibilityButtonTheme() {
+        document.querySelectorAll('.asw-menu-btn').forEach((button) => {
+            button.style.setProperty('right', '20px', 'important');
+            button.style.setProperty('bottom', '14px', 'important');
+            button.style.setProperty('left', 'auto', 'important');
+            button.style.setProperty('top', 'auto', 'important');
+            button.style.setProperty('background', '#800000', 'important');
+            button.style.setProperty('background-image', 'none', 'important');
+            button.style.setProperty('border', '2px solid #5f0012', 'important');
+        });
+    }
+
+    forceAccessibilityButtonTheme();
+    new MutationObserver(forceAccessibilityButtonTheme).observe(document.body, { childList: true, subtree: true });
 });
 </script>
 

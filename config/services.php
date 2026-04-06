@@ -88,4 +88,11 @@ return [
         'timeout' => (int) env('PUPT_FLSS_TIMEOUT', 30),
     ],
 
+    'medical_status_webhook' => [
+        'url' => env('MEDICAL_STATUS_WEBHOOK_URL'),
+        'secret' => env('MEDICAL_STATUS_WEBHOOK_SECRET'),
+        'timeout' => (int) env('MEDICAL_STATUS_WEBHOOK_TIMEOUT', 20),
+        'signature_header' => env('MEDICAL_STATUS_WEBHOOK_SIGNATURE_HEADER', 'X-Medical-Signature'),
+    ],
+
 ];

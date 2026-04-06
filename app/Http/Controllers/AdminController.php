@@ -10,6 +10,7 @@ use App\Models\Item;
 use App\Models\Setting;
 use App\Models\Admin;
 use App\Services\FacultySyncService;
+use App\Services\MedicalStatusWebhookService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
@@ -813,6 +814,10 @@ public function updateClearance(Request $request, $id)
 
     // 5. I-save at i-check
     if($record->save()){
+        if ($request->clearance_status === 'Issued' && $record->user) {
+            app(MedicalStatusWebhookService::class)->notifyStudentStatus($record->user, 'health_clearance_issued');
+        }
+
         return redirect()->route('admin.health_records')
                          ->with('success', 'Health Clearance status updated successfully!');
     } else {

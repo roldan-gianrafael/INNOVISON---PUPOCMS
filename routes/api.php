@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminProfileController;
+use App\Http\Controllers\Api\MedicalStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,7 @@ Route::middleware('external.api')->group(function () {
     Route::get('/external/admins/{admin_id}', [AdminProfileController::class, 'externalShow']);
     Route::put('/external/admins/{admin_id}', [AdminProfileController::class, 'externalUpdate']);
     Route::get('/external/admin-profile', [AdminProfileController::class, 'lookup']);
+    Route::get('/external/students/{student_id}/medical-status', [MedicalStatusController::class, 'show']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

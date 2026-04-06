@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Appointment;
 use App\Models\User;
+use App\Services\MedicalStatusWebhookService;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -719,6 +720,7 @@ public function storeHealthForm(Request $request)
         // 4. UPDATE USER STATUS
         $user->is_health_profile_completed = 1;
         $user->save();
+        app(MedicalStatusWebhookService::class)->notifyStudentStatus($user, 'health_profile_completed');
 
         // 5. ACTIVITY LOG
         \App\Models\ActivityLog::create([

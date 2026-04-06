@@ -54,6 +54,10 @@
         margin-top: 18px;
     }
 
+    .api-system-group.is-hidden {
+        display: none;
+    }
+
     .api-search-form label {
         display: block;
         margin-bottom: 8px;
@@ -393,7 +397,7 @@
                     <option value="custom" {{ ($source ?? 'faculty') === 'custom' ? 'selected' : '' }}>Custom Temp API</option>
                 </select>
             </div>
-            <div>
+            <div id="apiSystemGroup" class="api-system-group {{ in_array(($source ?? 'faculty'), ['admin_api', 'admin_options'], true) ? '' : 'is-hidden' }}">
                 <label for="system">External System</label>
                 <select id="system" name="system">
                     <option value="">Choose system</option>
@@ -501,41 +505,45 @@
 
        @elseif(($source ?? '') === 'faculty')
     <div class="admin-option-list">
-        {{-- Target the correct array depth --}}
-        @foreach($results['fields']['faculties'] ?? [] as $faculty)
+        @foreach($results as $result)
+            @php
+                $facultyFields = $result['fields'] ?? [];
+                $facultyFirstName = $result['first_name'] ?? ($facultyFields['first_name'] ?? '');
+                $facultyLastName = $result['last_name'] ?? ($facultyFields['last_name'] ?? '');
+                $facultySuffixName = $result['suffix_name'] ?? ($facultyFields['suffix_name'] ?? '');
+                $facultyEmail = $result['email'] ?? ($facultyFields['email'] ?? 'N/A');
+                $facultyStatus = $result['status'] ?? ($facultyFields['status'] ?? 'Active');
+                $facultyOffice = $result['office'] ?? ($facultyFields['department'] ?? $facultyFields['office'] ?? 'N/A');
+                $facultyIdentifier = $result['identifier'] ?? ($facultyFields['faculty_code'] ?? 'N/A');
+            @endphp
             <button
                 type="button"
-                class="admin-option-item" {{-- Ginamit ko yung class ng admin para sa styling --}}
-                data-first-name="{{ $faculty['first_name'] ?? '' }}"
-                data-last-name="{{ $faculty['last_name'] ?? '' }}"
-                data-suffix-name="{{ $faculty['suffix_name'] ?? '' }}"
-                data-email="{{ $faculty['email'] ?? '' }}"
-                data-status="{{ $faculty['status'] ?? '' }}"
-                data-office="{{ $faculty['department'] ?? 'N/A' }}"
-                data-identifier="{{ $faculty['faculty_code'] ?? '' }}"
+                class="faculty-option-item"
+                data-first-name="{{ $facultyFirstName }}"
+                data-last-name="{{ $facultyLastName }}"
+                data-suffix-name="{{ ($facultySuffixName ?? '') === 'N/A' ? '' : ($facultySuffixName ?? '') }}"
+                data-email="{{ $facultyEmail }}"
+                data-status="{{ $facultyStatus }}"
+                data-office="{{ $facultyOffice }}"
+                data-identifier="{{ $facultyIdentifier }}"
             >
-                {{-- Match Admin's naming and layout --}}
-                <p class="admin-option-name">
-                    {{ ($faculty['first_name'] ?? '') }} {{ ($faculty['last_name'] ?? '') }}
-                </p>
-                <div class="admin-option-email">{{ $faculty['email'] ?? 'N/A' }}</div>
-                
-                <div class="admin-option-meta">
-                    <span class="admin-option-chip">ID: {{ $faculty['faculty_code'] ?? 'N/A' }}</span>
-                    <span class="admin-option-chip">Office: {{ $faculty['department'] ?? 'N/A' }}</span>
-                    <span class="admin-option-chip">Status: {{ $faculty['status'] ?? 'Active' }}</span>
+                <p class="faculty-option-name">{{ $result['name'] ?? trim($facultyFirstName . ' ' . $facultyLastName) ?: 'N/A' }}</p>
+                <div class="faculty-option-email">{{ $facultyEmail }}</div>
+
+                <div class="faculty-option-meta">
+                    <span class="faculty-option-chip">ID: {{ $facultyIdentifier }}</span>
+                    <span class="faculty-option-chip">Office: {{ $facultyOffice }}</span>
+                    <span class="faculty-option-chip">Status: {{ $facultyStatus }}</span>
                 </div>
 
-                {{-- Raw Response Toggle --}}
                 <details class="api-raw-toggle" style="margin-top: 10px;">
                     <summary onclick="event.stopPropagation()">Show raw response</summary>
-                    <div class="api-json">{{ json_encode($faculty, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                    <div class="api-json">{{ json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
                 </details>
             </button>
         @endforeach
     </div>
 
-    {{-- Selected Faculty Panel --}}
     <div class="faculty-autofill-panel">
         <h3>Selected Faculty Details</h3>
         <div class="faculty-autofill-grid">
@@ -580,10 +588,20 @@
         const sourceField = document.getElementById('source');
         const searchField = document.getElementById('search');
         const systemField = document.getElementById('system');
+        const systemGroup = document.getElementById('apiSystemGroup');
 
-        if (!form || !sourceField || !searchField || !systemField) return;
+        if (!form || !sourceField || !searchField || !systemField || !systemGroup) return;
 
         let hasAutoSubmitted = false;
+        const syncSystemVisibility = () => {
+            const needsSystem = ['admin_api', 'admin_options'].includes(sourceField.value);
+            systemField.disabled = !needsSystem;
+            systemGroup.classList.toggle('is-hidden', !needsSystem);
+
+            if (!needsSystem) {
+                systemField.value = '';
+            }
+        };
 
         // Auto-submit logic kapag nag-focus sa search field for specific sources
         searchField.addEventListener('focus', function () {
@@ -597,15 +615,10 @@
         });
 
         sourceField.addEventListener('change', function () {
-            const needsSystem = ['admin_api', 'admin_options'].includes(sourceField.value);
-            systemField.disabled = !needsSystem;
-
-            if (!needsSystem) {
-                systemField.value = '';
-            }
+            syncSystemVisibility();
         });
 
-        systemField.disabled = !['admin_api', 'admin_options'].includes(sourceField.value);
+        syncSystemVisibility();
 
         // Handler para sa Admin Options & Admin API (Unified)
         const handleAdminSelection = (button) => {

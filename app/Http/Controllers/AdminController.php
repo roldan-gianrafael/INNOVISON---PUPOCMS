@@ -637,7 +637,13 @@ class AdminController extends Controller
             return [];
         }
 
-        $items = array_is_list($records) ? $records : [$records];
+        if (is_array($records) && isset($records['faculties']) && is_array($records['faculties'])) {
+            $items = $records['faculties'];
+        } elseif (array_is_list($records)) {
+            $items = $records;
+        } else {
+            $items = [$records];
+        }
         $needle = strtolower($search);
         $normalized = [];
 

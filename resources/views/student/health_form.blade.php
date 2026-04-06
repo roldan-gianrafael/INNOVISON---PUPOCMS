@@ -6,13 +6,223 @@
     <title>Fill Up - Student Health Information Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7f6; padding: 40px 0; font-family: 'Segoe UI', sans-serif; color: #000; }
-        .form-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; }
-        .section-title { background-color: #800000; color: white; padding: 12px; margin-top: 30px; border-radius: 6px; font-weight: bold; text-transform: uppercase; font-size: 0.95rem; }
-        .form-label { font-weight: 600; font-size: 0.9rem; color: #000; }
-        .sub-label { font-size: 0.85rem; font-style: italic; color: #000; margin-bottom: 15px; display: block; }
+        :root {
+            --clinic-maroon: #800000;
+            --clinic-maroon-dark: #5f0012;
+            --clinic-maroon-soft: #f5e7ea;
+            --clinic-grey-bg: #eef1f3;
+            --clinic-panel: #ffffff;
+            --clinic-field: #fbfbfc;
+            --clinic-border: #d9dee5;
+            --clinic-text: #111827;
+            --clinic-muted: #5b6470;
+            --clinic-yellow: #fff6cc;
+        }
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(128, 0, 0, 0.08), transparent 28%),
+                linear-gradient(180deg, #f3f5f7 0%, #e9edf0 100%);
+            padding: 34px 0 48px;
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--clinic-text);
+        }
+        .form-card {
+            background: var(--clinic-panel);
+            padding: 34px;
+            border-radius: 28px;
+            box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(128, 0, 0, 0.08);
+            max-width: 1120px;
+            margin: auto;
+        }
+        .intake-shell {
+            display: grid;
+            gap: 26px;
+        }
+        .stepper-shell {
+            background: linear-gradient(180deg, #fafafb 0%, #f2f4f7 100%);
+            border: 1px solid var(--clinic-border);
+            border-radius: 24px;
+            padding: 22px;
+        }
+        .stepper-track {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .step-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 84px;
+            border-radius: 20px;
+            padding: 16px 18px;
+            border: 1px solid #d7dce3;
+            background: #f6f7f9;
+            color: #6b7280;
+        }
+        .step-card.active {
+            background: linear-gradient(135deg, var(--clinic-maroon) 0%, #991b1b 100%);
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: 0 18px 34px rgba(128, 0, 0, 0.22);
+        }
+        .step-card.completed {
+            background: #f7ebee;
+            border-color: rgba(128, 0, 0, 0.16);
+            color: var(--clinic-maroon);
+        }
+        .step-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.78);
+            color: var(--clinic-maroon);
+            flex-shrink: 0;
+        }
+        .step-card.active .step-icon {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+        .step-card:not(.active):not(.completed) .step-icon {
+            color: #7b8794;
+        }
+        .step-copy small {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.75;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        .step-copy strong {
+            display: block;
+            font-size: 14px;
+            line-height: 1.3;
+        }
+        .intro-panel {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+            gap: 18px;
+            align-items: stretch;
+        }
+        .intro-copy,
+        .intro-upload {
+            border-radius: 24px;
+            border: 1px solid var(--clinic-border);
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fb 100%);
+            padding: 24px;
+        }
+        .intro-copy h2 {
+            margin: 0;
+            color: var(--clinic-maroon);
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .intro-copy p {
+            margin: 12px 0 0;
+            color: var(--clinic-muted);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .intro-upload h3 {
+            margin: 0 0 14px;
+            color: var(--clinic-maroon);
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .section-title {
+            background: transparent;
+            color: var(--clinic-maroon);
+            padding: 0;
+            margin-top: 26px;
+            border-radius: 0;
+            font-weight: 800;
+            font-size: 1.12rem;
+            text-transform: none;
+            border-bottom: 2px solid rgba(128, 0, 0, 0.12);
+            padding-bottom: 10px;
+            letter-spacing: 0.01em;
+        }
+        .section-hint {
+            margin: 10px 0 0;
+            color: var(--clinic-muted);
+            font-size: 0.92rem;
+        }
+        .form-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--clinic-text);
+            margin-bottom: 8px;
+        }
+        .required-mark {
+            color: var(--clinic-maroon);
+            font-weight: 800;
+            margin-left: 2px;
+        }
+        .sub-label { font-size: 0.85rem; font-style: italic; color: var(--clinic-text); margin-bottom: 15px; display: block; }
+        .form-control,
+        .form-select {
+            min-height: 48px;
+            border-radius: 14px;
+            border: 1px solid var(--clinic-border);
+            background: var(--clinic-field);
+            color: var(--clinic-text);
+            box-shadow: none;
+            padding: 11px 14px;
+        }
+        textarea.form-control {
+            min-height: 120px;
+        }
+        .form-control:focus,
+        .form-select:focus {
+            border-color: rgba(128, 0, 0, 0.5);
+            box-shadow: 0 0 0 0.18rem rgba(128, 0, 0, 0.11);
+            background: #ffffff;
+        }
+        .form-control.bg-light {
+            background: #f2f4f7 !important;
+            border-color: #dbe0e7;
+        }
         .vax-table th { background-color: #f8f9fa; font-size: 0.85rem; text-align: center; }
-        .upload-box { border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #fafafa; }
+        .upload-box {
+            border: 2px dashed #c7ced8;
+            padding: 22px 18px;
+            text-align: center;
+            border-radius: 18px;
+            background: linear-gradient(180deg, #fcfcfd 0%, #f4f6f8 100%);
+            min-height: 170px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+        }
+        .upload-box svg {
+            width: 42px;
+            height: 42px;
+            margin: 0 auto;
+            color: var(--clinic-maroon);
+        }
+        .upload-box strong {
+            display: block;
+            color: var(--clinic-maroon);
+            font-size: 0.96rem;
+        }
+        .upload-box span {
+            display: block;
+            color: var(--clinic-muted);
+            font-size: 0.82rem;
+        }
         .health-upload-field {
             border: 2px solid #800000;
             border-radius: 8px;
@@ -33,32 +243,167 @@
         .text-muted {
             color: #000 !important;
         }
+        .cta-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 34px;
+        }
+        .btn-health-submit {
+            min-width: 220px;
+            border: none;
+            border-radius: 16px;
+            padding: 15px 24px;
+            background: linear-gradient(135deg, var(--clinic-maroon) 0%, var(--clinic-maroon-dark) 100%);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            box-shadow: 0 16px 28px rgba(128, 0, 0, 0.2);
+        }
+        .btn-health-submit:hover {
+            background: linear-gradient(135deg, #8f0c0c 0%, #6d0217 100%);
+            color: #ffffff;
+        }
+        @media (max-width: 992px) {
+            .intro-panel {
+                grid-template-columns: 1fr;
+            }
+            .stepper-track {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 18px 0 28px;
+            }
+            .form-card {
+                padding: 20px;
+                border-radius: 20px;
+            }
+            .upload-grid,
+            .stepper-track {
+                grid-template-columns: 1fr;
+            }
+            .cta-row {
+                justify-content: stretch;
+            }
+            .btn-health-submit {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="form-card">
-        <h2 class="text-center fw-bold" style="color: #800000;">MEDICAL SERVICES DEPARTMENT</h2>
-        <h5 class="text-center mb-5" style="color: #000;">Student Health Information Entry</h5>
+        <div class="intake-shell">
+        <div class="stepper-shell">
+            <div class="stepper-track">
+                <div class="step-card active">
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21a8 8 0 0 0-16 0"></path>
+                            <circle cx="12" cy="8" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="step-copy">
+                        <small>Step 1</small>
+                        <strong>Personal Information</strong>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 7h16"></path>
+                            <path d="M7 7v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7"></path>
+                            <path d="M10 11h4"></path>
+                            <path d="M12 9v4"></path>
+                        </svg>
+                    </div>
+                    <div class="step-copy">
+                        <small>Step 2</small>
+                        <strong>Medical History</strong>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"></path>
+                            <path d="M9 12l2 2 4-4"></path>
+                        </svg>
+                    </div>
+                    <div class="step-copy">
+                        <small>Step 3</small>
+                        <strong>Personal Social History & Vaccination</strong>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16l4-3 4 3 4-3 4 3V8z"></path>
+                            <path d="M14 2v6h6"></path>
+                        </svg>
+                    </div>
+                    <div class="step-copy">
+                        <small>Step 4</small>
+                        <strong>Verification & Uploads</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <p class="mb-0" style="font-size: 0.9rem; color: #000;">
-                    <strong>Instruction:</strong> Please provide complete and truthful information. Type <b>"N/A"</b> or <b>"NONE"</b> for fields that do not apply to you. Do not leave any field blank to ensure successful submission.
+        <div class="intro-panel">
+            <div class="intro-copy">
+                <h2>Personal Information</h2>
+                <p>
+                    Please provide complete and truthful information. Type <strong>N/A</strong> or <strong>NONE</strong>
+                    for fields that do not apply to you. Required fields are marked with a maroon asterisk.
                 </p>
+            </div>
+            <div class="intro-upload">
+                <h3>Required Uploads</h3>
+                <div class="upload-grid">
+                    <div class="upload-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 7h4l2-2h4l2 2h4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z"></path>
+                            <circle cx="12" cy="13" r="3"></circle>
+                        </svg>
+                        <div>
+                            <strong>Upload 2x2 Picture</strong>
+                            <span>JPEG / PNG</span>
+                        </div>
+                        <input type="file" name="student_photo" class="form-control form-control-sm" accept="image/*" required>
+                    </div>
+                    <div class="upload-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                        </svg>
+                        <div>
+                            <strong>Draw or Upload Digital Signature</strong>
+                            <span>PNG / JPG</span>
+                        </div>
+                        <input type="file" name="digital_signature" class="form-control form-control-sm" accept="image/*" required>
+                    </div>
+                </div>
+            </div>
+        </div>
         <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
-    <div class="section-title">PART I. STUDENT INFORMATION</div>
+    <div class="section-title">Step 1. Personal Information</div>
+    <p class="section-hint">Review your student identity details and complete the core contact and profile information below.</p>
     
     <div class="row mt-4">
         <div class="col-md-9">
             <div class="row">
                 <div class="col-md-7 mb-3">
-                    <label class="form-label">Full Name</label>
+                    <label class="form-label">Full Name<span class="required-mark">*</span></label>
                     <input type="text" class="form-control bg-light" value="{{ trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name]))) }}" readonly>
                 </div>
                 <div class="col-md-5 mb-3">
-                    <label class="form-label">PUP Student No.</label>
+                    <label class="form-label">PUP Student No.<span class="required-mark">*</span></label>
                     <input type="text" class="form-control bg-light" value="{{ Auth::user()->student_id }}" readonly>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -70,7 +415,7 @@
                     <input type="text" class="form-control bg-light" value="{{ optional($linkedAdminProfile)->suffix_name }}" readonly>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Home Address</label>
+                    <label class="form-label">Mailing Address<span class="required-mark">*</span></label>
                     <input type="text" name="home_address" class="form-control" placeholder="House No., Street, Brgy, City" required>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -87,29 +432,22 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <label class="form-label text-center d-block">Upload ID Photo</label>
-            <div class="upload-box">
-                <input type="file" name="student_photo" class="form-control form-control-sm" accept="image/*" required>
-                <small class="text-muted">2x2 or Passport Size</small>
-            </div>
-        </div>
     </div>
 
     <div class="row">
         <div class="col-md-3 mb-3">
-            <label class="form-label">Age</label>
+            <label class="form-label">Age<span class="required-mark">*</span></label>
             <input type="number" name="age" value="{{ $calculatedAge }}" class="form-control" readonly placeholder="Auto-calculated">
         </div>
         <div class="col-md-3 mb-3">
-            <label class="form-label">Sex</label>
+            <label class="form-label">Sex<span class="required-mark">*</span></label>
             <select name="sex" class="form-select" required>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
             </select>
         </div>
         <div class="col-md-3 mb-3">
-            <label class="form-label">Civil Status</label>
+            <label class="form-label">Civil Status<span class="required-mark">*</span></label>
             <select name="civil_status" class="form-select" required>
                 <option value="" selected disabled>Select Status</option>
                 <option value="Single">Single</option>
@@ -130,11 +468,11 @@
             <input type="text" name="blood_type" class="form-control" placeholder="e.g. O+">
         </div>
         <div class="col-md-8 mb-3">
-            <label class="form-label">Email Address</label>
+            <label class="form-label">Email Address<span class="required-mark">*</span></label>
             <input type="email" name="email" class="form-control" value="{{ Auth::user()->email }}" readonly>
         </div>
         <div class="col-md-7 mb-3">
-            <label class="form-label">Parent's Name / Guardian / Spouse</label>
+            <label class="form-label">Parent's Name / Guardian / Spouse<span class="required-mark">*</span></label>
             <input type="text" name="guardian_name" class="form-control" required>
         </div>
         <div class="col-md-2 mb-3">
@@ -142,12 +480,12 @@
             <input type="text" name="landline" class="form-control">
         </div>
         <div class="col-md-3 mb-3">
-            <label class="form-label">Cellphone No.</label>
+            <label class="form-label">Phone Number<span class="required-mark">*</span></label>
             <input type="text" name="cellphone" class="form-control" required>
         </div>
     </div>
 
-    <div class="section-title">PART II. MEDICAL HISTORY</div>
+    <div class="section-title">Step 2. Medical History</div>
     
     <div class="row mt-3">
         <div class="col-12 mb-2">
@@ -193,6 +531,14 @@
                     <label class="form-label">3. Medical Certificate</label>
                     <input type="file" name="medical_certificate" class="form-control health-upload-field" accept=".jpg,.jpeg,.png,.pdf">
                     <small class="health-upload-helper">Upload JPG, PNG, or PDF if you have a medical certificate.</small>
+                    <label class="form-label" style="margin-top: 12px;">Medical certificate issued by: Dr:</label>
+                    <input
+                        type="text"
+                        name="medical_certificate_issued_by"
+                        class="form-control"
+                        placeholder="Enter doctor's name"
+                        value="{{ old('medical_certificate_issued_by') }}"
+                    >
                 </div></div>
     </div>
 
@@ -254,7 +600,7 @@
         </div>
     </div>
 
-    <div class="section-title">PART III. PERSONAL SOCIAL HISTORY & VACCINATION</div>
+    <div class="section-title">Step 3. Personal Social History & Vaccination</div>
     <div class="row mt-4">
         <div class="col-md-12 mb-3">
             <label class="form-label">COVID-19 Vaccination History:</label>
@@ -272,20 +618,14 @@
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-6 offset-md-3">
-            <label class="form-label text-center d-block">Upload Digital Signature</label>
-            <div class="upload-box">
-                <input type="file" name="digital_signature" class="form-control" accept="image/*" required>
-                <small class="text-muted">PNG or JPG with clear background</small>
-            </div>
-        </div>
-    </div>
+    <div class="section-title">Step 4. Verification & Uploads</div>
+    <p class="section-hint">Review your entries, confirm your supporting documents, and continue to submission.</p>
 
-    <div class="text-center mt-5">
-        <button type="submit" class="btn btn-success btn-lg px-5 shadow">SUBMIT HEALTH PROFILE</button>
+    <div class="cta-row">
+        <button type="submit" class="btn-health-submit">Save &amp; Continue</button>
     </div>
 </form>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

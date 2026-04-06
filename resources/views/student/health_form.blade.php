@@ -20,14 +20,14 @@
         }
         body {
             background:
-                radial-gradient(circle at top left, rgba(128, 0, 0, 0.08), transparent 28%),
-                linear-gradient(180deg, #f3f5f7 0%, #e9edf0 100%);
+                linear-gradient(rgba(45, 10, 12, 0.72), rgba(28, 8, 8, 0.8)),
+                url('{{ asset('images/PUPBG.jpg') }}') center center / cover no-repeat fixed;
             padding: 34px 0 48px;
             font-family: 'Segoe UI', sans-serif;
             color: var(--clinic-text);
         }
         .form-card {
-            background: var(--clinic-panel);
+            background: rgba(255, 255, 255, 0.96);
             padding: 34px;
             border-radius: 28px;
             box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
@@ -78,6 +78,12 @@
             color: #ffffff;
             box-shadow: 0 16px 28px rgba(22, 163, 74, 0.18);
         }
+        .step-card.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #facc15 100%);
+            border-color: transparent;
+            color: #3f2b00;
+            box-shadow: 0 16px 28px rgba(245, 158, 11, 0.2);
+        }
         .step-icon {
             width: 44px;
             height: 44px;
@@ -100,13 +106,26 @@
             background: rgba(255, 255, 255, 0.16);
             color: #ffffff;
         }
+        .step-card.warning .step-icon {
+            background: rgba(255, 255, 255, 0.26);
+            color: #6b3f00;
+        }
         .step-card.completed .step-icon .step-icon-default {
             display: none;
         }
         .step-card.completed .step-icon .step-icon-check {
             display: block;
         }
+        .step-card.warning .step-icon .step-icon-default {
+            display: none;
+        }
+        .step-card.warning .step-icon .step-icon-warning {
+            display: block;
+        }
         .step-icon-check {
+            display: none;
+        }
+        .step-icon-warning {
             display: none;
         }
         .step-copy small {
@@ -192,6 +211,29 @@
             margin: 10px 0 0;
             color: var(--clinic-muted);
             font-size: 0.92rem;
+        }
+        .step4-note-box {
+            margin-top: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(128, 0, 0, 0.12);
+            background: linear-gradient(180deg, #fffdf8 0%, #f8f4f1 100%);
+            padding: 18px 20px;
+        }
+        .step4-note-box h4 {
+            margin: 0 0 10px;
+            color: var(--clinic-maroon);
+            font-size: 1rem;
+            font-weight: 800;
+        }
+        .step4-note-box p,
+        .step4-note-box li {
+            color: var(--clinic-muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .step4-note-box ul {
+            margin: 0;
+            padding-left: 20px;
         }
         .form-label {
             font-weight: 700;
@@ -371,6 +413,11 @@
                         <svg class="step-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6L9 17l-5-5"></path>
                         </svg>
+                        <svg class="step-icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 9v4"></path>
+                            <path d="M12 17h.01"></path>
+                            <path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0z"></path>
+                        </svg>
                     </div>
                     <div class="step-copy">
                         <small>Step 1</small>
@@ -388,6 +435,11 @@
                         <svg class="step-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6L9 17l-5-5"></path>
                         </svg>
+                        <svg class="step-icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 9v4"></path>
+                            <path d="M12 17h.01"></path>
+                            <path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0z"></path>
+                        </svg>
                     </div>
                     <div class="step-copy">
                         <small>Step 2</small>
@@ -403,6 +455,11 @@
                         <svg class="step-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6L9 17l-5-5"></path>
                         </svg>
+                        <svg class="step-icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 9v4"></path>
+                            <path d="M12 17h.01"></path>
+                            <path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0z"></path>
+                        </svg>
                     </div>
                     <div class="step-copy">
                         <small>Step 3</small>
@@ -417,6 +474,11 @@
                         </svg>
                         <svg class="step-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6L9 17l-5-5"></path>
+                        </svg>
+                        <svg class="step-icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 9v4"></path>
+                            <path d="M12 17h.01"></path>
+                            <path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0z"></path>
                         </svg>
                     </div>
                     <div class="step-copy">
@@ -704,6 +766,15 @@
     <section class="form-step" data-step="4">
     <div class="section-title">Step 4. Verification & Uploads</div>
     <p class="section-hint">Review your entries, confirm your supporting documents, and continue to submission.</p>
+    <div class="step4-note-box">
+        <h4>Upload Instructions</h4>
+        <ul>
+            <li>Upload a clear 2x2 picture in JPEG or PNG format.</li>
+            <li>Upload a clear digital signature in PNG or JPG format.</li>
+            <li>For best results, use a transparent signature image. You may use <strong>remove.bg</strong> to remove the background before uploading.</li>
+            <li>Make sure the uploaded files are readable and belong to the student account holder.</li>
+        </ul>
+    </div>
     </section>
 
     <div class="cta-row">
@@ -745,7 +816,63 @@ document.addEventListener('DOMContentLoaded', function() {
             text: 'Review your entries, confirm the required uploads, and submit your health profile once everything looks correct.',
         }
     };
+    const attemptedSteps = new Set();
     let currentStep = 1;
+
+    const validateStep = (stepNumber) => {
+        const section = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+        if (!section) {
+            return true;
+        }
+
+        const customRequired = {
+            4: [
+                document.querySelector('input[name="student_photo"]'),
+                document.querySelector('input[name="digital_signature"]')
+            ]
+        };
+
+        const controls = [
+            ...Array.from(section.querySelectorAll('input, select, textarea')).filter((field) => field.required),
+            ...(customRequired[stepNumber] || [])
+        ].filter(Boolean);
+
+        for (const field of controls) {
+            if (field.disabled) {
+                continue;
+            }
+
+            const type = (field.type || '').toLowerCase();
+
+            if (type === 'radio') {
+                const group = section.querySelectorAll(`input[type="radio"][name="${field.name}"]`);
+                if (!Array.from(group).some((radio) => radio.checked)) {
+                    return false;
+                }
+                continue;
+            }
+
+            if (type === 'checkbox') {
+                if (!field.checked) {
+                    return false;
+                }
+                continue;
+            }
+
+            if (type === 'file') {
+                if (!field.files || field.files.length === 0) {
+                    return false;
+                }
+                continue;
+            }
+
+            if (!String(field.value || '').trim()) {
+                return false;
+            }
+        }
+
+        return true;
+    };
 
     const renderStep = (stepNumber) => {
         currentStep = stepNumber;
@@ -756,8 +883,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         stepCards.forEach((card, index) => {
             const cardStep = Number(card.dataset.stepTarget);
-            card.classList.toggle('active', cardStep === stepNumber);
-            card.classList.toggle('completed', cardStep < stepNumber);
+            const isValid = validateStep(cardStep);
+            const isWarning = attemptedSteps.has(cardStep) && !isValid;
+            card.classList.toggle('active', cardStep === stepNumber && !isWarning);
+            card.classList.toggle('completed', cardStep < stepNumber && isValid);
+            card.classList.toggle('warning', isWarning);
             card.classList.toggle('is-clickable', true);
         });
 
@@ -790,6 +920,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     nextStepBtn?.addEventListener('click', function () {
+        if (!validateStep(currentStep)) {
+            attemptedSteps.add(currentStep);
+            renderStep(currentStep);
+            const activeSection = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const invalidField = activeSection?.querySelector('[required]');
+            invalidField?.focus();
+            return;
+        }
+
+        attemptedSteps.delete(currentStep);
+
         if (currentStep < steps.length) {
             renderStep(currentStep + 1);
         }
@@ -799,6 +940,11 @@ document.addEventListener('DOMContentLoaded', function() {
         card.addEventListener('click', function () {
             const targetStep = Number(card.dataset.stepTarget);
             if (targetStep >= 1 && targetStep <= steps.length) {
+                if (targetStep > currentStep && !validateStep(currentStep)) {
+                    attemptedSteps.add(currentStep);
+                    renderStep(currentStep);
+                    return;
+                }
                 renderStep(targetStep);
             }
         });

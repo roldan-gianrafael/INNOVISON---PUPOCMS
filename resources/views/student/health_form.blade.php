@@ -44,6 +44,10 @@
             border: 1px solid var(--clinic-border);
             border-radius: 24px;
             padding: 22px;
+            position: sticky;
+            top: 18px;
+            z-index: 20;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
         }
         .stepper-track {
             display: grid;
@@ -69,9 +73,10 @@
             box-shadow: 0 18px 34px rgba(128, 0, 0, 0.22);
         }
         .step-card.completed {
-            background: #f7ebee;
-            border-color: rgba(128, 0, 0, 0.16);
-            color: var(--clinic-maroon);
+            background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: 0 16px 28px rgba(22, 163, 74, 0.18);
         }
         .step-icon {
             width: 44px;
@@ -90,6 +95,19 @@
         }
         .step-card:not(.active):not(.completed) .step-icon {
             color: #7b8794;
+        }
+        .step-card.completed .step-icon {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+        .step-card.completed .step-icon .step-icon-default {
+            display: none;
+        }
+        .step-card.completed .step-icon .step-icon-check {
+            display: block;
+        }
+        .step-icon-check {
+            display: none;
         }
         .step-copy small {
             display: block;
@@ -153,6 +171,22 @@
             border-bottom: 2px solid rgba(128, 0, 0, 0.12);
             padding-bottom: 10px;
             letter-spacing: 0.01em;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.is-active {
+            display: block;
+        }
+        .step-card {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+        }
+        .step-card.is-clickable {
+            cursor: pointer;
+        }
+        .step-card.is-clickable:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
         }
         .section-hint {
             margin: 10px 0 0;
@@ -245,8 +279,29 @@
         }
         .cta-row {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
             margin-top: 34px;
+        }
+        .cta-group {
+            display: flex;
+            gap: 12px;
+            margin-left: auto;
+        }
+        .btn-health-secondary {
+            min-width: 170px;
+            border: 1px solid rgba(128, 0, 0, 0.18);
+            border-radius: 16px;
+            padding: 15px 24px;
+            background: #ffffff;
+            color: var(--clinic-maroon);
+            font-size: 0.96rem;
+            font-weight: 800;
+        }
+        .btn-health-secondary:hover {
+            background: #faf4f5;
+            color: var(--clinic-maroon-dark);
         }
         .btn-health-submit {
             min-width: 220px;
@@ -285,8 +340,15 @@
                 grid-template-columns: 1fr;
             }
             .cta-row {
-                justify-content: stretch;
+                flex-direction: column;
+                align-items: stretch;
             }
+            .cta-group {
+                width: 100%;
+                flex-direction: column;
+                margin-left: 0;
+            }
+            .btn-health-secondary,
             .btn-health-submit {
                 width: 100%;
             }
@@ -300,11 +362,14 @@
         <div class="intake-shell">
         <div class="stepper-shell">
             <div class="stepper-track">
-                <div class="step-card active">
+                <div class="step-card active is-clickable" data-step-target="1">
                     <div class="step-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="step-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21a8 8 0 0 0-16 0"></path>
                             <circle cx="12" cy="8" r="4"></circle>
+                        </svg>
+                        <svg class="step-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 6L9 17l-5-5"></path>
                         </svg>
                     </div>
                     <div class="step-copy">
@@ -312,13 +377,16 @@
                         <strong>Personal Information</strong>
                     </div>
                 </div>
-                <div class="step-card">
+                <div class="step-card is-clickable" data-step-target="2">
                     <div class="step-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="step-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 7h16"></path>
                             <path d="M7 7v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7"></path>
                             <path d="M10 11h4"></path>
                             <path d="M12 9v4"></path>
+                        </svg>
+                        <svg class="step-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 6L9 17l-5-5"></path>
                         </svg>
                     </div>
                     <div class="step-copy">
@@ -326,11 +394,14 @@
                         <strong>Medical History</strong>
                     </div>
                 </div>
-                <div class="step-card">
+                <div class="step-card is-clickable" data-step-target="3">
                     <div class="step-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="step-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"></path>
                             <path d="M9 12l2 2 4-4"></path>
+                        </svg>
+                        <svg class="step-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 6L9 17l-5-5"></path>
                         </svg>
                     </div>
                     <div class="step-copy">
@@ -338,11 +409,14 @@
                         <strong>Personal Social History & Vaccination</strong>
                     </div>
                 </div>
-                <div class="step-card">
+                <div class="step-card is-clickable" data-step-target="4">
                     <div class="step-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="step-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16l4-3 4 3 4-3 4 3V8z"></path>
                             <path d="M14 2v6h6"></path>
+                        </svg>
+                        <svg class="step-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 6L9 17l-5-5"></path>
                         </svg>
                     </div>
                     <div class="step-copy">
@@ -392,6 +466,7 @@
         <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
+    <section class="form-step is-active" data-step="1">
     <div class="section-title">Step 1. Personal Information</div>
     <p class="section-hint">Review your student identity details and complete the core contact and profile information below.</p>
     
@@ -485,6 +560,9 @@
         </div>
     </div>
 
+    </section>
+
+    <section class="form-step" data-step="2">
     <div class="section-title">Step 2. Medical History</div>
     
     <div class="row mt-3">
@@ -600,6 +678,9 @@
         </div>
     </div>
 
+    </section>
+
+    <section class="form-step" data-step="3">
     <div class="section-title">Step 3. Personal Social History & Vaccination</div>
     <div class="row mt-4">
         <div class="col-md-12 mb-3">
@@ -618,17 +699,111 @@
         </div>
     </div>
 
+    </section>
+
+    <section class="form-step" data-step="4">
     <div class="section-title">Step 4. Verification & Uploads</div>
     <p class="section-hint">Review your entries, confirm your supporting documents, and continue to submission.</p>
+    </section>
 
     <div class="cta-row">
-        <button type="submit" class="btn-health-submit">Save &amp; Continue</button>
+        <div id="stepStatusText" class="section-hint" style="margin: 0;">Step 1 of 4</div>
+        <div class="cta-group">
+            <button type="button" class="btn-health-secondary" id="prevStepBtn" style="display:none;">Back</button>
+            <button type="button" class="btn-health-submit" id="nextStepBtn">Save &amp; Continue</button>
+            <button type="submit" class="btn-health-submit" id="submitStepBtn" style="display:none;">Submit Health Profile</button>
+        </div>
     </div>
 </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const steps = Array.from(document.querySelectorAll('.form-step'));
+    const stepCards = Array.from(document.querySelectorAll('.step-card[data-step-target]'));
+    const prevStepBtn = document.getElementById('prevStepBtn');
+    const nextStepBtn = document.getElementById('nextStepBtn');
+    const submitStepBtn = document.getElementById('submitStepBtn');
+    const stepStatusText = document.getElementById('stepStatusText');
+    const introTitle = document.querySelector('.intro-copy h2');
+    const introBody = document.querySelector('.intro-copy p');
+    const stepDescriptions = {
+        1: {
+            title: 'Personal Information',
+            text: 'Please provide complete and truthful information. Type N/A or NONE for fields that do not apply to you. Required fields are marked with a maroon asterisk.',
+        },
+        2: {
+            title: 'Medical History',
+            text: 'Review illnesses, supporting records, and condition-specific declarations before moving to the next section.',
+        },
+        3: {
+            title: 'Personal Social History & Vaccination',
+            text: 'Complete your vaccination details and related personal history information in this section.',
+        },
+        4: {
+            title: 'Verification & Uploads',
+            text: 'Review your entries, confirm the required uploads, and submit your health profile once everything looks correct.',
+        }
+    };
+    let currentStep = 1;
+
+    const renderStep = (stepNumber) => {
+        currentStep = stepNumber;
+
+        steps.forEach((section) => {
+            section.classList.toggle('is-active', Number(section.dataset.step) === stepNumber);
+        });
+
+        stepCards.forEach((card, index) => {
+            const cardStep = Number(card.dataset.stepTarget);
+            card.classList.toggle('active', cardStep === stepNumber);
+            card.classList.toggle('completed', cardStep < stepNumber);
+            card.classList.toggle('is-clickable', true);
+        });
+
+        if (stepStatusText) {
+            stepStatusText.textContent = `Step ${stepNumber} of ${steps.length}`;
+        }
+
+        if (introTitle && introBody && stepDescriptions[stepNumber]) {
+            introTitle.textContent = stepDescriptions[stepNumber].title;
+            introBody.textContent = stepDescriptions[stepNumber].text;
+        }
+
+        if (prevStepBtn) {
+            prevStepBtn.style.display = stepNumber === 1 ? 'none' : '';
+        }
+
+        if (nextStepBtn && submitStepBtn) {
+            const isFinalStep = stepNumber === steps.length;
+            nextStepBtn.style.display = isFinalStep ? 'none' : '';
+            submitStepBtn.style.display = isFinalStep ? '' : 'none';
+        }
+
+        document.querySelector('.stepper-shell')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    prevStepBtn?.addEventListener('click', function () {
+        if (currentStep > 1) {
+            renderStep(currentStep - 1);
+        }
+    });
+
+    nextStepBtn?.addEventListener('click', function () {
+        if (currentStep < steps.length) {
+            renderStep(currentStep + 1);
+        }
+    });
+
+    stepCards.forEach((card) => {
+        card.addEventListener('click', function () {
+            const targetStep = Number(card.dataset.stepTarget);
+            if (targetStep >= 1 && targetStep <= steps.length) {
+                renderStep(targetStep);
+            }
+        });
+    });
+
     // 1. Medical Illness Logic
     const illnessRadios = document.querySelectorAll('.illness-radio');
     const illnessCheckboxes = document.querySelectorAll('.illness-checkbox');
@@ -692,6 +867,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleIllness();
     toggleDisability();
     toggleAllergies();
+    renderStep(1);
 });
 </script>
 

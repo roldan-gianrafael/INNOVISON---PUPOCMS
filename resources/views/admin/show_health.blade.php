@@ -6,14 +6,6 @@
 <style>
     /* --- PRINT SETTINGS --- */
 @media print {
-    /* 1. Itago lahat ng admin elements at buttons */
-    header, footer, nav, aside, .sidebar, .navbar, .no-print,
-    .main-header, .main-sidebar, .btn, .content-header,
-    .app-header, .app-sidebar, .dashboard-shell, .floating-ai-panel,
-    .medicine-alert-fab, .medicine-alert-panel, .asw-menu-btn, .asw-widget, .page-chrome {
-        display: none !important; 
-    }
-
     html, body {
         background: white !important;
         margin: 0 !important;
@@ -22,12 +14,19 @@
     }
 
     body {
-        visibility: hidden; 
+        visibility: visible !important;
     }
 
-    /* 3. Ipakita lang ang form container */
+    body * {
+        visibility: hidden !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
     .print-container, .print-container * {
-        visibility: visible; 
+        visibility: visible !important;
     }
 
     /* 4. I-dikit sa pinakataas ang container */
@@ -383,15 +382,14 @@ for the improvement of healthcare services.
             <span class="label">Date:</span>
             <div class="field">&nbsp;</div>
         </div>
-        <div class="row">
-            <span class="label">Chest X-ray Result:</span>
-            <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : '' }}</div>
-            <span class="label">Date:</span>
-            <div class="field">&nbsp;</div>
-        </div>
+    <div class="row">
+        <span class="label">Chest X-ray Result:</span>
+        <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : '' }}</div>
+        <span class="label">Date:</span>
+        <div class="field">&nbsp;</div>
     </div>
-
-   <div class="print-page" style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
+    
+   <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
         <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
         
         <div class="row" style="display: flex; align-items: center; gap: 15px;">
@@ -424,31 +422,20 @@ for the improvement of healthcare services.
     <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
 </div>
 
-            <div style="flex: 0.6; text-align: center; position: relative;">
-                
-                @if($profile->physician_signature)
-                    <div style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                        <img src="{{ asset('storage/' . $profile->digital_signature) }}" alt="Signature" style="height: 60px; pointer-events: none;">
+            <div style="flex: 0.6; text-align: center; position: relative; min-height: 80px;">
+                @if($profile->clearance_status == 'Issued')
+                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
+                        <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
+                             alt="Nurse Signature" 
+                             style="height: 80px; width: auto; pointer-events: none;">
                     </div>
                 @endif
 
-                <div style="flex: 0.6; text-align: center; position: relative; min-height: 80px;">
-    
-
-    @if($profile->clearance_status == 'Issued')
-        <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
-            <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
-                 alt="Nurse Signature" 
-                 style="height: 80px; width: auto; pointer-events: none;">
-        </div>
-    @endif
-
-    <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
-
-        MS. NURSE NAME, RN
-    </div>
-    <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
-</div>
+                <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
+                    MS. NURSE NAME, RN
+                </div>
+                <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
+            </div>
             </div>
         </div>
     </div>

@@ -7,21 +7,26 @@
     /* --- PRINT SETTINGS --- */
 @media print {
     /* 1. Itago lahat ng admin elements at buttons */
-    header, footer, nav, .sidebar, .navbar, .no-print, 
-    .main-header, .main-sidebar, .btn, .content-header { 
+    header, footer, nav, aside, .sidebar, .navbar, .no-print,
+    .main-header, .main-sidebar, .btn, .content-header,
+    .app-header, .app-sidebar, .dashboard-shell, .floating-ai-panel,
+    .medicine-alert-fab, .medicine-alert-panel, .asw-menu-btn, .asw-widget, .page-chrome {
         display: none !important; 
     }
 
-    /* 2. Siguraduhin na walang background at margin ang body */
-    body { 
-        visibility: hidden; 
-        background: white !important; 
-        margin: 0 !important; 
+    html, body {
+        background: white !important;
+        margin: 0 !important;
         padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    body {
+        visibility: hidden; 
     }
 
     /* 3. Ipakita lang ang form container */
-    .print-container, .print-container * { 
+    .print-container, .print-container * {
         visibility: visible; 
     }
 
@@ -37,6 +42,20 @@
         box-shadow: none !important;
         line-height: 1.2;
         border: none !important;
+    }
+
+    .print-page {
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .print-page:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .screen-page-separator {
+        display: none !important;
     }
 
     /* 5. Force the page size and REMOVE default browser margins */
@@ -111,10 +130,22 @@
     min-height: 15px;
     margin-bottom: 2px;
 }
-.sig-label {
+    .sig-label {
     font-size: 9px;
     font-weight: bold;
     color: #000;
+}
+
+.screen-page-separator {
+    margin: 34px 0 26px;
+    padding-top: 18px;
+    border-top: 2px dashed rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    text-transform: uppercase;
 }
 </style>
 @endpush
@@ -131,6 +162,7 @@
 </div>
 
 <div class="print-container">
+    <div class="print-page">
     <div class="header-section">
         <img src="{{ asset('images/pup_logo.png') }}" class="logo">
         <div class="header-text">
@@ -319,7 +351,11 @@ for the improvement of healthcare services.
     </div>
 </div>
 
-    <div style="page-break-before: always; margin-top: 28px;">
+    </div>
+
+    <div class="screen-page-separator">Page 2</div>
+
+    <div class="print-page" style="margin-top: 28px;">
         <div class="form-title" style="margin-top: 0;">MEDICAL ASSESSMENT SUMMARY</div>
 
         <div class="row">
@@ -355,7 +391,7 @@ for the improvement of healthcare services.
         </div>
     </div>
 
-   <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
+   <div class="print-page" style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
         <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
         
         <div class="row" style="display: flex; align-items: center; gap: 15px;">

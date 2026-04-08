@@ -18,13 +18,9 @@ class MedicalStatusWebhookService
             }
 
             $payload = [
-                'student_id' => (string) $user->student_id,
-                'status' => (bool) $user->is_health_profile_completed,
-                'timestamps' => [
-                    'sent_at' => now()->toIso8601String(),
-                    'user_updated_at' => optional($user->updated_at)->toIso8601String(),
-                    'event' => $event,
-                ],
+                'student_number' => (string) $user->student_id,
+                'status' => $user->is_health_profile_completed ? 'cleared' : 'not_cleared',
+                'timestamp' => now()->toIso8601String(),
             ];
 
             $rawPayload = json_encode($payload, JSON_UNESCAPED_SLASHES);

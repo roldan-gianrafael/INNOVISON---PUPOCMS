@@ -394,6 +394,7 @@
                     <option value="faculty" {{ ($source ?? 'faculty') === 'faculty' ? 'selected' : '' }}>Faculty API</option>
                     <option value="admin_api" {{ ($source ?? 'faculty') === 'admin_api' ? 'selected' : '' }}>Our Admin API</option>
                     <option value="admin_options" {{ ($source ?? 'faculty') === 'admin_options' ? 'selected' : '' }}>Our Admin Options API</option>
+                    <option value="medical_status" {{ ($source ?? 'faculty') === 'medical_status' ? 'selected' : '' }}>Student Medical Status API</option>
                     <option value="custom" {{ ($source ?? 'faculty') === 'custom' ? 'selected' : '' }}>Custom Temp API</option>
                 </select>
             </div>
@@ -409,13 +410,13 @@
                 </select>
             </div>
             <div>
-                <label for="search">Search by name, email, or ID</label>
+                <label for="search">{{ ($source ?? 'faculty') === 'medical_status' ? 'Search by Student ID' : 'Search by name, email, or ID' }}</label>
                 <input
                     type="text"
                     id="search"
                     name="search"
                     value="{{ $search }}"
-                    placeholder="Try a name, email address, or identifier"
+                    placeholder="{{ ($source ?? 'faculty') === 'medical_status' ? 'Try a student ID' : 'Try a name, email address, or identifier' }}"
                 >
             </div>
             <button type="submit">Search API</button>
@@ -556,6 +557,37 @@
             <div class="faculty-autofill-field"><label>Department/Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
         </div>
     </div>
+        @elseif(($source ?? '') === 'medical_status')
+            <div class="api-results">
+                @foreach($results as $result)
+                    <article class="api-result-card">
+                        <h3 style="margin: 0; color: #7f1d2d;">Student Medical Status</h3>
+                        <div class="api-result-grid">
+                            <div class="api-field">
+                                <small>Student ID</small>
+                                <strong>{{ $result['student_id'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Status</small>
+                                <strong>{{ !empty($result['status']) ? 'true' : 'false' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Created At</small>
+                                <strong>{{ $result['timestamps']['created_at'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Updated At</small>
+                                <strong>{{ $result['timestamps']['updated_at'] ?? 'N/A' }}</strong>
+                            </div>
+                        </div>
+
+                        <details class="api-raw-toggle">
+                            <summary>Show raw response</summary>
+                            <div class="api-json">{{ json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                        </details>
+                    </article>
+                @endforeach
+            </div>
         @else
             {{-- Unified Display for Other APIs (Custom / Admin API) --}}
             <div class="api-results">
@@ -617,6 +649,12 @@
 
         sourceField.addEventListener('change', function () {
             syncSystemVisibility();
+            const searchLabel = document.querySelector('label[for="search"]');
+            const isMedicalStatus = sourceField.value === 'medical_status';
+            if (searchLabel) {
+                searchLabel.textContent = isMedicalStatus ? 'Search by Student ID' : 'Search by name, email, or ID';
+            }
+            searchField.placeholder = isMedicalStatus ? 'Try a student ID' : 'Try a name, email address, or identifier';
         });
 
         syncSystemVisibility();

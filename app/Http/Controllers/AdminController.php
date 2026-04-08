@@ -250,12 +250,17 @@ class AdminController extends Controller
             $facultyEndpoint = trim((string) config('services.pupt_flss.faculty_profiles_url', ''));
             $internalAdminEndpoint = url('/api/external/admins');
             $internalAdminOptionsEndpoint = url('/api/external/admins/options');
+            $internalMedicalStatusBaseEndpoint = url('/api/external/students');
             $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
 
             if ($source === 'admin_api') {
                 $endpoint = $internalAdminEndpoint;
             } elseif ($source === 'admin_options') {
                 $endpoint = $internalAdminOptionsEndpoint;
+            } elseif ($source === 'medical_status') {
+                $endpoint = $search !== ''
+                    ? rtrim($internalMedicalStatusBaseEndpoint, '/') . '/' . urlencode($search) . '/medical-status'
+                    : $internalMedicalStatusBaseEndpoint . '/{student_id}/medical-status';
             } elseif ($source === 'custom' && $configuredTempEndpoint !== '') {
                 $endpoint = $configuredTempEndpoint;
             } else {
@@ -354,6 +359,20 @@ class AdminController extends Controller
 
                         if (empty($results)) {
                             $errorMessage = 'No matching records were found for the current search.';
+                        }
+                    } elseif ($source === 'medical_status') {
+                        $results = $this->searchLocalMedicalStatusForApiTesting($search);
+                        $apiResponseMeta = [
+                            'status' => empty($results) ? 404 : 200,
+                            'ok' => !empty($results),
+                            'endpoint' => $endpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'external-api-key',
+                            'source' => $source,
+                        ];
+
+                        if (empty($results)) {
+                            $errorMessage = 'No student medical status record matched the provided Student ID.';
                         }
                     } else {
                         $queryParams = [
@@ -625,6 +644,28 @@ class AdminController extends Controller
         }
 
         return 'active';
+    }
+
+    private function searchLocalMedicalStatusForApiTesting(string $search): array
+    {
+        $studentId = trim($search);
+        if ($studentId === '') {
+            return [];
+        }
+
+        $user = User::query()->where('student_id', $studentId)->first();
+        if (!$user) {
+            return [];
+        }
+
+        return [[
+            'student_id' => (string) $user->student_id,
+            'status' => (bool) $user->is_health_profile_completed,
+            'timestamps' => [
+                'created_at' => optional($user->created_at)->toIso8601String(),
+                'updated_at' => optional($user->updated_at)->toIso8601String(),
+            ],
+        ]];
     }
 
     private function normalizeApiTestingResults($payload, string $search): array

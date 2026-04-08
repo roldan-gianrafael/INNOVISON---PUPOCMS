@@ -30,6 +30,14 @@
         font-size: 36px;
         font-weight: 800;
         color: #fff;
+        overflow: hidden;
+    }
+
+    .hero-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
 
     .hero-info { flex: 1; }
@@ -332,7 +340,14 @@
 
     <div class="profile-hero">
         <div class="hero-avatar">
-            {{ strtoupper(substr($user->name, 0, 1)) }}
+            @php
+                $healthProfile = \App\Models\HealthProfile::where('user_id', $user->id)->first();
+            @endphp
+            @if(!empty($healthProfile?->student_photo))
+                <img src="{{ asset('storage/' . $healthProfile->student_photo) }}" alt="Student 2x2 Picture">
+            @else
+                {{ strtoupper(substr($user->name, 0, 1)) }}
+            @endif
         </div>
         <div class="hero-info">
             <h1 class="hero-name">{{ $user->name }} <span class="hero-badge">Active</span></h1>

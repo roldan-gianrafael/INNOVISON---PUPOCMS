@@ -9,6 +9,7 @@ class HealthProfile extends Model
     protected $fillable = [
         'user_id', 
         'school_year', 'home_address', 'student_photo', 
+        'height', 'weight',
         'age', 'sex', 'civil_status', 'course_college', 
         'blood_type', 'guardian_name', 'landline', 'cellphone',
         'has_illness', 'medical_history', 'other_illness', 
@@ -16,7 +17,7 @@ class HealthProfile extends Model
         'has_disability', 'disability_type',
         'pwd_id_proof',
         'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies',
-        'medical_certificate',
+        'medical_certificate', 'medical_certificate_issued_by',
         'is_smoker', 'is_drinker', 'vaccine_history', 'digital_signature', 'clearance_status',
     'pending_reason',
     'verified_at',

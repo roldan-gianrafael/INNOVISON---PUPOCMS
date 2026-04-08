@@ -630,6 +630,8 @@ public function storeHealthForm(Request $request)
         'school_year'       => 'required|string',
         'home_address'      => 'required|string|max:255',
         'student_photo'     => 'required|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+        'height'            => 'nullable|string|max:50',
+        'weight'            => 'nullable|string|max:50',
         'age'               => 'required|numeric|min:15|max:100',
         'sex'               => 'required|string',
         'civil_status'      => 'required|string',
@@ -648,6 +650,7 @@ public function storeHealthForm(Request $request)
         // Allergies
         'medicine_allergies' => 'nullable|array',
         'medical_certificate' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:4096',
+        'medical_certificate_issued_by' => 'nullable|string|max:255',
         
         // Signature
         'digital_signature' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -678,6 +681,8 @@ public function storeHealthForm(Request $request)
                 'school_year'        => $request->school_year,
                 'home_address'       => $request->home_address,
                 'student_photo'      => $photoPath,
+                'height'             => $request->height,
+                'weight'             => $request->weight,
                 'age'                => $request->age,
                 'sex'                => $request->sex,
                 'civil_status'       => $request->civil_status,
@@ -702,6 +707,7 @@ public function storeHealthForm(Request $request)
                 'medicine_allergies'  => $request->medicine_allergies,
                 'other_med_allergies' => $request->other_med_allergies,
                 'medical_certificate' => $medicalCertificatePath,
+                'medical_certificate_issued_by' => $request->medical_certificate_issued_by,
 
                 // Part III: COVID Vax
                 'vaccine_history' => [

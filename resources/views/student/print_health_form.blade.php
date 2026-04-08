@@ -175,6 +175,10 @@
         <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
     </div>
     <div class="row">
+        <span class="label">Height:</span> <div class="field">{{ $profile->height ?? 'N/A' }}</div>
+        <span class="label">Weight:</span> <div class="field">{{ $profile->weight ?? 'N/A' }}</div>
+    </div>
+    <div class="row">
         <span class="label">Age:</span> <div class="field">{{ $profile->age ?? '' }}</div>
         <span class="label">Sex:</span> <div class="field">{{ $profile->sex ?? '' }}</div>
         <span class="label">Civil Status:</span> <div class="field">{{ $profile->civil_status ?? '' }}</div>
@@ -215,6 +219,14 @@
         <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'None' ? '/' : '' }}</div> None</div>
         <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'Yes' ? '/' : '' }}</div> Yes:</div>
         <div class="field">{{ $profile->disability_type ?? '' }}</div>
+    </div>
+    <div class="row">
+        <span class="label">Chest X-Ray Result:</span> <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : 'N/A' }}</div>
+        <span class="label">PWD ID / Proof:</span> <div class="field">{{ $profile->pwd_id_proof ? 'Uploaded' : 'N/A' }}</div>
+    </div>
+    <div class="row">
+        <span class="label">Medical Certificate:</span> <div class="field">{{ $profile->medical_certificate ? 'Uploaded' : 'N/A' }}</div>
+        <span class="label">Issued By:</span> <div class="field">{{ $profile->medical_certificate_issued_by ?? 'N/A' }}</div>
     </div>
 
     <div class="section-header">3. ALLERGIES & MEDICAL CONDITIONS</div>

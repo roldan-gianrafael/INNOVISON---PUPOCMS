@@ -563,9 +563,6 @@
     @csrf
 
     <section class="form-step is-active" data-step="1">
-    <div class="section-title">Step 1. Personal Information</div>
-    <p class="section-hint">Review your student identity details and complete the core contact and profile information below.</p>
-    
     <div class="row mt-4">
         <div class="col-md-9">
             <div class="row">
@@ -659,8 +656,6 @@
     </section>
 
     <section class="form-step" data-step="2">
-    <div class="section-title">Step 2. Medical History</div>
-    
     <div class="row mt-3">
         <div class="col-12 mb-2">
             <label class="form-label">1. Do you need medical attention or has known medical illness?</label>
@@ -777,7 +772,6 @@
     </section>
 
     <section class="form-step" data-step="3">
-    <div class="section-title">Step 3. Personal Social History & Vaccination</div>
     <div class="row mt-4">
         <div class="col-md-12 mb-3">
             <label class="form-label">COVID-19 Vaccination History:</label>
@@ -798,8 +792,6 @@
     </section>
 
     <section class="form-step" data-step="4">
-    <div class="section-title">Step 4. Verification & Uploads</div>
-    <p class="section-hint">Review your entries, confirm the required uploads, and submit your health profile once everything looks correct.</p>
     <div class="step4-note-box">
         <h4>Upload Instructions</h4>
         <ul>

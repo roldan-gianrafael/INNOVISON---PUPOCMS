@@ -162,6 +162,10 @@
         <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
     </div>
     <div class="row">
+        <span class="label">Height:</span> <div class="field">{{ $profile->height ?? 'N/A' }}</div>
+        <span class="label">Weight:</span> <div class="field">{{ $profile->weight ?? 'N/A' }}</div>
+    </div>
+    <div class="row">
         <span class="label">Age:</span> <div class="field">{{ $profile->age ?? '' }}</div>
         <span class="label">Sex:</span> <div class="field">{{ $profile->sex ?? '' }}</div>
         <span class="label">Civil Status:</span> <div class="field">{{ $profile->civil_status ?? '' }}</div>
@@ -202,6 +206,14 @@
         <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'None' ? '/' : '' }}</div> None</div>
         <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'Yes' ? '/' : '' }}</div> Yes:</div>
         <div class="field">{{ $profile->disability_type ?? '' }}</div>
+    </div>
+    <div class="row">
+        <span class="label">Chest X-Ray Result:</span> <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : 'N/A' }}</div>
+        <span class="label">PWD ID / Proof:</span> <div class="field">{{ $profile->pwd_id_proof ? 'Uploaded' : 'N/A' }}</div>
+    </div>
+    <div class="row">
+        <span class="label">Medical Certificate:</span> <div class="field">{{ $profile->medical_certificate ? 'Uploaded' : 'N/A' }}</div>
+        <span class="label">Issued By:</span> <div class="field">{{ $profile->medical_certificate_issued_by ?? 'N/A' }}</div>
     </div>
 
     <div class="section-header">3. ALLERGIES & MEDICAL CONDITIONS</div>
@@ -306,6 +318,42 @@ for the improvement of healthcare services.
         <div class="sig-line">Date Signed</div>
     </div>
 </div>
+
+    <div style="page-break-before: always; margin-top: 28px;">
+        <div class="form-title" style="margin-top: 0;">MEDICAL ASSESSMENT SUMMARY</div>
+
+        <div class="row">
+            <span class="label">Date:</span> <div class="field">{{ $profile->created_at ? $profile->created_at->format('m/d/Y') : '' }}</div>
+            <span class="label">Date of Birth:</span> <div class="field">{{ !empty($profile->user->DOB) ? \Carbon\Carbon::parse($profile->user->DOB)->format('m/d/Y') : '' }}</div>
+        </div>
+        <div class="row">
+            <span class="label">Height:</span> <div class="field">{{ $profile->height ?? '' }}</div>
+            <span class="label">ft</span>
+            <span class="label">Weight:</span> <div class="field">{{ $profile->weight ?? '' }}</div>
+            <span class="label">lbs</span>
+        </div>
+        <div class="row">
+            <span class="label">BP:</span> <div class="field">&nbsp;</div>
+            <span class="label">RR:</span> <div class="field">&nbsp;</div>
+            <span class="label">Temp:</span> <div class="field">&nbsp;</div>
+        </div>
+        <div class="row">
+            <span class="label">Covid Positive?</span> <div class="field">&nbsp;</div>
+            <span class="label">Date:</span> <div class="field">&nbsp;</div>
+        </div>
+        <div class="row">
+            <span class="label">Medical certificate issued by: Dr</span>
+            <div class="field">{{ $profile->medical_certificate_issued_by ?? '' }}</div>
+            <span class="label">Date:</span>
+            <div class="field">&nbsp;</div>
+        </div>
+        <div class="row">
+            <span class="label">Chest X-ray Result:</span>
+            <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : '' }}</div>
+            <span class="label">Date:</span>
+            <div class="field">&nbsp;</div>
+        </div>
+    </div>
 
    <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
         <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>

@@ -25,6 +25,39 @@
         display: none !important;
     }
 
+    .no-print *,
+    .sidebar,
+    .sidebar-toggle,
+    .medicine-alert-fab,
+    .medicine-alert-panel,
+    .asw-menu-btn,
+    .asw-widget,
+    .profile-dropdown,
+    .logout-link,
+    header,
+    nav,
+    footer,
+    aside,
+    .admin-layout > .sidebar,
+    .admin-layout > .main > *:not(.print-container) {
+        display: none !important;
+    }
+
+    .admin-layout,
+    .main {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .main > *:not(.print-container) {
+        display: none !important;
+    }
+
     .print-container, .print-container * {
         visibility: visible !important;
     }
@@ -348,7 +381,55 @@ for the improvement of healthcare services.
         </div>
         <div class="sig-line">Date Signed</div>
     </div>
-</div>
+    <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
+        <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
+        
+        <div class="row" style="display: flex; align-items: center; gap: 15px;">
+            <span style="font-weight: bold;">Medical Clearance:</span>
+            
+            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
+                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
+                    {{ $profile->clearance_status == 'Issued' ? '✔' : '' }}
+                </div> 
+                Issued
+            </div>
+
+            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
+                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
+                    {{ $profile->clearance_status == 'Pending' ? '✔' : '' }}
+                </div> 
+                Pending, Reason: 
+                <div class="field" style="border-bottom: 1px solid #000; min-width: 150px; padding-left: 5px; font-size: 12px; font-style: italic;">
+                    {{ $profile->clearance_status == 'Pending' ? $profile->pending_reason : '' }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 25px; display: flex; align-items: flex-end; gap: 20px;">
+            <div style="flex: 0.4;">
+                <div class="field" style="border-bottom: 1px solid #000; text-align: center; font-weight: bold; min-height: 20px;">
+                    {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
+                </div>
+                <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
+            </div>
+
+            <div style="flex: 0.6; text-align: center; position: relative; min-height: 80px;">
+                @if($profile->clearance_status == 'Issued')
+                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
+                        <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
+                             alt="Nurse Signature" 
+                             style="height: 80px; width: auto; pointer-events: none;">
+                    </div>
+                @endif
+
+                <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
+                    MS. NURSE NAME, RN
+                </div>
+                <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
+            </div>
+            </div>
+        </div>
+    </div>
 
     </div>
 
@@ -382,61 +463,11 @@ for the improvement of healthcare services.
             <span class="label">Date:</span>
             <div class="field">&nbsp;</div>
         </div>
-    <div class="row">
-        <span class="label">Chest X-ray Result:</span>
-        <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : '' }}</div>
-        <span class="label">Date:</span>
-        <div class="field">&nbsp;</div>
-    </div>
-    
-   <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
-        <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
-        
-        <div class="row" style="display: flex; align-items: center; gap: 15px;">
-            <span style="font-weight: bold;">Medical Clearance:</span>
-            
-            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
-                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
-                    {{ $profile->clearance_status == 'Issued' ? '✔' : '' }}
-                </div> 
-                Issued
-            </div>
-
-            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
-                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
-                    {{ $profile->clearance_status == 'Pending' ? '✔' : '' }}
-                </div> 
-                Pending, Reason: 
-                <div class="field" style="border-bottom: 1px solid #000; min-width: 150px; padding-left: 5px; font-size: 12px; font-style: italic;">
-                    {{ $profile->clearance_status == 'Pending' ? $profile->pending_reason : '' }}
-                </div>
-            </div>
-        </div>
-
-        <div class="row" style="margin-top: 25px; display: flex; align-items: flex-end; gap: 20px;">
-            <div style="flex: 0.4;">
-    <div class="field" style="border-bottom: 1px solid #000; text-align: center; font-weight: bold; min-height: 20px;">
-        {{-- I-check kung may verified_at date na sa DB, kung wala, ipakita ang date ngayon --}}
-        {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
-    </div>
-    <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
-</div>
-
-            <div style="flex: 0.6; text-align: center; position: relative; min-height: 80px;">
-                @if($profile->clearance_status == 'Issued')
-                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                        <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
-                             alt="Nurse Signature" 
-                             style="height: 80px; width: auto; pointer-events: none;">
-                    </div>
-                @endif
-
-                <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
-                    MS. NURSE NAME, RN
-                </div>
-                <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
-            </div>
-            </div>
+        <div class="row">
+            <span class="label">Chest X-ray Result:</span>
+            <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : '' }}</div>
+            <span class="label">Date:</span>
+            <div class="field">&nbsp;</div>
         </div>
     </div>
 </div>

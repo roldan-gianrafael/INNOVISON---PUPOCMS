@@ -129,6 +129,25 @@
         padding: 22px 24px 16px;
         border-bottom: 1px solid rgba(127,0,0,0.08);
     }
+    .section-spot {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--stg-maroon);
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    .section-spot::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--stg-maroon);
+        box-shadow: 0 0 0 4px rgba(127,0,0,0.10);
+    }
     .panel-head h3 {
         margin: 0;
         font-size: 18px;
@@ -152,6 +171,26 @@
         align-items: center;
         margin-bottom: 14px;
     }
+    .profile-id {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+    }
+    .profile-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 900;
+        letter-spacing: 0.02em;
+        background: linear-gradient(135deg, var(--stg-maroon), var(--stg-maroon-deep));
+        box-shadow: 0 14px 28px rgba(127,0,0,0.22);
+    }
     .profile-name {
         margin: 0;
         font-size: 16px;
@@ -159,12 +198,20 @@
         color: var(--stg-text);
     }
     .profile-role {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         padding: 7px 10px;
         border-radius: 999px;
         color: #fff;
         background: linear-gradient(135deg, var(--stg-maroon), var(--stg-maroon-deep));
         font-size: 11px;
         font-weight: 900;
+    }
+    .profile-role svg {
+        width: 14px;
+        height: 14px;
+        flex: 0 0 auto;
     }
     .profile-list {
         display: grid;
@@ -453,11 +500,27 @@
             </div>
             <div class="panel-body">
                 <div class="profile-top">
-                    <div>
-                        <p class="profile-name">{{ $cmsProfile['first_name'] ?? 'N/A' }} {{ $cmsProfile['last_name'] ?? '' }}</p>
-                        <div class="section-subtitle" style="margin-top:4px; color:var(--stg-muted);">{{ $cmsProfile['email'] ?? ($admin->email ?? 'N/A') }}</div>
+                    @php
+                        $profileName = trim(($cmsProfile['first_name'] ?? '') . ' ' . ($cmsProfile['last_name'] ?? ''));
+                        $profileInitials = '';
+                        foreach (preg_split('/\s+/', trim($profileName ?: 'NA')) as $part) {
+                            if ($part === '') continue;
+                            $profileInitials .= strtoupper(mb_substr($part, 0, 1));
+                            if (strlen($profileInitials) >= 2) break;
+                        }
+                        $profileStatus = strtolower($cmsProfile['status'] ?? 'active');
+                        $statusIcon = $profileStatus === 'inactive'
+                            ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M8 8L16 16M16 8L8 16" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>'
+                            : '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M8 12.5L10.9 15.4L16.5 9.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                    @endphp
+                    <div class="profile-id">
+                        <div class="profile-avatar">{{ $profileInitials ?: 'NA' }}</div>
+                        <div>
+                            <p class="profile-name">{{ $cmsProfile['first_name'] ?? 'N/A' }} {{ $cmsProfile['last_name'] ?? '' }}</p>
+                            <div class="section-subtitle" style="margin-top:4px; color:var(--stg-muted);">{{ $cmsProfile['email'] ?? ($admin->email ?? 'N/A') }}</div>
+                        </div>
                     </div>
-                    <div class="profile-role">{{ ucfirst($cmsProfile['status'] ?? 'active') }}</div>
+                    <div class="profile-role">{!! $statusIcon !!} {{ ucfirst($profileStatus) }}</div>
                 </div>
                 <div class="profile-list">
                     <div class="profile-row"><div class="key">Admin ID</div><div class="val">{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}</div></div>
@@ -479,10 +542,11 @@
             <form action="{{ url('/admin/settings/update') }}" method="POST">
                 @csrf @method('PUT')
                 <section class="panel">
-                    <div class="panel-head">
-                        <h3>Clinic Information</h3>
-                        <p>Update the clinic name and location shown throughout the system.</p>
-                    </div>
+            <div class="panel-head">
+                <div class="section-spot">Clinic Data</div>
+                <h3>Clinic Information</h3>
+                <p>Update the clinic name and location shown throughout the system.</p>
+            </div>
                     <div class="panel-body">
                         <div class="field-grid">
                             <div class="field">
@@ -498,10 +562,11 @@
                 </section>
 
                 <section class="panel">
-                    <div class="panel-head">
-                        <h3>Clinic Hours</h3>
-                        <p>Set the daily opening and closing time for the clinic.</p>
-                    </div>
+            <div class="panel-head">
+                <div class="section-spot">Clinic Schedule</div>
+                <h3>Clinic Hours</h3>
+                <p>Set the daily opening and closing time for the clinic.</p>
+            </div>
                     <div class="panel-body">
                         <div class="field-grid two">
                             <div class="field">
@@ -517,10 +582,11 @@
                 </section>
 
                 <section class="panel">
-                    <div class="panel-head">
-                        <h3>System Preferences</h3>
-                        <p>Control reminder and auto-approval behavior for the clinic workflow.</p>
-                    </div>
+            <div class="panel-head">
+                <div class="section-spot">Workflow</div>
+                <h3>System Preferences</h3>
+                <p>Control reminder and auto-approval behavior for the clinic workflow.</p>
+            </div>
                     <div class="panel-body">
                         <div class="switch-list">
                             <div class="switch-item">
@@ -544,6 +610,7 @@
     <div id="profileModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-head">
+                <div class="section-spot">Edit Admin</div>
                 <h3>Edit Profile</h3>
                 <p>Keep your admin identity and clinic contact details aligned with the hub record.</p>
             </div>

@@ -403,9 +403,9 @@
         .admin-header {
             position: sticky;
             top: 0;
-            background: linear-gradient(180deg, rgba(35, 17, 25, 0.98) 0%, rgba(24, 11, 18, 0.96) 100%);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(180deg, #231119 0%, #180b12 100%);
+            backdrop-filter: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
             padding: 14px clamp(16px, 3vw, 30px);
             display: flex;
             justify-content: space-between;
@@ -1233,7 +1233,7 @@
         }
 
         html[data-theme="light"] .admin-header {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 247, 249, 0.96) 100%);
+            background: linear-gradient(180deg, #ffffff 0%, #faf7f9 100%);
             border-bottom-color: rgba(128, 0, 0, 0.12);
             box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
         }

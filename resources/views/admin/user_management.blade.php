@@ -227,6 +227,13 @@
         color: #0f172a;
     }
 
+    .um-table thead th:last-child,
+    .um-table tbody td:last-child {
+        width: 190px;
+        min-width: 190px;
+        white-space: nowrap;
+    }
+
     .um-user {
         display: flex;
         align-items: center;
@@ -455,6 +462,12 @@
     #lookupModal .um-table thead th,
     #lookupModal .um-table tbody td {
         padding: 12px 14px;
+    }
+
+    #lookupModal .um-table thead th:last-child,
+    #lookupModal .um-table tbody td:last-child {
+        width: 200px;
+        min-width: 200px;
     }
 
     #lookupModal .um-search input {
@@ -737,7 +750,6 @@
             </form>
             <div class="um-directory-toggle" style="padding: 14px 0 10px;">
                 <div class="hint">Type a search term to show matching API and admin users below, or open the list manually.</div>
-            <button type="button" class="um-btn um-btn-soft" id="toggleLookupDirectoryBtn">Show Search Results</button>
             </div>
             <div style="margin-top: 16px;" class="um-directory-panel {{ $lookupSearch !== '' ? 'is-open' : '' }}" id="lookupDirectoryPanel">
             <div class="um-table-wrap">
@@ -897,7 +909,16 @@
                             This faculty profile is managed externally, so it is read-only here.
                         </div>
                         <div class="um-actions">
-            <button type="button" class="um-btn um-btn-soft" id="deactivateBtn">Deactivate Account</button>
+                            <button type="button" class="um-btn um-btn-soft" id="deactivateBtn">Deactivate Account</button>
+                            <button
+                                type="submit"
+                                form="deleteForm"
+                                class="um-btn"
+                                style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;"
+                                onclick="return confirm('Remove this account access and return it to the default student role?')"
+                            >
+                                Remove Access
+                            </button>
                             <button type="submit" class="um-btn um-btn-primary" id="saveSettingsBtn">Save Changes</button>
                         </div>
                     </form>
@@ -906,9 +927,6 @@
                         @csrf
                         @method('DELETE')
                         <input type="hidden" name="admin_profile_id" id="deleteAdminProfileId">
-                        <div class="um-actions" style="justify-content: flex-start;">
-                    <button type="submit" class="um-btn" style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;" onclick="return confirm('Remove this account access and return it to the default student role?')">Remove Access</button>
-                </div>
             </form>
                 </div>
             </div>
@@ -946,17 +964,7 @@
     const directoryPanel = document.getElementById('directoryPanel');
     const lookupDirectoryPanel = document.getElementById('lookupDirectoryPanel');
     const lookupSearchField = document.getElementById('lookupSearchField');
-    const toggleLookupDirectoryBtn = document.getElementById('toggleLookupDirectoryBtn');
     const userHoverHint = document.getElementById('userHoverHint');
-
-    const openLookupDirectory = () => {
-        if (lookupDirectoryPanel) {
-            lookupDirectoryPanel.classList.add('is-open');
-        }
-        if (toggleLookupDirectoryBtn) {
-            toggleLookupDirectoryBtn.textContent = 'Results Open';
-        }
-    };
 
     const openSettingsFromRow = (row) => {
         if (!row) {
@@ -1039,10 +1047,6 @@
         deleteForm.style.display = canEdit ? 'block' : 'none';
         settingsModal.classList.add('show');
     };
-
-    if (toggleLookupDirectoryBtn) {
-        toggleLookupDirectoryBtn.addEventListener('click', openLookupDirectory);
-    }
 
     if (lookupModal && lookupSearchField && lookupSearchField.value.trim() !== '') {
         lookupModal.classList.add('show');

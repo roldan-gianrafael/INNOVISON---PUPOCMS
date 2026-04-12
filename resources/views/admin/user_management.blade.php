@@ -367,6 +367,12 @@
         box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
     }
 
+    #lookupModal .um-modal-content {
+        width: min(920px, 100%);
+        max-height: 88vh;
+        border-radius: 18px;
+    }
+
     .um-modal-head {
         padding: 18px 20px;
         border-bottom: 1px solid rgba(148, 163, 184, 0.14);
@@ -374,6 +380,10 @@
         align-items: flex-start;
         justify-content: space-between;
         gap: 12px;
+    }
+
+    #lookupModal .um-modal-head {
+        padding: 14px 16px;
     }
 
     .um-modal-head h3 {
@@ -387,10 +397,32 @@
         padding: 18px 20px 22px;
     }
 
+    #lookupModal .um-modal-body {
+        padding: 14px 16px 18px;
+    }
+
     .um-modal-grid {
         display: grid;
         grid-template-columns: 280px 1fr;
         gap: 20px;
+    }
+
+    #lookupModal .um-modal-grid {
+        grid-template-columns: 240px 1fr;
+        gap: 14px;
+    }
+
+    #lookupModal .um-table {
+        min-width: 760px;
+    }
+
+    #lookupModal .um-table thead th,
+    #lookupModal .um-table tbody td {
+        padding: 12px 14px;
+    }
+
+    #lookupModal .um-search input {
+        padding: 10px 12px;
     }
 
     .um-detail-card {

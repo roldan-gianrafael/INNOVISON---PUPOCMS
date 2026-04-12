@@ -1057,12 +1057,23 @@ public function deleteItem($id)
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
 
-        $settings->clinic_name = $request->clinic_name;
-        $settings->clinic_location = $request->clinic_location;
-        $settings->open_time = $request->open_time;
-        $settings->close_time = $request->close_time;
-        $settings->email_notifications = $request->has('email_notifications');
-        $settings->auto_approve = $request->has('auto_approve');
+        $settings->clinic_name = $request->input('clinic_name', $settings->clinic_name);
+        $settings->clinic_location = $request->input('clinic_location', $settings->clinic_location);
+        $settings->open_time = $request->input('open_time', $settings->open_time);
+        $settings->close_time = $request->input('close_time', $settings->close_time);
+
+        if ($request->has('email_notifications')) {
+            $settings->email_notifications = true;
+        } elseif ($request->boolean('preferences_form')) {
+            $settings->email_notifications = false;
+        }
+
+        if ($request->has('auto_approve')) {
+            $settings->auto_approve = true;
+        } elseif ($request->boolean('preferences_form')) {
+            $settings->auto_approve = false;
+        }
+
         $settings->save();
 
         // --- LOGS CODES ---

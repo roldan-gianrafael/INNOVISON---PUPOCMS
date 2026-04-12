@@ -35,12 +35,13 @@
     }
 
     .hero {
-        background: linear-gradient(135deg, rgba(127, 0, 0, 0.98), rgba(79, 0, 0, 0.94));
-        color: #fff;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,247,249,0.96));
+        color: var(--stg-text);
+        border: 1px solid rgba(127,0,0,0.10);
         border-radius: 28px;
         padding: 28px;
         margin-bottom: 22px;
-        box-shadow: 0 24px 60px rgba(127, 0, 0, 0.18);
+        box-shadow: 0 20px 48px rgba(15,23,42,0.08);
     }
     .hero-top {
         display: flex;
@@ -59,27 +60,9 @@
     .hero p {
         margin: 12px 0 0;
         max-width: 760px;
-        color: rgba(255,255,255,0.82);
+        color: var(--stg-muted);
         line-height: 1.7;
         font-size: 14px;
-    }
-    .hero-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-    .hero-btn {
-        border: 1px solid rgba(255,255,255,0.18);
-        background: rgba(255,255,255,0.12);
-        color: #fff;
-        padding: 11px 16px;
-        border-radius: 14px;
-        font-weight: 800;
-        cursor: pointer;
-    }
-    .hero-btn.primary {
-        background: #fff;
-        color: var(--stg-maroon);
     }
     .badges {
         display: flex;
@@ -93,8 +76,9 @@
         gap: 8px;
         padding: 9px 12px;
         border-radius: 999px;
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.15);
+        background: rgba(127,0,0,0.06);
+        border: 1px solid rgba(127,0,0,0.12);
+        color: var(--stg-maroon);
         font-size: 12px;
         font-weight: 800;
     }
@@ -131,6 +115,12 @@
         padding: 22px 24px 18px;
         border-bottom: 1px solid rgba(127,0,0,0.10);
         background: linear-gradient(180deg, rgba(127,0,0,0.03), rgba(255,255,255,0));
+    }
+    .panel-head-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
     }
     .section-spot {
         display: inline-flex;
@@ -169,6 +159,39 @@
     }
     .panel-body {
         padding: 28px;
+    }
+    .btn-edit-profile {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(127,0,0,0.12);
+        background: rgba(127,0,0,0.06);
+        color: var(--stg-maroon);
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+        box-shadow: 0 10px 20px rgba(15,23,42,0.06);
+    }
+    .btn-edit-profile:hover {
+        background: rgba(127,0,0,0.10);
+    }
+    .mini-edit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(127,0,0,0.12);
+        background: rgba(127,0,0,0.06);
+        color: var(--stg-maroon);
+        padding: 9px 13px;
+        border-radius: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .mini-edit-btn:hover {
+        background: rgba(127,0,0,0.10);
     }
 
     .profile-top {
@@ -543,17 +566,19 @@
                     <div class="badge"><span></span> System Preferences</div>
                 </div>
             </div>
-            <div class="hero-actions">
-                <button class="hero-btn primary" onclick="openProfileModal()">Edit Profile</button>
-            </div>
         </div>
     </section>
 
     <div class="grid">
         <section class="panel">
             <div class="panel-head">
-                <h3>CMS Admin Profile</h3>
-                <p>Read-only hub profile for the current clinic administrator.</p>
+                <div class="panel-head-top">
+                    <div>
+                        <h3>CMS Admin Profile</h3>
+                        <p>Read-only hub profile for the current clinic administrator.</p>
+                    </div>
+                    <button type="button" class="btn-edit-profile" onclick="openProfileModal()">Edit Profile</button>
+                </div>
             </div>
             <div class="panel-body">
                 <div class="profile-top">
@@ -596,62 +621,53 @@
         </section>
 
         <div style="display:grid; gap:22px;">
+            <section class="panel">
+                <div class="panel-head">
+                    <div class="panel-head-top">
+                        <div>
+                            <div class="section-spot">Clinic Data</div>
+                            <h3>Clinic Information</h3>
+                            <p>Read-only clinic identity details for this workspace.</p>
+                        </div>
+                        <button type="button" class="mini-edit-btn" onclick="openSettingsModal('clinicInfoModal')">Edit</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="profile-list">
+                        <div class="profile-row"><div class="key">Clinic Name</div><div class="val">{{ $settings->clinic_name ?: 'N/A' }}</div></div>
+                        <div class="profile-row"><div class="key">Location</div><div class="val">{{ $settings->clinic_location ?: 'N/A' }}</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div class="panel-head-top">
+                        <div>
+                            <div class="section-spot">Clinic Schedule</div>
+                            <h3>Clinic Hours</h3>
+                            <p>Read-only daily operating schedule for the clinic.</p>
+                        </div>
+                        <button type="button" class="mini-edit-btn" onclick="openSettingsModal('clinicHoursModal')">Edit</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="profile-list">
+                        <div class="profile-row"><div class="key">Opening Time</div><div class="val">{{ $settings->open_time ?: 'N/A' }}</div></div>
+                        <div class="profile-row"><div class="key">Closing Time</div><div class="val">{{ $settings->close_time ?: 'N/A' }}</div></div>
+                    </div>
+                </div>
+            </section>
+
             <form action="{{ url('/admin/settings/update') }}" method="POST">
                 @csrf @method('PUT')
+                <input type="hidden" name="preferences_form" value="1">
                 <section class="panel">
                     <div class="panel-head">
-                        <div class="section-spot">Clinic Data</div>
-                        <h3>Clinic Information</h3>
-                        <p>Update the clinic name and location shown throughout the system.</p>
+                        <div class="section-spot">Workflow</div>
+                        <h3>System Preferences</h3>
+                        <p>Control reminder and auto-approval behavior for the clinic workflow.</p>
                     </div>
-                    <div class="panel-body">
-                        <div class="editable-list">
-                            <div class="editable-row">
-                                <div class="editable-key">Clinic Name</div>
-                                <div class="editable-field">
-                                    <input type="text" name="clinic_name" value="{{ $settings->clinic_name }}" placeholder="Clinic name">
-                                </div>
-                            </div>
-                            <div class="editable-row">
-                                <div class="editable-key">Location</div>
-                                <div class="editable-field">
-                                    <input type="text" name="clinic_location" value="{{ $settings->clinic_location }}" placeholder="Clinic location">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="panel">
-                    <div class="panel-head">
-                        <div class="section-spot">Clinic Schedule</div>
-                        <h3>Clinic Hours</h3>
-                        <p>Set the daily opening and closing time for the clinic.</p>
-                    </div>
-                    <div class="panel-body">
-                        <div class="editable-list">
-                            <div class="editable-row">
-                                <div class="editable-key">Opening Time</div>
-                                <div class="editable-field">
-                                    <input type="time" name="open_time" value="{{ $settings->open_time }}">
-                                </div>
-                            </div>
-                            <div class="editable-row">
-                                <div class="editable-key">Closing Time</div>
-                                <div class="editable-field">
-                                    <input type="time" name="close_time" value="{{ $settings->close_time }}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="panel">
-            <div class="panel-head">
-                <div class="section-spot">Workflow</div>
-                <h3>System Preferences</h3>
-                <p>Control reminder and auto-approval behavior for the clinic workflow.</p>
-            </div>
                     <div class="panel-body">
                         <div class="switch-list">
                             <div class="switch-item">
@@ -668,6 +684,64 @@
                         </div>
                     </div>
                 </section>
+            </form>
+        </div>
+    </div>
+
+    <div id="clinicInfoModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-head">
+                <div class="section-spot">Clinic Data</div>
+                <h3>Edit Clinic Information</h3>
+                <p>Update the clinic identity details shown across the system.</p>
+            </div>
+            <form action="{{ url('/admin/settings/update') }}" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="field-grid">
+                        <div class="field">
+                            <label>Clinic Name</label>
+                            <input type="text" name="clinic_name" value="{{ $settings->clinic_name }}" placeholder="Clinic name">
+                        </div>
+                        <div class="field">
+                            <label>Location</label>
+                            <input type="text" name="clinic_location" value="{{ $settings->clinic_location }}" placeholder="Clinic location">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeSettingsModal('clinicInfoModal')">Cancel</button>
+                    <button type="submit" class="btn-save">Save Clinic Information</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="clinicHoursModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-head">
+                <div class="section-spot">Clinic Schedule</div>
+                <h3>Edit Clinic Hours</h3>
+                <p>Update the daily opening and closing schedule for the clinic.</p>
+            </div>
+            <form action="{{ url('/admin/settings/update') }}" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="field-grid two">
+                        <div class="field">
+                            <label>Opening Time</label>
+                            <input type="time" name="open_time" value="{{ $settings->open_time }}">
+                        </div>
+                        <div class="field">
+                            <label>Closing Time</label>
+                            <input type="time" name="close_time" value="{{ $settings->close_time }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeSettingsModal('clinicHoursModal')">Cancel</button>
+                    <button type="submit" class="btn-save">Save Clinic Hours</button>
+                </div>
             </form>
         </div>
     </div>
@@ -797,6 +871,20 @@
 
 @push('scripts')
 <script>
+    function openSettingsModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeSettingsModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
     function openProfileModal() {
         document.getElementById('profileModal').style.display = 'flex';
         syncCmsAge();
@@ -809,6 +897,12 @@
     window.addEventListener('click', function (e) {
         if (e.target === document.getElementById('profileModal')) {
             closeProfileModal();
+        }
+        if (e.target === document.getElementById('clinicInfoModal')) {
+            closeSettingsModal('clinicInfoModal');
+        }
+        if (e.target === document.getElementById('clinicHoursModal')) {
+            closeSettingsModal('clinicHoursModal');
         }
     });
 

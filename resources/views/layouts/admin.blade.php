@@ -811,6 +811,12 @@
 
         .main::-webkit-scrollbar,
         .sidebar::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
+        .main.scrollbar-visible::-webkit-scrollbar,
+        .sidebar.scrollbar-visible::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
@@ -820,53 +826,42 @@
             background: transparent;
         }
 
-        .main::-webkit-scrollbar-thumb,
-        .sidebar::-webkit-scrollbar-thumb {
-            background: transparent;
+        .main.scrollbar-visible::-webkit-scrollbar-thumb,
+        .sidebar.scrollbar-visible::-webkit-scrollbar-thumb {
             background: linear-gradient(
                 180deg,
-                #800000 0%,
-                #b91c1c 50%,
-                #4a1a22 50%,
-                #4a1a22 100%
+                #8b0000 0%,
+                #c02626 46%,
+                #4a1a22 46%,
+                #2d1016 100%
             );
             border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+                0 8px 16px rgba(75, 17, 25, 0.18);
             animation: scrollbarGlow 2.2s ease-in-out infinite;
-            opacity: 0;
-            transition: opacity 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+            transition: background 0.25s ease, box-shadow 0.25s ease;
         }
 
-        .main:hover::-webkit-scrollbar-thumb,
-        .sidebar:hover::-webkit-scrollbar-thumb,
-        .main:focus-within::-webkit-scrollbar-thumb,
-        .sidebar:focus-within::-webkit-scrollbar-thumb,
-        .main::-webkit-scrollbar-thumb:active,
-        .sidebar::-webkit-scrollbar-thumb:active {
-            opacity: 1;
-            background: linear-gradient(
-                180deg,
-                #800000 0%,
-                #b91c1c 50%,
-                #4a1a22 50%,
-                #4a1a22 100%
-            );
-        }
-
-        .main::-webkit-scrollbar-thumb:hover,
-        .sidebar::-webkit-scrollbar-thumb:hover {
+        .main.scrollbar-visible::-webkit-scrollbar-thumb:hover,
+        .sidebar.scrollbar-visible::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(
                 180deg,
                 #990000 0%,
-                #d11f1f 50%,
-                #5d2028 50%,
-                #5d2028 100%
+                #dc2626 46%,
+                #5b2028 46%,
+                #361219 100%
             );
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.16),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+                0 10px 18px rgba(75, 17, 25, 0.24);
         }
 
-        .main::-webkit-scrollbar-corner,
-        .sidebar::-webkit-scrollbar-corner {
+        .main.scrollbar-visible::-webkit-scrollbar-corner,
+        .sidebar.scrollbar-visible::-webkit-scrollbar-corner {
             background: transparent;
         }
 
@@ -2015,6 +2010,40 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         });
     }
 
+    function initAutoHideScrollbars() {
+        const targets = Array.from(document.querySelectorAll('.main, .sidebar'));
+
+        if (!targets.length) {
+            return;
+        }
+
+        targets.forEach((target) => {
+            let hideTimer = null;
+
+            const show = () => {
+                target.classList.add('scrollbar-visible');
+                if (hideTimer) {
+                    clearTimeout(hideTimer);
+                }
+                hideTimer = window.setTimeout(() => {
+                    target.classList.remove('scrollbar-visible');
+                }, 900);
+            };
+
+            target.addEventListener('mouseenter', show);
+            target.addEventListener('focusin', show);
+            target.addEventListener('scroll', show, { passive: true });
+            target.addEventListener('mouseleave', () => {
+                if (hideTimer) {
+                    clearTimeout(hideTimer);
+                }
+                hideTimer = window.setTimeout(() => {
+                    target.classList.remove('scrollbar-visible');
+                }, 250);
+            });
+        });
+    }
+
     function initMedicineAlerts() {
         const toggle = document.getElementById('medicineAlertToggle');
         const panel = document.getElementById('medicineAlertPanel');
@@ -2512,6 +2541,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
         initThemeToggle();
+        initAutoHideScrollbars();
         initMedicineAlerts();
         initAccessibilityLaunch();
     });

@@ -403,8 +403,8 @@
         .admin-header {
             position: sticky;
             top: 0;
-            background: linear-gradient(180deg, rgba(80, 18, 31, 0.96) 0%, rgba(59, 13, 23, 0.94) 100%);
-            backdrop-filter: blur(10px);
+            background: transparent;
+            backdrop-filter: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.18);
             padding: 14px clamp(16px, 3vw, 30px);
             display: flex;
@@ -413,6 +413,61 @@
             gap: 16px;
             flex-shrink: 0;
             z-index: 70;
+        }
+
+        .glass-nav {
+            transition: background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .glass-nav.scrolled {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom-color: rgba(255, 255, 255, 0.28);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .glass-nav.scrolled .header-kicker,
+        .glass-nav.scrolled .header-subtitle {
+            color: rgba(255, 255, 255, 0.86);
+        }
+
+        .glass-nav.scrolled .header-title {
+            color: #ffffff;
+        }
+
+        .glass-nav.scrolled .admin-user {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.26);
+        }
+
+        .glass-nav.scrolled .admin-user-name,
+        .glass-nav.scrolled .admin-user-role {
+            color: #ffffff;
+        }
+
+        html[data-theme="dark"] .glass-nav.scrolled {
+            background: rgba(15, 23, 42, 0.72);
+            border-bottom-color: rgba(148, 163, 184, 0.2);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        }
+
+        html[data-theme="light"] .glass-nav.scrolled {
+            background: rgba(248, 249, 250, 0.72);
+            border-bottom-color: rgba(15, 23, 42, 0.08);
+        }
+
+        html[data-theme="light"] .glass-nav.scrolled .header-kicker,
+        html[data-theme="light"] .glass-nav.scrolled .header-subtitle,
+        html[data-theme="light"] .glass-nav.scrolled .header-title,
+        html[data-theme="light"] .glass-nav.scrolled .admin-user-name,
+        html[data-theme="light"] .glass-nav.scrolled .admin-user-role {
+            color: #111827;
+        }
+
+        html[data-theme="light"] .glass-nav.scrolled .admin-user {
+            background: rgba(255, 255, 255, 0.78);
+            border-color: rgba(15, 23, 42, 0.08);
         }
 
         .header-left {
@@ -696,23 +751,42 @@
             font-size: 13px;
             font-weight: 700;
             letter-spacing: 0.01em;
-            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
             min-width: 210px;
+            min-height: 48px;
             white-space: nowrap;
+            isolation: isolate;
+        }
+
+        .sidebar-nav a::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: transparent;
+            border-radius: inherit;
+            z-index: -1;
+            transition: background 0.3s ease;
         }
 
         .sidebar-nav a:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.16);
+            color: #111827;
+            border-color: rgba(15, 23, 42, 0.08);
             transform: translateX(1px);
-            backdrop-filter: blur(8px);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+        }
+
+        .sidebar-nav a:hover::before {
+            background: #f8f9fa;
         }
 
         .sidebar-nav a.active {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.24);
-            color: #ffffff;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 6px 18px rgba(0, 0, 0, 0.06);
+            color: #111827;
+            border-color: rgba(15, 23, 42, 0.08);
+            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+        }
+
+        .sidebar-nav a.active::before {
+            background: #f8f9fa;
         }
 
         .sidebar-short {
@@ -1325,17 +1399,15 @@
         }
 
         html[data-theme="light"] .sidebar-nav a:hover {
-            background: rgba(128, 0, 0, 0.05);
-            border-color: rgba(128, 0, 0, 0.14);
-            box-shadow: inset 0 0 0 1px rgba(128, 0, 0, 0.03);
-            backdrop-filter: blur(8px);
+            color: #111827;
+            border-color: rgba(15, 23, 42, 0.08);
+            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
         }
 
         html[data-theme="light"] .sidebar-nav a.active {
-            background: rgba(128, 0, 0, 0.09);
-            border-color: rgba(128, 0, 0, 0.22);
-            color: #4a0f1a;
-            box-shadow: inset 0 0 0 1px rgba(128, 0, 0, 0.04), 0 6px 18px rgba(128, 0, 0, 0.06);
+            color: #111827;
+            border-color: rgba(15, 23, 42, 0.08);
+            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
         }
 
         html[data-theme="light"] .sidebar-short {
@@ -1705,7 +1777,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $medicineAlertOverflow = $medicineAlerts->slice(2)->values();
 @endphp
 
-<header class="admin-header">
+<header class="admin-header glass-nav" id="adminNavbar">
     <div class="header-left">
         <img src="{{ $brandLogo }}" alt="Clinic Logo" class="header-brand-avatar">
         <div class="header-copy">
@@ -1743,6 +1815,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         </div>
     </div>
 </header>
+
+<button type="button" id="scroll-button" aria-hidden="true" tabindex="-1" style="position:absolute; left:-9999px; top:160px; width:1px; height:1px; opacity:0; pointer-events:none;">scroll</button>
 
 <div class="admin-layout">
   
@@ -1987,6 +2061,35 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 console.warn('Theme preference was not saved.', error);
             }
         });
+    }
+
+    function initGlassNav() {
+        const nav = document.getElementById('adminNavbar');
+        const trigger = document.getElementById('scroll-button');
+        const scrollContainer = document.querySelector('.main');
+
+        if (!nav || !trigger) {
+            return;
+        }
+
+        const getScrollTop = () => {
+            if (scrollContainer && scrollContainer.scrollTop !== undefined) {
+                return scrollContainer.scrollTop;
+            }
+
+            return window.scrollY || document.documentElement.scrollTop || 0;
+        };
+
+        const updateGlassNav = () => {
+            const triggerTop = trigger.offsetTop || 0;
+            const scrolled = getScrollTop() > triggerTop;
+            nav.classList.toggle('scrolled', scrolled);
+        };
+
+        const target = scrollContainer || window;
+        target.addEventListener('scroll', updateGlassNav, { passive: true });
+        window.addEventListener('resize', updateGlassNav, { passive: true });
+        updateGlassNav();
     }
 
     function initSidebarScrollCue() {
@@ -2509,6 +2612,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
         initThemeToggle();
+        initGlassNav();
         initSidebarScrollCue();
         initMedicineAlerts();
         initAccessibilityLaunch();

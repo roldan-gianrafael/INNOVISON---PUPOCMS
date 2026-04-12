@@ -464,62 +464,124 @@
         position: fixed;
         inset: 0;
         padding: 24px 16px;
-        background: rgba(15,23,42,0.38);
-        backdrop-filter: blur(6px);
+        background: rgba(15,23,42,0.34);
+        backdrop-filter: blur(8px);
         z-index: 1000;
         justify-content: center;
         align-items: flex-start;
         overflow-y: auto;
     }
     .modal-box {
-        width: min(980px, 100%);
+        width: min(640px, 100%);
         max-width: 96vw;
-        border-radius: 22px;
+        border-radius: 24px;
         overflow: hidden;
         background: #ffffff;
         border: 1px solid rgba(148,163,184,0.16);
-        box-shadow: 0 24px 60px rgba(15,23,42,0.14);
+        box-shadow: 0 26px 70px rgba(15,23,42,0.18);
     }
     .modal-head {
-        padding: 22px 24px 16px;
+        padding: 30px 32px 10px;
         border-bottom: 1px solid rgba(148,163,184,0.14);
         background: #ffffff;
+        text-align: center;
     }
     .modal-head h3 {
         margin: 0;
         color: var(--stg-maroon);
-        font-size: 18px;
+        font-size: 24px;
         font-weight: 900;
+        letter-spacing: -0.02em;
     }
     .modal-head p {
-        margin: 6px 0 0;
+        margin: 8px auto 0;
         color: var(--stg-muted);
         font-size: 13px;
         line-height: 1.6;
+        max-width: 420px;
     }
-    .modal-body { padding: 26px; }
+    .modal-body {
+        padding: 22px 32px 28px;
+    }
     .modal-actions {
         position: sticky;
         bottom: 0;
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        padding: 16px 24px 20px;
+        padding: 14px 32px 28px;
         background: #ffffff;
         border-top: 1px solid rgba(148,163,184,0.14);
     }
     .btn-cancel {
         padding: 11px 16px;
         border-radius: 12px;
-        border: 1px solid rgba(148,163,184,0.22);
-        background: #ffffff;
-        color: #334155;
+        border: 1px solid rgba(127,0,0,0.10);
+        background: rgba(127,0,0,0.04);
+        color: var(--stg-maroon);
         font-weight: 800;
         cursor: pointer;
     }
     .modal-head .section-spot {
-        margin-bottom: 10px;
+        display: none;
+    }
+    .modal-body .field-grid,
+    .modal-body .field-grid.two,
+    .modal-body .field-grid.three {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .modal-body .field {
+        padding: 0;
+        border-radius: 0;
+        background: transparent;
+        border: none;
         box-shadow: none;
+        backdrop-filter: none;
+    }
+    .modal-body .field label {
+        position: static;
+        transform: none;
+        display: block;
+        min-height: 0;
+        margin-bottom: 8px;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: #5f6677;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+    }
+    .modal-body .field input,
+    .modal-body .field select {
+        min-height: 56px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 1px solid #d7dde5;
+        background: #ffffff;
+        box-shadow: none;
+        transform: none !important;
+    }
+    .modal-body .field input:hover,
+    .modal-body .field select:hover {
+        border-color: #c4ccd6;
+        box-shadow: none;
+    }
+    .modal-body .field input:focus,
+    .modal-body .field select:focus {
+        border-color: var(--stg-maroon);
+        box-shadow: 0 0 0 4px rgba(127,0,0,0.10);
+        transform: none !important;
+    }
+    .modal-body .field input:disabled {
+        background: #f8fafc;
+        color: #64748b;
+    }
+    .modal-body .field-help {
+        margin: 8px 0 0;
+        padding-left: 2px;
     }
 
     .alert {
@@ -678,6 +740,24 @@
         background: rgba(255,255,255,0.06);
         color: #fff1f4;
         border-color: rgba(255,255,255,0.10);
+    }
+    html[data-theme="dark"] .modal-body .field label {
+        color: #d7b3bc;
+    }
+    html[data-theme="dark"] .modal-body .field input,
+    html[data-theme="dark"] .modal-body .field select {
+        background: rgba(20, 9, 13, 0.92);
+        color: #fff1f4;
+        border-color: rgba(255,255,255,0.10);
+    }
+    html[data-theme="dark"] .modal-body .field input:hover,
+    html[data-theme="dark"] .modal-body .field select:hover {
+        border-color: rgba(255,255,255,0.18);
+    }
+    html[data-theme="dark"] .modal-body .field input:focus,
+    html[data-theme="dark"] .modal-body .field select:focus {
+        border-color: #ffb8c6;
+        box-shadow: 0 0 0 4px rgba(255,184,198,0.10);
     }
     html[data-theme="dark"] .alert-success {
         background: rgba(22, 101, 52, 0.18);

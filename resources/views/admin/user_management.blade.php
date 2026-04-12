@@ -237,11 +237,11 @@
         cursor: pointer;
     }
 
-    tr[data-user-card] {
+    tr[data-user-card][data-can-edit="1"] {
         cursor: pointer;
     }
 
-    tr[data-user-card]:hover .um-user {
+    tr[data-user-card][data-can-edit="1"]:hover .um-user {
         background: rgba(128, 0, 0, 0.04);
         border-radius: 12px;
     }
@@ -541,8 +541,8 @@
         <div class="um-summary-grid">
             <div class="um-summary-card">
                 <div class="um-summary-label">Total Users</div>
-                <div class="um-summary-value">{{ count($records) }}</div>
-                <p class="um-summary-note">Combined students, admins, faculty, and assistants.</p>
+                <div class="um-summary-value">{{ $stats['local_total'] }}</div>
+                <p class="um-summary-note">Users already stored in the CMS.</p>
             </div>
             <div class="um-summary-card">
                 <div class="um-summary-label">Active</div>
@@ -568,12 +568,12 @@
 
         <div class="um-card-head">
             <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
-                <input type="search" name="search" value="{{ $search }}" placeholder="Search by email, name, or student ID" id="userManagementSearch">
+                <input type="search" name="search_local" value="{{ $localSearch }}" placeholder="Search local users by email, name, or student ID" id="userManagementSearch">
                 <button class="um-btn um-btn-soft" type="submit">Search</button>
             </form>
         </div>
 
-        <div class="um-directory-panel {{ $search !== '' ? 'is-open' : '' }}" id="directoryPanel">
+        <div class="um-directory-panel {{ $localSearch !== '' ? 'is-open' : '' }}" id="directoryPanel">
         <div class="um-table-wrap">
             <table class="um-table">
                 <thead>
@@ -587,7 +587,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($records as $record)
+                    @forelse($localRecords as $record)
                         <tr
                             data-user-card
                             data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
@@ -650,7 +650,7 @@
                     @empty
                         <tr>
                             <td colspan="6">
-                                <div class="um-empty">No users matched the current search.</div>
+                                <div class="um-empty">No local users matched the current search.</div>
                             </td>
                         </tr>
                     @endforelse
@@ -666,20 +666,20 @@
         <div class="um-modal-head">
             <div>
                 <h3>Add New User</h3>
-                <div class="um-note">Search existing students, faculty, or admin profiles. The results list stays hidden until you search or open it on purpose.</div>
+                <div class="um-note">Search across students, faculty, or admin profiles from the API and admin hub.</div>
             </div>
             <button type="button" class="um-btn um-btn-soft" data-close-lookup>Close</button>
         </div>
         <div class="um-modal-body">
             <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
-                <input type="search" name="search" value="{{ $search }}" placeholder="Search by email, name, or student ID" id="lookupSearchField">
+                <input type="search" name="lookup_search" value="{{ $lookupSearch }}" placeholder="Search API / admin users by email, name, or student ID" id="lookupSearchField">
                 <button class="um-btn um-btn-primary" type="submit">Search</button>
             </form>
             <div class="um-directory-toggle" style="padding: 14px 0 10px;">
-                <div class="hint">Type a search term to show matching users below, or open the full list manually.</div>
+                <div class="hint">Type a search term to show matching API and admin users below, or open the list manually.</div>
                 <button type="button" class="um-btn um-btn-soft" id="toggleLookupDirectoryBtn">Show Search Results</button>
             </div>
-            <div style="margin-top: 16px;" class="um-directory-panel {{ $search !== '' ? 'is-open' : '' }}" id="lookupDirectoryPanel">
+            <div style="margin-top: 16px;" class="um-directory-panel {{ $lookupSearch !== '' ? 'is-open' : '' }}" id="lookupDirectoryPanel">
             <div class="um-table-wrap">
                 <table class="um-table" style="min-width: 900px;">
                     <thead>
@@ -693,7 +693,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($records as $record)
+                        @forelse($lookupRecords as $record)
                             <tr
                                 data-user-card
                                 data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
@@ -747,7 +747,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6"><div class="um-empty">No users matched the current search.</div></td>
+                                <td colspan="6"><div class="um-empty">No API or admin users matched the current search.</div></td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -839,7 +839,7 @@
                         @csrf
                         @method('DELETE')
                         <div class="um-actions" style="justify-content: flex-start;">
-                    <button type="submit" class="um-btn" style="background:#fee2e2;color:#991b1b;border:1px solid #fecaca;" onclick="return confirm('Delete this account permanently?')">Delete Account</button>
+                    <button type="submit" class="um-btn" style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;" onclick="return confirm('Remove this account access and return it to the default student role?')">Remove Access</button>
                 </div>
             </form>
                 </div>
@@ -991,6 +991,10 @@
     });
 
     document.querySelectorAll('tr[data-user-card]').forEach((row) => {
+        if (row.dataset.canEdit !== '1') {
+            return;
+        }
+
         const moveHint = (event) => {
             if (!userHoverHint) {
                 return;

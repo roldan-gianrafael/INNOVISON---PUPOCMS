@@ -18,29 +18,44 @@ class AdminUserController extends Controller
 {
     public function index(Request $request, FacultySyncService $facultySyncService)
     {
-        $search = trim((string) $request->query('search', ''));
-        $localUsers = $this->collectLocalUsers($search);
-        $facultyUsers = $this->collectFacultyUsers($facultySyncService, $search);
+        $localSearch = trim((string) $request->query('search_local', ''));
+        $lookupSearch = trim((string) $request->query('lookup_search', ''));
 
-        $records = collect($localUsers)
-            ->merge($facultyUsers)
-            ->sortBy(fn (array $record) => sprintf(
-                '%02d-%s',
-                $this->recordSortWeight($record['source'] ?? 'student'),
-                strtolower((string) ($record['name'] ?? ''))
-            ))
-            ->values()
-            ->all();
+        $allLocalUsers = $this->collectLocalUsers('');
+        $allFacultyUsers = $this->collectFacultyUsers($facultySyncService, '');
+
+        $localRecords = $localSearch !== ''
+            ? $this->collectLocalUsers($localSearch)
+            : [];
+
+        $lookupRecords = $lookupSearch !== ''
+            ? collect($this->collectLocalUsers($lookupSearch))
+                ->merge($this->collectFacultyUsers($facultySyncService, $lookupSearch))
+                ->sortBy(fn (array $record) => sprintf(
+                    '%02d-%s',
+                    $this->recordSortWeight($record['source'] ?? 'student'),
+                    strtolower((string) ($record['name'] ?? ''))
+                ))
+                ->values()
+                ->all()
+            : [];
 
         $stats = [
-            'students' => collect($localUsers)->where('source', 'student')->count(),
-            'admins' => collect($localUsers)->whereIn('source', ['admin', 'superadmin', 'student_assistant'])->count(),
-            'faculty' => collect($facultyUsers)->count(),
-            'active' => collect($records)->where('status', 'active')->count(),
-            'inactive' => collect($records)->where('status', 'inactive')->count(),
+            'students' => collect($allLocalUsers)->where('source', 'student')->count(),
+            'admins' => collect($allLocalUsers)->whereIn('source', ['admin', 'superadmin', 'student_assistant'])->count(),
+            'faculty' => collect($allFacultyUsers)->count(),
+            'active' => collect($allLocalUsers)->where('status', 'active')->count(),
+            'inactive' => collect($allLocalUsers)->where('status', 'inactive')->count(),
+            'local_total' => count($allLocalUsers),
         ];
 
-        return view('admin.user_management', compact('search', 'records', 'stats'));
+        return view('admin.user_management', [
+            'localSearch' => $localSearch,
+            'lookupSearch' => $lookupSearch,
+            'localRecords' => $localRecords,
+            'lookupRecords' => $lookupRecords,
+            'stats' => $stats,
+        ]);
     }
 
     public function update(Request $request, User $user)
@@ -124,27 +139,40 @@ class AdminUserController extends Controller
         $this->ensureCanManageUsers();
 
         if ($this->isProtectedUser($user) || $user->id === Auth::id()) {
-            return redirect()->back()->with('error', 'This account cannot be deleted.');
+            return redirect()->back()->with('error', 'This account access cannot be removed.');
         }
 
-        DB::transaction(function () use ($user) {
-            if (Schema::hasTable('health_profiles')) {
-                $user->healthProfile()->delete();
-            }
+        $originalRole = $user->user_role;
+        $originalStatus = $user->status ?? 'active';
 
-            if (Schema::hasTable('appointments')) {
-                Appointment::where('user_id', $user->id)->delete();
-            }
+        $user->user_role = User::ROLE_STUDENT;
+        if (Schema::hasColumn('users', 'status')) {
+            $user->status = 'active';
+        }
+        $user->save();
 
-            $user->delete();
-        });
+        $linkedAdmin = $this->findLinkedAdminProfile($user);
+        if ($linkedAdmin) {
+            if (Admin::hasColumn('access_level')) {
+                $linkedAdmin->access_level = null;
+            }
+            if (Admin::hasColumn('status')) {
+                $linkedAdmin->status = 'active';
+            }
+            $linkedAdmin->save();
+        }
 
         $this->logUserManagementAction(
-            'Deleted user account',
-            sprintf('Deleted user account for %s (%s).', $user->name ?? $user->email, $user->email)
+            'Removed user access',
+            sprintf(
+                'Removed elevated access for %s (%s) and reset role from %s to student.',
+                $user->name ?? $user->email,
+                $user->email,
+                $originalRole
+            )
         );
 
-        return redirect()->back()->with('success', 'User account deleted successfully.');
+        return redirect()->back()->with('success', 'User access removed successfully. The account is now back to the default student role.');
     }
 
     private function collectLocalUsers(string $search): array

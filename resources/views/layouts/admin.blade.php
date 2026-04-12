@@ -1622,6 +1622,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $reportsUrl = $isStudentAssistant ? url('/assistant/reports') : url('/admin/reports');
     $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
     $settingsUrl = url('/admin/settings');
+    $userManagementUrl = url('/admin/user-management');
     $assistantAccountsUrl = url('/admin/student-assistants');
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
     $assistantEndpoint = $isStudentAssistant ? route('assistant.intent') : route('admin.assistant.intent');
@@ -1730,6 +1731,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
           </a>
           <a href="{{ $settingsUrl }}" class="{{ Request::is('admin/settings*') ? 'active' : '' }}">
             <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>
+          </a>
+          <a href="{{ $userManagementUrl }}" class="{{ Request::is('admin/user-management*') ? 'active' : '' }}">
+            <span class="sidebar-short">UM</span><span class="sidebar-label">User Management</span>
           </a>
       @endif
       <a href="{{ $apiTestingUrl }}" class="{{ (Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">

@@ -275,6 +275,19 @@ class LoginController extends Controller
         return $response;
     }
 
+    private function buildLogoutRedirectUrl(): string
+    {
+        $configuredUrl = trim((string) config('services.idp.logout_url', ''));
+        if ($configuredUrl !== '') {
+            return $configuredUrl;
+        }
+
+        $baseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
+        $logoutPath = '/' . ltrim((string) config('services.idp.logout_path', '/logout'), '/');
+
+        return $baseUrl !== '' ? $baseUrl . $logoutPath : '/';
+    }
+
     private function exchangeCodeForTokens(string $code): ?array
     {
         $tokenPath = trim((string) config('services.idp.token_path', '/auth/token'));
@@ -855,6 +868,25 @@ class LoginController extends Controller
 
             /** @var \App\Models\User $authenticatedUser */
             $authenticatedUser = Auth::user();
+            if (strtolower(trim((string) ($authenticatedUser->status ?? 'active'))) === 'inactive') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                $this->recordAuthEvent(
+                    $request,
+                    'Login Blocked',
+                    'Login attempt blocked because the account is inactive.',
+                    $authenticatedUser,
+                    423,
+                    'error'
+                );
+
+                return back()->withErrors([
+                    'email' => 'This account is inactive. Please contact the clinic administrator.',
+                ])->withInput();
+            }
+
             $normalizedRole = User::normalizeRole($authenticatedUser->user_role);
 
             if ($normalizedRole !== strtolower((string) ($authenticatedUser->user_role ?? ''))) {
@@ -951,6 +983,17 @@ class LoginController extends Controller
         $user->user_role = User::normalizeRole($user->user_role);
         $user->save();
 
+        if (strtolower(trim((string) ($user->status ?? 'active'))) === 'inactive') {
+            Log::warning('IDP callback blocked inactive account.', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+            ]);
+
+            return redirect('/login?idp_error=1')->withErrors([
+                'idp' => 'This account is inactive. Please contact the clinic administrator.',
+            ]);
+        }
+
         Log::info('IDP callback upserted local user.', [
             'user_id' => $user->id,
             'user_role' => $user->user_role,
@@ -976,7 +1019,7 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        $response = redirect('/');
+        $response = redirect()->away($this->buildLogoutRedirectUrl());
 
         return $this->clearIdpCookies($response);
     }

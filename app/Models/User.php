@@ -51,6 +51,7 @@ class User extends Authenticatable
     'section',
     'barcode',
     'user_role',
+    'status',
     'password',
     'is_health_profile_completed',
 

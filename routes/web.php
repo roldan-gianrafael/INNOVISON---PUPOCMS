@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminAssistantController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -109,6 +110,9 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::get('/admin/reports/inventory-summary', [AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
         Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
+        Route::get('/admin/user-management', [AdminUserController::class, 'index'])->name('admin.user-management');
+        Route::put('/admin/user-management/{user}', [AdminUserController::class, 'update'])->name('admin.user-management.update');
+        Route::delete('/admin/user-management/{user}', [AdminUserController::class, 'destroy'])->name('admin.user-management.destroy');
         Route::get('/admin/api-testing', [AdminController::class, 'apiTesting'])->name('admin.api-testing');
         Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])
             ->middleware('role:superadmin')

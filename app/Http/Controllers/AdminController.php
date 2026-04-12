@@ -1120,6 +1120,10 @@ public function deleteItem($id)
         $user->user_role = User::normalizeRole($request->role);
     }
 
+    if (Schema::hasColumn('users', 'status') && $request->filled('status')) {
+        $user->status = $request->status;
+    }
+
     if ($request->filled('password')) {
         $user->password = bcrypt($request->password);
     }

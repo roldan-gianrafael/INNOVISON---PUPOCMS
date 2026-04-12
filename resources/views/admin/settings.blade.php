@@ -163,6 +163,10 @@
                 <label>Office</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['office'] ?? 'Admission Office' }}" disabled>
             </div>
+            <div class="form-group">
+                <label>Status</label>
+                <input type="text" class="form-control" value="{{ ucfirst($cmsProfile['status'] ?? 'active') }}" disabled>
+            </div>
             <div class="form-group" style="grid-column: 1 / -1;">
                 <label>Address</label>
                 <input type="text" class="form-control" value="{{ $cmsProfile['address'] ?? 'N/A' }}" disabled>
@@ -310,6 +314,14 @@
                     <div class="form-group">
                         <label>Office</label>
                         <input type="text" name="office" class="form-control" value="{{ old('office', $cmsProfile['office'] ?? 'Admission Office') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status" class="form-control">
+                            <option value="active" {{ old('status', $cmsProfile['status'] ?? 'active') === 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ old('status', $cmsProfile['status'] ?? 'active') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
                     </div>
 
                     <div style="border-top: 1px solid #eee; margin: 15px 0; padding-top: 15px;">

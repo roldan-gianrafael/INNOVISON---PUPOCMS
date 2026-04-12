@@ -653,7 +653,7 @@
     </div>
 </div>
 
-<div class="um-modal-backdrop" id="lookupModal">
+<div class="um-modal-backdrop {{ $lookupSearch !== '' ? 'show' : '' }}" id="lookupModal">
     <div class="um-modal-content">
         <div class="um-modal-head">
             <div>
@@ -953,6 +953,10 @@
 
     if (toggleLookupDirectoryBtn) {
         toggleLookupDirectoryBtn.addEventListener('click', openLookupDirectory);
+    }
+
+    if (lookupModal && lookupSearchField && lookupSearchField.value.trim() !== '') {
+        lookupModal.classList.add('show');
     }
 
     document.querySelectorAll('[data-open-lookup]').forEach((button) => {

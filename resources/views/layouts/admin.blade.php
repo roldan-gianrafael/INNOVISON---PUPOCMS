@@ -762,9 +762,9 @@
         .sidebar-nav a::before {
             content: '';
             position: absolute;
-            inset: 3px;
+            inset: 0;
             background: transparent;
-            border-radius: calc(var(--radius-md) - 3px);
+            border-radius: inherit;
             z-index: -1;
             transition: background 0.3s ease;
         }
@@ -773,21 +773,27 @@
             color: #111827;
             border-color: rgba(15, 23, 42, 0.08);
             transform: translateX(1px);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+            box-shadow: none;
         }
 
         .sidebar-nav a:hover::before {
-            background: #f8f9fa;
+            background:
+                radial-gradient(circle at -10% -10%, rgba(255, 255, 255, 0.08) 0%, transparent 42%),
+                radial-gradient(circle at 110% 120%, rgba(255, 184, 28, 0.06) 0%, transparent 36%),
+                linear-gradient(180deg, rgba(250, 242, 245, 0.98) 0%, rgba(244, 230, 235, 0.98) 80%);
         }
 
         .sidebar-nav a.active {
             color: #111827;
             border-color: rgba(15, 23, 42, 0.08);
-            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+            box-shadow: none;
         }
 
         .sidebar-nav a.active::before {
-            background: #f8f9fa;
+            background:
+                radial-gradient(circle at -10% -10%, rgba(255, 255, 255, 0.08) 0%, transparent 42%),
+                radial-gradient(circle at 110% 120%, rgba(255, 184, 28, 0.06) 0%, transparent 36%),
+                linear-gradient(180deg, rgba(250, 242, 245, 0.98) 0%, rgba(244, 230, 235, 0.98) 80%);
         }
 
         .sidebar-short {
@@ -869,7 +875,9 @@
             height: 30px;
             border-radius: 999px;
             border: 1px solid rgba(255, 255, 255, 0.16);
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             color: #ffffff;
             display: none;
             align-items: center;
@@ -878,7 +886,16 @@
             font-weight: 900;
             line-height: 1;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-            pointer-events: none;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .sidebar-scroll-cue:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.14);
         }
 
         .main {
@@ -1403,18 +1420,21 @@
         html[data-theme="light"] .sidebar-nav a:hover {
             color: #111827;
             border-color: rgba(15, 23, 42, 0.08);
-            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+            box-shadow: none;
         }
 
         html[data-theme="light"] .sidebar-nav a:hover::before,
         html[data-theme="light"] .sidebar-nav a.active::before {
-            background: rgba(255, 255, 255, 0.99);
+            background:
+                radial-gradient(circle at -10% -10%, rgba(255, 255, 255, 0.16) 0%, transparent 42%),
+                radial-gradient(circle at 110% 120%, rgba(128, 0, 0, 0.08) 0%, transparent 36%),
+                linear-gradient(180deg, rgba(250, 242, 245, 0.98) 0%, rgba(244, 230, 235, 0.98) 80%);
         }
 
         html[data-theme="light"] .sidebar-nav a.active {
             color: #111827;
             border-color: rgba(15, 23, 42, 0.08);
-            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+            box-shadow: none;
         }
 
         html[data-theme="light"] .sidebar-short {
@@ -1436,6 +1456,16 @@
         html[data-theme="light"] .sidebar-logout a:hover {
             background: rgba(128, 0, 0, 0.14);
             border-color: rgba(128, 0, 0, 0.28);
+        }
+
+        html[data-theme="light"] .sidebar-scroll-cue {
+            background: rgba(255, 255, 255, 0.42);
+            border-color: rgba(15, 23, 42, 0.08);
+            color: #111827;
+        }
+
+        html[data-theme="light"] .sidebar-scroll-cue:hover {
+            background: rgba(255, 255, 255, 0.58);
         }
 
         html[data-theme="light"] .main {

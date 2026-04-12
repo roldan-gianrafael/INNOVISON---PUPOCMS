@@ -50,6 +50,31 @@
         font-weight: 800;
         letter-spacing: 0.01em;
     }
+    .card-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 20px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid rgba(127, 0, 0, 0.10);
+    }
+    .card-header-row h3 {
+        margin: 0;
+        line-height: 1.2;
+    }
+    .section-subtitle {
+        margin-top: 6px;
+        color: var(--settings-muted);
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .section-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
     .profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 20px; }
     .profile-grid-wide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 20px; }
     .profile-note {
@@ -332,9 +357,14 @@
     @endif
 
     <section class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3>CMS Admin Profile</h3>
-            <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
+        <div class="card-header-row">
+            <div>
+                <h3>CMS Admin Profile</h3>
+                <div class="section-subtitle">The clinic hub profile shown across the admin side.</div>
+            </div>
+            <div class="section-actions">
+                <button class="btn-edit" onclick="openProfileModal()">Edit Profile</button>
+            </div>
         </div>
 
         <div class="profile-grid-wide">
@@ -401,7 +431,12 @@
         @csrf @method('PUT')
         
         <section class="card">
-            <h3>Clinic Information</h3>
+            <div class="card-header-row">
+                <div>
+                    <h3>Clinic Information</h3>
+                    <div class="section-subtitle">Update the public clinic name and location used across the system.</div>
+                </div>
+            </div>
 
             <div class="form-group">
                 <label>Clinic Name</label>
@@ -415,7 +450,12 @@
         </section>
 
         <section class="card">
-            <h3>Clinic Hours</h3>
+            <div class="card-header-row">
+                <div>
+                    <h3>Clinic Hours</h3>
+                    <div class="section-subtitle">Set the regular open and close schedule for the clinic.</div>
+                </div>
+            </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label>Opening Time</label>
@@ -429,7 +469,12 @@
         </section>
 
         <section class="card">
-            <h3>System Preferences</h3>
+            <div class="card-header-row">
+                <div>
+                    <h3>System Preferences</h3>
+                    <div class="section-subtitle">Control the behavior of reminders and automatic approvals.</div>
+                </div>
+            </div>
 
             <div class="switch-row">
                 <input type="checkbox" name="email_notifications" id="emailNotif" {{ $settings->email_notifications ? 'checked' : '' }}>
@@ -450,7 +495,10 @@
     <div id="profileModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <h3>Edit Profile</h3>
+                <div>
+                    <h3>Edit Profile</h3>
+                    <div class="section-subtitle">Keep your admin identity and clinic contact details current.</div>
+                </div>
             </div>
             
             <form action="{{ url('/admin/profile/update') }}" method="POST">

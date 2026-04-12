@@ -600,8 +600,10 @@
 
         .sidebar {
             width: 86px;
-            background: linear-gradient(180deg, #2a1318 0%, #1a0b0f 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background:
+                linear-gradient(180deg, rgba(140, 72, 89, 0.16) 0%, rgba(98, 33, 47, 0.22) 100%),
+                linear-gradient(180deg, #281217 0%, #160a0e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-soft);
             padding: 20px 14px;
@@ -610,7 +612,11 @@
             flex-shrink: 0;
             overflow-y: auto;
             overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
             transition: width 0.28s ease;
+            position: relative;
+            backdrop-filter: blur(16px);
         }
 
         .sidebar:hover {
@@ -779,6 +785,27 @@
             background: rgba(255, 255, 255, 0.12);
         }
 
+        .sidebar-scroll-cue {
+            position: sticky;
+            bottom: 8px;
+            align-self: center;
+            margin-top: 12px;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 1;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+            pointer-events: none;
+        }
+
         .main {
             flex: 1;
             min-width: 0;
@@ -798,7 +825,8 @@
 
         .main::-webkit-scrollbar,
         .sidebar::-webkit-scrollbar {
-            width: 8px;
+            width: 0;
+            height: 0;
         }
 
         .main::-webkit-scrollbar-track,
@@ -1771,6 +1799,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         <span class="sidebar-short">LO</span><span class="sidebar-label">Logout</span>
       </a>
     </div>
+    <div class="sidebar-scroll-cue" id="sidebarScrollCue" aria-hidden="true">v</div>
   </aside>
 
     <main class="main">
@@ -1958,6 +1987,29 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 console.warn('Theme preference was not saved.', error);
             }
         });
+    }
+
+    function initSidebarScrollCue() {
+        const sidebar = document.getElementById('adminSidebar');
+        const cue = document.getElementById('sidebarScrollCue');
+
+        if (!sidebar || !cue) {
+            return;
+        }
+
+        const updateCue = () => {
+            const hasOverflow = sidebar.scrollHeight > sidebar.clientHeight + 4;
+            const isNearBottom = sidebar.scrollTop + sidebar.clientHeight >= sidebar.scrollHeight - 12;
+            cue.style.display = hasOverflow && !isNearBottom ? 'flex' : 'none';
+        };
+
+        cue.addEventListener('click', () => {
+            sidebar.scrollBy({ top: 140, behavior: 'smooth' });
+        });
+
+        sidebar.addEventListener('scroll', updateCue, { passive: true });
+        window.addEventListener('resize', updateCue);
+        updateCue();
     }
 
     function initMedicineAlerts() {
@@ -2457,6 +2509,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
         initThemeToggle();
+        initSidebarScrollCue();
         initMedicineAlerts();
         initAccessibilityLaunch();
     });

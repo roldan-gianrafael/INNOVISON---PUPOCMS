@@ -33,7 +33,7 @@ class AdminSeeder extends Seeder
                 'emergency_contact_person' => 'Emergency Contact',
                 'emergency_contact_no' => '09123456789',
                 'office' => 'Clinic Office',
-                'access_level' => 'admin',
+                'access_level' => 'superadmin',
             ],
             [
                 'admin_id' => 2,

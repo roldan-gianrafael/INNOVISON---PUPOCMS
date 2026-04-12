@@ -15,17 +15,19 @@
 
     .settings-page {
         position: relative;
+        isolation: isolate;
     }
     .settings-page::before {
         content: '';
-        position: fixed;
+        position: absolute;
         inset: 0;
         background:
             radial-gradient(circle at top left, rgba(127, 0, 0, 0.08), transparent 24%),
             radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.06), transparent 24%),
             linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.92));
         pointer-events: none;
-        z-index: 0;
+        z-index: -1;
+        border-radius: 28px;
     }
     .settings-page > * {
         position: relative;
@@ -106,7 +108,7 @@
     .grid {
         display: grid;
         grid-template-columns: 1.05fr 1.25fr;
-        gap: 22px;
+        gap: 26px;
     }
 
     .panel {
@@ -126,27 +128,32 @@
         background: linear-gradient(90deg, var(--stg-maroon), #ad2234 55%, #d4a373);
     }
     .panel-head {
-        padding: 22px 24px 16px;
-        border-bottom: 1px solid rgba(127,0,0,0.08);
+        padding: 22px 24px 18px;
+        border-bottom: 1px solid rgba(127,0,0,0.10);
+        background: linear-gradient(180deg, rgba(127,0,0,0.03), rgba(255,255,255,0));
     }
     .section-spot {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 10px;
-        color: var(--stg-maroon);
-        font-size: 11px;
+        margin-bottom: 12px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--stg-maroon), var(--stg-maroon-deep));
+        font-size: 10px;
         font-weight: 900;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
+        box-shadow: 0 10px 20px rgba(127,0,0,0.18);
     }
     .section-spot::before {
         content: '';
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: var(--stg-maroon);
-        box-shadow: 0 0 0 4px rgba(127,0,0,0.10);
+        background: rgba(255,255,255,0.95);
+        box-shadow: 0 0 0 4px rgba(255,255,255,0.12);
     }
     .panel-head h3 {
         margin: 0;
@@ -161,7 +168,7 @@
         font-size: 13px;
     }
     .panel-body {
-        padding: 24px;
+        padding: 28px;
     }
 
     .profile-top {
@@ -178,18 +185,19 @@
         min-width: 0;
     }
     .profile-avatar {
-        width: 52px;
-        height: 52px;
-        border-radius: 18px;
+        width: 60px;
+        height: 60px;
+        border-radius: 20px;
         flex: 0 0 auto;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #fff;
+        font-size: 16px;
         font-weight: 900;
         letter-spacing: 0.02em;
         background: linear-gradient(135deg, var(--stg-maroon), var(--stg-maroon-deep));
-        box-shadow: 0 14px 28px rgba(127,0,0,0.22);
+        box-shadow: 0 16px 32px rgba(127,0,0,0.24);
     }
     .profile-name {
         margin: 0;
@@ -201,11 +209,11 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 7px 10px;
+        padding: 8px 12px;
         border-radius: 999px;
         color: #fff;
         background: linear-gradient(135deg, var(--stg-maroon), var(--stg-maroon-deep));
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 900;
     }
     .profile-role svg {
@@ -215,16 +223,16 @@
     }
     .profile-list {
         display: grid;
-        gap: 10px;
+        gap: 12px;
     }
     .profile-row {
         display: flex;
         justify-content: space-between;
         gap: 12px;
-        padding: 12px 14px;
+        padding: 13px 14px;
         border-radius: 16px;
-        background: rgba(255,255,255,0.90);
-        border: 1px solid rgba(148,163,184,0.16);
+        background: rgba(255,255,255,0.95);
+        border: 1px solid rgba(127,0,0,0.10);
     }
     .profile-row .key {
         color: var(--stg-muted);
@@ -238,6 +246,49 @@
         font-size: 13px;
         font-weight: 700;
         text-align: right;
+    }
+    .editable-list {
+        display: grid;
+        gap: 12px;
+    }
+    .editable-row {
+        display: grid;
+        grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+        align-items: center;
+        gap: 16px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.95);
+        border: 1px solid rgba(127,0,0,0.10);
+    }
+    .editable-key {
+        color: var(--stg-muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .editable-field input {
+        width: 100%;
+        min-height: 54px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(127,0,0,0.10);
+        background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(250,251,252,0.96));
+        color: var(--stg-text);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,0.96);
+        transition: 0.2s ease;
+    }
+    .editable-field input:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 32px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.98);
+    }
+    .editable-field input:focus {
+        outline: none;
+        border-color: var(--stg-maroon);
+        background: #fff;
+        box-shadow: 0 0 0 5px rgba(127,0,0,0.10), 0 18px 34px rgba(15,23,42,0.10);
+        transform: translateY(-1px);
     }
 
     .field-grid {
@@ -445,6 +496,11 @@
     .alert-success { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
     .alert-error { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
 
+    .profile-summary .panel-head,
+    .field-grid + .field-grid {
+        margin-top: 0;
+    }
+
     @media (max-width: 1080px) {
         .grid { grid-template-columns: 1fr; }
     }
@@ -452,6 +508,7 @@
         .hero { padding: 24px 20px; }
         .panel-body, .modal-body, .modal-head { padding-left: 18px; padding-right: 18px; }
         .field-grid.two, .field-grid.three { grid-template-columns: 1fr; }
+        .editable-row { grid-template-columns: 1fr; gap: 10px; }
         .modal-overlay { padding: 12px; }
         .modal-actions { padding: 14px 18px 18px; flex-wrap: wrap; }
         .modal-actions button { width: 100%; }
@@ -542,40 +599,48 @@
             <form action="{{ url('/admin/settings/update') }}" method="POST">
                 @csrf @method('PUT')
                 <section class="panel">
-            <div class="panel-head">
-                <div class="section-spot">Clinic Data</div>
-                <h3>Clinic Information</h3>
-                <p>Update the clinic name and location shown throughout the system.</p>
-            </div>
+                    <div class="panel-head">
+                        <div class="section-spot">Clinic Data</div>
+                        <h3>Clinic Information</h3>
+                        <p>Update the clinic name and location shown throughout the system.</p>
+                    </div>
                     <div class="panel-body">
-                        <div class="field-grid">
-                            <div class="field">
-                                <label>Clinic Name</label>
-                                <input type="text" name="clinic_name" value="{{ $settings->clinic_name }}" placeholder="Clinic name">
+                        <div class="editable-list">
+                            <div class="editable-row">
+                                <div class="editable-key">Clinic Name</div>
+                                <div class="editable-field">
+                                    <input type="text" name="clinic_name" value="{{ $settings->clinic_name }}" placeholder="Clinic name">
+                                </div>
                             </div>
-                            <div class="field">
-                                <label>Location</label>
-                                <input type="text" name="clinic_location" value="{{ $settings->clinic_location }}" placeholder="Clinic location">
+                            <div class="editable-row">
+                                <div class="editable-key">Location</div>
+                                <div class="editable-field">
+                                    <input type="text" name="clinic_location" value="{{ $settings->clinic_location }}" placeholder="Clinic location">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
                 <section class="panel">
-            <div class="panel-head">
-                <div class="section-spot">Clinic Schedule</div>
-                <h3>Clinic Hours</h3>
-                <p>Set the daily opening and closing time for the clinic.</p>
-            </div>
+                    <div class="panel-head">
+                        <div class="section-spot">Clinic Schedule</div>
+                        <h3>Clinic Hours</h3>
+                        <p>Set the daily opening and closing time for the clinic.</p>
+                    </div>
                     <div class="panel-body">
-                        <div class="field-grid two">
-                            <div class="field">
-                                <label>Opening Time</label>
-                                <input type="time" name="open_time" value="{{ $settings->open_time }}">
+                        <div class="editable-list">
+                            <div class="editable-row">
+                                <div class="editable-key">Opening Time</div>
+                                <div class="editable-field">
+                                    <input type="time" name="open_time" value="{{ $settings->open_time }}">
+                                </div>
                             </div>
-                            <div class="field">
-                                <label>Closing Time</label>
-                                <input type="time" name="close_time" value="{{ $settings->close_time }}">
+                            <div class="editable-row">
+                                <div class="editable-key">Closing Time</div>
+                                <div class="editable-field">
+                                    <input type="time" name="close_time" value="{{ $settings->close_time }}">
+                                </div>
                             </div>
                         </div>
                     </div>

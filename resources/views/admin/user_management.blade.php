@@ -373,6 +373,12 @@
         border-radius: 18px;
     }
 
+    #settingsModal .um-modal-content {
+        width: min(980px, 100%);
+        max-height: 88vh;
+        border-radius: 18px;
+    }
+
     .um-modal-head {
         padding: 18px 20px;
         border-bottom: 1px solid rgba(148, 163, 184, 0.14);
@@ -383,6 +389,10 @@
     }
 
     #lookupModal .um-modal-head {
+        padding: 14px 16px;
+    }
+
+    #settingsModal .um-modal-head {
         padding: 14px 16px;
     }
 
@@ -401,6 +411,10 @@
         padding: 14px 16px 18px;
     }
 
+    #settingsModal .um-modal-body {
+        padding: 14px 16px 18px;
+    }
+
     .um-modal-grid {
         display: grid;
         grid-template-columns: 280px 1fr;
@@ -410,6 +424,28 @@
     #lookupModal .um-modal-grid {
         grid-template-columns: 240px 1fr;
         gap: 14px;
+    }
+
+    #settingsModal .um-modal-grid {
+        grid-template-columns: 240px 1fr;
+        gap: 14px;
+    }
+
+    #settingsModal .um-detail-card {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    #settingsModal .um-detail-photo {
+        width: 84px;
+        height: 84px;
+        font-size: 1.65rem;
+        margin-bottom: 12px;
+        border-radius: 16px;
+    }
+
+    #settingsModal .um-field {
+        margin-bottom: 12px;
     }
 
     #lookupModal .um-table {

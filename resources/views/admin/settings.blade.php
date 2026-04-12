@@ -91,30 +91,62 @@
     }
     .form-control {
         width: 100%;
-        min-height: 50px;
-        padding: 13px 15px;
-        border: 1px solid rgba(127, 0, 0, 0.16);
-        border-radius: 16px;
+        min-height: 54px;
+        padding: 13px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        border-radius: 20px;
         font-size: 14px;
         color: var(--settings-text);
-        background: var(--settings-surface-strong);
-        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 1px 0 rgba(15, 23, 42, 0.03);
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,251,252,0.96));
+        transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, background 0.22s ease, color 0.22s ease, filter 0.22s ease;
+        box-shadow:
+            0 10px 24px rgba(15, 23, 42, 0.08),
+            0 2px 6px rgba(15, 23, 42, 0.04),
+            inset 0 1px 0 rgba(255,255,255,0.95);
+        letter-spacing: 0.01em;
     }
     .form-control:hover {
-        border-color: rgba(127, 0, 0, 0.28);
+        border-color: rgba(127, 0, 0, 0.24);
+        box-shadow:
+            0 12px 28px rgba(15, 23, 42, 0.10),
+            0 3px 8px rgba(15, 23, 42, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.96);
+        transform: translateY(-1px);
     }
     .form-control:focus {
         border-color: var(--settings-maroon);
-        box-shadow: 0 0 0 5px rgba(127, 0, 0, 0.13);
+        background: #fff;
+        box-shadow:
+            0 0 0 5px rgba(127, 0, 0, 0.12),
+            0 16px 32px rgba(15, 23, 42, 0.10),
+            0 4px 10px rgba(15, 23, 42, 0.05);
         outline: none;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+    }
+    .form-control::placeholder {
+        color: #94a3b8;
+        opacity: 1;
     }
     .form-control:disabled {
-        background: #f8fafc;
+        background: linear-gradient(180deg, #f8fafc, #eef2f7);
         color: #64748b;
         cursor: not-allowed;
-        box-shadow: none;
+        box-shadow:
+            0 8px 18px rgba(15, 23, 42, 0.04),
+            inset 0 1px 0 rgba(255,255,255,0.92);
+    }
+    select.form-control {
+        appearance: none;
+        background-image:
+            linear-gradient(45deg, transparent 50%, #7f0000 50%),
+            linear-gradient(135deg, #7f0000 50%, transparent 50%);
+        background-position:
+            calc(100% - 20px) calc(50% - 3px),
+            calc(100% - 14px) calc(50% - 3px);
+        background-size: 6px 6px, 6px 6px;
+        background-repeat: no-repeat;
+        padding-right: 42px;
     }
 
     /* Switches */

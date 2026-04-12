@@ -77,18 +77,21 @@
     }
 
     .um-summary-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        display: flex;
         gap: 12px;
-        padding: 18px 20px 8px;
+        padding: 16px 20px 8px;
+        overflow-x: auto;
+        scrollbar-width: thin;
     }
 
     .um-summary-card {
+        min-width: 220px;
+        flex: 0 0 220px;
         background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
         border: 1px solid rgba(148, 163, 184, 0.16);
         border-radius: 16px;
-        padding: 14px 15px;
-        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+        padding: 12px 14px;
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04);
     }
 
     .um-summary-label {
@@ -101,7 +104,7 @@
     }
 
     .um-summary-value {
-        font-size: 1.5rem;
+        font-size: 1.35rem;
         font-weight: 900;
         color: #800000;
         line-height: 1;
@@ -110,7 +113,7 @@
     .um-summary-note {
         margin: 4px 0 0;
         color: #64748b;
-        font-size: .86rem;
+        font-size: .8rem;
     }
 
     .um-recent-wrap {
@@ -484,14 +487,19 @@
             grid-template-columns: 1fr;
         }
 
-        .um-summary-grid,
-        .um-recent-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
         .um-hero {
             align-items: flex-start;
             flex-direction: column;
+        }
+
+        .um-summary-card {
+            min-width: 200px;
+            flex-basis: 200px;
+        }
+
+        .um-recent-card {
+            min-width: 220px;
+            flex-basis: 220px;
         }
     }
 
@@ -505,14 +513,15 @@
             align-items: stretch;
         }
 
-        .um-summary-grid,
-        .um-recent-grid {
-            grid-template-columns: 1fr;
-        }
-
         .um-directory-toggle {
             align-items: flex-start;
             flex-direction: column;
+        }
+
+        .um-summary-card,
+        .um-recent-card {
+            min-width: 180px;
+            flex-basis: 180px;
         }
     }
 </style>

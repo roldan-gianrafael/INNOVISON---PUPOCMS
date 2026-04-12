@@ -19,11 +19,17 @@ class AdminUserController extends Controller
     public function index(Request $request, FacultySyncService $facultySyncService)
     {
         $lookupSearch = trim((string) $request->query('lookup_search', ''));
+        $currentUserId = Auth::id();
 
         $allLocalUsers = $this->collectLocalUsers('');
         $allFacultyUsers = $this->collectFacultyUsers($facultySyncService, '');
 
         $localRecords = collect($allLocalUsers)
+            ->map(function (array $record) use ($currentUserId) {
+                $record['can_edit'] = $this->canManageRecord($record, $currentUserId);
+
+                return $record;
+            })
             ->filter(fn (array $record) => in_array($record['source'] ?? 'student', ['admin', 'superadmin', 'student_assistant'], true))
             ->sortBy(fn (array $record) => sprintf(
                 '%02d-%s',
@@ -431,7 +437,34 @@ class AdminUserController extends Controller
 
     private function isProtectedUser(User $user): bool
     {
-        return $user->id === Auth::id();
+        $currentUserId = Auth::id();
+        $currentUser = Auth::user();
+        $currentUserRole = User::normalizeRole((string) ($currentUser?->user_role ?? ''));
+        $targetRole = User::normalizeRole((string) ($user->user_role ?? ''));
+
+        if ($user->id === $currentUserId) {
+            return true;
+        }
+
+        return $targetRole === User::ROLE_SUPERADMIN && $currentUserRole === User::ROLE_SUPERADMIN;
+    }
+
+    private function canManageRecord(array $record, ?int $currentUserId = null): bool
+    {
+        $currentUser = Auth::user();
+        $currentUserRole = User::normalizeRole((string) ($currentUser?->user_role ?? ''));
+        $recordRole = strtolower(trim((string) ($record['raw_role'] ?? $record['normalized_role'] ?? $record['source'] ?? 'student')));
+        $recordId = (string) ($record['id'] ?? $record['record_id'] ?? '');
+
+        if ($recordId !== '' && $currentUserId !== null && $recordId === (string) $currentUserId) {
+            return false;
+        }
+
+        if (in_array($recordRole, ['superadmin', 'super_admin'], true) && $currentUserRole === User::ROLE_SUPERADMIN) {
+            return false;
+        }
+
+        return true;
     }
 
     private function ensureCanManageUsers(): void

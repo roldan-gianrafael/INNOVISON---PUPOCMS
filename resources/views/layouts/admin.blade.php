@@ -798,8 +798,8 @@
 
         .main::-webkit-scrollbar,
         .sidebar::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 12px;
+            height: 12px;
         }
 
         .main::-webkit-scrollbar-track,
@@ -809,8 +809,32 @@
 
         .main::-webkit-scrollbar-thumb,
         .sidebar::-webkit-scrollbar-thumb {
-            background: #b17382;
+            background: linear-gradient(
+                180deg,
+                #2563eb 0%,
+                #8b5cf6 50%,
+                #1f2937 50%,
+                #1f2937 100%
+            );
             border-radius: 999px;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        }
+
+        .main::-webkit-scrollbar-thumb:hover,
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(
+                180deg,
+                #1d4ed8 0%,
+                #7c3aed 50%,
+                #111827 50%,
+                #111827 100%
+            );
+        }
+
+        .main::-webkit-scrollbar-corner,
+        .sidebar::-webkit-scrollbar-corner {
+            background: transparent;
         }
 
         .card {

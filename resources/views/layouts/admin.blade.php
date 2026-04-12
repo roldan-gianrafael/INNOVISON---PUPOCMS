@@ -796,10 +796,23 @@
             width: 100%;
         }
 
+        @keyframes scrollbarGlow {
+            0%, 100% {
+                box-shadow:
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+                    0 0 0 0 rgba(128, 0, 0, 0.0);
+            }
+            50% {
+                box-shadow:
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                    0 0 10px 2px rgba(128, 0, 0, 0.22);
+            }
+        }
+
         .main::-webkit-scrollbar,
         .sidebar::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
 
         .main::-webkit-scrollbar-track,
@@ -809,6 +822,7 @@
 
         .main::-webkit-scrollbar-thumb,
         .sidebar::-webkit-scrollbar-thumb {
+            background: transparent;
             background: linear-gradient(
                 180deg,
                 #800000 0%,
@@ -819,6 +833,25 @@
             border-radius: 999px;
             border: 1px solid rgba(255, 255, 255, 0.10);
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            animation: scrollbarGlow 2.2s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .main:hover::-webkit-scrollbar-thumb,
+        .sidebar:hover::-webkit-scrollbar-thumb,
+        .main:focus-within::-webkit-scrollbar-thumb,
+        .sidebar:focus-within::-webkit-scrollbar-thumb,
+        .main::-webkit-scrollbar-thumb:active,
+        .sidebar::-webkit-scrollbar-thumb:active {
+            opacity: 1;
+            background: linear-gradient(
+                180deg,
+                #800000 0%,
+                #b91c1c 50%,
+                #4a1a22 50%,
+                #4a1a22 100%
+            );
         }
 
         .main::-webkit-scrollbar-thumb:hover,

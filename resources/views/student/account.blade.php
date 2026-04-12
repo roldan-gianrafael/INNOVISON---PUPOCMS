@@ -320,7 +320,7 @@
 @section('content')
 @php
     $linkedAccessLevel = strtolower(trim((string) optional($linkedAdminProfile)->access_level));
-    $linkedRoleLabel = !empty($linkedAdminProfile)
+    $linkedRoleLabel = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin'], true)
         ? (str_contains($linkedAccessLevel, 'faculty') ? 'Faculty' : 'Admin')
         : null;
 @endphp

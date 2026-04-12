@@ -150,6 +150,7 @@ class AdminUserController extends Controller
 
         $originalRole = $user->user_role;
         $originalStatus = $user->status ?? 'active';
+        $adminProfileId = trim((string) request()->input('admin_profile_id', ''));
 
         $user->user_role = User::ROLE_STUDENT;
         if (Schema::hasColumn('users', 'status')) {
@@ -157,13 +158,26 @@ class AdminUserController extends Controller
         }
         $user->save();
 
-        $linkedAdmin = $this->findLinkedAdminProfile($user);
+        $linkedAdmin = null;
+        if ($adminProfileId !== '' && Schema::hasTable('admins')) {
+            $linkedAdmin = Admin::query()
+                ->when(Admin::hasColumn('admin_id'), fn ($query) => $query->where('admin_id', $adminProfileId))
+                ->first();
+        }
+
+        if (!$linkedAdmin) {
+            $linkedAdmin = $this->findLinkedAdminProfile($user);
+        }
+
         if ($linkedAdmin) {
             if (Admin::hasColumn('access_level')) {
                 $linkedAdmin->access_level = null;
             }
             if (Admin::hasColumn('status')) {
                 $linkedAdmin->status = 'active';
+            }
+            if (Admin::hasColumn('email_address')) {
+                $linkedAdmin->email_address = null;
             }
             $linkedAdmin->save();
         }

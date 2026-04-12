@@ -837,6 +837,7 @@
                     <form method="POST" id="deleteForm" style="margin-top: 10px;">
                         @csrf
                         @method('DELETE')
+                        <input type="hidden" name="admin_profile_id" id="deleteAdminProfileId">
                         <div class="um-actions" style="justify-content: flex-start;">
                     <button type="submit" class="um-btn" style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;" onclick="return confirm('Remove this account access and return it to the default student role?')">Remove Access</button>
                 </div>
@@ -871,6 +872,7 @@
     const adminEmailWrap = document.getElementById('adminEmailWrap');
     const detailAdminEmail = document.getElementById('detailAdminEmail');
     const adminEmailNote = document.getElementById('adminEmailNote');
+    const deleteAdminProfileId = document.getElementById('deleteAdminProfileId');
     const externalNote = document.getElementById('externalNote');
     const deactivateBtn = document.getElementById('deactivateBtn');
     const directoryPanel = document.getElementById('directoryPanel');
@@ -926,6 +928,9 @@
         })();
         const accessLevel = (meta.access_level || '').toLowerCase();
         const adminLoginEmail = meta.admin_login_email || '';
+        if (deleteAdminProfileId) {
+            deleteAdminProfileId.value = meta.admin_profile_id || '';
+        }
         detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
         const showAdminAccessLevel = normalizedRole === 'admin';
         accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';

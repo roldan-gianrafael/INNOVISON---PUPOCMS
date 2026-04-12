@@ -431,7 +431,7 @@ class AdminUserController extends Controller
 
     private function isProtectedUser(User $user): bool
     {
-        return $user->id === Auth::id() || User::normalizeRole((string) ($user->user_role ?? '')) === User::ROLE_SUPERADMIN;
+        return $user->id === Auth::id();
     }
 
     private function ensureCanManageUsers(): void

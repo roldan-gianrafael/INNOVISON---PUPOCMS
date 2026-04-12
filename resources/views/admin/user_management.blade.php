@@ -1115,6 +1115,10 @@
     });
 
     deactivateBtn.addEventListener('click', () => {
+        const confirmDeactivate = window.confirm('Deactivate this account? The user will lose access until reactivated.');
+        if (!confirmDeactivate) {
+            return;
+        }
         detailStatus.value = 'inactive';
         settingsForm.submit();
     });

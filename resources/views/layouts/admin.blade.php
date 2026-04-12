@@ -415,62 +415,6 @@
             z-index: 70;
         }
 
-        .glass-nav {
-            transition: background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-        }
-
-        .glass-nav.scrolled {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom-color: rgba(255, 255, 255, 0.28);
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-        }
-
-        .glass-nav.scrolled .header-kicker,
-        .glass-nav.scrolled .header-subtitle {
-            color: rgba(255, 255, 255, 0.86);
-        }
-
-        .glass-nav.scrolled .header-title {
-            color: #ffffff;
-        }
-
-        .glass-nav.scrolled .admin-user {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.26);
-        }
-
-        .glass-nav.scrolled .admin-user-name,
-        .glass-nav.scrolled .admin-user-role {
-            color: #ffffff;
-        }
-
-        html[data-theme="dark"] .glass-nav.scrolled {
-            background: rgba(15, 23, 42, 0.72);
-            border-bottom-color: rgba(148, 163, 184, 0.2);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-        }
-
-        html[data-theme="light"] .glass-nav.scrolled {
-            background: rgba(255, 255, 255, 0.92);
-            border-bottom-color: rgba(15, 23, 42, 0.06);
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-        }
-
-        html[data-theme="light"] .glass-nav.scrolled .header-kicker,
-        html[data-theme="light"] .glass-nav.scrolled .header-subtitle,
-        html[data-theme="light"] .glass-nav.scrolled .header-title,
-        html[data-theme="light"] .glass-nav.scrolled .admin-user-name,
-        html[data-theme="light"] .glass-nav.scrolled .admin-user-role {
-            color: #111827;
-        }
-
-        html[data-theme="light"] .glass-nav.scrolled .admin-user {
-            background: rgba(255, 255, 255, 0.94);
-            border-color: rgba(15, 23, 42, 0.08);
-        }
-
         .header-left {
             min-width: 0;
             display: flex;
@@ -668,11 +612,7 @@
             flex-shrink: 0;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
             transition: width 0.28s ease;
-            position: relative;
-            backdrop-filter: blur(16px);
         }
 
         .sidebar:hover {
@@ -738,8 +678,6 @@
         }
 
         .sidebar-nav a {
-            position: relative;
-            overflow: hidden;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -752,48 +690,22 @@
             font-size: 13px;
             font-weight: 700;
             letter-spacing: 0.01em;
-            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
             min-width: 210px;
-            min-height: 48px;
             white-space: nowrap;
-            isolation: isolate;
-        }
-
-        .sidebar-nav a::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: transparent;
-            border-radius: inherit;
-            z-index: -1;
-            transition: background 0.3s ease;
         }
 
         .sidebar-nav a:hover {
-            color: #111827;
-            border-color: rgba(15, 23, 42, 0.08);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
             transform: translateX(1px);
-            box-shadow: none;
-        }
-
-        .sidebar-nav a:hover::before {
-            background:
-                radial-gradient(circle at -10% -10%, rgba(255, 255, 255, 0.08) 0%, transparent 42%),
-                radial-gradient(circle at 110% 120%, rgba(255, 184, 28, 0.06) 0%, transparent 36%),
-                linear-gradient(180deg, rgba(250, 242, 245, 0.98) 0%, rgba(244, 230, 235, 0.98) 80%);
         }
 
         .sidebar-nav a.active {
-            color: #111827;
-            border-color: rgba(15, 23, 42, 0.08);
-            box-shadow: none;
-        }
-
-        .sidebar-nav a.active::before {
-            background:
-                radial-gradient(circle at -10% -10%, rgba(255, 255, 255, 0.08) 0%, transparent 42%),
-                radial-gradient(circle at 110% 120%, rgba(255, 184, 28, 0.06) 0%, transparent 36%),
-                linear-gradient(180deg, rgba(250, 242, 245, 0.98) 0%, rgba(244, 230, 235, 0.98) 80%);
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.26);
+            color: #ffffff;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
         }
 
         .sidebar-short {
@@ -866,38 +778,6 @@
             background: rgba(255, 255, 255, 0.12);
         }
 
-        .sidebar-scroll-cue {
-            position: sticky;
-            bottom: 8px;
-            align-self: center;
-            margin-top: 12px;
-            width: 30px;
-            height: 30px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            background: rgba(255, 255, 255, 0.14);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            color: #ffffff;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 900;
-            line-height: 1;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-            pointer-events: auto;
-            cursor: pointer;
-            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-            overflow: hidden;
-        }
-
-        .sidebar-scroll-cue:hover {
-            transform: translateY(-1px);
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.14);
-        }
-
         .main {
             flex: 1;
             min-width: 0;
@@ -918,8 +798,8 @@
 
         .main::-webkit-scrollbar,
         .sidebar::-webkit-scrollbar {
-            width: 0;
-            height: 0;
+            width: 8px;
+            height: 8px;
         }
 
         .main::-webkit-scrollbar-track,
@@ -1418,23 +1298,14 @@
         }
 
         html[data-theme="light"] .sidebar-nav a:hover {
-            color: #111827;
-            border-color: rgba(15, 23, 42, 0.08);
-            box-shadow: none;
-        }
-
-        html[data-theme="light"] .sidebar-nav a:hover::before,
-        html[data-theme="light"] .sidebar-nav a.active::before {
-            background:
-                radial-gradient(circle at -10% -10%, rgba(255, 255, 255, 0.16) 0%, transparent 42%),
-                radial-gradient(circle at 110% 120%, rgba(128, 0, 0, 0.08) 0%, transparent 36%),
-                linear-gradient(180deg, rgba(250, 242, 245, 0.98) 0%, rgba(244, 230, 235, 0.98) 80%);
+            background: rgba(128, 0, 0, 0.08);
+            border-color: rgba(128, 0, 0, 0.18);
         }
 
         html[data-theme="light"] .sidebar-nav a.active {
-            color: #111827;
-            border-color: rgba(15, 23, 42, 0.08);
-            box-shadow: none;
+            background: rgba(128, 0, 0, 0.13);
+            border-color: rgba(128, 0, 0, 0.26);
+            color: #4a0f1a;
         }
 
         html[data-theme="light"] .sidebar-short {
@@ -1456,16 +1327,6 @@
         html[data-theme="light"] .sidebar-logout a:hover {
             background: rgba(128, 0, 0, 0.14);
             border-color: rgba(128, 0, 0, 0.28);
-        }
-
-        html[data-theme="light"] .sidebar-scroll-cue {
-            background: rgba(255, 255, 255, 0.42);
-            border-color: rgba(15, 23, 42, 0.08);
-            color: #111827;
-        }
-
-        html[data-theme="light"] .sidebar-scroll-cue:hover {
-            background: rgba(255, 255, 255, 0.58);
         }
 
         html[data-theme="light"] .main {
@@ -1814,7 +1675,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $medicineAlertOverflow = $medicineAlerts->slice(2)->values();
 @endphp
 
-<header class="admin-header glass-nav" id="adminNavbar">
+<header class="admin-header">
     <div class="header-left">
         <img src="{{ $brandLogo }}" alt="Clinic Logo" class="header-brand-avatar">
         <div class="header-copy">
@@ -1908,11 +1769,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         <span class="sidebar-short">LO</span><span class="sidebar-label">Logout</span>
       </a>
     </div>
-    <div class="sidebar-scroll-cue" id="sidebarScrollCue" aria-hidden="true">v</div>
   </aside>
 
     <main class="main">
-        <button type="button" id="scroll-button" aria-hidden="true" tabindex="-1" style="position:absolute; top:160px; left:0; width:1px; height:1px; opacity:0; pointer-events:none;">scroll</button>
         @yield('content')
     </main>
 
@@ -2097,58 +1956,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 console.warn('Theme preference was not saved.', error);
             }
         });
-    }
-
-    function initGlassNav() {
-        const nav = document.getElementById('adminNavbar');
-        const trigger = document.getElementById('scroll-button');
-        const scrollContainer = document.querySelector('.main');
-
-        if (!nav || !trigger) {
-            return;
-        }
-
-        const getScrollTop = () => {
-            if (scrollContainer && scrollContainer.scrollTop !== undefined) {
-                return scrollContainer.scrollTop;
-            }
-
-            return window.scrollY || document.documentElement.scrollTop || 0;
-        };
-
-        const updateGlassNav = () => {
-            const triggerTop = trigger.offsetTop || 0;
-            const scrolled = getScrollTop() > triggerTop;
-            nav.classList.toggle('scrolled', scrolled);
-        };
-
-        const target = scrollContainer || window;
-        target.addEventListener('scroll', updateGlassNav, { passive: true });
-        window.addEventListener('resize', updateGlassNav, { passive: true });
-        updateGlassNav();
-    }
-
-    function initSidebarScrollCue() {
-        const sidebar = document.getElementById('adminSidebar');
-        const cue = document.getElementById('sidebarScrollCue');
-
-        if (!sidebar || !cue) {
-            return;
-        }
-
-        const updateCue = () => {
-            const hasOverflow = sidebar.scrollHeight > sidebar.clientHeight + 4;
-            const isNearBottom = sidebar.scrollTop + sidebar.clientHeight >= sidebar.scrollHeight - 12;
-            cue.style.display = hasOverflow && !isNearBottom ? 'flex' : 'none';
-        };
-
-        cue.addEventListener('click', () => {
-            sidebar.scrollBy({ top: 140, behavior: 'smooth' });
-        });
-
-        sidebar.addEventListener('scroll', updateCue, { passive: true });
-        window.addEventListener('resize', updateCue);
-        updateCue();
     }
 
     function initMedicineAlerts() {
@@ -2648,8 +2455,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
         initThemeToggle();
-        initGlassNav();
-        initSidebarScrollCue();
         initMedicineAlerts();
         initAccessibilityLaunch();
     });

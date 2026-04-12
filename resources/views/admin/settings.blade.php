@@ -235,10 +235,18 @@
         gap: 8px;
         padding: 8px 12px;
         border-radius: 999px;
-        color: #fff;
-        background: linear-gradient(135deg, var(--stg-maroon), var(--stg-maroon-deep));
         font-size: 12px;
         font-weight: 900;
+    }
+    .profile-role.active {
+        color: #166534;
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        border: 1px solid rgba(34, 197, 94, 0.24);
+    }
+    .profile-role.inactive {
+        color: #b91c1c;
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        border: 1px solid rgba(239, 68, 68, 0.24);
     }
     .profile-role svg {
         width: 14px;
@@ -530,6 +538,158 @@
         margin-top: 0;
     }
 
+    html[data-theme="dark"] .settings-page::before {
+        background:
+            radial-gradient(circle at top left, rgba(255, 184, 28, 0.06), transparent 22%),
+            radial-gradient(circle at bottom right, rgba(127, 0, 0, 0.18), transparent 24%),
+            linear-gradient(180deg, rgba(35, 11, 18, 0.98), rgba(24, 8, 14, 0.96));
+    }
+    html[data-theme="dark"] .hero {
+        background: linear-gradient(180deg, rgba(57, 22, 31, 0.96), rgba(39, 14, 21, 0.98));
+        color: #fff1f4;
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+    }
+    html[data-theme="dark"] .hero h1 {
+        color: #fff4f7;
+    }
+    html[data-theme="dark"] .hero p {
+        color: #e8cad2;
+    }
+    html[data-theme="dark"] .badge {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.10);
+        color: #ffd9e1;
+    }
+    html[data-theme="dark"] .panel {
+        background: linear-gradient(180deg, rgba(58, 23, 32, 0.96), rgba(38, 14, 21, 0.94));
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+    }
+    html[data-theme="dark"] .panel-head {
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+    }
+    html[data-theme="dark"] .panel-head h3,
+    html[data-theme="dark"] .section-spot,
+    html[data-theme="dark"] .btn-edit-profile,
+    html[data-theme="dark"] .mini-edit-btn {
+        color: #ffd7df;
+    }
+    html[data-theme="dark"] .panel-head p,
+    html[data-theme="dark"] .field-help,
+    html[data-theme="dark"] .profile-row .key,
+    html[data-theme="dark"] .section-subtitle {
+        color: #d7b3bc !important;
+    }
+    html[data-theme="dark"] .section-spot,
+    html[data-theme="dark"] .btn-edit-profile,
+    html[data-theme="dark"] .mini-edit-btn {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.10);
+        box-shadow: none;
+    }
+    html[data-theme="dark"] .section-spot::before {
+        background: #ffb8c6;
+        box-shadow: 0 0 0 4px rgba(255, 184, 198, 0.12);
+    }
+    html[data-theme="dark"] .profile-name,
+    html[data-theme="dark"] .profile-row .val,
+    html[data-theme="dark"] .switch-item label {
+        color: #fff1f4;
+    }
+    html[data-theme="dark"] .profile-role.active {
+        color: #bbf7d0;
+        background: rgba(22, 101, 52, 0.22);
+        border-color: rgba(34, 197, 94, 0.24);
+    }
+    html[data-theme="dark"] .profile-role.inactive {
+        color: #fecaca;
+        background: rgba(153, 27, 27, 0.22);
+        border-color: rgba(248, 113, 113, 0.24);
+    }
+    html[data-theme="dark"] .profile-row,
+    html[data-theme="dark"] .switch-item,
+    html[data-theme="dark"] .editable-row {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+    html[data-theme="dark"] .editable-key {
+        color: #d7b3bc;
+    }
+    html[data-theme="dark"] .editable-field input,
+    html[data-theme="dark"] .field input,
+    html[data-theme="dark"] .field select {
+        background: rgba(20, 9, 13, 0.92);
+        color: #fff1f4;
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    html[data-theme="dark"] .editable-field input::placeholder,
+    html[data-theme="dark"] .field input::placeholder {
+        color: #b7929d;
+    }
+    html[data-theme="dark"] .field label {
+        background: rgba(32, 12, 19, 0.96);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #e1c0c8;
+        box-shadow: none;
+    }
+    html[data-theme="dark"] .field:focus-within label {
+        color: #ffd7df;
+        border-color: rgba(255, 184, 198, 0.16);
+    }
+    html[data-theme="dark"] .editable-field input:hover,
+    html[data-theme="dark"] .field input:hover,
+    html[data-theme="dark"] .field select:hover {
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    html[data-theme="dark"] .editable-field input:focus,
+    html[data-theme="dark"] .field input:focus,
+    html[data-theme="dark"] .field select:focus {
+        background: rgba(28, 11, 17, 0.98);
+        border-color: #ffb8c6;
+        box-shadow: 0 0 0 5px rgba(255, 184, 198, 0.10), 0 12px 30px rgba(0,0,0,0.24);
+    }
+    html[data-theme="dark"] .field input:disabled {
+        background: rgba(53, 32, 39, 0.84);
+        color: #c9aab3;
+    }
+    html[data-theme="dark"] .modal-overlay {
+        background: rgba(5, 2, 4, 0.62);
+    }
+    html[data-theme="dark"] .modal-box {
+        background: linear-gradient(180deg, rgba(43, 17, 25, 0.98), rgba(28, 10, 16, 0.98));
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 34px 90px rgba(0,0,0,0.34);
+    }
+    html[data-theme="dark"] .modal-head,
+    html[data-theme="dark"] .modal-actions {
+        background: rgba(43, 17, 25, 0.98);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+    html[data-theme="dark"] .modal-head h3 {
+        color: #ffd7df;
+    }
+    html[data-theme="dark"] .modal-head p {
+        color: #d7b3bc;
+    }
+    html[data-theme="dark"] .btn-cancel {
+        background: rgba(255,255,255,0.06);
+        color: #fff1f4;
+        border-color: rgba(255,255,255,0.10);
+    }
+    html[data-theme="dark"] .alert-success {
+        background: rgba(22, 101, 52, 0.18);
+        color: #b7f7cd;
+        border-color: rgba(34, 197, 94, 0.24);
+    }
+    html[data-theme="dark"] .alert-error {
+        background: rgba(153, 27, 27, 0.18);
+        color: #fecaca;
+        border-color: rgba(248, 113, 113, 0.24);
+    }
+
     @media (max-width: 1080px) {
         .grid { grid-template-columns: 1fr; }
     }
@@ -608,7 +768,7 @@
                             <div class="section-subtitle" style="margin-top:4px; color:var(--stg-muted);">{{ $cmsProfile['email'] ?? ($admin->email ?? 'N/A') }}</div>
                         </div>
                     </div>
-                    <div class="profile-role">{!! $statusIcon !!} {{ ucfirst($profileStatus) }}</div>
+                    <div class="profile-role {{ $profileStatus === 'inactive' ? 'inactive' : 'active' }}">{!! $statusIcon !!} {{ ucfirst($profileStatus) }}</div>
                 </div>
                 <div class="profile-list">
                     <div class="profile-row"><div class="key">Admin ID</div><div class="val">{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}</div></div>

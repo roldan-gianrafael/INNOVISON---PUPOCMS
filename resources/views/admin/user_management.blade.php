@@ -76,6 +76,108 @@
         overflow: hidden;
     }
 
+    .um-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        padding: 18px 20px 8px;
+    }
+
+    .um-summary-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 16px;
+        padding: 14px 15px;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .um-summary-label {
+        font-size: .76rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #64748b;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .um-summary-value {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: #800000;
+        line-height: 1;
+    }
+
+    .um-summary-note {
+        margin: 4px 0 0;
+        color: #64748b;
+        font-size: .86rem;
+    }
+
+    .um-recent-wrap {
+        padding: 0 20px 18px;
+    }
+
+    .um-recent-grid {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: thin;
+    }
+
+    .um-recent-card {
+        min-width: 240px;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 16px;
+        padding: 14px;
+        background: rgba(248, 250, 252, 0.95);
+        flex: 0 0 240px;
+    }
+
+    .um-recent-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .um-recent-name {
+        font-weight: 800;
+        color: #111827;
+        line-height: 1.2;
+    }
+
+    .um-recent-meta {
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+        color: #64748b;
+        font-size: .85rem;
+    }
+
+    .um-directory-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 0 20px 18px;
+    }
+
+    .um-directory-toggle .hint {
+        color: #64748b;
+        font-size: .92rem;
+    }
+
+    .um-directory-panel {
+        display: none;
+    }
+
+    .um-directory-panel.is-open {
+        display: block;
+    }
+
     .um-card-head {
         padding: 18px 20px;
         border-bottom: 1px solid rgba(100, 116, 139, 0.12);
@@ -382,6 +484,11 @@
             grid-template-columns: 1fr;
         }
 
+        .um-summary-grid,
+        .um-recent-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
         .um-hero {
             align-items: flex-start;
             flex-direction: column;
@@ -396,6 +503,16 @@
         .um-card-head {
             flex-direction: column;
             align-items: stretch;
+        }
+
+        .um-summary-grid,
+        .um-recent-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .um-directory-toggle {
+            align-items: flex-start;
+            flex-direction: column;
         }
     }
 </style>
@@ -433,13 +550,73 @@
     </div>
 
     <div class="um-card">
+        <div class="um-summary-grid">
+            <div class="um-summary-card">
+                <div class="um-summary-label">Total Users</div>
+                <div class="um-summary-value">{{ count($records) }}</div>
+                <p class="um-summary-note">Combined students, admins, faculty, and assistants.</p>
+            </div>
+            <div class="um-summary-card">
+                <div class="um-summary-label">Active</div>
+                <div class="um-summary-value">{{ $stats['active'] }}</div>
+                <p class="um-summary-note">Accounts currently enabled.</p>
+            </div>
+            <div class="um-summary-card">
+                <div class="um-summary-label">Inactive</div>
+                <div class="um-summary-value">{{ $stats['inactive'] }}</div>
+                <p class="um-summary-note">Accounts temporarily disabled.</p>
+            </div>
+            <div class="um-summary-card">
+                <div class="um-summary-label">Admin Hub</div>
+                <div class="um-summary-value">{{ $stats['admins'] }}</div>
+                <p class="um-summary-note">Super admins, clinic staff, and student assistants.</p>
+            </div>
+        </div>
+
+        <div class="um-recent-wrap">
+            <div class="um-summary-label" style="margin-bottom:8px;">Recently Updated</div>
+            <div class="um-recent-grid">
+                @forelse($recentRecords as $record)
+                    <div class="um-recent-card">
+                        <div class="um-recent-top">
+                            <div class="um-avatar" style="width:40px;height:40px;flex-basis:40px;">
+                                @if(!empty($record['avatar_url']))
+                                    <img src="{{ $record['avatar_url'] }}" alt="{{ $record['name'] }}">
+                                @else
+                                    {{ $record['avatar_letter'] }}
+                                @endif
+                            </div>
+                            <div>
+                                <div class="um-recent-name">{{ $record['name'] }}</div>
+                                <div class="um-sub">{{ $record['role'] }}</div>
+                            </div>
+                        </div>
+                        <div class="um-recent-meta">
+                            <span>{{ $record['source_label'] }}</span>
+                            <span>{{ $record['status'] === 'inactive' ? 'Inactive' : 'Active' }}</span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="um-recent-card" style="grid-column: 1 / -1;">
+                        <div class="um-empty" style="padding: 18px 0;">No recent users available.</div>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="um-directory-toggle">
+            <div class="hint">Click the search field to open the full user directory. The list stays hidden until you need it.</div>
+            <button type="button" class="um-btn um-btn-soft" id="toggleDirectoryBtn">Show Full Directory</button>
+        </div>
+
         <div class="um-card-head">
             <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
-                <input type="search" name="search" value="{{ $search }}" placeholder="Search by email, name, or student ID">
+                <input type="search" name="search" value="{{ $search }}" placeholder="Search by email, name, or student ID" id="userManagementSearch">
                 <button class="um-btn um-btn-soft" type="submit">Search</button>
             </form>
         </div>
 
+        <div class="um-directory-panel {{ $search !== '' ? 'is-open' : '' }}" id="directoryPanel">
         <div class="um-table-wrap">
             <table class="um-table">
                 <thead>
@@ -518,6 +695,7 @@
                 </tbody>
             </table>
         </div>
+        </div>
     </div>
 </div>
 
@@ -526,16 +704,21 @@
         <div class="um-modal-head">
             <div>
                 <h3>Add New User</h3>
-                <div class="um-note">Search existing students, faculty, or admin profiles. Leaving the search blank shows everything below.</div>
+                <div class="um-note">Search existing students, faculty, or admin profiles. Click the search field to reveal the results list.</div>
             </div>
             <button type="button" class="um-btn um-btn-soft" data-close-lookup>Close</button>
         </div>
         <div class="um-modal-body">
             <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
-                <input type="search" name="search" value="{{ $search }}" placeholder="Search by email, name, or student ID">
+                <input type="search" name="search" value="{{ $search }}" placeholder="Search by email, name, or student ID" id="lookupSearchField">
                 <button class="um-btn um-btn-primary" type="submit">Search</button>
             </form>
-            <div style="margin-top: 16px;" class="um-table-wrap">
+            <div class="um-directory-toggle" style="padding: 14px 0 10px;">
+                <div class="hint">Click the search field to show the matching users below.</div>
+                <button type="button" class="um-btn um-btn-soft" id="toggleLookupDirectoryBtn">Show Search Results</button>
+            </div>
+            <div style="margin-top: 16px;" class="um-directory-panel {{ $search !== '' ? 'is-open' : '' }}" id="lookupDirectoryPanel">
+            <div class="um-table-wrap">
                 <table class="um-table" style="min-width: 900px;">
                     <thead>
                         <tr>
@@ -602,6 +785,7 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     </div>
@@ -718,6 +902,48 @@
     const detailStatus = document.getElementById('detailStatus');
     const externalNote = document.getElementById('externalNote');
     const deactivateBtn = document.getElementById('deactivateBtn');
+    const directoryPanel = document.getElementById('directoryPanel');
+    const userManagementSearch = document.getElementById('userManagementSearch');
+    const toggleDirectoryBtn = document.getElementById('toggleDirectoryBtn');
+    const lookupDirectoryPanel = document.getElementById('lookupDirectoryPanel');
+    const lookupSearchField = document.getElementById('lookupSearchField');
+    const toggleLookupDirectoryBtn = document.getElementById('toggleLookupDirectoryBtn');
+
+    const openDirectory = () => {
+        if (directoryPanel) {
+            directoryPanel.classList.add('is-open');
+        }
+        if (toggleDirectoryBtn) {
+            toggleDirectoryBtn.textContent = 'Directory Open';
+        }
+    };
+
+    const openLookupDirectory = () => {
+        if (lookupDirectoryPanel) {
+            lookupDirectoryPanel.classList.add('is-open');
+        }
+        if (toggleLookupDirectoryBtn) {
+            toggleLookupDirectoryBtn.textContent = 'Results Open';
+        }
+    };
+
+    if (userManagementSearch) {
+        userManagementSearch.addEventListener('focus', openDirectory);
+        userManagementSearch.addEventListener('click', openDirectory);
+    }
+
+    if (toggleDirectoryBtn) {
+        toggleDirectoryBtn.addEventListener('click', openDirectory);
+    }
+
+    if (lookupSearchField) {
+        lookupSearchField.addEventListener('focus', openLookupDirectory);
+        lookupSearchField.addEventListener('click', openLookupDirectory);
+    }
+
+    if (toggleLookupDirectoryBtn) {
+        toggleLookupDirectoryBtn.addEventListener('click', openLookupDirectory);
+    }
 
     document.querySelectorAll('[data-open-lookup]').forEach((button) => {
         button.addEventListener('click', () => lookupModal.classList.add('show'));
@@ -806,7 +1032,6 @@
         const isStudent = detailRole.value === 'student';
         const isAdmin = detailRole.value === 'admin';
         const isSuperAdmin = detailRole.value === 'super_admin';
-        const isStudentAssistant = detailRole.value === 'student_assistant';
 
         if (isStudent) {
             detailEmailLabel.textContent = 'Student Gmail Account';

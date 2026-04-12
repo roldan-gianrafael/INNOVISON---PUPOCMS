@@ -562,18 +562,10 @@
         </div>
 
         <div class="um-directory-toggle">
-            <div class="hint">Use the search field to find managed users already added in the CMS. Students stay in the add-user lookup flow.</div>
-            <button type="button" class="um-btn um-btn-soft" id="toggleDirectoryBtn">Show Full Directory</button>
+            <div class="hint">Managed users already added in the CMS are listed below. Students stay in the add-user lookup flow.</div>
         </div>
 
-        <div class="um-card-head">
-            <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
-                <input type="search" name="search_local" value="{{ $localSearch }}" placeholder="Search managed users by email, name, or student ID" id="userManagementSearch">
-                <button class="um-btn um-btn-soft" type="submit">Search</button>
-            </form>
-        </div>
-
-        <div class="um-directory-panel {{ $localSearch !== '' ? 'is-open' : '' }}" id="directoryPanel">
+        <div class="um-directory-panel is-open" id="directoryPanel">
         <div class="um-table-wrap">
             <table class="um-table">
                 <thead>
@@ -677,7 +669,7 @@
             </form>
             <div class="um-directory-toggle" style="padding: 14px 0 10px;">
                 <div class="hint">Type a search term to show matching API and admin users below, or open the list manually.</div>
-                <button type="button" class="um-btn um-btn-soft" id="toggleLookupDirectoryBtn">Show Search Results</button>
+            <button type="button" class="um-btn um-btn-soft" id="toggleLookupDirectoryBtn">Show Search Results</button>
             </div>
             <div style="margin-top: 16px;" class="um-directory-panel {{ $lookupSearch !== '' ? 'is-open' : '' }}" id="lookupDirectoryPanel">
             <div class="um-table-wrap">
@@ -872,21 +864,10 @@
     const externalNote = document.getElementById('externalNote');
     const deactivateBtn = document.getElementById('deactivateBtn');
     const directoryPanel = document.getElementById('directoryPanel');
-    const userManagementSearch = document.getElementById('userManagementSearch');
-    const toggleDirectoryBtn = document.getElementById('toggleDirectoryBtn');
     const lookupDirectoryPanel = document.getElementById('lookupDirectoryPanel');
     const lookupSearchField = document.getElementById('lookupSearchField');
     const toggleLookupDirectoryBtn = document.getElementById('toggleLookupDirectoryBtn');
     const userHoverHint = document.getElementById('userHoverHint');
-
-    const openDirectory = () => {
-        if (directoryPanel) {
-            directoryPanel.classList.add('is-open');
-        }
-        if (toggleDirectoryBtn) {
-            toggleDirectoryBtn.textContent = 'Directory Open';
-        }
-    };
 
     const openLookupDirectory = () => {
         if (lookupDirectoryPanel) {
@@ -969,10 +950,6 @@
         deleteForm.style.display = canEdit ? 'block' : 'none';
         settingsModal.classList.add('show');
     };
-
-    if (toggleDirectoryBtn) {
-        toggleDirectoryBtn.addEventListener('click', openDirectory);
-    }
 
     if (toggleLookupDirectoryBtn) {
         toggleLookupDirectoryBtn.addEventListener('click', openLookupDirectory);

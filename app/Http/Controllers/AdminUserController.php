@@ -18,18 +18,20 @@ class AdminUserController extends Controller
 {
     public function index(Request $request, FacultySyncService $facultySyncService)
     {
-        $localSearch = trim((string) $request->query('search_local', ''));
         $lookupSearch = trim((string) $request->query('lookup_search', ''));
 
         $allLocalUsers = $this->collectLocalUsers('');
         $allFacultyUsers = $this->collectFacultyUsers($facultySyncService, '');
 
-        $localRecords = $localSearch !== ''
-            ? collect($this->collectLocalUsers($localSearch))
-                ->filter(fn (array $record) => in_array($record['source'] ?? 'student', ['admin', 'superadmin', 'student_assistant'], true))
-                ->values()
-                ->all()
-            : [];
+        $localRecords = collect($allLocalUsers)
+            ->filter(fn (array $record) => in_array($record['source'] ?? 'student', ['admin', 'superadmin', 'student_assistant'], true))
+            ->sortBy(fn (array $record) => sprintf(
+                '%02d-%s',
+                $this->recordSortWeight($record['source'] ?? 'student'),
+                strtolower((string) ($record['name'] ?? ''))
+            ))
+            ->values()
+            ->all();
 
         $lookupRecords = $lookupSearch !== ''
             ? collect($this->collectLocalUsers($lookupSearch))
@@ -49,11 +51,10 @@ class AdminUserController extends Controller
             'faculty' => collect($allFacultyUsers)->count(),
             'active' => collect($allLocalUsers)->where('status', 'active')->count(),
             'inactive' => collect($allLocalUsers)->where('status', 'inactive')->count(),
-            'local_total' => count($allLocalUsers),
+            'local_total' => count($localRecords),
         ];
 
         return view('admin.user_management', [
-            'localSearch' => $localSearch,
             'lookupSearch' => $lookupSearch,
             'localRecords' => $localRecords,
             'lookupRecords' => $lookupRecords,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\Appointment;
 use App\Models\HealthProfile;
 use App\Models\User;
@@ -33,7 +34,7 @@ class AdminUserController extends Controller
 
         $stats = [
             'students' => collect($localUsers)->where('source', 'student')->count(),
-            'admins' => collect($localUsers)->whereIn('source', ['admin', 'superadmin'])->count(),
+            'admins' => collect($localUsers)->whereIn('source', ['admin', 'superadmin', 'student_assistant'])->count(),
             'faculty' => collect($facultyUsers)->count(),
             'active' => collect($records)->where('status', 'active')->count(),
             'inactive' => collect($records)->where('status', 'inactive')->count(),
@@ -50,6 +51,7 @@ class AdminUserController extends Controller
             'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'access_level' => ['nullable', Rule::in(['clinic_staff', 'designee'])],
         ]);
 
         if ($this->isProtectedUser($user)) {
@@ -67,6 +69,39 @@ class AdminUserController extends Controller
         }
 
         $user->save();
+
+        $linkedAdmin = $this->findLinkedAdminProfile($user);
+        if (in_array(User::normalizeRole($request->user_role), [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true)) {
+            if (!$linkedAdmin) {
+                $linkedAdmin = new Admin();
+            }
+
+            if (Admin::hasColumn('first_name')) {
+                $linkedAdmin->first_name = $user->first_name;
+            }
+            if (Admin::hasColumn('last_name')) {
+                $linkedAdmin->last_name = $user->last_name;
+            }
+            if (Admin::hasColumn('email')) {
+                $linkedAdmin->email = $user->email;
+            }
+            if (Admin::hasColumn('email_address')) {
+                $linkedAdmin->email_address = $user->email;
+            }
+            if (Admin::hasColumn('name')) {
+                $linkedAdmin->name = $user->name;
+            }
+            if (Admin::hasColumn('access_level')) {
+                $linkedAdmin->access_level = $request->filled('access_level')
+                    ? $request->access_level
+                    : (User::normalizeRole($request->user_role) === User::ROLE_SUPERADMIN ? 'superadmin' : 'clinic_staff');
+            }
+            if (Admin::hasColumn('status')) {
+                $linkedAdmin->status = $request->status;
+            }
+
+            $linkedAdmin->save();
+        }
 
         $this->logUserManagementAction(
             'Updated user account',
@@ -140,7 +175,9 @@ class AdminUserController extends Controller
             ->limit(100)
             ->get()
             ->map(function (User $user) {
-                $role = User::normalizeRole((string) ($user->user_role ?? 'student'));
+                $linkedAdmin = $this->findLinkedAdminProfile($user);
+                $rawRole = strtolower(trim((string) ($user->user_role ?? 'student')));
+                $role = User::normalizeRole($rawRole);
                 $status = strtolower(trim((string) ($user->status ?? 'active')));
                 if ($status === '') {
                     $status = 'active';
@@ -166,8 +203,9 @@ class AdminUserController extends Controller
                     'last_name' => (string) ($user->last_name ?? ''),
                     'student_id' => (string) ($user->student_id ?? ''),
                     'email' => (string) ($user->email ?? ''),
-                    'role' => $this->prettyRoleLabel($role),
-                    'raw_role' => $role,
+                    'role' => $this->resolveRoleLabel($rawRole, $linkedAdmin),
+                    'raw_role' => $rawRole,
+                    'normalized_role' => $role,
                     'status' => $status === 'inactive' ? 'inactive' : 'active',
                     'avatar_url' => $studentPhoto ? asset('storage/' . $studentPhoto) : null,
                     'avatar_letter' => strtoupper(substr($displayName !== '' ? $displayName : ($user->email ?? 'U'), 0, 1)),
@@ -182,6 +220,8 @@ class AdminUserController extends Controller
                         'gender' => (string) ($user->gender ?? ''),
                         'contact_no' => (string) ($user->contact_no ?? ''),
                         'is_health_profile_completed' => (bool) ($user->is_health_profile_completed ?? false),
+                        'access_level' => (string) ($linkedAdmin?->access_level ?? ''),
+                        'admin_profile_id' => $linkedAdmin?->admin_id,
                         'updated_at' => optional($user->updated_at)->toIso8601String(),
                     ],
                 ];
@@ -254,7 +294,14 @@ class AdminUserController extends Controller
 
     private function resolveUserSource(User $user): string
     {
-        return match (User::normalizeRole((string) ($user->user_role ?? 'student'))) {
+        $rawRole = strtolower(trim((string) ($user->user_role ?? 'student')));
+        $normalizedRole = User::normalizeRole($rawRole);
+
+        if (in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)) {
+            return 'student_assistant';
+        }
+
+        return match ($normalizedRole) {
             User::ROLE_SUPERADMIN => 'superadmin',
             User::ROLE_ADMIN => 'admin',
             default => 'student',
@@ -265,18 +312,60 @@ class AdminUserController extends Controller
     {
         return match ($this->resolveUserSource($user)) {
             'superadmin' => 'Super Admin',
-            'admin' => 'Student Assistant',
+            'admin' => 'Admin',
+            'student_assistant' => 'Student Assistant',
             default => 'Student',
         };
     }
 
-    private function prettyRoleLabel(string $role): string
+    private function resolveRoleLabel(string $role, ?Admin $linkedAdmin = null): string
     {
-        return match (User::normalizeRole($role)) {
+        $rawRole = strtolower(trim($role));
+        $normalizedRole = User::normalizeRole($rawRole);
+
+        if (in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)) {
+            return 'Student Assistant';
+        }
+
+        if ($normalizedRole === User::ROLE_ADMIN && $linkedAdmin) {
+            $accessLevel = strtolower(trim((string) ($linkedAdmin->access_level ?? '')));
+
+            return match ($accessLevel) {
+                'designee' => 'Admin - Designee',
+                'clinic_staff', 'clinic staff', 'staff' => 'Admin - Clinic Staff',
+                default => 'Admin',
+            };
+        }
+
+        return match ($normalizedRole) {
             User::ROLE_SUPERADMIN => 'Super Admin',
-            User::ROLE_ADMIN => 'Student Assistant',
+            User::ROLE_ADMIN => 'Admin',
             default => 'Student',
         };
+    }
+
+    private function findLinkedAdminProfile(User $user): ?Admin
+    {
+        if (!Schema::hasTable('admins')) {
+            return null;
+        }
+
+        $email = trim((string) ($user->email ?? ''));
+        if ($email === '') {
+            return null;
+        }
+
+        return Admin::query()
+            ->where(function ($builder) use ($email) {
+                if (Admin::hasColumn('email')) {
+                    $builder->orWhere('email', $email);
+                }
+
+                if (Admin::hasColumn('email_address')) {
+                    $builder->orWhere('email_address', $email);
+                }
+            })
+            ->first();
     }
 
     private function recordSortWeight(string $source): int
@@ -284,8 +373,9 @@ class AdminUserController extends Controller
         return match ($source) {
             'superadmin' => 0,
             'admin' => 1,
-            'student' => 2,
-            'faculty' => 3,
+            'student_assistant' => 2,
+            'student' => 3,
+            'faculty' => 4,
             default => 9,
         };
     }

@@ -1616,6 +1616,28 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $currentRole = \App\Models\User::normalizeRole(optional($authUser)->user_role ?? '');
     $isStudentAssistant = $currentRole === \App\Models\User::ROLE_ADMIN;
     $isAdminLike = $currentRole === \App\Models\User::ROLE_SUPERADMIN;
+    $linkedAdminProfile = null;
+    $adminTypeLabel = null;
+    if ($authUser && $currentRole === \App\Models\User::ROLE_ADMIN) {
+        $email = trim((string) ($authUser->email ?? ''));
+        if ($email !== '') {
+            $linkedAdminProfile = \App\Models\Admin::query()
+                ->where(function ($query) use ($email) {
+                    $query->where('email', $email);
+                    if (\App\Models\Admin::hasColumn('email_address')) {
+                        $query->orWhere('email_address', $email);
+                    }
+                })
+                ->first();
+
+            $accessLevel = strtolower(trim((string) ($linkedAdminProfile?->access_level ?? '')));
+            if ($accessLevel === 'designee') {
+                $adminTypeLabel = 'Admin - Designee';
+            } elseif (in_array($accessLevel, ['clinic_staff', 'clinic staff', 'staff'], true)) {
+                $adminTypeLabel = 'Admin - Clinic Staff';
+            }
+        }
+    }
     $dashboardUrl = $isStudentAssistant ? url('/assistant/dashboard') : url('/admin/dashboard');
     $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
     $inventoryUrl = $isStudentAssistant ? url('/assistant/inventory') : url('/admin/inventory');
@@ -1631,11 +1653,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $brandLogo = asset('images/clinic_logo.png');
     $roleLabelMap = [
         'superadmin' => 'Super Admin',
-        'admin' => 'Student Assistant',
+        'admin' => 'Admin',
         'super_admin' => 'Super Admin',
         'student_assistant' => 'Student Assistant',
     ];
-    $displayRole = $roleLabelMap[$currentRole] ?? ucfirst($currentRole ?: 'user');
+    $displayRole = $adminTypeLabel ?: ($roleLabelMap[$currentRole] ?? ucfirst($currentRole ?: 'user'));
     $medicineAlertsQuery = \App\Models\Item::query()
         ->where('category', 'Medicine')
         ->whereNotNull('expiration_date')
@@ -1653,7 +1675,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     <div class="header-left">
         <img src="{{ $brandLogo }}" alt="Clinic Logo" class="header-brand-avatar">
         <div class="header-copy">
-            <p class="header-kicker">{{ $isStudentAssistant ? 'Clinic Assistant Console' : 'Clinic Administration' }}</p>
+            <p class="header-kicker">{{ $adminTypeLabel ? 'Clinic Administration' : ($isStudentAssistant ? 'Clinic Assistant Console' : 'Clinic Administration') }}</p>
             <h1 class="header-title">Welcome back, <span>{{ $welcomeName }}</span></h1>
             <p class="header-subtitle">Monitor operations and patient flow in one clear workspace.</p>
         </div>
@@ -1695,7 +1717,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
       <img src="{{ $brandLogo }}" alt="Clinic Logo">
       <div class="sidebar-logo-text">
         <div class="sidebar-logo-title">PUP TAGUIG</div>
-        <div class="sidebar-logo-sub">{{ $isStudentAssistant ? 'Clinic Assistant' : 'Clinic Admin' }}</div>
+        <div class="sidebar-logo-sub">{{ $adminTypeLabel ? 'Clinic Admin' : ($isStudentAssistant ? 'Clinic Assistant' : 'Clinic Admin') }}</div>
       </div>
     </div>
     

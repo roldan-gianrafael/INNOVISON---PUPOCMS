@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -115,6 +116,51 @@ class LoginController extends Controller
         }
 
         if ($normalizedRole === User::normalizeRole($this->adminRoleValue())) {
+            return '/assistant/dashboard';
+        }
+
+        return '/student/home';
+    }
+
+    private function findLinkedAdminProfile(User $user): ?Admin
+    {
+        if (!Schema::hasTable('admins')) {
+            return null;
+        }
+
+        $email = trim((string) ($user->email ?? ''));
+        if ($email === '') {
+            return null;
+        }
+
+        return Admin::query()
+            ->where(function ($builder) use ($email) {
+                if (Admin::hasColumn('email')) {
+                    $builder->orWhere('email', $email);
+                }
+
+                if (Admin::hasColumn('email_address')) {
+                    $builder->orWhere('email_address', $email);
+                }
+            })
+            ->first();
+    }
+
+    private function resolveRedirectPathForUser(User $user): string
+    {
+        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
+        if ($normalizedRole === User::ROLE_SUPERADMIN) {
+            return '/admin/dashboard';
+        }
+
+        if ($normalizedRole === User::ROLE_ADMIN) {
+            $linkedAdmin = $this->findLinkedAdminProfile($user);
+            $accessLevel = strtolower(trim((string) ($linkedAdmin?->access_level ?? '')));
+
+            if ($accessLevel === 'designee') {
+                return '/student/home';
+            }
+
             return '/assistant/dashboard';
         }
 
@@ -894,7 +940,7 @@ class LoginController extends Controller
                 $authenticatedUser->save();
             }
 
-            return redirect($this->redirectPathByRole($normalizedRole));
+            return redirect($this->resolveRedirectPathForUser($authenticatedUser));
         }
 
         $this->recordAuthEvent(
@@ -1005,7 +1051,7 @@ class LoginController extends Controller
         $request->session()->flash('show_terms_modal', true);
         $this->recordAuthEvent($request, 'Login', 'User logged in successfully via IDP authorization code flow.', $user);
 
-        $redirectResponse = redirect($this->redirectPathByRole($user->user_role));
+        $redirectResponse = redirect($this->resolveRedirectPathForUser($user));
         return $this->attachIdpCookies($redirectResponse, $accessToken, $refreshToken);
     }
 
@@ -1027,7 +1073,7 @@ class LoginController extends Controller
     public function showLoginForm(Request $request)
     {
         if (Auth::check()) {
-            return redirect($this->redirectPathByRole((string) optional(Auth::user())->user_role));
+            return redirect($this->resolveRedirectPathForUser(Auth::user()));
         }
 
         if ($this->useIdpAuth()) {

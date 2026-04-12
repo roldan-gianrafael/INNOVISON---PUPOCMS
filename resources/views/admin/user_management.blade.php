@@ -650,14 +650,22 @@
                             <select name="user_role" id="detailRole">
                                 <option value="student">Student</option>
                                 <option value="student_assistant">Student Assistant</option>
+                                <option value="admin">Admin</option>
                                 <option value="super_admin">Super Admin</option>
+                            </select>
+                        </div>
+                        <div class="um-field" id="accessLevelWrap" style="display:none;">
+                            <label id="detailAccessLevelLabel">Admin Type</label>
+                            <select name="access_level" id="detailAccessLevel">
+                                <option value="clinic_staff">Clinic Staff</option>
+                                <option value="designee">Designee</option>
                             </select>
                         </div>
                         <div class="um-field">
                             <label id="detailEmailLabel">Gmail Account</label>
                             <input type="email" name="email" id="detailEditEmail" placeholder="Enter Gmail account">
                             <div class="um-note" id="emailRoleNote" style="margin-top: 6px;">
-                                Use a separate Gmail account for admin-side access.
+                                Use a separate Gmail account for the selected account type.
                             </div>
                         </div>
                         <div class="um-field">
@@ -671,7 +679,7 @@
                             This faculty profile is managed externally, so it is read-only here.
                         </div>
                         <div class="um-actions">
-                            <button type="button" class="um-btn um-btn-soft" id="deactivateBtn">Deactivate Account</button>
+            <button type="button" class="um-btn um-btn-soft" id="deactivateBtn">Deactivate Account</button>
                             <button type="submit" class="um-btn um-btn-primary" id="saveSettingsBtn">Save Changes</button>
                         </div>
                     </form>
@@ -700,6 +708,9 @@
     const detailEmail = document.getElementById('detailEmail');
     const detailEditEmail = document.getElementById('detailEditEmail');
     const detailEmailLabel = document.getElementById('detailEmailLabel');
+    const accessLevelWrap = document.getElementById('accessLevelWrap');
+    const detailAccessLevel = document.getElementById('detailAccessLevel');
+    const detailAccessLevelLabel = document.getElementById('detailAccessLevelLabel');
     const detailIdentifier = document.getElementById('detailIdentifier');
     const detailSource = document.getElementById('detailSource');
     const detailUpdated = document.getElementById('detailUpdated');
@@ -733,7 +744,10 @@
             detailUpdated.value = button.dataset.updated || 'N/A';
             const normalizedRole = (() => {
                 const raw = (button.dataset.role || 'student').toLowerCase();
-                if (raw === 'admin' || raw === 'student_assistant' || raw === 'studentassistant' || raw === 'assistant') {
+                if (raw === 'admin') {
+                    return 'admin';
+                }
+                if (raw === 'student_assistant' || raw === 'studentassistant' || raw === 'assistant') {
                     return 'student_assistant';
                 }
                 if (raw === 'superadmin' || raw === 'super_admin') {
@@ -743,12 +757,26 @@
             })();
             detailRole.value = normalizedRole;
             detailStatus.value = button.dataset.status || 'active';
+            const meta = (() => {
+                try {
+                    return JSON.parse(button.dataset.meta || '{}') || {};
+                } catch (error) {
+                    return {};
+                }
+            })();
+            const accessLevel = (meta.access_level || '').toLowerCase();
+            detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
+            const showAdminAccessLevel = normalizedRole === 'admin';
+            accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
 
             detailEditEmail.value = button.dataset.email || '';
-            detailEmailLabel.textContent = normalizedRole === 'student' ? 'Student Gmail Account' : 'Admin Gmail Account';
+            detailEmailLabel.textContent = normalizedRole === 'student'
+                ? 'Student Gmail Account'
+                : (normalizedRole === 'student_assistant' ? 'Admin Gmail Account' : 'Admin Gmail Account');
             emailRoleNote.textContent = normalizedRole === 'student'
                 ? 'This email stays with the student account.'
-                : 'Use a separate Gmail account for admin-side access.';
+                : 'Use a separate Gmail account for the selected account type.';
+            detailAccessLevelLabel.textContent = 'Admin Type';
 
             if (avatarUrl) {
                 detailAvatar.innerHTML = `<img src="${avatarUrl}" alt="">`;
@@ -775,12 +803,22 @@
     });
 
     detailRole.addEventListener('change', () => {
-        if (detailRole.value === 'student') {
+        const isStudent = detailRole.value === 'student';
+        const isAdmin = detailRole.value === 'admin';
+        const isSuperAdmin = detailRole.value === 'super_admin';
+        const isStudentAssistant = detailRole.value === 'student_assistant';
+
+        if (isStudent) {
             detailEmailLabel.textContent = 'Student Gmail Account';
             emailRoleNote.textContent = 'This email stays with the student account.';
+            accessLevelWrap.style.display = 'none';
         } else {
-            detailEmailLabel.textContent = 'Admin Gmail Account';
-            emailRoleNote.textContent = 'Use a separate Gmail account for admin-side access.';
+            detailEmailLabel.textContent = isSuperAdmin
+                ? 'Super Admin Gmail Account'
+                : 'Admin Gmail Account';
+            emailRoleNote.textContent = 'Use a separate Gmail account for the selected account type.';
+            accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
+            detailAccessLevelLabel.textContent = 'Admin Type';
         }
     });
 

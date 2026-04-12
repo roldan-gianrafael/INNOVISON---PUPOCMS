@@ -10,6 +10,7 @@ use App\Http\Controllers\MedicalConditionController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\StudentAssistantController;
 use App\Http\Controllers\WalkInController;
+use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -184,6 +185,23 @@ Route::get('/dev-login/{id}', function ($id) {
             return redirect('/admin/dashboard')->with('success', 'Logged in as ' . $user->name);
         }
         if ($normalizedRole === User::ROLE_ADMIN) {
+            $linkedAdmin = null;
+            $email = trim((string) ($user->email ?? ''));
+            if ($email !== '') {
+                $linkedAdmin = Admin::query()
+                    ->where(function ($query) use ($email) {
+                        $query->where('email', $email);
+                        if (Admin::hasColumn('email_address')) {
+                            $query->orWhere('email_address', $email);
+                        }
+                    })
+                    ->first();
+            }
+
+            if (strtolower(trim((string) ($linkedAdmin?->access_level ?? ''))) === 'designee') {
+                return redirect('/student/home')->with('success', 'Logged in as ' . $user->name);
+            }
+
             return redirect('/assistant/dashboard')->with('success', 'Logged in as ' . $user->name);
         }
 

@@ -510,7 +510,7 @@
 <div class="user-management-shell">
     <div class="um-hero">
         <div>
-            <h1>User Management</h1>
+            <h1>Users Management</h1>
             <p>Search and manage students, faculty, and admin accounts from one place.</p>
         </div>
         <button type="button" class="um-btn um-btn-primary" data-open-lookup>

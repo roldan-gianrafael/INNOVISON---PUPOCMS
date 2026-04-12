@@ -1745,7 +1745,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     </a>
       @if($isAdminLike)
           <a href="{{ $userManagementUrl }}" class="{{ Request::is('admin/user-management*') ? 'active' : '' }}">
-            <span class="sidebar-short">UM</span><span class="sidebar-label">User Management</span>
+            <span class="sidebar-short">UM</span><span class="sidebar-label">Users Management</span>
           </a>
           <a href="{{ route('admin.logs') }}" class="{{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
             <span class="sidebar-short">LG</span><span class="sidebar-label">Audit Trail</span>

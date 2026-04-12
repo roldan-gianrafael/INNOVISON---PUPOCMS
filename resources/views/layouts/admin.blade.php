@@ -453,8 +453,9 @@
         }
 
         html[data-theme="light"] .glass-nav.scrolled {
-            background: rgba(248, 249, 250, 0.72);
-            border-bottom-color: rgba(15, 23, 42, 0.08);
+            background: rgba(255, 255, 255, 0.92);
+            border-bottom-color: rgba(15, 23, 42, 0.06);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
         }
 
         html[data-theme="light"] .glass-nav.scrolled .header-kicker,
@@ -466,7 +467,7 @@
         }
 
         html[data-theme="light"] .glass-nav.scrolled .admin-user {
-            background: rgba(255, 255, 255, 0.78);
+            background: rgba(255, 255, 255, 0.94);
             border-color: rgba(15, 23, 42, 0.08);
         }
 
@@ -761,9 +762,9 @@
         .sidebar-nav a::before {
             content: '';
             position: absolute;
-            inset: 0;
+            inset: 3px;
             background: transparent;
-            border-radius: inherit;
+            border-radius: calc(var(--radius-md) - 3px);
             z-index: -1;
             transition: background 0.3s ease;
         }
@@ -883,6 +884,7 @@
         .main {
             flex: 1;
             min-width: 0;
+            position: relative;
             overflow-y: auto;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -1404,6 +1406,11 @@
             box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
         }
 
+        html[data-theme="light"] .sidebar-nav a:hover::before,
+        html[data-theme="light"] .sidebar-nav a.active::before {
+            background: rgba(255, 255, 255, 0.99);
+        }
+
         html[data-theme="light"] .sidebar-nav a.active {
             color: #111827;
             border-color: rgba(15, 23, 42, 0.08);
@@ -1816,8 +1823,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     </div>
 </header>
 
-<button type="button" id="scroll-button" aria-hidden="true" tabindex="-1" style="position:absolute; left:-9999px; top:160px; width:1px; height:1px; opacity:0; pointer-events:none;">scroll</button>
-
 <div class="admin-layout">
   
   <aside class="sidebar" id="adminSidebar">
@@ -1877,6 +1882,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
   </aside>
 
     <main class="main">
+        <button type="button" id="scroll-button" aria-hidden="true" tabindex="-1" style="position:absolute; top:160px; left:0; width:1px; height:1px; opacity:0; pointer-events:none;">scroll</button>
         @yield('content')
     </main>
 

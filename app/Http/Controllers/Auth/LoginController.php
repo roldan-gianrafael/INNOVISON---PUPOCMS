@@ -146,6 +146,51 @@ class LoginController extends Controller
             ->first();
     }
 
+    private function resolveLocalRoleFromAdminHub(string $email): ?string
+    {
+        if (!Schema::hasTable('admins')) {
+            return null;
+        }
+
+        $email = trim(strtolower($email));
+        if ($email === '') {
+            return null;
+        }
+
+        $linkedAdmin = Admin::query()
+            ->where(function ($builder) use ($email) {
+                if (Admin::hasColumn('email')) {
+                    $builder->orWhere('email', $email);
+                }
+
+                if (Admin::hasColumn('email_address')) {
+                    $builder->orWhere('email_address', $email);
+                }
+            })
+            ->first();
+
+        if (!$linkedAdmin) {
+            return null;
+        }
+
+        $hubRole = strtolower(trim((string) (
+            $linkedAdmin->access_level
+            ?? $linkedAdmin->role
+            ?? $linkedAdmin->user_role
+            ?? ''
+        )));
+
+        if ($hubRole === 'superadmin' || $hubRole === 'super_admin') {
+            return $this->superAdminRoleValue();
+        }
+
+        if (in_array($hubRole, ['clinic_staff', 'clinic staff', 'staff', 'designee'], true)) {
+            return $this->adminRoleValue();
+        }
+
+        return null;
+    }
+
     private function resolveRedirectPathForUser(User $user): string
     {
         $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
@@ -813,6 +858,10 @@ class LoginController extends Controller
             'data.user.role',
         ]);
         $role = $this->mapIdpRolesToLocal($this->extractRawRoles($profile), $preferredRole);
+        $adminHubRole = $this->resolveLocalRoleFromAdminHub($emailSeed);
+        if ($adminHubRole !== null) {
+            $role = $adminHubRole;
+        }
 
         $normalizedEmailSeed = trim(strtolower($emailSeed));
         $existingUser = null;

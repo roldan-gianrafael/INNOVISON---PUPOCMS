@@ -805,10 +805,17 @@
                             </select>
                         </div>
                         <div class="um-field">
-                            <label id="detailEmailLabel">Gmail Account</label>
+                            <label id="detailEmailLabel">Student Email</label>
                             <input type="email" name="email" id="detailEditEmail" placeholder="Enter Gmail account">
                             <div class="um-note" id="emailRoleNote" style="margin-top: 6px;">
-                                Use a separate Gmail account for the selected account type.
+                                Keep this email for the student side.
+                            </div>
+                        </div>
+                        <div class="um-field" id="adminEmailWrap" style="display:none;">
+                            <label id="detailAdminEmailLabel">Admin Login Email</label>
+                            <input type="email" name="admin_email" id="detailAdminEmail" placeholder="Enter separate admin login email">
+                            <div class="um-note" id="adminEmailNote" style="margin-top: 6px;">
+                                This email is used for the admin side only.
                             </div>
                         </div>
                         <div class="um-field">
@@ -861,6 +868,9 @@
     const detailUpdated = document.getElementById('detailUpdated');
     const detailRole = document.getElementById('detailRole');
     const detailStatus = document.getElementById('detailStatus');
+    const adminEmailWrap = document.getElementById('adminEmailWrap');
+    const detailAdminEmail = document.getElementById('detailAdminEmail');
+    const adminEmailNote = document.getElementById('adminEmailNote');
     const externalNote = document.getElementById('externalNote');
     const deactivateBtn = document.getElementById('deactivateBtn');
     const directoryPanel = document.getElementById('directoryPanel');
@@ -915,17 +925,23 @@
             }
         })();
         const accessLevel = (meta.access_level || '').toLowerCase();
+        const adminLoginEmail = meta.admin_login_email || '';
         detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
         const showAdminAccessLevel = normalizedRole === 'admin';
         accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
+        adminEmailWrap.style.display = normalizedRole === 'admin' || normalizedRole === 'super_admin' ? 'block' : 'none';
 
         detailEditEmail.value = row.dataset.email || '';
-        detailEmailLabel.textContent = normalizedRole === 'student'
-            ? 'Student Gmail Account'
-            : (normalizedRole === 'student_assistant' ? 'Admin Gmail Account' : 'Admin Gmail Account');
+        detailEmailLabel.textContent = 'Student Email';
         emailRoleNote.textContent = normalizedRole === 'student'
             ? 'This email stays with the student account.'
-            : 'Use a separate Gmail account for the selected account type.';
+            : 'Keep this email for the student side.';
+        if (detailAdminEmail) {
+            detailAdminEmail.value = adminLoginEmail;
+        }
+        if (adminEmailNote) {
+            adminEmailNote.textContent = 'This email is used for the admin side only.';
+        }
         detailAccessLevelLabel.textContent = 'Admin Type';
 
         if (avatarUrl) {
@@ -1003,20 +1019,20 @@
     });
 
     detailRole.addEventListener('change', () => {
-        const isStudent = detailRole.value === 'student';
-        const isAdmin = detailRole.value === 'admin';
-        const isSuperAdmin = detailRole.value === 'super_admin';
+            const isStudent = detailRole.value === 'student';
+            const isAdmin = detailRole.value === 'admin';
+            const isSuperAdmin = detailRole.value === 'super_admin';
 
         if (isStudent) {
-            detailEmailLabel.textContent = 'Student Gmail Account';
+            detailEmailLabel.textContent = 'Student Email';
             emailRoleNote.textContent = 'This email stays with the student account.';
             accessLevelWrap.style.display = 'none';
+            adminEmailWrap.style.display = 'none';
         } else {
-            detailEmailLabel.textContent = isSuperAdmin
-                ? 'Super Admin Gmail Account'
-                : 'Admin Gmail Account';
-            emailRoleNote.textContent = 'Use a separate Gmail account for the selected account type.';
+            detailEmailLabel.textContent = 'Student Email';
+            emailRoleNote.textContent = 'Keep this email for the student side.';
             accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
+            adminEmailWrap.style.display = isAdmin || isSuperAdmin ? 'block' : 'none';
             detailAccessLevelLabel.textContent = 'Admin Type';
         }
     });

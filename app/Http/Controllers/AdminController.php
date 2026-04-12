@@ -1206,10 +1206,28 @@ public function deleteItem($id)
             $linkedAdminProfile->office = $request->office;
         }
 
+        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
         if (Admin::hasColumn('access_level')) {
-            $linkedAdminProfile->access_level = $request->role;
+            if ($request->filled('role')) {
+                $requestRole = User::normalizeRole($request->role);
+                $linkedAdminProfile->access_level = match ($requestRole) {
+                    User::ROLE_SUPERADMIN => 'superadmin',
+                    User::ROLE_ADMIN => in_array(strtolower((string) ($linkedAdminProfile->access_level ?? '')), ['clinic_staff', 'designee'], true)
+                        ? strtolower((string) $linkedAdminProfile->access_level)
+                        : 'clinic_staff',
+                    default => null,
+                };
+            } else {
+                $linkedAdminProfile->access_level = match ($normalizedRole) {
+                    User::ROLE_SUPERADMIN => 'superadmin',
+                    User::ROLE_ADMIN => in_array(strtolower((string) ($linkedAdminProfile->access_level ?? '')), ['clinic_staff', 'designee'], true)
+                        ? strtolower((string) $linkedAdminProfile->access_level)
+                        : 'clinic_staff',
+                    default => null,
+                };
+            }
         } elseif (Admin::hasColumn('role')) {
-            $linkedAdminProfile->role = $request->role;
+            $linkedAdminProfile->role = $request->role ?: ($normalizedRole === User::ROLE_SUPERADMIN ? 'superadmin' : ($normalizedRole === User::ROLE_ADMIN ? 'clinic_staff' : null));
         }
 
         if (Admin::hasColumn('status')) {

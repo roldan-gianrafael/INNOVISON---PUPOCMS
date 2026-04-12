@@ -70,6 +70,7 @@ class AdminUserController extends Controller
             'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'admin_email' => ['nullable', 'email', 'max:255'],
             'access_level' => ['nullable', Rule::in(['clinic_staff', 'designee'])],
         ]);
 
@@ -82,6 +83,7 @@ class AdminUserController extends Controller
 
         $user->user_role = User::normalizeRole($request->user_role);
         $user->email = trim((string) $request->email);
+        $adminLoginEmail = trim((string) $request->admin_email);
 
         if (Schema::hasColumn('users', 'status')) {
             $user->status = $request->status;
@@ -102,10 +104,10 @@ class AdminUserController extends Controller
                 $linkedAdmin->last_name = $user->last_name;
             }
             if (Admin::hasColumn('email')) {
-                $linkedAdmin->email = $user->email;
+                $linkedAdmin->email = $adminLoginEmail !== '' ? $adminLoginEmail : $user->email;
             }
             if (Admin::hasColumn('email_address')) {
-                $linkedAdmin->email_address = $user->email;
+                $linkedAdmin->email_address = $adminLoginEmail !== '' ? $adminLoginEmail : $user->email;
             }
             if (Admin::hasColumn('name')) {
                 $linkedAdmin->name = $user->name;
@@ -253,6 +255,7 @@ class AdminUserController extends Controller
                         'contact_no' => (string) ($user->contact_no ?? ''),
                         'is_health_profile_completed' => (bool) ($user->is_health_profile_completed ?? false),
                         'access_level' => (string) ($linkedAdmin?->access_level ?? ''),
+                        'admin_login_email' => (string) ($linkedAdmin?->email_address ?? $linkedAdmin?->email ?? ''),
                         'admin_profile_id' => $linkedAdmin?->admin_id,
                         'updated_at' => optional($user->updated_at)->toIso8601String(),
                     ],

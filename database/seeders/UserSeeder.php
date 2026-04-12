@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             'email' => 'pupocms2027@gmail.com',
             'user_role' => User::ROLE_SUPERADMIN,
             'status' => 'active',
-            'password' => Hash::make('PUPTAdmin2027!'),
+            'password' => Hash::make('Innovision2027'),
         ];
 
         if (Schema::hasColumn('users', 'user_type')) {

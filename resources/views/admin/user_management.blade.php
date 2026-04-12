@@ -116,50 +116,6 @@
         font-size: .8rem;
     }
 
-    .um-recent-wrap {
-        padding: 0 20px 18px;
-    }
-
-    .um-recent-grid {
-        display: flex;
-        gap: 12px;
-        margin-top: 12px;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        scrollbar-width: thin;
-    }
-
-    .um-recent-card {
-        min-width: 240px;
-        border: 1px solid rgba(148, 163, 184, 0.14);
-        border-radius: 16px;
-        padding: 14px;
-        background: rgba(248, 250, 252, 0.95);
-        flex: 0 0 240px;
-    }
-
-    .um-recent-top {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .um-recent-name {
-        font-weight: 800;
-        color: #111827;
-        line-height: 1.2;
-    }
-
-    .um-recent-meta {
-        margin-top: 8px;
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        flex-wrap: wrap;
-        color: #64748b;
-        font-size: .85rem;
-    }
-
     .um-directory-toggle {
         display: flex;
         align-items: center;
@@ -277,6 +233,19 @@
         gap: 12px;
     }
 
+    .um-user-card {
+        cursor: pointer;
+    }
+
+    tr[data-user-card] {
+        cursor: pointer;
+    }
+
+    tr[data-user-card]:hover .um-user {
+        background: rgba(128, 0, 0, 0.04);
+        border-radius: 12px;
+    }
+
     .um-avatar {
         width: 46px;
         height: 46px;
@@ -334,6 +303,22 @@
     .um-badge.source {
         background: rgba(128, 0, 0, 0.10);
         color: #800000;
+    }
+
+    .um-cursor-hint {
+        position: fixed;
+        z-index: 9999;
+        display: none;
+        pointer-events: none;
+        background: rgba(17, 24, 39, 0.92);
+        color: #fff;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: .78rem;
+        font-weight: 800;
+        letter-spacing: .03em;
+        box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
+        white-space: nowrap;
     }
 
     .um-action-btn {
@@ -496,11 +481,6 @@
             min-width: 200px;
             flex-basis: 200px;
         }
-
-        .um-recent-card {
-            min-width: 220px;
-            flex-basis: 220px;
-        }
     }
 
     @media (max-width: 768px) {
@@ -518,8 +498,7 @@
             flex-direction: column;
         }
 
-        .um-summary-card,
-        .um-recent-card {
+        .um-summary-card {
             min-width: 180px;
             flex-basis: 180px;
         }
@@ -582,39 +561,8 @@
             </div>
         </div>
 
-        <div class="um-recent-wrap">
-            <div class="um-summary-label" style="margin-bottom:8px;">Recently Updated</div>
-            <div class="um-recent-grid">
-                @forelse($recentRecords as $record)
-                    <div class="um-recent-card">
-                        <div class="um-recent-top">
-                            <div class="um-avatar" style="width:40px;height:40px;flex-basis:40px;">
-                                @if(!empty($record['avatar_url']))
-                                    <img src="{{ $record['avatar_url'] }}" alt="{{ $record['name'] }}">
-                                @else
-                                    {{ $record['avatar_letter'] }}
-                                @endif
-                            </div>
-                            <div>
-                                <div class="um-recent-name">{{ $record['name'] }}</div>
-                                <div class="um-sub">{{ $record['role'] }}</div>
-                            </div>
-                        </div>
-                        <div class="um-recent-meta">
-                            <span>{{ $record['source_label'] }}</span>
-                            <span>{{ $record['status'] === 'inactive' ? 'Inactive' : 'Active' }}</span>
-                        </div>
-                    </div>
-                @empty
-                    <div class="um-recent-card" style="grid-column: 1 / -1;">
-                        <div class="um-empty" style="padding: 18px 0;">No recent users available.</div>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
         <div class="um-directory-toggle">
-            <div class="hint">Click the search field to open the full user directory. The list stays hidden until you need it.</div>
+            <div class="hint">Use the search field to find a user. The full directory stays hidden unless you intentionally open it.</div>
             <button type="button" class="um-btn um-btn-soft" id="toggleDirectoryBtn">Show Full Directory</button>
         </div>
 
@@ -640,7 +588,25 @@
                 </thead>
                 <tbody>
                     @forelse($records as $record)
-                        <tr>
+                        <tr
+                            data-user-card
+                            data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
+                            data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
+                            data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
+                            data-id="{{ $record['record_id'] }}"
+                            data-name="{{ $record['name'] }}"
+                            data-email="{{ $record['email'] }}"
+                            data-role="{{ $record['raw_role'] }}"
+                            data-role-label="{{ $record['role'] }}"
+                            data-status="{{ $record['status'] }}"
+                            data-source="{{ $record['source'] }}"
+                            data-source-label="{{ $record['source_label'] }}"
+                            data-student-id="{{ $record['student_id'] }}"
+                            data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
+                            data-avatar-letter="{{ $record['avatar_letter'] }}"
+                            data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
+                            data-meta='@json($record["meta"])'
+                        >
                             <td>
                                 <div class="um-user">
                                     <div class="um-avatar">
@@ -669,29 +635,16 @@
                                 <span class="um-badge source">{{ $record['source_label'] }}</span>
                             </td>
                             <td>
-                                <button
-                                    type="button"
-                                    class="um-action-btn"
-                                    data-user-settings
-                                    data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
-                                    data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
-                                    data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
-                                    data-id="{{ $record['record_id'] }}"
-                                    data-name="{{ $record['name'] }}"
-                                    data-email="{{ $record['email'] }}"
-                                    data-role="{{ $record['raw_role'] }}"
-                                    data-role-label="{{ $record['role'] }}"
-                                    data-status="{{ $record['status'] }}"
-                                    data-source="{{ $record['source'] }}"
-                                    data-source-label="{{ $record['source_label'] }}"
-                                    data-student-id="{{ $record['student_id'] }}"
-                                    data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
-                                    data-avatar-letter="{{ $record['avatar_letter'] }}"
-                                    data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
-                                    data-meta='@json($record["meta"])'
-                                >
-                                    Settings
-                                </button>
+                                @if($record['can_edit'])
+                                    <button
+                                        type="button"
+                                        class="um-action-btn"
+                                    >
+                                        Settings
+                                    </button>
+                                @else
+                                    <span class="um-badge source" style="background: rgba(128, 0, 0, 0.08); color: #800000;">Read only</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -713,7 +666,7 @@
         <div class="um-modal-head">
             <div>
                 <h3>Add New User</h3>
-                <div class="um-note">Search existing students, faculty, or admin profiles. Click the search field to reveal the results list.</div>
+                <div class="um-note">Search existing students, faculty, or admin profiles. The results list stays hidden until you search or open it on purpose.</div>
             </div>
             <button type="button" class="um-btn um-btn-soft" data-close-lookup>Close</button>
         </div>
@@ -723,7 +676,7 @@
                 <button class="um-btn um-btn-primary" type="submit">Search</button>
             </form>
             <div class="um-directory-toggle" style="padding: 14px 0 10px;">
-                <div class="hint">Click the search field to show the matching users below.</div>
+                <div class="hint">Type a search term to show matching users below, or open the full list manually.</div>
                 <button type="button" class="um-btn um-btn-soft" id="toggleLookupDirectoryBtn">Show Search Results</button>
             </div>
             <div style="margin-top: 16px;" class="um-directory-panel {{ $search !== '' ? 'is-open' : '' }}" id="lookupDirectoryPanel">
@@ -741,7 +694,25 @@
                     </thead>
                     <tbody>
                         @forelse($records as $record)
-                            <tr>
+                            <tr
+                                data-user-card
+                                data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
+                                data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
+                                data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
+                                data-id="{{ $record['record_id'] }}"
+                                data-name="{{ $record['name'] }}"
+                                data-email="{{ $record['email'] }}"
+                                data-role="{{ $record['raw_role'] }}"
+                                data-role-label="{{ $record['role'] }}"
+                                data-status="{{ $record['status'] }}"
+                                data-source="{{ $record['source'] }}"
+                                data-source-label="{{ $record['source_label'] }}"
+                                data-student-id="{{ $record['student_id'] }}"
+                                data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
+                                data-avatar-letter="{{ $record['avatar_letter'] }}"
+                                data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
+                                data-meta='@json($record["meta"])'
+                            >
                                 <td>
                                     <div class="um-user">
                                         <div class="um-avatar">
@@ -762,29 +733,16 @@
                                 <td><span class="um-badge {{ $record['status'] === 'inactive' ? 'inactive' : 'active' }}">{{ ucfirst($record['status']) }}</span></td>
                                 <td><span class="um-badge source">{{ $record['source_label'] }}</span></td>
                                 <td>
-                                    <button
-                                        type="button"
-                                        class="um-action-btn"
-                                        data-user-settings
-                                        data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
-                                        data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
-                                        data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
-                                        data-id="{{ $record['record_id'] }}"
-                                        data-name="{{ $record['name'] }}"
-                                        data-email="{{ $record['email'] }}"
-                                        data-role="{{ $record['raw_role'] }}"
-                                        data-role-label="{{ $record['role'] }}"
-                                        data-status="{{ $record['status'] }}"
-                                        data-source="{{ $record['source'] }}"
-                                        data-source-label="{{ $record['source_label'] }}"
-                                        data-student-id="{{ $record['student_id'] }}"
-                                        data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
-                                        data-avatar-letter="{{ $record['avatar_letter'] }}"
-                                        data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
-                                        data-meta='@json($record["meta"])'
-                                    >
-                                        Open Settings
-                                    </button>
+                                    @if($record['can_edit'])
+                                        <button
+                                            type="button"
+                                            class="um-action-btn"
+                                        >
+                                            Open Settings
+                                        </button>
+                                    @else
+                                        <span class="um-badge source" style="background: rgba(128, 0, 0, 0.08); color: #800000;">Read only</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -890,6 +848,8 @@
     </div>
 </div>
 
+<div class="um-cursor-hint" id="userHoverHint">Click to enter</div>
+
 @push('scripts')
 <script>
     const lookupModal = document.getElementById('lookupModal');
@@ -917,6 +877,7 @@
     const lookupDirectoryPanel = document.getElementById('lookupDirectoryPanel');
     const lookupSearchField = document.getElementById('lookupSearchField');
     const toggleLookupDirectoryBtn = document.getElementById('toggleLookupDirectoryBtn');
+    const userHoverHint = document.getElementById('userHoverHint');
 
     const openDirectory = () => {
         if (directoryPanel) {
@@ -936,18 +897,81 @@
         }
     };
 
-    if (userManagementSearch) {
-        userManagementSearch.addEventListener('focus', openDirectory);
-        userManagementSearch.addEventListener('click', openDirectory);
-    }
+    const openSettingsFromRow = (row) => {
+        if (!row) {
+            return;
+        }
+
+        const canEdit = row.dataset.canEdit === '1';
+        const avatarUrl = row.dataset.avatarUrl || '';
+        const avatarLetter = row.dataset.avatarLetter || 'U';
+
+        detailName.value = row.dataset.name || '';
+        detailEmail.value = row.dataset.email || '';
+        detailIdentifier.value = row.dataset.studentId || row.dataset.id || '';
+        detailSource.value = row.dataset.sourceLabel || row.dataset.source || '';
+        detailUpdated.value = row.dataset.updated || 'N/A';
+        const normalizedRole = (() => {
+            const raw = (row.dataset.role || 'student').toLowerCase();
+            if (raw === 'admin') {
+                return 'admin';
+            }
+            if (raw === 'student_assistant' || raw === 'studentassistant' || raw === 'assistant') {
+                return 'student_assistant';
+            }
+            if (raw === 'superadmin' || raw === 'super_admin') {
+                return 'super_admin';
+            }
+            return 'student';
+        })();
+        detailRole.value = normalizedRole;
+        detailStatus.value = row.dataset.status || 'active';
+        const meta = (() => {
+            try {
+                return JSON.parse(row.dataset.meta || '{}') || {};
+            } catch (error) {
+                return {};
+            }
+        })();
+        const accessLevel = (meta.access_level || '').toLowerCase();
+        detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
+        const showAdminAccessLevel = normalizedRole === 'admin';
+        accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
+
+        detailEditEmail.value = row.dataset.email || '';
+        detailEmailLabel.textContent = normalizedRole === 'student'
+            ? 'Student Gmail Account'
+            : (normalizedRole === 'student_assistant' ? 'Admin Gmail Account' : 'Admin Gmail Account');
+        emailRoleNote.textContent = normalizedRole === 'student'
+            ? 'This email stays with the student account.'
+            : 'Use a separate Gmail account for the selected account type.';
+        detailAccessLevelLabel.textContent = 'Admin Type';
+
+        if (avatarUrl) {
+            detailAvatar.innerHTML = `<img src="${avatarUrl}" alt="">`;
+        } else {
+            detailAvatar.textContent = avatarLetter;
+        }
+
+        settingsForm.action = row.dataset.updateUrl || '#';
+        deleteForm.action = row.dataset.deleteUrl || '#';
+
+        settingsForm.querySelectorAll('input, select, button').forEach((field) => {
+            if (field.id === 'deactivateBtn') {
+                return;
+            }
+            field.disabled = !canEdit;
+        });
+        deactivateBtn.disabled = !canEdit;
+        externalNote.style.display = canEdit ? 'none' : 'block';
+        detailEditEmail.readOnly = !canEdit;
+
+        deleteForm.style.display = canEdit ? 'block' : 'none';
+        settingsModal.classList.add('show');
+    };
 
     if (toggleDirectoryBtn) {
         toggleDirectoryBtn.addEventListener('click', openDirectory);
-    }
-
-    if (lookupSearchField) {
-        lookupSearchField.addEventListener('focus', openLookupDirectory);
-        lookupSearchField.addEventListener('click', openLookupDirectory);
     }
 
     if (toggleLookupDirectoryBtn) {
@@ -966,75 +990,31 @@
         button.addEventListener('click', () => settingsModal.classList.remove('show'));
     });
 
-    document.querySelectorAll('[data-user-settings]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const canEdit = button.dataset.canEdit === '1';
-            const avatarUrl = button.dataset.avatarUrl || '';
-            const avatarLetter = button.dataset.avatarLetter || 'U';
-
-            detailName.value = button.dataset.name || '';
-            detailEmail.value = button.dataset.email || '';
-            detailIdentifier.value = button.dataset.studentId || button.dataset.id || '';
-            detailSource.value = button.dataset.sourceLabel || button.dataset.source || '';
-            detailUpdated.value = button.dataset.updated || 'N/A';
-            const normalizedRole = (() => {
-                const raw = (button.dataset.role || 'student').toLowerCase();
-                if (raw === 'admin') {
-                    return 'admin';
-                }
-                if (raw === 'student_assistant' || raw === 'studentassistant' || raw === 'assistant') {
-                    return 'student_assistant';
-                }
-                if (raw === 'superadmin' || raw === 'super_admin') {
-                    return 'super_admin';
-                }
-                return 'student';
-            })();
-            detailRole.value = normalizedRole;
-            detailStatus.value = button.dataset.status || 'active';
-            const meta = (() => {
-                try {
-                    return JSON.parse(button.dataset.meta || '{}') || {};
-                } catch (error) {
-                    return {};
-                }
-            })();
-            const accessLevel = (meta.access_level || '').toLowerCase();
-            detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
-            const showAdminAccessLevel = normalizedRole === 'admin';
-            accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
-
-            detailEditEmail.value = button.dataset.email || '';
-            detailEmailLabel.textContent = normalizedRole === 'student'
-                ? 'Student Gmail Account'
-                : (normalizedRole === 'student_assistant' ? 'Admin Gmail Account' : 'Admin Gmail Account');
-            emailRoleNote.textContent = normalizedRole === 'student'
-                ? 'This email stays with the student account.'
-                : 'Use a separate Gmail account for the selected account type.';
-            detailAccessLevelLabel.textContent = 'Admin Type';
-
-            if (avatarUrl) {
-                detailAvatar.innerHTML = `<img src="${avatarUrl}" alt="">`;
-            } else {
-                detailAvatar.textContent = avatarLetter;
+    document.querySelectorAll('tr[data-user-card]').forEach((row) => {
+        const moveHint = (event) => {
+            if (!userHoverHint) {
+                return;
             }
+            userHoverHint.style.display = 'block';
+            const offsetX = 18;
+            const offsetY = 18;
+            const maxX = window.innerWidth - userHoverHint.offsetWidth - 12;
+            const maxY = window.innerHeight - userHoverHint.offsetHeight - 12;
+            const left = Math.min(event.clientX + offsetX, maxX);
+            const top = Math.min(event.clientY + offsetY, maxY);
+            userHoverHint.style.left = `${Math.max(left, 12)}px`;
+            userHoverHint.style.top = `${Math.max(top, 12)}px`;
+        };
 
-            settingsForm.action = button.dataset.updateUrl || '#';
-            deleteForm.action = button.dataset.deleteUrl || '#';
-
-            settingsForm.querySelectorAll('input, select, button').forEach((field) => {
-                if (field.id === 'deactivateBtn') {
-                    return;
-                }
-                field.disabled = !canEdit;
-            });
-            deactivateBtn.disabled = !canEdit;
-            externalNote.style.display = canEdit ? 'none' : 'block';
-            detailEditEmail.readOnly = !canEdit;
-
-            deleteForm.style.display = canEdit ? 'block' : 'none';
-            settingsModal.classList.add('show');
+        row.addEventListener('mouseenter', moveHint);
+        row.addEventListener('mousemove', moveHint);
+        row.addEventListener('mouseleave', () => {
+            if (userHoverHint) {
+                userHoverHint.style.display = 'none';
+            }
         });
+
+        row.addEventListener('click', () => openSettingsFromRow(row));
     });
 
     detailRole.addEventListener('change', () => {

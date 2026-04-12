@@ -32,12 +32,6 @@ class AdminUserController extends Controller
             ->values()
             ->all();
 
-        $recentRecords = collect($records)
-            ->sortByDesc(fn (array $record) => (string) ($record['meta']['updated_at'] ?? ''))
-            ->take(6)
-            ->values()
-            ->all();
-
         $stats = [
             'students' => collect($localUsers)->where('source', 'student')->count(),
             'admins' => collect($localUsers)->whereIn('source', ['admin', 'superadmin', 'student_assistant'])->count(),
@@ -46,7 +40,7 @@ class AdminUserController extends Controller
             'inactive' => collect($records)->where('status', 'inactive')->count(),
         ];
 
-        return view('admin.user_management', compact('search', 'records', 'recentRecords', 'stats'));
+        return view('admin.user_management', compact('search', 'records', 'stats'));
     }
 
     public function update(Request $request, User $user)

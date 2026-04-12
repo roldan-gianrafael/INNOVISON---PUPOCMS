@@ -74,7 +74,12 @@
     html[data-theme="dark"] .um-stat .label,
     html[data-theme="dark"] .um-summary-label,
     html[data-theme="dark"] .um-field label {
-        color: #94a3b8;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .user-management-shell,
+    html[data-theme="dark"] .user-management-shell * {
+        color: #ffffff;
     }
 
     html[data-theme="dark"] .um-stat .value,
@@ -697,56 +702,14 @@
     <div class="um-hero">
         <div>
             <h1>Users Management</h1>
-            <p>Search and manage students, faculty, and admin accounts from one place.</p>
+            <p>Search and manage roles of accounts from one place.</p>
         </div>
         <button type="button" class="um-btn um-btn-primary" data-open-lookup>
             <span>+</span> Add New User
         </button>
     </div>
 
-    <div class="um-grid">
-        <div class="um-stat">
-            <div class="label">Students</div>
-            <div class="value">{{ $stats['students'] }}</div>
-        </div>
-        <div class="um-stat">
-            <div class="label">Admins</div>
-            <div class="value">{{ $stats['admins'] }}</div>
-        </div>
-        <div class="um-stat">
-            <div class="label">Faculty</div>
-            <div class="value">{{ $stats['faculty'] }}</div>
-        </div>
-        <div class="um-stat">
-            <div class="label">Active / Inactive</div>
-            <div class="value">{{ $stats['active'] }} / {{ $stats['inactive'] }}</div>
-        </div>
-    </div>
-
     <div class="um-card">
-        <div class="um-summary-grid">
-            <div class="um-summary-card">
-                <div class="um-summary-label">Total Users</div>
-                <div class="um-summary-value">{{ $stats['local_total'] }}</div>
-                <p class="um-summary-note">Users already stored in the CMS.</p>
-            </div>
-            <div class="um-summary-card">
-                <div class="um-summary-label">Active</div>
-                <div class="um-summary-value">{{ $stats['active'] }}</div>
-                <p class="um-summary-note">Accounts currently enabled.</p>
-            </div>
-            <div class="um-summary-card">
-                <div class="um-summary-label">Inactive</div>
-                <div class="um-summary-value">{{ $stats['inactive'] }}</div>
-                <p class="um-summary-note">Accounts temporarily disabled.</p>
-            </div>
-            <div class="um-summary-card">
-                <div class="um-summary-label">Admin Hub</div>
-                <div class="um-summary-value">{{ $stats['admins'] }}</div>
-                <p class="um-summary-note">Super admins, clinic staff, and student assistants.</p>
-            </div>
-        </div>
-
         <div class="um-directory-toggle">
             <div class="hint">Managed users already added in the CMS are listed below. Students stay in the add-user lookup flow.</div>
         </div>

@@ -676,6 +676,8 @@
         }
 
         .sidebar-nav a {
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -694,16 +696,17 @@
         }
 
         .sidebar-nav a:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.16);
             transform: translateX(1px);
+            backdrop-filter: blur(8px);
         }
 
         .sidebar-nav a.active {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.26);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.24);
             color: #ffffff;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 6px 18px rgba(0, 0, 0, 0.06);
         }
 
         .sidebar-short {
@@ -1294,14 +1297,17 @@
         }
 
         html[data-theme="light"] .sidebar-nav a:hover {
-            background: rgba(128, 0, 0, 0.08);
-            border-color: rgba(128, 0, 0, 0.18);
+            background: rgba(128, 0, 0, 0.05);
+            border-color: rgba(128, 0, 0, 0.14);
+            box-shadow: inset 0 0 0 1px rgba(128, 0, 0, 0.03);
+            backdrop-filter: blur(8px);
         }
 
         html[data-theme="light"] .sidebar-nav a.active {
-            background: rgba(128, 0, 0, 0.13);
-            border-color: rgba(128, 0, 0, 0.26);
+            background: rgba(128, 0, 0, 0.09);
+            border-color: rgba(128, 0, 0, 0.22);
             color: #4a0f1a;
+            box-shadow: inset 0 0 0 1px rgba(128, 0, 0, 0.04), 0 6px 18px rgba(128, 0, 0, 0.06);
         }
 
         html[data-theme="light"] .sidebar-short {

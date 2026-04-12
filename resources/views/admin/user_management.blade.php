@@ -562,13 +562,13 @@
         </div>
 
         <div class="um-directory-toggle">
-            <div class="hint">Use the search field to find a user. The full directory stays hidden unless you intentionally open it.</div>
+            <div class="hint">Use the search field to find managed users already added in the CMS. Students stay in the add-user lookup flow.</div>
             <button type="button" class="um-btn um-btn-soft" id="toggleDirectoryBtn">Show Full Directory</button>
         </div>
 
         <div class="um-card-head">
             <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
-                <input type="search" name="search_local" value="{{ $localSearch }}" placeholder="Search local users by email, name, or student ID" id="userManagementSearch">
+                <input type="search" name="search_local" value="{{ $localSearch }}" placeholder="Search managed users by email, name, or student ID" id="userManagementSearch">
                 <button class="um-btn um-btn-soft" type="submit">Search</button>
             </form>
         </div>

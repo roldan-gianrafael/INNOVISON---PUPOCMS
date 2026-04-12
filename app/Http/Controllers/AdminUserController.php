@@ -25,7 +25,10 @@ class AdminUserController extends Controller
         $allFacultyUsers = $this->collectFacultyUsers($facultySyncService, '');
 
         $localRecords = $localSearch !== ''
-            ? $this->collectLocalUsers($localSearch)
+            ? collect($this->collectLocalUsers($localSearch))
+                ->filter(fn (array $record) => in_array($record['source'] ?? 'student', ['admin', 'superadmin', 'student_assistant'], true))
+                ->values()
+                ->all()
             : [];
 
         $lookupRecords = $lookupSearch !== ''

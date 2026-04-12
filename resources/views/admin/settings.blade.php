@@ -104,22 +104,45 @@
     .readonly-helper { font-size: 12px; color: var(--settings-muted); margin-top: 6px; }
 
     /* Forms */
-    .form-group { margin-bottom: 16px; }
+    .form-group {
+        position: relative;
+        margin-bottom: 18px;
+        padding-top: 12px;
+    }
     .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 12px;
+        position: absolute;
+        left: 14px;
+        top: 0;
+        transform: translateY(10px);
+        display: inline-flex;
+        align-items: center;
+        height: 24px;
+        padding: 0 10px;
+        border-radius: 999px;
+        font-size: 11px;
         font-weight: 800;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.07em;
         text-transform: uppercase;
-        color: var(--settings-muted);
+        color: #64748b;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+        border: 1px solid rgba(127, 0, 0, 0.08);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+        pointer-events: none;
+        z-index: 2;
+        transition: transform 0.22s ease, color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .form-group:focus-within label {
+        transform: translateY(6px) scale(1.02);
+        color: var(--settings-maroon);
+        border-color: rgba(127, 0, 0, 0.18);
+        box-shadow: 0 10px 20px rgba(127, 0, 0, 0.10);
     }
     .form-control {
         width: 100%;
-        min-height: 54px;
-        padding: 13px 16px;
+        min-height: 58px;
+        padding: 20px 16px 14px;
         border: 1px solid rgba(255, 255, 255, 0.72);
-        border-radius: 20px;
+        border-radius: 22px;
         font-size: 14px;
         color: var(--settings-text);
         background:
@@ -143,9 +166,10 @@
         border-color: var(--settings-maroon);
         background: #fff;
         box-shadow:
-            0 0 0 5px rgba(127, 0, 0, 0.12),
-            0 16px 32px rgba(15, 23, 42, 0.10),
-            0 4px 10px rgba(15, 23, 42, 0.05);
+            0 0 0 6px rgba(127, 0, 0, 0.10),
+            0 18px 36px rgba(15, 23, 42, 0.11),
+            0 4px 10px rgba(15, 23, 42, 0.05),
+            0 0 24px rgba(127, 0, 0, 0.10);
         outline: none;
         transform: translateY(-2px);
     }
@@ -160,6 +184,10 @@
         box-shadow:
             0 8px 18px rgba(15, 23, 42, 0.04),
             inset 0 1px 0 rgba(255,255,255,0.92);
+    }
+    .form-group .readonly-helper {
+        margin-top: 8px;
+        padding-left: 6px;
     }
     select.form-control {
         appearance: none;
@@ -194,6 +222,11 @@
     }
     .switch-row input { width: 18px; height: 18px; accent-color: var(--settings-maroon); cursor: pointer; }
     .switch-label { font-size: 14px; font-weight: 700; color: var(--settings-text); cursor: pointer; flex: 1; }
+    .switch-row input:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(127, 0, 0, 0.12);
+        border-radius: 4px;
+    }
 
     /* Buttons */
     .btn-save {

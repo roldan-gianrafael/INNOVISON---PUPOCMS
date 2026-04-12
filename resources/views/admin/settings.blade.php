@@ -129,21 +129,22 @@
         margin-bottom: 12px;
         padding: 7px 11px;
         border-radius: 999px;
-        color: #fff;
-        background: linear-gradient(135deg, var(--stg-maroon), var(--stg-maroon-deep));
+        color: var(--stg-maroon);
+        background: rgba(127, 0, 0, 0.08);
+        border: 1px solid rgba(127, 0, 0, 0.12);
         font-size: 10px;
         font-weight: 900;
         letter-spacing: 0.12em;
         text-transform: uppercase;
-        box-shadow: 0 10px 20px rgba(127,0,0,0.18);
+        box-shadow: 0 8px 18px rgba(15,23,42,0.06);
     }
     .section-spot::before {
         content: '';
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.95);
-        box-shadow: 0 0 0 4px rgba(255,255,255,0.12);
+        background: var(--stg-maroon);
+        box-shadow: 0 0 0 4px rgba(127,0,0,0.10);
     }
     .panel-head h3 {
         margin: 0;
@@ -455,8 +456,8 @@
         position: fixed;
         inset: 0;
         padding: 24px 16px;
-        background: rgba(15,23,42,0.62);
-        backdrop-filter: blur(10px);
+        background: rgba(15,23,42,0.38);
+        backdrop-filter: blur(6px);
         z-index: 1000;
         justify-content: center;
         align-items: flex-start;
@@ -465,20 +466,21 @@
     .modal-box {
         width: min(980px, 100%);
         max-width: 96vw;
-        border-radius: 28px;
+        border-radius: 22px;
         overflow: hidden;
-        background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(249,250,251,0.96));
-        border: 1px solid rgba(255,255,255,0.76);
-        box-shadow: 0 34px 90px rgba(15,23,42,0.32);
+        background: #ffffff;
+        border: 1px solid rgba(148,163,184,0.16);
+        box-shadow: 0 24px 60px rgba(15,23,42,0.14);
     }
     .modal-head {
-        padding: 24px 26px 18px;
-        border-bottom: 1px solid rgba(127,0,0,0.10);
+        padding: 22px 24px 16px;
+        border-bottom: 1px solid rgba(148,163,184,0.14);
+        background: #ffffff;
     }
     .modal-head h3 {
         margin: 0;
         color: var(--stg-maroon);
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 900;
     }
     .modal-head p {
@@ -494,18 +496,22 @@
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        padding: 18px 26px 26px;
-        background: linear-gradient(to top, rgba(255,255,255,0.98) 74%, rgba(255,255,255,0.88) 90%, rgba(255,255,255,0));
-        border-top: 1px solid rgba(127,0,0,0.10);
+        padding: 16px 24px 20px;
+        background: #ffffff;
+        border-top: 1px solid rgba(148,163,184,0.14);
     }
     .btn-cancel {
-        padding: 12px 18px;
-        border-radius: 14px;
+        padding: 11px 16px;
+        border-radius: 12px;
         border: 1px solid rgba(148,163,184,0.22);
-        background: rgba(255,255,255,0.92);
+        background: #ffffff;
         color: #334155;
         font-weight: 800;
         cursor: pointer;
+    }
+    .modal-head .section-spot {
+        margin-bottom: 10px;
+        box-shadow: none;
     }
 
     .alert {

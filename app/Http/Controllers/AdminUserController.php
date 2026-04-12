@@ -47,8 +47,9 @@ class AdminUserController extends Controller
         $this->ensureCanManageUsers();
 
         $request->validate([
-            'user_role' => ['required', Rule::in(['student', 'admin', 'superadmin'])],
+            'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
             'status' => ['required', Rule::in(['active', 'inactive'])],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
         ]);
 
         if ($this->isProtectedUser($user)) {
@@ -59,6 +60,7 @@ class AdminUserController extends Controller
         $originalStatus = $user->status ?? 'active';
 
         $user->user_role = User::normalizeRole($request->user_role);
+        $user->email = trim((string) $request->email);
 
         if (Schema::hasColumn('users', 'status')) {
             $user->status = $request->status;
@@ -263,7 +265,7 @@ class AdminUserController extends Controller
     {
         return match ($this->resolveUserSource($user)) {
             'superadmin' => 'Super Admin',
-            'admin' => 'Admin',
+            'admin' => 'Student Assistant',
             default => 'Student',
         };
     }
@@ -272,7 +274,7 @@ class AdminUserController extends Controller
     {
         return match (User::normalizeRole($role)) {
             User::ROLE_SUPERADMIN => 'Super Admin',
-            User::ROLE_ADMIN => 'Admin',
+            User::ROLE_ADMIN => 'Student Assistant',
             default => 'Student',
         };
     }

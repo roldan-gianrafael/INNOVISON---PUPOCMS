@@ -1623,7 +1623,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
     $settingsUrl = url('/admin/settings');
     $userManagementUrl = url('/admin/user-management');
-    $assistantAccountsUrl = url('/admin/student-assistants');
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
     $assistantEndpoint = $isStudentAssistant ? route('assistant.intent') : route('admin.assistant.intent');
     $displayName = optional($authUser)->name ?? 'Clinic User';
@@ -1632,9 +1631,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $brandLogo = asset('images/clinic_logo.png');
     $roleLabelMap = [
         'superadmin' => 'Super Admin',
-        'admin' => 'Admin',
-        'super_admin' => 'Super Admin (Legacy)',
-        'student_assistant' => 'Admin (Legacy)',
+        'admin' => 'Student Assistant',
+        'super_admin' => 'Super Admin',
+        'student_assistant' => 'Student Assistant',
     ];
     $displayRole = $roleLabelMap[$currentRole] ?? ucfirst($currentRole ?: 'user');
     $medicineAlertsQuery = \App\Models\Item::query()
@@ -1723,17 +1722,14 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     <span class="sidebar-label">Student Health Form</span>
     </a>
       @if($isAdminLike)
-          <a href="{{ $assistantAccountsUrl }}" class="{{ Request::is('admin/student-assistants*') ? 'active' : '' }}">
-            <span class="sidebar-short">SA</span><span class="sidebar-label">Student Assistants</span>
+          <a href="{{ $userManagementUrl }}" class="{{ Request::is('admin/user-management*') ? 'active' : '' }}">
+            <span class="sidebar-short">UM</span><span class="sidebar-label">User Management</span>
           </a>
           <a href="{{ route('admin.logs') }}" class="{{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
             <span class="sidebar-short">LG</span><span class="sidebar-label">Audit Trail</span>
           </a>
           <a href="{{ $settingsUrl }}" class="{{ Request::is('admin/settings*') ? 'active' : '' }}">
             <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>
-          </a>
-          <a href="{{ $userManagementUrl }}" class="{{ Request::is('admin/user-management*') ? 'active' : '' }}">
-            <span class="sidebar-short">UM</span><span class="sidebar-label">User Management</span>
           </a>
       @endif
       <a href="{{ $apiTestingUrl }}" class="{{ (Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">

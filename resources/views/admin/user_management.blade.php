@@ -649,9 +649,16 @@
                             <label>Role</label>
                             <select name="user_role" id="detailRole">
                                 <option value="student">Student</option>
-                                <option value="admin">Admin</option>
-                                <option value="superadmin">Super Admin</option>
+                                <option value="student_assistant">Student Assistant</option>
+                                <option value="super_admin">Super Admin</option>
                             </select>
+                        </div>
+                        <div class="um-field">
+                            <label id="detailEmailLabel">Gmail Account</label>
+                            <input type="email" name="email" id="detailEditEmail" placeholder="Enter Gmail account">
+                            <div class="um-note" id="emailRoleNote" style="margin-top: 6px;">
+                                Use a separate Gmail account for admin-side access.
+                            </div>
                         </div>
                         <div class="um-field">
                             <label>Status</label>
@@ -691,6 +698,8 @@
     const detailAvatar = document.getElementById('detailAvatar');
     const detailName = document.getElementById('detailName');
     const detailEmail = document.getElementById('detailEmail');
+    const detailEditEmail = document.getElementById('detailEditEmail');
+    const detailEmailLabel = document.getElementById('detailEmailLabel');
     const detailIdentifier = document.getElementById('detailIdentifier');
     const detailSource = document.getElementById('detailSource');
     const detailUpdated = document.getElementById('detailUpdated');
@@ -722,17 +731,24 @@
             detailIdentifier.value = button.dataset.studentId || button.dataset.id || '';
             detailSource.value = button.dataset.sourceLabel || button.dataset.source || '';
             detailUpdated.value = button.dataset.updated || 'N/A';
-            detailRole.value = button.dataset.role || 'student';
+            const normalizedRole = (() => {
+                const raw = (button.dataset.role || 'student').toLowerCase();
+                if (raw === 'admin' || raw === 'student_assistant' || raw === 'studentassistant' || raw === 'assistant') {
+                    return 'student_assistant';
+                }
+                if (raw === 'superadmin' || raw === 'super_admin') {
+                    return 'super_admin';
+                }
+                return 'student';
+            })();
+            detailRole.value = normalizedRole;
             detailStatus.value = button.dataset.status || 'active';
 
-            const rawRole = button.dataset.role || 'student';
-            if (![...detailRole.options].some((option) => option.value === rawRole)) {
-                const externalRoleOption = document.createElement('option');
-                externalRoleOption.value = rawRole;
-                externalRoleOption.textContent = button.dataset.roleLabel || rawRole;
-                detailRole.appendChild(externalRoleOption);
-                detailRole.value = rawRole;
-            }
+            detailEditEmail.value = button.dataset.email || '';
+            detailEmailLabel.textContent = normalizedRole === 'student' ? 'Student Gmail Account' : 'Admin Gmail Account';
+            emailRoleNote.textContent = normalizedRole === 'student'
+                ? 'This email stays with the student account.'
+                : 'Use a separate Gmail account for admin-side access.';
 
             if (avatarUrl) {
                 detailAvatar.innerHTML = `<img src="${avatarUrl}" alt="">`;
@@ -751,10 +767,21 @@
             });
             deactivateBtn.disabled = !canEdit;
             externalNote.style.display = canEdit ? 'none' : 'block';
+            detailEditEmail.readOnly = !canEdit;
 
             deleteForm.style.display = canEdit ? 'block' : 'none';
             settingsModal.classList.add('show');
         });
+    });
+
+    detailRole.addEventListener('change', () => {
+        if (detailRole.value === 'student') {
+            detailEmailLabel.textContent = 'Student Gmail Account';
+            emailRoleNote.textContent = 'This email stays with the student account.';
+        } else {
+            detailEmailLabel.textContent = 'Admin Gmail Account';
+            emailRoleNote.textContent = 'Use a separate Gmail account for admin-side access.';
+        }
     });
 
     deactivateBtn.addEventListener('click', () => {

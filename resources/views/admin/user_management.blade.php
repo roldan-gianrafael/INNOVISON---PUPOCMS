@@ -1626,6 +1626,7 @@
             adminHubSection.classList.toggle('is-hidden', managementView === 'account-access');
         }
         accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
+        detailAccessLevel.disabled = !showAdminAccessLevel || !canEdit;
         adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
         adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
         adminHubSection.style.display = canEdit ? '' : 'none';
@@ -1731,12 +1732,14 @@
             detailEmailLabel.textContent = 'Student Email';
             emailRoleNote.textContent = 'This email stays with the student account.';
             accessLevelWrap.style.display = 'none';
+            detailAccessLevel.disabled = true;
             adminEmailWrap.style.display = 'none';
             adminOfficeWrap.style.display = 'none';
         } else {
             detailEmailLabel.textContent = 'Student Email';
             emailRoleNote.textContent = 'Keep this email for the student side.';
             accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
+            detailAccessLevel.disabled = !isAdmin;
             adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
             adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
             detailAccessLevelLabel.textContent = 'Admin Type';

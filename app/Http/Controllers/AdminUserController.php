@@ -111,8 +111,9 @@ class AdminUserController extends Controller
 
         $originalRole = $user->user_role;
         $originalStatus = $user->status ?? 'active';
+        $normalizedRequestedRole = User::normalizeRole($request->user_role);
 
-        $user->user_role = User::normalizeRole($request->user_role);
+        $user->user_role = $normalizedRequestedRole;
         $user->email = trim((string) $request->email);
         $adminLoginEmail = trim((string) $request->admin_email);
 
@@ -123,7 +124,7 @@ class AdminUserController extends Controller
         $user->save();
 
         $linkedAdmin = $this->findLinkedAdminProfile($user);
-        if (in_array(User::normalizeRole($request->user_role), [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true)) {
+        if (in_array($normalizedRequestedRole, [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true)) {
             if (!$linkedAdmin) {
                 $linkedAdmin = new Admin();
             }
@@ -148,9 +149,11 @@ class AdminUserController extends Controller
                 $linkedAdmin->name = $user->name;
             }
             if (Admin::hasColumn('access_level')) {
-                $linkedAdmin->access_level = $request->filled('access_level')
-                    ? $request->access_level
-                    : (User::normalizeRole($request->user_role) === User::ROLE_SUPERADMIN ? 'superadmin' : 'clinic_staff');
+                $linkedAdmin->access_level = match ($normalizedRequestedRole) {
+                    User::ROLE_SUPERADMIN => 'superadmin',
+                    User::ROLE_ADMIN => $request->filled('access_level') ? $request->access_level : 'clinic_staff',
+                    default => null,
+                };
             }
             if (Admin::hasColumn('status')) {
                 $linkedAdmin->status = $request->status;

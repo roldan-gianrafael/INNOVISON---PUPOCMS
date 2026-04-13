@@ -840,6 +840,14 @@
         display: none;
     }
 
+    #settingsModal.admin-hub-mode #accountAccessSection {
+        display: none !important;
+    }
+
+    #settingsModal.account-access-mode #accountAccessSection {
+        display: block !important;
+    }
+
     .um-section-title {
         margin: 0 0 4px;
         font-size: 1rem;
@@ -1528,6 +1536,10 @@
 
     const applySettingsSectionMode = (managementView, canEdit, canOnboard) => {
         const isAdminHubOnly = managementView === 'admin-hub';
+        if (settingsModal) {
+            settingsModal.classList.toggle('admin-hub-mode', isAdminHubOnly);
+            settingsModal.classList.toggle('account-access-mode', !isAdminHubOnly);
+        }
 
         if (accountAccessSection) {
             accountAccessSection.classList.toggle('is-hidden', isAdminHubOnly);

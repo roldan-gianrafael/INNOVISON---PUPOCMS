@@ -99,28 +99,30 @@
     }
 
     html[data-theme="dark"] .um-mode-btn {
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.94));
-        border-color: rgba(148, 163, 184, 0.14);
-        box-shadow: 0 22px 36px rgba(0, 0, 0, 0.24);
+        background: linear-gradient(145deg, #570012 0%, #7a0d18 36%, #b07b10 100%);
+        border-color: rgba(255, 229, 158, 0.22);
+        box-shadow:
+            0 24px 38px rgba(0, 0, 0, 0.34),
+            0 52px 72px -38px rgba(176, 123, 16, 0.52);
     }
 
     html[data-theme="dark"] .um-mode-btn.active {
         border-color: rgba(248, 113, 113, 0.32);
-        background: linear-gradient(180deg, rgba(35, 13, 18, 0.98), rgba(27, 14, 20, 0.95));
+        background: linear-gradient(145deg, #650014 0%, #86111b 38%, #c08a11 100%);
     }
 
     html[data-theme="dark"] .um-mode-btn .eyebrow {
-        background: rgba(248, 113, 113, 0.14);
-        color: #fecaca;
+        background: rgba(255, 248, 220, 0.12);
+        color: #fff1bf;
     }
 
     html[data-theme="dark"] .um-mode-btn h3,
     html[data-theme="dark"] .um-panel-intro {
-        color: #fff;
+        color: #fff8e4;
     }
 
     html[data-theme="dark"] .um-mode-btn p {
-        color: #cbd5e1;
+        color: rgba(255, 248, 228, 0.88);
     }
 
     html[data-theme="dark"] .um-panel-header h2,
@@ -226,25 +228,54 @@
 
     .um-mode-btn {
         width: min(360px, 100%);
-        border: 1px solid rgba(128, 0, 0, 0.12);
-        border-radius: 22px;
-        padding: 24px 22px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
-        box-shadow: 0 18px 30px rgba(15, 23, 42, 0.06);
+        min-height: 280px;
+        border: 1px solid rgba(128, 0, 0, 0.14);
+        border-radius: 28px;
+        padding: 28px 24px 30px;
+        background: linear-gradient(145deg, #6f0015 0%, #8f0f19 34%, #c58d11 100%);
+        box-shadow:
+            0 24px 40px rgba(111, 0, 21, 0.22),
+            0 48px 60px -32px rgba(197, 141, 17, 0.58);
         text-align: left;
         cursor: pointer;
-        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+        position: relative;
+        overflow: hidden;
+        transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
+    }
+
+    .um-mode-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.08));
+        pointer-events: none;
+    }
+
+    .um-mode-btn::after {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        bottom: -22px;
+        height: 36px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(111, 0, 21, 0.30) 0%, rgba(111, 0, 21, 0.10) 42%, transparent 78%);
+        filter: blur(12px);
+        pointer-events: none;
     }
 
     .um-mode-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 22px 38px rgba(15, 23, 42, 0.08);
+        transform: translateY(-4px);
+        box-shadow:
+            0 28px 44px rgba(111, 0, 21, 0.26),
+            0 52px 72px -34px rgba(197, 141, 17, 0.62);
     }
 
     .um-mode-btn.active {
-        border-color: rgba(128, 0, 0, 0.28);
-        background: linear-gradient(180deg, rgba(255,248,248,0.98), rgba(255,241,242,0.94));
-        box-shadow: 0 24px 42px rgba(128, 0, 0, 0.12);
+        border-color: rgba(255, 229, 158, 0.55);
+        box-shadow:
+            0 30px 50px rgba(111, 0, 21, 0.30),
+            0 56px 78px -36px rgba(197, 141, 17, 0.70);
     }
 
     .um-mode-btn .eyebrow {
@@ -253,26 +284,56 @@
         gap: 8px;
         padding: 6px 12px;
         border-radius: 999px;
-        background: rgba(128, 0, 0, 0.08);
-        color: #800000;
+        background: rgba(255, 248, 220, 0.18);
+        color: #fff4cf;
         font-size: .76rem;
         font-weight: 900;
         letter-spacing: .08em;
         text-transform: uppercase;
+        position: relative;
+        z-index: 1;
+    }
+
+    .um-mode-icon {
+        width: 68px;
+        height: 68px;
+        margin: 18px 0 10px;
+        border-radius: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 248, 220, 0.14);
+        border: 1px solid rgba(255, 244, 207, 0.28);
+        color: #fff8e4;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.24),
+            0 18px 28px rgba(56, 9, 17, 0.22);
+        position: relative;
+        z-index: 1;
+        animation: umModeFloat 3.8s ease-in-out infinite;
+    }
+
+    .um-mode-icon svg {
+        width: 30px;
+        height: 30px;
     }
 
     .um-mode-btn h3 {
         margin: 14px 0 8px;
         font-size: 1.24rem;
         font-weight: 900;
-        color: #111827;
+        color: #fff8e4;
+        position: relative;
+        z-index: 1;
     }
 
     .um-mode-btn p {
         margin: 0;
-        color: #64748b;
+        color: rgba(255, 248, 228, 0.92);
         line-height: 1.6;
         font-size: .95rem;
+        position: relative;
+        z-index: 1;
     }
 
     .um-mode-panel {
@@ -317,6 +378,15 @@
         background: transparent;
         color: #800000;
         border: 1px solid rgba(128, 0, 0, 0.16);
+    }
+
+    @keyframes umModeFloat {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-8px);
+        }
     }
 
     .um-summary-grid {
@@ -745,6 +815,10 @@
         background: linear-gradient(180deg, rgba(239, 246, 255, 0.92), rgba(248, 250, 252, 0.95));
     }
 
+    .um-section-block.is-hidden {
+        display: none;
+    }
+
     .um-section-title {
         margin: 0 0 4px;
         font-size: 1rem;
@@ -963,11 +1037,25 @@
     <div class="um-mode-picker">
         <button type="button" class="um-mode-btn" data-mode-button="account-access">
             <span class="eyebrow">Users Table</span>
+            <span class="um-mode-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M19 8v6"/>
+                    <path d="M22 11h-6"/>
+                </svg>
+            </span>
             <h3>Account Access</h3>
             <p>Open the clinic login view for managed users. This is where we control the student email, clinic role, and active or inactive access.</p>
         </button>
         <button type="button" class="um-mode-btn" data-mode-button="admin-hub">
             <span class="eyebrow">Admins Table</span>
+            <span class="um-mode-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/>
+                    <path d="M9.5 12l1.7 1.7 3.3-3.4"/>
+                </svg>
+            </span>
             <h3>Admin Hub Profile</h3>
             <p>Open the clinic-only admin hub view. This is where we handle admin login email, admin type, office, and shared admin profile context.</p>
         </button>
@@ -1016,11 +1104,12 @@
                                 data-source="{{ $record['source'] }}"
                                 data-source-label="{{ $record['source_label'] }}"
                                 data-student-id="{{ $record['student_id'] }}"
-                                data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
-                                data-avatar-letter="{{ $record['avatar_letter'] }}"
-                                data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
-                                data-meta='@json($record["meta"])'
-                            >
+                            data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
+                            data-avatar-letter="{{ $record['avatar_letter'] }}"
+                            data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
+                            data-management-view="account-access"
+                            data-meta='@json($record["meta"])'
+                        >
                                 <td>
                                     <div class="um-user">
                                         <div class="um-avatar">
@@ -1107,11 +1196,12 @@
                                 data-source="{{ $record['source'] }}"
                                 data-source-label="{{ $record['source_label'] }}"
                                 data-student-id="{{ $record['student_id'] }}"
-                                data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
-                                data-avatar-letter="{{ $record['avatar_letter'] }}"
-                                data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
-                                data-meta='@json($record["meta"])'
-                            >
+                            data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
+                            data-avatar-letter="{{ $record['avatar_letter'] }}"
+                            data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
+                            data-management-view="admin-hub"
+                            data-meta='@json($record["meta"])'
+                        >
                                 <td>
                                     <div class="um-user">
                                         <div class="um-avatar">
@@ -1290,7 +1380,7 @@
                     <form method="POST" id="settingsForm">
                         @csrf
                         @method('PUT')
-                        <div class="um-section-block account-access">
+                        <div class="um-section-block account-access" id="accountAccessSection">
                             <div class="um-section-kicker">Users Table</div>
                             <h4 class="um-section-title">Account Access</h4>
                             <p class="um-section-copy">This controls the clinic login role, the student-side email, and whether the account can enter the clinic system.</p>
@@ -1390,6 +1480,7 @@
     const detailEditEmail = document.getElementById('detailEditEmail');
     const detailEmailLabel = document.getElementById('detailEmailLabel');
     const emailRoleNote = document.getElementById('emailRoleNote');
+    const accountAccessSection = document.getElementById('accountAccessSection');
     const accessLevelWrap = document.getElementById('accessLevelWrap');
     const detailAccessLevel = document.getElementById('detailAccessLevel');
     const detailAccessLevelLabel = document.getElementById('detailAccessLevelLabel');
@@ -1472,6 +1563,7 @@
         const canEdit = row.dataset.canEdit === '1';
         const avatarUrl = row.dataset.avatarUrl || '';
         const avatarLetter = row.dataset.avatarLetter || 'U';
+        const managementView = row.dataset.managementView || 'account-access';
 
         detailName.value = row.dataset.name || '';
         detailEmail.value = row.dataset.email || '';
@@ -1510,10 +1602,16 @@
         detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
         const showAdminAccessLevel = normalizedRole === 'admin';
         const hasAdminHub = normalizedRole === 'admin' || normalizedRole === 'super_admin';
+        if (accountAccessSection) {
+            accountAccessSection.classList.toggle('is-hidden', managementView === 'admin-hub');
+        }
+        if (adminHubSection) {
+            adminHubSection.classList.toggle('is-hidden', managementView === 'account-access');
+        }
         accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
         adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
         adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
-        adminHubSection.style.display = canEdit ? 'block' : 'none';
+        adminHubSection.style.display = canEdit ? '' : 'none';
 
         detailEditEmail.value = row.dataset.email || '';
         detailEmailLabel.textContent = 'Student Email';

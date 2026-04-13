@@ -1190,10 +1190,10 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Admin Login Email</th>
+                            <th>Email</th>
                             <th>Admin Type</th>
                             <th>Office</th>
-                            <th>Hub Status</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>

@@ -660,7 +660,7 @@
         </div>
         <div class="col-md-7 mb-3">
             <label class="form-label">Parent's Name / Guardian / Spouse<span class="required-mark">*</span></label>
-            <input type="text" name="guardian_name" class="form-control" value="{{ old('guardian_name') }}" required>
+            <input type="text" name="guardian_name" class="form-control" value="{{ old('guardian_name') }}">
         </div>
         <div class="col-md-2 mb-3">
             <label class="form-label">Landline</label>

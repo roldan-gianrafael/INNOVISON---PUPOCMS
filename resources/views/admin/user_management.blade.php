@@ -113,16 +113,16 @@
 
     html[data-theme="dark"] .um-mode-btn .eyebrow {
         background: rgba(255, 248, 220, 0.12);
-        color: #fff1bf;
+        color: #ffffff;
     }
 
     html[data-theme="dark"] .um-mode-btn h3,
     html[data-theme="dark"] .um-panel-intro {
-        color: #fff8e4;
+        color: #ffffff;
     }
 
     html[data-theme="dark"] .um-mode-btn p {
-        color: rgba(255, 248, 228, 0.88);
+        color: rgba(255, 255, 255, 0.9);
     }
 
     html[data-theme="dark"] .um-panel-header h2,
@@ -285,7 +285,7 @@
         padding: 6px 12px;
         border-radius: 999px;
         background: rgba(255, 248, 220, 0.18);
-        color: #fff4cf;
+        color: #ffffff;
         font-size: .76rem;
         font-weight: 900;
         letter-spacing: .08em;
@@ -304,7 +304,7 @@
         justify-content: center;
         background: rgba(255, 248, 220, 0.14);
         border: 1px solid rgba(255, 244, 207, 0.28);
-        color: #fff8e4;
+        color: #ffffff;
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.24),
             0 18px 28px rgba(56, 9, 17, 0.22);
@@ -329,7 +329,7 @@
 
     .um-mode-btn p {
         margin: 0;
-        color: rgba(255, 248, 228, 0.92);
+        color: rgba(255, 255, 255, 0.95);
         line-height: 1.6;
         font-size: .95rem;
         position: relative;
@@ -1036,7 +1036,6 @@
 
     <div class="um-mode-picker">
         <button type="button" class="um-mode-btn" data-mode-button="account-access">
-            <span class="eyebrow">Users Table</span>
             <span class="um-mode-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -1049,7 +1048,6 @@
             <p>Open the clinic login view for managed users. This is where we control the student email, clinic role, and active or inactive access.</p>
         </button>
         <button type="button" class="um-mode-btn" data-mode-button="admin-hub">
-            <span class="eyebrow">Admins Table</span>
             <span class="um-mode-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/>
@@ -1066,7 +1064,7 @@
             <div class="um-panel-header">
                 <div>
                     <h2>Account Access</h2>
-                    <p>Managed users already added in the clinic CMS are listed here. Use this view for superadmin, admin-clinic staff, and student assistant access.</p>
+                    <p>Managed users already added in the clinic CMS are listed here.</p>
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" class="um-btn um-btn-ghost" data-back-to-modes>Back</button>
@@ -1434,7 +1432,7 @@
                             </div>
                             <div class="um-field" id="adminOfficeWrap" style="display:none;">
                                 <label>Office</label>
-                                <input type="text" name="office" id="detailOffice" placeholder="Enter clinic office or desk assignment">
+                                <input type="text" name="office" id="detailOffice" placeholder="Office or Department">
                             </div>
                         </div>
                         <div class="um-note" id="externalNote" style="display:none; margin-top: 6px;">

@@ -237,14 +237,16 @@ class AdminController extends Controller
     {
         $search = trim((string) $request->query('search', ''));
         $source = trim((string) $request->query('source', 'faculty'));
+        $dbTable = trim((string) $request->query('db_table', 'users'));
         $availableSystems = $this->externalApiTestingSystems();
         $selectedSystem = trim((string) $request->query('system', ($availableSystems[0] ?? '')));
         $results = [];
+        $databaseInfo = [];
         $apiResponseMeta = null;
         $errorMessage = null;
         $errorDetails = null;
 
-        $canRunWithoutSearch = in_array($source, ['admin_api', 'admin_options'], true);
+        $canRunWithoutSearch = in_array($source, ['admin_api', 'admin_options', 'database_info'], true);
 
         if ($search !== '' || $canRunWithoutSearch) {
             $facultyEndpoint = trim((string) config('services.pupt_flss.faculty_profiles_url', ''));
@@ -253,7 +255,9 @@ class AdminController extends Controller
             $internalMedicalStatusBaseEndpoint = url('/api/external/students');
             $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
 
-            if ($source === 'admin_api') {
+            if ($source === 'database_info') {
+                $endpoint = 'local-database://' . $dbTable;
+            } elseif ($source === 'admin_api') {
                 $endpoint = $internalAdminEndpoint;
             } elseif ($source === 'admin_options') {
                 $endpoint = $internalAdminOptionsEndpoint;
@@ -374,6 +378,21 @@ class AdminController extends Controller
                         if (empty($results)) {
                             $errorMessage = 'No student medical status record matched the provided Student ID.';
                         }
+                    } elseif ($source === 'database_info') {
+                        $dbTable = in_array($dbTable, ['users', 'admins'], true) ? $dbTable : 'users';
+                        $databaseInfo = $this->searchDatabaseInfoRecords($dbTable, $search);
+                        $apiResponseMeta = [
+                            'status' => 200,
+                            'ok' => true,
+                            'endpoint' => $endpoint,
+                            'result_count' => count($databaseInfo),
+                            'auth_mode' => 'superadmin-local',
+                            'source' => $source,
+                        ];
+
+                        if (empty($databaseInfo)) {
+                            $errorMessage = 'No database records matched the current search.';
+                        }
                     } else {
                         $queryParams = [
                             'search' => $search,
@@ -424,13 +443,99 @@ class AdminController extends Controller
         return view('admin.api-testing', [
             'search' => $search,
             'source' => $source,
+            'dbTable' => $dbTable,
             'selectedSystem' => $selectedSystem,
             'availableSystems' => $availableSystems,
             'results' => $results,
+            'databaseInfo' => $databaseInfo,
             'apiResponseMeta' => $apiResponseMeta,
             'errorMessage' => $errorMessage,
             'errorDetails' => $errorDetails,
         ]);
+    }
+
+    public function updateApiTestingDatabaseRecord(Request $request, string $table, int $id)
+    {
+        abort_unless(User::normalizeRole(optional(Auth::user())->user_role ?? '') === User::ROLE_SUPERADMIN, 403);
+
+        if ($table === 'users') {
+            $request->validate([
+                'first_name' => 'nullable|string|max:255',
+                'last_name' => 'nullable|string|max:255',
+                'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($id)],
+                'student_id' => 'nullable|string|max:255',
+                'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
+                'status' => ['nullable', Rule::in(['active', 'inactive'])],
+            ]);
+
+            $user = User::findOrFail($id);
+            $user->first_name = $request->input('first_name');
+            $user->last_name = $request->input('last_name');
+            $user->name = trim(implode(' ', array_filter([$request->input('first_name'), $request->input('last_name')]))) ?: $user->name;
+            $user->email = $request->input('email');
+            $user->student_id = $request->input('student_id');
+            $user->user_role = User::normalizeRole($request->input('user_role'));
+            if (Schema::hasColumn('users', 'status')) {
+                $user->status = $request->input('status', 'active');
+            }
+            $user->save();
+
+            return redirect()->route('admin.api-testing', ['source' => 'database_info', 'db_table' => 'users'])->with('success', 'User record updated.');
+        }
+
+        abort_unless($table === 'admins', 404);
+
+        $request->validate([
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'office' => 'nullable|string|max:255',
+            'access_level' => 'nullable|string|max:255',
+            'status' => ['nullable', Rule::in(['active', 'inactive'])],
+        ]);
+
+        $admin = Admin::findOrFail($id);
+        if (Admin::hasColumn('first_name')) {
+            $admin->first_name = $request->input('first_name');
+        }
+        if (Admin::hasColumn('last_name')) {
+            $admin->last_name = $request->input('last_name');
+        }
+        if (Admin::hasColumn('name')) {
+            $admin->name = trim(implode(' ', array_filter([$request->input('first_name'), $request->input('last_name')]))) ?: $admin->name;
+        }
+        if (Admin::hasColumn('email')) {
+            $admin->email = $request->input('email');
+        }
+        if (Admin::hasColumn('email_address')) {
+            $admin->email_address = $request->input('email');
+        }
+        if (Admin::hasColumn('office')) {
+            $admin->office = $request->input('office');
+        }
+        if (Admin::hasColumn('access_level')) {
+            $admin->access_level = $request->input('access_level');
+        }
+        if (Admin::hasColumn('status')) {
+            $admin->status = $request->input('status', 'active');
+        }
+        $admin->save();
+
+        return redirect()->route('admin.api-testing', ['source' => 'database_info', 'db_table' => 'admins'])->with('success', 'Admin record updated.');
+    }
+
+    public function deleteApiTestingDatabaseRecord(string $table, int $id)
+    {
+        abort_unless(User::normalizeRole(optional(Auth::user())->user_role ?? '') === User::ROLE_SUPERADMIN, 403);
+
+        if ($table === 'users') {
+            User::findOrFail($id)->delete();
+            return redirect()->route('admin.api-testing', ['source' => 'database_info', 'db_table' => 'users'])->with('success', 'User record deleted.');
+        }
+
+        abort_unless($table === 'admins', 404);
+        Admin::findOrFail($id)->delete();
+        return redirect()->route('admin.api-testing', ['source' => 'database_info', 'db_table' => 'admins'])->with('success', 'Admin record deleted.');
     }
 
     private function externalApiTestingSystems(): array
@@ -463,6 +568,85 @@ class AdminController extends Controller
             'system_header_name' => trim((string) config('services.external_admin_profile.system_header', 'X-External-System')),
             'api_key_preview' => substr($apiKey, 0, 8) . '...' . substr($apiKey, -6),
         ], null];
+    }
+
+    private function searchDatabaseInfoRecords(string $table, string $search): array
+    {
+        if ($table === 'admins') {
+            $query = Admin::query();
+
+            if ($search !== '') {
+                $query->where(function ($builder) use ($search) {
+                    foreach (['admin_id', 'name', 'first_name', 'last_name', 'email', 'email_address', 'office', 'access_level', 'status'] as $column) {
+                        if (Admin::hasColumn($column)) {
+                            $builder->orWhere($column, 'like', '%' . $search . '%');
+                        }
+                    }
+                });
+            }
+
+            return $query->orderByDesc('admin_id')
+                ->limit(100)
+                ->get()
+                ->map(function (Admin $admin) {
+                    return [
+                        'id' => $admin->admin_id,
+                        'name' => $admin->name ?: trim(implode(' ', array_filter([$admin->first_name, $admin->last_name]))),
+                        'email' => $admin->email_address ?: $admin->email,
+                        'status' => $admin->status ?? 'N/A',
+                        'primary' => [
+                            'Admin ID' => $admin->admin_id,
+                            'First Name' => $admin->first_name ?? 'N/A',
+                            'Last Name' => $admin->last_name ?? 'N/A',
+                            'Email' => $admin->email_address ?: ($admin->email ?? 'N/A'),
+                            'Office' => $admin->office ?? 'N/A',
+                            'Access Level' => $admin->access_level ?? 'N/A',
+                            'Status' => $admin->status ?? 'N/A',
+                            'Updated At' => optional($admin->updated_at)->toIso8601String() ?? 'N/A',
+                        ],
+                        'raw' => $admin->toArray(),
+                    ];
+                })
+                ->values()
+                ->all();
+        }
+
+        $query = User::query();
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                foreach (['id', 'student_id', 'name', 'first_name', 'last_name', 'email', 'user_role', 'status'] as $column) {
+                    if (Schema::hasColumn('users', $column)) {
+                        $builder->orWhere($column, 'like', '%' . $search . '%');
+                    }
+                }
+            });
+        }
+
+        return $query->orderByDesc('id')
+            ->limit(100)
+            ->get()
+            ->map(function (User $user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name ?: trim(implode(' ', array_filter([$user->first_name, $user->last_name]))),
+                    'email' => $user->email,
+                    'status' => $user->status ?? 'N/A',
+                    'primary' => [
+                        'User ID' => $user->id,
+                        'Student ID' => $user->student_id ?? 'N/A',
+                        'First Name' => $user->first_name ?? 'N/A',
+                        'Last Name' => $user->last_name ?? 'N/A',
+                        'Email' => $user->email ?? 'N/A',
+                        'Role' => $user->user_role ?? 'N/A',
+                        'Status' => $user->status ?? 'N/A',
+                        'Updated At' => optional($user->updated_at)->toIso8601String() ?? 'N/A',
+                    ],
+                    'raw' => $user->toArray(),
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     private function searchLocalAdminsForApiTesting(string $search): array

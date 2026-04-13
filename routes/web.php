@@ -129,6 +129,8 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
         Route::put('/admin/settings/update', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
         Route::put('/admin/profile/update', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
+        Route::put('/admin/api-testing/database/{table}/{id}', [AdminController::class, 'updateApiTestingDatabaseRecord'])->name('admin.api-testing.database.update');
+        Route::delete('/admin/api-testing/database/{table}/{id}', [AdminController::class, 'deleteApiTestingDatabaseRecord'])->name('admin.api-testing.database.delete');
 
         Route::post('/admin/inventory/store', [AdminController::class, 'storeItem'])->name('admin.inventory.store');
         Route::put('/admin/inventory/{id}', [AdminController::class, 'updateItem'])->name('admin.inventory.update');

@@ -99,6 +99,8 @@ class AdminUserController extends Controller
 
         $originalRole = $user->user_role;
         $originalStatus = $user->status ?? 'active';
+        $requestedRoleRaw = strtolower(trim((string) $request->user_role));
+        $usesSeparateAdminEmail = in_array($requestedRoleRaw, ['student_assistant', 'studentassistant', 'assistant'], true);
         $normalizedRequestedRole = User::normalizeRole($request->user_role);
 
         $user->user_role = $normalizedRequestedRole;
@@ -128,10 +130,10 @@ class AdminUserController extends Controller
                 $linkedAdmin->last_name = $user->last_name;
             }
             if (Admin::hasColumn('email')) {
-                $linkedAdmin->email = $adminLoginEmail !== '' ? $adminLoginEmail : $user->email;
+                $linkedAdmin->email = $usesSeparateAdminEmail && $adminLoginEmail !== '' ? $adminLoginEmail : $user->email;
             }
             if (Admin::hasColumn('email_address')) {
-                $linkedAdmin->email_address = $adminLoginEmail !== '' ? $adminLoginEmail : $user->email;
+                $linkedAdmin->email_address = $usesSeparateAdminEmail && $adminLoginEmail !== '' ? $adminLoginEmail : $user->email;
             }
             if (Admin::hasColumn('name')) {
                 $linkedAdmin->name = $user->name;
@@ -203,6 +205,8 @@ class AdminUserController extends Controller
         ]);
 
         $normalizedRequestedRole = User::normalizeRole($request->user_role);
+        $requestedRoleRaw = strtolower(trim((string) $request->user_role));
+        $usesSeparateAdminEmail = in_array($requestedRoleRaw, ['student_assistant', 'studentassistant', 'assistant'], true);
         $baseEmail = trim((string) $request->email);
 
         $managementView = trim((string) $request->input('management_view', 'account-access'));
@@ -214,7 +218,7 @@ class AdminUserController extends Controller
         }
 
         if ($managementView === 'admin-hub') {
-            $adminEmail = trim((string) $request->input('admin_email', '')) ?: $baseEmail;
+            $adminEmail = $baseEmail;
             $linkedAdmin = Admin::query()
                 ->where(function ($query) use ($adminEmail, $baseEmail) {
                     if (Admin::hasColumn('email')) {
@@ -304,10 +308,14 @@ class AdminUserController extends Controller
                 $linkedAdmin->name = $user->name;
             }
             if (Admin::hasColumn('email')) {
-                $linkedAdmin->email = trim((string) $request->input('admin_email', '')) ?: $user->email;
+                $linkedAdmin->email = $usesSeparateAdminEmail && trim((string) $request->input('admin_email', '')) !== ''
+                    ? trim((string) $request->input('admin_email', ''))
+                    : $user->email;
             }
             if (Admin::hasColumn('email_address')) {
-                $linkedAdmin->email_address = trim((string) $request->input('admin_email', '')) ?: $user->email;
+                $linkedAdmin->email_address = $usesSeparateAdminEmail && trim((string) $request->input('admin_email', '')) !== ''
+                    ? trim((string) $request->input('admin_email', ''))
+                    : $user->email;
             }
             if (Admin::hasColumn('access_level')) {
                 $linkedAdmin->access_level = match ($normalizedRequestedRole) {

@@ -1575,9 +1575,11 @@
         const canOnboard = options.canOnboard === true;
         const managementView = detailManagementView ? detailManagementView.value : 'account-access';
         const isStudent = detailRole.value === 'student';
+        const isStudentAssistant = detailRole.value === 'student_assistant';
         const isAdmin = detailRole.value === 'admin';
         const isSuperAdmin = detailRole.value === 'super_admin';
         const hasAdminHub = isAdmin || isSuperAdmin;
+        const usesSeparateAdminEmail = managementView !== 'admin-hub' && isStudentAssistant;
 
         applySettingsSectionMode(managementView, canEdit, canOnboard);
 
@@ -1593,9 +1595,13 @@
             emailRoleNote.textContent = 'Keep this email for the student side.';
             accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
             detailAccessLevel.disabled = !isAdmin || !(canEdit || canOnboard);
-            adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
+            adminEmailWrap.style.display = usesSeparateAdminEmail ? 'block' : 'none';
             adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
             detailAccessLevelLabel.textContent = 'Admin Type';
+        }
+
+        if (adminEmailNote) {
+            adminEmailNote.textContent = 'Use a separate login email only for Student Assistant accounts.';
         }
 
         if (detailAdminProfileStatus && !hasAdminHub) {
@@ -1732,10 +1738,6 @@
                     ? 'No linked admin hub record yet. Saving here will create a designee-only admin hub record.'
                     : 'No linked admin hub record yet. One will be created when you save an admin-side role.');
         }
-        if (adminEmailNote) {
-            adminEmailNote.textContent = 'This email is used for the admin side only.';
-        }
-
         if (avatarUrl) {
             detailAvatar.innerHTML = `<img src="${avatarUrl}" alt="">`;
         } else {

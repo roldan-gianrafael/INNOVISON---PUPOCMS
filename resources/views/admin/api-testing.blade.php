@@ -58,6 +58,145 @@
         display: none;
     }
 
+    .api-db-switch {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+    }
+
+    .api-db-btn {
+        border: 1px solid rgba(127, 29, 45, 0.16);
+        border-radius: 16px;
+        padding: 12px 18px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,244,246,0.98));
+        color: #7f1d2d;
+        font-weight: 800;
+        text-decoration: none;
+        box-shadow: 0 12px 24px rgba(127, 29, 45, 0.08);
+    }
+
+    .api-db-btn.is-active {
+        background: linear-gradient(135deg, #7f1d2d, #5b0c0e);
+        color: #fff;
+    }
+
+    .api-db-list {
+        display: grid;
+        gap: 18px;
+    }
+
+    .api-db-card {
+        border-radius: 20px;
+        padding: 20px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 244, 246, 0.98));
+        border: 1px solid rgba(127, 29, 45, 0.12);
+    }
+
+    .api-db-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .api-db-head h3 {
+        margin: 0;
+        color: #7f1d2d;
+    }
+
+    .api-db-head p {
+        margin: 4px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .api-db-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .api-db-action-btn {
+        border: 1px solid rgba(127, 29, 45, 0.16);
+        border-radius: 12px;
+        padding: 10px 14px;
+        background: #fff;
+        color: #7f1d2d;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .api-db-action-btn.delete {
+        border-color: rgba(185, 28, 28, 0.18);
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .api-db-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .api-edit-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.48);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 5000;
+    }
+
+    .api-edit-modal.show {
+        display: flex;
+    }
+
+    .api-edit-content {
+        width: min(720px, 100%);
+        border-radius: 24px;
+        background: rgba(255,255,255,0.98);
+        border: 1px solid rgba(127, 29, 45, 0.12);
+        box-shadow: 0 24px 54px rgba(15,23,42,0.18);
+        padding: 22px;
+    }
+
+    .api-edit-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 16px;
+    }
+
+    .api-edit-field label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        color: #6b7280;
+    }
+
+    .api-edit-field input,
+    .api-edit-field select {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(127, 29, 45, 0.16);
+        padding: 12px 14px;
+    }
+
+    .api-edit-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
     .api-search-form label {
         display: block;
         margin-bottom: 8px;
@@ -322,6 +461,36 @@
         border-color: rgba(255, 255, 255, 0.08);
     }
 
+    html[data-theme="dark"] .api-db-btn:not(.is-active),
+    html[data-theme="dark"] .api-db-card,
+    html[data-theme="dark"] .api-edit-content {
+        background: linear-gradient(180deg, rgba(59, 24, 33, 0.96), rgba(35, 17, 25, 0.98));
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .api-db-head h3 {
+        color: #f3d6da;
+    }
+
+    html[data-theme="dark"] .api-db-head p,
+    html[data-theme="dark"] .api-edit-field label {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .api-db-action-btn {
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+        border-color: rgba(255,255,255,0.12);
+    }
+
+    html[data-theme="dark"] .api-edit-field input,
+    html[data-theme="dark"] .api-edit-field select {
+        background: rgba(18, 18, 18, 0.55);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #f8fafc;
+    }
+
     html[data-theme="dark"] .admin-option-name,
     html[data-theme="dark"] .faculty-option-name {
         color: #f3d6da;
@@ -395,6 +564,7 @@
                     <option value="admin_api" {{ ($source ?? 'faculty') === 'admin_api' ? 'selected' : '' }}>Our Admin API</option>
                     <option value="admin_options" {{ ($source ?? 'faculty') === 'admin_options' ? 'selected' : '' }}>Our Admin Options API</option>
                     <option value="medical_status" {{ ($source ?? 'faculty') === 'medical_status' ? 'selected' : '' }}>Student Medical Status API</option>
+                    <option value="database_info" {{ ($source ?? 'faculty') === 'database_info' ? 'selected' : '' }}>Database Info</option>
                     <option value="custom" {{ ($source ?? 'faculty') === 'custom' ? 'selected' : '' }}>Custom Temp API</option>
                 </select>
             </div>
@@ -421,6 +591,13 @@
             </div>
             <button type="submit">Search API</button>
         </form>
+
+        @if(($source ?? '') === 'database_info')
+            <div class="api-db-switch">
+                <a href="{{ route('admin.api-testing', ['source' => 'database_info', 'db_table' => 'users', 'search' => $search]) }}" class="api-db-btn {{ ($dbTable ?? 'users') === 'users' ? 'is-active' : '' }}">Users</a>
+                <a href="{{ route('admin.api-testing', ['source' => 'database_info', 'db_table' => 'admins', 'search' => $search]) }}" class="api-db-btn {{ ($dbTable ?? 'users') === 'admins' ? 'is-active' : '' }}">Admins</a>
+            </div>
+        @endif
 
         @if($apiResponseMeta)
             <p class="api-testing-meta" style="margin-top: 16px;">
@@ -607,10 +784,74 @@
                 @endforeach
             </div>
         @endif
+    @elseif(($source ?? '') === 'database_info')
+        <div class="api-db-list">
+            @forelse(($databaseInfo ?? []) as $record)
+                <article class="api-db-card">
+                    <div class="api-db-head">
+                        <div>
+                            <h3>{{ $record['name'] ?: 'Unnamed Record' }}</h3>
+                            <p>{{ $record['email'] ?: 'No email available' }}</p>
+                        </div>
+                        @if(\App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '') === \App\Models\User::ROLE_SUPERADMIN)
+                            <div class="api-db-actions">
+                                <button
+                                    type="button"
+                                    class="api-db-action-btn"
+                                    data-db-edit
+                                    data-table="{{ $dbTable ?? 'users' }}"
+                                    data-id="{{ $record['id'] }}"
+                                    data-raw='@json($record["raw"])'
+                                >
+                                    Edit
+                                </button>
+                                <form method="POST" action="{{ route('admin.api-testing.database.delete', ['table' => $dbTable ?? 'users', 'id' => $record['id']]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="api-db-action-btn delete" onclick="return confirm('Delete this database record?')">Delete</button>
+                                </form>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="api-db-grid">
+                        @foreach(($record['primary'] ?? []) as $label => $value)
+                            <div class="api-field">
+                                <small>{{ $label }}</small>
+                                <strong>{{ $value ?: 'N/A' }}</strong>
+                            </div>
+                        @endforeach
+                    </div>
+                    <details class="api-raw-toggle">
+                        <summary>Show raw response</summary>
+                        <div class="api-json">{{ json_encode($record['raw'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                    </details>
+                </article>
+            @empty
+                <p class="api-empty">No database records matched the current filter.</p>
+            @endforelse
+        </div>
     @else
         <p class="api-empty">Search results will appear here once you choose a source and enter a name, email, or ID.</p>
     @endif
 </section>
+</div>
+
+<div class="api-edit-modal" id="databaseEditModal">
+    <div class="api-edit-content">
+        <div class="api-testing-head">
+            <h2>Edit Database Record</h2>
+            <p>Temporary local editor for API Testing.</p>
+        </div>
+        <form method="POST" id="databaseEditForm">
+            @csrf
+            @method('PUT')
+            <div class="api-edit-grid" id="databaseEditFields"></div>
+            <div class="api-edit-actions">
+                <button type="button" class="api-db-action-btn" id="closeDatabaseEditModal">Cancel</button>
+                <button type="submit" class="api-db-action-btn" style="background:linear-gradient(135deg,#7f1d2d,#5b0c0e);color:#fff;">Save</button>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection
 
@@ -622,6 +863,10 @@
         const searchField = document.getElementById('search');
         const systemField = document.getElementById('system');
         const systemGroup = document.getElementById('apiSystemGroup');
+        const dbEditModal = document.getElementById('databaseEditModal');
+        const dbEditForm = document.getElementById('databaseEditForm');
+        const dbEditFields = document.getElementById('databaseEditFields');
+        const closeDbEditModal = document.getElementById('closeDatabaseEditModal');
 
         if (!form || !sourceField || !searchField || !systemField || !systemGroup) return;
 
@@ -658,6 +903,83 @@
         });
 
         syncSystemVisibility();
+
+        const fieldSets = {
+            users: [
+                { name: 'first_name', label: 'First Name', type: 'text' },
+                { name: 'last_name', label: 'Last Name', type: 'text' },
+                { name: 'email', label: 'Email', type: 'email' },
+                { name: 'student_id', label: 'Student ID', type: 'text' },
+                { name: 'user_role', label: 'Role', type: 'select', options: ['student', 'student_assistant', 'admin', 'superadmin'] },
+                { name: 'status', label: 'Status', type: 'select', options: ['active', 'inactive'] },
+            ],
+            admins: [
+                { name: 'first_name', label: 'First Name', type: 'text' },
+                { name: 'last_name', label: 'Last Name', type: 'text' },
+                { name: 'email', label: 'Email', type: 'email' },
+                { name: 'office', label: 'Office', type: 'text' },
+                { name: 'access_level', label: 'Access Level', type: 'text' },
+                { name: 'status', label: 'Status', type: 'select', options: ['active', 'inactive'] },
+            ]
+        };
+
+        document.querySelectorAll('[data-db-edit]').forEach((button) => {
+            button.addEventListener('click', () => {
+                if (!dbEditModal || !dbEditForm || !dbEditFields) return;
+                const table = button.dataset.table || 'users';
+                const id = button.dataset.id;
+                let raw = {};
+                try {
+                    raw = JSON.parse(button.dataset.raw || '{}') || {};
+                } catch (error) {
+                    raw = {};
+                }
+
+                dbEditForm.action = `{{ url('/admin/api-testing/database') }}/${table}/${id}`;
+                dbEditFields.innerHTML = '';
+
+                (fieldSets[table] || []).forEach((field) => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'api-edit-field';
+
+                    const label = document.createElement('label');
+                    label.textContent = field.label;
+                    wrap.appendChild(label);
+
+                    let control;
+                    if (field.type === 'select') {
+                        control = document.createElement('select');
+                        field.options.forEach((optionValue) => {
+                            const option = document.createElement('option');
+                            option.value = optionValue;
+                            option.textContent = optionValue;
+                            if ((raw[field.name] || '') === optionValue) {
+                                option.selected = true;
+                            }
+                            control.appendChild(option);
+                        });
+                    } else {
+                        control = document.createElement('input');
+                        control.type = field.type;
+                        control.value = raw[field.name] || '';
+                    }
+                    control.name = field.name;
+                    wrap.appendChild(control);
+                    dbEditFields.appendChild(wrap);
+                });
+
+                dbEditModal.classList.add('show');
+            });
+        });
+
+        if (closeDbEditModal && dbEditModal) {
+            closeDbEditModal.addEventListener('click', () => dbEditModal.classList.remove('show'));
+            dbEditModal.addEventListener('click', (event) => {
+                if (event.target === dbEditModal) {
+                    dbEditModal.classList.remove('show');
+                }
+            });
+        }
 
         // Handler para sa Admin Options & Admin API (Unified)
         const handleAdminSelection = (button) => {

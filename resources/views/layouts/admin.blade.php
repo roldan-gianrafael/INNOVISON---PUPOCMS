@@ -406,6 +406,7 @@
             background: linear-gradient(180deg, #231119 0%, #180b12 100%);
             backdrop-filter: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 -14px 28px rgba(0, 0, 0, 0.18);
             padding: 14px clamp(16px, 3vw, 30px);
             display: flex;
             justify-content: space-between;
@@ -809,25 +810,21 @@
             }
         }
 
-        .main::-webkit-scrollbar,
-        .sidebar::-webkit-scrollbar {
+        .main::-webkit-scrollbar {
             width: 0;
             height: 0;
         }
 
-        .main.scrollbar-visible::-webkit-scrollbar,
-        .sidebar.scrollbar-visible::-webkit-scrollbar {
+        .main.scrollbar-visible::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
 
-        .main::-webkit-scrollbar-track,
-        .sidebar::-webkit-scrollbar-track {
+        .main::-webkit-scrollbar-track {
             background: transparent;
         }
 
-        .main.scrollbar-visible::-webkit-scrollbar-thumb,
-        .sidebar.scrollbar-visible::-webkit-scrollbar-thumb {
+        .main.scrollbar-visible::-webkit-scrollbar-thumb {
             background: linear-gradient(
                 180deg,
                 #8b0000 0%,
@@ -845,8 +842,7 @@
             transition: background 0.25s ease, box-shadow 0.25s ease;
         }
 
-        .main.scrollbar-visible::-webkit-scrollbar-thumb:hover,
-        .sidebar.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+        .main.scrollbar-visible::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(
                 180deg,
                 #990000 0%,
@@ -860,9 +856,56 @@
                 0 10px 18px rgba(75, 17, 25, 0.24);
         }
 
-        .main.scrollbar-visible::-webkit-scrollbar-corner,
-        .sidebar.scrollbar-visible::-webkit-scrollbar-corner {
+        .main.scrollbar-visible::-webkit-scrollbar-corner {
             background: transparent;
+        }
+
+        .sidebar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        .sidebar-scroll-indicator {
+            position: sticky;
+            bottom: 12px;
+            margin: auto auto 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.16);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+            transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sidebar-scroll-indicator.is-visible {
+            display: inline-flex;
+        }
+
+        .sidebar-scroll-indicator:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 14px 24px rgba(15, 23, 42, 0.2);
+        }
+
+        .sidebar-scroll-indicator svg {
+            width: 14px;
+            height: 14px;
+            display: block;
+            stroke: currentColor;
         }
 
         .card {
@@ -1235,7 +1278,7 @@
         html[data-theme="light"] .admin-header {
             background: linear-gradient(180deg, #ffffff 0%, #faf7f9 100%);
             border-bottom-color: rgba(128, 0, 0, 0.12);
-            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+            box-shadow: inset 0 -12px 24px rgba(15, 23, 42, 0.06);
         }
 
         html[data-theme="light"] .header-kicker,
@@ -1380,6 +1423,18 @@
         html[data-theme="light"] .sidebar-logout a:hover {
             background: rgba(128, 0, 0, 0.14);
             border-color: rgba(128, 0, 0, 0.28);
+        }
+
+        html[data-theme="light"] .sidebar-scroll-indicator {
+            background: rgba(255, 255, 255, 0.94);
+            color: #7f1d2d;
+            border-color: rgba(127, 29, 45, 0.14);
+            box-shadow: 0 10px 18px rgba(127, 29, 45, 0.12);
+        }
+
+        html[data-theme="light"] .sidebar-scroll-indicator:hover {
+            background: #ffffff;
+            box-shadow: 0 14px 24px rgba(127, 29, 45, 0.16);
         }
 
         html[data-theme="light"] .main {
@@ -1817,6 +1872,12 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
     </nav>
 
+    <button type="button" class="sidebar-scroll-indicator" id="sidebarScrollIndicator" aria-label="Scroll navigation">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </button>
+
     <div class="sidebar-logout">
       <a href="#" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">
         <span class="sidebar-short">LO</span><span class="sidebar-label">Logout</span>
@@ -2012,7 +2073,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     }
 
     function initAutoHideScrollbars() {
-        const targets = Array.from(document.querySelectorAll('.main, .sidebar'));
+        const targets = Array.from(document.querySelectorAll('.main'));
 
         if (!targets.length) {
             return;
@@ -2043,6 +2104,33 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 }, 250);
             });
         });
+    }
+
+    function initSidebarScrollIndicator() {
+        const sidebar = document.getElementById('adminSidebar');
+        const indicator = document.getElementById('sidebarScrollIndicator');
+
+        if (!sidebar || !indicator) {
+            return;
+        }
+
+        const updateIndicator = () => {
+            const canScroll = sidebar.scrollHeight - sidebar.clientHeight > 6;
+            const hasMoreBelow = sidebar.scrollTop + sidebar.clientHeight < sidebar.scrollHeight - 6;
+            indicator.classList.toggle('is-visible', canScroll && hasMoreBelow);
+        };
+
+        indicator.addEventListener('click', () => {
+            sidebar.scrollBy({
+                top: Math.max(180, Math.floor(sidebar.clientHeight * 0.45)),
+                behavior: 'smooth'
+            });
+        });
+
+        sidebar.addEventListener('scroll', updateIndicator, { passive: true });
+        window.addEventListener('resize', updateIndicator, { passive: true });
+        updateIndicator();
+        window.setTimeout(updateIndicator, 150);
     }
 
     function initMedicineAlerts() {
@@ -2543,6 +2631,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         initAssistantUi();
         initThemeToggle();
         initAutoHideScrollbars();
+        initSidebarScrollIndicator();
         initMedicineAlerts();
         initAccessibilityLaunch();
     });

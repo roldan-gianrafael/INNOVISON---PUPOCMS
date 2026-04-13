@@ -628,7 +628,7 @@
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Sex<span class="required-mark">*</span></label>
-            <select name="sex" class="form-select" required>
+            <select name="sex" class="form-select">
                 <option value="Male" {{ old('sex') === 'Male' ? 'selected' : '' }}>Male</option>
                 <option value="Female" {{ old('sex') === 'Female' ? 'selected' : '' }}>Female</option>
             </select>

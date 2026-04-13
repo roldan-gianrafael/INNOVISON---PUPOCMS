@@ -111,9 +111,13 @@
         background: linear-gradient(145deg, #6d0014 0%, #8a0d19 40%, #d09510 100%);
     }
 
+    html[data-theme="dark"] .um-mode-btn::before {
+        background: linear-gradient(180deg, rgba(193, 138, 16, 0.16), rgba(125, 11, 23, 0.06) 42%, rgba(95, 0, 18, 0.14));
+    }
+
     html[data-theme="dark"] .um-mode-btn .eyebrow {
-        background: rgba(193, 138, 16, 0.18);
-        color: #ffffff;
+        background: rgba(193, 138, 16, 0.22);
+        color: #ffd86b;
     }
 
     html[data-theme="dark"] .um-mode-btn h3,
@@ -122,7 +126,7 @@
     }
 
     html[data-theme="dark"] .um-mode-btn p {
-        color: rgba(255, 255, 255, 0.9);
+        color: #ffe7a6;
     }
 
     html[data-theme="dark"] .um-mode-btn::after {
@@ -130,11 +134,11 @@
     }
 
     html[data-theme="dark"] .um-mode-icon {
-        background: rgba(193, 138, 16, 0.16);
-        border-color: rgba(255, 230, 165, 0.28);
-        color: #ffffff;
+        background: linear-gradient(145deg, rgba(193, 138, 16, 0.20), rgba(95, 0, 18, 0.34));
+        border-color: rgba(255, 210, 90, 0.24);
+        color: #ffd86b;
         box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.18),
+            inset 0 1px 0 rgba(255, 210, 90, 0.12),
             0 18px 28px rgba(95, 0, 18, 0.28);
     }
 

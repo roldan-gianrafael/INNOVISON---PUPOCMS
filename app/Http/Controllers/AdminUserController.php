@@ -415,6 +415,27 @@ class AdminUserController extends Controller
         return redirect()->back()->with('success', 'Admin Hub access removed successfully.');
     }
 
+    public function deleteAdminHubRecord(Admin $admin)
+    {
+        $this->ensureCanManageUsers();
+
+        $adminName = $admin->name ?? ($admin->email ?? 'Unknown Admin');
+        $adminId = $admin->admin_id;
+
+        $admin->delete();
+
+        $this->logUserManagementAction(
+            'Deleted admin hub record',
+            sprintf(
+                'Deleted admin hub record #%s (%s) from the admins table.',
+                $adminId,
+                $adminName
+            )
+        );
+
+        return redirect()->back()->with('success', 'Admin Hub record deleted successfully.');
+    }
+
     public function destroy(User $user)
     {
         $this->ensureCanManageUsers();
@@ -680,6 +701,7 @@ class AdminUserController extends Controller
                     'is_external' => false,
                     'update_url' => route('admin.user-management.admin-hub.update', $admin->admin_id),
                     'delete_url' => route('admin.user-management.admin-hub.destroy', $admin->admin_id),
+                    'delete_admin_hub_url' => route('admin.user-management.admin-hub.delete-record', $admin->admin_id),
                     'meta' => [
                         'email' => $email,
                         'access_level' => 'designee',

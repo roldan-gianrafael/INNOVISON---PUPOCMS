@@ -1208,6 +1208,7 @@
                                 data-user-card
                                 data-update-url="{{ $record['update_url'] ?? ($record['can_edit'] ? route('admin.user-management.update', $record['id']) : '') }}"
                                 data-delete-url="{{ $record['delete_url'] ?? ($record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '') }}"
+                                data-delete-admin-hub-url="{{ $record['delete_admin_hub_url'] ?? '' }}"
                                 data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
                                 data-id="{{ $record['record_id'] }}"
                                 data-name="{{ $record['name'] }}"
@@ -1465,6 +1466,16 @@
                             >
                                 Remove Access
                             </button>
+                            <button
+                                type="submit"
+                                form="deleteAdminHubForm"
+                                class="um-btn"
+                                id="deleteAdminHubBtn"
+                                style="display:none; background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;"
+                                onclick="return confirm('Delete this admin hub record from the admins table? This cannot be undone.')"
+                            >
+                                Delete Admin Record
+                            </button>
                             <button type="submit" class="um-btn um-btn-primary" id="saveSettingsBtn">Save Changes</button>
                         </div>
                     </form>
@@ -1473,7 +1484,12 @@
                         @csrf
                         @method('DELETE')
                         <input type="hidden" name="admin_profile_id" id="deleteAdminProfileId">
-            </form>
+                    </form>
+
+                    <form method="POST" id="deleteAdminHubForm" style="display:none;">
+                        @csrf
+                        @method('DELETE')
+                    </form>
                 </div>
             </div>
         </div>
@@ -1518,6 +1534,8 @@
     const detailAdminProfileStatus = document.getElementById('detailAdminProfileStatus');
     const adminEmailNote = document.getElementById('adminEmailNote');
     const deleteAdminProfileId = document.getElementById('deleteAdminProfileId');
+    const deleteAdminHubForm = document.getElementById('deleteAdminHubForm');
+    const deleteAdminHubBtn = document.getElementById('deleteAdminHubBtn');
     const externalNote = document.getElementById('externalNote');
     const deactivateBtn = document.getElementById('deactivateBtn');
     const saveSettingsBtn = document.getElementById('saveSettingsBtn');
@@ -1729,6 +1747,9 @@
             settingsMethod.value = canEdit ? 'PUT' : 'POST';
         }
         deleteForm.action = row.dataset.deleteUrl || '#';
+        if (deleteAdminHubForm) {
+            deleteAdminHubForm.action = row.dataset.deleteAdminHubUrl || '#';
+        }
 
         settingsForm.querySelectorAll('input, select, button').forEach((field) => {
             if (field.id === 'deactivateBtn') {
@@ -1746,6 +1767,14 @@
         detailEditEmail.readOnly = !(canEdit || canOnboard);
 
         deleteForm.style.display = canEdit ? 'block' : 'none';
+        if (deleteAdminHubBtn) {
+            const showDeleteAdminHub = managementView === 'admin-hub' && canEdit && adminProfileId;
+            deleteAdminHubBtn.style.display = showDeleteAdminHub ? '' : 'none';
+            deleteAdminHubBtn.disabled = !showDeleteAdminHub;
+        }
+        if (deleteAdminHubForm) {
+            deleteAdminHubForm.style.display = 'none';
+        }
         if (!canEdit && canOnboard) {
             detailRole.value = 'admin';
             detailAccessLevel.value = 'designee';

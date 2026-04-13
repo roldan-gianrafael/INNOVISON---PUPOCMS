@@ -117,6 +117,7 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::delete('/admin/user-management/{user}', [AdminUserController::class, 'destroy'])->name('admin.user-management.destroy');
         Route::put('/admin/user-management/admin-hub/{admin}', [AdminUserController::class, 'updateAdminHub'])->name('admin.user-management.admin-hub.update');
         Route::delete('/admin/user-management/admin-hub/{admin}', [AdminUserController::class, 'destroyAdminHub'])->name('admin.user-management.admin-hub.destroy');
+        Route::delete('/admin/user-management/admin-hub/{admin}/delete-record', [AdminUserController::class, 'deleteAdminHubRecord'])->name('admin.user-management.admin-hub.delete-record');
         Route::get('/admin/api-testing', [AdminController::class, 'apiTesting'])->name('admin.api-testing');
         Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])
             ->middleware('role:superadmin')

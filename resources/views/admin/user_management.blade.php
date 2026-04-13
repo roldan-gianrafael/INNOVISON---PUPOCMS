@@ -591,10 +591,25 @@
         padding: 18px;
     }
 
+    .um-section-block {
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.9));
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+    }
+
     .um-section-block + .um-section-block {
         margin-top: 18px;
-        padding-top: 18px;
-        border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .um-section-block.account-access {
+        border-color: rgba(128, 0, 0, 0.14);
+    }
+
+    .um-section-block.admin-hub {
+        border-color: rgba(30, 64, 175, 0.16);
+        background: linear-gradient(180deg, rgba(239, 246, 255, 0.92), rgba(248, 250, 252, 0.95));
     }
 
     .um-section-title {
@@ -602,6 +617,26 @@
         font-size: 1rem;
         font-weight: 800;
         color: #800000;
+    }
+
+    .um-section-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(128, 0, 0, 0.08);
+        color: #800000;
+        font-size: .76rem;
+        font-weight: 900;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .um-section-block.admin-hub .um-section-kicker {
+        background: rgba(30, 64, 175, 0.10);
+        color: #1d4ed8;
     }
 
     .um-section-copy {
@@ -712,6 +747,17 @@
         color: #cbd5e1;
     }
 
+    html[data-theme="dark"] .um-section-block {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.94));
+        border-color: rgba(148, 163, 184, 0.14);
+        box-shadow: 0 18px 32px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-theme="dark"] .um-section-block.admin-hub {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.94));
+        border-color: rgba(59, 130, 246, 0.24);
+    }
+
     html[data-theme="dark"] .um-profile-row {
         background: rgba(15, 23, 42, 0.84);
         border-color: rgba(148, 163, 184, 0.14);
@@ -720,6 +766,16 @@
     html[data-theme="dark"] .um-profile-row .value,
     html[data-theme="dark"] .um-section-title {
         color: #fff;
+    }
+
+    html[data-theme="dark"] .um-section-kicker {
+        background: rgba(248, 113, 113, 0.16);
+        color: #fecaca;
+    }
+
+    html[data-theme="dark"] .um-section-block.admin-hub .um-section-kicker {
+        background: rgba(96, 165, 250, 0.16);
+        color: #bfdbfe;
     }
 
     @media (max-width: 1024px) {
@@ -1001,7 +1057,8 @@
                     <form method="POST" id="settingsForm">
                         @csrf
                         @method('PUT')
-                        <div class="um-section-block">
+                        <div class="um-section-block account-access">
+                            <div class="um-section-kicker">Users Table</div>
                             <h4 class="um-section-title">Account Access</h4>
                             <p class="um-section-copy">This controls the clinic login role, the student-side email, and whether the account can enter the clinic system.</p>
                             <div class="um-field">
@@ -1028,7 +1085,8 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="um-section-block" id="adminHubSection">
+                        <div class="um-section-block admin-hub" id="adminHubSection">
+                            <div class="um-section-kicker">Admins Table</div>
                             <h4 class="um-section-title">Admin Hub Profile</h4>
                             <p class="um-section-copy">This is clinic-only data for admin-side access. It can stay separate from the student login profile while still being managed here.</p>
                             <div class="um-profile-list">
@@ -1186,7 +1244,7 @@
         }
         if (detailAdminProfileStatus) {
             detailAdminProfileStatus.textContent = adminProfileId
-                ? `Linked to admin hub record #${adminProfileId}${meta.admin_profile_name ? ` • ${meta.admin_profile_name}` : ''}`
+                ? `Linked to admin hub record #${adminProfileId}${meta.admin_profile_name ? ` | ${meta.admin_profile_name}` : ''}`
                 : 'No linked admin hub record yet. One will be created when you save an admin-side role.';
         }
         if (adminEmailNote) {

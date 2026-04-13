@@ -895,6 +895,10 @@
             display: inline-flex;
         }
 
+        .sidebar:not(:hover) .sidebar-scroll-indicator.is-visible {
+            display: none;
+        }
+
         .sidebar-scroll-indicator:hover {
             transform: translateY(-2px);
             background: rgba(255, 255, 255, 0.14);
@@ -2117,7 +2121,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const updateIndicator = () => {
             const canScroll = sidebar.scrollHeight - sidebar.clientHeight > 6;
             const hasMoreBelow = sidebar.scrollTop + sidebar.clientHeight < sidebar.scrollHeight - 6;
-            indicator.classList.toggle('is-visible', canScroll && hasMoreBelow);
+            const isExpanded = window.innerWidth <= 860 || sidebar.matches(':hover') || document.body.classList.contains('sidebar-open');
+            indicator.classList.toggle('is-visible', canScroll && hasMoreBelow && isExpanded);
         };
 
         indicator.addEventListener('click', () => {
@@ -2128,6 +2133,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         });
 
         sidebar.addEventListener('scroll', updateIndicator, { passive: true });
+        sidebar.addEventListener('mouseenter', updateIndicator);
+        sidebar.addEventListener('mouseleave', updateIndicator);
         window.addEventListener('resize', updateIndicator, { passive: true });
         updateIndicator();
         window.setTimeout(updateIndicator, 150);

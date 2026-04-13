@@ -576,11 +576,13 @@
         cursor: pointer;
     }
 
-    tr[data-user-card][data-can-edit="1"] {
+    tr[data-user-card][data-can-edit="1"],
+    tr[data-user-card][data-can-onboard="1"] {
         cursor: pointer;
     }
 
-    tr[data-user-card][data-can-edit="1"]:hover .um-user {
+    tr[data-user-card][data-can-edit="1"]:hover .um-user,
+    tr[data-user-card][data-can-onboard="1"]:hover .um-user {
         background: rgba(128, 0, 0, 0.04);
         border-radius: 12px;
     }
@@ -1288,7 +1290,9 @@
                                 data-user-card
                                 data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
                                 data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
+                                data-create-url="{{ !$record['can_edit'] && !empty($record['can_onboard']) ? route('admin.user-management.store-from-lookup') : '' }}"
                                 data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
+                                data-can-onboard="{{ !empty($record['can_onboard']) ? '1' : '0' }}"
                                 data-id="{{ $record['record_id'] }}"
                                 data-name="{{ $record['name'] }}"
                                 data-first-name="{{ $record['first_name'] }}"
@@ -1619,10 +1623,10 @@
             adminHubSection.classList.toggle('is-hidden', managementView === 'account-access');
         }
         accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
-        detailAccessLevel.disabled = !showAdminAccessLevel || !canEdit;
+        detailAccessLevel.disabled = !showAdminAccessLevel || !(canEdit || canOnboard);
         adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
         adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
-        adminHubSection.style.display = canEdit ? '' : 'none';
+        adminHubSection.style.display = (canEdit || canOnboard) ? '' : 'none';
 
         detailEditEmail.value = row.dataset.email || '';
         detailEmailLabel.textContent = 'Student Email';
@@ -1690,7 +1694,8 @@
         deleteForm.style.display = canEdit ? 'block' : 'none';
         if (!canEdit && canOnboard) {
             detailRole.value = 'admin';
-            detailAccessLevel.value = 'clinic_staff';
+            detailAccessLevel.value = 'designee';
+            detailStatus.value = row.dataset.status || 'active';
         }
         if (saveSettingsBtn) {
             saveSettingsBtn.textContent = canEdit ? 'Save Changes' : 'Add to Clinic';

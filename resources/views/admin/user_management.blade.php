@@ -1102,7 +1102,6 @@
                             <th>Role</th>
                             <th>Status</th>
                             <th>Source</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1110,11 +1109,15 @@
                             <tr
                                 data-user-card
                                 data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
+                                data-create-url="{{ !$record['can_edit'] && !empty($record['can_onboard']) ? route('admin.user-management.store-from-lookup') : '' }}"
                                 data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
                                 data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
-                                data-id="{{ $record['record_id'] }}"
-                                data-name="{{ $record['name'] }}"
-                                data-email="{{ $record['email'] }}"
+                                data-can-onboard="{{ !empty($record['can_onboard']) ? '1' : '0' }}"
+                            data-id="{{ $record['record_id'] }}"
+                            data-name="{{ $record['name'] }}"
+                            data-first-name="{{ $record['first_name'] }}"
+                            data-last-name="{{ $record['last_name'] }}"
+                            data-email="{{ $record['email'] }}"
                                 data-role="{{ $record['raw_role'] }}"
                                 data-role-label="{{ $record['role'] }}"
                                 data-status="{{ $record['status'] }}"
@@ -1150,17 +1153,10 @@
                                     </span>
                                 </td>
                                 <td><span class="um-badge source">{{ $record['source_label'] }}</span></td>
-                                <td>
-                                    @if($record['can_edit'])
-                                        <button type="button" class="um-action-btn">Settings</button>
-                                    @else
-                                        <span class="um-badge source" style="background: rgba(128, 0, 0, 0.08); color: #800000;">Read only</span>
-                                    @endif
-                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6"><div class="um-empty">No managed clinic users found yet.</div></td>
+                                <td colspan="5"><div class="um-empty">No managed clinic users found yet.</div></td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -1194,7 +1190,6 @@
                             <th>Admin Type</th>
                             <th>Office</th>
                             <th>Status</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1206,6 +1201,8 @@
                                 data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
                                 data-id="{{ $record['record_id'] }}"
                                 data-name="{{ $record['name'] }}"
+                                data-first-name="{{ $record['first_name'] }}"
+                                data-last-name="{{ $record['last_name'] }}"
                                 data-email="{{ $record['email'] }}"
                                 data-role="{{ $record['raw_role'] }}"
                                 data-role-label="{{ $record['role'] }}"
@@ -1242,17 +1239,10 @@
                                         {{ ucfirst($record['status']) }}
                                     </span>
                                 </td>
-                                <td>
-                                    @if($record['can_edit'])
-                                        <button type="button" class="um-action-btn">Settings</button>
-                                    @else
-                                        <span class="um-badge source" style="background: rgba(128, 0, 0, 0.08); color: #800000;">Read only</span>
-                                    @endif
-                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6"><div class="um-empty">No admin-hub-linked users are available yet.</div></td>
+                                <td colspan="5"><div class="um-empty">No admin-hub-linked users are available yet.</div></td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -1290,7 +1280,6 @@
                             <th>Role</th>
                             <th>Status</th>
                             <th>Source</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1302,6 +1291,8 @@
                                 data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
                                 data-id="{{ $record['record_id'] }}"
                                 data-name="{{ $record['name'] }}"
+                                data-first-name="{{ $record['first_name'] }}"
+                                data-last-name="{{ $record['last_name'] }}"
                                 data-email="{{ $record['email'] }}"
                                 data-role="{{ $record['raw_role'] }}"
                                 data-role-label="{{ $record['role'] }}"
@@ -1333,22 +1324,10 @@
                                 <td>{{ $record['role'] }}</td>
                                 <td><span class="um-badge {{ $record['status'] === 'inactive' ? 'inactive' : 'active' }}">{{ ucfirst($record['status']) }}</span></td>
                                 <td><span class="um-badge source">{{ $record['source_label'] }}</span></td>
-                                <td>
-                                    @if($record['can_edit'])
-                                        <button
-                                            type="button"
-                                            class="um-action-btn"
-                                        >
-                                            Open Settings
-                                        </button>
-                                    @else
-                                        <span class="um-badge source" style="background: rgba(128, 0, 0, 0.08); color: #800000;">Read only</span>
-                                    @endif
-                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6"><div class="um-empty">No API or admin users matched the current search.</div></td>
+                                <td colspan="5"><div class="um-empty">No API or admin users matched the current search.</div></td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -1396,7 +1375,12 @@
                 <div class="um-detail-card">
                     <form method="POST" id="settingsForm">
                         @csrf
-                        @method('PUT')
+                        <input type="hidden" name="_method" id="settingsMethod" value="PUT">
+                        <input type="hidden" name="lookup_source" id="detailLookupSource" value="">
+                        <input type="hidden" name="first_name" id="detailFirstName" value="">
+                        <input type="hidden" name="last_name" id="detailLastName" value="">
+                        <input type="hidden" name="full_name" id="detailFullName" value="">
+                        <input type="hidden" name="external_identifier" id="detailExternalIdentifier" value="">
                         <div class="um-section-block account-access" id="accountAccessSection">
                             <div class="um-section-kicker">Users Table</div>
                             <h4 class="um-section-title">Account Access</h4>
@@ -1455,7 +1439,7 @@
                             </div>
                         </div>
                         <div class="um-note" id="externalNote" style="display:none; margin-top: 6px;">
-                            This faculty profile is managed externally, so it is read-only here.
+                            This faculty profile comes from the external source. Saving here will add a clinic-side user and admin hub record without changing the source system.
                         </div>
                         <div class="um-actions">
                             <button type="button" class="um-btn um-btn-soft" id="deactivateBtn">Deactivate Account</button>
@@ -1490,6 +1474,7 @@
     const lookupModal = document.getElementById('lookupModal');
     const settingsModal = document.getElementById('settingsModal');
     const settingsForm = document.getElementById('settingsForm');
+    const settingsMethod = document.getElementById('settingsMethod');
     const deleteForm = document.getElementById('deleteForm');
     const detailAvatar = document.getElementById('detailAvatar');
     const detailName = document.getElementById('detailName');
@@ -1506,6 +1491,11 @@
     const detailUpdated = document.getElementById('detailUpdated');
     const detailRole = document.getElementById('detailRole');
     const detailStatus = document.getElementById('detailStatus');
+    const detailLookupSource = document.getElementById('detailLookupSource');
+    const detailFirstName = document.getElementById('detailFirstName');
+    const detailLastName = document.getElementById('detailLastName');
+    const detailFullName = document.getElementById('detailFullName');
+    const detailExternalIdentifier = document.getElementById('detailExternalIdentifier');
     const adminEmailWrap = document.getElementById('adminEmailWrap');
     const detailAdminEmail = document.getElementById('detailAdminEmail');
     const detailOffice = document.getElementById('detailOffice');
@@ -1516,6 +1506,7 @@
     const deleteAdminProfileId = document.getElementById('deleteAdminProfileId');
     const externalNote = document.getElementById('externalNote');
     const deactivateBtn = document.getElementById('deactivateBtn');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
     const directoryPanel = document.getElementById('directoryPanel');
     const lookupDirectoryPanel = document.getElementById('lookupDirectoryPanel');
     const lookupSearchField = document.getElementById('lookupSearchField');
@@ -1578,6 +1569,7 @@
         }
 
         const canEdit = row.dataset.canEdit === '1';
+        const canOnboard = row.dataset.canOnboard === '1';
         const avatarUrl = row.dataset.avatarUrl || '';
         const avatarLetter = row.dataset.avatarLetter || 'U';
         const managementView = row.dataset.managementView || 'account-access';
@@ -1613,6 +1605,7 @@
         const adminLoginEmail = meta.admin_login_email || '';
         const office = meta.office || '';
         const adminProfileId = meta.admin_profile_id || '';
+        const lookupSource = meta.lookup_source || '';
         if (deleteAdminProfileId) {
             deleteAdminProfileId.value = adminProfileId;
         }
@@ -1642,6 +1635,21 @@
         if (detailOffice) {
             detailOffice.value = office;
         }
+        if (detailLookupSource) {
+            detailLookupSource.value = lookupSource;
+        }
+        if (detailFirstName) {
+            detailFirstName.value = row.dataset.firstName || '';
+        }
+        if (detailLastName) {
+            detailLastName.value = row.dataset.lastName || '';
+        }
+        if (detailFullName) {
+            detailFullName.value = row.dataset.name || '';
+        }
+        if (detailExternalIdentifier) {
+            detailExternalIdentifier.value = row.dataset.studentId || row.dataset.id || '';
+        }
         if (detailAdminProfileStatus) {
             detailAdminProfileStatus.textContent = adminProfileId
                 ? `Linked to admin hub record #${adminProfileId}${meta.admin_profile_name ? ` | ${meta.admin_profile_name}` : ''}`
@@ -1658,20 +1666,35 @@
             detailAvatar.textContent = avatarLetter;
         }
 
-        settingsForm.action = row.dataset.updateUrl || '#';
+        settingsForm.action = canEdit ? (row.dataset.updateUrl || '#') : (row.dataset.createUrl || '#');
+        if (settingsMethod) {
+            settingsMethod.value = canEdit ? 'PUT' : 'POST';
+        }
         deleteForm.action = row.dataset.deleteUrl || '#';
 
         settingsForm.querySelectorAll('input, select, button').forEach((field) => {
             if (field.id === 'deactivateBtn') {
                 return;
             }
-            field.disabled = !canEdit;
+            if (field.id === 'settingsMethod' || field.id === 'detailLookupSource' || field.id === 'detailFirstName' || field.id === 'detailLastName' || field.id === 'detailFullName' || field.id === 'detailExternalIdentifier') {
+                field.disabled = false;
+                return;
+            }
+            field.disabled = !(canEdit || canOnboard);
         });
         deactivateBtn.disabled = !canEdit;
-        externalNote.style.display = canEdit ? 'none' : 'block';
-        detailEditEmail.readOnly = !canEdit;
+        deactivateBtn.style.display = canEdit ? '' : 'none';
+        externalNote.style.display = canOnboard ? 'block' : 'none';
+        detailEditEmail.readOnly = !(canEdit || canOnboard);
 
         deleteForm.style.display = canEdit ? 'block' : 'none';
+        if (!canEdit && canOnboard) {
+            detailRole.value = 'admin';
+            detailAccessLevel.value = 'clinic_staff';
+        }
+        if (saveSettingsBtn) {
+            saveSettingsBtn.textContent = canEdit ? 'Save Changes' : 'Add to Clinic';
+        }
         settingsModal.classList.add('show');
     };
 
@@ -1692,7 +1715,7 @@
     });
 
     document.querySelectorAll('tr[data-user-card]').forEach((row) => {
-        if (row.dataset.canEdit !== '1') {
+        if (row.dataset.canEdit !== '1' && row.dataset.canOnboard !== '1') {
             return;
         }
 

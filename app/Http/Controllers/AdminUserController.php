@@ -195,6 +195,109 @@ class AdminUserController extends Controller
         return redirect()->back()->with('success', 'User account updated successfully.');
     }
 
+    public function storeFromLookup(Request $request)
+    {
+        $this->ensureCanManageUsers();
+
+        $request->validate([
+            'lookup_source' => ['required', Rule::in(['faculty'])],
+            'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+            'email' => ['required', 'email', 'max:255'],
+            'admin_email' => ['nullable', 'email', 'max:255'],
+            'access_level' => ['nullable', Rule::in(['clinic_staff', 'designee'])],
+            'office' => ['nullable', 'string', 'max:255'],
+            'first_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['nullable', 'string', 'max:255'],
+            'full_name' => ['nullable', 'string', 'max:255'],
+            'external_identifier' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $normalizedRequestedRole = User::normalizeRole($request->user_role);
+        $baseEmail = trim((string) $request->email);
+
+        $user = User::query()->where('email', $baseEmail)->first();
+
+        if (!$user) {
+            $studentIdSeed = trim((string) $request->input('external_identifier', ''));
+            if ($studentIdSeed === '') {
+                $studentIdSeed = 'faculty-' . strtolower(substr(md5($baseEmail), 0, 10));
+            }
+
+            $firstName = trim((string) $request->input('first_name', ''));
+            $lastName = trim((string) $request->input('last_name', ''));
+            $fullName = trim((string) $request->input('full_name', ''));
+
+            if ($fullName === '') {
+                $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+            }
+
+            $user = new User();
+            $user->student_id = $this->resolveUniqueLocalIdentifier($studentIdSeed);
+            $user->first_name = $firstName !== '' ? $firstName : 'Faculty';
+            $user->last_name = $lastName !== '' ? $lastName : 'User';
+            $user->name = $fullName !== '' ? $fullName : trim($user->first_name . ' ' . $user->last_name);
+            $user->email = $baseEmail;
+            $user->password = bcrypt(\Illuminate\Support\Str::random(40));
+        }
+
+        $user->user_role = $normalizedRequestedRole;
+        if (Schema::hasColumn('users', 'status')) {
+            $user->status = $request->status;
+        }
+        $user->save();
+
+        $linkedAdmin = $this->findLinkedAdminProfile($user) ?? new Admin();
+
+        if (in_array($normalizedRequestedRole, [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true)) {
+            if (Admin::hasColumn('user_id')) {
+                $linkedAdmin->user_id = $user->id;
+            }
+            if (Admin::hasColumn('first_name')) {
+                $linkedAdmin->first_name = $user->first_name;
+            }
+            if (Admin::hasColumn('last_name')) {
+                $linkedAdmin->last_name = $user->last_name;
+            }
+            if (Admin::hasColumn('name')) {
+                $linkedAdmin->name = $user->name;
+            }
+            if (Admin::hasColumn('email')) {
+                $linkedAdmin->email = trim((string) $request->input('admin_email', '')) ?: $user->email;
+            }
+            if (Admin::hasColumn('email_address')) {
+                $linkedAdmin->email_address = trim((string) $request->input('admin_email', '')) ?: $user->email;
+            }
+            if (Admin::hasColumn('access_level')) {
+                $linkedAdmin->access_level = match ($normalizedRequestedRole) {
+                    User::ROLE_SUPERADMIN => 'superadmin',
+                    User::ROLE_ADMIN => $request->filled('access_level') ? $request->access_level : 'clinic_staff',
+                    default => null,
+                };
+            }
+            if (Admin::hasColumn('status')) {
+                $linkedAdmin->status = $request->status;
+            }
+            if (Admin::hasColumn('office')) {
+                $linkedAdmin->office = $request->input('office');
+            }
+            $linkedAdmin->save();
+        }
+
+        $this->logUserManagementAction(
+            'Added user from lookup',
+            sprintf(
+                'Added %s (%s) from %s lookup into clinic access as %s.',
+                $user->name ?? $user->email,
+                $user->email,
+                $request->lookup_source,
+                $user->user_role
+            )
+        );
+
+        return redirect()->route('admin.user-management')->with('success', 'Lookup user added to the clinic system successfully.');
+    }
+
     public function destroy(User $user)
     {
         $this->ensureCanManageUsers();
@@ -383,6 +486,7 @@ class AdminUserController extends Controller
                     'avatar_url' => null,
                     'avatar_letter' => strtoupper(substr($name !== '' ? $name : ($email ?: 'F'), 0, 1)),
                     'can_edit' => false,
+                    'can_onboard' => true,
                     'is_external' => true,
                     'meta' => [
                         'faculty_id' => $faculty['faculty_id'] ?? null,
@@ -390,6 +494,7 @@ class AdminUserController extends Controller
                         'faculty_type' => $faculty['faculty_type'] ?? null,
                         'department' => $faculty['department'] ?? null,
                         'profile' => $profile,
+                        'lookup_source' => 'faculty',
                         'updated_at' => $faculty['last_updated'] ?? null,
                     ],
                 ];
@@ -563,5 +668,19 @@ class AdminUserController extends Controller
             'ip_address' => request()->ip(),
             'user_agent' => substr((string) request()->userAgent(), 0, 255),
         ]);
+    }
+
+    private function resolveUniqueLocalIdentifier(string $seed): string
+    {
+        $base = trim($seed) !== '' ? trim($seed) : 'lookup-user';
+        $candidate = $base;
+        $counter = 1;
+
+        while (User::query()->where('student_id', $candidate)->exists()) {
+            $candidate = $base . '-' . $counter;
+            $counter++;
+        }
+
+        return $candidate;
     }
 }

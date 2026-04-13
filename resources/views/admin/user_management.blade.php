@@ -1270,7 +1270,7 @@
         </div>
         <div class="um-modal-body">
             <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
-                <input type="search" name="lookup_search" value="{{ $lookupSearch }}" placeholder="Search API / admin users by email, name, or student ID" id="lookupSearchField">
+                <input type="search" name="lookup_search" value="{{ $lookupSearch }}" placeholder="Search users by email, name, or ID" id="lookupSearchField">
                 <button class="um-btn um-btn-primary" type="submit">Search</button>
             </form>
             <div class="um-directory-toggle" style="padding: 14px 0 10px;">

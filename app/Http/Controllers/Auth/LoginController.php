@@ -128,12 +128,22 @@ class LoginController extends Controller
             return null;
         }
 
+        if (Admin::hasColumn('user_id')) {
+            $linkedByUserId = Admin::query()
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($linkedByUserId) {
+                return $linkedByUserId;
+            }
+        }
+
         $email = trim((string) ($user->email ?? ''));
         if ($email === '') {
             return null;
         }
 
-        return Admin::query()
+        $linkedAdmin = Admin::query()
             ->where(function ($builder) use ($email) {
                 if (Admin::hasColumn('email')) {
                     $builder->orWhere('email', $email);
@@ -144,6 +154,60 @@ class LoginController extends Controller
                 }
             })
             ->first();
+
+        if ($linkedAdmin && Admin::hasColumn('user_id') && !$linkedAdmin->user_id) {
+            $linkedAdmin->user_id = $user->id;
+            $linkedAdmin->save();
+        }
+
+        return $linkedAdmin;
+    }
+
+    private function ensureDefaultAdminHubProfile(User $user, string $role): void
+    {
+        if (!Schema::hasTable('admins') || User::normalizeRole($role) !== User::ROLE_ADMIN) {
+            return;
+        }
+
+        $linkedAdmin = $this->findLinkedAdminProfile($user);
+
+        if (!$linkedAdmin) {
+            $linkedAdmin = new Admin();
+        }
+
+        if (Admin::hasColumn('user_id')) {
+            $linkedAdmin->user_id = $user->id;
+        }
+
+        if (Admin::hasColumn('first_name') && trim((string) $linkedAdmin->first_name) === '') {
+            $linkedAdmin->first_name = $user->first_name;
+        }
+
+        if (Admin::hasColumn('last_name') && trim((string) $linkedAdmin->last_name) === '') {
+            $linkedAdmin->last_name = $user->last_name;
+        }
+
+        if (Admin::hasColumn('name') && trim((string) $linkedAdmin->name) === '') {
+            $linkedAdmin->name = trim((string) ($user->name ?? ''));
+        }
+
+        if (Admin::hasColumn('email') && trim((string) $linkedAdmin->email) === '') {
+            $linkedAdmin->email = $user->email;
+        }
+
+        if (Admin::hasColumn('email_address') && trim((string) $linkedAdmin->email_address) === '') {
+            $linkedAdmin->email_address = $user->email;
+        }
+
+        if (Admin::hasColumn('access_level') && trim((string) $linkedAdmin->access_level) === '') {
+            $linkedAdmin->access_level = 'designee';
+        }
+
+        if (Admin::hasColumn('status') && trim((string) ($linkedAdmin->status ?? '')) === '') {
+            $linkedAdmin->status = 'active';
+        }
+
+        $linkedAdmin->save();
     }
 
     private function resolveLocalRoleFromAdminHub(string $email): ?string
@@ -936,6 +1000,7 @@ class LoginController extends Controller
             }
 
             $existingUser->save();
+            $this->ensureDefaultAdminHubProfile($existingUser, $role);
             return $existingUser;
         }
 
@@ -958,6 +1023,8 @@ class LoginController extends Controller
             $user->user_type = User::normalizeRole($role) === User::normalizeRole($this->studentRoleValue()) ? 'Regular' : 'Assistant';
             $user->save();
         }
+
+        $this->ensureDefaultAdminHubProfile($user, $role);
 
         return $user;
     }

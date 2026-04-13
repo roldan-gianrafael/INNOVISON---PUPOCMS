@@ -77,12 +77,22 @@ class RoleMiddleware
             return null;
         }
 
+        if (Admin::hasColumn('user_id')) {
+            $linkedByUserId = Admin::query()
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($linkedByUserId) {
+                return $linkedByUserId;
+            }
+        }
+
         $email = trim((string) ($user->email ?? ''));
         if ($email === '') {
             return null;
         }
 
-        return Admin::query()
+        $linkedAdmin = Admin::query()
             ->where(function ($builder) use ($email) {
                 if (Admin::hasColumn('email')) {
                     $builder->orWhere('email', $email);
@@ -93,5 +103,12 @@ class RoleMiddleware
                 }
             })
             ->first();
+
+        if ($linkedAdmin && Admin::hasColumn('user_id') && !$linkedAdmin->user_id) {
+            $linkedAdmin->user_id = $user->id;
+            $linkedAdmin->save();
+        }
+
+        return $linkedAdmin;
     }
 }

@@ -219,6 +219,7 @@ class AdminUserController extends Controller
 
         if ($managementView === 'admin-hub') {
             $adminEmail = $baseEmail;
+            $externalIdentifier = trim((string) $request->input('external_identifier', ''));
             $linkedAdmin = Admin::query()
                 ->where(function ($query) use ($adminEmail, $baseEmail) {
                     if (Admin::hasColumn('email')) {
@@ -244,6 +245,9 @@ class AdminUserController extends Controller
             }
             if (Admin::hasColumn('email_address')) {
                 $linkedAdmin->email_address = $adminEmail;
+            }
+            if (Admin::hasColumn('external_identifier')) {
+                $linkedAdmin->external_identifier = $externalIdentifier !== '' ? $externalIdentifier : null;
             }
             if (Admin::hasColumn('access_level')) {
                 $linkedAdmin->access_level = 'designee';
@@ -375,6 +379,12 @@ class AdminUserController extends Controller
         }
         if (Admin::hasColumn('email_address')) {
             $admin->email_address = trim((string) $request->input('admin_email'));
+        }
+        if (Admin::hasColumn('external_identifier')) {
+            $incomingIdentifier = trim((string) $request->input('external_identifier', ''));
+            if ($incomingIdentifier !== '') {
+                $admin->external_identifier = $incomingIdentifier;
+            }
         }
         if (Admin::hasColumn('status')) {
             $admin->status = $request->status;
@@ -606,7 +616,8 @@ class AdminUserController extends Controller
                 $email = trim((string) ($faculty['email'] ?? ''));
                 $role = trim((string) ($faculty['faculty_type'] ?? $faculty['role'] ?? $faculty['access_level'] ?? 'Faculty'));
                 $status = strtolower(trim((string) ($faculty['status'] ?? 'active')));
-                $recordId = (string) ($faculty['faculty_id'] ?? $faculty['faculty_code'] ?? $faculty['id'] ?? ($email !== '' ? $email : 'faculty'));
+                $facultyIdentifier = (string) ($faculty['faculty_id'] ?? $faculty['faculty_code'] ?? $faculty['id'] ?? '');
+                $recordId = $facultyIdentifier !== '' ? $facultyIdentifier : ($email !== '' ? $email : 'faculty');
 
                 if (in_array($status, ['1', 'true', 'active', 'enabled'], true)) {
                     $status = 'active';
@@ -624,7 +635,7 @@ class AdminUserController extends Controller
                     'name' => $name !== '' ? $name : ($email !== '' ? $email : 'Faculty'),
                     'first_name' => (string) ($faculty['first_name'] ?? ''),
                     'last_name' => (string) ($faculty['last_name'] ?? ''),
-                    'student_id' => (string) ($faculty['faculty_code'] ?? ''),
+                    'student_id' => $facultyIdentifier,
                     'email' => $email,
                     'role' => $role !== '' ? $role : 'Faculty',
                     'raw_role' => $role,
@@ -676,6 +687,7 @@ class AdminUserController extends Controller
             ->get()
             ->map(function (Admin $admin) {
                 $linkedUser = Admin::hasColumn('user_id') && $admin->user_id ? User::find($admin->user_id) : null;
+                $externalIdentifier = trim((string) ($admin->external_identifier ?? ''));
                 $displayName = trim((string) ($admin->name ?? ''));
                 if ($displayName === '') {
                     $displayName = trim(implode(' ', array_filter([
@@ -697,7 +709,7 @@ class AdminUserController extends Controller
                     'name' => $displayName !== '' ? $displayName : ($email !== '' ? $email : 'Admin Hub Record'),
                     'first_name' => (string) ($admin->first_name ?? ''),
                     'last_name' => (string) ($admin->last_name ?? ''),
-                    'student_id' => (string) ($linkedUser?->student_id ?? ''),
+                    'student_id' => $externalIdentifier !== '' ? $externalIdentifier : (string) ($linkedUser?->student_id ?? ''),
                     'email' => $email,
                     'role' => 'Admin - Designee',
                     'raw_role' => 'admin',
@@ -716,6 +728,7 @@ class AdminUserController extends Controller
                         'admin_login_email' => $email,
                         'admin_profile_id' => $admin->admin_id,
                         'admin_profile_name' => $displayName,
+                        'external_identifier' => $externalIdentifier,
                         'office' => (string) ($admin->office ?? ''),
                         'lookup_source' => 'admin-hub',
                         'updated_at' => optional($admin->updated_at)->toIso8601String(),

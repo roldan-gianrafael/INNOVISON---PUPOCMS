@@ -1238,7 +1238,7 @@
                                         </div>
                                         <div>
                                             <div class="um-name">{{ $record['name'] }}</div>
-                                            <div class="um-sub">{{ $record['meta']['admin_profile_id'] ? 'ID: ' . $record['meta']['admin_profile_id'] : 'No ID yet' }}</div>
+                                            <div class="um-sub">{{ $record['student_id'] ? 'ID: ' . $record['student_id'] : 'No ID yet' }}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -1373,7 +1373,7 @@
                         <input type="text" id="detailEmail" readonly>
                     </div>
                     <div class="um-field">
-                        <label>Student / Faculty ID</label>
+                        <label id="detailIdentifierLabel">Student / Faculty ID</label>
                         <input type="text" id="detailIdentifier" readonly>
                     </div>
                     <div class="um-field">
@@ -1508,6 +1508,7 @@
     const detailAvatar = document.getElementById('detailAvatar');
     const detailName = document.getElementById('detailName');
     const detailEmail = document.getElementById('detailEmail');
+    const detailIdentifierLabel = document.getElementById('detailIdentifierLabel');
     const detailEditEmail = document.getElementById('detailEditEmail');
     const detailEmailLabel = document.getElementById('detailEmailLabel');
     const emailRoleNote = document.getElementById('emailRoleNote');
@@ -1670,6 +1671,9 @@
         detailName.value = row.dataset.name || '';
         detailEmail.value = row.dataset.email || '';
         detailIdentifier.value = row.dataset.studentId || row.dataset.id || '';
+        if (detailIdentifierLabel) {
+            detailIdentifierLabel.textContent = managementView === 'admin-hub' ? 'Faculty / External ID' : 'Student / Faculty ID';
+        }
         detailSource.value = row.dataset.sourceLabel || row.dataset.source || '';
         detailUpdated.value = row.dataset.updated || 'N/A';
         const normalizedRole = (() => {

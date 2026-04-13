@@ -692,7 +692,7 @@
                 $facultyEmail = $result['email'] ?? ($facultyFields['email'] ?? 'N/A');
                 $facultyStatus = $result['status'] ?? ($facultyFields['status'] ?? 'Active');
                 $facultyOffice = $result['office'] ?? ($facultyFields['department'] ?? $facultyFields['office'] ?? 'N/A');
-                $facultyIdentifier = $result['identifier'] ?? ($facultyFields['faculty_code'] ?? 'N/A');
+                $facultyIdentifier = $result['identifier'] ?? ($facultyFields['faculty_id'] ?? ($facultyFields['faculty_code'] ?? 'N/A'));
             @endphp
             <button
                 type="button"

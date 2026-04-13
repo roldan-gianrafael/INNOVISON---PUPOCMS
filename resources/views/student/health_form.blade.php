@@ -602,8 +602,8 @@
                     <input type="text" class="form-control bg-light" value="{{ optional($linkedAdminProfile)->suffix_name }}" readonly>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Mailing Address<span class="required-mark">*</span></label>
-                    <input type="text" name="home_address" class="form-control" placeholder="House No., Street, Brgy, City" value="{{ old('home_address') }}" required>
+                    <label class="form-label">Home Address<span class="required-mark">*</span></label>
+                    <input type="text" name="home_address" class="form-control" placeholder="House No., Street, Brgy, City" value="{{ old('home_address') }}" >
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">School Year</label>

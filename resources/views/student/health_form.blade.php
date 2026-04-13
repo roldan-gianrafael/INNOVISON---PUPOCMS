@@ -635,7 +635,7 @@
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Civil Status<span class="required-mark">*</span></label>
-            <select name="civil_status" class="form-select" required>
+            <select name="civil_status" class="form-select">
                 <option value="" selected disabled>Select Status</option>
                 <option value="Single" {{ old('civil_status') === 'Single' ? 'selected' : '' }}>Single</option>
                 <option value="Married" {{ old('civil_status') === 'Married' ? 'selected' : '' }}>Married</option>
@@ -668,7 +668,7 @@
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Phone Number<span class="required-mark">*</span></label>
-            <input type="text" name="cellphone" class="form-control" value="{{ old('cellphone') }}" required>
+            <input type="text" name="cellphone" class="form-control" value="{{ old('cellphone') }}">
         </div>
     </div>
 

@@ -229,13 +229,13 @@
     .um-mode-btn {
         width: min(360px, 100%);
         min-height: 280px;
-        border: 1px solid rgba(128, 0, 0, 0.14);
+        border: 1px solid rgba(203, 213, 225, 0.78);
         border-radius: 28px;
         padding: 28px 24px 30px;
-        background: linear-gradient(145deg, #6f0015 0%, #8f0f19 34%, #c58d11 100%);
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 48%, #e5e7eb 100%);
         box-shadow:
-            0 24px 40px rgba(111, 0, 21, 0.22),
-            0 48px 60px -32px rgba(197, 141, 17, 0.58);
+            0 22px 36px rgba(148, 163, 184, 0.18),
+            0 48px 60px -36px rgba(203, 213, 225, 0.74);
         text-align: left;
         cursor: pointer;
         position: relative;
@@ -247,7 +247,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.08));
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.10));
         pointer-events: none;
     }
 
@@ -259,7 +259,7 @@
         bottom: -22px;
         height: 36px;
         border-radius: 999px;
-        background: radial-gradient(circle, rgba(111, 0, 21, 0.30) 0%, rgba(111, 0, 21, 0.10) 42%, transparent 78%);
+        background: radial-gradient(circle, rgba(148, 163, 184, 0.34) 0%, rgba(148, 163, 184, 0.14) 42%, transparent 78%);
         filter: blur(12px);
         pointer-events: none;
     }
@@ -267,15 +267,15 @@
     .um-mode-btn:hover {
         transform: translateY(-4px);
         box-shadow:
-            0 28px 44px rgba(111, 0, 21, 0.26),
-            0 52px 72px -34px rgba(197, 141, 17, 0.62);
+            0 26px 42px rgba(148, 163, 184, 0.22),
+            0 54px 76px -38px rgba(203, 213, 225, 0.82);
     }
 
     .um-mode-btn.active {
-        border-color: rgba(255, 229, 158, 0.55);
+        border-color: rgba(148, 163, 184, 0.95);
         box-shadow:
-            0 30px 50px rgba(111, 0, 21, 0.30),
-            0 56px 78px -36px rgba(197, 141, 17, 0.70);
+            0 28px 48px rgba(148, 163, 184, 0.24),
+            0 56px 78px -38px rgba(226, 232, 240, 0.88);
     }
 
     .um-mode-btn .eyebrow {
@@ -284,8 +284,8 @@
         gap: 8px;
         padding: 6px 12px;
         border-radius: 999px;
-        background: rgba(255, 248, 220, 0.18);
-        color: #ffffff;
+        background: rgba(241, 245, 249, 0.94);
+        color: #64748b;
         font-size: .76rem;
         font-weight: 900;
         letter-spacing: .08em;
@@ -302,12 +302,12 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 248, 220, 0.14);
-        border: 1px solid rgba(255, 244, 207, 0.28);
-        color: #ffffff;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(226, 232, 240, 0.96);
+        color: #800000;
         box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.24),
-            0 18px 28px rgba(56, 9, 17, 0.22);
+            inset 0 1px 0 rgba(255,255,255,0.96),
+            0 18px 28px rgba(148, 163, 184, 0.18);
         position: relative;
         z-index: 1;
         animation: umModeFloat 3.8s ease-in-out infinite;
@@ -322,14 +322,14 @@
         margin: 14px 0 8px;
         font-size: 1.24rem;
         font-weight: 900;
-        color: #fff8e4;
+        color: #0f172a;
         position: relative;
         z-index: 1;
     }
 
     .um-mode-btn p {
         margin: 0;
-        color: rgba(255, 255, 255, 0.95);
+        color: #64748b;
         line-height: 1.6;
         font-size: .95rem;
         position: relative;

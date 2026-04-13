@@ -30,7 +30,16 @@ class AdminUserController extends Controller
 
                 return $record;
             })
-            ->filter(fn (array $record) => in_array($record['source'] ?? 'student', ['admin', 'superadmin', 'student_assistant'], true))
+            ->filter(function (array $record) {
+                $source = $record['source'] ?? 'student';
+                $accessLevel = strtolower(trim((string) ($record['meta']['access_level'] ?? '')));
+
+                if ($source === 'superadmin' || $source === 'student_assistant') {
+                    return true;
+                }
+
+                return $source === 'admin' && $accessLevel !== 'designee';
+            })
             ->sortBy(fn (array $record) => sprintf(
                 '%02d-%s',
                 $this->recordSortWeight($record['source'] ?? 'student'),
@@ -39,8 +48,17 @@ class AdminUserController extends Controller
             ->values()
             ->all();
 
-        $adminHubRecords = collect($localRecords)
-            ->filter(fn (array $record) => in_array($record['normalized_role'] ?? 'student', [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true))
+        $adminHubRecords = collect($allLocalUsers)
+            ->map(function (array $record) use ($currentUserId) {
+                $record['can_edit'] = $this->canManageRecord($record, $currentUserId);
+
+                return $record;
+            })
+            ->filter(function (array $record) {
+                return ($record['source'] ?? '') === 'admin'
+                    && strtolower(trim((string) ($record['meta']['access_level'] ?? ''))) === 'designee';
+            })
+            ->sortBy(fn (array $record) => strtolower((string) ($record['name'] ?? '')))
             ->values()
             ->all();
 

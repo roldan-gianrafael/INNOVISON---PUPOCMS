@@ -123,6 +123,11 @@
         color: #cbd5e1;
     }
 
+    html[data-theme="dark"] .um-panel-header h2,
+    html[data-theme="dark"] .um-panel-header p {
+        color: #fff;
+    }
+
     html[data-theme="dark"] .um-card-head,
     html[data-theme="dark"] .um-modal-head {
         border-color: rgba(148, 163, 184, 0.14);
@@ -278,10 +283,40 @@
         display: block;
     }
 
+    .um-mode-picker.is-hidden {
+        display: none;
+    }
+
     .um-panel-intro {
         padding: 16px 20px 0;
         color: #64748b;
         line-height: 1.6;
+    }
+
+    .um-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 20px 0;
+    }
+
+    .um-panel-header h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 900;
+        color: #111827;
+    }
+
+    .um-panel-header p {
+        margin: 6px 0 0;
+        color: #64748b;
+    }
+
+    .um-btn-ghost {
+        background: transparent;
+        color: #800000;
+        border: 1px solid rgba(128, 0, 0, 0.16);
     }
 
     .um-summary-grid {
@@ -923,13 +958,10 @@
             <h1>Users Management</h1>
             <p>Search and manage roles of accounts from one place.</p>
         </div>
-        <button type="button" class="um-btn um-btn-primary" data-open-lookup>
-            <span>+</span> Add New User
-        </button>
     </div>
 
     <div class="um-mode-picker">
-        <button type="button" class="um-mode-btn active" data-mode-button="account-access">
+        <button type="button" class="um-mode-btn" data-mode-button="account-access">
             <span class="eyebrow">Users Table</span>
             <h3>Account Access</h3>
             <p>Open the clinic login view for managed users. This is where we control the student email, clinic role, and active or inactive access.</p>
@@ -941,13 +973,19 @@
         </button>
     </div>
 
-    <div class="um-mode-panel is-active" id="account-access-panel">
+    <div class="um-mode-panel" id="account-access-panel">
         <div class="um-card">
-            <div class="um-directory-toggle" style="padding-top: 18px;">
-                <div class="hint">Managed users already added in the clinic CMS are listed here. Use this view when you want to manage access roles and account status.</div>
-                <button type="button" class="um-btn um-btn-primary" data-open-lookup>
-                    <span>+</span> Add New User
-                </button>
+            <div class="um-panel-header">
+                <div>
+                    <h2>Account Access</h2>
+                    <p>Managed users already added in the clinic CMS are listed here. Use this view for superadmin, admin-clinic staff, and student assistant access.</p>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="button" class="um-btn um-btn-ghost" data-back-to-modes>Back</button>
+                    <button type="button" class="um-btn um-btn-primary" data-open-lookup>
+                        <span>+</span> Add New User
+                    </button>
+                </div>
             </div>
             <div class="um-directory-panel is-open" id="directoryPanel">
             <div class="um-table-wrap">
@@ -1028,11 +1066,17 @@
 
     <div class="um-mode-panel" id="admin-hub-panel">
         <div class="um-card">
-            <div class="um-directory-toggle" style="padding-top: 18px;">
-                <div class="hint">This view focuses on the clinic admin hub record. Use it when you want to see which managed users already have admin-side profile data stored in the `admins` table.</div>
-                <button type="button" class="um-btn um-btn-primary" data-open-lookup>
-                    <span>+</span> Add New User
-                </button>
+            <div class="um-panel-header">
+                <div>
+                    <h2>Admin Hub Profile</h2>
+                    <p>This view only shows admin-designee records stored in the clinic `admins` table.</p>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="button" class="um-btn um-btn-ghost" data-back-to-modes>Back</button>
+                    <button type="button" class="um-btn um-btn-primary" data-open-lookup>
+                        <span>+</span> Add New User
+                    </button>
+                </div>
             </div>
             <div class="um-directory-panel is-open">
             <div class="um-table-wrap">
@@ -1368,13 +1412,19 @@
     const lookupDirectoryPanel = document.getElementById('lookupDirectoryPanel');
     const lookupSearchField = document.getElementById('lookupSearchField');
     const userHoverHint = document.getElementById('userHoverHint');
+    const modePicker = document.querySelector('.um-mode-picker');
     const modeButtons = document.querySelectorAll('[data-mode-button]');
+    const backToModesButtons = document.querySelectorAll('[data-back-to-modes]');
     const modePanels = {
         'account-access': document.getElementById('account-access-panel'),
         'admin-hub': document.getElementById('admin-hub-panel'),
     };
 
     const setUserManagementMode = (mode) => {
+        if (modePicker) {
+            modePicker.classList.add('is-hidden');
+        }
+
         modeButtons.forEach((button) => {
             button.classList.toggle('active', button.dataset.modeButton === mode);
         });
@@ -1388,8 +1438,30 @@
         });
     };
 
+    const resetUserManagementModes = () => {
+        if (modePicker) {
+            modePicker.classList.remove('is-hidden');
+        }
+
+        modeButtons.forEach((button) => {
+            button.classList.remove('active');
+        });
+
+        Object.values(modePanels).forEach((panel) => {
+            if (!panel) {
+                return;
+            }
+
+            panel.classList.remove('is-active');
+        });
+    };
+
     modeButtons.forEach((button) => {
         button.addEventListener('click', () => setUserManagementMode(button.dataset.modeButton));
+    });
+
+    backToModesButtons.forEach((button) => {
+        button.addEventListener('click', resetUserManagementModes);
     });
 
     const openSettingsFromRow = (row) => {

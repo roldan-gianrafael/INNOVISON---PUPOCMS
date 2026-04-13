@@ -624,19 +624,27 @@
     <div class="row">
         <div class="col-md-3 mb-3">
             <label class="form-label">Age<span class="required-mark">*</span></label>
-            <input type="number" name="age" value="{{ old('age', $calculatedAge) }}" class="form-control" readonly placeholder="Auto-calculated">
+            <input
+                type="number"
+                name="age"
+                value="{{ old('age', $calculatedAge) }}"
+                class="form-control"
+                {{ $calculatedAge ? 'readonly' : '' }}
+                placeholder="{{ $calculatedAge ? 'Auto-calculated' : 'Enter your age' }}"
+                required
+            >
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Sex<span class="required-mark">*</span></label>
-            <select name="sex" class="form-select">
+            <select name="sex" class="form-select" required>
                 <option value="Male" {{ old('sex') === 'Male' ? 'selected' : '' }}>Male</option>
                 <option value="Female" {{ old('sex') === 'Female' ? 'selected' : '' }}>Female</option>
             </select>
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Civil Status<span class="required-mark">*</span></label>
-            <select name="civil_status" class="form-select">
-                <option value="" selected disabled>Select Status</option>
+            <select name="civil_status" class="form-select" required>
+                <option value="" {{ old('civil_status') ? '' : 'selected' }} disabled>Select Status</option>
                 <option value="Single" {{ old('civil_status') === 'Single' ? 'selected' : '' }}>Single</option>
                 <option value="Married" {{ old('civil_status') === 'Married' ? 'selected' : '' }}>Married</option>
                 <option value="Widowed" {{ old('civil_status') === 'Widowed' ? 'selected' : '' }}>Widowed</option>
@@ -644,8 +652,16 @@
             </select>
         </div>
         <div class="col-md-3 mb-3">
-            <label class="form-label">Course / College</label>
-            <input type="text" name="course_college" class="form-control" value="{{ Auth::user()->course }}" readonly>
+            <label class="form-label">Course / College<span class="required-mark">*</span></label>
+            <input
+                type="text"
+                name="course_college"
+                class="form-control"
+                value="{{ old('course_college', Auth::user()->course) }}"
+                {{ Auth::user()->course ? 'readonly' : '' }}
+                placeholder="{{ Auth::user()->course ? '' : 'Enter your course or college' }}"
+                required
+            >
         </div>
     </div>
 
@@ -660,7 +676,7 @@
         </div>
         <div class="col-md-7 mb-3">
             <label class="form-label">Parent's Name / Guardian / Spouse<span class="required-mark">*</span></label>
-            <input type="text" name="guardian_name" class="form-control" value="{{ old('guardian_name') }}">
+            <input type="text" name="guardian_name" class="form-control" value="{{ old('guardian_name') }}" required>
         </div>
         <div class="col-md-2 mb-3">
             <label class="form-label">Landline</label>
@@ -668,7 +684,7 @@
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Phone Number<span class="required-mark">*</span></label>
-            <input type="text" name="cellphone" class="form-control" value="{{ old('cellphone') }}">
+            <input type="text" name="cellphone" class="form-control" value="{{ old('cellphone') }}" required>
         </div>
     </div>
 
@@ -1175,4 +1191,3 @@ document.addEventListener('DOMContentLoaded', function() {
 @include('partials.student_voice_input_support')
 </body>
 </html>
-

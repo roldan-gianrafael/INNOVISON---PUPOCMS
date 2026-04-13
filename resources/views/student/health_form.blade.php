@@ -463,6 +463,25 @@
 <div class="container">
     <div class="form-card">
         <div class="intake-shell">
+        @if (session('success'))
+            <div class="alert alert-success mb-3">{{ session('success') }}</div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger mb-3">{{ session('error') }}</div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger mb-3">
+                <strong>Please review the required fields before submitting.</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="stepper-shell">
             <div class="stepper-track">
                 <div class="step-card active is-clickable" data-step-target="1">
@@ -584,19 +603,19 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Mailing Address<span class="required-mark">*</span></label>
-                    <input type="text" name="home_address" class="form-control" placeholder="House No., Street, Brgy, City" required>
+                    <input type="text" name="home_address" class="form-control" placeholder="House No., Street, Brgy, City" value="{{ old('home_address') }}" required>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">School Year</label>
-                    <input type="text" name="school_year" class="form-control" value="2025-2026">
+                    <input type="text" name="school_year" class="form-control" value="{{ old('school_year', '2025-2026') }}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Height</label>
-                    <input type="text" name="height" class="form-control" placeholder="cm">
+                    <input type="text" name="height" class="form-control" placeholder="cm" value="{{ old('height') }}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Weight</label>
-                    <input type="text" name="weight" class="form-control" placeholder="kg">
+                    <input type="text" name="weight" class="form-control" placeholder="kg" value="{{ old('weight') }}">
                 </div>
             </div>
         </div>
@@ -605,23 +624,23 @@
     <div class="row">
         <div class="col-md-3 mb-3">
             <label class="form-label">Age<span class="required-mark">*</span></label>
-            <input type="number" name="age" value="{{ $calculatedAge }}" class="form-control" readonly placeholder="Auto-calculated">
+            <input type="number" name="age" value="{{ old('age', $calculatedAge) }}" class="form-control" readonly placeholder="Auto-calculated">
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Sex<span class="required-mark">*</span></label>
             <select name="sex" class="form-select" required>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="Male" {{ old('sex') === 'Male' ? 'selected' : '' }}>Male</option>
+                <option value="Female" {{ old('sex') === 'Female' ? 'selected' : '' }}>Female</option>
             </select>
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Civil Status<span class="required-mark">*</span></label>
             <select name="civil_status" class="form-select" required>
                 <option value="" selected disabled>Select Status</option>
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-                <option value="Widowed">Widowed</option>
-                <option value="Separated">Separated</option>
+                <option value="Single" {{ old('civil_status') === 'Single' ? 'selected' : '' }}>Single</option>
+                <option value="Married" {{ old('civil_status') === 'Married' ? 'selected' : '' }}>Married</option>
+                <option value="Widowed" {{ old('civil_status') === 'Widowed' ? 'selected' : '' }}>Widowed</option>
+                <option value="Separated" {{ old('civil_status') === 'Separated' ? 'selected' : '' }}>Separated</option>
             </select>
         </div>
         <div class="col-md-3 mb-3">
@@ -633,7 +652,7 @@
     <div class="row">
         <div class="col-md-4 mb-3">
             <label class="form-label">Blood Type</label>
-            <input type="text" name="blood_type" class="form-control" placeholder="e.g. O+">
+            <input type="text" name="blood_type" class="form-control" placeholder="e.g. O+" value="{{ old('blood_type') }}">
         </div>
         <div class="col-md-8 mb-3">
             <label class="form-label">Email Address<span class="required-mark">*</span></label>
@@ -641,15 +660,15 @@
         </div>
         <div class="col-md-7 mb-3">
             <label class="form-label">Parent's Name / Guardian / Spouse<span class="required-mark">*</span></label>
-            <input type="text" name="guardian_name" class="form-control" required>
+            <input type="text" name="guardian_name" class="form-control" value="{{ old('guardian_name') }}" required>
         </div>
         <div class="col-md-2 mb-3">
             <label class="form-label">Landline</label>
-            <input type="text" name="landline" class="form-control">
+            <input type="text" name="landline" class="form-control" value="{{ old('landline') }}">
         </div>
         <div class="col-md-3 mb-3">
             <label class="form-label">Phone Number<span class="required-mark">*</span></label>
-            <input type="text" name="cellphone" class="form-control" required>
+            <input type="text" name="cellphone" class="form-control" value="{{ old('cellphone') }}" required>
         </div>
     </div>
 
@@ -660,11 +679,11 @@
         <div class="col-12 mb-2">
             <label class="form-label">1. Do you need medical attention or has known medical illness?</label>
             <div class="form-check form-check-inline ms-3">
-                <input class="form-check-input illness-radio" type="radio" name="has_illness" value="No" id="illnessNo">
+                <input class="form-check-input illness-radio" type="radio" name="has_illness" value="No" id="illnessNo" {{ old('has_illness') === 'No' ? 'checked' : '' }}>
                 <label class="form-check-label" for="illnessNo">No</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input illness-radio" type="radio" name="has_illness" value="Yes" id="illnessYes">
+                <input class="form-check-input illness-radio" type="radio" name="has_illness" value="Yes" id="illnessYes" {{ old('has_illness') === 'Yes' ? 'checked' : '' }}>
                 <label class="form-check-label" for="illnessYes">Yes</label>
             </div>
         </div>
@@ -686,7 +705,7 @@
         @endforeach
         <div class="col-md-12 mt-2">
             <label class="form-label">Others (Pls. Indicate):</label>
-            <input type="text" name="other_illness" class="form-control">
+            <input type="text" name="other_illness" class="form-control" value="{{ old('other_illness') }}">
         </div>
         <div class="row mt-4">
         <div class="col-md-12 mt-3">
@@ -715,14 +734,14 @@
         <div class="col-12 mb-2">
             <label class="form-label">4. Do you have disability?</label>
             <div class="form-check form-check-inline ms-3">
-                <input class="form-check-input disability-radio" type="radio" name="has_disability" value="None" id="disabilityNo">
+                <input class="form-check-input disability-radio" type="radio" name="has_disability" value="None" id="disabilityNo" {{ old('has_disability') === 'None' ? 'checked' : '' }}>
                 <label class="form-check-label" for="disabilityNo">None</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input disability-radio" type="radio" name="has_disability" value="Yes" id="disabilityYes">
+                <input class="form-check-input disability-radio" type="radio" name="has_disability" value="Yes" id="disabilityYes" {{ old('has_disability') === 'Yes' ? 'checked' : '' }}>
                 <label class="form-check-label" for="disabilityYes">if Yes, What type?</label>
             </div>
-            <input type="text" name="disability_type" id="disability_type" class="form-control d-inline-block w-50 ms-2" placeholder="Specify disability">
+            <input type="text" name="disability_type" id="disability_type" class="form-control d-inline-block w-50 ms-2" placeholder="Specify disability" value="{{ old('disability_type') }}">
         </div>
         <div class="col-12 mt-3" id="pwdProofWrapper" style="display: none;">
             <label class="form-label">PWD ID / Proof</label>
@@ -739,12 +758,12 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Food (Please specify):</label>
-                    <input type="text" name="food_allergies" class="form-control">
+                    <input type="text" name="food_allergies" class="form-control" value="{{ old('food_allergies') }}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">No Known Allergies:</label>
                     <div class="form-check mt-2">
-                        <input class="form-check-input" type="checkbox" name="no_allergies" id="noAllergiesCheck" value="1">
+                        <input class="form-check-input" type="checkbox" name="no_allergies" id="noAllergiesCheck" value="1" {{ old('no_allergies') ? 'checked' : '' }}>
                         <label class="form-check-label" for="noAllergiesCheck">I confirm no known allergies</label>
                     </div>
                 </div>
@@ -762,7 +781,7 @@
                 </div>
                 @endforeach
                 <div class="col-md-12 mt-2">
-                    <input type="text" name="other_med_allergies" class="form-control" placeholder="Others: Specify">
+                    <input type="text" name="other_med_allergies" class="form-control" placeholder="Others: Specify" value="{{ old('other_med_allergies') }}">
                 </div>
                 
             </div>
@@ -848,6 +867,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const validationErrors = @json($errors->keys());
     const steps = Array.from(document.querySelectorAll('.form-step'));
     const stepCards = Array.from(document.querySelectorAll('.step-card[data-step-target]'));
     const prevStepBtn = document.getElementById('prevStepBtn');
@@ -884,6 +904,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const customRequired = {
+            1: [
+                document.querySelector('input[name="school_year"]'),
+                document.querySelector('input[name="home_address"]'),
+                document.querySelector('input[name="age"]'),
+                document.querySelector('select[name="sex"]'),
+                document.querySelector('select[name="civil_status"]'),
+                document.querySelector('input[name="course_college"]'),
+                document.querySelector('input[name="guardian_name"]'),
+                document.querySelector('input[name="cellphone"]')
+            ],
+            2: [
+                document.querySelector('input[name="has_illness"]'),
+                document.querySelector('input[name="has_disability"]')
+            ],
             4: [
                 document.querySelector('input[name="student_photo"]'),
                 document.querySelector('input[name="digital_signature"]')
@@ -930,6 +964,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         return true;
+    };
+
+    const resolveStepFromErrors = () => {
+        const fieldStepMap = {
+            school_year: 1,
+            home_address: 1,
+            age: 1,
+            sex: 1,
+            civil_status: 1,
+            course_college: 1,
+            guardian_name: 1,
+            cellphone: 1,
+            has_illness: 2,
+            medical_history: 2,
+            chest_xray_result: 2,
+            has_disability: 2,
+            disability_type: 2,
+            pwd_id_proof: 2,
+            food_allergies: 2,
+            no_allergies: 2,
+            medicine_allergies: 2,
+            other_med_allergies: 2,
+            medical_certificate: 2,
+            medical_certificate_issued_by: 2,
+            vaccine_history: 3,
+            vax_date_1: 3,
+            vax_brand_1: 3,
+            vax_date_2: 3,
+            vax_brand_2: 3,
+            booster_date_1: 3,
+            booster_brand_1: 3,
+            booster_date_2: 3,
+            booster_brand_2: 3,
+            student_photo: 4,
+            digital_signature: 4,
+        };
+
+        for (const fieldName of validationErrors) {
+            if (fieldStepMap[fieldName]) {
+                return fieldStepMap[fieldName];
+            }
+        }
+
+        return 1;
     };
 
     const renderStep = (stepNumber) => {
@@ -1071,7 +1149,11 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleIllness();
     toggleDisability();
     toggleAllergies();
-    renderStep(1);
+    const initialStep = validationErrors.length ? resolveStepFromErrors() : 1;
+    if (validationErrors.length) {
+        attemptedSteps.add(initialStep);
+    }
+    renderStep(initialStep);
 
     function forceAccessibilityButtonTheme() {
         document.querySelectorAll('.asw-menu-btn').forEach((button) => {

@@ -1526,21 +1526,30 @@
     };
     let currentLookupContext = 'account-access';
 
+    const applySettingsSectionMode = (managementView, canEdit, canOnboard) => {
+        const isAdminHubOnly = managementView === 'admin-hub';
+
+        if (accountAccessSection) {
+            accountAccessSection.classList.toggle('is-hidden', isAdminHubOnly);
+            accountAccessSection.style.display = isAdminHubOnly ? 'none' : '';
+        }
+
+        if (adminHubSection) {
+            adminHubSection.classList.remove('is-hidden');
+            adminHubSection.style.display = (canEdit || canOnboard) ? '' : 'none';
+        }
+    };
+
     const syncRoleUi = (options = {}) => {
         const canEdit = options.canEdit === true;
         const canOnboard = options.canOnboard === true;
-        const isAdminHubOnly = detailManagementView && detailManagementView.value === 'admin-hub';
+        const managementView = detailManagementView ? detailManagementView.value : 'account-access';
         const isStudent = detailRole.value === 'student';
         const isAdmin = detailRole.value === 'admin';
         const isSuperAdmin = detailRole.value === 'super_admin';
         const hasAdminHub = isAdmin || isSuperAdmin;
 
-        if (accountAccessSection) {
-            accountAccessSection.classList.toggle('is-hidden', isAdminHubOnly);
-        }
-        if (adminHubSection) {
-            adminHubSection.classList.remove('is-hidden');
-        }
+        applySettingsSectionMode(managementView, canEdit, canOnboard);
 
         if (isStudent) {
             detailEmailLabel.textContent = 'Student Email';
@@ -1658,13 +1667,7 @@
             deleteAdminProfileId.value = adminProfileId;
         }
         detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
-        if (accountAccessSection) {
-            accountAccessSection.classList.toggle('is-hidden', managementView === 'admin-hub');
-        }
-        if (adminHubSection) {
-            adminHubSection.classList.remove('is-hidden');
-        }
-        adminHubSection.style.display = (canEdit || canOnboard) ? '' : 'none';
+        applySettingsSectionMode(managementView, canEdit, canOnboard);
 
         detailEditEmail.value = row.dataset.email || '';
         detailEmailLabel.textContent = 'Student Email';

@@ -99,20 +99,20 @@
     }
 
     html[data-theme="dark"] .um-mode-btn {
-        background: linear-gradient(145deg, #570012 0%, #7a0d18 36%, #b07b10 100%);
-        border-color: rgba(255, 229, 158, 0.22);
+        background: linear-gradient(145deg, #5f0012 0%, #7d0b17 42%, #c18a10 100%);
+        border-color: rgba(255, 230, 165, 0.34);
         box-shadow:
-            0 24px 38px rgba(0, 0, 0, 0.34),
-            0 52px 72px -38px rgba(176, 123, 16, 0.52);
+            0 24px 38px rgba(95, 0, 18, 0.34),
+            0 52px 72px -38px rgba(193, 138, 16, 0.56);
     }
 
     html[data-theme="dark"] .um-mode-btn.active {
-        border-color: rgba(248, 113, 113, 0.32);
-        background: linear-gradient(145deg, #650014 0%, #86111b 38%, #c08a11 100%);
+        border-color: rgba(255, 230, 165, 0.52);
+        background: linear-gradient(145deg, #6d0014 0%, #8a0d19 40%, #d09510 100%);
     }
 
     html[data-theme="dark"] .um-mode-btn .eyebrow {
-        background: rgba(255, 248, 220, 0.12);
+        background: rgba(193, 138, 16, 0.18);
         color: #ffffff;
     }
 
@@ -123,6 +123,19 @@
 
     html[data-theme="dark"] .um-mode-btn p {
         color: rgba(255, 255, 255, 0.9);
+    }
+
+    html[data-theme="dark"] .um-mode-btn::after {
+        background: radial-gradient(circle, rgba(193, 138, 16, 0.34) 0%, rgba(95, 0, 18, 0.18) 42%, transparent 78%);
+    }
+
+    html[data-theme="dark"] .um-mode-icon {
+        background: rgba(193, 138, 16, 0.16);
+        border-color: rgba(255, 230, 165, 0.28);
+        color: #ffffff;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.18),
+            0 18px 28px rgba(95, 0, 18, 0.28);
     }
 
     html[data-theme="dark"] .um-panel-header h2,
@@ -316,6 +329,8 @@
     .um-mode-icon svg {
         width: 30px;
         height: 30px;
+        display: block;
+        stroke: currentColor;
     }
 
     .um-mode-btn h3 {

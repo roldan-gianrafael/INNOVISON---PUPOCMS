@@ -191,8 +191,39 @@ class LoginController extends Controller
         return null;
     }
 
+    private function resolveForcedLocalRole(string $email): ?string
+    {
+        $email = trim(strtolower($email));
+        if ($email === '') {
+            return null;
+        }
+
+        $localPart = Str::before($email, '@');
+        $identifiers = array_map(
+            static fn ($value) => trim(strtolower((string) $value)),
+            (array) config('services.idp.local_superadmin_identifiers', [])
+        );
+
+        foreach ($identifiers as $identifier) {
+            if ($identifier === '') {
+                continue;
+            }
+
+            if ($identifier === $email || $identifier === $localPart) {
+                return $this->superAdminRoleValue();
+            }
+        }
+
+        return null;
+    }
+
     private function resolveRedirectPathForUser(User $user): string
     {
+        $forcedRole = $this->resolveForcedLocalRole((string) ($user->email ?? ''));
+        if ($forcedRole !== null && User::normalizeRole($forcedRole) === User::ROLE_SUPERADMIN) {
+            return '/admin/dashboard';
+        }
+
         $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
         if ($normalizedRole === User::ROLE_SUPERADMIN) {
             return '/admin/dashboard';
@@ -858,8 +889,13 @@ class LoginController extends Controller
             'data.user.role',
         ]);
         $role = $this->mapIdpRolesToLocal($this->extractRawRoles($profile), $preferredRole);
+        $forcedRole = $this->resolveForcedLocalRole($emailSeed);
+        if ($forcedRole !== null) {
+            $role = $forcedRole;
+        }
+
         $adminHubRole = $this->resolveLocalRoleFromAdminHub($emailSeed);
-        if ($adminHubRole !== null) {
+        if ($forcedRole === null && $adminHubRole !== null) {
             $role = $adminHubRole;
         }
 

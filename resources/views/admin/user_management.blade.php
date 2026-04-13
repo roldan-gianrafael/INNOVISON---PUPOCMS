@@ -1230,7 +1230,7 @@
                                         </div>
                                         <div>
                                             <div class="um-name">{{ $record['name'] }}</div>
-                                            <div class="um-sub">{{ $record['meta']['admin_profile_id'] ? 'Hub record #' . $record['meta']['admin_profile_id'] : 'No hub record yet' }}</div>
+                                            <div class="um-sub">{{ $record['meta']['admin_profile_id'] ? 'ID: ' . $record['meta']['admin_profile_id'] : 'No ID yet' }}</div>
                                         </div>
                                     </div>
                                 </td>

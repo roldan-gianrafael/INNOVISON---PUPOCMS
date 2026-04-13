@@ -48,19 +48,7 @@ class AdminUserController extends Controller
             ->values()
             ->all();
 
-        $adminHubRecords = collect($allLocalUsers)
-            ->map(function (array $record) use ($currentUserId) {
-                $record['can_edit'] = $this->canManageRecord($record, $currentUserId);
-
-                return $record;
-            })
-            ->filter(function (array $record) {
-                return ($record['source'] ?? '') === 'admin'
-                    && strtolower(trim((string) ($record['meta']['access_level'] ?? ''))) === 'designee';
-            })
-            ->sortBy(fn (array $record) => strtolower((string) ($record['name'] ?? '')))
-            ->values()
-            ->all();
+        $adminHubRecords = $this->collectAdminHubProfiles($lookupSearch);
 
         $lookupRecords = $lookupSearch !== ''
             ? collect($this->collectLocalUsers($lookupSearch))
@@ -201,6 +189,7 @@ class AdminUserController extends Controller
 
         $request->validate([
             'lookup_source' => ['required', Rule::in(['faculty'])],
+            'management_view' => ['nullable', Rule::in(['account-access', 'admin-hub'])],
             'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'email' => ['required', 'email', 'max:255'],
@@ -216,20 +205,72 @@ class AdminUserController extends Controller
         $normalizedRequestedRole = User::normalizeRole($request->user_role);
         $baseEmail = trim((string) $request->email);
 
+        $managementView = trim((string) $request->input('management_view', 'account-access'));
+        $firstName = trim((string) $request->input('first_name', ''));
+        $lastName = trim((string) $request->input('last_name', ''));
+        $fullName = trim((string) $request->input('full_name', ''));
+        if ($fullName === '') {
+            $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+        }
+
+        if ($managementView === 'admin-hub') {
+            $adminEmail = trim((string) $request->input('admin_email', '')) ?: $baseEmail;
+            $linkedAdmin = Admin::query()
+                ->where(function ($query) use ($adminEmail, $baseEmail) {
+                    if (Admin::hasColumn('email')) {
+                        $query->orWhere('email', $adminEmail)->orWhere('email', $baseEmail);
+                    }
+                    if (Admin::hasColumn('email_address')) {
+                        $query->orWhere('email_address', $adminEmail)->orWhere('email_address', $baseEmail);
+                    }
+                })
+                ->first() ?? new Admin();
+
+            if (Admin::hasColumn('first_name')) {
+                $linkedAdmin->first_name = $firstName !== '' ? $firstName : 'Faculty';
+            }
+            if (Admin::hasColumn('last_name')) {
+                $linkedAdmin->last_name = $lastName !== '' ? $lastName : 'User';
+            }
+            if (Admin::hasColumn('name')) {
+                $linkedAdmin->name = $fullName !== '' ? $fullName : trim(($linkedAdmin->first_name ?? 'Faculty') . ' ' . ($linkedAdmin->last_name ?? 'User'));
+            }
+            if (Admin::hasColumn('email')) {
+                $linkedAdmin->email = $adminEmail;
+            }
+            if (Admin::hasColumn('email_address')) {
+                $linkedAdmin->email_address = $adminEmail;
+            }
+            if (Admin::hasColumn('access_level')) {
+                $linkedAdmin->access_level = 'designee';
+            }
+            if (Admin::hasColumn('status')) {
+                $linkedAdmin->status = $request->status;
+            }
+            if (Admin::hasColumn('office')) {
+                $linkedAdmin->office = $request->input('office');
+            }
+            $linkedAdmin->save();
+
+            $this->logUserManagementAction(
+                'Added admin hub profile from lookup',
+                sprintf(
+                    'Added %s (%s) from %s lookup into the clinic admin hub as designee only.',
+                    $linkedAdmin->name ?? $adminEmail,
+                    $adminEmail,
+                    $request->lookup_source
+                )
+            );
+
+            return redirect()->route('admin.user-management')->with('success', 'Lookup user added to the Admin Hub successfully.');
+        }
+
         $user = User::query()->where('email', $baseEmail)->first();
 
         if (!$user) {
             $studentIdSeed = trim((string) $request->input('external_identifier', ''));
             if ($studentIdSeed === '') {
                 $studentIdSeed = 'faculty-' . strtolower(substr(md5($baseEmail), 0, 10));
-            }
-
-            $firstName = trim((string) $request->input('first_name', ''));
-            $lastName = trim((string) $request->input('last_name', ''));
-            $fullName = trim((string) $request->input('full_name', ''));
-
-            if ($fullName === '') {
-                $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
             }
 
             $user = new User();
@@ -296,6 +337,82 @@ class AdminUserController extends Controller
         );
 
         return redirect()->route('admin.user-management')->with('success', 'Lookup user added to the clinic system successfully.');
+    }
+
+    public function updateAdminHub(Request $request, Admin $admin)
+    {
+        $this->ensureCanManageUsers();
+
+        $request->validate([
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+            'admin_email' => ['required', 'email', 'max:255'],
+            'office' => ['nullable', 'string', 'max:255'],
+            'first_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['nullable', 'string', 'max:255'],
+            'full_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        if (Admin::hasColumn('first_name')) {
+            $admin->first_name = trim((string) $request->input('first_name', ''));
+        }
+        if (Admin::hasColumn('last_name')) {
+            $admin->last_name = trim((string) $request->input('last_name', ''));
+        }
+        if (Admin::hasColumn('name')) {
+            $fullName = trim((string) $request->input('full_name', ''));
+            $admin->name = $fullName !== '' ? $fullName : trim(implode(' ', array_filter([$admin->first_name, $admin->last_name])));
+        }
+        if (Admin::hasColumn('email')) {
+            $admin->email = trim((string) $request->input('admin_email'));
+        }
+        if (Admin::hasColumn('email_address')) {
+            $admin->email_address = trim((string) $request->input('admin_email'));
+        }
+        if (Admin::hasColumn('status')) {
+            $admin->status = $request->status;
+        }
+        if (Admin::hasColumn('office')) {
+            $admin->office = $request->input('office');
+        }
+        if (Admin::hasColumn('access_level')) {
+            $admin->access_level = 'designee';
+        }
+        $admin->save();
+
+        $this->logUserManagementAction(
+            'Updated admin hub profile',
+            sprintf(
+                'Updated admin hub record #%s (%s).',
+                $admin->admin_id,
+                $admin->name ?? ($admin->email ?? 'Unknown Admin')
+            )
+        );
+
+        return redirect()->back()->with('success', 'Admin Hub profile updated successfully.');
+    }
+
+    public function destroyAdminHub(Admin $admin)
+    {
+        $this->ensureCanManageUsers();
+
+        if (Admin::hasColumn('access_level')) {
+            $admin->access_level = null;
+        }
+        if (Admin::hasColumn('status')) {
+            $admin->status = 'active';
+        }
+        $admin->save();
+
+        $this->logUserManagementAction(
+            'Removed admin hub access',
+            sprintf(
+                'Removed admin hub designee access for record #%s (%s).',
+                $admin->admin_id,
+                $admin->name ?? ($admin->email ?? 'Unknown Admin')
+            )
+        );
+
+        return redirect()->back()->with('success', 'Admin Hub access removed successfully.');
     }
 
     public function destroy(User $user)
@@ -496,6 +613,83 @@ class AdminUserController extends Controller
                         'profile' => $profile,
                         'lookup_source' => 'faculty',
                         'updated_at' => $faculty['last_updated'] ?? null,
+                    ],
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function collectAdminHubProfiles(string $search = ''): array
+    {
+        if (!Schema::hasTable('admins')) {
+            return [];
+        }
+
+        $query = Admin::query();
+
+        if (Admin::hasColumn('access_level')) {
+            $query->where('access_level', 'designee');
+        }
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                foreach (['admin_id', 'name', 'first_name', 'last_name', 'email', 'email_address', 'office', 'status'] as $column) {
+                    if (Admin::hasColumn($column)) {
+                        $builder->orWhere($column, 'like', '%' . $search . '%');
+                    }
+                }
+            });
+        }
+
+        return $query->orderBy('name')
+            ->limit(100)
+            ->get()
+            ->map(function (Admin $admin) {
+                $linkedUser = Admin::hasColumn('user_id') && $admin->user_id ? User::find($admin->user_id) : null;
+                $displayName = trim((string) ($admin->name ?? ''));
+                if ($displayName === '') {
+                    $displayName = trim(implode(' ', array_filter([
+                        $admin->first_name ?? '',
+                        $admin->last_name ?? '',
+                    ])));
+                }
+                $email = trim((string) ($admin->email_address ?? $admin->email ?? ''));
+                $status = strtolower(trim((string) ($admin->status ?? 'active')));
+                if ($status === '') {
+                    $status = 'active';
+                }
+
+                return [
+                    'id' => (string) $admin->admin_id,
+                    'record_id' => (string) $admin->admin_id,
+                    'source' => 'admin',
+                    'source_label' => 'Admin Hub',
+                    'name' => $displayName !== '' ? $displayName : ($email !== '' ? $email : 'Admin Hub Record'),
+                    'first_name' => (string) ($admin->first_name ?? ''),
+                    'last_name' => (string) ($admin->last_name ?? ''),
+                    'student_id' => (string) ($linkedUser?->student_id ?? ''),
+                    'email' => $email,
+                    'role' => 'Admin - Designee',
+                    'raw_role' => 'admin',
+                    'normalized_role' => User::ROLE_ADMIN,
+                    'status' => $status === 'inactive' ? 'inactive' : 'active',
+                    'avatar_url' => null,
+                    'avatar_letter' => strtoupper(substr($displayName !== '' ? $displayName : ($email ?: 'A'), 0, 1)),
+                    'can_edit' => true,
+                    'is_external' => false,
+                    'update_url' => route('admin.user-management.admin-hub.update', $admin->admin_id),
+                    'delete_url' => route('admin.user-management.admin-hub.destroy', $admin->admin_id),
+                    'meta' => [
+                        'email' => $email,
+                        'access_level' => 'designee',
+                        'admin_login_email' => $email,
+                        'admin_profile_id' => $admin->admin_id,
+                        'admin_profile_name' => $displayName,
+                        'office' => (string) ($admin->office ?? ''),
+                        'lookup_source' => 'admin-hub',
+                        'updated_at' => optional($admin->updated_at)->toIso8601String(),
+                        'linked_user_id' => $admin->user_id ?? null,
                     ],
                 ];
             })

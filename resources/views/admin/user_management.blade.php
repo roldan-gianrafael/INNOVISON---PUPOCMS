@@ -1089,7 +1089,7 @@
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" class="um-btn um-btn-ghost" data-back-to-modes>Back</button>
-                    <button type="button" class="um-btn um-btn-primary" data-open-lookup>
+                    <button type="button" class="um-btn um-btn-primary" data-open-lookup="account-access">
                         <span>+</span> Add New User
                     </button>
                 </div>
@@ -1177,7 +1177,7 @@
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" class="um-btn um-btn-ghost" data-back-to-modes>Back</button>
-                    <button type="button" class="um-btn um-btn-primary" data-open-lookup>
+                    <button type="button" class="um-btn um-btn-primary" data-open-lookup="admin-hub">
                         <span>+</span> Add New User
                     </button>
                 </div>
@@ -1198,8 +1198,8 @@
                         @forelse($adminHubRecords as $record)
                             <tr
                                 data-user-card
-                                data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
-                                data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
+                                data-update-url="{{ $record['update_url'] ?? ($record['can_edit'] ? route('admin.user-management.update', $record['id']) : '') }}"
+                                data-delete-url="{{ $record['delete_url'] ?? ($record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '') }}"
                                 data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
                                 data-id="{{ $record['record_id'] }}"
                                 data-name="{{ $record['name'] }}"
@@ -1380,6 +1380,7 @@
                     <form method="POST" id="settingsForm">
                         @csrf
                         <input type="hidden" name="_method" id="settingsMethod" value="PUT">
+                        <input type="hidden" name="management_view" id="detailManagementView" value="account-access">
                         <input type="hidden" name="lookup_source" id="detailLookupSource" value="">
                         <input type="hidden" name="first_name" id="detailFirstName" value="">
                         <input type="hidden" name="last_name" id="detailLastName" value="">
@@ -1495,6 +1496,7 @@
     const detailUpdated = document.getElementById('detailUpdated');
     const detailRole = document.getElementById('detailRole');
     const detailStatus = document.getElementById('detailStatus');
+    const detailManagementView = document.getElementById('detailManagementView');
     const detailLookupSource = document.getElementById('detailLookupSource');
     const detailFirstName = document.getElementById('detailFirstName');
     const detailLastName = document.getElementById('detailLastName');
@@ -1521,6 +1523,45 @@
     const modePanels = {
         'account-access': document.getElementById('account-access-panel'),
         'admin-hub': document.getElementById('admin-hub-panel'),
+    };
+    let currentLookupContext = 'account-access';
+
+    const syncRoleUi = (options = {}) => {
+        const canEdit = options.canEdit === true;
+        const canOnboard = options.canOnboard === true;
+        const isAdminHubOnly = detailManagementView && detailManagementView.value === 'admin-hub';
+        const isStudent = detailRole.value === 'student';
+        const isAdmin = detailRole.value === 'admin';
+        const isSuperAdmin = detailRole.value === 'super_admin';
+        const hasAdminHub = isAdmin || isSuperAdmin;
+
+        if (accountAccessSection) {
+            accountAccessSection.classList.toggle('is-hidden', isAdminHubOnly);
+        }
+        if (adminHubSection) {
+            adminHubSection.classList.remove('is-hidden');
+        }
+
+        if (isStudent) {
+            detailEmailLabel.textContent = 'Student Email';
+            emailRoleNote.textContent = 'This email stays with the student account.';
+            accessLevelWrap.style.display = 'none';
+            detailAccessLevel.disabled = true;
+            adminEmailWrap.style.display = 'none';
+            adminOfficeWrap.style.display = 'none';
+        } else {
+            detailEmailLabel.textContent = 'Student Email';
+            emailRoleNote.textContent = 'Keep this email for the student side.';
+            accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
+            detailAccessLevel.disabled = !isAdmin || !(canEdit || canOnboard);
+            adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
+            adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
+            detailAccessLevelLabel.textContent = 'Admin Type';
+        }
+
+        if (detailAdminProfileStatus && !hasAdminHub) {
+            detailAdminProfileStatus.textContent = 'Not needed while this account stays on the student side only.';
+        }
     };
 
     const setUserManagementMode = (mode) => {
@@ -1576,7 +1617,10 @@
         const canOnboard = row.dataset.canOnboard === '1';
         const avatarUrl = row.dataset.avatarUrl || '';
         const avatarLetter = row.dataset.avatarLetter || 'U';
-        const managementView = row.dataset.managementView || 'account-access';
+        const managementView = row.dataset.managementView || currentLookupContext || 'account-access';
+        if (detailManagementView) {
+            detailManagementView.value = managementView;
+        }
 
         detailName.value = row.dataset.name || '';
         detailEmail.value = row.dataset.email || '';
@@ -1614,18 +1658,12 @@
             deleteAdminProfileId.value = adminProfileId;
         }
         detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
-        const showAdminAccessLevel = normalizedRole === 'admin';
-        const hasAdminHub = normalizedRole === 'admin' || normalizedRole === 'super_admin';
         if (accountAccessSection) {
             accountAccessSection.classList.toggle('is-hidden', managementView === 'admin-hub');
         }
         if (adminHubSection) {
-            adminHubSection.classList.toggle('is-hidden', managementView === 'account-access');
+            adminHubSection.classList.remove('is-hidden');
         }
-        accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
-        detailAccessLevel.disabled = !showAdminAccessLevel || !(canEdit || canOnboard);
-        adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
-        adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
         adminHubSection.style.display = (canEdit || canOnboard) ? '' : 'none';
 
         detailEditEmail.value = row.dataset.email || '';
@@ -1657,12 +1695,13 @@
         if (detailAdminProfileStatus) {
             detailAdminProfileStatus.textContent = adminProfileId
                 ? `Linked to admin hub record #${adminProfileId}${meta.admin_profile_name ? ` | ${meta.admin_profile_name}` : ''}`
-                : 'No linked admin hub record yet. One will be created when you save an admin-side role.';
+                : (managementView === 'admin-hub'
+                    ? 'No linked admin hub record yet. Saving here will create a designee-only admin hub record.'
+                    : 'No linked admin hub record yet. One will be created when you save an admin-side role.');
         }
         if (adminEmailNote) {
             adminEmailNote.textContent = 'This email is used for the admin side only.';
         }
-        detailAccessLevelLabel.textContent = 'Admin Type';
 
         if (avatarUrl) {
             detailAvatar.innerHTML = `<img src="${avatarUrl}" alt="">`;
@@ -1697,6 +1736,7 @@
             detailAccessLevel.value = 'designee';
             detailStatus.value = row.dataset.status || 'active';
         }
+        syncRoleUi({ canEdit, canOnboard });
         if (saveSettingsBtn) {
             saveSettingsBtn.textContent = canEdit ? 'Save Changes' : 'Add to Clinic';
         }
@@ -1708,7 +1748,10 @@
     }
 
     document.querySelectorAll('[data-open-lookup]').forEach((button) => {
-        button.addEventListener('click', () => lookupModal.classList.add('show'));
+        button.addEventListener('click', () => {
+            currentLookupContext = button.dataset.openLookup || 'account-access';
+            lookupModal.classList.add('show');
+        });
     });
 
     document.querySelectorAll('[data-close-lookup]').forEach((button) => {
@@ -1751,31 +1794,9 @@
     });
 
     detailRole.addEventListener('change', () => {
-        const isStudent = detailRole.value === 'student';
-        const isAdmin = detailRole.value === 'admin';
-        const isSuperAdmin = detailRole.value === 'super_admin';
-        const hasAdminHub = isAdmin || isSuperAdmin;
-
-        if (isStudent) {
-            detailEmailLabel.textContent = 'Student Email';
-            emailRoleNote.textContent = 'This email stays with the student account.';
-            accessLevelWrap.style.display = 'none';
-            detailAccessLevel.disabled = true;
-            adminEmailWrap.style.display = 'none';
-            adminOfficeWrap.style.display = 'none';
-        } else {
-            detailEmailLabel.textContent = 'Student Email';
-            emailRoleNote.textContent = 'Keep this email for the student side.';
-            accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
-            detailAccessLevel.disabled = !isAdmin;
-            adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
-            adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
-            detailAccessLevelLabel.textContent = 'Admin Type';
-        }
-
-        if (detailAdminProfileStatus && !hasAdminHub) {
-            detailAdminProfileStatus.textContent = 'Not needed while this account stays on the student side only.';
-        }
+        const canEdit = !deactivateBtn.disabled;
+        const canOnboard = externalNote.style.display !== 'none';
+        syncRoleUi({ canEdit, canOnboard });
     });
 
     deactivateBtn.addEventListener('click', () => {

@@ -98,6 +98,31 @@
         border-color: rgba(148, 163, 184, 0.14);
     }
 
+    html[data-theme="dark"] .um-mode-btn {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.94));
+        border-color: rgba(148, 163, 184, 0.14);
+        box-shadow: 0 22px 36px rgba(0, 0, 0, 0.24);
+    }
+
+    html[data-theme="dark"] .um-mode-btn.active {
+        border-color: rgba(248, 113, 113, 0.32);
+        background: linear-gradient(180deg, rgba(35, 13, 18, 0.98), rgba(27, 14, 20, 0.95));
+    }
+
+    html[data-theme="dark"] .um-mode-btn .eyebrow {
+        background: rgba(248, 113, 113, 0.14);
+        color: #fecaca;
+    }
+
+    html[data-theme="dark"] .um-mode-btn h3,
+    html[data-theme="dark"] .um-panel-intro {
+        color: #fff;
+    }
+
+    html[data-theme="dark"] .um-mode-btn p {
+        color: #cbd5e1;
+    }
+
     html[data-theme="dark"] .um-card-head,
     html[data-theme="dark"] .um-modal-head {
         border-color: rgba(148, 163, 184, 0.14);
@@ -184,6 +209,79 @@
         border-radius: 18px;
         box-shadow: 0 18px 32px rgba(15, 23, 42, 0.06);
         overflow: hidden;
+    }
+
+    .um-mode-picker {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        margin: 18px 0 24px;
+        flex-wrap: wrap;
+    }
+
+    .um-mode-btn {
+        width: min(360px, 100%);
+        border: 1px solid rgba(128, 0, 0, 0.12);
+        border-radius: 22px;
+        padding: 24px 22px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
+        box-shadow: 0 18px 30px rgba(15, 23, 42, 0.06);
+        text-align: left;
+        cursor: pointer;
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .um-mode-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 22px 38px rgba(15, 23, 42, 0.08);
+    }
+
+    .um-mode-btn.active {
+        border-color: rgba(128, 0, 0, 0.28);
+        background: linear-gradient(180deg, rgba(255,248,248,0.98), rgba(255,241,242,0.94));
+        box-shadow: 0 24px 42px rgba(128, 0, 0, 0.12);
+    }
+
+    .um-mode-btn .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(128, 0, 0, 0.08);
+        color: #800000;
+        font-size: .76rem;
+        font-weight: 900;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .um-mode-btn h3 {
+        margin: 14px 0 8px;
+        font-size: 1.24rem;
+        font-weight: 900;
+        color: #111827;
+    }
+
+    .um-mode-btn p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.6;
+        font-size: .95rem;
+    }
+
+    .um-mode-panel {
+        display: none;
+    }
+
+    .um-mode-panel.is-active {
+        display: block;
+    }
+
+    .um-panel-intro {
+        padding: 16px 20px 0;
+        color: #64748b;
+        line-height: 1.6;
     }
 
     .um-summary-grid {
@@ -830,95 +928,186 @@
         </button>
     </div>
 
-    <div class="um-card">
-        <div class="um-directory-toggle">
-            <div class="hint">Managed users already added in the CMS are listed below. Students stay in the add-user lookup flow.</div>
-        </div>
+    <div class="um-mode-picker">
+        <button type="button" class="um-mode-btn active" data-mode-button="account-access">
+            <span class="eyebrow">Users Table</span>
+            <h3>Account Access</h3>
+            <p>Open the clinic login view for managed users. This is where we control the student email, clinic role, and active or inactive access.</p>
+        </button>
+        <button type="button" class="um-mode-btn" data-mode-button="admin-hub">
+            <span class="eyebrow">Admins Table</span>
+            <h3>Admin Hub Profile</h3>
+            <p>Open the clinic-only admin hub view. This is where we handle admin login email, admin type, office, and shared admin profile context.</p>
+        </button>
+    </div>
 
-        <div class="um-directory-panel is-open" id="directoryPanel">
-        <div class="um-table-wrap">
-            <table class="um-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Source</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($localRecords as $record)
-                        <tr
-                            data-user-card
-                            data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
-                            data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
-                            data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
-                            data-id="{{ $record['record_id'] }}"
-                            data-name="{{ $record['name'] }}"
-                            data-email="{{ $record['email'] }}"
-                            data-role="{{ $record['raw_role'] }}"
-                            data-role-label="{{ $record['role'] }}"
-                            data-status="{{ $record['status'] }}"
-                            data-source="{{ $record['source'] }}"
-                            data-source-label="{{ $record['source_label'] }}"
-                            data-student-id="{{ $record['student_id'] }}"
-                            data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
-                            data-avatar-letter="{{ $record['avatar_letter'] }}"
-                            data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
-                            data-meta='@json($record["meta"])'
-                        >
-                            <td>
-                                <div class="um-user">
-                                    <div class="um-avatar">
-                                        @if(!empty($record['avatar_url']))
-                                            <img src="{{ $record['avatar_url'] }}" alt="{{ $record['name'] }}">
-                                        @else
-                                            {{ $record['avatar_letter'] }}
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <div class="um-name">{{ $record['name'] }}</div>
-                                        <div class="um-sub">
-                                            {{ $record['student_id'] ?: 'ID not available' }}
+    <div class="um-mode-panel is-active" id="account-access-panel">
+        <div class="um-card">
+            <div class="um-directory-toggle" style="padding-top: 18px;">
+                <div class="hint">Managed users already added in the clinic CMS are listed here. Use this view when you want to manage access roles and account status.</div>
+                <button type="button" class="um-btn um-btn-primary" data-open-lookup>
+                    <span>+</span> Add New User
+                </button>
+            </div>
+            <div class="um-directory-panel is-open" id="directoryPanel">
+            <div class="um-table-wrap">
+                <table class="um-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Source</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($localRecords as $record)
+                            <tr
+                                data-user-card
+                                data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
+                                data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
+                                data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
+                                data-id="{{ $record['record_id'] }}"
+                                data-name="{{ $record['name'] }}"
+                                data-email="{{ $record['email'] }}"
+                                data-role="{{ $record['raw_role'] }}"
+                                data-role-label="{{ $record['role'] }}"
+                                data-status="{{ $record['status'] }}"
+                                data-source="{{ $record['source'] }}"
+                                data-source-label="{{ $record['source_label'] }}"
+                                data-student-id="{{ $record['student_id'] }}"
+                                data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
+                                data-avatar-letter="{{ $record['avatar_letter'] }}"
+                                data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
+                                data-meta='@json($record["meta"])'
+                            >
+                                <td>
+                                    <div class="um-user">
+                                        <div class="um-avatar">
+                                            @if(!empty($record['avatar_url']))
+                                                <img src="{{ $record['avatar_url'] }}" alt="{{ $record['name'] }}">
+                                            @else
+                                                {{ $record['avatar_letter'] }}
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <div class="um-name">{{ $record['name'] }}</div>
+                                            <div class="um-sub">{{ $record['student_id'] ?: 'ID not available' }}</div>
                                         </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td>{{ $record['email'] ?: 'N/A' }}</td>
-                            <td>{{ $record['role'] }}</td>
-                            <td>
-                                <span class="um-badge {{ $record['status'] === 'inactive' ? 'inactive' : 'active' }}">
-                                    {{ ucfirst($record['status']) }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="um-badge source">{{ $record['source_label'] }}</span>
-                            </td>
-                            <td>
-                                @if($record['can_edit'])
-                                    <button
-                                        type="button"
-                                        class="um-action-btn"
-                                    >
-                                        Settings
-                                    </button>
-                                @else
-                                    <span class="um-badge source" style="background: rgba(128, 0, 0, 0.08); color: #800000;">Read only</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6">
-                                <div class="um-empty">No local users matched the current search.</div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                </td>
+                                <td>{{ $record['email'] ?: 'N/A' }}</td>
+                                <td>{{ $record['role'] }}</td>
+                                <td>
+                                    <span class="um-badge {{ $record['status'] === 'inactive' ? 'inactive' : 'active' }}">
+                                        {{ ucfirst($record['status']) }}
+                                    </span>
+                                </td>
+                                <td><span class="um-badge source">{{ $record['source_label'] }}</span></td>
+                                <td>
+                                    @if($record['can_edit'])
+                                        <button type="button" class="um-action-btn">Settings</button>
+                                    @else
+                                        <span class="um-badge source" style="background: rgba(128, 0, 0, 0.08); color: #800000;">Read only</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6"><div class="um-empty">No managed clinic users found yet.</div></td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            </div>
         </div>
+    </div>
+
+    <div class="um-mode-panel" id="admin-hub-panel">
+        <div class="um-card">
+            <div class="um-directory-toggle" style="padding-top: 18px;">
+                <div class="hint">This view focuses on the clinic admin hub record. Use it when you want to see which managed users already have admin-side profile data stored in the `admins` table.</div>
+                <button type="button" class="um-btn um-btn-primary" data-open-lookup>
+                    <span>+</span> Add New User
+                </button>
+            </div>
+            <div class="um-directory-panel is-open">
+            <div class="um-table-wrap">
+                <table class="um-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Admin Login Email</th>
+                            <th>Admin Type</th>
+                            <th>Office</th>
+                            <th>Hub Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($adminHubRecords as $record)
+                            <tr
+                                data-user-card
+                                data-update-url="{{ $record['can_edit'] ? route('admin.user-management.update', $record['id']) : '' }}"
+                                data-delete-url="{{ $record['can_edit'] ? route('admin.user-management.destroy', $record['id']) : '' }}"
+                                data-can-edit="{{ $record['can_edit'] ? '1' : '0' }}"
+                                data-id="{{ $record['record_id'] }}"
+                                data-name="{{ $record['name'] }}"
+                                data-email="{{ $record['email'] }}"
+                                data-role="{{ $record['raw_role'] }}"
+                                data-role-label="{{ $record['role'] }}"
+                                data-status="{{ $record['status'] }}"
+                                data-source="{{ $record['source'] }}"
+                                data-source-label="{{ $record['source_label'] }}"
+                                data-student-id="{{ $record['student_id'] }}"
+                                data-avatar-url="{{ $record['avatar_url'] ?? '' }}"
+                                data-avatar-letter="{{ $record['avatar_letter'] }}"
+                                data-updated="{{ $record['meta']['updated_at'] ?? '' }}"
+                                data-meta='@json($record["meta"])'
+                            >
+                                <td>
+                                    <div class="um-user">
+                                        <div class="um-avatar">
+                                            @if(!empty($record['avatar_url']))
+                                                <img src="{{ $record['avatar_url'] }}" alt="{{ $record['name'] }}">
+                                            @else
+                                                {{ $record['avatar_letter'] }}
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <div class="um-name">{{ $record['name'] }}</div>
+                                            <div class="um-sub">{{ $record['meta']['admin_profile_id'] ? 'Hub record #' . $record['meta']['admin_profile_id'] : 'No hub record yet' }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ $record['meta']['admin_login_email'] ?: 'Not assigned yet' }}</td>
+                                <td>{{ $record['meta']['access_level'] ?: 'Not assigned yet' }}</td>
+                                <td>{{ $record['meta']['office'] ?: 'Not assigned yet' }}</td>
+                                <td>
+                                    <span class="um-badge {{ $record['status'] === 'inactive' ? 'inactive' : 'active' }}">
+                                        {{ ucfirst($record['status']) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($record['can_edit'])
+                                        <button type="button" class="um-action-btn">Settings</button>
+                                    @else
+                                        <span class="um-badge source" style="background: rgba(128, 0, 0, 0.08); color: #800000;">Read only</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6"><div class="um-empty">No admin-hub-linked users are available yet.</div></td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1179,6 +1368,29 @@
     const lookupDirectoryPanel = document.getElementById('lookupDirectoryPanel');
     const lookupSearchField = document.getElementById('lookupSearchField');
     const userHoverHint = document.getElementById('userHoverHint');
+    const modeButtons = document.querySelectorAll('[data-mode-button]');
+    const modePanels = {
+        'account-access': document.getElementById('account-access-panel'),
+        'admin-hub': document.getElementById('admin-hub-panel'),
+    };
+
+    const setUserManagementMode = (mode) => {
+        modeButtons.forEach((button) => {
+            button.classList.toggle('active', button.dataset.modeButton === mode);
+        });
+
+        Object.entries(modePanels).forEach(([panelMode, panel]) => {
+            if (!panel) {
+                return;
+            }
+
+            panel.classList.toggle('is-active', panelMode === mode);
+        });
+    };
+
+    modeButtons.forEach((button) => {
+        button.addEventListener('click', () => setUserManagementMode(button.dataset.modeButton));
+    });
 
     const openSettingsFromRow = (row) => {
         if (!row) {

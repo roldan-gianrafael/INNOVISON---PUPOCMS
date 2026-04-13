@@ -39,6 +39,11 @@ class AdminUserController extends Controller
             ->values()
             ->all();
 
+        $adminHubRecords = collect($localRecords)
+            ->filter(fn (array $record) => in_array($record['normalized_role'] ?? 'student', [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true))
+            ->values()
+            ->all();
+
         $lookupRecords = $lookupSearch !== ''
             ? collect($this->collectLocalUsers($lookupSearch))
                 ->merge($this->collectFacultyUsers($facultySyncService, $lookupSearch))
@@ -63,6 +68,7 @@ class AdminUserController extends Controller
         return view('admin.user_management', [
             'lookupSearch' => $lookupSearch,
             'localRecords' => $localRecords,
+            'adminHubRecords' => $adminHubRecords,
             'lookupRecords' => $lookupRecords,
             'stats' => $stats,
         ]);

@@ -78,6 +78,7 @@ class AdminUserController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'admin_email' => ['nullable', 'email', 'max:255'],
             'access_level' => ['nullable', Rule::in(['clinic_staff', 'designee'])],
+            'office' => ['nullable', 'string', 'max:255'],
         ]);
 
         if ($this->isProtectedUser($user)) {
@@ -103,6 +104,10 @@ class AdminUserController extends Controller
                 $linkedAdmin = new Admin();
             }
 
+            if (Admin::hasColumn('user_id')) {
+                $linkedAdmin->user_id = $user->id;
+            }
+
             if (Admin::hasColumn('first_name')) {
                 $linkedAdmin->first_name = $user->first_name;
             }
@@ -126,7 +131,24 @@ class AdminUserController extends Controller
             if (Admin::hasColumn('status')) {
                 $linkedAdmin->status = $request->status;
             }
+            if (Admin::hasColumn('office')) {
+                $linkedAdmin->office = $request->input('office');
+            }
 
+            $linkedAdmin->save();
+        } elseif ($linkedAdmin) {
+            if (Admin::hasColumn('access_level')) {
+                $linkedAdmin->access_level = null;
+            }
+            if (Admin::hasColumn('email_address')) {
+                $linkedAdmin->email_address = null;
+            }
+            if (Admin::hasColumn('status')) {
+                $linkedAdmin->status = $request->status;
+            }
+            if (Admin::hasColumn('office') && $request->filled('office')) {
+                $linkedAdmin->office = $request->input('office');
+            }
             $linkedAdmin->save();
         }
 
@@ -277,6 +299,8 @@ class AdminUserController extends Controller
                         'access_level' => (string) ($linkedAdmin?->access_level ?? ''),
                         'admin_login_email' => (string) ($linkedAdmin?->email_address ?? $linkedAdmin?->email ?? ''),
                         'admin_profile_id' => $linkedAdmin?->admin_id,
+                        'admin_profile_name' => (string) ($linkedAdmin?->name ?? ''),
+                        'office' => (string) ($linkedAdmin?->office ?? ''),
                         'updated_at' => optional($user->updated_at)->toIso8601String(),
                     ],
                 ];
@@ -405,12 +429,22 @@ class AdminUserController extends Controller
             return null;
         }
 
+        if (Admin::hasColumn('user_id')) {
+            $linkedByUserId = Admin::query()
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($linkedByUserId) {
+                return $linkedByUserId;
+            }
+        }
+
         $email = trim((string) ($user->email ?? ''));
         if ($email === '') {
             return null;
         }
 
-        return Admin::query()
+        $linkedAdmin = Admin::query()
             ->where(function ($builder) use ($email) {
                 if (Admin::hasColumn('email')) {
                     $builder->orWhere('email', $email);
@@ -421,6 +455,13 @@ class AdminUserController extends Controller
                 }
             })
             ->first();
+
+        if ($linkedAdmin && Admin::hasColumn('user_id') && !$linkedAdmin->user_id) {
+            $linkedAdmin->user_id = $user->id;
+            $linkedAdmin->save();
+        }
+
+        return $linkedAdmin;
     }
 
     private function recordSortWeight(string $source): int

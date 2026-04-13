@@ -591,6 +591,56 @@
         padding: 18px;
     }
 
+    .um-section-block + .um-section-block {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .um-section-title {
+        margin: 0 0 4px;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #800000;
+    }
+
+    .um-section-copy {
+        margin: 0 0 14px;
+        color: #64748b;
+        font-size: .9rem;
+        line-height: 1.55;
+    }
+
+    .um-profile-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .um-profile-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .um-profile-row .label {
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        font-weight: 800;
+        color: #64748b;
+    }
+
+    .um-profile-row .value {
+        font-weight: 700;
+        color: #0f172a;
+        word-break: break-word;
+    }
+
     .um-detail-photo {
         width: 100px;
         height: 100px;
@@ -655,6 +705,21 @@
         color: #64748b;
         font-size: .92rem;
         line-height: 1.55;
+    }
+
+    html[data-theme="dark"] .um-section-copy,
+    html[data-theme="dark"] .um-profile-row .label {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .um-profile-row {
+        background: rgba(15, 23, 42, 0.84);
+        border-color: rgba(148, 163, 184, 0.14);
+    }
+
+    html[data-theme="dark"] .um-profile-row .value,
+    html[data-theme="dark"] .um-section-title {
+        color: #fff;
     }
 
     @media (max-width: 1024px) {
@@ -936,42 +1001,60 @@
                     <form method="POST" id="settingsForm">
                         @csrf
                         @method('PUT')
-                        <div class="um-field">
-                            <label>Role</label>
-                            <select name="user_role" id="detailRole">
-                                <option value="student">Student</option>
-                                <option value="student_assistant">Student Assistant</option>
-                                <option value="admin">Admin</option>
-                                <option value="super_admin">Super Admin</option>
-                            </select>
-                        </div>
-                        <div class="um-field" id="accessLevelWrap" style="display:none;">
-                            <label id="detailAccessLevelLabel">Admin Type</label>
-                            <select name="access_level" id="detailAccessLevel">
-                                <option value="clinic_staff">Clinic Staff</option>
-                                <option value="designee">Designee</option>
-                            </select>
-                        </div>
-                        <div class="um-field">
-                            <label id="detailEmailLabel">Student Email</label>
-                            <input type="email" name="email" id="detailEditEmail" placeholder="Enter Gmail account">
-                            <div class="um-note" id="emailRoleNote" style="margin-top: 6px;">
-                                Keep this email for the student side.
+                        <div class="um-section-block">
+                            <h4 class="um-section-title">Account Access</h4>
+                            <p class="um-section-copy">This controls the clinic login role, the student-side email, and whether the account can enter the clinic system.</p>
+                            <div class="um-field">
+                                <label>Clinic Role</label>
+                                <select name="user_role" id="detailRole">
+                                    <option value="student">Student</option>
+                                    <option value="student_assistant">Student Assistant</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="super_admin">Super Admin</option>
+                                </select>
+                            </div>
+                            <div class="um-field">
+                                <label id="detailEmailLabel">Student Email</label>
+                                <input type="email" name="email" id="detailEditEmail" placeholder="Enter Gmail account">
+                                <div class="um-note" id="emailRoleNote" style="margin-top: 6px;">
+                                    Keep this email for the student side.
+                                </div>
+                            </div>
+                            <div class="um-field">
+                                <label>Status</label>
+                                <select name="status" id="detailStatus">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="um-field" id="adminEmailWrap" style="display:none;">
-                            <label id="detailAdminEmailLabel">Admin Login Email</label>
-                            <input type="email" name="admin_email" id="detailAdminEmail" placeholder="Enter separate admin login email">
-                            <div class="um-note" id="adminEmailNote" style="margin-top: 6px;">
-                                This email is used for the admin side only.
+                        <div class="um-section-block" id="adminHubSection">
+                            <h4 class="um-section-title">Admin Hub Profile</h4>
+                            <p class="um-section-copy">This is clinic-only data for admin-side access. It can stay separate from the student login profile while still being managed here.</p>
+                            <div class="um-profile-list">
+                                <div class="um-profile-row">
+                                    <div class="label">Hub Record</div>
+                                    <div class="value" id="detailAdminProfileStatus">No linked admin hub record yet</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="um-field">
-                            <label>Status</label>
-                            <select name="status" id="detailStatus">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
+                            <div class="um-field" id="accessLevelWrap" style="display:none; margin-top: 14px;">
+                                <label id="detailAccessLevelLabel">Admin Type</label>
+                                <select name="access_level" id="detailAccessLevel">
+                                    <option value="clinic_staff">Clinic Staff</option>
+                                    <option value="designee">Designee</option>
+                                </select>
+                            </div>
+                            <div class="um-field" id="adminEmailWrap" style="display:none;">
+                                <label id="detailAdminEmailLabel">Admin Login Email</label>
+                                <input type="email" name="admin_email" id="detailAdminEmail" placeholder="Enter separate admin login email">
+                                <div class="um-note" id="adminEmailNote" style="margin-top: 6px;">
+                                    This email is used for the admin side only.
+                                </div>
+                            </div>
+                            <div class="um-field" id="adminOfficeWrap" style="display:none;">
+                                <label>Office</label>
+                                <input type="text" name="office" id="detailOffice" placeholder="Enter clinic office or desk assignment">
+                            </div>
                         </div>
                         <div class="um-note" id="externalNote" style="display:none; margin-top: 6px;">
                             This faculty profile is managed externally, so it is read-only here.
@@ -1015,6 +1098,7 @@
     const detailEmail = document.getElementById('detailEmail');
     const detailEditEmail = document.getElementById('detailEditEmail');
     const detailEmailLabel = document.getElementById('detailEmailLabel');
+    const emailRoleNote = document.getElementById('emailRoleNote');
     const accessLevelWrap = document.getElementById('accessLevelWrap');
     const detailAccessLevel = document.getElementById('detailAccessLevel');
     const detailAccessLevelLabel = document.getElementById('detailAccessLevelLabel');
@@ -1025,6 +1109,10 @@
     const detailStatus = document.getElementById('detailStatus');
     const adminEmailWrap = document.getElementById('adminEmailWrap');
     const detailAdminEmail = document.getElementById('detailAdminEmail');
+    const detailOffice = document.getElementById('detailOffice');
+    const adminHubSection = document.getElementById('adminHubSection');
+    const adminOfficeWrap = document.getElementById('adminOfficeWrap');
+    const detailAdminProfileStatus = document.getElementById('detailAdminProfileStatus');
     const adminEmailNote = document.getElementById('adminEmailNote');
     const deleteAdminProfileId = document.getElementById('deleteAdminProfileId');
     const externalNote = document.getElementById('externalNote');
@@ -1072,13 +1160,18 @@
         })();
         const accessLevel = (meta.access_level || '').toLowerCase();
         const adminLoginEmail = meta.admin_login_email || '';
+        const office = meta.office || '';
+        const adminProfileId = meta.admin_profile_id || '';
         if (deleteAdminProfileId) {
-            deleteAdminProfileId.value = meta.admin_profile_id || '';
+            deleteAdminProfileId.value = adminProfileId;
         }
         detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
         const showAdminAccessLevel = normalizedRole === 'admin';
+        const hasAdminHub = normalizedRole === 'admin' || normalizedRole === 'super_admin';
         accessLevelWrap.style.display = showAdminAccessLevel ? 'block' : 'none';
-        adminEmailWrap.style.display = normalizedRole === 'admin' || normalizedRole === 'super_admin' ? 'block' : 'none';
+        adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
+        adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
+        adminHubSection.style.display = canEdit ? 'block' : 'none';
 
         detailEditEmail.value = row.dataset.email || '';
         detailEmailLabel.textContent = 'Student Email';
@@ -1087,6 +1180,14 @@
             : 'Keep this email for the student side.';
         if (detailAdminEmail) {
             detailAdminEmail.value = adminLoginEmail;
+        }
+        if (detailOffice) {
+            detailOffice.value = office;
+        }
+        if (detailAdminProfileStatus) {
+            detailAdminProfileStatus.textContent = adminProfileId
+                ? `Linked to admin hub record #${adminProfileId}${meta.admin_profile_name ? ` • ${meta.admin_profile_name}` : ''}`
+                : 'No linked admin hub record yet. One will be created when you save an admin-side role.';
         }
         if (adminEmailNote) {
             adminEmailNote.textContent = 'This email is used for the admin side only.';
@@ -1164,21 +1265,28 @@
     });
 
     detailRole.addEventListener('change', () => {
-            const isStudent = detailRole.value === 'student';
-            const isAdmin = detailRole.value === 'admin';
-            const isSuperAdmin = detailRole.value === 'super_admin';
+        const isStudent = detailRole.value === 'student';
+        const isAdmin = detailRole.value === 'admin';
+        const isSuperAdmin = detailRole.value === 'super_admin';
+        const hasAdminHub = isAdmin || isSuperAdmin;
 
         if (isStudent) {
             detailEmailLabel.textContent = 'Student Email';
             emailRoleNote.textContent = 'This email stays with the student account.';
             accessLevelWrap.style.display = 'none';
             adminEmailWrap.style.display = 'none';
+            adminOfficeWrap.style.display = 'none';
         } else {
             detailEmailLabel.textContent = 'Student Email';
             emailRoleNote.textContent = 'Keep this email for the student side.';
             accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
-            adminEmailWrap.style.display = isAdmin || isSuperAdmin ? 'block' : 'none';
+            adminEmailWrap.style.display = hasAdminHub ? 'block' : 'none';
+            adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
             detailAccessLevelLabel.textContent = 'Admin Type';
+        }
+
+        if (detailAdminProfileStatus && !hasAdminHub) {
+            detailAdminProfileStatus.textContent = 'Not needed while this account stays on the student side only.';
         }
     });
 

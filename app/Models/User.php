@@ -93,6 +93,11 @@ class User extends Authenticatable
         return $this->hasMany(Appointment::class);
     }
 
+    public function adminProfile()
+    {
+        return $this->hasOne(Admin::class, 'user_id', 'id');
+    }
+
     /**
      * SCOPE: Only students
      */
@@ -121,7 +126,7 @@ class User extends Authenticatable
     {
         return $this->hasRole(self::ROLE_ADMIN);
     }
-    public function healthProfile() {
+public function healthProfile() {
     return $this->hasOne(HealthProfile::class);
 }
 }

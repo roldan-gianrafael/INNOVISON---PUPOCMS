@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Schema;
 
 class Admin extends Model
@@ -48,5 +49,10 @@ class Admin extends Model
     public static function hasColumn(string $column): bool
     {
         return in_array($column, static::availableColumns(), true);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

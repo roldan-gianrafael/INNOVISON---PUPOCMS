@@ -26,7 +26,9 @@ Route::post('/register-action', [RegisterController::class, 'register']);
 
 // --- PROTECTED ROUTES (Login required) ---
 Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class, 'audit'])->group(function () {
+    Route::prefix('v1/auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+});
 
     // Student-only routes
     Route::middleware('role:student')->group(function () {

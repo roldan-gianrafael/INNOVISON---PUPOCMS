@@ -23,10 +23,10 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/auth/callback', [LoginController::class, 'handleIdpCallback'])->name('auth.callback');
 Route::post('/login-action', [LoginController::class, 'login']);
 Route::post('/register-action', [RegisterController::class, 'register']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout'); // Move here
 
 // --- PROTECTED ROUTES (Login required) ---
 Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class, 'audit'])->group(function () {
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Student-only routes
     Route::middleware('role:student')->group(function () {

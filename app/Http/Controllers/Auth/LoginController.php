@@ -1211,29 +1211,39 @@ class LoginController extends Controller
 {
     // 1. Get the Client ID from config
     $clientId = config('services.idp.client_id');
-    $idpLogoutUrl = config('services.idp.logout_url'); // Ensure this is the full /api/v1/auth/logout URL
+    $idpLogoutUrl = config('services.idp.logout_url');
 
-    // 2. Call the IDP API directly from your server (as a POST request)
+    // 2. Retrieve the access token from the session/cookie
+    // Since this is a web app, use the cookie name defined in your config
+    $accessTokenCookie = config('services.idp.access_cookie_name', 'access_token');
+    $token = $request->cookie($accessTokenCookie);
+
+    // 3. Call the IDP API directly (Server-to-Server POST)
     try {
-        Http::withToken($request->bearerToken()) // If required
-            ->post($idpLogoutUrl, [
-                'client_id' => $clientId
-            ]);
+        if ($idpLogoutUrl) {
+            \Illuminate\Support\Facades\Http::withToken($token)
+                ->post($idpLogoutUrl, [
+                    'client_id' => $clientId
+                ]);
+        }
     } catch (\Exception $e) {
-        Log::error('IDP Logout API call failed: ' . $e->getMessage());
+        \Illuminate\Support\Facades\Log::error('IDP Logout API call failed: ' . $e->getMessage());
     }
 
-    // 3. Local Logout
+    // 4. Record local logout event
     if (Auth::check()) {
         $this->recordAuthEvent($request, 'Logout', 'User logged out from the system.');
     }
 
-    Auth::logout();
+    // 5. Local Session Cleanup
+    Auth::guard('web')->logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
-    // 4. Redirect the user back to your app's home or login page
-    return redirect('/')->with('status', 'Logged out successfully');
+    // 6. Clear IDP cookies and redirect
+    $response = redirect('/')->with('status', 'Logged out successfully');
+    
+    return $this->clearIdpCookies($response);
 }
 
     public function showLoginForm(Request $request)

@@ -1208,19 +1208,33 @@ class LoginController extends Controller
     }
 
     public function logout(Request $request)
-    {
-        if (Auth::check()) {
-            $this->recordAuthEvent($request, 'Logout', 'User logged out from the system.');
-        }
+{
+    // 1. Get the Client ID from config
+    $clientId = config('services.idp.client_id');
+    $idpLogoutUrl = config('services.idp.logout_url'); // Ensure this is the full /api/v1/auth/logout URL
 
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        $response = redirect()->away($this->buildLogoutRedirectUrl());
-
-        return $this->clearIdpCookies($response);
+    // 2. Call the IDP API directly from your server (as a POST request)
+    try {
+        Http::withToken($request->bearerToken()) // If required
+            ->post($idpLogoutUrl, [
+                'client_id' => $clientId
+            ]);
+    } catch (\Exception $e) {
+        Log::error('IDP Logout API call failed: ' . $e->getMessage());
     }
+
+    // 3. Local Logout
+    if (Auth::check()) {
+        $this->recordAuthEvent($request, 'Logout', 'User logged out from the system.');
+    }
+
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    // 4. Redirect the user back to your app's home or login page
+    return redirect('/')->with('status', 'Logged out successfully');
+}
 
     public function showLoginForm(Request $request)
     {

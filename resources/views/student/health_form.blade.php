@@ -456,6 +456,39 @@
                 font-size: 0.86rem;
             }
         }
+        /* === NEW PROFESSIONAL FORM LAYOUT === */
+.form-row {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-row .form-label {
+    margin: 0;
+    font-weight: 700;
+}
+
+.form-row .form-control,
+.form-row .form-select {
+    width: 100%;
+}
+
+.form-row-wrapper {
+    margin-bottom: 10px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row .form-label {
+        margin-bottom: 6px;
+    }
+}
     </style>
 </head>
 <body>
@@ -582,113 +615,131 @@
     @csrf
 
     <section class="form-step is-active" data-step="1">
-    <div class="row mt-4">
-        <div class="col-md-9">
-            <div class="row">
-                <div class="col-md-7 mb-3">
-                    <label class="form-label">Full Name<span class="required-mark">*</span></label>
-                    <input type="text" class="form-control bg-light" value="{{ trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name]))) }}" readonly>
-                </div>
-                <div class="col-md-5 mb-3">
-                    <label class="form-label">PUP Student No.<span class="required-mark">*</span></label>
-                    <input type="text" class="form-control bg-light" value="{{ Auth::user()->student_id }}" readonly>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Middle Name</label>
-                    <input type="text" class="form-control bg-light" value="{{ optional($linkedAdminProfile)->middle_name }}" readonly>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Suffix Name</label>
-                    <input type="text" class="form-control bg-light" value="{{ optional($linkedAdminProfile)->suffix_name }}" readonly>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Home Address<span class="required-mark">*</span></label>
-                    <input type="text" name="home_address" class="form-control" placeholder="House No., Street, Brgy, City" value="{{ old('home_address') }}" >
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">School Year</label>
-                    <input type="text" name="school_year" class="form-control" value="{{ old('school_year', '2025-2026') }}">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Height</label>
-                    <input type="text" name="height" class="form-control" placeholder="cm" value="{{ old('height') }}">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Weight</label>
-                    <input type="text" name="weight" class="form-control" placeholder="kg" value="{{ old('weight') }}">
-                </div>
-            </div>
+
+<div class="row mt-4">
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Full Name<span class="required-mark">*</span></label>
+            <input type="text" class="form-control bg-light"
+                value="{{ trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name]))) }}"
+                readonly>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-3 mb-3">
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">PUP Student No.<span class="required-mark">*</span></label>
+            <input type="text" class="form-control bg-light"
+                value="{{ Auth::user()->student_id }}" readonly>
+        </div>
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Home Address<span class="required-mark">*</span></label>
+            <input type="text" name="home_address" class="form-control"
+                value="{{ old('home_address') }}">
+        </div>
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">School Year</label>
+            <input type="text" name="school_year" class="form-control"
+                value="{{ old('school_year', '2025-2026') }}">
+        </div>
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Height</label>
+            <input type="text" name="height" class="form-control"
+                value="{{ old('height') }}">
+        </div>
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Weight</label>
+            <input type="text" name="weight" class="form-control"
+                value="{{ old('weight') }}">
+        </div>
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
             <label class="form-label">Age<span class="required-mark">*</span></label>
-            <input
-                type="number"
-                name="age"
+            <input type="number" name="age" class="form-control"
                 value="{{ old('age', $calculatedAge) }}"
-                class="form-control"
-                {{ $calculatedAge ? 'readonly' : '' }}
-                placeholder="{{ $calculatedAge ? 'Auto-calculated' : 'Enter your age' }}"
-                required
-            >
+                {{ $calculatedAge ? 'readonly' : '' }}>
         </div>
-        <div class="col-md-3 mb-3">
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
             <label class="form-label">Sex<span class="required-mark">*</span></label>
-            <select name="sex" class="form-select" required>
-                <option value="Male" {{ old('sex') === 'Male' ? 'selected' : '' }}>Male</option>
-                <option value="Female" {{ old('sex') === 'Female' ? 'selected' : '' }}>Female</option>
+            <select name="sex" class="form-select">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
             </select>
         </div>
-        <div class="col-md-3 mb-3">
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
             <label class="form-label">Civil Status<span class="required-mark">*</span></label>
-            <select name="civil_status" class="form-select" required>
-                <option value="" {{ old('civil_status') ? '' : 'selected' }} disabled>Select Status</option>
-                <option value="Single" {{ old('civil_status') === 'Single' ? 'selected' : '' }}>Single</option>
-                <option value="Married" {{ old('civil_status') === 'Married' ? 'selected' : '' }}>Married</option>
-                <option value="Widowed" {{ old('civil_status') === 'Widowed' ? 'selected' : '' }}>Widowed</option>
-                <option value="Separated" {{ old('civil_status') === 'Separated' ? 'selected' : '' }}>Separated</option>
+            <select name="civil_status" class="form-select">
+                <option disabled selected>Select</option>
+                <option>Single</option>
+                <option>Married</option>
             </select>
         </div>
-        <div class="col-md-3 mb-3">
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
             <label class="form-label">Course / College<span class="required-mark">*</span></label>
-            <input
-                type="text"
-                name="course_college"
-                class="form-control"
-                value="{{ old('course_college', Auth::user()->course) }}"
-                {{ Auth::user()->course ? 'readonly' : '' }}
-                placeholder="{{ Auth::user()->course ? '' : 'Enter your course or college' }}"
-                required
-            >
+            <input type="text" name="course_college" class="form-control"
+                value="{{ old('course_college', Auth::user()->course) }}">
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-3">
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
             <label class="form-label">Blood Type</label>
-            <input type="text" name="blood_type" class="form-control" placeholder="e.g. O+" value="{{ old('blood_type') }}">
-        </div>
-        <div class="col-md-8 mb-3">
-            <label class="form-label">Email Address<span class="required-mark">*</span></label>
-            <input type="email" name="email" class="form-control" value="{{ Auth::user()->email }}" readonly>
-        </div>
-        <div class="col-md-7 mb-3">
-            <label class="form-label">Parent's Name / Guardian / Spouse<span class="required-mark">*</span></label>
-            <input type="text" name="guardian_name" class="form-control" value="{{ old('guardian_name') }}" required>
-        </div>
-        <div class="col-md-2 mb-3">
-            <label class="form-label">Landline</label>
-            <input type="text" name="landline" class="form-control" value="{{ old('landline') }}">
-        </div>
-        <div class="col-md-3 mb-3">
-            <label class="form-label">Phone Number<span class="required-mark">*</span></label>
-            <input type="text" name="cellphone" class="form-control" value="{{ old('cellphone') }}" required>
+            <input type="text" name="blood_type" class="form-control"
+                value="{{ old('blood_type') }}">
         </div>
     </div>
 
-    </section>
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Email Address<span class="required-mark">*</span></label>
+            <input type="email" name="email" class="form-control"
+                value="{{ Auth::user()->email }}" readonly>
+        </div>
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Guardian Name<span class="required-mark">*</span></label>
+            <input type="text" name="guardian_name" class="form-control"
+                value="{{ old('guardian_name') }}">
+        </div>
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Phone Number<span class="required-mark">*</span></label>
+            <input type="text" name="cellphone" class="form-control"
+                value="{{ old('cellphone') }}">
+        </div>
+    </div>
+
+</div>
+
+</section>
 
     <section class="form-step" data-step="2">
     <div class="row mt-3">

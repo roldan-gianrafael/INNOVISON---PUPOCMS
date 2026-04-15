@@ -912,6 +912,7 @@
                 { name: 'student_id', label: 'Student ID', type: 'text' },
                 { name: 'user_role', label: 'Role', type: 'select', options: ['student', 'student_assistant', 'admin', 'superadmin'] },
                 { name: 'status', label: 'Status', type: 'select', options: ['active', 'inactive'] },
+                { name: 'is_health_profile_completed', label: 'Health Profile Completed', type: 'select', options: ['0', '1'] },
             ],
             admins: [
                 { name: 'first_name', label: 'First Name', type: 'text' },

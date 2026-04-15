@@ -352,11 +352,11 @@
         <div class="hero-info">
             <h1 class="hero-name">{{ $user->name }} <span class="hero-badge">Active</span></h1>
             <div class="hero-course" @if($linkedRoleLabel) style="display: none;" @endif>
-                {{ $user->student_id }} • {{ $user->course ?? 'BS Information Technology' }}
+                {{ $user->student_number }} • {{ $user->course ?? 'BS Information Technology' }}
             </div>
             @if($linkedRoleLabel)
                 <div class="hero-course">
-                    {{ $user->student_id }} - {{ $linkedRoleLabel }}
+                    {{ $user->student_number }} - {{ $linkedRoleLabel }}
                 </div>
             @endif
 

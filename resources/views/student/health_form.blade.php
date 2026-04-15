@@ -631,7 +631,7 @@
         <div class="form-row">
             <label class="form-label">PUP Student No.<span class="required-mark">*</span></label>
             <input type="text" class="form-control bg-light"
-                value="{{ Auth::user()->student_id }}" readonly>
+                value="{{ Auth::user()->student_number }}" readonly>
         </div>
     </div>
 

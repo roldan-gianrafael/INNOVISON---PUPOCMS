@@ -51,7 +51,7 @@
         </div>
         <div class="info-box">
             <div class="info-label">Student ID</div>
-            <div class="info-value">{{ $record->user->student_id }}</div>
+            <div class="info-value">{{ $record->user->student_number }}</div>
         </div>
         <div class="info-box">
             <div class="info-label">Course & Section</div>

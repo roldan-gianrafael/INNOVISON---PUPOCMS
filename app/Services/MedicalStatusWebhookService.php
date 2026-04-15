@@ -4,50 +4,58 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log; // Ensure this is imported
+use Illuminate\Support\Facades\Log;
 
 class MedicalStatusWebhookService
 {
-    public function notifyStudentStatus(User $user, string $event = 'completed'): bool
+    public function notifyStudentStatus(User $user): bool
     {
         try {
-            $url = trim((string) config('services.medical_status_webhook.url', ''));
-            $secret = (string) config('services.medical_status_webhook.secret', '');
+            // 1. Get Config
+            $baseUrl = 'https://puptas.undraftedbsit2027.com/api/v1';
+            $clientId = config('services.puptas.client_id');
+            $clientSecret = config('services.puptas.client_secret');
+            $webhookSecret = config('services.puptas.webhook_secret');
+            $signatureHeader = config('services.puptas.signature_header', 'X-Medical-Signature');
 
-            if ($url === '' || $secret === '' || trim((string) $user->student_id) === '') {
-                Log::warning('MedicalStatusWebhook: Missing configuration or student_id.', [
-                    'student_id' => $user->student_id,
-                    'url_configured' => !empty($url),
-                ]);
+            // 2. Obtain OAuth Token
+            $tokenResponse = Http::asForm()->post($baseUrl . '/oauth/token', [
+                'grant_type' => 'client_credentials',
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+                'scope' => 'medical-write',
+            ]);
+
+            if ($tokenResponse->failed()) {
+                Log::error('PUPTAS: OAuth Failed', ['body' => $tokenResponse->body()]);
                 return false;
             }
 
+            $token = $tokenResponse->json('access_token');
+
+            // 3. Prepare Payload
             $payload = [
                 'student_number' => (string) $user->student_id,
-                'status' => $user->is_health_profile_completed ? 'cleared' : 'not_cleared',
-                'timestamp' => now()->toIso8601String(),
+                'medical_status' => $user->is_health_profile_completed ? 'cleared' : 'failed',
             ];
 
+            // Use JSON_UNESCAPED_SLASHES to ensure the string matches exactly what the receiver expects
             $rawPayload = json_encode($payload, JSON_UNESCAPED_SLASHES);
-            if ($rawPayload === false) {
-                return false;
-            }
+            
+            // 4. Calculate HMAC Signature based on the RAW string
+            $signature = hash_hmac('sha256', $rawPayload, $webhookSecret);
 
-            $signature = hash_hmac('sha256', $rawPayload, $secret);
-            $signatureHeader = trim((string) config('services.medical_status_webhook.signature_header', 'X-Medical-Signature'));
-
-            Log::info('MedicalStatusWebhook: Sending payload.', ['student_id' => $user->student_id, 'payload' => $payload]);
-
-            $response = Http::timeout((int) config('services.medical_status_webhook.timeout', 20))
-                ->acceptJson()
+            // 5. Send Request using withBody() to guarantee byte-for-byte matching
+            $response = Http::withToken($token)
                 ->withHeaders([
                     $signatureHeader => $signature,
+                    'Accept' => 'application/json',
                 ])
                 ->withBody($rawPayload, 'application/json')
-                ->post($url);
+                ->post($baseUrl . '/webhooks/medical-result');
 
             if ($response->failed()) {
-                Log::error('MedicalStatusWebhook: Failed to send.', [
+                Log::error('PUPTAS: API Request Failed', [
                     'student_id' => $user->student_id,
                     'status' => $response->status(),
                     'response' => $response->body()
@@ -55,14 +63,9 @@ class MedicalStatusWebhookService
                 return false;
             }
 
-            Log::info('MedicalStatusWebhook: Success.', ['student_id' => $user->student_id, 'status' => $response->status()]);
             return true;
-
         } catch (\Throwable $exception) {
-            Log::error('MedicalStatusWebhook: Exception caught.', [
-                'message' => $exception->getMessage(),
-                'trace' => $exception->getTraceAsString()
-            ]);
+            Log::error('PUPTAS: Exception', ['message' => $exception->getMessage()]);
             return false;
         }
     }

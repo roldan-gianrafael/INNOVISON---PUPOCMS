@@ -1038,16 +1038,20 @@ public function updateClearance(Request $request, $id)
     }
 
     // 5. I-save at i-check
-    if($record->save()){
-        if ($request->clearance_status === 'Issued' && $record->user) {
-            app(MedicalStatusWebhookService::class)->notifyStudentStatus($record->user, 'health_clearance_issued');
-        }
-
-        return redirect()->route('admin.health_records')
-                         ->with('success', 'Health Clearance status updated successfully!');
-    } else {
-        return back()->with('error', 'Failed to save to database.');
+    // 5. I-save at i-check
+if($record->save()){
+    // Revised Trigger Logic: Notify PUPTAS regardless of status (Issued or otherwise)
+    if ($record->user) {
+        // The service will automatically determine if the status is 'cleared' or 'failed'
+        // based on the boolean state inside your MedicalStatusWebhookService
+        app(MedicalStatusWebhookService::class)->notifyStudentStatus($record->user);
     }
+
+    return redirect()->route('admin.health_records')
+                     ->with('success', 'Health Clearance status updated successfully!');
+} else {
+    return back()->with('error', 'Failed to save to database.');
+}
 }
 
     public function appointments()

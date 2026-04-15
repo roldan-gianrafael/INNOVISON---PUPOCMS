@@ -92,7 +92,7 @@ return [
     'puptas' => [
         'client_id'        => env('PUPTAS_CLIENT_ID'),
         'client_secret'    => env('PUPTAS_CLIENT_SECRET'),
-        'webhook_url'      => env('PUPTAS_WEBHOOK_URL'),
+        'api_url'      => env('PUPTAS_API_URL'),
         'webhook_secret'   => env('PUPTAS_WEBHOOK_SECRET'),
         'timeout'          => (int) env('PUPTAS_TIMEOUT', 20),
         'signature_header' => env('PUPTAS_SIGNATURE_HEADER', 'X-Medical-Signature'),

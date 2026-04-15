@@ -1009,49 +1009,45 @@ public function updateClearance(Request $request, $id)
             ->with('error', 'Only Nurse Joyce or Super Admin can e-sign health records.');
     }
 
-    // 1. I-validate ang data
     $request->validate([
         'clearance_status' => 'required',
         'pending_reason'   => 'nullable|string',
         'verified_at'      => 'nullable|date',
     ]);
 
-    // 2. Hanapin ang record
     $record = HealthProfile::findOrFail($id);
 
-    // 3. Manual Assignment
     $record->clearance_status = $request->clearance_status;
     $record->pending_reason   = $request->pending_reason;
 
-    // 4. Date Logic
     if ($request->clearance_status == 'Issued') {
-        // Kapag Issued, gamitin ang nilagay na date o ang oras ngayon (now)
         $record->verified_at = $request->verified_at ?? now();
     } else {
-        // Kapag Pending o Rejected, gawing NULL ang date para hindi lumitaw sa form
         $record->verified_at = null;
-        
-        // Optional: I-clear din ang pending_reason kung Issued na uli
         if ($request->clearance_status == 'Issued') {
             $record->pending_reason = null;
         }
     }
 
-    // 5. I-save at i-check
-    // 5. I-save at i-check
-if($record->save()){
-    // Revised Trigger Logic: Notify PUPTAS regardless of status (Issued or otherwise)
-    if ($record->user) {
-        // The service will automatically determine if the status is 'cleared' or 'failed'
-        // based on the boolean state inside your MedicalStatusWebhookService
-        app(MedicalStatusWebhookService::class)->notifyStudentStatus($record->user);
-    }
+    if ($record->save()) {
+        if ($record->user) {
+            // Determine if the student is cleared based on the current status
+            $isCleared = ($record->clearance_status === 'Issued') ? 1 : 0;
 
-    return redirect()->route('admin.health_records')
-                     ->with('success', 'Health Clearance status updated successfully!');
-} else {
-    return back()->with('error', 'Failed to save to database.');
-}
+            // Use the new service class provided by PUPTAS
+            $puptasService = new \App\Services\PuptasWebhookService();
+            
+            // Notify PUPTAS with the current status (1 or 0)
+            $puptasService->sendWithRetry(
+                $record->user->student_id, 
+                $record->user->student_number, 
+                $isCleared
+            );
+        }
+
+        return redirect()->route('admin.health_records')
+                         ->with('success', 'Health Clearance status updated successfully and synced with PUPTAS!');
+    }
 }
 
     public function appointments()

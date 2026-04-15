@@ -2,71 +2,132 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class MedicalStatusWebhookService
+class PuptasWebhookService
 {
-    public function notifyStudentStatus(User $user): bool
-    {
-        try {
-            // 1. Get Config
-            $baseUrl = 'https://puptas.undraftedbsit2027.com/api/v1';
-            $clientId = config('services.puptas.client_id');
-            $clientSecret = config('services.puptas.client_secret');
-            $webhookSecret = config('services.puptas.webhook_secret');
-            $signatureHeader = config('services.puptas.signature_header', 'X-Medical-Signature');
+private string $apiUrl = 'https://puptas.undraftedbsit2027.com/api/v1/webhooks/medical-result';
+private string $apiToken;
 
-            // 2. Obtain OAuth Token
-            $tokenResponse = Http::asForm()->post($baseUrl . '/oauth/token', [
-                'grant_type' => 'client_credentials',
-                'client_id' => $clientId,
-                'client_secret' => $clientSecret,
-                'scope' => 'medical-write',
-            ]);
+public function __construct()
+{
+// Get token from config or .env
+$this->apiToken = config('services.puptas.api_token');
+}
 
-            if ($tokenResponse->failed()) {
-                Log::error('PUPTAS: OAuth Failed', ['body' => $tokenResponse->body()]);
-                return false;
-            }
+/**
+* Send medical clearance notification to PUPTAS
+*
+* @param string $studentId The student's UUID (your student_id field)
+* @param string|null $studentNumber The student's number (optional)
+* @param int $isCleared 1 = cleared/passed, 0 = failed
+* @return array ['success' => bool, 'message' => string, 'response' => array|null]
+*/
+public function sendMedicalClearance(string $studentId, ?string $studentNumber = null, int $isCleared = 1): array
+{
+try {
+// Prepare payload
+$payload = [
+'student_id' => $studentId,
+'is_health_profile_completed' => $isCleared
+];
 
-            $token = $tokenResponse->json('access_token');
+// Add student number if available
+if ($studentNumber) {
+$payload['student_number'] = $studentNumber;
+}
 
-            // 3. Prepare Payload
-            $payload = [
-                'student_number' => (string) $user->student_id,
-                'medical_status' => $user->is_health_profile_completed ? 'cleared' : 'failed',
-            ];
+// Send request
+$response = Http::timeout(30)
+->withHeaders([
+'Authorization' => 'Bearer ' . $this->apiToken,
+'Content-Type' => 'application/json',
+'Accept' => 'application/json',
+])
+->post($this->apiUrl, $payload);
 
-            // Use JSON_UNESCAPED_SLASHES to ensure the string matches exactly what the receiver expects
-            $rawPayload = json_encode($payload, JSON_UNESCAPED_SLASHES);
-            
-            // 4. Calculate HMAC Signature based on the RAW string
-            $signature = hash_hmac('sha256', $rawPayload, $webhookSecret);
+// Check response
+if ($response->successful()) {
+Log::info('PUPTAS webhook sent successfully', [
+'student_id' => $studentId,
+'student_number' => $studentNumber,
+'status' => $isCleared,
+'response' => $response->json()
+]);
 
-            // 5. Send Request using withBody() to guarantee byte-for-byte matching
-            $response = Http::withToken($token)
-                ->withHeaders([
-                    $signatureHeader => $signature,
-                    'Accept' => 'application/json',
-                ])
-                ->withBody($rawPayload, 'application/json')
-                ->post($baseUrl . '/webhooks/medical-result');
+return [
+'success' => true,
+'message' => 'Medical clearance sent to PUPTAS successfully',
+'response' => $response->json()
+];
+} else {
+Log::error('PUPTAS webhook failed', [
+'student_id' => $studentId,
+'status_code' => $response->status(),
+'error' => $response->body()
+]);
 
-            if ($response->failed()) {
-                Log::error('PUPTAS: API Request Failed', [
-                    'student_id' => $user->student_id,
-                    'status' => $response->status(),
-                    'response' => $response->body()
-                ]);
-                return false;
-            }
+return [
+'success' => false,
+'message' => 'Failed to send to PUPTAS: ' . $response->body(),
+'response' => $response->json()
+];
+}
 
-            return true;
-        } catch (\Throwable $exception) {
-            Log::error('PUPTAS: Exception', ['message' => $exception->getMessage()]);
-            return false;
-        }
-    }
+} catch (\Exception $e) {
+Log::error('PUPTAS webhook exception', [
+'student_id' => $studentId,
+'error' => $e->getMessage(),
+'trace' => $e->getTraceAsString()
+]);
+
+return [
+'success' => false,
+'message' => 'Exception: ' . $e->getMessage(),
+'response' => null
+];
+}
+}
+
+/**
+* Send with automatic retry on failure
+*
+* @param string $studentId
+* @param string|null $studentNumber
+* @param int $isCleared
+* @param int $maxRetries
+* @return array
+*/
+public function sendWithRetry(string $studentId, ?string $studentNumber = null, int $isCleared = 1, int $maxRetries = 3): array
+{
+$attempt = 0;
+$delays = [5, 30, 300]; // seconds: 5s, 30s, 5min
+
+while ($attempt < $maxRetries) {
+$result = $this->sendMedicalClearance($studentId, $studentNumber, $isCleared);
+
+if ($result['success']) {
+return $result;
+}
+
+$attempt++;
+if ($attempt < $maxRetries) {
+Log::warning("PUPTAS webhook retry attempt {$attempt} for student {$studentId}");
+sleep($delays[$attempt - 1]);
+}
+}
+
+// All retries failed
+Log::critical('PUPTAS webhook failed after all retries', [
+'student_id' => $studentId,
+'attempts' => $maxRetries
+]);
+
+return [
+'success' => false,
+'message' => 'Failed after ' . $maxRetries . ' attempts',
+'response' => null
+];
+}
 }

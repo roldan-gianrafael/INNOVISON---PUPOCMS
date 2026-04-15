@@ -13,83 +13,483 @@
     ></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-/* === PREMIUM GLASS UI UPGRADE === */
-
-:root {
-    --clinic-maroon: #800000;
-    --clinic-maroon-dark: #5f0012;
-    --clinic-glass: rgba(255,255,255,0.75);
+        :root {
+            --clinic-maroon: #800000;
+            --clinic-maroon-dark: #5f0012;
+            --clinic-maroon-soft: #f5e7ea;
+            --clinic-grey-bg: #eef1f3;
+            --clinic-panel: #ffffff;
+            --clinic-field: #fbfbfc;
+            --clinic-border: #d9dee5;
+            --clinic-text: #111827;
+            --clinic-muted: #5b6470;
+            --clinic-yellow: #fff6cc;
+        }
+        body {
+            background:
+                linear-gradient(rgba(45, 10, 12, 0.72), rgba(28, 8, 8, 0.8)),
+                url('{{ asset('images/PUPBG.jpg') }}') center center / cover no-repeat fixed;
+            padding: 34px 0 48px;
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--clinic-text);
+        }
+        .form-card {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 34px;
+            border-radius: 28px;
+            box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(128, 0, 0, 0.08);
+            max-width: 1120px;
+            margin: auto;
+        }
+        .intake-shell {
+            display: grid;
+            gap: 26px;
+        }
+        .stepper-shell {
+            background: linear-gradient(180deg, #fafafb 0%, #f2f4f7 100%);
+            border: 1px solid var(--clinic-border);
+            border-radius: 24px;
+            padding: 22px;
+            position: sticky;
+            top: 18px;
+            z-index: 20;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+        .stepper-track {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+        :where(.asw-menu-btn) {
+            position: fixed;
+            left: auto !important;
+            right: 20px !important;
+            top: auto !important;
+            bottom: 14px !important;
+            background: #800000 !important;
+            background-image: none !important;
+            border: 2px solid #5f0012 !important;
+            outline: none !important;
+            box-shadow: 0 10px 24px rgba(128, 0, 0, 0.28) !important;
+        }
+        :where(.asw-menu-btn svg),
+        :where(.asw-menu-btn svg path:not([fill="none"])) {
+            fill: #ffffff !important;
+            stroke: none !important;
+        }
+        :where(.asw-menu-btn svg path[fill="none"]) {
+            stroke: none !important;
+        }
+        .step-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 84px;
+            border-radius: 20px;
+            padding: 16px 18px;
+            border: 1px solid #d7dce3;
+            background: #f6f7f9;
+            color: #6b7280;
+        }
+        .step-card.active {
+            background: linear-gradient(135deg, var(--clinic-maroon) 0%, #991b1b 100%);
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: 0 18px 34px rgba(128, 0, 0, 0.22);
+        }
+        .step-card.completed {
+            background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: 0 16px 28px rgba(22, 163, 74, 0.18);
+        }
+        .step-card.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #facc15 100%);
+            border-color: transparent;
+            color: #3f2b00;
+            box-shadow: 0 16px 28px rgba(245, 158, 11, 0.2);
+        }
+        .step-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.78);
+            color: var(--clinic-maroon);
+            flex-shrink: 0;
+        }
+        .step-card.active .step-icon {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+        .step-card:not(.active):not(.completed) .step-icon {
+            color: #7b8794;
+        }
+        .step-card.completed .step-icon {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+        .step-card.warning .step-icon {
+            background: rgba(255, 255, 255, 0.26);
+            color: #6b3f00;
+        }
+        .step-card.completed .step-icon .step-icon-default {
+            display: none;
+        }
+        .step-card.completed .step-icon .step-icon-check {
+            display: block;
+        }
+        .step-card.warning .step-icon .step-icon-default {
+            display: none;
+        }
+        .step-card.warning .step-icon .step-icon-warning {
+            display: block;
+        }
+        .step-icon-check {
+            display: none;
+        }
+        .step-icon-warning {
+            display: none;
+        }
+        .step-copy small {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.75;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        .step-copy strong {
+            display: block;
+            font-size: 14px;
+            line-height: 1.3;
+        }
+        .intro-panel {
+            display: block;
+        }
+        .intro-copy,
+        .intro-upload {
+            border-radius: 24px;
+            border: 1px solid var(--clinic-border);
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fb 100%);
+            padding: 24px;
+        }
+        .intro-copy h2 {
+            margin: 0;
+            color: var(--clinic-maroon);
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .intro-copy p {
+            margin: 12px 0 0;
+            color: var(--clinic-muted);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .intro-upload h3 {
+            margin: 0 0 14px;
+            color: var(--clinic-maroon);
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .verification-upload-shell {
+            margin-top: 22px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(128, 0, 0, 0.12);
+        }
+        .privacy-copy {
+            margin-top: 18px;
+            text-align: center;
+            color: var(--clinic-muted);
+            font-size: 0.92rem;
+            line-height: 1.7;
+            max-width: 760px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .section-title {
+            background: transparent;
+            color: var(--clinic-maroon);
+            padding: 0;
+            margin-top: 26px;
+            border-radius: 0;
+            font-weight: 800;
+            font-size: 1.12rem;
+            text-transform: none;
+            border-bottom: 2px solid rgba(128, 0, 0, 0.12);
+            padding-bottom: 10px;
+            letter-spacing: 0.01em;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.is-active {
+            display: block;
+        }
+        .step-card {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+        }
+        .step-card.is-clickable {
+            cursor: pointer;
+        }
+        .step-card.is-clickable:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
+        }
+        .section-hint {
+            margin: 10px 0 0;
+            color: var(--clinic-muted);
+            font-size: 0.92rem;
+        }
+        .step4-note-box {
+            margin-top: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(128, 0, 0, 0.12);
+            background: linear-gradient(180deg, #fffdf8 0%, #f8f4f1 100%);
+            padding: 18px 20px;
+        }
+        .step4-note-box h4 {
+            margin: 0 0 10px;
+            color: var(--clinic-maroon);
+            font-size: 1rem;
+            font-weight: 800;
+        }
+        .step4-note-box p,
+        .step4-note-box li {
+            color: var(--clinic-muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .step4-note-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .form-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--clinic-text);
+            margin-bottom: 8px;
+        }
+        .required-mark {
+            color: var(--clinic-maroon);
+            font-weight: 800;
+            margin-left: 2px;
+        }
+        .sub-label { font-size: 0.85rem; font-style: italic; color: var(--clinic-text); margin-bottom: 15px; display: block; }
+        .form-control,
+        .form-select {
+            min-height: 48px;
+            border-radius: 14px;
+            border: 1px solid var(--clinic-border);
+            background: var(--clinic-field);
+            color: var(--clinic-text);
+            box-shadow: none;
+            padding: 11px 14px;
+        }
+        textarea.form-control {
+            min-height: 120px;
+        }
+        .form-control:focus,
+        .form-select:focus {
+            border-color: rgba(128, 0, 0, 0.5);
+            box-shadow: 0 0 0 0.18rem rgba(128, 0, 0, 0.11);
+            background: #ffffff;
+        }
+        .form-control.bg-light {
+            background: #f2f4f7 !important;
+            border-color: #dbe0e7;
+        }
+        .vax-table th { background-color: #f8f9fa; font-size: 0.85rem; text-align: center; }
+        .upload-box {
+            border: 2px dashed #c7ced8;
+            padding: 22px 18px;
+            text-align: center;
+            border-radius: 18px;
+            background: linear-gradient(180deg, #fcfcfd 0%, #f4f6f8 100%);
+            min-height: 170px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+        }
+        .upload-box svg {
+            width: 42px;
+            height: 42px;
+            margin: 0 auto;
+            color: var(--clinic-maroon);
+        }
+        .upload-box strong {
+            display: block;
+            color: var(--clinic-maroon);
+            font-size: 0.96rem;
+        }
+        .upload-box span {
+            display: block;
+            color: var(--clinic-muted);
+            font-size: 0.82rem;
+        }
+        .health-upload-field {
+            border: 2px solid #800000;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: #fff;
+            color: #000;
+        }
+        .health-upload-field:focus {
+            border-color: #5c0000;
+            box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.15);
+        }
+        .health-upload-helper {
+            color: #000 !important;
+            display: block;
+            margin-top: 6px;
+            font-size: 0.82rem;
+        }
+        .text-muted {
+            color: #000 !important;
+        }
+        .cta-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            margin-top: 34px;
+        }
+        .cta-group {
+            display: flex;
+            gap: 12px;
+            margin-left: auto;
+        }
+        .btn-health-secondary {
+            min-width: 170px;
+            border: 1px solid rgba(128, 0, 0, 0.18);
+            border-radius: 16px;
+            padding: 15px 24px;
+            background: #ffffff;
+            color: var(--clinic-maroon);
+            font-size: 0.96rem;
+            font-weight: 800;
+        }
+        .btn-health-secondary:hover {
+            background: #faf4f5;
+            color: var(--clinic-maroon-dark);
+        }
+        .btn-health-submit {
+            min-width: 220px;
+            border: none;
+            border-radius: 16px;
+            padding: 15px 24px;
+            background: linear-gradient(135deg, var(--clinic-maroon) 0%, var(--clinic-maroon-dark) 100%);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            box-shadow: 0 16px 28px rgba(128, 0, 0, 0.2);
+        }
+        .btn-health-submit:hover {
+            background: linear-gradient(135deg, #8f0c0c 0%, #6d0217 100%);
+            color: #ffffff;
+        }
+        @media (max-width: 992px) {
+            .stepper-track {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 18px 0 28px;
+            }
+            .form-card {
+                padding: 16px;
+                border-radius: 20px;
+            }
+            .stepper-shell {
+                top: 10px;
+                padding: 14px;
+                border-radius: 18px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .stepper-track {
+                display: flex;
+                gap: 12px;
+                min-width: max-content;
+            }
+            .step-card {
+                width: 250px;
+                min-height: 78px;
+                padding: 14px 15px;
+            }
+            .step-copy small {
+                font-size: 10px;
+            }
+            .step-copy strong {
+                font-size: 13px;
+            }
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+            .cta-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .cta-group {
+                width: 100%;
+                flex-direction: column;
+                margin-left: 0;
+            }
+            .btn-health-secondary,
+            .btn-health-submit {
+                width: 100%;
+            }
+            .privacy-copy {
+                font-size: 0.86rem;
+            }
+        }
+        /* === NEW PROFESSIONAL FORM LAYOUT === */
+.form-row {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
-/* BACKGROUND */
-body {
-    background:
-        linear-gradient(rgba(20, 5, 6, 0.85), rgba(20, 5, 6, 0.9)),
-        url('{{ asset('images/PUPBG.jpg') }}') center/cover no-repeat fixed;
+.form-row .form-label {
+    margin: 0;
+    font-weight: 700;
 }
 
-/* GLASS CARD */
-.form-card {
-    backdrop-filter: blur(18px);
-    background: var(--clinic-glass);
-    border: 1px solid rgba(255,255,255,0.2);
+.form-row .form-control,
+.form-row .form-select {
+    width: 100%;
 }
 
-/* STEPPER PREMIUM */
-.step-card {
-    transition: all 0.25s ease;
-    border-radius: 18px;
+.form-row-wrapper {
+    margin-bottom: 10px;
 }
 
-.step-card:hover {
-    transform: translateY(-3px) scale(1.01);
-}
+/* Mobile */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
 
-.step-card.active {
-    transform: scale(1.03);
+    .form-row .form-label {
+        margin-bottom: 6px;
+    }
 }
-
-/* INPUT FOCUS */
-.form-control:focus,
-.form-select:focus {
-    transform: scale(1.01);
-    transition: all 0.15s ease;
-}
-
-/* BUTTON UPGRADE */
-.btn-health-submit {
-    transition: all 0.25s ease;
-}
-
-.btn-health-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 35px rgba(128,0,0,0.35);
-}
-
-/* STEP ANIMATION */
-.form-step {
-    opacity: 0;
-    transform: translateY(15px);
-    transition: all 0.3s ease;
-}
-
-.form-step.is-active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* INPUT ERROR */
-.input-error {
-    border: 1px solid #dc2626 !important;
-    background: #fff0f0;
-}
-
-/* SUCCESS STATE */
-.input-success {
-    border: 1px solid #16a34a !important;
-    background: #f0fff4;
-}
-</style>
+    </style>
 </head>
 <body>
 
@@ -534,62 +934,98 @@ body {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
     const validationErrors = @json($errors->keys());
     const steps = Array.from(document.querySelectorAll('.form-step'));
     const stepCards = Array.from(document.querySelectorAll('.step-card[data-step-target]'));
-
     const prevStepBtn = document.getElementById('prevStepBtn');
     const nextStepBtn = document.getElementById('nextStepBtn');
     const submitStepBtn = document.getElementById('submitStepBtn');
     const stepStatusText = document.getElementById('stepStatusText');
-
     const introTitle = document.querySelector('.intro-copy h2');
     const introBody = document.querySelector('.intro-copy p');
-
     const stepDescriptions = {
-        1: { title: 'Personal Information', text: 'Please provide complete and truthful information.' },
-        2: { title: 'Medical History', text: 'Review illnesses and supporting records.' },
-        3: { title: 'Vaccination', text: 'Complete vaccination details.' },
-        4: { title: 'Uploads', text: 'Upload required documents before submission.' }
+        1: {
+            title: 'Personal Information',
+            text: 'Please provide complete and truthful information. Type N/A or NONE for fields that do not apply to you. Required fields are marked with a maroon asterisk.',
+        },
+        2: {
+            title: 'Medical History',
+            text: 'Review illnesses, supporting records, and condition-specific declarations before moving to the next section.',
+        },
+        3: {
+            title: 'Personal Social History & Vaccination',
+            text: 'Complete your vaccination details and related personal history information in this section.',
+        },
+        4: {
+            title: 'Verification & Uploads',
+            text: 'Review your entries, confirm the required uploads, and submit your health profile once everything looks correct.',
+        }
     };
-
-    let currentStep = 1;
     const attemptedSteps = new Set();
+    let currentStep = 1;
 
-    // =========================
-    // 🔥 VALIDATION (IMPROVED)
-    // =========================
     const validateStep = (stepNumber) => {
         const section = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
-        if (!section) return true;
+        if (!section) {
+            return true;
+        }
 
-        const fields = Array.from(section.querySelectorAll('input, select, textarea'));
+        const customRequired = {
+            1: [
+                document.querySelector('input[name="school_year"]'),
+                document.querySelector('input[name="home_address"]'),
+                document.querySelector('input[name="age"]'),
+                document.querySelector('select[name="sex"]'),
+                document.querySelector('select[name="civil_status"]'),
+                document.querySelector('input[name="course_college"]'),
+                document.querySelector('input[name="guardian_name"]'),
+                document.querySelector('input[name="cellphone"]')
+            ],
+            2: [
+                document.querySelector('input[name="has_illness"]'),
+                document.querySelector('input[name="has_disability"]')
+            ],
+            4: [
+                document.querySelector('input[name="student_photo"]'),
+                document.querySelector('input[name="digital_signature"]')
+            ]
+        };
 
-        for (const field of fields) {
-            if (field.disabled) continue;
+        const controls = [
+            ...Array.from(section.querySelectorAll('input, select, textarea')).filter((field) => field.required),
+            ...(customRequired[stepNumber] || [])
+        ].filter(Boolean);
 
-            const type = field.type;
+        for (const field of controls) {
+            if (field.disabled) {
+                continue;
+            }
 
-            // RADIO GROUP FIX
+            const type = (field.type || '').toLowerCase();
+
             if (type === 'radio') {
-                const group = section.querySelectorAll(`input[name="${field.name}"]`);
-                if (!Array.from(group).some(r => r.checked)) {
+                const group = section.querySelectorAll(`input[type="radio"][name="${field.name}"]`);
+                if (!Array.from(group).some((radio) => radio.checked)) {
                     return false;
                 }
                 continue;
             }
 
-            // FILE
+            if (type === 'checkbox') {
+                if (!field.checked) {
+                    return false;
+                }
+                continue;
+            }
+
             if (type === 'file') {
-                if (field.required && (!field.files || field.files.length === 0)) {
+                if (!field.files || field.files.length === 0) {
                     return false;
                 }
                 continue;
             }
 
-            // NORMAL INPUT
-            if (field.required && !field.value.trim()) {
+            if (!String(field.value || '').trim()) {
                 return false;
             }
         }
@@ -597,11 +1033,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     };
 
-    // =========================
-    // 🔥 FIND ERROR STEP
-    // =========================
     const resolveStepFromErrors = () => {
-        const map = {
+        const fieldStepMap = {
+            school_year: 1,
             home_address: 1,
             age: 1,
             sex: 1,
@@ -610,186 +1044,198 @@ document.addEventListener('DOMContentLoaded', function() {
             guardian_name: 1,
             cellphone: 1,
             has_illness: 2,
+            medical_history: 2,
+            chest_xray_result: 2,
             has_disability: 2,
+            disability_type: 2,
+            pwd_id_proof: 2,
+            food_allergies: 2,
+            no_allergies: 2,
+            medicine_allergies: 2,
+            other_med_allergies: 2,
+            medical_certificate: 2,
+            medical_certificate_issued_by: 2,
+            vaccine_history: 3,
+            vax_date_1: 3,
+            vax_brand_1: 3,
+            vax_date_2: 3,
+            vax_brand_2: 3,
+            booster_date_1: 3,
+            booster_brand_1: 3,
+            booster_date_2: 3,
+            booster_brand_2: 3,
             student_photo: 4,
             digital_signature: 4,
         };
 
-        for (const key of validationErrors) {
-            if (map[key]) return map[key];
+        for (const fieldName of validationErrors) {
+            if (fieldStepMap[fieldName]) {
+                return fieldStepMap[fieldName];
+            }
         }
 
         return 1;
     };
 
-    // =========================
-    // 🔥 RENDER STEP
-    // =========================
-    const renderStep = (step) => {
-        currentStep = step;
+    const renderStep = (stepNumber) => {
+        currentStep = stepNumber;
 
-        steps.forEach(s => {
-            s.classList.toggle('is-active', Number(s.dataset.step) === step);
+        steps.forEach((section) => {
+            section.classList.toggle('is-active', Number(section.dataset.step) === stepNumber);
         });
 
-        stepCards.forEach(card => {
-            const s = Number(card.dataset.stepTarget);
-            const valid = validateStep(s);
-            const warning = attemptedSteps.has(s) && !valid;
-
-            card.classList.toggle('active', s === step && !warning);
-            card.classList.toggle('completed', s < step && valid);
-            card.classList.toggle('warning', warning);
+        stepCards.forEach((card, index) => {
+            const cardStep = Number(card.dataset.stepTarget);
+            const isValid = validateStep(cardStep);
+            const isWarning = attemptedSteps.has(cardStep) && !isValid;
+            card.classList.toggle('active', cardStep === stepNumber && !isWarning);
+            card.classList.toggle('completed', cardStep < stepNumber && isValid);
+            card.classList.toggle('warning', isWarning);
+            card.classList.toggle('is-clickable', true);
         });
 
-        stepStatusText.textContent = `Step ${step} of ${steps.length}`;
-
-        if (stepDescriptions[step]) {
-            introTitle.textContent = stepDescriptions[step].title;
-            introBody.textContent = stepDescriptions[step].text;
+        if (stepStatusText) {
+            stepStatusText.textContent = `Step ${stepNumber} of ${steps.length}`;
         }
 
-        prevStepBtn.style.display = step === 1 ? 'none' : '';
-        nextStepBtn.style.display = step === steps.length ? 'none' : '';
-        submitStepBtn.style.display = step === steps.length ? '' : '';
+        if (introTitle && introBody && stepDescriptions[stepNumber]) {
+            introTitle.textContent = stepDescriptions[stepNumber].title;
+            introBody.textContent = stepDescriptions[stepNumber].text;
+        }
 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (prevStepBtn) {
+            prevStepBtn.style.display = stepNumber === 1 ? 'none' : '';
+        }
+
+        if (nextStepBtn && submitStepBtn) {
+            const isFinalStep = stepNumber === steps.length;
+            nextStepBtn.style.display = isFinalStep ? 'none' : '';
+            submitStepBtn.style.display = isFinalStep ? '' : 'none';
+        }
+
+        document.querySelector('.stepper-shell')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    // =========================
-    // 🔥 NAVIGATION
-    // =========================
-    nextStepBtn.addEventListener('click', () => {
+    prevStepBtn?.addEventListener('click', function () {
+        if (currentStep > 1) {
+            renderStep(currentStep - 1);
+        }
+    });
+
+    nextStepBtn?.addEventListener('click', function () {
         if (!validateStep(currentStep)) {
             attemptedSteps.add(currentStep);
             renderStep(currentStep);
-
-            const firstInvalid = document.querySelector(`.form-step[data-step="${currentStep}"] input:invalid, select:invalid`);
-            if (firstInvalid) firstInvalid.focus();
-
+            const activeSection = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const invalidField = activeSection?.querySelector('[required]');
+            invalidField?.focus();
             return;
         }
 
         attemptedSteps.delete(currentStep);
-        renderStep(currentStep + 1);
+
+        if (currentStep < steps.length) {
+            renderStep(currentStep + 1);
+        }
     });
 
-    prevStepBtn.addEventListener('click', () => {
-        renderStep(currentStep - 1);
-    });
-
-    stepCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const step = Number(card.dataset.stepTarget);
-
-            if (step > currentStep && !validateStep(currentStep)) {
-                attemptedSteps.add(currentStep);
-                renderStep(currentStep);
-                return;
+    stepCards.forEach((card) => {
+        card.addEventListener('click', function () {
+            const targetStep = Number(card.dataset.stepTarget);
+            if (targetStep >= 1 && targetStep <= steps.length) {
+                if (targetStep > currentStep && !validateStep(currentStep)) {
+                    attemptedSteps.add(currentStep);
+                    renderStep(currentStep);
+                    return;
+                }
+                renderStep(targetStep);
             }
-
-            renderStep(step);
         });
     });
 
-    // =========================
-    // 🔥 MEDICAL LOGIC
-    // =========================
-    const illnessNo = document.getElementById('illnessNo');
+    // 1. Medical Illness Logic
+    const illnessRadios = document.querySelectorAll('.illness-radio');
     const illnessCheckboxes = document.querySelectorAll('.illness-checkbox');
     const otherIllness = document.querySelector('input[name="other_illness"]');
 
     function toggleIllness() {
-        const disabled = illnessNo.checked;
-
+        const isNo = document.getElementById('illnessNo').checked;
         illnessCheckboxes.forEach(cb => {
-            cb.disabled = disabled;
-            if (disabled) cb.checked = false;
+            cb.disabled = isNo;
+            if (isNo) cb.checked = false;
         });
-
-        otherIllness.disabled = disabled;
-        if (disabled) otherIllness.value = '';
+        otherIllness.disabled = isNo;
+        if (isNo) otherIllness.value = '';
     }
 
-    document.querySelectorAll('.illness-radio').forEach(r => r.addEventListener('change', toggleIllness));
-
-    // =========================
-    // 🔥 DISABILITY LOGIC
-    // =========================
-    const disabilityNo = document.getElementById('disabilityNo');
-    const disabilityYes = document.getElementById('disabilityYes');
+    // 2. Disability Logic
+    const disabilityRadios = document.querySelectorAll('.disability-radio');
     const disabilityType = document.getElementById('disability_type');
-    const pwdWrapper = document.getElementById('pwdProofWrapper');
-    const pwdProof = document.getElementById('pwd_id_proof');
+    const pwdProofWrapper = document.getElementById('pwdProofWrapper');
+    const pwdIdProof = document.getElementById('pwd_id_proof');
 
     function toggleDisability() {
-        if (disabilityNo.checked) {
-            disabilityType.value = '';
-            disabilityType.disabled = true;
-            pwdWrapper.style.display = 'none';
-            pwdProof.required = false;
-        } else {
-            disabilityType.disabled = false;
-            pwdWrapper.style.display = 'block';
-            pwdProof.required = true;
+        const isNone = document.getElementById('disabilityNo').checked;
+        const isYes = document.getElementById('disabilityYes').checked;
+        disabilityType.disabled = isNone;
+        if (isNone) disabilityType.value = '';
+        pwdProofWrapper.style.display = isYes ? 'block' : 'none';
+        pwdIdProof.required = isYes;
+        pwdIdProof.disabled = !isYes;
+        if (!isYes) {
+            pwdIdProof.value = '';
         }
     }
 
-    document.querySelectorAll('.disability-radio').forEach(r => r.addEventListener('change', toggleDisability));
-
-    // =========================
-    // 🔥 ALLERGY LOGIC
-    // =========================
-    const noAllergies = document.getElementById('noAllergiesCheck');
-    const food = document.querySelector('input[name="food_allergies"]');
-    const meds = document.querySelectorAll('.medicine-checkbox');
-    const otherMeds = document.querySelector('input[name="other_med_allergies"]');
+    // 3. Allergies Logic
+    const noAllergiesCheck = document.getElementById('noAllergiesCheck');
+    const foodAllergies = document.querySelector('input[name="food_allergies"]');
+    const medicineCheckboxes = document.querySelectorAll('.medicine-checkbox');
+    const otherMedAllergies = document.querySelector('input[name="other_med_allergies"]');
 
     function toggleAllergies() {
-        const disabled = noAllergies.checked;
-
-        food.disabled = disabled;
-        otherMeds.disabled = disabled;
-
-        meds.forEach(cb => {
-            cb.disabled = disabled;
-            if (disabled) cb.checked = false;
+        const isNoAllergies = noAllergiesCheck.checked;
+        foodAllergies.disabled = isNoAllergies;
+        otherMedAllergies.disabled = isNoAllergies;
+        medicineCheckboxes.forEach(cb => {
+            cb.disabled = isNoAllergies;
+            if (isNoAllergies) cb.checked = false;
         });
-
-        if (disabled) {
-            food.value = '';
-            otherMeds.value = '';
+        if (isNoAllergies) {
+            foodAllergies.value = '';
+            otherMedAllergies.value = '';
         }
     }
 
-    noAllergies.addEventListener('change', toggleAllergies);
+    // Listeners
+    illnessRadios.forEach(r => r.addEventListener('change', toggleIllness));
+    disabilityRadios.forEach(r => r.addEventListener('change', toggleDisability));
+    noAllergiesCheck.addEventListener('change', toggleAllergies);
 
-    // =========================
-    // 🔥 INIT
-    // =========================
+    // Initial Run
     toggleIllness();
     toggleDisability();
     toggleAllergies();
-
     const initialStep = validationErrors.length ? resolveStepFromErrors() : 1;
-    if (validationErrors.length) attemptedSteps.add(initialStep);
-
+    if (validationErrors.length) {
+        attemptedSteps.add(initialStep);
+    }
     renderStep(initialStep);
 
-    // =========================
-    // 🔥 ACCESSIBILITY BUTTON FIX
-    // =========================
-    function fixAccessibilityBtn() {
-        document.querySelectorAll('.asw-menu-btn').forEach(btn => {
-            btn.style.right = '20px';
-            btn.style.bottom = '14px';
-            btn.style.background = '#800000';
+    function forceAccessibilityButtonTheme() {
+        document.querySelectorAll('.asw-menu-btn').forEach((button) => {
+            button.style.setProperty('right', '20px', 'important');
+            button.style.setProperty('bottom', '14px', 'important');
+            button.style.setProperty('left', 'auto', 'important');
+            button.style.setProperty('top', 'auto', 'important');
+            button.style.setProperty('background', '#800000', 'important');
+            button.style.setProperty('background-image', 'none', 'important');
+            button.style.setProperty('border', '2px solid #5f0012', 'important');
         });
     }
 
-    fixAccessibilityBtn();
-    new MutationObserver(fixAccessibilityBtn).observe(document.body, { childList: true, subtree: true });
-
+    forceAccessibilityButtonTheme();
+    new MutationObserver(forceAccessibilityButtonTheme).observe(document.body, { childList: true, subtree: true });
 });
 </script>
 

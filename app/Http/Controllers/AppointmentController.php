@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Appointment;
 use App\Models\User;
-use App\Services\PuptasWebhookService;
+use App\Services\MedicalStatusWebhookService;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -163,7 +163,6 @@ class AppointmentController extends Controller
         $appointment = new Appointment();
         $appointment->user_id    = $user->id;
         $appointment->student_id = $request->input('student_id', '2025-0000-TG-0');
-        $appointment->student_number = $request->input('student_number', '2025-0000-TG-0');
         $appointment->name       = $user->name;
         $appointment->email      = $user->email;
         $appointment->date       = $request->date;
@@ -610,17 +609,8 @@ public function showHealthForm()
     /** @var \App\Models\User $user */
     $user = Auth::user();
     
-    // 1. Initialize your service
-    $puptas = new \App\Services\PuptasWebhookService();
-
-    // 2. Fetch the live status from PUPTAS
-    $status = $puptas->getClearanceStatus($user->student_number);
-    
-    // 3. If they are already completed, check if they are cleared/approved
     if ($user->is_health_profile_completed) {
-        // You can pass the status to the print view too
-        return redirect()->route('print.health.form')
-            ->with(['info' => 'You have already completed your health profile.', 'status' => $status]);
+        return redirect()->route('print.health.form')->with('info', 'You have already completed your health profile.');
     }
 
     $calculatedAge = null;
@@ -629,8 +619,7 @@ public function showHealthForm()
     }
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
 
-    // 4. Pass the $status variable to the health_form view
-    return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile', 'status'));
+    return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile'));
 }
 
 

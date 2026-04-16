@@ -450,21 +450,7 @@
 
             {{-- NEW: Health Form Quick Access Div --}}
            <div class="health-status-card">
-    @php
-        $puptasService = new \App\Services\PuptasWebhookService();
-        
-        // Cache for 5 minutes (300 seconds) to avoid API lag
-        $statusData = \Illuminate\Support\Facades\Cache::remember(
-            'clearance_' . $user->student_number, 
-            300, 
-            function() use ($puptasService, $user) {
-                return $puptasService->getClearanceStatus($user->student_number);
-            }
-        );
-        
-        $isApproved = ($statusData['is_cleared'] ?? false);
-    @endphp
-
+   
     <span class="health-status-title">Health Information Record</span>
     
     @if($isApproved)

@@ -13,6 +13,23 @@ use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
+    private function normalizeMeasurement(?string $value, string $unit): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        $normalizedUnit = strtolower(trim($unit));
+        $normalizedValue = preg_replace('/\s+/', ' ', $value) ?? $value;
+
+        if (!str_contains(strtolower($normalizedValue), $normalizedUnit)) {
+            $normalizedValue .= ' ' . $normalizedUnit;
+        }
+
+        return $normalizedValue;
+    }
+
     private function hasSubmittedHealthProfile(?User $user): bool
     {
         if (!$user) {
@@ -657,6 +674,22 @@ public function showHealthForm()
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
 
     $applicantData = app(PuptasWebhookService::class)->fetchApplicantByStudentNumber((string) ($user->student_number ?? ''));
+    $resolvedSex = trim((string) ($user->gender ?? optional($linkedAdminProfile)->gender ?? ''));
+    $resolvedSex = in_array(strtolower($resolvedSex), ['male', 'female'], true)
+        ? ucfirst(strtolower($resolvedSex))
+        : '';
+
+    $resolvedCivilStatus = trim((string) (optional($linkedAdminProfile)->civil_status ?? ''));
+    $resolvedCivilStatus = in_array($resolvedCivilStatus, ['Single', 'Married'], true) ? $resolvedCivilStatus : 'Single';
+    $resolvedBirthday = (string) ($user->DOB ?? optional($linkedAdminProfile)->birthday ?? '');
+    if ($resolvedBirthday !== '') {
+        try {
+            $resolvedBirthday = \Carbon\Carbon::parse($resolvedBirthday)->format('Y-m-d');
+        } catch (\Throwable $exception) {
+            $resolvedBirthday = '';
+        }
+    }
+
     $healthFormPrefill = [
         'full_name' => trim(implode(' ', array_filter([
             data_get($applicantData, 'first_name'),
@@ -668,6 +701,17 @@ public function showHealthForm()
             data_get($applicantData, 'program.code'),
             data_get($applicantData, 'program.name'),
         ]))) ?: (string) ($user->course ?? ''),
+        'home_address' => trim((string) (optional($linkedAdminProfile)->address ?? '')),
+        'school_year' => '2025-2026',
+        'height' => (string) ($user->height ?? ''),
+        'weight' => (string) ($user->weight ?? ''),
+        'birthday' => $resolvedBirthday,
+        'age' => $calculatedAge,
+        'sex' => $resolvedSex,
+        'civil_status' => $resolvedCivilStatus,
+        'blood_type' => '',
+        'guardian_name' => trim((string) (optional($linkedAdminProfile)->emergency_contact_person ?? '')),
+        'cellphone' => trim((string) (optional($linkedAdminProfile)->emergency_contact_no ?: ($user->contact_no ?? ''))),
     ];
 
     // Return the view with all required variables
@@ -709,6 +753,8 @@ public function storeHealthForm(Request $request)
 
     /** @var \App\Models\User $user */
     $user = Auth::user();
+    $normalizedHeight = $this->normalizeMeasurement($request->input('height'), 'cm');
+    $normalizedWeight = $this->normalizeMeasurement($request->input('weight'), 'kg');
 
     try {
         // 2. FILE HANDLING: I-save ang Photo at Signature sa storage
@@ -732,8 +778,8 @@ public function storeHealthForm(Request $request)
                 'school_year'        => $request->school_year,
                 'home_address'       => $request->home_address,
                 'student_photo'      => $photoPath,
-                'height'             => $request->height,
-                'weight'             => $request->weight,
+                'height'             => $normalizedHeight,
+                'weight'             => $normalizedWeight,
                 'age'                => $request->age,
                 'sex'                => $request->sex,
                 'civil_status'       => $request->civil_status,

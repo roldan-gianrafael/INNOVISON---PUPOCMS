@@ -247,6 +247,7 @@
             <thead>
                 <tr>
                     <th>Student</th>
+                    <th>Student Number</th>
                     <th>Type</th> <th>Service</th>
                     <th>Date & Time</th>
                     <th>Status</th>
@@ -258,8 +259,9 @@
                     <tr>
                         <td>
                             <div style="font-weight: 700;" class="student-name">{{ $appt->name }}</div>
-                            <div style="font-size: 12px; color: #111827;">{{ $appt->student_number ?: $appt->student_id }}</div>
+                            <div style="font-size: 12px; color: #111827;">{{ $appt->student_id }}</div>
                         </td>
+                        <td>{{ $appt->student_number ?: 'N/A' }}</td>
                        <td>
     @php
         // Preferred source field is `type`; fallback for legacy records.
@@ -337,7 +339,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8;">No appointments found.</td>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">No appointments found.</td>
                     </tr>
                 @endforelse
             </tbody>

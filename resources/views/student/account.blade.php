@@ -505,10 +505,9 @@
         </a>
         <span class="health-status-note">Required for clinic consultations.</span>
     @endif
-</div>
-            
-
-            {{-- Full Profile Widget --}}
+</div>   
+        
+{{-- Full Profile Widget --}}
             <div class="widget-card">
     <div class="section-title" style="font-size: 16px; margin-bottom: 15px;"> Profile Information</div>
     

@@ -639,7 +639,7 @@
         <div class="form-row">
             <label class="form-label">Home Address<span class="required-mark">*</span></label>
             <input type="text" name="home_address" class="form-control"
-                value="{{ old('home_address') }}">
+                value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}">
         </div>
     </div>
 
@@ -647,7 +647,7 @@
         <div class="form-row">
             <label class="form-label">School Year</label>
             <input type="text" name="school_year" class="form-control"
-                value="{{ old('school_year', '2025-2026') }}">
+                value="{{ old('school_year', $healthFormPrefill['school_year'] ?? '2025-2026') }}">
         </div>
     </div>
 
@@ -655,7 +655,8 @@
         <div class="form-row">
             <label class="form-label">Height</label>
             <input type="text" name="height" class="form-control"
-                value="{{ old('height') }}">
+                value="{{ old('height', $healthFormPrefill['height'] ?? '') }}"
+                placeholder="e.g. 170 cm">
         </div>
     </div>
 
@@ -663,7 +664,16 @@
         <div class="form-row">
             <label class="form-label">Weight</label>
             <input type="text" name="weight" class="form-control"
-                value="{{ old('weight') }}">
+                value="{{ old('weight', $healthFormPrefill['weight'] ?? '') }}"
+                placeholder="e.g. 65 kg">
+        </div>
+    </div>
+
+    <div class="col-md-6 form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Birthday</label>
+            <input type="date" name="birthday" class="form-control"
+                value="{{ old('birthday', $healthFormPrefill['birthday'] ?? '') }}" readonly>
         </div>
     </div>
 
@@ -671,8 +681,8 @@
         <div class="form-row">
             <label class="form-label">Age<span class="required-mark">*</span></label>
             <input type="number" name="age" class="form-control"
-                value="{{ old('age', $calculatedAge) }}"
-                {{ $calculatedAge ? 'readonly' : '' }}>
+                value="{{ old('age', $healthFormPrefill['age'] ?? $calculatedAge) }}"
+                {{ !empty($healthFormPrefill['birthday']) || $calculatedAge ? 'readonly' : '' }}>
         </div>
     </div>
 
@@ -680,8 +690,8 @@
         <div class="form-row">
             <label class="form-label">Sex<span class="required-mark">*</span></label>
             <select name="sex" class="form-select">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="Male" {{ old('sex', $healthFormPrefill['sex'] ?? '') === 'Male' ? 'selected' : '' }}>Male</option>
+                <option value="Female" {{ old('sex', $healthFormPrefill['sex'] ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
             </select>
         </div>
     </div>
@@ -690,9 +700,9 @@
         <div class="form-row">
             <label class="form-label">Civil Status<span class="required-mark">*</span></label>
             <select name="civil_status" class="form-select">
-                <option disabled selected>Select</option>
-                <option>Single</option>
-                <option>Married</option>
+                <option disabled {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === '' ? 'selected' : '' }}>Select</option>
+                <option {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === 'Single' ? 'selected' : '' }}>Single</option>
+                <option {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === 'Married' ? 'selected' : '' }}>Married</option>
             </select>
         </div>
     </div>
@@ -709,7 +719,7 @@
         <div class="form-row">
             <label class="form-label">Blood Type</label>
             <input type="text" name="blood_type" class="form-control"
-                value="{{ old('blood_type') }}">
+                value="{{ old('blood_type', $healthFormPrefill['blood_type'] ?? '') }}">
         </div>
     </div>
 
@@ -725,7 +735,7 @@
         <div class="form-row">
             <label class="form-label">Guardian Name<span class="required-mark">*</span></label>
             <input type="text" name="guardian_name" class="form-control"
-                value="{{ old('guardian_name') }}">
+                value="{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}">
         </div>
     </div>
 
@@ -733,7 +743,7 @@
         <div class="form-row">
             <label class="form-label">Phone Number<span class="required-mark">*</span></label>
             <input type="text" name="cellphone" class="form-control"
-                value="{{ old('cellphone') }}">
+                value="{{ old('cellphone', $healthFormPrefill['cellphone'] ?? '') }}">
         </div>
     </div>
 

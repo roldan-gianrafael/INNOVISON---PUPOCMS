@@ -175,13 +175,27 @@
         <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
     </div>
     <div class="row">
-        <span class="label">Height:</span> <div class="field">{{ $profile->height ?? 'N/A' }}</div>
-        <span class="label">Weight:</span> <div class="field">{{ $profile->weight ?? 'N/A' }}</div>
+        @php
+            $formattedHeight = trim((string) ($profile->height ?? ''));
+            if ($formattedHeight !== '' && !str_contains(strtolower($formattedHeight), 'cm')) {
+                $formattedHeight .= ' cm';
+            }
+
+            $formattedWeight = trim((string) ($profile->weight ?? ''));
+            if ($formattedWeight !== '' && !str_contains(strtolower($formattedWeight), 'kg')) {
+                $formattedWeight .= ' kg';
+            }
+        @endphp
+        <span class="label">Height:</span> <div class="field">{{ $formattedHeight !== '' ? $formattedHeight : 'N/A' }}</div>
+        <span class="label">Weight:</span> <div class="field">{{ $formattedWeight !== '' ? $formattedWeight : 'N/A' }}</div>
     </div>
     <div class="row">
+        <span class="label">Birthday:</span> <div class="field">{{ optional(optional($profile->user)->DOB ? \Carbon\Carbon::parse($profile->user->DOB) : null)->format('m/d/Y') ?? 'N/A' }}</div>
         <span class="label">Age:</span> <div class="field">{{ $profile->age ?? '' }}</div>
         <span class="label">Sex:</span> <div class="field">{{ $profile->sex ?? '' }}</div>
         <span class="label">Civil Status:</span> <div class="field">{{ $profile->civil_status ?? '' }}</div>
+    </div>
+    <div class="row">
         <span class="label">Course:</span> <div class="field">{{ $profile->course_college ?? '' }}</div>
     </div>
     <div class="row">

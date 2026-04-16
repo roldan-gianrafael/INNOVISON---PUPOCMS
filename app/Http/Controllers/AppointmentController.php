@@ -609,15 +609,23 @@ public function showHealthForm()
     /** @var \App\Models\User $user */
     $user = Auth::user();
     
+    // Redirect if already completed
     if ($user->is_health_profile_completed) {
-        return redirect()->route('print.health.form')->with('info', 'You have already completed your health profile.');
+        return redirect()->route('print.health.form')
+            ->with('info', 'You have already completed your health profile.');
     }
 
+    // Calculate age
     $calculatedAge = null;
     if ($user->DOB) {
         $calculatedAge = \Carbon\Carbon::parse($user->DOB)->age;
     }
-    return view('student.health_form', compact('user', 'calculatedAge'));
+
+    // Resolve the linked admin profile (Required by your view to avoid Undefined Variable error)
+    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+
+    // Return the view with all required variables
+    return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile'));
 }
 
 public function storeHealthForm(Request $request)

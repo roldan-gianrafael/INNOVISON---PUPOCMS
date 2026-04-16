@@ -450,38 +450,98 @@
 
             {{-- NEW: Health Form Quick Access Div --}}
            <div class="health-status-card">
-    @php
-        $puptasService = new \App\Services\PuptasWebhookService();
-        
-        // Cache for 5 minutes (300 seconds) to avoid API lag
-        $statusData = \Illuminate\Support\Facades\Cache::remember(
-            'clearance_' . $user->student_number, 
-            300, 
-            function() use ($puptasService, $user) {
-                return $puptasService->getClearanceStatus($user->student_number);
-            }
-        );
-        
-        $isApproved = ($statusData['is_cleared'] ?? false);
-    @endphp
 
     <span class="health-status-title">Health Information Record</span>
-    
-    @if($isApproved)
-        <div class="health-status-summary">
-            <span class="health-status-state issued">Approved</span>
-            <p class="health-status-message">Your medical clearance has been verified by PUPTAS.</p>
-        </div>
-        <div class="health-status-actions">
-            <a href="{{ route('print.health.form') }}" class="btn-print-form approved">Print Approved Form</a>
-        </div>
-    @else
-        <div class="health-status-summary">
-            <span class="health-status-state pending">Pending Review</span>
-            <p class="health-status-message">Waiting for clearance verification from the clinic system.</p>
-        </div>
-    @endif
-</div>
+
+   
+
+    @if($user->is_health_profile_completed)
+
+        @php
+
+            $status = $user->healthProfile->clearance_status ?? 'Pending';
+
+        @endphp
+
+
+
+        @if($status == 'Issued')
+
+            {{-- CASE 1: APPROVED --}}
+
+            <div class="health-status-summary">
+
+                <span class="health-status-state issued">Approved</span>
+
+                <p class="health-status-message">
+
+                    Your health profile is now approved and ready for printing.
+
+                </p>
+
+            </div>
+
+           
+
+            <div class="health-status-actions">
+
+                <a href="{{ route('print.health.form') }}" class="btn-print-form approved">
+
+                    Print Approved Form
+
+                </a>
+
+       
+
+                <a href="" class="health-status-link">
+
+                    View Record Details
+
+                </a>
+
+            </div>
+
+            <span class="health-status-note">Valid for Academic Year 2025-2026</span>
+
+
+
+        @else
+
+           
+
+            <div class="health-status-summary">
+
+                <span class="health-status-state pending">Pending Review</span>
+
+                <p class="health-status-message">
+
+                    Your profile has been submitted and is currently <strong>awaiting medical review</strong>.
+
+                </p>
+
+            </div>
+
+           
+
+            <div class="health-status-actions">
+
+                <a href="{{ route('print.health.form') }}" class="btn-print-form pending">
+
+                    View Submitted Form
+
+                </a>
+
+                <button class="btn-print-form disabled" disabled>
+
+                    Printing Disabled (Pending)
+
+                </button>
+
+            </div>
+
+            <span class="health-status-note">Physician signature is required to print.</span>
+
+        @endif
             
 
             {{-- Full Profile Widget --}}

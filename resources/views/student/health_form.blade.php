@@ -305,6 +305,20 @@
             box-shadow: 0 0 0 0.18rem rgba(128, 0, 0, 0.11);
             background: #ffffff;
         }
+        .field-invalid,
+        .field-invalid.form-control,
+        .field-invalid.form-select,
+        .field-invalid.form-check-input {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 0.18rem rgba(220, 38, 38, 0.14) !important;
+            background: #fff5f5 !important;
+        }
+        .field-error-note {
+            color: #b91c1c;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-top: 6px;
+        }
         .form-control.bg-light {
             background: #f2f4f7 !important;
             border-color: #dbe0e7;
@@ -337,6 +351,37 @@
             display: block;
             color: var(--clinic-muted);
             font-size: 0.82rem;
+        }
+        .signature-pad-wrap {
+            margin-top: 16px;
+            border-top: 1px solid rgba(128, 0, 0, 0.12);
+            padding-top: 16px;
+            display: grid;
+            gap: 12px;
+        }
+        .signature-pad {
+            width: 100%;
+            height: 220px;
+            border: 2px dashed #c7ced8;
+            border-radius: 16px;
+            background: #fff;
+            touch-action: none;
+            cursor: crosshair;
+        }
+        .signature-toolbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .signature-toolbar .signature-btn {
+            border: 1px solid rgba(128, 0, 0, 0.18);
+            background: #fff;
+            color: var(--clinic-maroon);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-weight: 700;
         }
         .health-upload-field {
             border: 2px solid #800000;
@@ -615,6 +660,23 @@
     @csrf
 
     <section class="form-step is-active" data-step="1">
+@php
+    $lockedHomeAddress = !empty($healthFormPrefill['home_address'] ?? '');
+    $lockedSchoolYear = !empty($healthFormPrefill['school_year'] ?? '');
+    $lockedHeight = !empty($healthFormPrefill['height'] ?? '');
+    $lockedWeight = !empty($healthFormPrefill['weight'] ?? '');
+    $lockedBirthday = !empty($healthFormPrefill['birthday'] ?? '');
+    $lockedAge = !empty($healthFormPrefill['birthday'] ?? '') || !empty($healthFormPrefill['age'] ?? null) || !empty($calculatedAge ?? null);
+    $lockedSex = !empty($healthFormPrefill['sex'] ?? '');
+    $lockedCivilStatus = !empty($healthFormPrefill['civil_status'] ?? '');
+    $lockedCourseCollege = !empty($healthFormPrefill['course_college'] ?? '');
+    $lockedBloodType = !empty($healthFormPrefill['blood_type'] ?? '');
+    $lockedEmail = !empty($healthFormPrefill['email'] ?? '');
+    $lockedGuardianName = !empty($healthFormPrefill['guardian_name'] ?? '');
+    $lockedCellphone = !empty($healthFormPrefill['cellphone'] ?? '');
+    $selectedBloodType = old('blood_type', $healthFormPrefill['blood_type'] ?? 'Not Known');
+    $bloodTypeOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Not Known'];
+@endphp
 
 <div class="row mt-4">
 
@@ -639,7 +701,8 @@
         <div class="form-row">
             <label class="form-label">Home Address<span class="required-mark">*</span></label>
             <input type="text" name="home_address" class="form-control"
-                value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}">
+                value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}"
+                {{ $lockedHomeAddress ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -647,7 +710,8 @@
         <div class="form-row">
             <label class="form-label">School Year</label>
             <input type="text" name="school_year" class="form-control"
-                value="{{ old('school_year', $healthFormPrefill['school_year'] ?? '2025-2026') }}">
+                value="{{ old('school_year', $healthFormPrefill['school_year'] ?? '2025-2026') }}"
+                {{ $lockedSchoolYear ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -656,7 +720,8 @@
             <label class="form-label">Height</label>
             <input type="text" name="height" class="form-control"
                 value="{{ old('height', $healthFormPrefill['height'] ?? '') }}"
-                placeholder="e.g. 170 cm">
+                placeholder="e.g. 170 cm"
+                {{ $lockedHeight ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -665,7 +730,8 @@
             <label class="form-label">Weight</label>
             <input type="text" name="weight" class="form-control"
                 value="{{ old('weight', $healthFormPrefill['weight'] ?? '') }}"
-                placeholder="e.g. 65 kg">
+                placeholder="e.g. 65 kg"
+                {{ $lockedWeight ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -673,7 +739,8 @@
         <div class="form-row">
             <label class="form-label">Birthday</label>
             <input type="date" name="birthday" class="form-control"
-                value="{{ old('birthday', $healthFormPrefill['birthday'] ?? '') }}" readonly>
+                value="{{ old('birthday', $healthFormPrefill['birthday'] ?? '') }}"
+                {{ $lockedBirthday ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -682,28 +749,34 @@
             <label class="form-label">Age<span class="required-mark">*</span></label>
             <input type="number" name="age" class="form-control"
                 value="{{ old('age', $healthFormPrefill['age'] ?? $calculatedAge) }}"
-                {{ !empty($healthFormPrefill['birthday']) || $calculatedAge ? 'readonly' : '' }}>
+                {{ $lockedAge ? 'readonly' : '' }} required>
         </div>
     </div>
 
     <div class="col-md-6 form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Sex<span class="required-mark">*</span></label>
-            <select name="sex" class="form-select">
+            <select name="sex" class="form-select" {{ $lockedSex ? 'disabled' : '' }} required>
                 <option value="Male" {{ old('sex', $healthFormPrefill['sex'] ?? '') === 'Male' ? 'selected' : '' }}>Male</option>
                 <option value="Female" {{ old('sex', $healthFormPrefill['sex'] ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
             </select>
+            @if($lockedSex)
+                <input type="hidden" name="sex" value="{{ old('sex', $healthFormPrefill['sex'] ?? '') }}">
+            @endif
         </div>
     </div>
 
     <div class="col-md-6 form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Civil Status<span class="required-mark">*</span></label>
-            <select name="civil_status" class="form-select">
+            <select name="civil_status" class="form-select" {{ $lockedCivilStatus ? 'disabled' : '' }} required>
                 <option disabled {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === '' ? 'selected' : '' }}>Select</option>
                 <option {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === 'Single' ? 'selected' : '' }}>Single</option>
                 <option {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === 'Married' ? 'selected' : '' }}>Married</option>
             </select>
+            @if($lockedCivilStatus)
+                <input type="hidden" name="civil_status" value="{{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') }}">
+            @endif
         </div>
     </div>
 
@@ -711,15 +784,24 @@
         <div class="form-row">
             <label class="form-label">Course / College<span class="required-mark">*</span></label>
             <input type="text" name="course_college" class="form-control"
-                value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}">
+                value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}"
+                {{ $lockedCourseCollege ? 'readonly' : '' }} required>
         </div>
     </div>
 
     <div class="col-md-6 form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Blood Type</label>
-            <input type="text" name="blood_type" class="form-control"
-                value="{{ old('blood_type', $healthFormPrefill['blood_type'] ?? '') }}">
+            <select name="blood_type" class="form-select" {{ $lockedBloodType ? 'disabled' : '' }} required>
+                @foreach($bloodTypeOptions as $bloodTypeOption)
+                    <option value="{{ $bloodTypeOption }}" {{ $selectedBloodType === $bloodTypeOption ? 'selected' : '' }}>
+                        {{ $bloodTypeOption }}
+                    </option>
+                @endforeach
+            </select>
+            @if($lockedBloodType)
+                <input type="hidden" name="blood_type" value="{{ $selectedBloodType }}">
+            @endif
         </div>
     </div>
 
@@ -727,7 +809,8 @@
         <div class="form-row">
             <label class="form-label">Email Address<span class="required-mark">*</span></label>
             <input type="email" name="email" class="form-control"
-                value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}" readonly>
+                value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}"
+                {{ $lockedEmail ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -735,7 +818,8 @@
         <div class="form-row">
             <label class="form-label">Guardian Name<span class="required-mark">*</span></label>
             <input type="text" name="guardian_name" class="form-control"
-                value="{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}">
+                value="{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}"
+                {{ $lockedGuardianName ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -743,7 +827,8 @@
         <div class="form-row">
             <label class="form-label">Phone Number<span class="required-mark">*</span></label>
             <input type="text" name="cellphone" class="form-control"
-                value="{{ old('cellphone', $healthFormPrefill['cellphone'] ?? '') }}">
+                value="{{ old('cellphone', $healthFormPrefill['cellphone'] ?? '') }}"
+                {{ $lockedCellphone ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -756,11 +841,11 @@
         <div class="col-12 mb-2">
             <label class="form-label">1. Do you need medical attention or has known medical illness?</label>
             <div class="form-check form-check-inline ms-3">
-                <input class="form-check-input illness-radio" type="radio" name="has_illness" value="No" id="illnessNo" {{ old('has_illness') === 'No' ? 'checked' : '' }}>
+                <input class="form-check-input illness-radio" type="radio" name="has_illness" value="No" id="illnessNo" {{ old('has_illness') === 'No' ? 'checked' : '' }} required>
                 <label class="form-check-label" for="illnessNo">No</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input illness-radio" type="radio" name="has_illness" value="Yes" id="illnessYes" {{ old('has_illness') === 'Yes' ? 'checked' : '' }}>
+                <input class="form-check-input illness-radio" type="radio" name="has_illness" value="Yes" id="illnessYes" {{ old('has_illness') === 'Yes' ? 'checked' : '' }} required>
                 <label class="form-check-label" for="illnessYes">Yes</label>
             </div>
         </div>
@@ -787,14 +872,14 @@
         <div class="row mt-4">
         <div class="col-md-12 mt-3">
             <label class="form-label">2. Chest X-Ray Result</label>
-            <input type="file" name="chest_xray_result" class="form-control health-upload-field" accept=".jpg,.jpeg,.png,.pdf">
+            <input type="file" name="chest_xray_result" class="form-control health-upload-field" accept=".jpg,.jpeg,.png,.pdf" required>
             <small class="health-upload-helper">Upload JPG, PNG, or PDF if available.</small>
         </div>
         </div>
           <div class="row mt-4">
         <div class="col-md-12 mt-3">
                     <label class="form-label">3. Medical Certificate</label>
-                    <input type="file" name="medical_certificate" class="form-control health-upload-field" accept=".jpg,.jpeg,.png,.pdf">
+                    <input type="file" name="medical_certificate" class="form-control health-upload-field" accept=".jpg,.jpeg,.png,.pdf" required>
                     <small class="health-upload-helper">Upload JPG, PNG, or PDF if you have a medical certificate.</small>
                     <label class="form-label" style="margin-top: 12px;">Medical certificate issued by: Dr:</label>
                     <input
@@ -803,6 +888,7 @@
                         class="form-control"
                         placeholder="Enter doctor's name"
                         value="{{ old('medical_certificate_issued_by') }}"
+                        required
                     >
                 </div></div>
     </div>
@@ -811,11 +897,11 @@
         <div class="col-12 mb-2">
             <label class="form-label">4. Do you have disability?</label>
             <div class="form-check form-check-inline ms-3">
-                <input class="form-check-input disability-radio" type="radio" name="has_disability" value="None" id="disabilityNo" {{ old('has_disability') === 'None' ? 'checked' : '' }}>
+                <input class="form-check-input disability-radio" type="radio" name="has_disability" value="None" id="disabilityNo" {{ old('has_disability') === 'None' ? 'checked' : '' }} required>
                 <label class="form-check-label" for="disabilityNo">None</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input disability-radio" type="radio" name="has_disability" value="Yes" id="disabilityYes" {{ old('has_disability') === 'Yes' ? 'checked' : '' }}>
+                <input class="form-check-input disability-radio" type="radio" name="has_disability" value="Yes" id="disabilityYes" {{ old('has_disability') === 'Yes' ? 'checked' : '' }} required>
                 <label class="form-check-label" for="disabilityYes">if Yes, What type?</label>
             </div>
             <input type="text" name="disability_type" id="disability_type" class="form-control d-inline-block w-50 ms-2" placeholder="Specify disability" value="{{ old('disability_type') }}">
@@ -835,7 +921,7 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Food (Please specify):</label>
-                    <input type="text" name="food_allergies" class="form-control" value="{{ old('food_allergies') }}">
+                    <input type="text" name="food_allergies" class="form-control" value="{{ old('food_allergies') }}" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">No Known Allergies:</label>
@@ -876,10 +962,10 @@
                     <tr><th>Dose</th><th>Date Received</th><th>Brand</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>1st Dose</td><td><input type="date" name="vax_date_1" class="form-control form-control-sm"></td><td><input type="text" name="vax_brand_1" class="form-control form-control-sm"></td></tr>
-                    <tr><td>2nd Dose</td><td><input type="date" name="vax_date_2" class="form-control form-control-sm"></td><td><input type="text" name="vax_brand_2" class="form-control form-control-sm"></td></tr>
-                    <tr><td>Booster 1st Dose</td><td><input type="date" name="booster_date_1" class="form-control form-control-sm"></td><td><input type="text" name="booster_brand_1" class="form-control form-control-sm"></td></tr>
-                    <tr><td>Booster 2nd Dose</td><td><input type="date" name="booster_date_2" class="form-control form-control-sm"></td><td><input type="text" name="booster_brand_2" class="form-control form-control-sm"></td></tr>
+                    <tr><td>1st Dose</td><td><input type="date" name="vax_date_1" class="form-control form-control-sm" required></td><td><input type="text" name="vax_brand_1" class="form-control form-control-sm" required></td></tr>
+                    <tr><td>2nd Dose</td><td><input type="date" name="vax_date_2" class="form-control form-control-sm" required></td><td><input type="text" name="vax_brand_2" class="form-control form-control-sm" required></td></tr>
+                    <tr><td>Booster 1st Dose</td><td><input type="date" name="booster_date_1" class="form-control form-control-sm" required></td><td><input type="text" name="booster_brand_1" class="form-control form-control-sm" required></td></tr>
+                    <tr><td>Booster 2nd Dose</td><td><input type="date" name="booster_date_2" class="form-control form-control-sm" required></td><td><input type="text" name="booster_brand_2" class="form-control form-control-sm" required></td></tr>
                 </tbody>
             </table>
         </div>
@@ -892,7 +978,7 @@
         <h4>Upload Instructions</h4>
         <ul>
             <li>Upload a clear 2x2 picture in JPEG or PNG format.</li>
-            <li>Upload a clear digital signature in PNG or JPG format.</li>
+            <li>Upload a clear digital signature in PNG or JPG format, or draw it below.</li>
             <li>For best results, use a transparent digital signature image. You may use <strong>remove.bg</strong> to remove the background before uploading.</li>
             <li>Make sure the uploaded files are readable and belong to the student account holder.</li>
         </ul>
@@ -921,7 +1007,19 @@
                         <strong>Draw or Upload Digital Signature</strong>
                         <span>PNG / JPG</span>
                     </div>
-                    <input type="file" name="digital_signature" class="form-control form-control-sm" accept="image/*" required>
+                    <input type="file" name="digital_signature" class="form-control form-control-sm" accept="image/*" id="digitalSignatureUpload">
+                    <div class="signature-pad-wrap">
+                        <input type="hidden" name="digital_signature_drawn" id="digitalSignatureDrawn" value="{{ old('digital_signature_drawn') }}">
+                        <div>
+                            <strong style="display:block; margin-bottom:8px; color:#7f1d2d;">Or draw your signature here</strong>
+                            <canvas id="signaturePad" class="signature-pad"></canvas>
+                            <div class="field-error-note" id="signatureErrorNote" style="display:none;">Please upload or draw your signature before continuing.</div>
+                        </div>
+                        <div class="signature-toolbar">
+                            <span style="color:#6b7280; font-size:0.85rem;">Use mouse, touch, or stylus.</span>
+                            <button type="button" class="signature-btn" id="clearSignaturePad">Clear Signature</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -944,6 +1042,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[action="{{ route('store.health.form') }}"]');
     const validationErrors = @json($errors->keys());
     const steps = Array.from(document.querySelectorAll('.form-step'));
     const stepCards = Array.from(document.querySelectorAll('.step-card[data-step-target]'));
@@ -953,6 +1052,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const stepStatusText = document.getElementById('stepStatusText');
     const introTitle = document.querySelector('.intro-copy h2');
     const introBody = document.querySelector('.intro-copy p');
+    const signatureUpload = document.getElementById('digitalSignatureUpload');
+    const signatureDrawn = document.getElementById('digitalSignatureDrawn');
+    const signaturePad = document.getElementById('signaturePad');
+    const clearSignaturePadBtn = document.getElementById('clearSignaturePad');
+    const signatureErrorNote = document.getElementById('signatureErrorNote');
     const stepDescriptions = {
         1: {
             title: 'Personal Information',
@@ -974,25 +1078,65 @@ document.addEventListener('DOMContentLoaded', function() {
     const attemptedSteps = new Set();
     let currentStep = 1;
 
+    const clearFieldInvalidState = (section) => {
+        (section || document).querySelectorAll('.field-invalid').forEach((field) => field.classList.remove('field-invalid'));
+        (section || document).querySelectorAll('.field-error-note.dynamic').forEach((note) => note.remove());
+        if (signatureErrorNote) {
+            signatureErrorNote.style.display = 'none';
+        }
+    };
+
+    const markFieldInvalid = (field, message = 'This field is required.') => {
+        if (!field) {
+            return;
+        }
+
+        field.classList.add('field-invalid');
+
+        if (field.type === 'radio') {
+            document.querySelectorAll(`input[type="radio"][name="${field.name}"]`).forEach((radio) => radio.classList.add('field-invalid'));
+        }
+
+        const parent = field.closest('.form-row, .col-md-12, .col-12, .upload-box, .signature-pad-wrap') || field.parentElement;
+        if (!parent || parent.querySelector('.field-error-note.dynamic')) {
+            return;
+        }
+
+        const note = document.createElement('div');
+        note.className = 'field-error-note dynamic';
+        note.textContent = message;
+        parent.appendChild(note);
+    };
+
     const validateStep = (stepNumber) => {
         const section = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
         if (!section) {
             return true;
         }
+        clearFieldInvalidState(section);
+
+        let isValid = true;
 
         const customRequired = {
             1: [
                 document.querySelector('input[name="school_year"]'),
                 document.querySelector('input[name="home_address"]'),
+                document.querySelector('input[name="height"]'),
+                document.querySelector('input[name="weight"]'),
+                document.querySelector('input[name="birthday"]'),
                 document.querySelector('input[name="age"]'),
                 document.querySelector('select[name="sex"]'),
                 document.querySelector('select[name="civil_status"]'),
                 document.querySelector('input[name="course_college"]'),
+                document.querySelector('select[name="blood_type"]'),
                 document.querySelector('input[name="guardian_name"]'),
                 document.querySelector('input[name="cellphone"]')
             ],
             2: [
                 document.querySelector('input[name="has_illness"]'),
+                document.querySelector('input[name="chest_xray_result"]'),
+                document.querySelector('input[name="medical_certificate"]'),
+                document.querySelector('input[name="medical_certificate_issued_by"]'),
                 document.querySelector('input[name="has_disability"]')
             ],
             4: [
@@ -1016,31 +1160,75 @@ document.addEventListener('DOMContentLoaded', function() {
             if (type === 'radio') {
                 const group = section.querySelectorAll(`input[type="radio"][name="${field.name}"]`);
                 if (!Array.from(group).some((radio) => radio.checked)) {
-                    return false;
+                    markFieldInvalid(field, 'Please choose an option.');
+                    isValid = false;
                 }
                 continue;
             }
 
             if (type === 'checkbox') {
                 if (!field.checked) {
-                    return false;
+                    markFieldInvalid(field, 'Please check this field.');
+                    isValid = false;
                 }
                 continue;
             }
 
             if (type === 'file') {
+                if (field.name === 'digital_signature') {
+                    const hasUpload = field.files && field.files.length > 0;
+                    const hasDrawn = signatureDrawn && String(signatureDrawn.value || '').trim() !== '';
+                    if (!hasUpload && !hasDrawn) {
+                        field.classList.add('field-invalid');
+                        if (signaturePad) signaturePad.classList.add('field-invalid');
+                        if (signatureErrorNote) signatureErrorNote.style.display = 'block';
+                        isValid = false;
+                    }
+                    continue;
+                }
                 if (!field.files || field.files.length === 0) {
-                    return false;
+                    markFieldInvalid(field, 'Please upload the required file.');
+                    isValid = false;
                 }
                 continue;
             }
 
             if (!String(field.value || '').trim()) {
-                return false;
+                markFieldInvalid(field);
+                isValid = false;
             }
         }
 
-        return true;
+        const disabilityYes = document.getElementById('disabilityYes');
+        const disabilityType = document.getElementById('disability_type');
+        const pwdIdProof = document.getElementById('pwd_id_proof');
+        if (stepNumber === 2 && disabilityYes?.checked) {
+            if (!String(disabilityType?.value || '').trim()) {
+                markFieldInvalid(disabilityType, 'Please specify the disability type.');
+                isValid = false;
+            }
+            if (!pwdIdProof?.files || pwdIdProof.files.length === 0) {
+                markFieldInvalid(pwdIdProof, 'Please upload PWD proof.');
+                isValid = false;
+            }
+        }
+
+        const noAllergiesCheck = document.getElementById('noAllergiesCheck');
+        const otherMedAllergies = document.querySelector('input[name="other_med_allergies"]');
+        if (stepNumber === 2 && !noAllergiesCheck?.checked) {
+            const medicineChecked = Array.from(document.querySelectorAll('input[name="medicine_allergies[]"]')).some((checkbox) => checkbox.checked);
+            const foodAllergies = document.querySelector('input[name="food_allergies"]');
+            if (!String(foodAllergies?.value || '').trim()) {
+                markFieldInvalid(foodAllergies, 'Please specify food allergies or mark no known allergies.');
+                isValid = false;
+            }
+            if (!medicineChecked && !String(otherMedAllergies?.value || '').trim()) {
+                markFieldInvalid(otherMedAllergies, 'Select a medicine allergy or specify another one.');
+                isValid = false;
+            }
+        }
+
+        return isValid;
     };
 
     const resolveStepFromErrors = () => {
@@ -1137,7 +1325,7 @@ document.addEventListener('DOMContentLoaded', function() {
             attemptedSteps.add(currentStep);
             renderStep(currentStep);
             const activeSection = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-            const invalidField = activeSection?.querySelector('[required]');
+            const invalidField = activeSection?.querySelector('.field-invalid');
             invalidField?.focus();
             return;
         }
@@ -1188,6 +1376,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isNone = document.getElementById('disabilityNo').checked;
         const isYes = document.getElementById('disabilityYes').checked;
         disabilityType.disabled = isNone;
+        disabilityType.required = isYes;
         if (isNone) disabilityType.value = '';
         pwdProofWrapper.style.display = isYes ? 'block' : 'none';
         pwdIdProof.required = isYes;
@@ -1206,6 +1395,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleAllergies() {
         const isNoAllergies = noAllergiesCheck.checked;
         foodAllergies.disabled = isNoAllergies;
+        foodAllergies.required = !isNoAllergies;
         otherMedAllergies.disabled = isNoAllergies;
         medicineCheckboxes.forEach(cb => {
             cb.disabled = isNoAllergies;
@@ -1226,11 +1416,98 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleIllness();
     toggleDisability();
     toggleAllergies();
+
+    if (signaturePad && signatureDrawn) {
+        const ctx = signaturePad.getContext('2d');
+        let drawing = false;
+
+        const resizeCanvas = () => {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const rect = signaturePad.getBoundingClientRect();
+            signaturePad.width = rect.width * ratio;
+            signaturePad.height = rect.height * ratio;
+            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#111827';
+        };
+
+        const getPoint = (event) => {
+            const rect = signaturePad.getBoundingClientRect();
+            const point = event.touches ? event.touches[0] : event;
+            return {
+                x: point.clientX - rect.left,
+                y: point.clientY - rect.top,
+            };
+        };
+
+        const beginDrawing = (event) => {
+            drawing = true;
+            const point = getPoint(event);
+            ctx.beginPath();
+            ctx.moveTo(point.x, point.y);
+            signaturePad.classList.remove('field-invalid');
+            if (signatureErrorNote) signatureErrorNote.style.display = 'none';
+            event.preventDefault();
+        };
+
+        const draw = (event) => {
+            if (!drawing) return;
+            const point = getPoint(event);
+            ctx.lineTo(point.x, point.y);
+            ctx.stroke();
+            event.preventDefault();
+        };
+
+        const endDrawing = () => {
+            if (!drawing) return;
+            drawing = false;
+            signatureDrawn.value = signaturePad.toDataURL('image/png');
+            if (signatureUpload) {
+                signatureUpload.value = '';
+                signatureUpload.classList.remove('field-invalid');
+            }
+        };
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        signaturePad.addEventListener('mousedown', beginDrawing);
+        signaturePad.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', endDrawing);
+        signaturePad.addEventListener('touchstart', beginDrawing, { passive: false });
+        signaturePad.addEventListener('touchmove', draw, { passive: false });
+        window.addEventListener('touchend', endDrawing);
+
+        clearSignaturePadBtn?.addEventListener('click', () => {
+            const rect = signaturePad.getBoundingClientRect();
+            ctx.clearRect(0, 0, rect.width, rect.height);
+            signatureDrawn.value = '';
+        });
+
+        signatureUpload?.addEventListener('change', () => {
+            if (signatureUpload.files && signatureUpload.files.length > 0) {
+                const rect = signaturePad.getBoundingClientRect();
+                ctx.clearRect(0, 0, rect.width, rect.height);
+                signatureDrawn.value = '';
+                signaturePad.classList.remove('field-invalid');
+                if (signatureErrorNote) signatureErrorNote.style.display = 'none';
+            }
+        });
+    }
+
     const initialStep = validationErrors.length ? resolveStepFromErrors() : 1;
     if (validationErrors.length) {
         attemptedSteps.add(initialStep);
     }
     renderStep(initialStep);
+
+    form?.addEventListener('submit', function (event) {
+        if (!validateStep(4)) {
+            event.preventDefault();
+            attemptedSteps.add(4);
+            renderStep(4);
+        }
+    });
 
     function forceAccessibilityButtonTheme() {
         document.querySelectorAll('.asw-menu-btn').forEach((button) => {

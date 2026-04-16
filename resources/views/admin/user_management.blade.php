@@ -1275,6 +1275,7 @@
         </div>
         <div class="um-modal-body">
             <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
+                <input type="hidden" name="management_view" value="{{ $managementView ?: 'account-access' }}" id="lookupManagementViewField">
                 <input type="search" name="lookup_search" value="{{ $lookupSearch }}" placeholder="Search users by email, name, or ID" id="lookupSearchField">
                 <button class="um-btn um-btn-primary" type="submit">Search</button>
             </form>
@@ -1543,6 +1544,7 @@
     const directoryPanel = document.getElementById('directoryPanel');
     const lookupDirectoryPanel = document.getElementById('lookupDirectoryPanel');
     const lookupSearchField = document.getElementById('lookupSearchField');
+    const lookupManagementViewField = document.getElementById('lookupManagementViewField');
     const userHoverHint = document.getElementById('userHoverHint');
     const modePicker = document.querySelector('.um-mode-picker');
     const modeButtons = document.querySelectorAll('[data-mode-button]');
@@ -1551,7 +1553,7 @@
         'account-access': document.getElementById('account-access-panel'),
         'admin-hub': document.getElementById('admin-hub-panel'),
     };
-    let currentLookupContext = 'account-access';
+    let currentLookupContext = @json($managementView ?: 'account-access');
 
     const applySettingsSectionMode = (managementView, canEdit, canOnboard) => {
         const isAdminHubOnly = managementView === 'admin-hub';
@@ -1611,6 +1613,11 @@
     };
 
     const setUserManagementMode = (mode) => {
+        currentLookupContext = mode || 'account-access';
+        if (lookupManagementViewField) {
+            lookupManagementViewField.value = currentLookupContext;
+        }
+
         if (modePicker) {
             modePicker.classList.add('is-hidden');
         }
@@ -1629,6 +1636,11 @@
     };
 
     const resetUserManagementModes = () => {
+        currentLookupContext = 'account-access';
+        if (lookupManagementViewField) {
+            lookupManagementViewField.value = currentLookupContext;
+        }
+
         if (modePicker) {
             modePicker.classList.remove('is-hidden');
         }
@@ -1793,6 +1805,10 @@
         settingsModal.classList.add('show');
     };
 
+    if (currentLookupContext) {
+        setUserManagementMode(currentLookupContext);
+    }
+
     if (lookupModal && lookupSearchField && lookupSearchField.value.trim() !== '') {
         lookupModal.classList.add('show');
     }
@@ -1800,6 +1816,10 @@
     document.querySelectorAll('[data-open-lookup]').forEach((button) => {
         button.addEventListener('click', () => {
             currentLookupContext = button.dataset.openLookup || 'account-access';
+            if (lookupManagementViewField) {
+                lookupManagementViewField.value = currentLookupContext;
+            }
+            setUserManagementMode(currentLookupContext);
             lookupModal.classList.add('show');
         });
     });

@@ -19,6 +19,10 @@ class AdminUserController extends Controller
     public function index(Request $request, FacultySyncService $facultySyncService)
     {
         $lookupSearch = trim((string) $request->query('lookup_search', ''));
+        $managementView = trim((string) $request->query('management_view', ''));
+        if (!in_array($managementView, ['account-access', 'admin-hub'], true)) {
+            $managementView = '';
+        }
         $currentUserId = Auth::id();
 
         $allLocalUsers = $this->collectLocalUsers('');
@@ -73,6 +77,7 @@ class AdminUserController extends Controller
 
         return view('admin.user_management', [
             'lookupSearch' => $lookupSearch,
+            'managementView' => $managementView,
             'localRecords' => $localRecords,
             'adminHubRecords' => $adminHubRecords,
             'lookupRecords' => $lookupRecords,

@@ -9,6 +9,7 @@ use App\Models\HealthProfile;
 use App\Models\User;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class AppointmentController extends Controller
@@ -45,6 +46,42 @@ class AppointmentController extends Controller
             'female' => 'Female',
             default => '',
         };
+    }
+
+    private function isPuptasApplicant(array $applicantData): bool
+    {
+        if (empty($applicantData)) {
+            return false;
+        }
+
+        if (is_array(data_get($applicantData, 'application'))) {
+            return true;
+        }
+
+        if (trim((string) data_get($applicantData, 'medical_process_status')) !== '') {
+            return true;
+        }
+
+        return trim((string) data_get($applicantData, 'student_number')) === '';
+    }
+
+    private function resolveSchoolYear(?array $applicantData, User $user): string
+    {
+        $now = now();
+        $calendarYear = (int) $now->format('Y');
+        $academicStartMonth = 7;
+
+        $isApplicant = is_array($applicantData) && $this->isPuptasApplicant($applicantData);
+
+        if ($isApplicant) {
+            return $calendarYear . '-' . ($calendarYear + 1);
+        }
+
+        $startYear = ((int) $now->format('n')) >= $academicStartMonth
+            ? $calendarYear
+            : ($calendarYear - 1);
+
+        return $startYear . '-' . ($startYear + 1);
     }
 
     private function normalizeMeasurement(?string $value, string $unit): ?string
@@ -739,6 +776,8 @@ public function showHealthForm()
         data_get($applicantData, 'postal_code'),
     ])));
 
+    $resolvedSchoolYear = $this->resolveSchoolYear($applicantData, $user);
+
     $healthFormPrefill = [
         'full_name' => trim(implode(' ', array_filter([
             data_get($applicantData, 'first_name') ?: data_get($applicantData, 'firstname'),
@@ -760,14 +799,14 @@ public function showHealthForm()
         'home_address' => $resolvedAddress !== ''
             ? $resolvedAddress
             : trim((string) (optional($linkedAdminProfile)->address ?? '')),
-        'school_year' => '2025-2026',
+        'school_year' => $resolvedSchoolYear,
         'height' => (string) ($user->height ?? ''),
         'weight' => (string) ($user->weight ?? ''),
         'birthday' => $resolvedBirthday,
         'age' => $calculatedAge,
         'sex' => $resolvedSex,
         'civil_status' => $resolvedCivilStatus,
-        'blood_type' => '',
+        'blood_type' => 'Not Known',
         'guardian_name' => trim((string) (optional($linkedAdminProfile)->emergency_contact_person ?? '')),
         'cellphone' => trim((string) (
             data_get($applicantData, 'contactnumber')
@@ -786,31 +825,44 @@ public function storeHealthForm(Request $request)
     $request->validate([
         'school_year'       => 'required|string',
         'home_address'      => 'required|string|max:255',
-        'student_photo'     => 'required|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
-        'height'            => 'nullable|string|max:50',
-        'weight'            => 'nullable|string|max:50',
+        'student_photo'     => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        'height'            => 'required|string|max:50',
+        'weight'            => 'required|string|max:50',
         'age'               => 'required|numeric|min:15|max:100',
         'sex'               => 'required|string',
         'civil_status'      => 'required|string',
         'course_college'    => 'required|string',
-        'blood_type'        => 'nullable|string|max:10',
+        'blood_type'        => 'required|string|max:20',
         'guardian_name'     => 'required|string|max:255',
         'cellphone'         => 'required|string|max:20',
         
         // Medical History
         'medical_history'   => 'nullable|array', 
         'has_illness'       => 'required|string',
-        'chest_xray_result' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:4096',
+        'chest_xray_result' => 'required|file|mimes:jpeg,jpg,png,pdf|max:4096',
         'has_disability'    => 'required|string',
+        'disability_type'   => 'required_if:has_disability,Yes|nullable|string|max:255',
         'pwd_id_proof'      => 'required_if:has_disability,Yes|file|mimes:jpeg,jpg,png,pdf|max:4096',
         
         // Allergies
-        'medicine_allergies' => 'nullable|array',
-        'medical_certificate' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:4096',
-        'medical_certificate_issued_by' => 'nullable|string|max:255',
+        'food_allergies' => 'required_without:no_allergies|nullable|string|max:255',
+        'medicine_allergies' => 'required_without:no_allergies|nullable|array|min:1',
+        'medical_certificate' => 'required|file|mimes:jpeg,jpg,png,pdf|max:4096',
+        'medical_certificate_issued_by' => 'required|string|max:255',
+
+        // Vaccination
+        'vax_date_1' => 'required|date',
+        'vax_brand_1' => 'required|string|max:255',
+        'vax_date_2' => 'required|date',
+        'vax_brand_2' => 'required|string|max:255',
+        'booster_date_1' => 'required|date',
+        'booster_brand_1' => 'required|string|max:255',
+        'booster_date_2' => 'required|date',
+        'booster_brand_2' => 'required|string|max:255',
         
         // Signature
-        'digital_signature' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        'digital_signature' => 'required_without:digital_signature_drawn|nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'digital_signature_drawn' => 'required_without:digital_signature|nullable|string',
     ]);
 
     /** @var \App\Models\User $user */
@@ -822,7 +874,24 @@ public function storeHealthForm(Request $request)
         // 2. FILE HANDLING: I-save ang Photo at Signature sa storage
         // Gagamit ng 'public' disk para ma-access ng 'storage:link'
         $photoPath = $request->file('student_photo')->store('health_profiles/photos', 'public');
-        $sigPath = $request->file('digital_signature')->store('health_profiles/signatures', 'public');
+        $sigPath = null;
+        if ($request->hasFile('digital_signature')) {
+            $sigPath = $request->file('digital_signature')->store('health_profiles/signatures', 'public');
+        } else {
+            $drawnSignature = (string) $request->input('digital_signature_drawn', '');
+            if (!preg_match('/^data:image\/png;base64,/', $drawnSignature)) {
+                throw new \RuntimeException('The drawn signature format is invalid.');
+            }
+
+            $binarySignature = base64_decode(substr($drawnSignature, strpos($drawnSignature, ',') + 1), true);
+            if ($binarySignature === false) {
+                throw new \RuntimeException('The drawn signature could not be processed.');
+            }
+
+            $signatureFileName = 'health_profiles/signatures/' . uniqid('drawn-signature-', true) . '.png';
+            Storage::disk('public')->put($signatureFileName, $binarySignature);
+            $sigPath = $signatureFileName;
+        }
         $chestXrayPath = $request->hasFile('chest_xray_result')
             ? $request->file('chest_xray_result')->store('health_profiles/chest_xray_results', 'public')
             : null;

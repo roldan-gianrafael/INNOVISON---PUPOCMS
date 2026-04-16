@@ -10,7 +10,7 @@ use App\Models\Item;
 use App\Models\Setting;
 use App\Models\Admin;
 use App\Services\FacultySyncService;
-use App\Services\MedicalStatusWebhookService;
+new \App\Services\PuptasWebhookService();
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
@@ -1017,39 +1017,34 @@ public function updateClearance(Request $request, $id)
 
     $record = HealthProfile::findOrFail($id);
 
+    // Update Status
     $record->clearance_status = $request->clearance_status;
-    $record->pending_reason   = $request->pending_reason;
-
-    if ($request->clearance_status == 'Issued') {
-        $record->verified_at = $request->verified_at ?? now();
-    } else {
-        $record->verified_at = null;
-        if ($request->clearance_status == 'Issued') {
-            $record->pending_reason = null;
-        }
-    }
+    $record->pending_reason   = ($request->clearance_status === 'Issued') ? null : $request->pending_reason;
+    $record->verified_at      = ($request->clearance_status === 'Issued') ? ($request->verified_at ?? now()) : null;
 
     if ($record->save()) {
         if ($record->user) {
-            // Determine if the student is cleared based on the current status
-            $isCleared = ($record->clearance_status === 'Issued') ? 1 : 0;
-
-            // Use the new service class provided by PUPTAS
-            $puptasService = new \App\Services\PuptasWebhookService();
-            
-            // Notify PUPTAS with the current status (1 or 0)
-            $puptasService->sendWithRetry(
-                $record->user->student_id, 
-                $record->user->student_number, 
-                $isCleared
-            );
+            try {
+                $isCleared = ($record->clearance_status === 'Issued') ? 1 : 0;
+                $puptasService = new \App\Services\PuptasWebhookService();
+                
+                $puptasService->sendWithRetry(
+                    $record->user->student_id, 
+                    $record->user->student_number, 
+                    $isCleared
+                );
+            } catch (\Exception $e) {
+                // Log the error but don't stop the user from succeeding in the local DB update
+                \Log::error("PUPTAS Sync Failed for User {$record->user->student_number}: " . $e->getMessage());
+            }
         }
 
         return redirect()->route('admin.health_records')
-                         ->with('success', 'Health Clearance status updated successfully and synced with PUPTAS!');
+                         ->with('success', 'Health Clearance status updated successfully.');
     }
-}
 
+    return back()->with('error', 'Failed to save to database.');
+}
     public function appointments()
     {
         $appointments = Appointment::latest()->get();

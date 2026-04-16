@@ -609,9 +609,7 @@ public function showHealthForm()
     /** @var \App\Models\User $user */
     $user = Auth::user();
     
-    // Initialize service and fetch status
-    $puptas = new \App\Services\PuptasWebhookService();
-    $status = $puptas->getClearanceStatus($user->student_number);
+
 
     // If profile is completed, redirect to print
     if ($user->is_health_profile_completed) {

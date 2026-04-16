@@ -609,17 +609,20 @@ public function showHealthForm()
     /** @var \App\Models\User $user */
     $user = Auth::user();
     
+    // Initialize service and fetch status
+    $puptas = new \App\Services\PuptasWebhookService();
+    $status = $puptas->getClearanceStatus($user->student_number);
+
+    // If profile is completed, redirect to print
     if ($user->is_health_profile_completed) {
-        return redirect()->route('print.health.form')->with('info', 'You have already completed your health profile.');
+        return redirect()->route('print.health.form')
+            ->with(['info' => 'Profile completed', 'status' => $status]);
     }
 
-    $calculatedAge = null;
-    if ($user->DOB) {
-        $calculatedAge = \Carbon\Carbon::parse($user->DOB)->age;
-    }
+    $calculatedAge = $user->DOB ? \Carbon\Carbon::parse($user->DOB)->age : null;
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
 
-    return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile'));
+    return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile', 'status'));
 }
 
 

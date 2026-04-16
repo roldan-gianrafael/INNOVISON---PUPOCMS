@@ -148,6 +148,44 @@ class PuptasWebhookService
         }
     }
 
+    public function fetchApplicantByIdpUserId(string $idpUserId): ?array
+    {
+        try {
+            $idpUserId = trim($idpUserId);
+            if ($idpUserId === '') {
+                return null;
+            }
+
+            $applicantsBaseUrl = $this->resolveApplicantsBaseUrl();
+            if ($applicantsBaseUrl === '') {
+                return null;
+            }
+
+            $response = Http::timeout($this->timeout)
+                ->withToken($this->getAccessToken())
+                ->acceptJson()
+                ->get(rtrim($applicantsBaseUrl, '/') . '/idp/' . urlencode($idpUserId));
+
+            if (!$response->successful()) {
+                Log::warning('PUPTAS applicant IDP lookup failed', [
+                    'idp_user_id' => $idpUserId,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                return null;
+            }
+
+            $data = $response->json('data');
+            return is_array($data) ? $data : null;
+        } catch (\Throwable $exception) {
+            Log::warning('PUPTAS applicant IDP lookup exception', [
+                'idp_user_id' => $idpUserId,
+                'error' => $exception->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
     public function sendMedicalClearance(string $studentNumber, bool $isCleared = true): array
     {
         try {

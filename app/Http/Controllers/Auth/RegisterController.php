@@ -48,7 +48,8 @@ class RegisterController extends Controller
 
     $user = User::create($payload);
 
-    Auth::login($user);
+    Auth::guard('student')->login($user);
+    $request->session()->regenerate();
     return redirect('/student/home');
 }
 }

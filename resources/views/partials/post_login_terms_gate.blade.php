@@ -235,6 +235,7 @@
 
     <form id="termsGateLogoutForm" method="POST" action="{{ route('logout') }}" style="display:none;">
         @csrf
+        <input type="hidden" name="portal_guard" value="{{ request()->is('admin/*') || request()->is('assistant/*') || request()->is('health-records') || request()->is('health-profile/*') ? 'admin' : 'student' }}">
     </form>
 
     <script>

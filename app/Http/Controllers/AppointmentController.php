@@ -673,7 +673,8 @@ public function showHealthForm()
     // Resolve the linked admin profile (Required by your view to avoid Undefined Variable error)
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
 
-    $applicantData = app(PuptasWebhookService::class)->fetchApplicantByStudentNumber((string) ($user->student_number ?? ''));
+    $lookupStudentNumber = trim((string) ($user->student_number ?: $user->student_id ?: ''));
+    $applicantData = app(PuptasWebhookService::class)->fetchApplicantByStudentNumber($lookupStudentNumber);
     $resolvedSex = trim((string) ($user->gender ?? optional($linkedAdminProfile)->gender ?? ''));
     $resolvedSex = in_array(strtolower($resolvedSex), ['male', 'female'], true)
         ? ucfirst(strtolower($resolvedSex))
@@ -695,7 +696,7 @@ public function showHealthForm()
             data_get($applicantData, 'first_name'),
             data_get($applicantData, 'last_name'),
         ]))),
-        'student_number' => (string) (data_get($applicantData, 'student_number') ?: ($user->student_number ?? '')),
+        'student_number' => (string) (data_get($applicantData, 'student_number') ?: ($user->student_number ?: $user->student_id ?: '')),
         'email' => (string) (data_get($applicantData, 'email') ?: ($user->email ?? '')),
         'course_college' => trim(implode(' - ', array_filter([
             data_get($applicantData, 'program.code'),

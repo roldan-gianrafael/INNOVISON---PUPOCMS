@@ -17,6 +17,55 @@ use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
+    private function studentGuardName(): string
+    {
+        return 'student';
+    }
+
+    private function adminGuardName(): string
+    {
+        return 'admin';
+    }
+
+    private function guardForUser(User $user): string
+    {
+        $redirectPath = $this->resolveRedirectPathForUser($user);
+
+        if (str_starts_with($redirectPath, '/admin/') || str_starts_with($redirectPath, '/assistant/')) {
+            return $this->adminGuardName();
+        }
+
+        return $this->studentGuardName();
+    }
+
+    private function authenticatedUser(): ?User
+    {
+        foreach ([$this->adminGuardName(), $this->studentGuardName(), 'web'] as $guard) {
+            $user = Auth::guard($guard)->user();
+            if ($user instanceof User) {
+                return $user;
+            }
+        }
+
+        return null;
+    }
+
+    private function activeGuard(?Request $request = null): ?string
+    {
+        $requestedGuard = trim((string) ($request?->input('portal_guard') ?? ''));
+        if (in_array($requestedGuard, [$this->adminGuardName(), $this->studentGuardName()], true)) {
+            return $requestedGuard;
+        }
+
+        foreach ([$this->adminGuardName(), $this->studentGuardName(), 'web'] as $guard) {
+            if (Auth::guard($guard)->check()) {
+                return $guard;
+            }
+        }
+
+        return null;
+    }
+
     private function usersTableHasUserTypeColumn(): bool
     {
         static $hasColumn;
@@ -72,7 +121,7 @@ class LoginController extends Controller
         string $eventType = 'auth'
     ): void
     {
-        $user = $actor ?? Auth::user();
+        $user = $actor ?? $this->authenticatedUser();
         $email = trim((string) $request->input('email', ''));
 
         if (!$user && $email === '') {
@@ -927,7 +976,8 @@ class LoginController extends Controller
     private function upsertLocalUserFromIdpProfile(array $profile): User
     {
         $emailSeed = $this->firstNonEmptyScalar($profile, ['email', 'mail', 'username', 'user.email']) ?? '';
-        $studentIdSeed = $this->firstNonEmptyScalar($profile, ['student_number', 'student_id', 'studentNo', 'user_id', 'id']) ?? '';
+        $studentNumberSeed = $this->firstNonEmptyScalar($profile, ['student_number', 'studentNo']) ?? '';
+        $studentIdSeed = $this->firstNonEmptyScalar($profile, ['student_id', 'student_number', 'studentNo', 'user_id', 'id']) ?? '';
         $firstName = $this->firstNonEmptyScalar($profile, ['first_name', 'firstname', 'given_name']) ?? '';
         $lastName = $this->firstNonEmptyScalar($profile, ['last_name', 'lastname', 'family_name']) ?? '';
         $displayName = $this->firstNonEmptyScalar($profile, ['name', 'full_name', 'display_name']) ?? '';
@@ -970,6 +1020,10 @@ class LoginController extends Controller
             $existingUser = User::query()->where('email', $normalizedEmailSeed)->first();
         }
 
+        if (!$existingUser && $studentNumberSeed !== '') {
+            $existingUser = User::query()->where('student_number', $studentNumberSeed)->first();
+        }
+
         if (!$existingUser && $studentIdSeed !== '') {
             $existingUser = User::query()->where('student_id', $studentIdSeed)->first();
         }
@@ -989,6 +1043,10 @@ class LoginController extends Controller
                 $existingUser->student_id = $this->resolveUniqueStudentId($studentIdSeed, (int) $existingUser->id);
             } elseif (trim((string) $existingUser->student_id) === '') {
                 $existingUser->student_id = $this->resolveUniqueStudentId('idp-' . $existingUser->id, (int) $existingUser->id);
+            }
+
+            if ($studentNumberSeed !== '' && trim((string) $existingUser->student_number) === '') {
+                $existingUser->student_number = $studentNumberSeed;
             }
 
             if (trim((string) $existingUser->password) === '') {
@@ -1011,6 +1069,7 @@ class LoginController extends Controller
 
         $user = User::create([
             'student_id' => $studentId,
+            'student_number' => $studentNumberSeed !== '' ? $studentNumberSeed : $studentId,
             'first_name' => $firstName !== '' ? $firstName : 'IDP',
             'last_name' => $lastName !== '' ? $lastName : 'User',
             'name' => $fullName !== '' ? $fullName : trim(($firstName ?: 'IDP') . ' ' . ($lastName ?: 'User')),
@@ -1059,16 +1118,17 @@ class LoginController extends Controller
             ])->withInput();
         }
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        $guard = $this->guardForUser($user);
+
+        if (Auth::guard($guard)->attempt(['email' => $request->email, 'password' => $request->password])) {
+            Auth::shouldUse($guard);
             $request->session()->regenerate();
             $request->session()->flash('show_terms_modal', true);
-            $this->recordAuthEvent($request, 'Login', 'User logged in successfully.');
 
             /** @var \App\Models\User $authenticatedUser */
-            $authenticatedUser = Auth::user();
+            $authenticatedUser = Auth::guard($guard)->user();
             if (strtolower(trim((string) ($authenticatedUser->status ?? 'active'))) === 'inactive') {
-                Auth::logout();
-                $request->session()->invalidate();
+                Auth::guard($guard)->logout();
                 $request->session()->regenerateToken();
 
                 $this->recordAuthEvent(
@@ -1091,6 +1151,8 @@ class LoginController extends Controller
                 $authenticatedUser->user_role = $normalizedRole;
                 $authenticatedUser->save();
             }
+
+            $this->recordAuthEvent($request, 'Login', 'User logged in successfully.', $authenticatedUser);
 
             return redirect($this->resolveRedirectPathForUser($authenticatedUser));
         }
@@ -1198,7 +1260,9 @@ class LoginController extends Controller
             'email' => $user->email,
         ]);
 
-        Auth::login($user);
+        $guard = $this->guardForUser($user);
+        Auth::guard($guard)->login($user);
+        Auth::shouldUse($guard);
         $request->session()->regenerate();
         $request->session()->flash('show_terms_modal', true);
         $this->recordAuthEvent($request, 'Login', 'User logged in successfully via IDP authorization code flow.', $user);
@@ -1208,48 +1272,53 @@ class LoginController extends Controller
     }
 
     public function logout(Request $request)
-{
-    // 1. Get the Client ID from config
-    $clientId = config('services.idp.client_id');
-    $idpLogoutUrl = config('services.idp.logout_url');
+    {
+        $guard = $this->activeGuard($request);
+        $user = $guard ? Auth::guard($guard)->user() : $this->authenticatedUser();
 
-    // 2. Retrieve the access token from the session/cookie
-    // Since this is a web app, use the cookie name defined in your config
-    $accessTokenCookie = config('services.idp.access_cookie_name', 'access_token');
-    $token = $request->cookie($accessTokenCookie);
+        $clientId = config('services.idp.client_id');
+        $idpLogoutUrl = config('services.idp.logout_url');
+        $accessTokenCookie = config('services.idp.access_cookie_name', 'access_token');
+        $token = $request->cookie($accessTokenCookie);
 
-    // 3. Call the IDP API directly (Server-to-Server POST)
-    try {
-        if ($idpLogoutUrl) {
-            \Illuminate\Support\Facades\Http::withToken($token)
-                ->post($idpLogoutUrl, [
-                    'client_id' => $clientId
+        try {
+            if ($idpLogoutUrl && $token) {
+                Http::withToken($token)->post($idpLogoutUrl, [
+                    'client_id' => $clientId,
                 ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('IDP Logout API call failed: ' . $e->getMessage());
         }
-    } catch (\Exception $e) {
-        \Illuminate\Support\Facades\Log::error('IDP Logout API call failed: ' . $e->getMessage());
+
+        if ($user instanceof User) {
+            $this->recordAuthEvent($request, 'Logout', 'User logged out from the system.', $user);
+        }
+
+        if ($guard) {
+            Auth::guard($guard)->logout();
+        }
+
+        $request->session()->regenerateToken();
+
+        $hasRemainingPortalSession = Auth::guard($this->adminGuardName())->check()
+            || Auth::guard($this->studentGuardName())->check();
+
+        $response = redirect('/')->with('status', 'Logged out successfully');
+
+        if ($hasRemainingPortalSession) {
+            return $response;
+        }
+
+        Auth::guard('web')->logout();
+        return $this->clearIdpCookies($response);
     }
-
-    // 4. Record local logout event
-    if (Auth::check()) {
-        $this->recordAuthEvent($request, 'Logout', 'User logged out from the system.');
-    }
-
-    // 5. Local Session Cleanup
-    Auth::guard('web')->logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    // 6. Clear IDP cookies and redirect
-    $response = redirect('/')->with('status', 'Logged out successfully');
-    
-    return $this->clearIdpCookies($response);
-}
 
     public function showLoginForm(Request $request)
     {
-        if (Auth::check()) {
-            return redirect($this->resolveRedirectPathForUser(Auth::user()));
+        $authenticatedUser = $this->authenticatedUser();
+        if ($authenticatedUser) {
+            return redirect($this->resolveRedirectPathForUser($authenticatedUser));
         }
 
         if ($this->useIdpAuth()) {

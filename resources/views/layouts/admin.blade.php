@@ -1897,6 +1897,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
 <form id="layoutLogoutForm" method="POST" action="{{ route('logout') }}" style="display:none;">
     @csrf
+    <input type="hidden" name="portal_guard" value="admin">
 </form>
 
 @if($medicineAlertCount > 0)

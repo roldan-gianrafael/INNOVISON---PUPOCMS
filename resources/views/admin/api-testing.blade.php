@@ -562,6 +562,7 @@
                 <select id="source" name="source">
                     <option value="faculty" {{ ($source ?? 'faculty') === 'faculty' ? 'selected' : '' }}>Faculty API</option>
                     <option value="puptas_applicant" {{ ($source ?? 'faculty') === 'puptas_applicant' ? 'selected' : '' }}>PUPTAS Applicant API</option>
+                    <option value="puptas_applicant_idp" {{ ($source ?? 'faculty') === 'puptas_applicant_idp' ? 'selected' : '' }}>PUPTAS Applicant API by IDP User ID</option>
                     <option value="admin_api" {{ ($source ?? 'faculty') === 'admin_api' ? 'selected' : '' }}>Our Admin API</option>
                     <option value="admin_options" {{ ($source ?? 'faculty') === 'admin_options' ? 'selected' : '' }}>Our Admin Options API</option>
                     <option value="database_info" {{ ($source ?? 'faculty') === 'database_info' ? 'selected' : '' }}>Database Info</option>
@@ -580,13 +581,13 @@
                 </select>
             </div>
             <div>
-                <label for="search">{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Search by Student Number' : 'Search by name, email, or ID' }}</label>
+                <label for="search">{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Search by Student Number' : (($source ?? 'faculty') === 'puptas_applicant_idp' ? 'Search by IDP User ID' : 'Search by name, email, or ID') }}</label>
                 <input
                     type="text"
                     id="search"
                     name="search"
                     value="{{ $search }}"
-                    placeholder="{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Try a student number' : 'Try a name, email address, or identifier' }}"
+                    placeholder="{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Try a student number' : (($source ?? 'faculty') === 'puptas_applicant_idp' ? 'Try an IDP user ID' : 'Try a name, email address, or identifier') }}"
                 >
             </div>
             <button type="submit">Search API's</button>
@@ -734,11 +735,24 @@
             <div class="faculty-autofill-field"><label>Department/Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
         </div>
     </div>
-        @elseif(($source ?? '') === 'puptas_applicant')
+        @elseif(in_array(($source ?? ''), ['puptas_applicant', 'puptas_applicant_idp'], true))
             <div class="api-results">
                 @foreach($results as $result)
+                    @php
+                        $applicantFirstName = $result['first_name'] ?? $result['firstname'] ?? null;
+                        $applicantMiddleName = $result['middle_name'] ?? $result['middlename'] ?? null;
+                        $applicantLastName = $result['last_name'] ?? $result['lastname'] ?? null;
+                        $applicantDisplayName = trim(implode(' ', array_filter([$applicantFirstName, $applicantMiddleName, $applicantLastName])));
+                        $applicantAddress = trim(implode(', ', array_filter([
+                            $result['street_address'] ?? null,
+                            $result['barangay'] ?? null,
+                            $result['city'] ?? null,
+                            $result['province'] ?? null,
+                            $result['postal_code'] ?? null,
+                        ])));
+                    @endphp
                     <article class="api-result-card">
-                        <h3 style="margin: 0; color: #7f1d2d;">{{ trim(implode(' ', array_filter([$result['first_name'] ?? null, $result['last_name'] ?? null]))) ?: 'PUPTAS Applicant' }}</h3>
+                        <h3 style="margin: 0; color: #7f1d2d;">{{ $applicantDisplayName ?: 'PUPTAS Applicant' }}</h3>
                         <div class="api-result-grid">
                             <div class="api-field">
                                 <small>Student Number</small>
@@ -753,6 +767,18 @@
                                 <strong>{{ $result['email'] ?? 'N/A' }}</strong>
                             </div>
                             <div class="api-field">
+                                <small>Birthday</small>
+                                <strong>{{ $result['birthday'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Sex</small>
+                                <strong>{{ $result['sex'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Contact Number</small>
+                                <strong>{{ $result['contactnumber'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
                                 <small>Program Code</small>
                                 <strong>{{ data_get($result, 'program.code', 'N/A') }}</strong>
                             </div>
@@ -761,8 +787,16 @@
                                 <strong>{{ data_get($result, 'program.name', 'N/A') }}</strong>
                             </div>
                             <div class="api-field">
-                                <small>Lifecycle Status</small>
-                                <strong>{{ $result['lifecycle_status'] ?? 'N/A' }}</strong>
+                                <small>Application Status</small>
+                                <strong>{{ data_get($result, 'application.status', 'N/A') }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Medical Process</small>
+                                <strong>{{ $result['medical_process_status'] ?? $result['lifecycle_status'] ?? 'N/A' }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Address</small>
+                                <strong>{{ $applicantAddress ?: 'N/A' }}</strong>
                             </div>
                         </div>
 
@@ -904,10 +938,15 @@
             syncSystemVisibility();
             const searchLabel = document.querySelector('label[for="search"]');
             const isPuptasApplicant = sourceField.value === 'puptas_applicant';
+            const isPuptasApplicantIdp = sourceField.value === 'puptas_applicant_idp';
             if (searchLabel) {
-                searchLabel.textContent = isPuptasApplicant ? 'Search by Student Number' : 'Search by name, email, or ID';
+                searchLabel.textContent = isPuptasApplicant
+                    ? 'Search by Student Number'
+                    : (isPuptasApplicantIdp ? 'Search by IDP User ID' : 'Search by name, email, or ID');
             }
-            searchField.placeholder = isPuptasApplicant ? 'Try a student number' : 'Try a name, email address, or identifier';
+            searchField.placeholder = isPuptasApplicant
+                ? 'Try a student number'
+                : (isPuptasApplicantIdp ? 'Try an IDP user ID' : 'Try a name, email address, or identifier');
         });
 
         syncSystemVisibility();

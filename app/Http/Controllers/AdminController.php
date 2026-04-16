@@ -262,6 +262,8 @@ class AdminController extends Controller
                 $endpoint = $internalAdminOptionsEndpoint;
             } elseif ($source === 'puptas_applicant') {
                 $endpoint = 'PUPTAS /api/v1/medical/applicants/{studentNumber}';
+            } elseif ($source === 'puptas_applicant_idp') {
+                $endpoint = 'PUPTAS /api/v1/medical/applicants/idp/{idpUserId}';
             } elseif ($source === 'custom' && $configuredTempEndpoint !== '') {
                 $endpoint = $configuredTempEndpoint;
             } else {
@@ -375,6 +377,21 @@ class AdminController extends Controller
 
                         if (empty($results)) {
                             $errorMessage = 'No PUPTAS applicant record matched the provided student number.';
+                        }
+                    } elseif ($source === 'puptas_applicant_idp') {
+                        $applicant = app(PuptasWebhookService::class)->fetchApplicantByIdpUserId($search);
+                        $results = $applicant ? [$applicant] : [];
+                        $apiResponseMeta = [
+                            'status' => $applicant ? 200 : 404,
+                            'ok' => !empty($results),
+                            'endpoint' => $endpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'oauth-client-credentials',
+                            'source' => $source,
+                        ];
+
+                        if (empty($results)) {
+                            $errorMessage = 'No PUPTAS applicant record matched the provided IDP user ID.';
                         }
                     } elseif ($source === 'database_info') {
                         $dbTable = in_array($dbTable, ['users', 'admins'], true) ? $dbTable : 'users';
@@ -1006,9 +1023,15 @@ public function updateClearance(Request $request, $id)
             if ($record->clearance_status === 'Issued') {
                 try {
                     $puptasService = app(PuptasWebhookService::class);
-                    $puptasService->sendWithRetry((string) ($record->user->student_number ?? ''), true);
+                    $studentNumber = trim((string) ($record->user->student_number ?: $record->user->student_id ?: ''));
+                    $syncResult = $puptasService->sendWithRetry($studentNumber, true);
+
+                    if (!$syncResult['success']) {
+                        \Log::error("PUPTAS Sync Failed for User {$studentNumber}: " . ($syncResult['message'] ?? 'Unknown error'));
+                    }
                 } catch (\Exception $e) {
-                    \Log::error("PUPTAS Sync Failed for User {$record->user->student_number}: " . $e->getMessage());
+                    $studentNumber = trim((string) ($record->user->student_number ?: $record->user->student_id ?: ''));
+                    \Log::error("PUPTAS Sync Failed for User {$studentNumber}: " . $e->getMessage());
                 }
             }
         }

@@ -26,9 +26,7 @@ Route::post('/register-action', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout'); 
 
 // --- PROTECTED ROUTES (Login required) ---
-Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class, 'audit'])->group(function () {
-
-    // Student-only routes
+Route::middleware(['auth:student,admin', 'audit'])->group(function () {
     Route::middleware('role:student')->group(function () {
         Route::post('/student/skip-barcode', function () {
             session(['barcode_skipped' => true]);
@@ -67,28 +65,28 @@ Route::middleware([\Illuminate\Auth\Middleware\Authenticate::class, 'audit'])->g
     });
 
     Route::get('/account', [AppointmentController::class, 'index'])->name('account');
-Route::get('/health-records', [AdminController::class, 'viewHealth'])
-    ->middleware('role:superadmin,admin')
-    ->name('admin.health_records');
-Route::get('/health-profile/{id}', [AdminController::class, 'showHealth'])
-    ->middleware('role:superadmin,admin')
-    ->name('admin.show_health');
-Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage'])
-    ->middleware('role:superadmin')
-    ->name('admin.sign_page');
-Route::put('/health-profile/{id}/update', [AdminController::class, 'updateClearance'])
-    ->middleware('role:superadmin')
-    ->name('admin.update_clearance');
-
-    // Legacy barcode endpoints kept for compatibility
     Route::get('/barcode-register', [AppointmentController::class, 'barcodeRegister'])->name('barcode.legacy.register');
     Route::post('/barcode-store', [AppointmentController::class, 'storeBarcode'])->name('barcode.legacy.store');
     Route::post('/barcode-validate', [AppointmentController::class, 'validateBarcodeScan'])->name('barcode.legacy.validate');
     Route::post('/barcode-reset', [AppointmentController::class, 'resetBarcode'])->name('barcode.legacy.reset');
 
     Route::get('/fetch-user/{student_id}', [AppointmentController::class, 'fetchUser']);
+});
 
-    // Shared admin workspace routes (Super Admin/Admin)
+Route::middleware(['auth:admin,student', 'audit'])->group(function () {
+    Route::get('/health-records', [AdminController::class, 'viewHealth'])
+        ->middleware('role:superadmin,admin')
+        ->name('admin.health_records');
+    Route::get('/health-profile/{id}', [AdminController::class, 'showHealth'])
+        ->middleware('role:superadmin,admin')
+        ->name('admin.show_health');
+    Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage'])
+        ->middleware('role:superadmin')
+        ->name('admin.sign_page');
+    Route::put('/health-profile/{id}/update', [AdminController::class, 'updateClearance'])
+        ->middleware('role:superadmin')
+        ->name('admin.update_clearance');
+
     Route::middleware('role:superadmin,admin')->group(function () {
         Route::post('/admin/assistant/intent', [AdminAssistantController::class, 'handle'])->name('admin.assistant.intent');
         Route::post('/assistant/intent', [AdminAssistantController::class, 'handle'])->name('assistant.intent');
@@ -168,7 +166,7 @@ Route::put('/health-profile/{id}/update', [AdminController::class, 'updateCleara
         Route::get('/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
         Route::get('/api-testing', [AdminController::class, 'apiTesting'])->name('api-testing');
     });
-}); // End protected routes
+});
 
 // Temporary dev login helper (debug mode only)
 Route::get('/dev-login/{id}', function ($id) {
@@ -185,9 +183,8 @@ Route::get('/dev-login/{id}', function ($id) {
             $user->save();
         }
 
-        Auth::login($user);
-
         if ($normalizedRole === User::ROLE_SUPERADMIN) {
+            Auth::guard('admin')->login($user);
             return redirect('/admin/dashboard')->with('success', 'Logged in as ' . $user->name);
         }
         if ($normalizedRole === User::ROLE_ADMIN) {
@@ -205,12 +202,15 @@ Route::get('/dev-login/{id}', function ($id) {
             }
 
             if (strtolower(trim((string) ($linkedAdmin?->access_level ?? ''))) === 'designee') {
+                Auth::guard('student')->login($user);
                 return redirect('/student/home')->with('success', 'Logged in as ' . $user->name);
             }
 
+            Auth::guard('admin')->login($user);
             return redirect('/assistant/dashboard')->with('success', 'Logged in as ' . $user->name);
         }
 
+        Auth::guard('student')->login($user);
         return redirect('/student/account')->with('success', 'Logged in as ' . $user->name);
     }
 

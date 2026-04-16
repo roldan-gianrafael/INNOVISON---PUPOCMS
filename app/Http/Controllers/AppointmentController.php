@@ -5,13 +5,32 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Appointment;
+use App\Models\HealthProfile;
 use App\Models\User;
-use App\Services\MedicalStatusWebhookService;
+use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
+    private function hasSubmittedHealthProfile(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->relationLoaded('healthProfile')) {
+            return $user->healthProfile !== null;
+        }
+
+        return HealthProfile::query()->where('user_id', $user->id)->exists();
+    }
+
+    private function isAdmissionCleared(?User $user): bool
+    {
+        return (bool) ($user?->is_health_profile_completed ?? false);
+    }
+
     private function resolveLinkedAdminProfile(?User $user): ?Admin
     {
         if (!$user || !Admin::hasColumn('email')) {
@@ -161,17 +180,18 @@ class AppointmentController extends Controller
   
 
         $appointment = new Appointment();
-        $appointment->user_id    = $user->id;
+        $appointment->user_id = $user->id;
         $appointment->student_id = $request->input('student_id', '2025-0000-TG-0');
-        $appointment->name       = $user->name;
-        $appointment->email      = $user->email;
-        $appointment->date       = $request->date;
-        $appointment->time       = $request->time;
-        $appointment->service    = $request->service;
-        $appointment->status     = 'Pending';
-        $appointment->remarks    = $request->remarks; 
-        $appointment->type            = 'online';
-        $appointment->user_type       = Appointment::normalizeUserType($user->user_role);
+        $appointment->student_number = $request->input('student_number', (string) ($user->student_number ?? ''));
+        $appointment->name = $user->name;
+        $appointment->email = $user->email;
+        $appointment->date = $request->date;
+        $appointment->time = $request->time;
+        $appointment->service = $request->service;
+        $appointment->status = 'Pending';
+        $appointment->remarks = $request->remarks; 
+        $appointment->type = 'online';
+        $appointment->user_type = Appointment::normalizeUserType($user->user_role);
         $appointment->save(); // Dito lang dapat magtatapos ang command.
 
         return redirect()->back()
@@ -287,6 +307,8 @@ class AppointmentController extends Controller
         return redirect('/login-as-student')->with('error', 'Please login first.');
     }
 
+    $user->load('healthProfile');
+
     // 2. Kunin ang appointments ng SPECIFIC user na naka-login
     $appointments = Appointment::where('user_id', $user->id)
                                 ->orderBy('updated_at', 'desc')
@@ -321,7 +343,21 @@ class AppointmentController extends Controller
         }
     }
     
+    $hasSubmittedHealthProfile = $this->hasSubmittedHealthProfile($user);
+    $isAdmissionCleared = $this->isAdmissionCleared($user);
+
     $notifications = collect($notifications);
+
+    if ($hasSubmittedHealthProfile) {
+        $notifications->prepend([
+            'type' => $isAdmissionCleared ? 'success' : 'warning',
+            'icon' => $isAdmissionCleared ? 'OK' : '...',
+            'message' => $isAdmissionCleared
+                ? 'Your health profile has been cleared by Admission/PUPTAS.'
+                : 'Your health profile was submitted and is awaiting Admission/PUPTAS clearance.',
+            'time' => 'Health form status',
+        ]);
+    }
 
     // 5. Return view user
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
@@ -334,7 +370,9 @@ class AppointmentController extends Controller
         'completedCount', 
         'cancelledCount', 
         'notifications',
-        'linkedAdminProfile'
+        'linkedAdminProfile',
+        'hasSubmittedHealthProfile',
+        'isAdmissionCleared'
     ));
 }
 
@@ -592,6 +630,7 @@ class AppointmentController extends Controller
                 'success' => true,
                 'name' => $user->name,
                 'student_id' => $user->student_id,
+                'student_number' => $user->student_number,
                 'barcode' => $user->barcode
             ]);
         }
@@ -609,10 +648,9 @@ public function showHealthForm()
     /** @var \App\Models\User $user */
     $user = Auth::user();
     
-    // Redirect if already completed
-    if ($user->is_health_profile_completed) {
+    if ($this->hasSubmittedHealthProfile($user)) {
         return redirect()->route('print.health.form')
-            ->with('info', 'You have already completed your health profile.');
+            ->with('info', 'You have already submitted your health profile.');
     }
 
     // Calculate age
@@ -624,8 +662,22 @@ public function showHealthForm()
     // Resolve the linked admin profile (Required by your view to avoid Undefined Variable error)
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
 
+    $applicantData = app(PuptasWebhookService::class)->fetchApplicantByStudentNumber((string) ($user->student_number ?? ''));
+    $healthFormPrefill = [
+        'full_name' => trim(implode(' ', array_filter([
+            data_get($applicantData, 'first_name'),
+            data_get($applicantData, 'last_name'),
+        ]))),
+        'student_number' => (string) (data_get($applicantData, 'student_number') ?: ($user->student_number ?? '')),
+        'email' => (string) (data_get($applicantData, 'email') ?: ($user->email ?? '')),
+        'course_college' => trim(implode(' - ', array_filter([
+            data_get($applicantData, 'program.code'),
+            data_get($applicantData, 'program.name'),
+        ]))) ?: (string) ($user->course ?? ''),
+    ];
+
     // Return the view with all required variables
-    return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile'));
+    return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile', 'healthFormPrefill'));
 }
 
 public function storeHealthForm(Request $request)
@@ -728,10 +780,13 @@ public function storeHealthForm(Request $request)
             ]
         );
 
-        // 4. UPDATE USER STATUS
-        $user->is_health_profile_completed = 1;
+        $syncResult = app(PuptasWebhookService::class)->sendWithRetry(
+            (string) $user->student_number,
+            true
+        );
+
+        $user->is_health_profile_completed = $syncResult['success'] ? 1 : 0;
         $user->save();
-        app(MedicalStatusWebhookService::class)->notifyStudentStatus($user, 'health_profile_completed');
 
         // 5. ACTIVITY LOG
         \App\Models\ActivityLog::create([
@@ -743,8 +798,12 @@ public function storeHealthForm(Request $request)
             'user_agent'  => $request->userAgent(),
         ]);
 
-        // Eto yung binago natin para diretso agad sa Print Form pagkatapos mag-submit
-        return redirect()->route('print.health.form')->with('success', 'Health Profile saved! You can now print your form.');
+        $flashType = $syncResult['success'] ? 'success' : 'warning';
+        $flashMessage = $syncResult['success']
+            ? 'Health Profile saved and synced to PUPTAS successfully.'
+            : 'Health Profile saved locally, but PUPTAS sync failed: ' . $syncResult['message'];
+
+        return redirect()->route('print.health.form')->with($flashType, $flashMessage);
 
     } catch (\Exception $e) {
    

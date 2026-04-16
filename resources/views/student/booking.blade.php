@@ -435,6 +435,13 @@
                            <input type="text" name="student_id" class="form-control" value="{{ $user->student_id }}" readonly>
                         </div>
                     </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Student Number</label>
+                        <div class="input-wrapper">
+                           <input type="text" name="student_number" class="form-control" value="{{ $user->student_number }}" readonly>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="input-group">

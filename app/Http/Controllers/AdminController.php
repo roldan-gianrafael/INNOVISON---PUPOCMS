@@ -10,7 +10,7 @@ use App\Models\Item;
 use App\Models\Setting;
 use App\Models\Admin;
 use App\Services\FacultySyncService;
-use \App\Services\PuptasWebhookService;
+use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
@@ -252,7 +252,6 @@ class AdminController extends Controller
             $facultyEndpoint = trim((string) config('services.pupt_flss.faculty_profiles_url', ''));
             $internalAdminEndpoint = url('/api/external/admins');
             $internalAdminOptionsEndpoint = url('/api/external/admins/options');
-            $internalMedicalStatusBaseEndpoint = url('/api/external/students');
             $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
 
             if ($source === 'database_info') {
@@ -261,10 +260,8 @@ class AdminController extends Controller
                 $endpoint = $internalAdminEndpoint;
             } elseif ($source === 'admin_options') {
                 $endpoint = $internalAdminOptionsEndpoint;
-            } elseif ($source === 'medical_status') {
-                $endpoint = $search !== ''
-                    ? rtrim($internalMedicalStatusBaseEndpoint, '/') . '/' . urlencode($search) . '/medical-status'
-                    : $internalMedicalStatusBaseEndpoint . '/{student_id}/medical-status';
+            } elseif ($source === 'puptas_applicant') {
+                $endpoint = 'PUPTAS /api/v1/medical/applicants/{studentNumber}';
             } elseif ($source === 'custom' && $configuredTempEndpoint !== '') {
                 $endpoint = $configuredTempEndpoint;
             } else {
@@ -364,19 +361,20 @@ class AdminController extends Controller
                         if (empty($results)) {
                             $errorMessage = 'No matching records were found for the current search.';
                         }
-                    } elseif ($source === 'medical_status') {
-                        $results = $this->searchLocalMedicalStatusForApiTesting($search);
+                    } elseif ($source === 'puptas_applicant') {
+                        $applicant = app(PuptasWebhookService::class)->fetchApplicantByStudentNumber($search);
+                        $results = $applicant ? [$applicant] : [];
                         $apiResponseMeta = [
-                            'status' => empty($results) ? 404 : 200,
+                            'status' => $applicant ? 200 : 404,
                             'ok' => !empty($results),
                             'endpoint' => $endpoint,
                             'result_count' => count($results),
-                            'auth_mode' => 'external-api-key',
+                            'auth_mode' => 'oauth-client-credentials',
                             'source' => $source,
                         ];
 
                         if (empty($results)) {
-                            $errorMessage = 'No student medical status record matched the provided Student ID.';
+                            $errorMessage = 'No PUPTAS applicant record matched the provided student number.';
                         }
                     } elseif ($source === 'database_info') {
                         $dbTable = in_array($dbTable, ['users', 'admins'], true) ? $dbTable : 'users';
@@ -830,28 +828,6 @@ class AdminController extends Controller
         return 'active';
     }
 
-    private function searchLocalMedicalStatusForApiTesting(string $search): array
-    {
-        $studentId = trim($search);
-        if ($studentId === '') {
-            return [];
-        }
-
-        $user = User::query()->where('student_id', $studentId)->first();
-        if (!$user) {
-            return [];
-        }
-
-        return [[
-            'student_id' => (string) $user->student_id,
-            'status' => (bool) $user->is_health_profile_completed,
-            'timestamps' => [
-                'created_at' => optional($user->created_at)->toIso8601String(),
-                'updated_at' => optional($user->updated_at)->toIso8601String(),
-            ],
-        ]];
-    }
-
     private function normalizeApiTestingResults($payload, string $search): array
     {
         if (!is_array($payload)) {
@@ -1023,22 +999,6 @@ public function updateClearance(Request $request, $id)
     $record->verified_at      = ($request->clearance_status === 'Issued') ? ($request->verified_at ?? now()) : null;
 
     if ($record->save()) {
-        if ($record->user) {
-            try {
-                $isCleared = ($record->clearance_status === 'Issued') ? 1 : 0;
-                $puptasService = new PuptasWebhookService();
-                
-                $puptasService->sendWithRetry(
-                    $record->user->student_id, 
-                    $record->user->student_number, 
-                    $isCleared
-                );
-            } catch (\Exception $e) {
-                // Log the error but don't stop the user from succeeding in the local DB update
-                \Log::error("PUPTAS Sync Failed for User {$record->user->student_number}: " . $e->getMessage());
-            }
-        }
-
         return redirect()->route('admin.health_records')
                          ->with('success', 'Health Clearance status updated successfully.');
     }

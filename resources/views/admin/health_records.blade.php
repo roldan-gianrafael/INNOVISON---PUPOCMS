@@ -134,7 +134,7 @@
         <tbody>
             @forelse($records as $record)
                 <tr>
-                    <td class="fw-bold">{{ $record->user->student_id }}</td>
+                    <td class="fw-bold">{{ $record->user->student_number ?: $record->user->student_id }}</td>
                     <td>
                         <div class="student-name" style="font-weight: 700;">{{ $record->user->name }}</div>
                     </td>

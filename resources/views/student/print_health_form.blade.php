@@ -120,17 +120,20 @@
 @endpush
 
 @section('content')
+@php
+    $isAdmissionCleared = (bool) optional($profile->user)->is_health_profile_completed;
+@endphp
 <div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
     
-    @if($profile->clearance_status == 'Issued')
+    @if($isAdmissionCleared)
 
         <button onclick="window.print()" class="btn btn-primary" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
-            CLICK TO PRINT FORM 🖨️
+            CLICK TO PRINT FORM
         </button>
     @else
 
         <div style="background: #fef2f2; color: #b91c1c; padding: 8px 15px; border-radius: 5px; font-size: 13px; font-weight: bold; border: 1px solid #fecaca;">
-            ⚠️ VIEWING ONLY: Pending Medical Review
+            VIEWING ONLY: Pending Admission/PUPTAS Clearance
         </div>
         <button disabled style="background: #94a3b8; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: not-allowed;">
             PRINTING DISABLED
@@ -333,25 +336,25 @@ for the improvement of healthcare services.
 </div>
 
    <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
-        <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
+        <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">CLEARANCE STATUS</p>
         
         <div class="row" style="display: flex; align-items: center; gap: 15px;">
-            <span style="font-weight: bold;">Medical Clearance:</span>
+            <span style="font-weight: bold;">Admission/PUPTAS Clearance:</span>
             
             <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
                 <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
-                    {{ $profile->clearance_status == 'Issued' ? '✔' : '' }}
+                    {{ $isAdmissionCleared ? '/' : '' }}
                 </div> 
-                Issued
+                Approved
             </div>
 
             <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
                 <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
-                    {{ $profile->clearance_status == 'Pending' ? '✔' : '' }}
+                    {{ !$isAdmissionCleared ? '/' : '' }}
                 </div> 
                 Pending, Reason: 
                 <div class="field" style="border-bottom: 1px solid #000; min-width: 150px; padding-left: 5px; font-size: 12px; font-style: italic;">
-                    {{ $profile->clearance_status == 'Pending' ? $profile->pending_reason : '' }}
+                    {{ !$isAdmissionCleared ? 'Awaiting Admission/PUPTAS verification' : '' }}
                 </div>
             </div>
         </div>
@@ -360,8 +363,8 @@ for the improvement of healthcare services.
     
     <div style="flex: 0.4; text-align: center;">
         <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; min-height: 20px; padding-bottom: 5px;">
-            @if($profile->clearance_status == 'Issued')
-                {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
+            @if($isAdmissionCleared)
+                {{ optional(optional($profile->user)->updated_at)->format('m/d/Y') ?? date('m/d/Y') }}
             @else
                 &nbsp; 
             @endif
@@ -371,18 +374,10 @@ for the improvement of healthcare services.
 
     <div style="flex: 0.6; text-align: center; position: relative;">
         
-        @if($profile->clearance_status == 'Issued')
-            <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
-                     alt="Nurse Signature" 
-                     style="height: 85px; width: auto; pointer-events: none;">
-            </div>
-        @endif
-
         <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-bottom: 5px;">
-            MS. NURSE NAME, RN
+            ADMISSION / PUPTAS
         </div>
-        <div style="font-size: 10px; font-weight: bold; margin-top: 5px;">Physician's Name and Signature</div>
+        <div style="font-size: 10px; font-weight: bold; margin-top: 5px;">External Clearance Source</div>
     </div>
 
 </div>

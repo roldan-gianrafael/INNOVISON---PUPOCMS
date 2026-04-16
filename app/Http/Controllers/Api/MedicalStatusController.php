@@ -23,6 +23,8 @@ class MedicalStatusController extends Controller
             'success' => true,
             'data' => [
                 'student_id' => (string) $user->student_id,
+                'student_number' => (string) ($user->student_number ?? ''),
+                'is_health_profile_completed' => (int) ((bool) $user->is_health_profile_completed),
                 'status' => (bool) $user->is_health_profile_completed,
                 'timestamps' => [
                     'created_at' => optional($user->created_at)->toIso8601String(),

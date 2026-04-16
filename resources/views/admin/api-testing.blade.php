@@ -561,9 +561,9 @@
                 <label for="source">API Source</label>
                 <select id="source" name="source">
                     <option value="faculty" {{ ($source ?? 'faculty') === 'faculty' ? 'selected' : '' }}>Faculty API</option>
+                    <option value="puptas_applicant" {{ ($source ?? 'faculty') === 'puptas_applicant' ? 'selected' : '' }}>PUPTAS Applicant API</option>
                     <option value="admin_api" {{ ($source ?? 'faculty') === 'admin_api' ? 'selected' : '' }}>Our Admin API</option>
                     <option value="admin_options" {{ ($source ?? 'faculty') === 'admin_options' ? 'selected' : '' }}>Our Admin Options API</option>
-                    <option value="medical_status" {{ ($source ?? 'faculty') === 'medical_status' ? 'selected' : '' }}>Student Medical Status API</option>
                     <option value="database_info" {{ ($source ?? 'faculty') === 'database_info' ? 'selected' : '' }}>Database Info</option>
                     <option value="custom" {{ ($source ?? 'faculty') === 'custom' ? 'selected' : '' }}>Custom Temp API</option>
                 </select>
@@ -580,13 +580,13 @@
                 </select>
             </div>
             <div>
-                <label for="search">{{ ($source ?? 'faculty') === 'medical_status' ? 'Search by Student ID' : 'Search by name, email, or ID' }}</label>
+                <label for="search">{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Search by Student Number' : 'Search by name, email, or ID' }}</label>
                 <input
                     type="text"
                     id="search"
                     name="search"
                     value="{{ $search }}"
-                    placeholder="{{ ($source ?? 'faculty') === 'medical_status' ? 'Try a student ID' : 'Try a name, email address, or identifier' }}"
+                    placeholder="{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Try a student number' : 'Try a name, email address, or identifier' }}"
                 >
             </div>
             <button type="submit">Search API's</button>
@@ -734,27 +734,35 @@
             <div class="faculty-autofill-field"><label>Department/Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
         </div>
     </div>
-        @elseif(($source ?? '') === 'medical_status')
+        @elseif(($source ?? '') === 'puptas_applicant')
             <div class="api-results">
                 @foreach($results as $result)
                     <article class="api-result-card">
-                        <h3 style="margin: 0; color: #7f1d2d;">Student Medical Status</h3>
+                        <h3 style="margin: 0; color: #7f1d2d;">{{ trim(implode(' ', array_filter([$result['first_name'] ?? null, $result['last_name'] ?? null]))) ?: 'PUPTAS Applicant' }}</h3>
                         <div class="api-result-grid">
                             <div class="api-field">
-                                <small>Student ID</small>
-                                <strong>{{ $result['student_id'] ?? 'N/A' }}</strong>
+                                <small>Student Number</small>
+                                <strong>{{ $result['student_number'] ?? 'N/A' }}</strong>
                             </div>
                             <div class="api-field">
-                                <small>Status</small>
-                                <strong>{{ !empty($result['status']) ? 'true' : 'false' }}</strong>
+                                <small>IDP User ID</small>
+                                <strong>{{ $result['idp_user_id'] ?? 'N/A' }}</strong>
                             </div>
                             <div class="api-field">
-                                <small>Created At</small>
-                                <strong>{{ $result['timestamps']['created_at'] ?? 'N/A' }}</strong>
+                                <small>Email</small>
+                                <strong>{{ $result['email'] ?? 'N/A' }}</strong>
                             </div>
                             <div class="api-field">
-                                <small>Updated At</small>
-                                <strong>{{ $result['timestamps']['updated_at'] ?? 'N/A' }}</strong>
+                                <small>Program Code</small>
+                                <strong>{{ data_get($result, 'program.code', 'N/A') }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Program Name</small>
+                                <strong>{{ data_get($result, 'program.name', 'N/A') }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Lifecycle Status</small>
+                                <strong>{{ $result['lifecycle_status'] ?? 'N/A' }}</strong>
                             </div>
                         </div>
 
@@ -895,11 +903,11 @@
         sourceField.addEventListener('change', function () {
             syncSystemVisibility();
             const searchLabel = document.querySelector('label[for="search"]');
-            const isMedicalStatus = sourceField.value === 'medical_status';
+            const isPuptasApplicant = sourceField.value === 'puptas_applicant';
             if (searchLabel) {
-                searchLabel.textContent = isMedicalStatus ? 'Search by Student ID' : 'Search by name, email, or ID';
+                searchLabel.textContent = isPuptasApplicant ? 'Search by Student Number' : 'Search by name, email, or ID';
             }
-            searchField.placeholder = isMedicalStatus ? 'Try a student ID' : 'Try a name, email address, or identifier';
+            searchField.placeholder = isPuptasApplicant ? 'Try a student number' : 'Try a name, email address, or identifier';
         });
 
         syncSystemVisibility();
@@ -912,7 +920,6 @@
                 { name: 'student_id', label: 'Student ID', type: 'text' },
                 { name: 'user_role', label: 'Role', type: 'select', options: ['student', 'student_assistant', 'admin', 'superadmin'] },
                 { name: 'status', label: 'Status', type: 'select', options: ['active', 'inactive'] },
-                { name: 'is_health_profile_completed', label: 'Health Profile Completed', type: 'select', options: ['0', '1'] },
             ],
             admins: [
                 { name: 'first_name', label: 'First Name', type: 'text' },

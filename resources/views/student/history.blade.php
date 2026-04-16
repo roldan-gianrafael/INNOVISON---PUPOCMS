@@ -74,7 +74,7 @@
                     <div>
                       <div class="apt-service">{{ $appt->service }}</div>
                       <div class="apt-details">
-                        <span>{{ $appt->name }} ({{ $appt->student_id }})</span>
+                        <span>{{ $appt->name }} ({{ $appt->student_number ?: $appt->student_id }})</span>
                         <span>{{ $appt->email }}</span>
                       </div>
                     </div>

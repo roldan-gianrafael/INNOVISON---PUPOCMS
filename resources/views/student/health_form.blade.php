@@ -622,7 +622,7 @@
         <div class="form-row">
             <label class="form-label">Full Name<span class="required-mark">*</span></label>
             <input type="text" class="form-control bg-light"
-                value="{{ trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name]))) }}"
+                value="{{ old('full_name', ($healthFormPrefill['full_name'] ?? '') !== '' ? $healthFormPrefill['full_name'] : trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name])))) }}"
                 readonly>
         </div>
     </div>
@@ -631,7 +631,7 @@
         <div class="form-row">
             <label class="form-label">PUP Student No.<span class="required-mark">*</span></label>
             <input type="text" class="form-control bg-light"
-                value="{{ Auth::user()->student_number }}" readonly>
+                value="{{ old('student_number', $healthFormPrefill['student_number'] ?? Auth::user()->student_number) }}" readonly>
         </div>
     </div>
 
@@ -701,7 +701,7 @@
         <div class="form-row">
             <label class="form-label">Course / College<span class="required-mark">*</span></label>
             <input type="text" name="course_college" class="form-control"
-                value="{{ old('course_college', Auth::user()->course) }}">
+                value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}">
         </div>
     </div>
 
@@ -717,7 +717,7 @@
         <div class="form-row">
             <label class="form-label">Email Address<span class="required-mark">*</span></label>
             <input type="email" name="email" class="form-control"
-                value="{{ Auth::user()->email }}" readonly>
+                value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}" readonly>
         </div>
     </div>
 

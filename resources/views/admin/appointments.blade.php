@@ -258,7 +258,7 @@
                     <tr>
                         <td>
                             <div style="font-weight: 700;" class="student-name">{{ $appt->name }}</div>
-                            <div style="font-size: 12px; color: #111827;">{{ $appt->student_id }}</div>
+                            <div style="font-size: 12px; color: #111827;">{{ $appt->student_number ?: $appt->student_id }}</div>
                         </td>
                        <td>
     @php

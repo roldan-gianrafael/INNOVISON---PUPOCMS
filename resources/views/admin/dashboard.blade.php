@@ -371,7 +371,7 @@
                     <tr>
                         <td style="font-weight: 600;">
                             {{ $appt->name }}<br>
-                            <span style="font-size:11px; color:#94a3b8; font-weight:400;">{{ $appt->student_id }}</span>
+                            <span style="font-size:11px; color:#94a3b8; font-weight:400;">{{ $appt->student_number ?: $appt->student_id }}</span>
                         </td>
                         <td>{{ $appt->service }}</td>
                         <td>

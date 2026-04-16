@@ -8,15 +8,12 @@ use Illuminate\Support\Facades\Log;
 class PuptasWebhookService
 {
     private string $apiUrl;
-    private string $clientId;
-    private string $clientSecret;
+    private string $apiToken;
 
     public function __construct()
     {
-        // Use the full URL from config
-        $this->apiUrl       = config('services.puptas.api_url');
-        $this->clientId     = config('services.puptas.client_id');
-        $this->clientSecret = config('services.puptas.client_secret');
+        $this->apiUrl   = config('services.puptas.api_url');
+        $this->apiToken = config('services.puptas.bearer_token');
     }
 
     public function sendMedicalClearance(string $student_id, ?string $student_number = null, int $isCleared = 1): array
@@ -31,13 +28,11 @@ class PuptasWebhookService
                 $payload['student_number'] = $student_number;
             }
 
-            // Using Custom Headers as per many API standards
             $response = Http::timeout(30)
+                ->withToken($this->apiToken) // Adds "Authorization: Bearer <token>"
                 ->withHeaders([
-                    'X-Client-ID'     => $this->clientId,
-                    'X-Client-Secret' => $this->clientSecret,
-                    'Content-Type'    => 'application/json',
-                    'Accept'          => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'Accept'       => 'application/json',
                 ])
                 ->post($this->apiUrl, $payload);
 
@@ -47,7 +42,7 @@ class PuptasWebhookService
             }
 
             Log::error('PUPTAS webhook failed', [
-                'status' => $response->status(), 
+                'status' => $response->status(),
                 'error'  => $response->body()
             ]);
             return ['success' => false, 'message' => $response->body()];
@@ -64,6 +59,7 @@ class PuptasWebhookService
         while ($attempt < $maxRetries) {
             $result = $this->sendMedicalClearance($student_id, $student_number, $isCleared);
             if ($result['success']) return $result;
+            
             $attempt++;
             if ($attempt < $maxRetries) sleep(2);
         }

@@ -90,12 +90,8 @@ return [
     ],
 
     'puptas' => [
-        'client_id'        => env('PUPTAS_CLIENT_ID'),
-        'client_secret'    => env('PUPTAS_CLIENT_SECRET'),
-        'api_url'      => env('PUPTAS_API_URL'),
-        'webhook_secret'   => env('PUPTAS_WEBHOOK_SECRET'),
-        'timeout'          => (int) env('PUPTAS_TIMEOUT', 20),
-        'signature_header' => env('PUPTAS_SIGNATURE_HEADER', 'X-Medical-Signature'),
-    ],
+    'api_url'      => env('PUPTAS_API_URL'),
+    'bearer_token' => env('MEDICAL_WEBHOOK_SECRET'),
+],
 
 ];

@@ -219,7 +219,7 @@
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     <div class="row">
         <span class="label">Name:</span> <div class="field">{{ $profile->user->name }}</div>
-        <span class="label">Student No.:</span> <div class="field">{{ $profile->user->student_id }}</div>
+        <span class="label">Student No.:</span> <div class="field">{{ $profile->user->student_number }}</div>
     </div>
     <div class="row">
         <span class="label">Home Address:</span> <div class="field">{{ $profile->user->home_address ?? '' }}</div>

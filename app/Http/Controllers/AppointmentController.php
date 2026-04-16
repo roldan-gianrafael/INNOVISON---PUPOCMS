@@ -163,6 +163,7 @@ class AppointmentController extends Controller
         $appointment = new Appointment();
         $appointment->user_id    = $user->id;
         $appointment->student_id = $request->input('student_id', '2025-0000-TG-0');
+        $appointment->student_number = $request->input('student_number', '2025-0000-TG-0');
         $appointment->name       = $user->name;
         $appointment->email      = $user->email;
         $appointment->date       = $request->date;

@@ -19,23 +19,23 @@ $this->apiToken = config('services.puptas.api_token');
 /**
 * Send medical clearance notification to PUPTAS
 *
-* @param string $studentId The student's UUID (your student_id field)
-* @param string|null $studentNumber The student's number (optional)
+* @param string $student_id The student's UUID (your student_id field)
+* @param string|null $student_number The student's number (optional)
 * @param int $isCleared 1 = cleared/passed, 0 = failed
 * @return array ['success' => bool, 'message' => string, 'response' => array|null]
 */
-public function sendMedicalClearance(string $studentId, ?string $studentNumber = null, int $isCleared = 1): array
+public function sendMedicalClearance(string $student_id, ?string $student_number = null, int $isCleared = 1): array
 {
 try {
 // Prepare payload
 $payload = [
-'student_id' => $studentId,
+'student_id' => $student_id,
 'is_health_profile_completed' => $isCleared
 ];
 
 // Add student number if available
-if ($studentNumber) {
-$payload['student_number'] = $studentNumber;
+if ($student_number) {
+$payload['student_number'] = $student_number;
 }
 
 // Send request
@@ -50,8 +50,8 @@ $response = Http::timeout(30)
 // Check response
 if ($response->successful()) {
 Log::info('PUPTAS webhook sent successfully', [
-'student_id' => $studentId,
-'student_number' => $studentNumber,
+'student_id' => $student_id,
+'student_number' => $student_number,
 'status' => $isCleared,
 'response' => $response->json()
 ]);
@@ -63,7 +63,8 @@ return [
 ];
 } else {
 Log::error('PUPTAS webhook failed', [
-'student_id' => $studentId,
+'student_id' => $student_id,
+'student_number' => $student_number,
 'status_code' => $response->status(),
 'error' => $response->body()
 ]);
@@ -77,7 +78,8 @@ return [
 
 } catch (\Exception $e) {
 Log::error('PUPTAS webhook exception', [
-'student_id' => $studentId,
+'student_id' => $student_id,
+'student_number' => $student_number,
 'error' => $e->getMessage(),
 'trace' => $e->getTraceAsString()
 ]);
@@ -93,19 +95,19 @@ return [
 /**
 * Send with automatic retry on failure
 *
-* @param string $studentId
-* @param string|null $studentNumber
+* @param string $student_id
+* @param string|null $student_number
 * @param int $isCleared
 * @param int $maxRetries
 * @return array
 */
-public function sendWithRetry(string $studentId, ?string $studentNumber = null, int $isCleared = 1, int $maxRetries = 3): array
+public function sendWithRetry(string $student_id, ?string $student_number = null, int $isCleared = 1, int $maxRetries = 3): array
 {
 $attempt = 0;
 $delays = [5, 30, 300]; // seconds: 5s, 30s, 5min
 
 while ($attempt < $maxRetries) {
-$result = $this->sendMedicalClearance($studentId, $studentNumber, $isCleared);
+$result = $this->sendMedicalClearance($student_id, $student_number, $isCleared);
 
 if ($result['success']) {
 return $result;
@@ -113,14 +115,15 @@ return $result;
 
 $attempt++;
 if ($attempt < $maxRetries) {
-Log::warning("PUPTAS webhook retry attempt {$attempt} for student {$studentId}");
+Log::warning("PUPTAS webhook retry attempt {$attempt} for student {$student_id}");
 sleep($delays[$attempt - 1]);
 }
 }
 
 // All retries failed
 Log::critical('PUPTAS webhook failed after all retries', [
-'student_id' => $studentId,
+'student_id' => $student_id,
+'student_number' => $student_number,
 'attempts' => $maxRetries
 ]);
 

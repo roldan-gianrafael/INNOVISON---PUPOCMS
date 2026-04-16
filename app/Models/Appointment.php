@@ -15,6 +15,7 @@ class Appointment extends Model
     protected $fillable = [
         'user_id',      // Link to User table
         'student_id',   // Student ID
+        'student_number', // Student number
         'name',         // Name of student
         'email',        // Email
         'problem',      // Issue / reason for consultation

@@ -13,7 +13,8 @@ private string $apiToken;
 public function __construct()
 {
 // Get token from config or .env
-$this->apiToken = config('services.puptas.api_token');
+$this->apiUrl = config('services.puptas.api_url');
+$this->apiToken = config('services.puptas.client_secret');
 }
 
 /**

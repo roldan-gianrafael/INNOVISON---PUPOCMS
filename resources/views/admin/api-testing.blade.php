@@ -589,7 +589,7 @@
                     placeholder="{{ ($source ?? 'faculty') === 'medical_status' ? 'Try a student ID' : 'Try a name, email address, or identifier' }}"
                 >
             </div>
-            <button type="submit">Search API</button>
+            <button type="submit">Search API's</button>
         </form>
 
         @if(($source ?? '') === 'database_info')

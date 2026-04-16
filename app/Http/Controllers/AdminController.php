@@ -10,7 +10,7 @@ use App\Models\Item;
 use App\Models\Setting;
 use App\Models\Admin;
 use App\Services\FacultySyncService;
-new \App\Services\PuptasWebhookService();
+use \App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
@@ -1026,7 +1026,7 @@ public function updateClearance(Request $request, $id)
         if ($record->user) {
             try {
                 $isCleared = ($record->clearance_status === 'Issued') ? 1 : 0;
-                $puptasService = new \App\Services\PuptasWebhookService();
+                $puptasService = new PuptasWebhookService();
                 
                 $puptasService->sendWithRetry(
                     $record->user->student_id, 

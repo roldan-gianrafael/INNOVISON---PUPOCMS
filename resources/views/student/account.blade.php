@@ -452,16 +452,16 @@
             <div class="health-status-card">
     @php
         $healthFormSubmitted = $hasSubmittedHealthProfile ?? ($user->healthProfile !== null);
-        $admissionCleared = $isAdmissionCleared ?? ((bool) $user->is_health_profile_completed);
+        $status = $user->healthProfile->clearance_status ?? 'Pending';
     @endphp
     <span class="health-status-title">Health Information Record</span>
     
     @if($healthFormSubmitted)
-        @if($admissionCleared)
+        @if($status == 'Issued')
             <div class="health-status-summary">
                 <span class="health-status-state issued">Approved</span>
                 <p class="health-status-message">
-                    Your health profile has been cleared by Admission/PUPTAS and is ready for printing.
+                    Your health profile is now approved and ready for printing.
                 </p>
             </div>
             
@@ -478,9 +478,9 @@
 
         @else
             <div class="health-status-summary">
-                <span class="health-status-state pending">Pending Admission Clearance</span>
+                <span class="health-status-state pending">Pending Review</span>
                 <p class="health-status-message">
-                    Your profile has been submitted and is currently <strong>awaiting Admission/PUPTAS clearance</strong>.
+                    Your profile has been submitted and is currently <strong>awaiting medical review</strong>.
                 </p>
             </div>
             
@@ -492,7 +492,7 @@
                     Printing Disabled (Pending)
                 </button>
             </div>
-            <span class="health-status-note">Printing will be enabled once Admission/PUPTAS clears your profile.</span>
+            <span class="health-status-note">Physician signature is required to print.</span>
         @endif
 
     @else

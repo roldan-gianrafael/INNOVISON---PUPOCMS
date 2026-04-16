@@ -26,11 +26,6 @@ class AppointmentController extends Controller
         return HealthProfile::query()->where('user_id', $user->id)->exists();
     }
 
-    private function isAdmissionCleared(?User $user): bool
-    {
-        return (bool) ($user?->is_health_profile_completed ?? false);
-    }
-
     private function resolveLinkedAdminProfile(?User $user): ?Admin
     {
         if (!$user || !Admin::hasColumn('email')) {
@@ -344,17 +339,17 @@ class AppointmentController extends Controller
     }
     
     $hasSubmittedHealthProfile = $this->hasSubmittedHealthProfile($user);
-    $isAdmissionCleared = $this->isAdmissionCleared($user);
+    $healthProfileStatus = optional($user->healthProfile)->clearance_status;
 
     $notifications = collect($notifications);
 
     if ($hasSubmittedHealthProfile) {
         $notifications->prepend([
-            'type' => $isAdmissionCleared ? 'success' : 'warning',
-            'icon' => $isAdmissionCleared ? 'OK' : '...',
-            'message' => $isAdmissionCleared
-                ? 'Your health profile has been cleared by Admission/PUPTAS.'
-                : 'Your health profile was submitted and is awaiting Admission/PUPTAS clearance.',
+            'type' => $healthProfileStatus === 'Issued' ? 'success' : 'warning',
+            'icon' => $healthProfileStatus === 'Issued' ? 'OK' : '...',
+            'message' => $healthProfileStatus === 'Issued'
+                ? 'Your health profile has been approved by the clinic.'
+                : 'Your health profile was submitted and is awaiting medical review.',
             'time' => 'Health form status',
         ]);
     }
@@ -371,8 +366,7 @@ class AppointmentController extends Controller
         'cancelledCount', 
         'notifications',
         'linkedAdminProfile',
-        'hasSubmittedHealthProfile',
-        'isAdmissionCleared'
+        'hasSubmittedHealthProfile'
     ));
 }
 
@@ -780,12 +774,7 @@ public function storeHealthForm(Request $request)
             ]
         );
 
-        $syncResult = app(PuptasWebhookService::class)->sendWithRetry(
-            (string) $user->student_number,
-            true
-        );
-
-        $user->is_health_profile_completed = $syncResult['success'] ? 1 : 0;
+        $user->is_health_profile_completed = 0;
         $user->save();
 
         // 5. ACTIVITY LOG
@@ -798,12 +787,7 @@ public function storeHealthForm(Request $request)
             'user_agent'  => $request->userAgent(),
         ]);
 
-        $flashType = $syncResult['success'] ? 'success' : 'warning';
-        $flashMessage = $syncResult['success']
-            ? 'Health Profile saved and synced to PUPTAS successfully.'
-            : 'Health Profile saved locally, but PUPTAS sync failed: ' . $syncResult['message'];
-
-        return redirect()->route('print.health.form')->with($flashType, $flashMessage);
+        return redirect()->route('print.health.form')->with('success', 'Health Profile saved! You can now print your form.');
 
     } catch (\Exception $e) {
    

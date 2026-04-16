@@ -999,6 +999,20 @@ public function updateClearance(Request $request, $id)
     $record->verified_at      = ($request->clearance_status === 'Issued') ? ($request->verified_at ?? now()) : null;
 
     if ($record->save()) {
+        if ($record->user) {
+            $record->user->is_health_profile_completed = $record->clearance_status === 'Issued' ? 1 : 0;
+            $record->user->save();
+
+            if ($record->clearance_status === 'Issued') {
+                try {
+                    $puptasService = app(PuptasWebhookService::class);
+                    $puptasService->sendWithRetry((string) ($record->user->student_number ?? ''), true);
+                } catch (\Exception $e) {
+                    \Log::error("PUPTAS Sync Failed for User {$record->user->student_number}: " . $e->getMessage());
+                }
+            }
+        }
+
         return redirect()->route('admin.health_records')
                          ->with('success', 'Health Clearance status updated successfully.');
     }

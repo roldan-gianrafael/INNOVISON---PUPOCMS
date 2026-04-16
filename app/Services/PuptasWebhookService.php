@@ -19,13 +19,13 @@ class PuptasWebhookService
     /**
      * Fetch clearance status from PUPTAS API
      */
-    public function getClearanceStatus(string $student_number): array
+    public function getClearanceStatus(string $student_id): array
     {
         try {
             $baseUrl = str_replace('/webhooks/medical-result', '', $this->apiUrl);
             $response = Http::timeout(10)
                 ->withToken($this->apiToken)
-                ->get($baseUrl . '/api/v1/students/clearance/' . $student_number);
+                ->get($baseUrl . '/api/v1/students/clearance/' . $student_id);
 
             return $response->successful() ? $response->json() : ['is_cleared' => false];
         } catch (\Exception $e) {

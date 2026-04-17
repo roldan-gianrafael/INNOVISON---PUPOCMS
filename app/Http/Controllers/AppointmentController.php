@@ -101,6 +101,18 @@ class AppointmentController extends Controller
         return $normalizedValue;
     }
 
+    private function normalizeDoctorName(?string $value): string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        $value = preg_replace('/^(dr\.?\s*)+/i', '', $value) ?? $value;
+
+        return 'Dr. ' . trim($value);
+    }
+
     private function buildHealthFormPrefill(User $user, ?Admin $linkedAdminProfile = null, ?HealthProfile $healthProfile = null): array
     {
         $linkedAdminProfile = $linkedAdminProfile ?: $this->resolveLinkedAdminProfile($user);
@@ -906,6 +918,7 @@ public function storeHealthForm(Request $request)
     $user = Auth::user();
     $normalizedHeight = $this->normalizeMeasurement($request->input('height'), 'cm');
     $normalizedWeight = $this->normalizeMeasurement($request->input('weight'), 'kg');
+    $normalizedDoctorName = $this->normalizeDoctorName($request->input('medical_certificate_issued_by'));
     $user->contact_no = $request->input('contact_no');
     $user->save();
 
@@ -977,7 +990,7 @@ public function storeHealthForm(Request $request)
                 'medicine_allergies'  => $request->medicine_allergies,
                 'other_med_allergies' => $request->other_med_allergies,
                 'medical_certificate' => $medicalCertificatePath,
-                'medical_certificate_issued_by' => $request->medical_certificate_issued_by,
+                'medical_certificate_issued_by' => $normalizedDoctorName,
 
                 // Part III: COVID Vax
                 'vaccine_history' => [

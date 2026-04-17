@@ -1151,7 +1151,7 @@
                     <label class="form-label">3. Medical Certificate</label>
                     <input type="file" name="medical_certificate" class="form-control health-upload-field" accept=".jpg,.jpeg,.png,.pdf" required>
                     <small class="health-upload-helper">Upload JPG, PNG, or PDF if you have a medical certificate.</small>
-                    <label class="form-label" style="margin-top: 12px;">Medical certificate issued by: Dr:</label>
+                    <label class="form-label" style="margin-top: 12px;">Medical certificate issued by:</label>
                     <input
                         type="text"
                         name="medical_certificate_issued_by"
@@ -1799,6 +1799,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    const doctorIssuedByInput = document.querySelector('input[name="medical_certificate_issued_by"]');
+    const normalizeDoctorIssuedBy = () => {
+        if (!doctorIssuedByInput) {
+            return;
+        }
+
+        const rawValue = String(doctorIssuedByInput.value || '').trim();
+        if (!rawValue) {
+            doctorIssuedByInput.value = '';
+            return;
+        }
+
+        doctorIssuedByInput.value = `Dr. ${rawValue.replace(/^(dr\.?\s*)+/i, '').trim()}`;
+    };
+
+    doctorIssuedByInput?.addEventListener('blur', normalizeDoctorIssuedBy);
 
     // Initial Run
     toggleIllness();

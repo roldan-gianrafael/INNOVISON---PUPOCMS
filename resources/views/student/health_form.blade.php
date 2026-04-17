@@ -974,7 +974,16 @@
             @endif
         </div>
     </div>
+    <div class="form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Contact Number<span class="required-mark">*</span></label>
+            <input type="text" name="contact_no" class="form-control {{ $lockedContactNumber ? 'bg-light api-prefill-field' : '' }}"
+                value="{{ old('contact_no', $healthFormPrefill['contact_number'] ?? '') }}"
+                {{ $lockedContactNumber ? 'readonly' : '' }} required>
+        </div>
     </div>
+    </div>
+
 
     <div class="step-one-panel">
         <div class="step-one-panel-title">
@@ -1076,14 +1085,7 @@
         </div>
     </div>
 
-    <div class="form-row-wrapper">
-        <div class="form-row">
-            <label class="form-label">Contact Number<span class="required-mark">*</span></label>
-            <input type="text" name="contact_no" class="form-control {{ $lockedContactNumber ? 'bg-light api-prefill-field' : '' }}"
-                value="{{ old('contact_no', $healthFormPrefill['contact_number'] ?? '') }}"
-                {{ $lockedContactNumber ? 'readonly' : '' }} required>
-        </div>
-    </div>
+    
 
     <div class="form-row-wrapper">
         <div class="form-row">

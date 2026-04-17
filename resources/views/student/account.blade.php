@@ -174,8 +174,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.55);
-        backdrop-filter: blur(8px);
+        background: rgba(15, 23, 42, 0.62);
+        backdrop-filter: blur(10px);
         animation: overlayFadeIn 0.28s ease;
     }
     .health-submit-overlay.is-hiding {
@@ -189,7 +189,7 @@
     .health-submit-title {
         font-size: 28px;
         font-weight: 800;
-        color: #1f2937;
+        color: #ffffff;
         margin: 0 0 22px;
         letter-spacing: -0.02em;
     }
@@ -235,7 +235,7 @@
     }
     .health-submit-subtext {
         font-size: 14px;
-        color: #4b5563;
+        color: rgba(255, 255, 255, 0.84);
         margin: 0;
     }
     @keyframes overlayFadeIn {
@@ -437,6 +437,8 @@
     $linkedRoleLabel = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin'], true)
         ? (str_contains($linkedAccessLevel, 'faculty') ? 'Faculty' : 'Admin')
         : null;
+    $accountProfileData = $accountProfileData ?? [];
+    $showOfficeField = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin', 'faculty'], true) || str_contains($linkedAccessLevel, 'faculty');
 @endphp
 <div class="container" style="padding: 40px 20px;">
 
@@ -649,7 +651,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.setTimeout(() => {
         overlay.classList.add('is-hiding');
         window.setTimeout(() => overlay.remove(), 320);
-    }, 2200);
+    }, 5000);
 });
 </script>
 @endif
@@ -668,7 +670,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="profile-grid-3">
                 <div>
                     <label class="input-label">Course</label>
-                    <input type="text" class="form-control" value="{{ $user->course }}" readonly style="background-color: #f8fafc;">
+                    <input type="text" class="form-control" value="{{ $accountProfileData['course_college'] ?? $user->course }}" readonly style="background-color: #f8fafc;">
                 </div>
                 <div>
                     <label class="input-label">Year</label>
@@ -685,11 +687,11 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Gender</label>
-                    <input type="text" class="form-control" value="{{ $user->gender }}" readonly style="background-color: #f8fafc;">
+                    <input type="text" class="form-control" value="{{ $accountProfileData['sex'] ?? $user->gender }}" readonly style="background-color: #f8fafc;">
                 </div>
                 <div>
                     <label class="input-label">Birthday (DOB)</label>
-                    <input type="text" class="form-control" value="{{ $user->DOB }}" readonly style="background-color: #f8fafc;">
+                    <input type="text" class="form-control" value="{{ $accountProfileData['birthday'] ?? $user->DOB }}" readonly style="background-color: #f8fafc;">
                 </div>
             </div>
         @endif
@@ -698,11 +700,11 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Height (cm)</label>
-                    <input type="number" step="0.1" name="height" class="form-control editable-input" value="{{ old('height', $user->height) }}" disabled>
+                    <input type="text" name="height" class="form-control editable-input" value="{{ old('height', $accountProfileData['height'] ?? $user->height) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Weight (kg)</label>
-                    <input type="number" step="0.1" name="weight" class="form-control editable-input" value="{{ old('weight', $user->weight) }}" disabled>
+                    <input type="text" name="weight" class="form-control editable-input" value="{{ old('weight', $accountProfileData['weight'] ?? $user->weight) }}" disabled>
                 </div>
             </div>
         @endif
@@ -711,6 +713,20 @@ document.addEventListener('DOMContentLoaded', function () {
             <div style="margin-bottom: 15px;">
                 <label class="input-label">Contact Number</label>
                 <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $user->contact_no) }}" disabled>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label class="input-label">Address</label>
+                <textarea class="form-control" rows="2" disabled>{{ old('home_address', $accountProfileData['home_address'] ?? '') }}</textarea>
+            </div>
+            <div class="profile-grid-2">
+                <div>
+                    <label class="input-label">Emergency Contact Person</label>
+                    <input type="text" class="form-control" value="{{ old('guardian_name', $accountProfileData['guardian_name'] ?? '') }}" disabled>
+                </div>
+                <div>
+                    <label class="input-label">Emergency Contact Number</label>
+                    <input type="text" class="form-control" value="{{ old('emergency_contact_no', $accountProfileData['cellphone'] ?? '') }}" disabled>
+                </div>
             </div>
         @endif
 
@@ -740,57 +756,59 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Email</label>
-                    <input type="email" name="email" class="form-control" value="{{ old('email', $linkedAdminProfile->email) }}" disabled>
+                    <input type="email" name="email" class="form-control" value="{{ old('email', $accountProfileData['email'] ?? $linkedAdminProfile->email) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Contact Number</label>
-                    <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $user->contact_no) }}" disabled>
+                    <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $accountProfileData['cellphone'] ?? $user->contact_no) }}" disabled>
                 </div>
             </div>
 
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Birthday</label>
-                    <input type="date" name="birthday" class="form-control" value="{{ old('birthday', $linkedAdminProfile->birthday) }}" disabled>
+                    <input type="date" name="birthday" class="form-control" value="{{ old('birthday', $accountProfileData['birthday'] ?? $linkedAdminProfile->birthday) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Gender</label>
-                    <input type="text" name="gender" class="form-control" value="{{ old('gender', $linkedAdminProfile->gender) }}" disabled>
+                    <input type="text" name="gender" class="form-control" value="{{ old('gender', $accountProfileData['sex'] ?? $linkedAdminProfile->gender) }}" disabled>
                 </div>
             </div>
 
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Age</label>
-                    <input type="number" name="age" class="form-control" value="{{ old('age', $linkedAdminProfile->age) }}" disabled>
+                    <input type="number" name="age" class="form-control" value="{{ old('age', $accountProfileData['age'] ?? $linkedAdminProfile->age) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Civil Status</label>
-                    <input type="text" name="civil_status" class="form-control editable-input" value="{{ old('civil_status', $linkedAdminProfile->civil_status) }}" disabled>
+                    <input type="text" name="civil_status" class="form-control editable-input" value="{{ old('civil_status', $accountProfileData['civil_status'] ?? $linkedAdminProfile->civil_status) }}" disabled>
                 </div>
             </div>
 
             <div style="margin-bottom: 15px;">
                 <label class="input-label">Address</label>
-                <textarea name="address" class="form-control editable-input" rows="2" disabled>{{ old('address', $linkedAdminProfile->address) }}</textarea>
+                <textarea name="address" class="form-control editable-input" rows="2" disabled>{{ old('address', $accountProfileData['home_address'] ?? $linkedAdminProfile->address) }}</textarea>
             </div>
 
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Emergency Contact Person</label>
-                    <input type="text" name="emergency_contact_person" class="form-control editable-input" value="{{ old('emergency_contact_person', $linkedAdminProfile->emergency_contact_person) }}" disabled>
+                    <input type="text" name="emergency_contact_person" class="form-control editable-input" value="{{ old('emergency_contact_person', $accountProfileData['guardian_name'] ?? $linkedAdminProfile->emergency_contact_person) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Emergency Contact Number</label>
-                    <input type="text" name="emergency_contact_no" class="form-control editable-input" value="{{ old('emergency_contact_no', $linkedAdminProfile->emergency_contact_no) }}" disabled>
+                    <input type="text" name="emergency_contact_no" class="form-control editable-input" value="{{ old('emergency_contact_no', $accountProfileData['cellphone'] ?? $linkedAdminProfile->emergency_contact_no) }}" disabled>
                 </div>
             </div>
 
             <div class="profile-grid-2">
+                @if($showOfficeField)
                 <div>
                     <label class="input-label">Office</label>
-                    <input type="text" name="office" class="form-control editable-input" value="{{ old('office', $linkedAdminProfile->office) }}" disabled>
+                    <input type="text" name="office" class="form-control editable-input" value="{{ old('office', $accountProfileData['office'] ?? $linkedAdminProfile->office) }}" disabled>
                 </div>
+                @endif
                 <div>
                     <label class="input-label">Access Level</label>
                     <input type="text" name="access_level" class="form-control" value="{{ old('access_level', $linkedAdminProfile->access_level) }}" disabled>

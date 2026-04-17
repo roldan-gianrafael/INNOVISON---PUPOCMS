@@ -1050,7 +1050,7 @@
 
     <div class="form-row-wrapper">
         <div class="form-row">
-            <label class="form-label">Guardian Name<span class="required-mark">*</span></label>
+            <label class="form-label">Emergency Contact Person<span class="required-mark">*</span></label>
             @if($lockedGuardianName)
                 <textarea name="guardian_name" class="form-control api-prefill-field bg-light expanded-display-field auto-grow-field" rows="2" readonly required>{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}</textarea>
             @else
@@ -1063,7 +1063,7 @@
 
     <div class="form-row-wrapper">
         <div class="form-row">
-            <label class="form-label">Phone Number<span class="required-mark">*</span></label>
+            <label class="form-label">Emergency Contact Number<span class="required-mark">*</span></label>
             <input type="text" name="cellphone" class="form-control {{ $lockedCellphone ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('cellphone', $healthFormPrefill['cellphone'] ?? '') }}"
                 {{ $lockedCellphone ? 'readonly' : '' }} required>

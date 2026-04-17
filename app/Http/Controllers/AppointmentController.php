@@ -101,6 +101,112 @@ class AppointmentController extends Controller
         return $normalizedValue;
     }
 
+    private function buildHealthFormPrefill(User $user, ?Admin $linkedAdminProfile = null, ?HealthProfile $healthProfile = null): array
+    {
+        $linkedAdminProfile = $linkedAdminProfile ?: $this->resolveLinkedAdminProfile($user);
+        $applicantData = $this->fetchPuptasApplicantForUser($user);
+
+        $calculatedAge = null;
+        if (!empty($user->DOB)) {
+            try {
+                $calculatedAge = \Carbon\Carbon::parse($user->DOB)->age;
+            } catch (\Throwable $exception) {
+                $calculatedAge = null;
+            }
+        }
+
+        $resolvedSex = $this->normalizeSexValue(
+            data_get($applicantData, 'sex')
+            ?: ($healthProfile->sex ?? $user->gender ?? optional($linkedAdminProfile)->gender ?? '')
+        );
+
+        $resolvedCivilStatus = trim((string) ($healthProfile->civil_status ?? optional($linkedAdminProfile)->civil_status ?? ''));
+        $resolvedCivilStatus = in_array($resolvedCivilStatus, ['Single', 'Married'], true) ? $resolvedCivilStatus : 'Single';
+
+        $resolvedBirthday = (string) (
+            $user->DOB
+            ?: optional($linkedAdminProfile)->birthday
+            ?: data_get($applicantData, 'birthday')
+            ?: ''
+        );
+
+        if ($resolvedBirthday !== '') {
+            try {
+                $resolvedBirthday = \Carbon\Carbon::parse($resolvedBirthday)->format('Y-m-d');
+            } catch (\Throwable $exception) {
+                $resolvedBirthday = '';
+            }
+        }
+
+        $resolvedAge = $healthProfile->age ?? $calculatedAge;
+        if ($resolvedBirthday !== '') {
+            try {
+                $resolvedAge = \Carbon\Carbon::parse($resolvedBirthday)->age;
+            } catch (\Throwable $exception) {
+                // keep existing resolved age
+            }
+        }
+
+        $resolvedAddress = trim(implode(', ', array_filter([
+            data_get($applicantData, 'street_address'),
+            data_get($applicantData, 'barangay'),
+            data_get($applicantData, 'city'),
+            data_get($applicantData, 'province'),
+        ])));
+
+        return [
+            'full_name' => trim(implode(' ', array_filter([
+                data_get($applicantData, 'first_name') ?: data_get($applicantData, 'firstname'),
+                data_get($applicantData, 'middle_name') ?: data_get($applicantData, 'middlename'),
+                data_get($applicantData, 'last_name') ?: data_get($applicantData, 'lastname'),
+            ]))) ?: trim((string) $user->name),
+            'student_id' => (string) ($healthProfile->student_id ?? $user->student_id ?? ''),
+            'student_number' => (string) (
+                data_get($applicantData, 'student_number')
+                ?: ($healthProfile->student_number ?? $user->student_number ?: ($user->student_id ?: ''))
+            ),
+            'email' => (string) (
+                $healthProfile->user->email
+                ?? data_get($applicantData, 'email')
+                ?: ($user->email ?? optional($linkedAdminProfile)->email ?? '')
+            ),
+            'course_college' => trim((string) (
+                $healthProfile->course_college
+                ?? trim(implode(' - ', array_filter([
+                    data_get($applicantData, 'program.code'),
+                    data_get($applicantData, 'program.name'),
+                ])))
+                ?: trim(implode(' - ', array_filter([
+                    data_get($applicantData, 'strand'),
+                    data_get($applicantData, 'track'),
+                ])))
+                ?: ($user->course ?? '')
+            )),
+            'home_address' => trim((string) (
+                $healthProfile->home_address
+                ?: ($resolvedAddress !== '' ? $resolvedAddress : trim((string) (optional($linkedAdminProfile)->address ?? '')))
+            )),
+            'zipcode' => trim((string) ($healthProfile->zipcode ?? data_get($applicantData, 'postal_code') ?? '')),
+            'school_year' => (string) ($healthProfile->school_year ?? $this->resolveSchoolYear($applicantData, $user)),
+            'height' => (string) ($healthProfile->height ?? $user->height ?? ''),
+            'weight' => (string) ($healthProfile->weight ?? $user->weight ?? ''),
+            'birthday' => $resolvedBirthday,
+            'age' => $resolvedAge,
+            'sex' => $resolvedSex,
+            'civil_status' => $resolvedCivilStatus,
+            'blood_type' => (string) ($healthProfile->blood_type ?? 'Not Known'),
+            'guardian_name' => trim((string) ($healthProfile->guardian_name ?? optional($linkedAdminProfile)->emergency_contact_person ?? '')),
+            'cellphone' => trim((string) (
+                $healthProfile->cellphone
+                ?: data_get($applicantData, 'contactnumber')
+                ?: (optional($linkedAdminProfile)->emergency_contact_no ?: ($user->contact_no ?? ''))
+            )),
+            'landline' => (string) ($healthProfile->landline ?? ''),
+            'office' => trim((string) (optional($linkedAdminProfile)->office ?? '')),
+            'access_level' => trim((string) (optional($linkedAdminProfile)->access_level ?? '')),
+        ];
+    }
+
     private function hasSubmittedHealthProfile(?User $user): bool
     {
         if (!$user) {
@@ -444,6 +550,7 @@ class AppointmentController extends Controller
 
     // 5. Return view user
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+    $accountProfileData = $this->buildHealthFormPrefill($user, $linkedAdminProfile, $user->healthProfile);
 
     return view('student.account', compact(
         'user', 
@@ -454,7 +561,8 @@ class AppointmentController extends Controller
         'cancelledCount', 
         'notifications',
         'linkedAdminProfile',
-        'hasSubmittedHealthProfile'
+        'hasSubmittedHealthProfile',
+        'accountProfileData'
     ));
 }
 
@@ -735,86 +843,10 @@ public function showHealthForm()
             ->with('info', 'You have already submitted your health profile.');
     }
 
-    // Calculate age
-    $calculatedAge = null;
-    if ($user->DOB) {
-        $calculatedAge = \Carbon\Carbon::parse($user->DOB)->age;
-    }
-
     // Resolve the linked admin profile (Required by your view to avoid Undefined Variable error)
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
-
-    $applicantData = $this->fetchPuptasApplicantForUser($user);
-    $resolvedSex = $this->normalizeSexValue(
-        data_get($applicantData, 'sex')
-        ?: ($user->gender ?? optional($linkedAdminProfile)->gender ?? '')
-    );
-
-    $resolvedCivilStatus = trim((string) (optional($linkedAdminProfile)->civil_status ?? ''));
-    $resolvedCivilStatus = in_array($resolvedCivilStatus, ['Single', 'Married'], true) ? $resolvedCivilStatus : 'Single';
-    $resolvedBirthday = (string) (
-        data_get($applicantData, 'birthday')
-        ?: ($user->DOB ?? optional($linkedAdminProfile)->birthday ?? '')
-    );
-    if ($resolvedBirthday !== '') {
-        try {
-            $resolvedBirthday = \Carbon\Carbon::parse($resolvedBirthday)->format('Y-m-d');
-        } catch (\Throwable $exception) {
-            $resolvedBirthday = '';
-        }
-    }
-
-    $calculatedAge = $resolvedBirthday !== ''
-        ? \Carbon\Carbon::parse($resolvedBirthday)->age
-        : $calculatedAge;
-
-    $resolvedAddress = trim(implode(', ', array_filter([
-        data_get($applicantData, 'street_address'),
-        data_get($applicantData, 'barangay'),
-        data_get($applicantData, 'city'),
-        data_get($applicantData, 'province'),
-    ])));
-
-    $resolvedSchoolYear = $this->resolveSchoolYear($applicantData, $user);
-
-    $healthFormPrefill = [
-        'full_name' => trim(implode(' ', array_filter([
-            data_get($applicantData, 'first_name') ?: data_get($applicantData, 'firstname'),
-            data_get($applicantData, 'middle_name') ?: data_get($applicantData, 'middlename'),
-            data_get($applicantData, 'last_name') ?: data_get($applicantData, 'lastname'),
-        ]))),
-        'student_id' => (string) ($user->student_id ?? ''),
-        'student_number' => (string) (
-            data_get($applicantData, 'student_number')
-            ?: ($user->student_number ?: ($user->student_id ?: ''))
-        ),
-        'email' => (string) (data_get($applicantData, 'email') ?: ($user->email ?? '')),
-        'course_college' => trim(implode(' - ', array_filter([
-            data_get($applicantData, 'program.code'),
-            data_get($applicantData, 'program.name'),
-        ]))) ?: trim(implode(' - ', array_filter([
-            data_get($applicantData, 'strand'),
-            data_get($applicantData, 'track'),
-        ]))) ?: (string) ($user->course ?? ''),
-        'home_address' => $resolvedAddress !== ''
-            ? $resolvedAddress
-            : trim((string) (optional($linkedAdminProfile)->address ?? '')),
-        'zipcode' => trim((string) data_get($applicantData, 'postal_code')),
-        'school_year' => $resolvedSchoolYear,
-        'height' => (string) ($user->height ?? ''),
-        'weight' => (string) ($user->weight ?? ''),
-        'birthday' => $resolvedBirthday,
-        'age' => $calculatedAge,
-        'sex' => $resolvedSex,
-        'civil_status' => $resolvedCivilStatus,
-        'blood_type' => 'Not Known',
-        'guardian_name' => trim((string) (optional($linkedAdminProfile)->emergency_contact_person ?? '')),
-        'cellphone' => trim((string) (
-            data_get($applicantData, 'contactnumber')
-            ?: (optional($linkedAdminProfile)->emergency_contact_no ?: ($user->contact_no ?? ''))
-        )),
-        'landline' => '',
-    ];
+    $healthFormPrefill = $this->buildHealthFormPrefill($user, $linkedAdminProfile);
+    $calculatedAge = $healthFormPrefill['age'] ?? null;
 
     // Return the view with all required variables
     return view('student.health_form', compact('user', 'calculatedAge', 'linkedAdminProfile', 'healthFormPrefill'));

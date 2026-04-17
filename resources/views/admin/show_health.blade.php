@@ -25,13 +25,19 @@
         display: none !important;
     }
 
+    .no-print,
     .no-print *,
     .sidebar,
     .sidebar-toggle,
+    .sidebar-scroll-indicator,
     .medicine-alert-fab,
     .medicine-alert-panel,
+    .medicine-hover-hint,
+    .accessibility-launch-admin,
     .asw-menu-btn,
     .asw-widget,
+    .asw-menu,
+    .asw-overlay,
     .profile-dropdown,
     .logout-link,
     header,
@@ -64,21 +70,23 @@
 
     /* 4. I-dikit sa pinakataas ang container */
     .print-container { 
-        position: absolute !important; 
-        left: 0 !important; 
-        top: 0 !important; 
+        position: static !important; 
         width: 100% !important; 
         margin: 0 !important; 
-        /* Dito mo kontrolin ang layo sa gilid at taas ng papel */
         padding: 0.2in 0.5in !important; 
         box-shadow: none !important;
         line-height: 1.2;
         border: none !important;
+        max-width: none !important;
+        min-height: auto !important;
+        background: white !important;
     }
 
     .print-page {
+        display: block !important;
         break-after: page;
         page-break-after: always;
+        break-inside: avoid;
     }
 
     .print-page:last-child {
@@ -93,13 +101,12 @@
     /* 5. Force the page size and REMOVE default browser margins */
     @page { 
         size: 8.5in 13in; 
-        margin: 0 !important; /* Ginawang 0 para mawala ang 0.81 gap */
+        margin: 0 !important;
     }
 }
-        
-        .row { margin-bottom: 4px !important; }
-        .section-header { margin-top: 12px !important; }
-    }
+
+    .row { margin-bottom: 4px !important; }
+    .section-header { margin-top: 12px !important; }
 
     /* --- SCREEN VIEW --- */
     body { background-color: #e2e8f0; }
@@ -271,14 +278,6 @@
         <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'Yes' ? '/' : '' }}</div> Yes:</div>
         <div class="field">{{ $profile->disability_type ?? '' }}</div>
     </div>
-    <div class="row">
-        <span class="label">Chest X-Ray Result:</span> <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : 'N/A' }}</div>
-        <span class="label">PWD ID / Proof:</span> <div class="field">{{ $profile->pwd_id_proof ? 'Uploaded' : 'N/A' }}</div>
-    </div>
-    <div class="row">
-        <span class="label">Medical Certificate:</span> <div class="field">{{ $profile->medical_certificate ? 'Uploaded' : 'N/A' }}</div>
-        <span class="label">Issued By:</span> <div class="field">{{ $profile->medical_certificate_issued_by ?? 'N/A' }}</div>
-    </div>
 
     <div class="section-header">3. ALLERGIES & MEDICAL CONDITIONS</div>
     <div class="row">
@@ -356,7 +355,9 @@ for the improvement of healthcare services.
     <div class="signature-row">
     {{-- Parent Signature Block --}}
     <div class="sig-block">
-        <div style="height: 60px;"></div> {{-- Space para sa manual signature --}}
+        <div style="padding-bottom: 5px; font-weight: bold; height: 60px; display: flex; align-items: flex-end; justify-content: center;">
+            {{ strtoupper($profile->guardian_name ?? 'PARENT/GUARDIAN') }}
+        </div>
         <div class="sig-line">Parent/Guardian Signature</div>
     </div>
 
@@ -368,15 +369,13 @@ for the improvement of healthcare services.
             <div style="height: 60px;"></div>
         @endif
         
-        {{-- FIX: Gamitin ang name ng student mula sa profile, hindi Auth::user() --}}
-        <div class="sig-line">{{ strtoupper($profile->user->name) }}</div>
+        <div class="sig-line">{{ strtoupper($profile->user->name ?? '') }}</div>
         <div style="font-size: 8px;">Student Digital Signature</div>
     </div>
 
     {{-- Date Signed Block --}}
     <div class="sig-block">
         <div style="padding-bottom: 5px; font-weight: bold; height: 60px; display: flex; align-items: flex-end; justify-content: center;">
-            {{-- FIX: Gamitin ang created_at date ng profile record --}}
             {{ $profile->created_at ? $profile->created_at->format('m/d/Y') : date('m/d/Y') }}
         </div>
         <div class="sig-line">Date Signed</div>

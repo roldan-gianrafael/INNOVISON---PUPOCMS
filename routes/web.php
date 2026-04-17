@@ -26,7 +26,7 @@ Route::post('/register-action', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout'); 
 
 // --- PROTECTED ROUTES (Login required) ---
-Route::middleware(['auth:student,admin', 'audit'])->group(function () {
+Route::middleware(['auth:student', 'audit'])->group(function () {
     Route::middleware('role:student')->group(function () {
         Route::post('/student/skip-barcode', function () {
             session(['barcode_skipped' => true]);
@@ -73,7 +73,7 @@ Route::middleware(['auth:student,admin', 'audit'])->group(function () {
     Route::get('/fetch-user/{student_id}', [AppointmentController::class, 'fetchUser']);
 });
 
-Route::middleware(['auth:admin,student', 'audit'])->group(function () {
+Route::middleware(['auth:admin', 'audit'])->group(function () {
     Route::get('/health-records', [AdminController::class, 'viewHealth'])
         ->middleware('role:superadmin,admin')
         ->name('admin.health_records');

@@ -1023,14 +1023,19 @@ public function updateClearance(Request $request, $id)
             if ($record->clearance_status === 'Issued') {
                 try {
                     $puptasService = app(PuptasWebhookService::class);
-                    $studentNumber = trim((string) ($record->user->student_number ?: $record->user->student_id ?: ''));
+                    $studentNumber = trim((string) ($record->user->student_number ?? ''));
+                    if ($studentNumber === '') {
+                        \Log::warning("PUPTAS Sync Skipped for User {$record->user->id}: missing student_number.");
+                        return redirect()->route('admin.health_records')
+                            ->with('success', 'Medical clearance updated, but PUPTAS sync was skipped because student number is missing.');
+                    }
                     $syncResult = $puptasService->sendWithRetry($studentNumber, true);
 
                     if (!$syncResult['success']) {
                         \Log::error("PUPTAS Sync Failed for User {$studentNumber}: " . ($syncResult['message'] ?? 'Unknown error'));
                     }
                 } catch (\Exception $e) {
-                    $studentNumber = trim((string) ($record->user->student_number ?: $record->user->student_id ?: ''));
+                    $studentNumber = trim((string) ($record->user->student_number ?? ''));
                     \Log::error("PUPTAS Sync Failed for User {$studentNumber}: " . $e->getMessage());
                 }
             }

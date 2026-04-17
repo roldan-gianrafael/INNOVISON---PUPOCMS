@@ -773,7 +773,6 @@ public function showHealthForm()
         data_get($applicantData, 'barangay'),
         data_get($applicantData, 'city'),
         data_get($applicantData, 'province'),
-        data_get($applicantData, 'postal_code'),
     ])));
 
     $resolvedSchoolYear = $this->resolveSchoolYear($applicantData, $user);
@@ -784,9 +783,10 @@ public function showHealthForm()
             data_get($applicantData, 'middle_name') ?: data_get($applicantData, 'middlename'),
             data_get($applicantData, 'last_name') ?: data_get($applicantData, 'lastname'),
         ]))),
+        'student_id' => (string) ($user->student_id ?? ''),
         'student_number' => (string) (
             data_get($applicantData, 'student_number')
-            ?: ($user->student_number ?: $user->student_id ?: '')
+            ?: ($user->student_number ?: '')
         ),
         'email' => (string) (data_get($applicantData, 'email') ?: ($user->email ?? '')),
         'course_college' => trim(implode(' - ', array_filter([
@@ -799,6 +799,7 @@ public function showHealthForm()
         'home_address' => $resolvedAddress !== ''
             ? $resolvedAddress
             : trim((string) (optional($linkedAdminProfile)->address ?? '')),
+        'zipcode' => trim((string) data_get($applicantData, 'postal_code')),
         'school_year' => $resolvedSchoolYear,
         'height' => (string) ($user->height ?? ''),
         'weight' => (string) ($user->weight ?? ''),
@@ -823,8 +824,11 @@ public function storeHealthForm(Request $request)
 {
     // 1. VALIDATION: Siguraduhin na lahat ng fields ay tama ang format
     $request->validate([
+        'student_id'        => 'nullable|string|max:255',
+        'student_number'    => 'required|string|max:255',
         'school_year'       => 'required|string',
         'home_address'      => 'required|string|max:255',
+        'zipcode'           => 'required|string|max:20',
         'student_photo'     => 'required|image|mimes:jpeg,png,jpg|max:2048',
         'height'            => 'required|string|max:50',
         'weight'            => 'required|string|max:50',
@@ -906,8 +910,11 @@ public function storeHealthForm(Request $request)
         \App\Models\HealthProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
+                'student_id'         => $request->student_id,
+                'student_number'     => $request->student_number,
                 'school_year'        => $request->school_year,
                 'home_address'       => $request->home_address,
+                'zipcode'            => $request->zipcode,
                 'student_photo'      => $photoPath,
                 'height'             => $normalizedHeight,
                 'weight'             => $normalizedWeight,

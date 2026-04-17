@@ -323,9 +323,20 @@
             background-color: #800000;
             border-color: #800000;
         }
-        .form-control.bg-light {
+        .form-control.bg-light,
+        .form-select.bg-light,
+        .api-prefill-field {
             background: #f2f4f7 !important;
             border-color: #dbe0e7;
+        }
+        .api-prefill-field[readonly],
+        .api-prefill-field:disabled {
+            color: var(--clinic-text);
+            opacity: 1;
+            cursor: not-allowed;
+        }
+        .api-prefill-field:focus {
+            background: #f2f4f7 !important;
         }
         .vax-table th { background-color: #f8f9fa; font-size: 0.85rem; text-align: center; }
         .upload-box {
@@ -527,6 +538,24 @@
 .form-row .form-control,
 .form-row .form-select {
     width: 100%;
+}
+.long-value-field {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    text-overflow: clip;
+}
+.long-value-field::-webkit-scrollbar {
+    height: 8px;
+}
+.long-value-field::-webkit-scrollbar-thumb {
+    background: rgba(128, 0, 0, 0.28);
+    border-radius: 999px;
+}
+.long-value-field::-webkit-scrollbar-track {
+    background: rgba(128, 0, 0, 0.06);
+    border-radius: 999px;
 }
 
 .form-row-wrapper {
@@ -755,9 +784,6 @@
                     Please provide complete and truthful information. Type <strong>N/A</strong> or <strong>NONE</strong>
                     for fields that do not apply to you. Required fields are marked with a maroon asterisk.
                 </p>
-                <div class="step-context-note">
-                    Some fields were auto-filled from verified school records and are locked for consistency. The remaining fields are for your personal health intake details.
-                </div>
             </div>
         </div>
         <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
@@ -766,6 +792,7 @@
     <section class="form-step is-active" data-step="1">
 @php
     $lockedHomeAddress = !empty($healthFormPrefill['home_address'] ?? '');
+    $lockedZipcode = !empty($healthFormPrefill['zipcode'] ?? '');
     $lockedSchoolYear = !empty($healthFormPrefill['school_year'] ?? '');
     $lockedHeight = !empty($healthFormPrefill['height'] ?? '');
     $lockedWeight = !empty($healthFormPrefill['weight'] ?? '');
@@ -774,11 +801,11 @@
     $lockedSex = !empty($healthFormPrefill['sex'] ?? '');
     $lockedCivilStatus = !empty($healthFormPrefill['civil_status'] ?? '');
     $lockedCourseCollege = !empty($healthFormPrefill['course_college'] ?? '');
-    $lockedBloodType = !empty($healthFormPrefill['blood_type'] ?? '');
+    $lockedBloodType = false;
     $lockedEmail = !empty($healthFormPrefill['email'] ?? '');
     $lockedGuardianName = !empty($healthFormPrefill['guardian_name'] ?? '');
     $lockedCellphone = !empty($healthFormPrefill['cellphone'] ?? '');
-    $selectedBloodType = old('blood_type', $healthFormPrefill['blood_type'] ?? 'Not Known');
+    $selectedBloodType = old('blood_type', ($healthFormPrefill['blood_type'] ?? '') !== '' ? $healthFormPrefill['blood_type'] : 'Not Known');
     $bloodTypeOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Not Known'];
 @endphp
 
@@ -786,13 +813,14 @@
     <div class="step-one-panel verified">
         <div class="step-one-panel-title">
             <h3>Verified Student Record</h3>
-            <span>Auto-filled</span>
         </div>
+
+    <input type="hidden" name="student_id" value="{{ old('student_id', $healthFormPrefill['student_id'] ?? Auth::user()->student_id) }}">
 
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Full Name<span class="required-mark">*</span></label>
-            <input type="text" class="form-control bg-light"
+            <input type="text" class="form-control bg-light long-value-field"
                 value="{{ old('full_name', ($healthFormPrefill['full_name'] ?? '') !== '' ? $healthFormPrefill['full_name'] : trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name])))) }}"
                 readonly>
         </div>
@@ -801,7 +829,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">PUP Student No.<span class="required-mark">*</span></label>
-            <input type="text" class="form-control bg-light"
+            <input type="text" name="student_number" class="form-control bg-light api-prefill-field"
                 value="{{ old('student_number', $healthFormPrefill['student_number'] ?? Auth::user()->student_number) }}" readonly>
         </div>
     </div>
@@ -809,7 +837,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">School Year</label>
-            <input type="text" name="school_year" class="form-control"
+            <input type="text" name="school_year" class="form-control {{ $lockedSchoolYear ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('school_year', $healthFormPrefill['school_year'] ?? '2025-2026') }}"
                 {{ $lockedSchoolYear ? 'readonly' : '' }} required>
         </div>
@@ -818,7 +846,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Email Address<span class="required-mark">*</span></label>
-            <input type="email" name="email" class="form-control"
+            <input type="email" name="email" class="form-control long-value-field {{ $lockedEmail ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}"
                 {{ $lockedEmail ? 'readonly' : '' }} required>
         </div>
@@ -827,7 +855,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Course / College<span class="required-mark">*</span></label>
-            <input type="text" name="course_college" class="form-control"
+            <input type="text" name="course_college" class="form-control long-value-field {{ $lockedCourseCollege ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}"
                 {{ $lockedCourseCollege ? 'readonly' : '' }} required>
         </div>
@@ -836,7 +864,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Birthday</label>
-            <input type="date" name="birthday" class="form-control"
+            <input type="date" name="birthday" class="form-control {{ $lockedBirthday ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('birthday', $healthFormPrefill['birthday'] ?? '') }}"
                 {{ $lockedBirthday ? 'readonly' : '' }} required>
         </div>
@@ -845,7 +873,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Sex<span class="required-mark">*</span></label>
-            <select name="sex" class="form-select" {{ $lockedSex ? 'disabled' : '' }} required>
+            <select name="sex" class="form-select {{ $lockedSex ? 'bg-light api-prefill-field' : '' }}" {{ $lockedSex ? 'disabled' : '' }} required>
                 <option value="Male" {{ old('sex', $healthFormPrefill['sex'] ?? '') === 'Male' ? 'selected' : '' }}>Male</option>
                 <option value="Female" {{ old('sex', $healthFormPrefill['sex'] ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
             </select>
@@ -859,15 +887,23 @@
     <div class="step-one-panel">
         <div class="step-one-panel-title">
             <h3>Personal Information</h3>
-            <span>Review Details</span>
         </div>
 
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Home Address<span class="required-mark">*</span></label>
-            <input type="text" name="home_address" class="form-control"
+            <input type="text" name="home_address" class="form-control long-value-field {{ $lockedHomeAddress ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}"
                 {{ $lockedHomeAddress ? 'readonly' : '' }} required>
+        </div>
+    </div>
+
+    <div class="form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Zip Code<span class="required-mark">*</span></label>
+            <input type="text" name="zipcode" class="form-control {{ $lockedZipcode ? 'bg-light api-prefill-field' : '' }}"
+                value="{{ old('zipcode', $healthFormPrefill['zipcode'] ?? '') }}"
+                {{ $lockedZipcode ? 'readonly' : '' }} required>
         </div>
     </div>
 
@@ -884,7 +920,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Age<span class="required-mark">*</span></label>
-            <input type="number" name="age" class="form-control"
+            <input type="number" name="age" class="form-control {{ $lockedAge ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('age', $healthFormPrefill['age'] ?? $calculatedAge) }}"
                 {{ $lockedAge ? 'readonly' : '' }} required>
         </div>
@@ -903,7 +939,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Civil Status<span class="required-mark">*</span></label>
-            <select name="civil_status" class="form-select" {{ $lockedCivilStatus ? 'disabled' : '' }} required>
+            <select name="civil_status" class="form-select {{ $lockedCivilStatus ? 'bg-light api-prefill-field' : '' }}" {{ $lockedCivilStatus ? 'disabled' : '' }} required>
                 <option disabled {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === '' ? 'selected' : '' }}>Select</option>
                 <option {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === 'Single' ? 'selected' : '' }}>Single</option>
                 <option {{ old('civil_status', $healthFormPrefill['civil_status'] ?? '') === 'Married' ? 'selected' : '' }}>Married</option>
@@ -933,7 +969,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Guardian Name<span class="required-mark">*</span></label>
-            <input type="text" name="guardian_name" class="form-control"
+            <input type="text" name="guardian_name" class="form-control long-value-field {{ $lockedGuardianName ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}"
                 {{ $lockedGuardianName ? 'readonly' : '' }} required>
         </div>
@@ -942,7 +978,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Phone Number<span class="required-mark">*</span></label>
-            <input type="text" name="cellphone" class="form-control"
+            <input type="text" name="cellphone" class="form-control {{ $lockedCellphone ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('cellphone', $healthFormPrefill['cellphone'] ?? '') }}"
                 {{ $lockedCellphone ? 'readonly' : '' }} required>
         </div>
@@ -1266,6 +1302,7 @@ document.addEventListener('DOMContentLoaded', function() {
             1: [
                 document.querySelector('input[name="school_year"]'),
                 document.querySelector('input[name="home_address"]'),
+                document.querySelector('input[name="zipcode"]'),
                 document.querySelector('input[name="height"]'),
                 document.querySelector('input[name="weight"]'),
                 document.querySelector('input[name="birthday"]'),
@@ -1398,6 +1435,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fieldStepMap = {
             school_year: 1,
             home_address: 1,
+            zipcode: 1,
             age: 1,
             sex: 1,
             civil_status: 1,

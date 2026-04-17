@@ -977,7 +977,7 @@ class LoginController extends Controller
     {
         $emailSeed = $this->firstNonEmptyScalar($profile, ['email', 'mail', 'username', 'user.email']) ?? '';
         $studentNumberSeed = $this->firstNonEmptyScalar($profile, ['student_number', 'studentNo']) ?? '';
-        $studentIdSeed = $this->firstNonEmptyScalar($profile, ['student_id', 'student_number', 'studentNo', 'user_id', 'id']) ?? '';
+        $studentIdSeed = $this->firstNonEmptyScalar($profile, ['student_id', 'idp_user_id', 'user_id', 'id']) ?? '';
         $firstName = $this->firstNonEmptyScalar($profile, ['first_name', 'firstname', 'given_name']) ?? '';
         $lastName = $this->firstNonEmptyScalar($profile, ['last_name', 'lastname', 'family_name']) ?? '';
         $displayName = $this->firstNonEmptyScalar($profile, ['name', 'full_name', 'display_name']) ?? '';
@@ -1069,7 +1069,7 @@ class LoginController extends Controller
 
         $user = User::create([
             'student_id' => $studentId,
-            'student_number' => $studentNumberSeed !== '' ? $studentNumberSeed : $studentId,
+            'student_number' => $studentNumberSeed !== '' ? $studentNumberSeed : null,
             'first_name' => $firstName !== '' ? $firstName : 'IDP',
             'last_name' => $lastName !== '' ? $lastName : 'User',
             'name' => $fullName !== '' ? $fullName : trim(($firstName ?: 'IDP') . ' ' . ($lastName ?: 'User')),

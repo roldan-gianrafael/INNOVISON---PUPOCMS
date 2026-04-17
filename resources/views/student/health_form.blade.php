@@ -132,6 +132,7 @@
         .step-card.completed .step-icon {
             background: rgba(255, 255, 255, 0.16);
             color: #ffffff;
+            animation: completeBadgePop 0.24s ease;
         }
         .step-card.warning .step-icon {
             background: rgba(255, 255, 255, 0.26);
@@ -235,6 +236,7 @@
         }
         .form-step.is-active {
             display: block;
+            animation: stepFadeSlideIn 0.28s ease;
         }
         .step-card {
             transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
@@ -299,31 +301,17 @@
         textarea.form-control {
             min-height: 120px;
         }
-        .compact-scroll-field {
-            min-height: 46px !important;
-            max-height: 46px;
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
+        .expanded-display-field {
+            min-height: 48px !important;
+            height: auto;
+            overflow: hidden !important;
             resize: none;
-            line-height: 1.2;
+            line-height: 1.35;
             white-space: normal;
             word-break: break-word;
             overflow-wrap: anywhere;
-            scrollbar-gutter: stable;
-            padding-top: 8px;
-            padding-bottom: 8px;
-            padding-right: 10px;
-        }
-        .compact-scroll-field::-webkit-scrollbar {
-            width: 8px;
-        }
-        .compact-scroll-field::-webkit-scrollbar-thumb {
-            background: rgba(128, 0, 0, 0.28);
-            border-radius: 999px;
-        }
-        .compact-scroll-field::-webkit-scrollbar-track {
-            background: rgba(128, 0, 0, 0.06);
-            border-radius: 999px;
+            padding-top: 10px;
+            padding-bottom: 10px;
         }
         .form-control:focus,
         .form-select:focus {
@@ -340,10 +328,67 @@
             background: #fff5f5 !important;
         }
         .field-error-note {
-            color: #b91c1c;
-            font-size: 0.82rem;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            color: #ffffff;
+            background: #b91c1c;
+            font-size: 0.8rem;
             font-weight: 700;
-            margin-top: 6px;
+            margin-top: 8px;
+            padding: 7px 10px;
+            border-radius: 10px;
+            box-shadow: 0 10px 22px rgba(185, 28, 28, 0.18);
+            line-height: 1.3;
+            max-width: 260px;
+            z-index: 2;
+            animation: errorBubbleIn 0.18s ease;
+        }
+        .field-error-note::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 16px;
+            width: 12px;
+            height: 12px;
+            background: #b91c1c;
+            transform: rotate(45deg);
+            border-radius: 2px;
+        }
+        .form-row .field-error-note {
+            grid-column: 2;
+            justify-self: start;
+        }
+        @keyframes stepFadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes errorBubbleIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes completeBadgePop {
+            0% {
+                transform: scale(0.92);
+            }
+            70% {
+                transform: scale(1.06);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
         .form-check-input:checked {
             background-color: #800000;
@@ -846,7 +891,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Full Name<span class="required-mark">*</span></label>
-            <textarea class="form-control bg-light api-prefill-field compact-scroll-field" rows="2" readonly>{{ old('full_name', ($healthFormPrefill['full_name'] ?? '') !== '' ? $healthFormPrefill['full_name'] : trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name])))) }}</textarea>
+            <textarea class="form-control bg-light api-prefill-field expanded-display-field auto-grow-field" rows="2" readonly>{{ old('full_name', ($healthFormPrefill['full_name'] ?? '') !== '' ? $healthFormPrefill['full_name'] : trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name])))) }}</textarea>
         </div>
     </div>
 
@@ -871,7 +916,7 @@
         <div class="form-row">
             <label class="form-label">Email Address<span class="required-mark">*</span></label>
             @if($lockedEmail)
-                <textarea name="email" class="form-control api-prefill-field bg-light compact-scroll-field" rows="2" readonly required>{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}</textarea>
+                <textarea name="email" class="form-control api-prefill-field bg-light expanded-display-field auto-grow-field" rows="2" readonly required>{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}</textarea>
             @else
                 <input type="email" name="email" class="form-control"
                     value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}"
@@ -884,7 +929,7 @@
         <div class="form-row">
             <label class="form-label">Course / College<span class="required-mark">*</span></label>
             @if($lockedCourseCollege)
-                <textarea name="course_college" class="form-control api-prefill-field bg-light compact-scroll-field" rows="2" readonly required>{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}</textarea>
+                <textarea name="course_college" class="form-control api-prefill-field bg-light expanded-display-field auto-grow-field" rows="2" readonly required>{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}</textarea>
             @else
                 <input type="text" name="course_college" class="form-control"
                     value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}"
@@ -925,7 +970,7 @@
         <div class="form-row">
             <label class="form-label">Home Address<span class="required-mark">*</span></label>
             @if($lockedHomeAddress)
-                <textarea name="home_address" class="form-control api-prefill-field bg-light compact-scroll-field" rows="2" readonly required>{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}</textarea>
+                <textarea name="home_address" class="form-control api-prefill-field bg-light expanded-display-field auto-grow-field" rows="2" readonly required>{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}</textarea>
             @else
                 <input type="text" name="home_address" class="form-control"
                     value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}"
@@ -1007,7 +1052,7 @@
         <div class="form-row">
             <label class="form-label">Guardian Name<span class="required-mark">*</span></label>
             @if($lockedGuardianName)
-                <textarea name="guardian_name" class="form-control api-prefill-field bg-light compact-scroll-field" rows="2" readonly required>{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}</textarea>
+                <textarea name="guardian_name" class="form-control api-prefill-field bg-light expanded-display-field auto-grow-field" rows="2" readonly required>{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}</textarea>
             @else
                 <input type="text" name="guardian_name" class="form-control"
                     value="{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}"
@@ -1353,30 +1398,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const customRequired = {
             1: [
-                document.querySelector('input[name="school_year"]'),
-                document.querySelector('input[name="home_address"]'),
-                document.querySelector('input[name="zipcode"]'),
-                document.querySelector('input[name="height"]'),
-                document.querySelector('input[name="weight"]'),
-                document.querySelector('input[name="birthday"]'),
-                document.querySelector('input[name="age"]'),
-                document.querySelector('select[name="sex"]'),
-                document.querySelector('select[name="civil_status"]'),
-                document.querySelector('input[name="course_college"]'),
-                document.querySelector('select[name="blood_type"]'),
-                document.querySelector('input[name="guardian_name"]'),
-                document.querySelector('input[name="cellphone"]')
+                document.querySelector('[name="school_year"]'),
+                document.querySelector('[name="home_address"]'),
+                document.querySelector('[name="zipcode"]'),
+                document.querySelector('[name="height"]'),
+                document.querySelector('[name="weight"]'),
+                document.querySelector('[name="birthday"]'),
+                document.querySelector('[name="age"]'),
+                document.querySelector('[name="sex"]'),
+                document.querySelector('[name="civil_status"]'),
+                document.querySelector('[name="course_college"]'),
+                document.querySelector('[name="blood_type"]'),
+                document.querySelector('[name="guardian_name"]'),
+                document.querySelector('[name="cellphone"]')
             ],
             2: [
-                document.querySelector('input[name="has_illness"]'),
-                document.querySelector('input[name="chest_xray_result"]'),
-                document.querySelector('input[name="medical_certificate"]'),
-                document.querySelector('input[name="medical_certificate_issued_by"]'),
-                document.querySelector('input[name="has_disability"]')
+                document.querySelector('[name="has_illness"]'),
+                document.querySelector('[name="chest_xray_result"]'),
+                document.querySelector('[name="medical_certificate"]'),
+                document.querySelector('[name="medical_certificate_issued_by"]'),
+                document.querySelector('[name="has_disability"]')
             ],
             4: [
-                document.querySelector('input[name="student_photo"]'),
-                document.querySelector('input[name="digital_signature"]')
+                document.querySelector('[name="student_photo"]'),
+                document.querySelector('[name="digital_signature"]')
             ]
         };
 
@@ -1815,6 +1860,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    const autoGrowFields = Array.from(document.querySelectorAll('.auto-grow-field'));
+    const resizeAutoGrowField = (field) => {
+        if (!field) {
+            return;
+        }
+        field.style.height = 'auto';
+        field.style.height = `${Math.max(field.scrollHeight, 48)}px`;
+    };
+
+    autoGrowFields.forEach((field) => resizeAutoGrowField(field));
 
     const initialStep = validationErrors.length ? resolveStepFromErrors() : 1;
     if (validationErrors.length) {

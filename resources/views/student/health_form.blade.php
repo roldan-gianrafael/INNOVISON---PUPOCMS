@@ -300,14 +300,18 @@
             min-height: 120px;
         }
         .compact-scroll-field {
-            min-height: 58px !important;
-            max-height: 58px;
-            overflow-y: auto;
-            overflow-x: hidden;
+            min-height: 46px !important;
+            max-height: 46px;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
             resize: none;
-            line-height: 1.35;
-            white-space: pre-wrap;
+            line-height: 1.2;
+            white-space: normal;
             word-break: break-word;
+            overflow-wrap: anywhere;
+            scrollbar-gutter: stable;
+            padding-top: 8px;
+            padding-bottom: 8px;
             padding-right: 10px;
         }
         .compact-scroll-field::-webkit-scrollbar {

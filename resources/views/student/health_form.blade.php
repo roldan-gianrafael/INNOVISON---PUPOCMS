@@ -299,6 +299,28 @@
         textarea.form-control {
             min-height: 120px;
         }
+        .compact-scroll-field {
+            min-height: 58px !important;
+            max-height: 58px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            resize: none;
+            line-height: 1.35;
+            white-space: pre-wrap;
+            word-break: break-word;
+            padding-right: 10px;
+        }
+        .compact-scroll-field::-webkit-scrollbar {
+            width: 8px;
+        }
+        .compact-scroll-field::-webkit-scrollbar-thumb {
+            background: rgba(128, 0, 0, 0.28);
+            border-radius: 999px;
+        }
+        .compact-scroll-field::-webkit-scrollbar-track {
+            background: rgba(128, 0, 0, 0.06);
+            border-radius: 999px;
+        }
         .form-control:focus,
         .form-select:focus {
             border-color: rgba(128, 0, 0, 0.5);
@@ -820,9 +842,7 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Full Name<span class="required-mark">*</span></label>
-            <input type="text" class="form-control bg-light long-value-field"
-                value="{{ old('full_name', ($healthFormPrefill['full_name'] ?? '') !== '' ? $healthFormPrefill['full_name'] : trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name])))) }}"
-                readonly>
+            <textarea class="form-control bg-light api-prefill-field compact-scroll-field" rows="2" readonly>{{ old('full_name', ($healthFormPrefill['full_name'] ?? '') !== '' ? $healthFormPrefill['full_name'] : trim(implode(' ', array_filter([optional($linkedAdminProfile)->first_name ?: Auth::user()->first_name, optional($linkedAdminProfile)->middle_name, optional($linkedAdminProfile)->last_name ?: Auth::user()->last_name, optional($linkedAdminProfile)->suffix_name])))) }}</textarea>
         </div>
     </div>
 
@@ -846,18 +866,26 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Email Address<span class="required-mark">*</span></label>
-            <input type="email" name="email" class="form-control long-value-field {{ $lockedEmail ? 'bg-light api-prefill-field' : '' }}"
-                value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}"
-                {{ $lockedEmail ? 'readonly' : '' }} required>
+            @if($lockedEmail)
+                <textarea name="email" class="form-control api-prefill-field bg-light compact-scroll-field" rows="2" readonly required>{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}</textarea>
+            @else
+                <input type="email" name="email" class="form-control"
+                    value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}"
+                    required>
+            @endif
         </div>
     </div>
 
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Course / College<span class="required-mark">*</span></label>
-            <input type="text" name="course_college" class="form-control long-value-field {{ $lockedCourseCollege ? 'bg-light api-prefill-field' : '' }}"
-                value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}"
-                {{ $lockedCourseCollege ? 'readonly' : '' }} required>
+            @if($lockedCourseCollege)
+                <textarea name="course_college" class="form-control api-prefill-field bg-light compact-scroll-field" rows="2" readonly required>{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}</textarea>
+            @else
+                <input type="text" name="course_college" class="form-control"
+                    value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}"
+                    required>
+            @endif
         </div>
     </div>
 
@@ -892,9 +920,13 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Home Address<span class="required-mark">*</span></label>
-            <input type="text" name="home_address" class="form-control long-value-field {{ $lockedHomeAddress ? 'bg-light api-prefill-field' : '' }}"
-                value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}"
-                {{ $lockedHomeAddress ? 'readonly' : '' }} required>
+            @if($lockedHomeAddress)
+                <textarea name="home_address" class="form-control api-prefill-field bg-light compact-scroll-field" rows="2" readonly required>{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}</textarea>
+            @else
+                <input type="text" name="home_address" class="form-control"
+                    value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}"
+                    required>
+            @endif
         </div>
     </div>
 
@@ -970,9 +1002,13 @@
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Guardian Name<span class="required-mark">*</span></label>
-            <input type="text" name="guardian_name" class="form-control long-value-field {{ $lockedGuardianName ? 'bg-light api-prefill-field' : '' }}"
-                value="{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}"
-                {{ $lockedGuardianName ? 'readonly' : '' }} required>
+            @if($lockedGuardianName)
+                <textarea name="guardian_name" class="form-control api-prefill-field bg-light compact-scroll-field" rows="2" readonly required>{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}</textarea>
+            @else
+                <input type="text" name="guardian_name" class="form-control"
+                    value="{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}"
+                    required>
+            @endif
         </div>
     </div>
 

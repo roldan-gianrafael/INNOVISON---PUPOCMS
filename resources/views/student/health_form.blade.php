@@ -907,6 +907,15 @@
         </div>
     </div>
 
+     <div class="form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Age<span class="required-mark">*</span></label>
+            <input type="number" name="age" class="form-control {{ $lockedAge ? 'bg-light api-prefill-field' : '' }}"
+                value="{{ old('age', $healthFormPrefill['age'] ?? $calculatedAge) }}"
+                {{ $lockedAge ? 'readonly' : '' }} required>
+        </div>
+    </div>
+
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Weight</label>
@@ -917,15 +926,7 @@
         </div>
     </div>
 
-    <div class="form-row-wrapper">
-        <div class="form-row">
-            <label class="form-label">Age<span class="required-mark">*</span></label>
-            <input type="number" name="age" class="form-control {{ $lockedAge ? 'bg-light api-prefill-field' : '' }}"
-                value="{{ old('age', $healthFormPrefill['age'] ?? $calculatedAge) }}"
-                {{ $lockedAge ? 'readonly' : '' }} required>
-        </div>
-    </div>
-
+   
     <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Height</label>
@@ -1134,12 +1135,24 @@
                     <tr><th>Dose</th><th>Date Received</th><th>Brand</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>1st Dose</td><td><input type="date" name="vax_date_1" class="form-control form-control-sm" required></td><td><input type="text" name="vax_brand_1" class="form-control form-control-sm" required></td></tr>
-                    <tr><td>2nd Dose</td><td><input type="date" name="vax_date_2" class="form-control form-control-sm" required></td><td><input type="text" name="vax_brand_2" class="form-control form-control-sm" required></td></tr>
-                    <tr><td>Booster 1st Dose</td><td><input type="date" name="booster_date_1" class="form-control form-control-sm" required></td><td><input type="text" name="booster_brand_1" class="form-control form-control-sm" required></td></tr>
-                    <tr><td>Booster 2nd Dose</td><td><input type="date" name="booster_date_2" class="form-control form-control-sm" required></td><td><input type="text" name="booster_brand_2" class="form-control form-control-sm" required></td></tr>
+                    <tr><td>1st Dose</td><td><input type="date" name="vax_date_1" class="form-control form-control-sm" required></td><td><input type="text" name="vax_brand_1" class="form-control form-control-sm" list="vaccineBrandRecommendations" placeholder="Select or type brand" value="{{ old('vax_brand_1') }}" required></td></tr>
+                    <tr><td>2nd Dose</td><td><input type="date" name="vax_date_2" class="form-control form-control-sm" required></td><td><input type="text" name="vax_brand_2" class="form-control form-control-sm" list="vaccineBrandRecommendations" placeholder="Select or type brand" value="{{ old('vax_brand_2') }}" required></td></tr>
+                    <tr><td>Booster 1st Dose</td><td><input type="date" name="booster_date_1" class="form-control form-control-sm" required></td><td><input type="text" name="booster_brand_1" class="form-control form-control-sm" list="vaccineBrandRecommendations" placeholder="Select or type brand" value="{{ old('booster_brand_1') }}" required></td></tr>
+                    <tr><td>Booster 2nd Dose</td><td><input type="date" name="booster_date_2" class="form-control form-control-sm" required></td><td><input type="text" name="booster_brand_2" class="form-control form-control-sm" list="vaccineBrandRecommendations" placeholder="Select or type brand" value="{{ old('booster_brand_2') }}" required></td></tr>
                 </tbody>
             </table>
+            <datalist id="vaccineBrandRecommendations">
+                <option value="Pfizer-BioNTech"></option>
+                <option value="Moderna"></option>
+                <option value="Sinovac"></option>
+                <option value="AstraZeneca"></option>
+                <option value="Johnson & Johnson"></option>
+                <option value="Novavax"></option>
+                <option value="Sputnik V"></option>
+                <option value="Sinopharm"></option>
+                <option value="Covaxin"></option>
+                <option value="CanSinoBIO"></option>
+            </datalist>
         </div>
     </div>
     </div>

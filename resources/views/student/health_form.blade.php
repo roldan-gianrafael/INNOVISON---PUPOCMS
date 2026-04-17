@@ -282,6 +282,20 @@
             color: var(--clinic-text);
             margin-bottom: 8px;
         }
+        .emergency-label {
+            position: relative;
+            padding-left: 12px;
+        }
+        .emergency-label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 4px;
+            height: calc(100% - 4px);
+            border-radius: 999px;
+            background: var(--clinic-maroon);
+        }
         .required-mark {
             color: var(--clinic-maroon);
             font-weight: 800;
@@ -874,6 +888,7 @@
     $lockedCourseCollege = !empty($healthFormPrefill['course_college'] ?? '');
     $lockedBloodType = false;
     $lockedEmail = !empty($healthFormPrefill['email'] ?? '');
+    $lockedContactNumber = !empty($healthFormPrefill['contact_number'] ?? '');
     $lockedGuardianName = !empty($healthFormPrefill['guardian_name'] ?? '');
     $lockedCellphone = !empty($healthFormPrefill['cellphone'] ?? '');
     $selectedBloodType = old('blood_type', ($healthFormPrefill['blood_type'] ?? '') !== '' ? $healthFormPrefill['blood_type'] : 'Not Known');
@@ -1050,7 +1065,7 @@
 
     <div class="form-row-wrapper">
         <div class="form-row">
-            <label class="form-label">Emergency Contact Person<span class="required-mark">*</span></label>
+            <label class="form-label emergency-label">Emergency Contact Person<span class="required-mark">*</span></label>
             @if($lockedGuardianName)
                 <textarea name="guardian_name" class="form-control api-prefill-field bg-light expanded-display-field auto-grow-field" rows="2" readonly required>{{ old('guardian_name', $healthFormPrefill['guardian_name'] ?? '') }}</textarea>
             @else
@@ -1063,7 +1078,16 @@
 
     <div class="form-row-wrapper">
         <div class="form-row">
-            <label class="form-label">Emergency Contact Number<span class="required-mark">*</span></label>
+            <label class="form-label">Contact Number<span class="required-mark">*</span></label>
+            <input type="text" name="contact_no" class="form-control {{ $lockedContactNumber ? 'bg-light api-prefill-field' : '' }}"
+                value="{{ old('contact_no', $healthFormPrefill['contact_number'] ?? '') }}"
+                {{ $lockedContactNumber ? 'readonly' : '' }} required>
+        </div>
+    </div>
+
+    <div class="form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label emergency-label">Emergency Contact Number<span class="required-mark">*</span></label>
             <input type="text" name="cellphone" class="form-control {{ $lockedCellphone ? 'bg-light api-prefill-field' : '' }}"
                 value="{{ old('cellphone', $healthFormPrefill['cellphone'] ?? '') }}"
                 {{ $lockedCellphone ? 'readonly' : '' }} required>
@@ -1432,6 +1456,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('[name="civil_status"]'),
                 document.querySelector('[name="course_college"]'),
                 document.querySelector('[name="blood_type"]'),
+                document.querySelector('[name="contact_no"]'),
                 document.querySelector('[name="guardian_name"]'),
                 document.querySelector('[name="cellphone"]')
             ],
@@ -1562,6 +1587,7 @@ document.addEventListener('DOMContentLoaded', function() {
             civil_status: 1,
             course_college: 1,
             guardian_name: 1,
+            contact_no: 1,
             cellphone: 1,
             has_illness: 2,
             medical_history: 2,

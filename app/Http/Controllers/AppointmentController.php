@@ -195,6 +195,7 @@ class AppointmentController extends Controller
             'sex' => $resolvedSex,
             'civil_status' => $resolvedCivilStatus,
             'blood_type' => (string) (optional($healthProfile)->blood_type ?? 'Not Known'),
+            'contact_number' => trim((string) ($user->contact_no ?? data_get($applicantData, 'contactnumber') ?? '')),
             'guardian_name' => trim((string) (optional($healthProfile)->guardian_name ?? optional($linkedAdminProfile)->emergency_contact_person ?? '')),
             'cellphone' => trim((string) (
                 optional($healthProfile)->cellphone
@@ -868,6 +869,7 @@ public function storeHealthForm(Request $request)
         'civil_status'      => 'required|string',
         'course_college'    => 'required|string',
         'blood_type'        => 'required|string|max:20',
+        'contact_no'        => 'required|string|max:20',
         'guardian_name'     => 'required|string|max:255',
         'cellphone'         => 'required|string|max:20',
         
@@ -904,6 +906,8 @@ public function storeHealthForm(Request $request)
     $user = Auth::user();
     $normalizedHeight = $this->normalizeMeasurement($request->input('height'), 'cm');
     $normalizedWeight = $this->normalizeMeasurement($request->input('weight'), 'kg');
+    $user->contact_no = $request->input('contact_no');
+    $user->save();
 
     try {
         // 2. FILE HANDLING: I-save ang Photo at Signature sa storage

@@ -209,8 +209,22 @@
         border: 4px solid rgba(22, 163, 74, 0.08);
         box-shadow: 0 18px 38px rgba(15, 23, 42, 0.16);
         transform: scale(0.84);
-        animation: submitCircleFill 0.42s ease forwards;
+        animation: submitCircleSettle 0.42s ease forwards;
         animation-delay: 0.92s;
+    }
+    .health-submit-logo-shell {
+        width: 68px;
+        height: 68px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #7f1d1d;
+        box-shadow: 0 10px 20px rgba(127, 29, 29, 0.18);
+        opacity: 1;
+        transform: scale(1);
+        animation: submitLogoSettleOut 0.24s ease forwards;
+        animation-delay: 1s;
     }
     .health-submit-ring {
         position: absolute;
@@ -229,13 +243,18 @@
         animation: submitRingDraw 0.9s ease forwards;
     }
     .health-submit-logo {
-        width: 62px;
-        height: 62px;
+        width: 42px;
+        height: 42px;
         object-fit: contain;
+        filter: brightness(0) invert(1);
+    }
+    .health-submit-check {
+        position: absolute;
+        width: 54px;
+        height: 54px;
         opacity: 0;
         transform: scale(0.6);
-        filter: drop-shadow(0 6px 12px rgba(255, 255, 255, 0.18));
-        animation: submitLogoReveal 0.34s ease forwards;
+        animation: submitCheckReveal 0.34s ease forwards;
         animation-delay: 1.18s;
     }
     .health-submit-overlay.is-hiding .health-submit-ring circle {
@@ -244,8 +263,11 @@
     .health-submit-overlay.is-hiding .health-submit-circle {
         animation: submitCircleClose 0.28s ease forwards;
     }
-    .health-submit-overlay.is-hiding .health-submit-logo {
-        animation: submitLogoHide 0.2s ease forwards;
+    .health-submit-overlay.is-hiding .health-submit-check {
+        animation: submitCheckHide 0.18s ease forwards;
+    }
+    .health-submit-overlay.is-hiding .health-submit-logo-shell {
+        animation: submitLogoReturn 0.24s ease forwards;
     }
     .health-submit-subtext {
         font-size: 14px;
@@ -268,7 +290,7 @@
             stroke-dashoffset: 0;
         }
     }
-    @keyframes submitCircleFill {
+    @keyframes submitCircleSettle {
         0% {
             transform: scale(0.84);
             background: #ffffff;
@@ -276,16 +298,16 @@
         }
         55% {
             transform: scale(1.04);
-            background: #22c55e;
-            border-color: #22c55e;
+            background: #ffffff;
+            border-color: rgba(22, 163, 74, 0.18);
         }
         100% {
             transform: scale(1);
-            background: #16a34a;
-            border-color: #16a34a;
+            background: #ffffff;
+            border-color: rgba(22, 163, 74, 0.2);
         }
     }
-    @keyframes submitLogoReveal {
+    @keyframes submitCheckReveal {
         0% {
             opacity: 0;
             transform: scale(0.6);
@@ -295,7 +317,17 @@
             transform: scale(1);
         }
     }
-    @keyframes submitLogoHide {
+    @keyframes submitLogoSettleOut {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.78);
+        }
+    }
+    @keyframes submitCheckHide {
         0% {
             opacity: 1;
             transform: scale(1);
@@ -303,6 +335,18 @@
         100% {
             opacity: 0;
             transform: scale(0.72);
+        }
+    }
+    @keyframes submitLogoReturn {
+        0% {
+            opacity: 0;
+            transform: scale(0.82);
+            background: #16a34a;
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+            background: #7f1d1d;
         }
     }
     @keyframes submitRingReverse {
@@ -318,8 +362,8 @@
     @keyframes submitCircleClose {
         0% {
             transform: scale(1);
-            background: #16a34a;
-            border-color: #16a34a;
+            background: #ffffff;
+            border-color: rgba(22, 163, 74, 0.2);
         }
         100% {
             transform: scale(0.82);
@@ -506,7 +550,12 @@
                     <svg class="health-submit-ring" viewBox="0 0 120 120" aria-hidden="true">
                         <circle cx="60" cy="60" r="54"></circle>
                     </svg>
-                    <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="health-submit-logo">
+                    <div class="health-submit-logo-shell">
+                        <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="health-submit-logo">
+                    </div>
+                    <svg class="health-submit-check" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"></path>
+                    </svg>
                 </div>
                 <p class="health-submit-subtext">Your record has been received and added to your account.</p>
             </div>

@@ -532,9 +532,101 @@
 .form-row-wrapper {
     margin-bottom: 10px;
 }
+.step-one-shell {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 18px;
+}
+.step-one-panel {
+    border: 1px solid rgba(128, 0, 0, 0.12);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(249,245,246,0.96));
+    padding: 22px 22px 12px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+}
+.step-one-panel.verified {
+    background: linear-gradient(180deg, rgba(248,250,252,0.98), rgba(241,245,249,0.96));
+}
+.step-one-panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(128, 0, 0, 0.1);
+}
+.step-one-panel-title h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--clinic-maroon);
+}
+.step-one-panel-title span {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--clinic-muted);
+}
+.step-panel-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 18px;
+}
+.step-panel {
+    border: 1px solid rgba(128, 0, 0, 0.12);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(249,245,246,0.96));
+    padding: 22px 22px 16px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+}
+.step-panel.full {
+    grid-column: 1 / -1;
+}
+.step-panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(128, 0, 0, 0.1);
+}
+.step-panel-title h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--clinic-maroon);
+}
+.step-panel-title span {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--clinic-muted);
+}
+.step-context-note {
+    margin-top: 16px;
+    border-radius: 18px;
+    padding: 14px 16px;
+    background: rgba(128, 0, 0, 0.05);
+    border: 1px solid rgba(128, 0, 0, 0.1);
+    color: var(--clinic-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
 
 /* Mobile */
 @media (max-width: 768px) {
+    .step-one-shell {
+        grid-template-columns: 1fr;
+    }
+    .step-panel-grid {
+        grid-template-columns: 1fr;
+    }
     .form-row {
         grid-template-columns: 1fr;
     }
@@ -663,6 +755,9 @@
                     Please provide complete and truthful information. Type <strong>N/A</strong> or <strong>NONE</strong>
                     for fields that do not apply to you. Required fields are marked with a maroon asterisk.
                 </p>
+                <div class="step-context-note">
+                    Some fields were auto-filled from verified school records and are locked for consistency. The remaining fields are for your personal health intake details.
+                </div>
             </div>
         </div>
         <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
@@ -687,9 +782,14 @@
     $bloodTypeOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Not Known'];
 @endphp
 
-<div class="row mt-4">
+<div class="step-one-shell">
+    <div class="step-one-panel verified">
+        <div class="step-one-panel-title">
+            <h3>Verified Student Record</h3>
+            <span>Auto-filled</span>
+        </div>
 
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Full Name<span class="required-mark">*</span></label>
             <input type="text" class="form-control bg-light"
@@ -698,7 +798,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">PUP Student No.<span class="required-mark">*</span></label>
             <input type="text" class="form-control bg-light"
@@ -706,16 +806,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
-        <div class="form-row">
-            <label class="form-label">Home Address<span class="required-mark">*</span></label>
-            <input type="text" name="home_address" class="form-control"
-                value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}"
-                {{ $lockedHomeAddress ? 'readonly' : '' }} required>
-        </div>
-    </div>
-
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">School Year</label>
             <input type="text" name="school_year" class="form-control"
@@ -724,27 +815,25 @@
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
-            <label class="form-label">Height</label>
-            <input type="text" name="height" class="form-control"
-                value="{{ old('height', $healthFormPrefill['height'] ?? '') }}"
-                placeholder="e.g. 170 cm"
-                {{ $lockedHeight ? 'readonly' : '' }} required>
+            <label class="form-label">Email Address<span class="required-mark">*</span></label>
+            <input type="email" name="email" class="form-control"
+                value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}"
+                {{ $lockedEmail ? 'readonly' : '' }} required>
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
-            <label class="form-label">Weight</label>
-            <input type="text" name="weight" class="form-control"
-                value="{{ old('weight', $healthFormPrefill['weight'] ?? '') }}"
-                placeholder="e.g. 65 kg"
-                {{ $lockedWeight ? 'readonly' : '' }} required>
+            <label class="form-label">Course / College<span class="required-mark">*</span></label>
+            <input type="text" name="course_college" class="form-control"
+                value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}"
+                {{ $lockedCourseCollege ? 'readonly' : '' }} required>
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Birthday</label>
             <input type="date" name="birthday" class="form-control"
@@ -753,16 +842,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
-        <div class="form-row">
-            <label class="form-label">Age<span class="required-mark">*</span></label>
-            <input type="number" name="age" class="form-control"
-                value="{{ old('age', $healthFormPrefill['age'] ?? $calculatedAge) }}"
-                {{ $lockedAge ? 'readonly' : '' }} required>
-        </div>
-    </div>
-
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Sex<span class="required-mark">*</span></label>
             <select name="sex" class="form-select" {{ $lockedSex ? 'disabled' : '' }} required>
@@ -774,8 +854,53 @@
             @endif
         </div>
     </div>
+    </div>
 
-    <div class="col-md-6 form-row-wrapper">
+    <div class="step-one-panel">
+        <div class="step-one-panel-title">
+            <h3>Personal Information</h3>
+            <span>Review Details</span>
+        </div>
+
+    <div class="form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Home Address<span class="required-mark">*</span></label>
+            <input type="text" name="home_address" class="form-control"
+                value="{{ old('home_address', $healthFormPrefill['home_address'] ?? '') }}"
+                {{ $lockedHomeAddress ? 'readonly' : '' }} required>
+        </div>
+    </div>
+
+    <div class="form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Weight</label>
+            <input type="text" name="weight" class="form-control"
+                value="{{ old('weight', $healthFormPrefill['weight'] ?? '') }}"
+                placeholder="e.g. 65 kg"
+                {{ $lockedWeight ? 'readonly' : '' }} required>
+        </div>
+    </div>
+
+    <div class="form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Age<span class="required-mark">*</span></label>
+            <input type="number" name="age" class="form-control"
+                value="{{ old('age', $healthFormPrefill['age'] ?? $calculatedAge) }}"
+                {{ $lockedAge ? 'readonly' : '' }} required>
+        </div>
+    </div>
+
+    <div class="form-row-wrapper">
+        <div class="form-row">
+            <label class="form-label">Height</label>
+            <input type="text" name="height" class="form-control"
+                value="{{ old('height', $healthFormPrefill['height'] ?? '') }}"
+                placeholder="e.g. 170 cm"
+                {{ $lockedHeight ? 'readonly' : '' }} required>
+        </div>
+    </div>
+
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Civil Status<span class="required-mark">*</span></label>
             <select name="civil_status" class="form-select" {{ $lockedCivilStatus ? 'disabled' : '' }} required>
@@ -789,16 +914,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
-        <div class="form-row">
-            <label class="form-label">Course / College<span class="required-mark">*</span></label>
-            <input type="text" name="course_college" class="form-control"
-                value="{{ old('course_college', $healthFormPrefill['course_college'] ?? Auth::user()->course) }}"
-                {{ $lockedCourseCollege ? 'readonly' : '' }} required>
-        </div>
-    </div>
-
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Blood Type</label>
             <select name="blood_type" class="form-select" {{ $lockedBloodType ? 'disabled' : '' }} required>
@@ -814,16 +930,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
-        <div class="form-row">
-            <label class="form-label">Email Address<span class="required-mark">*</span></label>
-            <input type="email" name="email" class="form-control"
-                value="{{ old('email', $healthFormPrefill['email'] ?? Auth::user()->email) }}"
-                {{ $lockedEmail ? 'readonly' : '' }} required>
-        </div>
-    </div>
-
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Guardian Name<span class="required-mark">*</span></label>
             <input type="text" name="guardian_name" class="form-control"
@@ -832,7 +939,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 form-row-wrapper">
+    <div class="form-row-wrapper">
         <div class="form-row">
             <label class="form-label">Phone Number<span class="required-mark">*</span></label>
             <input type="text" name="cellphone" class="form-control"
@@ -840,12 +947,18 @@
                 {{ $lockedCellphone ? 'readonly' : '' }} required>
         </div>
     </div>
-
+    </div>
 </div>
 
 </section>
 
     <section class="form-step" data-step="2">
+    <div class="step-panel-grid">
+    <div class="step-panel">
+        <div class="step-panel-title">
+            <h3>Medical Conditions</h3>
+            <span>Health History</span>
+        </div>
     <div class="row mt-3">
         <div class="col-12 mb-2">
             <label class="form-label">1. Do you need medical attention or has known medical illness?</label>
@@ -901,7 +1014,13 @@
                     >
                 </div></div>
     </div>
+    </div>
 
+    <div class="step-panel">
+        <div class="step-panel-title">
+            <h3>Disability and Allergies</h3>
+            <span>Supporting Details</span>
+        </div>
     <div class="row mt-4">
         <div class="col-12 mb-2">
             <label class="form-label">4. Do you have disability?</label>
@@ -959,10 +1078,18 @@
             </div>
         </div>
     </div>
+    </div>
+    </div>
 
     </section>
 
     <section class="form-step" data-step="3">
+    <div class="step-panel-grid">
+    <div class="step-panel full">
+        <div class="step-panel-title">
+            <h3>Vaccination History</h3>
+            <span>Required Record</span>
+        </div>
     <div class="row mt-4">
         <div class="col-md-12 mb-3">
             <label class="form-label">COVID-19 Vaccination History:</label>
@@ -978,6 +1105,8 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    </div>
     </div>
 
     </section>

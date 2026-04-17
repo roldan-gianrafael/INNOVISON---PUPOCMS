@@ -172,6 +172,10 @@ class AppointmentController extends Controller
                 data_get($applicantData, 'middle_name') ?: data_get($applicantData, 'middlename'),
                 data_get($applicantData, 'last_name') ?: data_get($applicantData, 'lastname'),
             ]))) ?: trim((string) $user->name),
+            'first_name' => trim((string) (optional($linkedAdminProfile)->first_name ?? $user->first_name ?? data_get($applicantData, 'first_name') ?? data_get($applicantData, 'firstname') ?? '')),
+            'middle_name' => trim((string) (optional($linkedAdminProfile)->middle_name ?? '')),
+            'last_name' => trim((string) (optional($linkedAdminProfile)->last_name ?? $user->last_name ?? data_get($applicantData, 'last_name') ?? data_get($applicantData, 'lastname') ?? '')),
+            'suffix_name' => trim((string) (optional($linkedAdminProfile)->suffix_name ?? '')),
             'student_id' => (string) (optional($healthProfile)->student_id ?? $user->student_id ?? ''),
             'student_number' => (string) (
                 data_get($applicantData, 'student_number')

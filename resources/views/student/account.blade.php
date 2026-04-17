@@ -735,22 +735,22 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">First Name</label>
-                    <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $linkedAdminProfile->first_name) }}" disabled>
+                    <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $accountProfileData['first_name'] ?? $linkedAdminProfile->first_name) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Middle Name</label>
-                    <input type="text" name="middle_name" class="form-control editable-input" value="{{ old('middle_name', $linkedAdminProfile->middle_name) }}" disabled>
+                    <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name', $accountProfileData['middle_name'] ?? $linkedAdminProfile->middle_name) }}" disabled>
                 </div>
             </div>
 
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Last Name</label>
-                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $linkedAdminProfile->last_name) }}" disabled>
+                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $accountProfileData['last_name'] ?? $linkedAdminProfile->last_name) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Suffix Name</label>
-                    <input type="text" name="suffix_name" class="form-control editable-input" value="{{ old('suffix_name', $linkedAdminProfile->suffix_name) }}" disabled>
+                    <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $accountProfileData['suffix_name'] ?? $linkedAdminProfile->suffix_name) }}" disabled>
                 </div>
             </div>
 
@@ -761,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div>
                     <label class="input-label">Contact Number</label>
-                    <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $user->contact_no) }}" disabled>
+                    <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no) }}" disabled>
                 </div>
             </div>
 
@@ -810,10 +810,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     <input type="text" name="office" class="form-control editable-input" value="{{ old('office', $accountProfileData['office'] ?? $linkedAdminProfile->office) }}" disabled>
                 </div>
                 @endif
-                <div>
-                    <label class="input-label">Access Level</label>
-                    <input type="text" name="access_level" class="form-control" value="{{ old('access_level', $linkedAdminProfile->access_level) }}" disabled>
-                </div>
             </div>
         @endif
 

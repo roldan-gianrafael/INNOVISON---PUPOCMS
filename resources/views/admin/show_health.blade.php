@@ -355,9 +355,7 @@ for the improvement of healthcare services.
     <div class="signature-row">
     {{-- Parent Signature Block --}}
     <div class="sig-block">
-        <div style="padding-bottom: 5px; font-weight: bold; height: 60px; display: flex; align-items: flex-end; justify-content: center;">
-            {{ strtoupper($profile->guardian_name ?? 'PARENT/GUARDIAN') }}
-        </div>
+        <div style="height: 60px;"></div>
         <div class="sig-line">Parent/Guardian Signature</div>
     </div>
 

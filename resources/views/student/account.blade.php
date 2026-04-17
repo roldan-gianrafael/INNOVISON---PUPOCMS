@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div>
                     <label class="input-label">Contact Number</label>
-                    <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $accountProfileData['cellphone'] ?? $user->contact_no) }}" disabled>
+                    <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $user->contact_no) }}" disabled>
                 </div>
             </div>
 

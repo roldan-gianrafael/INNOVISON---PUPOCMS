@@ -198,8 +198,7 @@ class AppointmentController extends Controller
             'guardian_name' => trim((string) (optional($healthProfile)->guardian_name ?? optional($linkedAdminProfile)->emergency_contact_person ?? '')),
             'cellphone' => trim((string) (
                 optional($healthProfile)->cellphone
-                ?: data_get($applicantData, 'contactnumber')
-                ?: (optional($linkedAdminProfile)->emergency_contact_no ?: ($user->contact_no ?? ''))
+                ?: (optional($linkedAdminProfile)->emergency_contact_no ?? '')
             )),
             'landline' => (string) (optional($healthProfile)->landline ?? ''),
             'office' => trim((string) (optional($linkedAdminProfile)->office ?? '')),

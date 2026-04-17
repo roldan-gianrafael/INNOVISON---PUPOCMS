@@ -1385,6 +1385,18 @@ document.addEventListener('DOMContentLoaded', function() {
         parent.appendChild(note);
     };
 
+    const clearRadioGroupInvalidState = (field) => {
+        if (!field || field.type !== 'radio') {
+            return;
+        }
+
+        const radios = document.querySelectorAll(`input[type="radio"][name="${field.name}"]`);
+        radios.forEach((radio) => radio.classList.remove('field-invalid'));
+
+        const parent = field.closest('.form-row, .col-md-12, .col-12, .upload-box, .signature-pad-wrap') || field.parentElement;
+        parent?.querySelectorAll('.field-error-note.dynamic').forEach((note) => note.remove());
+    };
+
     const validateStep = (stepNumber, markErrors = true) => {
         const section = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
         if (!section) {
@@ -1614,7 +1626,8 @@ document.addEventListener('DOMContentLoaded', function() {
             requestAnimationFrame(() => resizeSignaturePad());
         }
 
-        document.querySelector('.stepper-shell')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const scrollTarget = document.querySelector('.intro-panel') || document.querySelector('.form-card') || document.querySelector('.stepper-shell');
+        scrollTarget?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     prevStepBtn?.addEventListener('click', function () {
@@ -1711,8 +1724,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Listeners
-    illnessRadios.forEach(r => r.addEventListener('change', toggleIllness));
-    disabilityRadios.forEach(r => r.addEventListener('change', toggleDisability));
+    illnessRadios.forEach((radio) => radio.addEventListener('change', function () {
+        clearRadioGroupInvalidState(this);
+        toggleIllness();
+    }));
+    disabilityRadios.forEach((radio) => radio.addEventListener('change', function () {
+        clearRadioGroupInvalidState(this);
+        toggleDisability();
+    }));
     noAllergiesCheck.addEventListener('change', toggleAllergies);
 
     // Initial Run

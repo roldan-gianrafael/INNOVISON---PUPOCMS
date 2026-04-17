@@ -167,6 +167,88 @@
 
     /* --- NOTIFICATIONS --- */
     .alert-success { background: #dcfce7; color: #15803d; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; border: 1px solid #bbf7d0; }
+    .health-submit-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(8px);
+        animation: overlayFadeIn 0.28s ease;
+    }
+    .health-submit-overlay.is-hiding {
+        animation: overlayFadeOut 0.3s ease forwards;
+    }
+    .health-submit-overlay-card {
+        text-align: center;
+        padding: 30px 24px;
+        max-width: 420px;
+    }
+    .health-submit-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1f2937;
+        margin: 0 0 22px;
+        letter-spacing: -0.02em;
+    }
+    .health-submit-circle {
+        width: 132px;
+        height: 132px;
+        margin: 0 auto 18px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at 30% 30%, #9ca3af 0%, #6b7280 70%);
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.16);
+        transform: scale(0.84);
+        animation: submitCircleResolve 0.9s ease forwards;
+    }
+    .health-submit-check {
+        width: 54px;
+        height: 54px;
+        opacity: 0;
+        transform: scale(0.6);
+        animation: submitCheckReveal 0.34s ease forwards;
+        animation-delay: 0.62s;
+    }
+    .health-submit-subtext {
+        font-size: 14px;
+        color: #4b5563;
+        margin: 0;
+    }
+    @keyframes overlayFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes overlayFadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; visibility: hidden; }
+    }
+    @keyframes submitCircleResolve {
+        0% {
+            transform: scale(0.84);
+            background: radial-gradient(circle at 30% 30%, #9ca3af 0%, #6b7280 70%);
+        }
+        55% {
+            transform: scale(1.04);
+        }
+        100% {
+            transform: scale(1);
+            background: radial-gradient(circle at 30% 30%, #34d399 0%, #16a34a 72%);
+        }
+    }
+    @keyframes submitCheckReveal {
+        0% {
+            opacity: 0;
+            transform: scale(0.6);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
     .notif-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
     .notif-item:last-child { border-bottom: none; }
     .notif-icon { font-size: 16px; }
@@ -326,7 +408,21 @@
 @endphp
 <div class="container" style="padding: 40px 20px;">
 
-    @if(session('success'))
+    @if(session('health_profile_submitted'))
+        <div class="health-submit-overlay" id="healthSubmitOverlay">
+            <div class="health-submit-overlay-card">
+                <h2 class="health-submit-title">Health Profile Submitted</h2>
+                <div class="health-submit-circle" aria-hidden="true">
+                    <svg class="health-submit-check" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"></path>
+                    </svg>
+                </div>
+                <p class="health-submit-subtext">Your record has been received and added to your account.</p>
+            </div>
+        </div>
+    @endif
+
+    @if(session('success') && !session('health_profile_submitted'))
         <div class="alert-success">
             {{ session('success') }}
         </div>
@@ -505,7 +601,23 @@
         </a>
         <span class="health-status-note">Required for clinic consultations.</span>
     @endif
-</div>   
+</div>
+
+@if(session('health_profile_submitted'))
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const overlay = document.getElementById('healthSubmitOverlay');
+    if (!overlay) {
+        return;
+    }
+
+    window.setTimeout(() => {
+        overlay.classList.add('is-hiding');
+        window.setTimeout(() => overlay.remove(), 320);
+    }, 2200);
+});
+</script>
+@endif
       
 {{-- Full Profile Widget --}}
             <div class="widget-card">

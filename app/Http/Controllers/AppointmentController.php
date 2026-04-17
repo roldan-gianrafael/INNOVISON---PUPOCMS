@@ -971,7 +971,9 @@ public function storeHealthForm(Request $request)
             'user_agent'  => $request->userAgent(),
         ]);
 
-        return redirect()->route('print.health.form')->with('success', 'Health Profile saved! You can now print your form.');
+        return redirect('/student/account')
+            ->with('health_profile_submitted', true)
+            ->with('success', 'Health Profile saved successfully.');
 
     } catch (\Exception $e) {
    

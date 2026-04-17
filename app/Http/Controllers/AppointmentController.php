@@ -786,7 +786,7 @@ public function showHealthForm()
         'student_id' => (string) ($user->student_id ?? ''),
         'student_number' => (string) (
             data_get($applicantData, 'student_number')
-            ?: ($user->student_number ?: '')
+            ?: ($user->student_number ?: ($user->student_id ?: ''))
         ),
         'email' => (string) (data_get($applicantData, 'email') ?: ($user->email ?? '')),
         'course_college' => trim(implode(' - ', array_filter([

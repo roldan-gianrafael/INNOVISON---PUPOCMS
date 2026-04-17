@@ -198,12 +198,32 @@
         height: 132px;
         margin: 0 auto 18px;
         border-radius: 999px;
-        display: grid;
-        place-items: center;
-        background: radial-gradient(circle at 30% 30%, #9ca3af 0%, #6b7280 70%);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        border: 4px solid rgba(22, 163, 74, 0.08);
         box-shadow: 0 18px 38px rgba(15, 23, 42, 0.16);
         transform: scale(0.84);
-        animation: submitCircleResolve 0.9s ease forwards;
+        animation: submitCircleFill 0.42s ease forwards;
+        animation-delay: 0.92s;
+    }
+    .health-submit-ring {
+        position: absolute;
+        inset: -6px;
+        width: calc(100% + 12px);
+        height: calc(100% + 12px);
+        transform: rotate(-90deg);
+    }
+    .health-submit-ring circle {
+        fill: none;
+        stroke: #16a34a;
+        stroke-width: 6;
+        stroke-linecap: round;
+        stroke-dasharray: 339.3;
+        stroke-dashoffset: 339.3;
+        animation: submitRingDraw 0.9s ease forwards;
     }
     .health-submit-check {
         width: 54px;
@@ -211,7 +231,7 @@
         opacity: 0;
         transform: scale(0.6);
         animation: submitCheckReveal 0.34s ease forwards;
-        animation-delay: 0.62s;
+        animation-delay: 1.18s;
     }
     .health-submit-subtext {
         font-size: 14px;
@@ -226,17 +246,29 @@
         from { opacity: 1; }
         to { opacity: 0; visibility: hidden; }
     }
-    @keyframes submitCircleResolve {
+    @keyframes submitRingDraw {
+        0% {
+            stroke-dashoffset: 339.3;
+        }
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+    @keyframes submitCircleFill {
         0% {
             transform: scale(0.84);
-            background: radial-gradient(circle at 30% 30%, #9ca3af 0%, #6b7280 70%);
+            background: #ffffff;
+            border-color: rgba(22, 163, 74, 0.12);
         }
         55% {
             transform: scale(1.04);
+            background: #22c55e;
+            border-color: #22c55e;
         }
         100% {
             transform: scale(1);
-            background: radial-gradient(circle at 30% 30%, #34d399 0%, #16a34a 72%);
+            background: #16a34a;
+            border-color: #16a34a;
         }
     }
     @keyframes submitCheckReveal {
@@ -411,8 +443,11 @@
     @if(session('health_profile_submitted'))
         <div class="health-submit-overlay" id="healthSubmitOverlay">
             <div class="health-submit-overlay-card">
-                <h2 class="health-submit-title">Health Profile Submitted</h2>
+                <h2 class="health-submit-title">Health Form Submitted</h2>
                 <div class="health-submit-circle" aria-hidden="true">
+                    <svg class="health-submit-ring" viewBox="0 0 120 120" aria-hidden="true">
+                        <circle cx="60" cy="60" r="54"></circle>
+                    </svg>
                     <svg class="health-submit-check" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 6L9 17l-5-5"></path>
                     </svg>

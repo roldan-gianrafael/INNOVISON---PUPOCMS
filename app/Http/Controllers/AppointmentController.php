@@ -117,10 +117,10 @@ class AppointmentController extends Controller
 
         $resolvedSex = $this->normalizeSexValue(
             data_get($applicantData, 'sex')
-            ?: ($healthProfile->sex ?? $user->gender ?? optional($linkedAdminProfile)->gender ?? '')
+            ?: (optional($healthProfile)->sex ?? $user->gender ?? optional($linkedAdminProfile)->gender ?? '')
         );
 
-        $resolvedCivilStatus = trim((string) ($healthProfile->civil_status ?? optional($linkedAdminProfile)->civil_status ?? ''));
+        $resolvedCivilStatus = trim((string) (optional($healthProfile)->civil_status ?? optional($linkedAdminProfile)->civil_status ?? ''));
         $resolvedCivilStatus = in_array($resolvedCivilStatus, ['Single', 'Married'], true) ? $resolvedCivilStatus : 'Single';
 
         $resolvedBirthday = (string) (
@@ -138,7 +138,7 @@ class AppointmentController extends Controller
             }
         }
 
-        $resolvedAge = $healthProfile->age ?? $calculatedAge;
+        $resolvedAge = optional($healthProfile)->age ?? $calculatedAge;
         if ($resolvedBirthday !== '') {
             try {
                 $resolvedAge = \Carbon\Carbon::parse($resolvedBirthday)->age;
@@ -160,18 +160,18 @@ class AppointmentController extends Controller
                 data_get($applicantData, 'middle_name') ?: data_get($applicantData, 'middlename'),
                 data_get($applicantData, 'last_name') ?: data_get($applicantData, 'lastname'),
             ]))) ?: trim((string) $user->name),
-            'student_id' => (string) ($healthProfile->student_id ?? $user->student_id ?? ''),
+            'student_id' => (string) (optional($healthProfile)->student_id ?? $user->student_id ?? ''),
             'student_number' => (string) (
                 data_get($applicantData, 'student_number')
-                ?: ($healthProfile->student_number ?? $user->student_number ?: ($user->student_id ?: ''))
+                ?: (optional($healthProfile)->student_number ?? $user->student_number ?: ($user->student_id ?: ''))
             ),
             'email' => (string) (
-                $healthProfile->user->email
+                optional(optional($healthProfile)->user)->email
                 ?? data_get($applicantData, 'email')
                 ?: ($user->email ?? optional($linkedAdminProfile)->email ?? '')
             ),
             'course_college' => trim((string) (
-                $healthProfile->course_college
+                optional($healthProfile)->course_college
                 ?? trim(implode(' - ', array_filter([
                     data_get($applicantData, 'program.code'),
                     data_get($applicantData, 'program.name'),
@@ -183,25 +183,25 @@ class AppointmentController extends Controller
                 ?: ($user->course ?? '')
             )),
             'home_address' => trim((string) (
-                $healthProfile->home_address
+                optional($healthProfile)->home_address
                 ?: ($resolvedAddress !== '' ? $resolvedAddress : trim((string) (optional($linkedAdminProfile)->address ?? '')))
             )),
-            'zipcode' => trim((string) ($healthProfile->zipcode ?? data_get($applicantData, 'postal_code') ?? '')),
-            'school_year' => (string) ($healthProfile->school_year ?? $this->resolveSchoolYear($applicantData, $user)),
-            'height' => (string) ($healthProfile->height ?? $user->height ?? ''),
-            'weight' => (string) ($healthProfile->weight ?? $user->weight ?? ''),
+            'zipcode' => trim((string) (optional($healthProfile)->zipcode ?? data_get($applicantData, 'postal_code') ?? '')),
+            'school_year' => (string) (optional($healthProfile)->school_year ?? $this->resolveSchoolYear($applicantData, $user)),
+            'height' => (string) (optional($healthProfile)->height ?? $user->height ?? ''),
+            'weight' => (string) (optional($healthProfile)->weight ?? $user->weight ?? ''),
             'birthday' => $resolvedBirthday,
             'age' => $resolvedAge,
             'sex' => $resolvedSex,
             'civil_status' => $resolvedCivilStatus,
-            'blood_type' => (string) ($healthProfile->blood_type ?? 'Not Known'),
-            'guardian_name' => trim((string) ($healthProfile->guardian_name ?? optional($linkedAdminProfile)->emergency_contact_person ?? '')),
+            'blood_type' => (string) (optional($healthProfile)->blood_type ?? 'Not Known'),
+            'guardian_name' => trim((string) (optional($healthProfile)->guardian_name ?? optional($linkedAdminProfile)->emergency_contact_person ?? '')),
             'cellphone' => trim((string) (
-                $healthProfile->cellphone
+                optional($healthProfile)->cellphone
                 ?: data_get($applicantData, 'contactnumber')
                 ?: (optional($linkedAdminProfile)->emergency_contact_no ?: ($user->contact_no ?? ''))
             )),
-            'landline' => (string) ($healthProfile->landline ?? ''),
+            'landline' => (string) (optional($healthProfile)->landline ?? ''),
             'office' => trim((string) (optional($linkedAdminProfile)->office ?? '')),
             'access_level' => trim((string) (optional($linkedAdminProfile)->access_level ?? '')),
         ];

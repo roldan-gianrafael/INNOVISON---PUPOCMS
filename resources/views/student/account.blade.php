@@ -566,7 +566,7 @@
                 @endif
             </div>
             
-            {{-- Notification Div (Nandito pa rin) --}}
+            {{-- Notification Div --}}
             <div class="widget-card">
                 <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Notifications</div>
                 @forelse($notifications as $notif)

@@ -1397,6 +1397,17 @@ document.addEventListener('DOMContentLoaded', function() {
         parent?.querySelectorAll('.field-error-note.dynamic').forEach((note) => note.remove());
     };
 
+    const clearSingleFieldInvalidState = (field) => {
+        if (!field) {
+            return;
+        }
+
+        field.classList.remove('field-invalid');
+
+        const parent = field.closest('.form-row, .col-md-12, .col-12, .upload-box, .signature-pad-wrap') || field.parentElement;
+        parent?.querySelectorAll('.field-error-note.dynamic').forEach((note) => note.remove());
+    };
+
     const validateStep = (stepNumber, markErrors = true) => {
         const section = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
         if (!section) {
@@ -1733,6 +1744,33 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleDisability();
     }));
     noAllergiesCheck.addEventListener('change', toggleAllergies);
+
+    document.querySelectorAll('input, select, textarea').forEach((field) => {
+        const eventName = field.tagName === 'SELECT' || field.type === 'date' || field.type === 'file' ? 'change' : 'input';
+
+        field.addEventListener(eventName, function () {
+            if (this.type === 'radio') {
+                clearRadioGroupInvalidState(this);
+                return;
+            }
+
+            if (this.type === 'checkbox') {
+                clearSingleFieldInvalidState(this);
+                return;
+            }
+
+            if (this.type === 'file') {
+                if (this.files && this.files.length > 0) {
+                    clearSingleFieldInvalidState(this);
+                }
+                return;
+            }
+
+            if (String(this.value || '').trim() !== '') {
+                clearSingleFieldInvalidState(this);
+            }
+        });
+    });
 
     // Initial Run
     toggleIllness();

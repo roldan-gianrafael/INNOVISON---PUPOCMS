@@ -319,6 +319,10 @@
             font-weight: 700;
             margin-top: 6px;
         }
+        .form-check-input:checked {
+            background-color: #800000;
+            border-color: #800000;
+        }
         .form-control.bg-light {
             background: #f2f4f7 !important;
             border-color: #dbe0e7;
@@ -374,6 +378,11 @@
             gap: 12px;
             flex-wrap: wrap;
             align-items: center;
+        }
+        .signature-toolbar .signature-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         .signature-toolbar .signature-btn {
             border: 1px solid rgba(128, 0, 0, 0.18);
@@ -1017,7 +1026,10 @@
                         </div>
                         <div class="signature-toolbar">
                             <span style="color:#6b7280; font-size:0.85rem;">Use mouse, touch, or stylus.</span>
-                            <button type="button" class="signature-btn" id="clearSignaturePad">Clear Signature</button>
+                            <div class="signature-actions">
+                                <button type="button" class="signature-btn" id="undoSignaturePad">Undo</button>
+                                <button type="button" class="signature-btn" id="clearSignaturePad">Clear Signature</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1056,6 +1068,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const signatureDrawn = document.getElementById('digitalSignatureDrawn');
     const signaturePad = document.getElementById('signaturePad');
     const clearSignaturePadBtn = document.getElementById('clearSignaturePad');
+    const undoSignaturePadBtn = document.getElementById('undoSignaturePad');
     const signatureErrorNote = document.getElementById('signatureErrorNote');
     const stepDescriptions = {
         1: {
@@ -1077,6 +1090,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     const attemptedSteps = new Set();
     let currentStep = 1;
+    let resizeSignaturePad = null;
 
     const clearFieldInvalidState = (section) => {
         (section || document).querySelectorAll('.field-invalid').forEach((field) => field.classList.remove('field-invalid'));
@@ -1108,12 +1122,14 @@ document.addEventListener('DOMContentLoaded', function() {
         parent.appendChild(note);
     };
 
-    const validateStep = (stepNumber) => {
+    const validateStep = (stepNumber, markErrors = true) => {
         const section = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
         if (!section) {
             return true;
         }
-        clearFieldInvalidState(section);
+        if (markErrors) {
+            clearFieldInvalidState(section);
+        }
 
         let isValid = true;
 
@@ -1160,7 +1176,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (type === 'radio') {
                 const group = section.querySelectorAll(`input[type="radio"][name="${field.name}"]`);
                 if (!Array.from(group).some((radio) => radio.checked)) {
-                    markFieldInvalid(field, 'Please choose an option.');
+                    if (markErrors) {
+                        markFieldInvalid(field, 'Please choose an option.');
+                    }
                     isValid = false;
                 }
                 continue;
@@ -1168,7 +1186,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (type === 'checkbox') {
                 if (!field.checked) {
-                    markFieldInvalid(field, 'Please check this field.');
+                    if (markErrors) {
+                        markFieldInvalid(field, 'Please check this field.');
+                    }
                     isValid = false;
                 }
                 continue;
@@ -1179,22 +1199,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     const hasUpload = field.files && field.files.length > 0;
                     const hasDrawn = signatureDrawn && String(signatureDrawn.value || '').trim() !== '';
                     if (!hasUpload && !hasDrawn) {
-                        field.classList.add('field-invalid');
-                        if (signaturePad) signaturePad.classList.add('field-invalid');
-                        if (signatureErrorNote) signatureErrorNote.style.display = 'block';
+                        if (markErrors) {
+                            field.classList.add('field-invalid');
+                            if (signaturePad) signaturePad.classList.add('field-invalid');
+                            if (signatureErrorNote) signatureErrorNote.style.display = 'block';
+                        }
                         isValid = false;
                     }
                     continue;
                 }
                 if (!field.files || field.files.length === 0) {
-                    markFieldInvalid(field, 'Please upload the required file.');
+                    if (markErrors) {
+                        markFieldInvalid(field, 'Please upload the required file.');
+                    }
                     isValid = false;
                 }
                 continue;
             }
 
             if (!String(field.value || '').trim()) {
-                markFieldInvalid(field);
+                if (markErrors) {
+                    markFieldInvalid(field);
+                }
                 isValid = false;
             }
         }
@@ -1204,11 +1230,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const pwdIdProof = document.getElementById('pwd_id_proof');
         if (stepNumber === 2 && disabilityYes?.checked) {
             if (!String(disabilityType?.value || '').trim()) {
-                markFieldInvalid(disabilityType, 'Please specify the disability type.');
+                if (markErrors) {
+                    markFieldInvalid(disabilityType, 'Please specify the disability type.');
+                }
                 isValid = false;
             }
             if (!pwdIdProof?.files || pwdIdProof.files.length === 0) {
-                markFieldInvalid(pwdIdProof, 'Please upload PWD proof.');
+                if (markErrors) {
+                    markFieldInvalid(pwdIdProof, 'Please upload PWD proof.');
+                }
                 isValid = false;
             }
         }
@@ -1219,11 +1249,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const medicineChecked = Array.from(document.querySelectorAll('input[name="medicine_allergies[]"]')).some((checkbox) => checkbox.checked);
             const foodAllergies = document.querySelector('input[name="food_allergies"]');
             if (!String(foodAllergies?.value || '').trim()) {
-                markFieldInvalid(foodAllergies, 'Please specify food allergies or mark no known allergies.');
+                if (markErrors) {
+                    markFieldInvalid(foodAllergies, 'Please specify food allergies or mark no known allergies.');
+                }
                 isValid = false;
             }
             if (!medicineChecked && !String(otherMedAllergies?.value || '').trim()) {
-                markFieldInvalid(otherMedAllergies, 'Select a medicine allergy or specify another one.');
+                if (markErrors) {
+                    markFieldInvalid(otherMedAllergies, 'Select a medicine allergy or specify another one.');
+                }
                 isValid = false;
             }
         }
@@ -1284,7 +1318,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         stepCards.forEach((card, index) => {
             const cardStep = Number(card.dataset.stepTarget);
-            const isValid = validateStep(cardStep);
+            const isValid = validateStep(cardStep, false);
             const isWarning = attemptedSteps.has(cardStep) && !isValid;
             card.classList.toggle('active', cardStep === stepNumber && !isWarning);
             card.classList.toggle('completed', cardStep < stepNumber && isValid);
@@ -1309,6 +1343,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const isFinalStep = stepNumber === steps.length;
             nextStepBtn.style.display = isFinalStep ? 'none' : '';
             submitStepBtn.style.display = isFinalStep ? '' : 'none';
+        }
+
+        if (stepNumber === 4 && typeof resizeSignaturePad === 'function') {
+            requestAnimationFrame(() => resizeSignaturePad());
         }
 
         document.querySelector('.stepper-shell')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1420,17 +1458,74 @@ document.addEventListener('DOMContentLoaded', function() {
     if (signaturePad && signatureDrawn) {
         const ctx = signaturePad.getContext('2d');
         let drawing = false;
+        let signatureHistory = [];
+
+        const saveSignatureState = () => {
+            if (!signaturePad.width || !signaturePad.height) {
+                return;
+            }
+            signatureHistory.push(signaturePad.toDataURL('image/png'));
+            if (signatureHistory.length > 30) {
+                signatureHistory.shift();
+            }
+        };
+
+        const updateSignatureValue = () => {
+            const blankCanvas = document.createElement('canvas');
+            blankCanvas.width = signaturePad.width;
+            blankCanvas.height = signaturePad.height;
+            const blankContext = blankCanvas.getContext('2d');
+            blankContext.fillStyle = '#ffffff';
+            blankContext.fillRect(0, 0, blankCanvas.width, blankCanvas.height);
+
+            const currentDataUrl = signaturePad.toDataURL('image/png');
+            const blankDataUrl = blankCanvas.toDataURL('image/png');
+            signatureDrawn.value = currentDataUrl === blankDataUrl ? '' : currentDataUrl;
+        };
+
+        const restoreSignatureFromDataUrl = (dataUrl) => {
+            const rect = signaturePad.getBoundingClientRect();
+            ctx.clearRect(0, 0, rect.width, rect.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+
+            if (!dataUrl) {
+                signatureDrawn.value = '';
+                return;
+            }
+
+            const image = new Image();
+            image.onload = () => {
+                ctx.drawImage(image, 0, 0, rect.width, rect.height);
+                updateSignatureValue();
+            };
+            image.src = dataUrl;
+        };
 
         const resizeCanvas = () => {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             const rect = signaturePad.getBoundingClientRect();
+            if (!rect.width || !rect.height) {
+                return;
+            }
             signaturePad.width = rect.width * ratio;
             signaturePad.height = rect.height * ratio;
             ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-            ctx.lineWidth = 2;
+            ctx.clearRect(0, 0, rect.width, rect.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+            ctx.lineWidth = 3.5;
             ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
             ctx.strokeStyle = '#111827';
+
+            if (signatureDrawn.value) {
+                const image = new Image();
+                image.onload = () => ctx.drawImage(image, 0, 0, rect.width, rect.height);
+                image.src = signatureDrawn.value;
+            }
         };
+        resizeSignaturePad = resizeCanvas;
 
         const getPoint = (event) => {
             const rect = signaturePad.getBoundingClientRect();
@@ -1443,6 +1538,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const beginDrawing = (event) => {
             drawing = true;
+            saveSignatureState();
             const point = getPoint(event);
             ctx.beginPath();
             ctx.moveTo(point.x, point.y);
@@ -1462,7 +1558,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const endDrawing = () => {
             if (!drawing) return;
             drawing = false;
-            signatureDrawn.value = signaturePad.toDataURL('image/png');
+            updateSignatureValue();
             if (signatureUpload) {
                 signatureUpload.value = '';
                 signatureUpload.classList.remove('field-invalid');
@@ -1479,9 +1575,13 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('touchend', endDrawing);
 
         clearSignaturePadBtn?.addEventListener('click', () => {
-            const rect = signaturePad.getBoundingClientRect();
-            ctx.clearRect(0, 0, rect.width, rect.height);
-            signatureDrawn.value = '';
+            saveSignatureState();
+            restoreSignatureFromDataUrl('');
+        });
+
+        undoSignaturePadBtn?.addEventListener('click', () => {
+            const previousState = signatureHistory.pop() || '';
+            restoreSignatureFromDataUrl(previousState);
         });
 
         signatureUpload?.addEventListener('change', () => {
@@ -1489,6 +1589,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const rect = signaturePad.getBoundingClientRect();
                 ctx.clearRect(0, 0, rect.width, rect.height);
                 signatureDrawn.value = '';
+                signatureHistory = [];
                 signaturePad.classList.remove('field-invalid');
                 if (signatureErrorNote) signatureErrorNote.style.display = 'none';
             }

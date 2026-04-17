@@ -186,6 +186,9 @@
         padding: 30px 24px;
         max-width: 420px;
     }
+    .health-submit-overlay.is-hiding .health-submit-overlay-card {
+        animation: submitCardExit 0.3s ease forwards;
+    }
     .health-submit-title {
         font-size: 28px;
         font-weight: 800;
@@ -225,13 +228,24 @@
         stroke-dashoffset: 339.3;
         animation: submitRingDraw 0.9s ease forwards;
     }
-    .health-submit-check {
-        width: 54px;
-        height: 54px;
+    .health-submit-logo {
+        width: 62px;
+        height: 62px;
+        object-fit: contain;
         opacity: 0;
         transform: scale(0.6);
-        animation: submitCheckReveal 0.34s ease forwards;
+        filter: drop-shadow(0 6px 12px rgba(255, 255, 255, 0.18));
+        animation: submitLogoReveal 0.34s ease forwards;
         animation-delay: 1.18s;
+    }
+    .health-submit-overlay.is-hiding .health-submit-ring circle {
+        animation: submitRingReverse 0.28s ease forwards;
+    }
+    .health-submit-overlay.is-hiding .health-submit-circle {
+        animation: submitCircleClose 0.28s ease forwards;
+    }
+    .health-submit-overlay.is-hiding .health-submit-logo {
+        animation: submitLogoHide 0.2s ease forwards;
     }
     .health-submit-subtext {
         font-size: 14px;
@@ -271,7 +285,7 @@
             border-color: #16a34a;
         }
     }
-    @keyframes submitCheckReveal {
+    @keyframes submitLogoReveal {
         0% {
             opacity: 0;
             transform: scale(0.6);
@@ -279,6 +293,48 @@
         100% {
             opacity: 1;
             transform: scale(1);
+        }
+    }
+    @keyframes submitLogoHide {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.72);
+        }
+    }
+    @keyframes submitRingReverse {
+        0% {
+            stroke-dashoffset: 0;
+            opacity: 1;
+        }
+        100% {
+            stroke-dashoffset: 339.3;
+            opacity: 0.4;
+        }
+    }
+    @keyframes submitCircleClose {
+        0% {
+            transform: scale(1);
+            background: #16a34a;
+            border-color: #16a34a;
+        }
+        100% {
+            transform: scale(0.82);
+            background: #ffffff;
+            border-color: rgba(22, 163, 74, 0.08);
+        }
+    }
+    @keyframes submitCardExit {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.94);
         }
     }
     .notif-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
@@ -450,9 +506,7 @@
                     <svg class="health-submit-ring" viewBox="0 0 120 120" aria-hidden="true">
                         <circle cx="60" cy="60" r="54"></circle>
                     </svg>
-                    <svg class="health-submit-check" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 6L9 17l-5-5"></path>
-                    </svg>
+                    <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="health-submit-logo">
                 </div>
                 <p class="health-submit-subtext">Your record has been received and added to your account.</p>
             </div>
@@ -651,7 +705,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.setTimeout(() => {
         overlay.classList.add('is-hiding');
         window.setTimeout(() => overlay.remove(), 320);
-    }, 5000);
+    }, 3500);
 });
 </script>
 @endif

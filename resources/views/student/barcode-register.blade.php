@@ -276,7 +276,6 @@
 
     <div class="student-info-box">
         <p><strong>Student Name:</strong> {{ $user->name }}</p>
-        <p><strong>Student ID:</strong> {{ $user->student_id ?? 'N/A' }}</p>
         <p><strong>Student Number:</strong> {{ $user->student_number ?? 'N/A' }}</p>
     </div>
 

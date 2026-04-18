@@ -160,6 +160,77 @@ class AdminController extends Controller
         return $role === User::ROLE_SUPERADMIN;
     }
 
+    private function looksLikeIdpIdentifier(?string $value): bool
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return false;
+        }
+
+        if (str_starts_with(strtolower($value), 'idp-')) {
+            return true;
+        }
+
+        return (bool) preg_match(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+            $value
+        );
+    }
+
+    private function resolvePuptasStudentNumber(HealthProfile $record): string
+    {
+        $user = $record->user;
+        $candidateNumbers = [
+            trim((string) optional($user)->student_number),
+            trim((string) $record->student_number),
+        ];
+
+        $knownIdpIdentifiers = array_filter([
+            trim((string) optional($user)->student_id),
+            trim((string) $record->student_id),
+        ]);
+
+        foreach ($candidateNumbers as $candidate) {
+            if ($candidate === '') {
+                continue;
+            }
+
+            if (in_array($candidate, $knownIdpIdentifiers, true) || $this->looksLikeIdpIdentifier($candidate)) {
+                continue;
+            }
+
+            return $candidate;
+        }
+
+        $idpUserId = trim((string) optional($user)->student_id);
+        if ($idpUserId === '') {
+            $idpUserId = trim((string) $record->student_id);
+        }
+
+        if ($idpUserId === '') {
+            return '';
+        }
+
+        $applicant = app(PuptasWebhookService::class)->fetchApplicantByIdpUserId($idpUserId);
+        $studentNumber = trim((string) data_get($applicant, 'student_number'));
+
+        if ($studentNumber === '' || $studentNumber === $idpUserId || $this->looksLikeIdpIdentifier($studentNumber)) {
+            return '';
+        }
+
+        if ($user && trim((string) $user->student_number) === '') {
+            $user->student_number = $studentNumber;
+            $user->save();
+        }
+
+        if (trim((string) $record->student_number) === '' || $record->student_number === $idpUserId) {
+            $record->student_number = $studentNumber;
+            $record->save();
+        }
+
+        return $studentNumber;
+    }
+
     private function logActivity(string $action, string $description, ?string $module = null, ?string $eventType = null): void
     {
         $user = Auth::user();
@@ -1023,7 +1094,7 @@ public function updateClearance(Request $request, $id)
             if ($record->clearance_status === 'Issued') {
                 try {
                     $puptasService = app(PuptasWebhookService::class);
-                    $studentNumber = trim((string) ($record->user->student_number ?? ''));
+                    $studentNumber = $this->resolvePuptasStudentNumber($record);
                     if ($studentNumber === '') {
                         \Log::warning("PUPTAS Sync Skipped for User {$record->user->id}: missing student_number.");
                         return redirect()->route('admin.health_records')

@@ -1,6 +1,6 @@
 @extends('layouts.student')
 
-@section('title', 'Register Barcode')
+@section('title', 'Scan / Bio')
 
 @push('styles')
 <style>
@@ -170,11 +170,11 @@
 
     {{-- HEADER LOGIC --}}
     @if($user->barcode)
-        <h2 class="registered">✅ Barcode Linked</h2>
-        <p style="color: #64748b; margin-bottom: 20px;">Your barcode is already linked to your account.</p>
+        <h2 class="registered">✅ Scan / Bio Linked</h2>
+        <p style="color: #64748b; margin-bottom: 20px;">Your clinic scan or bio identity is already linked to your account.</p>
     @else
-        <h2 class="not-registered">Register Your Barcode</h2>
-        <p style="color: #64748b; margin-bottom: 20px;">Scan your physical ID to link it with your account.</p>
+        <h2 class="not-registered">Set Up Scan / Bio</h2>
+        <p style="color: #64748b; margin-bottom: 20px;">Scan your physical ID or use your bio-linked flow to connect it with your account.</p>
     @endif
 
     <div class="student-info-box">
@@ -205,7 +205,7 @@
 
             <p class="scan-helper">Or upload a clear photo of your ID barcode for instant validation.</p>
             <label for="barcode-image-input" class="btn-scan btn-upload">
-                Upload Barcode Image
+                Upload Scan Image
             </label>
             <input type="file" id="barcode-image-input" class="upload-input" accept="image/png,image/jpeg,image/jpg,image/webp">
 
@@ -221,7 +221,7 @@
         <form method="POST" action="{{ route('barcode.reset') }}" onsubmit="return confirm('Are you sure you want to unlink this barcode?')">
             @csrf
             <button type="submit" class="btn-reset">
-                Unlink / Reset Barcode
+                Unlink / Reset Scan / Bio
             </button>
         </form>
     @endif

@@ -583,7 +583,7 @@
                     <div class="barcode-icon-box">⚠️</div>
                     <span class="barcode-value" style="color: #b45309;">Not Yet Linked</span>
                     <p style="font-size: 12px; color: #64748b; margin: 0;">Scan your physical ID for quick check-ins.</p>
-                    <a href="{{ route('barcode.register') }}" class="btn-barcode-action">Register Barcode Now →</a>
+                    <a href="{{ route('barcode.register') }}" class="btn-barcode-action">Open Scan / Bio →</a>
                 @endif
             </div>
             

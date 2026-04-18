@@ -197,6 +197,100 @@
             padding: 5px 0;
         }
 
+        .nav-list li.nav-dropdown {
+            position: relative;
+        }
+
+        .nav-dropdown-toggle {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 15px;
+            padding: 5px 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .nav-dropdown-toggle:hover,
+        .nav-dropdown-toggle[aria-expanded="true"],
+        .nav-dropdown-toggle.active {
+            color: #ffc107;
+        }
+
+        .nav-dropdown-toggle:focus-visible {
+            outline: 2px solid #ffc107;
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        .nav-dropdown-caret {
+            width: 9px;
+            height: 9px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(45deg) translateY(-1px);
+            transition: transform 0.2s ease;
+        }
+
+        .nav-dropdown.is-open .nav-dropdown-caret {
+            transform: rotate(225deg) translateY(-1px);
+        }
+
+        .nav-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 14px);
+            right: 0;
+            min-width: 220px;
+            padding: 10px;
+            margin: 0;
+            list-style: none;
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid rgba(139, 0, 0, 0.12);
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.16);
+            display: none;
+            z-index: 40;
+        }
+
+        .nav-dropdown.is-open .nav-dropdown-menu {
+            display: block;
+        }
+
+        .nav-dropdown-menu li {
+            width: 100%;
+        }
+
+        .nav-dropdown-menu li + li {
+            margin-top: 4px;
+        }
+
+        .nav-dropdown-menu a {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px !important;
+            border-radius: 10px;
+            color: #1f2937 !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+        }
+
+        .nav-dropdown-menu a::after {
+            display: none !important;
+        }
+
+        .nav-dropdown-menu a:hover,
+        .nav-dropdown-menu a.active {
+            background: #fff7ed;
+            color: #8b0000 !important;
+        }
+
         /* Hover Effect: Turn Gold */
         .nav-list li a:not(.logout-btn):hover {
             color: #ffc107; /* PUP Gold */
@@ -336,6 +430,27 @@
                 padding: 8px 0;
             }
 
+            .nav-dropdown-toggle {
+                color: #1f2937;
+                width: 100%;
+                justify-content: space-between;
+                padding: 8px 0;
+            }
+
+            .nav-dropdown-menu {
+                position: static;
+                min-width: 100%;
+                margin-top: 8px;
+                box-shadow: none;
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+                background: #f8fafc;
+            }
+
+            .nav-dropdown-menu a {
+                padding: 10px 12px !important;
+            }
+
             .nav-list li a:not(.logout-btn)::after {
                 display: none;
             }
@@ -421,6 +536,22 @@
         html[data-theme="dark"] .nav-list li .accessibility-toggle-btn:hover,
         html[data-theme="dark"] .nav-list li .logout-btn:hover {
             background: rgba(255, 255, 255, 0.22);
+        }
+
+        html[data-theme="dark"] .nav-dropdown-menu {
+            background: #171d27;
+            border-color: #2f3847;
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.38);
+        }
+
+        html[data-theme="dark"] .nav-dropdown-menu a {
+            color: #e5eaf3 !important;
+        }
+
+        html[data-theme="dark"] .nav-dropdown-menu a:hover,
+        html[data-theme="dark"] .nav-dropdown-menu a.active {
+            background: rgba(139, 0, 0, 0.22);
+            color: #ffd166 !important;
         }
 
         html[data-theme="dark"] h1,
@@ -621,6 +752,10 @@
             html[data-theme="dark"] .nav-list li a:not(.logout-btn) {
                 color: #f3f4f6 !important;
             }
+
+            html[data-theme="dark"] .nav-dropdown-toggle {
+                color: #f3f4f6 !important;
+            }
         }
     </style>
 </head>
@@ -642,13 +777,31 @@
             </button>
 
             <nav id="main-menu" class="main-nav">
+                @php
+                    $isMyAccountSection = Request::is('student/account') || Request::is('student/history') || Request::is('student/barcode-register') || Request::is('student/print-health-form');
+                @endphp
                 <ul class="nav-list">
                     <li><a href="{{ url('/student/home') }}" class="{{ Request::is('student/home') ? 'active' : '' }}">Home</a></li>
 
                     <li><a href="{{ url('/student/home') }}#about">About Us</a></li>
                     <li><a href="{{ url('/student/booking') }}" class="{{ Request::is('student/booking') ? 'active' : '' }}">Appointments</a></li>
-                    <li><a href="{{ url('/student/barcode-register') }}" class="{{ Request::is('student/barcode-register') ? 'active' : '' }}">Register</a></li>
-                   <li><a href="{{ url('/student/account') }}" class="{{ Request::is('student/account') ? 'active' : '' }}">My Account</a></li>
+                    <li class="nav-dropdown {{ $isMyAccountSection ? 'is-open-on-route' : '' }}" data-nav-dropdown>
+                        <button
+                            type="button"
+                            class="nav-dropdown-toggle {{ $isMyAccountSection ? 'active' : '' }}"
+                            aria-expanded="{{ $isMyAccountSection ? 'true' : 'false' }}"
+                            aria-haspopup="true"
+                        >
+                            <span>My Account</span>
+                            <span class="nav-dropdown-caret" aria-hidden="true"></span>
+                        </button>
+                        <ul class="nav-dropdown-menu">
+                            <li><a href="{{ url('/student/account') }}" class="{{ Request::is('student/account') ? 'active' : '' }}">Profile</a></li>
+                            <li><a href="{{ url('/student/history') }}" class="{{ Request::is('student/history') ? 'active' : '' }}">Appointment History</a></li>
+                            <li><a href="{{ route('print.health.form') }}" class="{{ Request::is('student/print-health-form') ? 'active' : '' }}">Health Record</a></li>
+                            <li><a href="{{ url('/student/barcode-register') }}" class="{{ Request::is('student/barcode-register') ? 'active' : '' }}">Scan / Bio</a></li>
+                        </ul>
+                    </li>
                     <li><a href="{{ url('/student/faq') }}" class="{{ Request::is('student/faq') ? 'active' : '' }}">FAQ</a></li>
                     <li>
                         <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
@@ -696,6 +849,7 @@
         (function() {
             const navToggle = document.querySelector('.nav-toggle');
             const navList = document.querySelector('.nav-list');
+            const navDropdowns = document.querySelectorAll('[data-nav-dropdown]');
             const themeToggleBtn = document.getElementById('themeToggleBtn');
             const storageKey = 'student_theme';
 
@@ -723,9 +877,37 @@
 
             if (navToggle && navList) {
                 const closeMobileMenu = () => navList.classList.remove('show');
+                const closeDropdowns = (exceptDropdown = null) => {
+                    navDropdowns.forEach((dropdown) => {
+                        if (dropdown === exceptDropdown) {
+                            return;
+                        }
+
+                        dropdown.classList.remove('is-open');
+                        const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                        if (toggle) {
+                            toggle.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                };
 
                 navToggle.addEventListener('click', () => {
                     navList.classList.toggle('show');
+                });
+
+                navDropdowns.forEach((dropdown) => {
+                    const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                    if (!toggle) {
+                        return;
+                    }
+
+                    toggle.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        const isOpen = dropdown.classList.contains('is-open');
+                        closeDropdowns(isOpen ? null : dropdown);
+                        dropdown.classList.toggle('is-open', !isOpen);
+                        toggle.setAttribute('aria-expanded', (!isOpen).toString());
+                    });
                 });
 
                 navList.addEventListener('click', (event) => {
@@ -734,6 +916,11 @@
                         return;
                     }
 
+                    if (target.classList.contains('nav-dropdown-toggle')) {
+                        return;
+                    }
+
+                    closeDropdowns();
                     closeMobileMenu();
                 });
 
@@ -741,12 +928,14 @@
                     const clickedInsideMenu = navList.contains(event.target);
                     const clickedToggle = navToggle.contains(event.target);
                     if (!clickedInsideMenu && !clickedToggle) {
+                        closeDropdowns();
                         closeMobileMenu();
                     }
                 });
 
                 document.addEventListener('keydown', (event) => {
                     if (event.key === 'Escape') {
+                        closeDropdowns();
                         closeMobileMenu();
                     }
                 });

@@ -513,6 +513,7 @@
         </div>
     @endif
 
+    @if($accountView === 'profile')
     <div class="profile-hero">
         <div class="hero-avatar">
             @php
@@ -555,6 +556,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <div class="account-layout">
         @if(session('health_profile_submitted'))
@@ -887,5 +889,7 @@ function enableEditing() {
 }
 </script>
 @endsection
+
+
 
 

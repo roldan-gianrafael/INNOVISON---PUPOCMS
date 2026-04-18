@@ -318,11 +318,7 @@
 
             <div class="biosync-status">Pending Setup</div>
 
-            <ul class="biosync-list">
-                <li>Use this area for fingerprint, face match, or connected BioSync enrollment later.</li>
-                <li>Keep the same student identity source so clinic and walk-in verification stay aligned.</li>
-                <li>Once BioSync is enabled, this section can show linked status, last sync time, and retry actions.</li>
-            </ul>
+            
 
             <div class="biosync-panel">
                 <strong>Current status</strong>

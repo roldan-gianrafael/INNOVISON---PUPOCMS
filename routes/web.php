@@ -62,6 +62,8 @@ Route::middleware(['auth:student', 'audit'])->group(function () {
         Route::post('/student/barcode-register', [AppointmentController::class, 'storeBarcode'])->name('barcode.store');
         Route::post('/student/barcode-validate', [AppointmentController::class, 'validateBarcodeScan'])->name('barcode.validate');
         Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
+        Route::get('/student/notifications/{notificationId}', [AppointmentController::class, 'openNotification'])->name('student.notifications.open');
+        Route::post('/student/notifications/mark-all-read', [AppointmentController::class, 'markAllNotificationsRead'])->name('student.notifications.read_all');
     });
 
     Route::get('/account', [AppointmentController::class, 'index'])->name('account');

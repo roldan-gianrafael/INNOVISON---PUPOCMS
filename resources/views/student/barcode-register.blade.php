@@ -6,13 +6,42 @@
 <style>
     /* --- MAIN CARD CONTAINER --- */
     .barcode-card {
-        max-width: 500px;
+        max-width: 860px;
         margin: 50px auto;
         background: #fff;
         border-radius: 16px;
         padding: 30px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .scan-bio-grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.95fr;
+        gap: 22px;
+        align-items: start;
+    }
+
+    .scan-section {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
         text-align: center;
+    }
+
+    .scan-section h3 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        font-weight: 800;
+        color: #8B0000;
+    }
+
+    .scan-section-note {
+        color: #64748b;
+        font-size: 13px;
+        margin: 0 0 18px;
+        line-height: 1.5;
     }
 
     /* --- TYPOGRAPHY & HEADINGS --- */
@@ -162,6 +191,55 @@
     .upload-input {
         display: none;
     }
+
+    .biosync-card {
+        text-align: left;
+    }
+
+    .biosync-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #fffbeb;
+        color: #92400e;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .biosync-list {
+        margin: 0;
+        padding-left: 18px;
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .biosync-list li + li {
+        margin-top: 8px;
+    }
+
+    .biosync-panel {
+        margin-top: 18px;
+        padding: 16px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+    }
+
+    .biosync-panel strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #1e293b;
+    }
+
+    @media (max-width: 860px) {
+        .scan-bio-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 @endpush
 
@@ -191,42 +269,67 @@
         <div class="field-error">{{ $message }}</div>
     @enderror
 
-    <form method="POST" action="{{ route('barcode.store') }}">
-        @csrf
-        <input type="text" name="barcode" id="barcode" 
-               class="barcode-input {{ $user->barcode ? 'input-success' : '' }}"
-               readonly placeholder="Scan result will appear here..."
-               value="{{ $user->barcode ?? '' }}">
+    <div class="scan-bio-grid">
+        <section class="scan-section">
+            <h3>Barcode</h3>
+            <p class="scan-section-note">Use your school ID barcode for clinic walk-ins and quick identity checks.</p>
 
-        @if(!$user->barcode)
-            <button type="button" class="btn-scan" id="start-scan">
-                Start Camera Scan
-            </button>
+            <form method="POST" action="{{ route('barcode.store') }}">
+                @csrf
+                <input type="text" name="barcode" id="barcode" 
+                       class="barcode-input {{ $user->barcode ? 'input-success' : '' }}"
+                       readonly placeholder="Scan result will appear here..."
+                       value="{{ $user->barcode ?? '' }}">
 
-            <p class="scan-helper">Or upload a clear photo of your ID barcode for instant validation.</p>
-            <label for="barcode-image-input" class="btn-scan btn-upload">
-                Upload Scan Image
-            </label>
-            <input type="file" id="barcode-image-input" class="upload-input" accept="image/png,image/jpeg,image/jpg,image/webp">
+                @if(!$user->barcode)
+                    <button type="button" class="btn-scan" id="start-scan">
+                        Start Camera Scan
+                    </button>
 
-            <div id="scan-status" class="scan-status" aria-live="polite"></div>
+                    <p class="scan-helper">Or upload a clear photo of your ID barcode for instant validation.</p>
+                    <label for="barcode-image-input" class="btn-scan btn-upload">
+                        Upload Scan Image
+                    </label>
+                    <input type="file" id="barcode-image-input" class="upload-input" accept="image/png,image/jpeg,image/jpg,image/webp">
 
-            <button type="submit" class="btn-submit">
-                Submit Registration
-            </button>
-        @endif
-    </form>
+                    <div id="scan-status" class="scan-status" aria-live="polite"></div>
 
-    @if($user->barcode)
-        <form method="POST" action="{{ route('barcode.reset') }}" onsubmit="return confirm('Are you sure you want to unlink this barcode?')">
-            @csrf
-            <button type="submit" class="btn-reset">
-                Unlink / Reset Scan / Bio
-            </button>
-        </form>
-    @endif
+                    <button type="submit" class="btn-submit">
+                        Submit Barcode
+                    </button>
+                @endif
+            </form>
 
-    <div id="reader"></div>
+            @if($user->barcode)
+                <form method="POST" action="{{ route('barcode.reset') }}" onsubmit="return confirm('Are you sure you want to unlink this barcode?')">
+                    @csrf
+                    <button type="submit" class="btn-reset">
+                        Unlink Barcode
+                    </button>
+                </form>
+            @endif
+
+            <div id="reader"></div>
+        </section>
+
+        <section class="scan-section biosync-card">
+            <h3>BioSync</h3>
+            <p class="scan-section-note">This section is reserved for biometric or external identity sync once your BioSync flow is available.</p>
+
+            <div class="biosync-status">Pending Setup</div>
+
+            <ul class="biosync-list">
+                <li>Use this area for fingerprint, face match, or connected BioSync enrollment later.</li>
+                <li>Keep the same student identity source so clinic and walk-in verification stay aligned.</li>
+                <li>Once BioSync is enabled, this section can show linked status, last sync time, and retry actions.</li>
+            </ul>
+
+            <div class="biosync-panel">
+                <strong>Current status</strong>
+                BioSync is not yet connected in this portal. Barcode registration remains the active identity method for now.
+            </div>
+        </section>
+    </div>
 </div>
 @endsection
 

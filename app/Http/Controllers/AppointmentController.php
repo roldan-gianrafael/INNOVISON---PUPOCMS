@@ -14,6 +14,105 @@ use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
+    private function notificationReadStateKey(User $user): string
+    {
+        return 'student_notifications_read.' . $user->id;
+    }
+
+    private function getNotificationReadMap(User $user): array
+    {
+        return session($this->notificationReadStateKey($user), []);
+    }
+
+    private function markNotificationAsRead(User $user, string $notificationId): void
+    {
+        $readMap = $this->getNotificationReadMap($user);
+        $readMap[$notificationId] = now()->toIso8601String();
+        session([$this->notificationReadStateKey($user) => $readMap]);
+    }
+
+    private function buildNotificationId(string $prefix, array $parts = []): string
+    {
+        $normalizedParts = array_map(static fn ($value) => trim((string) $value), $parts);
+        return $prefix . '-' . substr(sha1(implode('|', $normalizedParts)), 0, 16);
+    }
+
+    public function getStudentNotifications(User $user): array
+    {
+        $user->loadMissing('healthProfile');
+
+        $appointments = Appointment::where('user_id', $user->id)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        $notifications = [];
+        foreach ($appointments as $appt) {
+            $timeAgo = $appt->updated_at ? $appt->updated_at->diffForHumans() : 'Just now';
+            $dateStr = $appt->date ? date('M d', strtotime($appt->date)) : 'N/A';
+
+            if ($appt->status === 'Approved') {
+                $notifications[] = [
+                    'id' => $this->buildNotificationId('appointment-approved', [$appt->id, $appt->status, optional($appt->updated_at)->timestamp]),
+                    'type' => 'success',
+                    'icon' => 'OK',
+                    'message' => "Your {$appt->service} on {$dateStr} has been approved.",
+                    'time' => $timeAgo,
+                    'link' => url('/student/history'),
+                ];
+            } elseif ($appt->status === 'Cancelled') {
+                $notifications[] = [
+                    'id' => $this->buildNotificationId('appointment-cancelled', [$appt->id, $appt->status, optional($appt->updated_at)->timestamp]),
+                    'type' => 'danger',
+                    'icon' => 'X',
+                    'message' => "Your {$appt->service} on {$dateStr} was cancelled.",
+                    'time' => $timeAgo,
+                    'link' => url('/student/history'),
+                ];
+            }
+        }
+
+        $healthProfile = $user->healthProfile;
+        $healthProfileStatus = optional($healthProfile)->clearance_status;
+        $puptasSyncStatus = optional($healthProfile)->puptas_sync_status;
+
+        if ($healthProfile) {
+            $notifications[] = [
+                'id' => $this->buildNotificationId('health-record', [$healthProfile->id, $healthProfileStatus, optional($healthProfile->updated_at)->timestamp]),
+                'type' => $healthProfileStatus === 'Issued' ? 'success' : 'warning',
+                'icon' => $healthProfileStatus === 'Issued' ? 'OK' : '...',
+                'message' => $healthProfileStatus === 'Issued'
+                    ? 'Your health profile has been approved by the clinic.'
+                    : 'Your health profile was submitted and is awaiting medical review.',
+                'time' => 'Health form status',
+                'link' => url('/student/account?view=health-record'),
+            ];
+
+            if ($healthProfileStatus === 'Issued' && $puptasSyncStatus !== null) {
+                $notifications[] = [
+                    'id' => $this->buildNotificationId('puptas-sync', [$healthProfile->id, $puptasSyncStatus, optional($healthProfile->puptas_synced_at)->timestamp, optional($healthProfile->updated_at)->timestamp]),
+                    'type' => $puptasSyncStatus === 'synced' ? 'success' : ($puptasSyncStatus === 'syncing' ? 'info' : 'warning'),
+                    'icon' => $puptasSyncStatus === 'synced' ? 'OK' : ($puptasSyncStatus === 'syncing' ? '...' : '!'),
+                    'message' => match ($puptasSyncStatus) {
+                        'synced' => 'Your approved health clearance was synced to PUPTAS.',
+                        'syncing' => 'Your approved health clearance is being prepared for PUPTAS sync.',
+                        'missing_student_number' => 'Your clearance is approved, but PUPTAS sync is waiting for a valid student number.',
+                        'failed' => 'Your clearance is approved, but the PUPTAS sync still needs attention.',
+                        default => 'Your clearance approval is being checked for PUPTAS sync.',
+                    },
+                    'time' => 'PUPTAS sync status',
+                    'link' => url('/student/account?view=health-record'),
+                ];
+            }
+        }
+
+        $readMap = $this->getNotificationReadMap($user);
+
+        return array_map(function (array $notification) use ($readMap) {
+            $notification['is_unread'] = !isset($readMap[$notification['id']]);
+            return $notification;
+        }, $notifications);
+    }
+
     private function fetchPuptasApplicantForUser(User $user): ?array
     {
         $puptasService = app(PuptasWebhookService::class);
@@ -502,7 +601,7 @@ class AppointmentController extends Controller
     // -------------------------------
     // 4. STUDENT ACCOUNT
     // -------------------------------
-   public function account()
+public function account(Request $request)
 {
     // 1. Kunin ang logged-in user. Kung walang session, redirect sa login page.
     $user = Auth::user();
@@ -526,63 +625,15 @@ class AppointmentController extends Controller
     $cancelledCount = $appointments->where('status', 'Cancelled')->count();
 
     // 4. Notification Logic
-    $notifications = [];
-    foreach ($appointments as $appt) {
-        $timeAgo = $appt->updated_at ? $appt->updated_at->diffForHumans() : 'Just now';
-        $dateStr = $appt->date ? date('M d', strtotime($appt->date)) : 'N/A';
-
-        if ($appt->status == 'Approved') {
-            $notifications[] = [
-                'type'    => 'success',
-                'icon'    => '✅',
-                'message' => "Your {$appt->service} on {$dateStr} has been APPROVED.",
-                'time'    => $timeAgo
-            ];
-        } elseif ($appt->status == 'Cancelled') {
-            $notifications[] = [
-                'type'    => 'danger',
-                'icon'    => '❌',
-                'message' => "Your {$appt->service} on {$dateStr} was CANCELLED.",
-                'time'    => $timeAgo
-            ];
-        }
-    }
-    
+    $notifications = collect($this->getStudentNotifications($user));
     $hasSubmittedHealthProfile = $this->hasSubmittedHealthProfile($user);
-    $healthProfileStatus = optional($user->healthProfile)->clearance_status;
-    $puptasSyncStatus = optional($user->healthProfile)->puptas_sync_status;
-
-    $notifications = collect($notifications);
-
-    if ($hasSubmittedHealthProfile) {
-        $notifications->prepend([
-            'type' => $healthProfileStatus === 'Issued' ? 'success' : 'warning',
-            'icon' => $healthProfileStatus === 'Issued' ? 'OK' : '...',
-            'message' => $healthProfileStatus === 'Issued'
-                ? 'Your health profile has been approved by the clinic.'
-                : 'Your health profile was submitted and is awaiting medical review.',
-            'time' => 'Health form status',
-        ]);
-
-        if ($healthProfileStatus === 'Issued' && $puptasSyncStatus !== null) {
-            $notifications->prepend([
-                'type' => $puptasSyncStatus === 'synced' ? 'success' : ($puptasSyncStatus === 'syncing' ? 'info' : 'warning'),
-                'icon' => $puptasSyncStatus === 'synced' ? 'OK' : ($puptasSyncStatus === 'syncing' ? '...' : '!'),
-                'message' => match ($puptasSyncStatus) {
-                    'synced' => 'Your approved health clearance was synced to PUPTAS.',
-                    'syncing' => 'Your approved health clearance is being prepared for PUPTAS sync.',
-                    'missing_student_number' => 'Your clearance is approved, but PUPTAS sync is waiting for a valid student number.',
-                    'failed' => 'Your clearance is approved, but the PUPTAS sync still needs attention.',
-                    default => 'Your clearance approval is being checked for PUPTAS sync.',
-                },
-                'time' => 'PUPTAS sync status',
-            ]);
-        }
-    }
 
     // 5. Return view user
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
     $accountProfileData = $this->buildHealthFormPrefill($user, $linkedAdminProfile, $user->healthProfile);
+    $accountView = in_array((string) $request->query('view', 'profile'), ['profile', 'health-record'], true)
+        ? (string) $request->query('view', 'profile')
+        : 'profile';
 
     return view('student.account', compact(
         'user', 
@@ -594,9 +645,48 @@ class AppointmentController extends Controller
         'notifications',
         'linkedAdminProfile',
         'hasSubmittedHealthProfile',
-        'accountProfileData'
+        'accountProfileData',
+        'accountView'
     ));
 }
+
+    public function openNotification(string $notificationId)
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user) {
+            return redirect('/login-as-student')->with('error', 'Please login first.');
+        }
+
+        $notification = collect($this->getStudentNotifications($user))
+            ->firstWhere('id', $notificationId);
+
+        if (!$notification) {
+            return redirect('/student/account')->with('error', 'Notification not found.');
+        }
+
+        $this->markNotificationAsRead($user, $notificationId);
+
+        return redirect($notification['link'] ?? '/student/account');
+    }
+
+    public function markAllNotificationsRead()
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user) {
+            return redirect('/login-as-student')->with('error', 'Please login first.');
+        }
+
+        $readMap = $this->getNotificationReadMap($user);
+        foreach ($this->getStudentNotifications($user) as $notification) {
+            $readMap[$notification['id']] = now()->toIso8601String();
+        }
+
+        session([$this->notificationReadStateKey($user) => $readMap]);
+
+        return back()->with('success', 'All notifications marked as read.');
+    }
 
 
     // -------------------------------
@@ -1080,4 +1170,5 @@ public function printHealthForm()
         return redirect()->back()->with('success', 'Barcode reset successfully! You can scan again.');
     }
 } 
+
 

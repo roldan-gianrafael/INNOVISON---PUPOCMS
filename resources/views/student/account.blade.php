@@ -69,9 +69,8 @@
 
     /* --- LAYOUT GRID --- */
     .account-layout {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 24px;
+        max-width: 960px;
+        margin: 0 auto;
     }
 
     /* --- APPOINTMENT CARDS --- */
@@ -460,6 +459,7 @@
         ? (str_contains($linkedAccessLevel, 'faculty') ? 'Faculty' : 'Admin')
         : null;
     $accountProfileData = $accountProfileData ?? [];
+    $accountView = in_array(($accountView ?? 'profile'), ['profile', 'health-record'], true) ? $accountView : 'profile';
     $showOfficeField = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin', 'faculty'], true) || str_contains($linkedAccessLevel, 'faculty');
 @endphp
 <div class="container" style="padding: 40px 20px;">
@@ -537,160 +537,7 @@
     </div>
 
     <div class="account-layout">
-        
-        {{-- Left: History --}}
-        <div>
-            <div class="section-title">My Appointment History</div>
-
-            @forelse($appointments as $appt)
-                <div class="appt-card {{ strtolower($appt->status) }}">
-                    <div class="appt-header">
-                        <div class="appt-service">{{ $appt->service }}</div>
-                        <div class="appt-date">
-                            {{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }}<br>
-                            <small>{{ \Carbon\Carbon::parse($appt->time)->format('g:i A') }}</small>
-                        </div>
-                    </div>
-                    
-                    @if($appt->remarks)
-                        <div class="appt-notes">
-                            "{{ $appt->remarks }}"
-                        </div>
-                    @endif
-
-                    <span class="status-badge {{ strtolower($appt->status) }}">
-                        ● {{ $appt->status }}
-                    </span>
-                </div>
-            @empty
-                <div style="text-align: center; padding: 40px; background: #fff; border-radius: 12px; border: 1px dashed #cbd5e1;">
-                    <div style="font-size: 40px; margin-bottom: 10px; opacity: 0.5;">📭</div>
-                    <div style="color: #64748b; font-weight: 600;">No appointment history found.</div>
-                </div>
-            @endforelse
-        </div>
-    
-        {{-- Right: Widgets --}}
-        <div>
-            <div class="barcode-status-card {{ $user->barcode ? 'linked' : 'not-linked' }}">
-                <div class="barcode-label">Clinic ID Link Status</div>
-                
-                @if($user->barcode)
-                    <div class="barcode-icon-box">✅</div>
-                    <span class="barcode-value">{{ $user->barcode }}</span>
-                    <p style="font-size: 12px; color: #64748b; margin: 0;">Your account is ready for clinic walk-ins.</p>
-                @else
-                    <div class="barcode-icon-box">⚠️</div>
-                    <span class="barcode-value" style="color: #b45309;">Not Yet Linked</span>
-                    <p style="font-size: 12px; color: #64748b; margin: 0;">Scan your physical ID for quick check-ins.</p>
-                    <a href="{{ route('barcode.register') }}" class="btn-barcode-action">Open Scan / Bio →</a>
-                @endif
-            </div>
-            
-            {{-- Notification Div --}}
-            <div class="widget-card">
-                <div class="section-title" style="font-size: 16px; margin-bottom: 15px;">Notifications</div>
-                @forelse($notifications as $notif)
-                    <div class="notif-item">
-                        <div class="notif-icon">{{ $notif['icon'] }}</div>
-                        <div style="flex:1;">
-                            <div class="notif-text">{{ $notif['message'] }}</div>
-                            <span class="notif-time">{{ $notif['time'] }}</span>
-                        </div>
-                    </div>
-                @empty
-                    <div style="font-size: 14px; color: #64748b; text-align: center; padding: 20px 0;">No new notifications.</div>
-                @endforelse
-            </div>
-
-            {{-- NEW: Health Form Quick Access Div --}}
-            <div class="health-status-card">
-    @php
-        $healthFormSubmitted = $hasSubmittedHealthProfile ?? ($user->healthProfile !== null);
-        $status = $user->healthProfile->clearance_status ?? 'Pending';
-    @endphp
-    <span class="health-status-title">Health Information Record</span>
-    
-    @if($healthFormSubmitted)
-        @if($status == 'Issued')
-            <div class="health-status-summary">
-                <span class="health-status-state issued">Approved</span>
-                <p class="health-status-message">
-                    Your health profile is now approved and ready for printing.
-                </p>
-            </div>
-            @php
-                $puptasSyncStatus = optional($user->healthProfile)->puptas_sync_status;
-                $puptasSyncMessage = trim((string) optional($user->healthProfile)->puptas_sync_message);
-                $puptasSyncedAt = optional(optional($user->healthProfile)->puptas_synced_at)->format('M d, Y g:i A');
-            @endphp
-            @if($puptasSyncStatus === 'synced')
-                <div class="health-status-sync synced">
-                    <strong>PUPTAS sync complete.</strong>
-                    @if($puptasSyncedAt)
-                        Synced on {{ $puptasSyncedAt }}.
-                    @endif
-                </div>
-            @elseif($puptasSyncStatus === 'syncing')
-                <div class="health-status-sync syncing">
-                    <strong>PUPTAS sync in progress.</strong>
-                    {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'Your approved clearance is being prepared for admission sync.' }}
-                </div>
-            @elseif($puptasSyncStatus === 'failed')
-                <div class="health-status-sync failed">
-                    <strong>PUPTAS sync failed.</strong>
-                    {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The approved clearance has not been accepted by PUPTAS yet.' }}
-                </div>
-            @elseif($puptasSyncStatus === 'missing_student_number')
-                <div class="health-status-sync missing">
-                    <strong>PUPTAS sync is waiting for a valid student number.</strong>
-                    {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The clinic approval is complete, but the admission sync cannot finish until the school student number is resolved.' }}
-                </div>
-            @endif
-            
-            <div class="health-status-actions">
-                <a href="{{ route('print.health.form') }}" class="btn-print-form approved">
-                    Print Approved Form
-                </a>
-        
-                <a href="{{ route('print.health.form') }}" class="health-status-link">
-                    View Record Details
-                </a>
-            </div>
-            <span class="health-status-note">Valid for Academic Year 2025-2026</span>
-
-        @else
-            <div class="health-status-summary">
-                <span class="health-status-state pending">Pending Review</span>
-                <p class="health-status-message">
-                    Your profile has been submitted and is currently <strong>awaiting medical review</strong>.
-                </p>
-            </div>
-            
-            <div class="health-status-actions">
-                <a href="{{ route('print.health.form') }}" class="btn-print-form pending">
-                    View Submitted Form
-                </a>
-                <button class="btn-print-form disabled" disabled>
-                    Printing Disabled (Pending)
-                </button>
-            </div>
-            <span class="health-status-note">Physician signature is required to print.</span>
-        @endif
-
-    @else
-        <div class="health-status-summary">
-            <span class="health-status-state incomplete">Not Completed</span>
-            <p class="health-status-message">You haven't completed your health profile yet.</p>
-        </div>
-        <a href="{{ route('health.form') }}" class="btn-print-form incomplete">
-            Complete Form Now
-        </a>
-        <span class="health-status-note">Required for clinic consultations.</span>
-    @endif
-</div>
-
-@if(session('health_profile_submitted'))
+        @if(session('health_profile_submitted'))
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const overlay = document.getElementById('healthSubmitOverlay');
@@ -705,7 +552,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endif
-      
+
+@if($accountView === 'profile')
 {{-- Full Profile Widget --}}
             <div class="widget-card">
     <div class="section-title" style="font-size: 16px; margin-bottom: 15px;"> Profile Information</div>
@@ -878,6 +726,75 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </form>
 </div>
+@else
+    @php
+        $healthFormSubmitted = $hasSubmittedHealthProfile ?? ($user->healthProfile !== null);
+        $status = $user->healthProfile->clearance_status ?? 'Pending';
+        $puptasSyncStatus = optional($user->healthProfile)->puptas_sync_status;
+        $puptasSyncMessage = trim((string) optional($user->healthProfile)->puptas_sync_message);
+        $puptasSyncedAt = optional(optional($user->healthProfile)->puptas_synced_at)->format('M d, Y g:i A');
+    @endphp
+    <div class="health-status-card">
+        <span class="health-status-title">Health Information Record</span>
+
+        @if($healthFormSubmitted)
+            @if($status === 'Issued')
+                <div class="health-status-summary">
+                    <span class="health-status-state issued">Approved</span>
+                    <p class="health-status-message">Your health profile is now approved and ready for printing.</p>
+                </div>
+
+                @if($puptasSyncStatus === 'synced')
+                    <div class="health-status-sync synced">
+                        <strong>PUPTAS sync complete.</strong>
+                        @if($puptasSyncedAt)
+                            Synced on {{ $puptasSyncedAt }}.
+                        @endif
+                    </div>
+                @elseif($puptasSyncStatus === 'syncing')
+                    <div class="health-status-sync syncing">
+                        <strong>PUPTAS sync in progress.</strong>
+                        {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'Your approved clearance is being prepared for PUPTAS sync.' }}
+                    </div>
+                @elseif($puptasSyncStatus === 'failed')
+                    <div class="health-status-sync failed">
+                        <strong>PUPTAS sync failed.</strong>
+                        {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The approved clearance has not been accepted by PUPTAS yet.' }}
+                    </div>
+                @elseif($puptasSyncStatus === 'missing_student_number')
+                    <div class="health-status-sync missing">
+                        <strong>PUPTAS sync is waiting for a valid student number.</strong>
+                        {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The clinic approval is complete, but the admission sync cannot finish until the school student number is resolved.' }}
+                    </div>
+                @endif
+
+                <div class="health-status-actions">
+                    <a href="{{ route('print.health.form') }}" class="btn-print-form approved">Print Approved Form</a>
+                    <a href="{{ route('print.health.form') }}" class="health-status-link">View Record Details</a>
+                </div>
+                <span class="health-status-note">Valid for Academic Year 2025-2026</span>
+            @else
+                <div class="health-status-summary">
+                    <span class="health-status-state pending">Pending Review</span>
+                    <p class="health-status-message">Your profile has been submitted and is currently <strong>awaiting medical review</strong>.</p>
+                </div>
+
+                <div class="health-status-actions">
+                    <a href="{{ route('print.health.form') }}" class="btn-print-form pending">View Submitted Form</a>
+                    <button class="btn-print-form disabled" disabled>Printing Disabled (Pending)</button>
+                </div>
+                <span class="health-status-note">Physician signature is required to print.</span>
+            @endif
+        @else
+            <div class="health-status-summary">
+                <span class="health-status-state incomplete">Not Completed</span>
+                <p class="health-status-message">You haven't completed your health profile yet.</p>
+            </div>
+            <a href="{{ route('health.form') }}" class="btn-print-form incomplete">Complete Form Now</a>
+            <span class="health-status-note">Required for clinic consultations.</span>
+        @endif
+    </div>
+@endif
         </div>
     </div>
 </div>

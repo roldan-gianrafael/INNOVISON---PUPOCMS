@@ -201,6 +201,14 @@
             position: relative;
         }
 
+        .nav-list-divider {
+            width: 1px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.28);
+            margin: 0 6px;
+            flex: 0 0 auto;
+        }
+
         .nav-dropdown-toggle {
             background: none;
             border: none;
@@ -289,6 +297,159 @@
         .nav-dropdown-menu a.active {
             background: #fff7ed;
             color: #8b0000 !important;
+        }
+
+        .notif-toggle-btn {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.42);
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            flex: 0 0 auto;
+            overflow: visible;
+            transition: all 0.2s ease;
+        }
+
+        .notif-toggle-btn:hover,
+        .notif-toggle-btn[aria-expanded="true"] {
+            background: rgba(255, 255, 255, 0.24);
+            border-color: rgba(255, 255, 255, 0.65);
+        }
+
+        .notif-toggle-btn svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+            flex: 0 0 auto;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #f59e0b;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+        }
+
+        .notif-badge.is-hidden {
+            display: none;
+        }
+
+        .notif-dropdown-menu {
+            min-width: 320px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .notif-dropdown-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-bottom: 1px solid #eef2f7;
+            background: #fffaf5;
+        }
+
+        .notif-dropdown-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #7c2d12;
+        }
+
+        .notif-read-all {
+            background: none;
+            border: none;
+            color: #8b0000;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .notif-read-all:hover {
+            text-decoration: underline;
+        }
+
+        .notif-dropdown-list {
+            max-height: 360px;
+            overflow-y: auto;
+            background: #fff;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .notif-dropdown-item {
+            display: flex !important;
+            gap: 10px;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            padding: 12px 14px !important;
+            border-radius: 0 !important;
+            border-bottom: 1px solid #f1f5f9;
+            position: relative;
+        }
+
+        .notif-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .notif-dropdown-item.unread {
+            background: #fffaf0;
+        }
+
+        .notif-item-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #8b0000;
+            margin-top: 6px;
+            flex: 0 0 auto;
+        }
+
+        .notif-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notif-item-message {
+            font-size: 13px;
+            line-height: 1.45;
+            color: #1f2937;
+        }
+
+        .notif-dropdown-item.unread .notif-item-message {
+            font-weight: 800;
+        }
+
+        .notif-item-time {
+            display: block;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #94a3b8;
         }
 
         /* Hover Effect: Turn Gold */
@@ -430,6 +591,13 @@
                 padding: 8px 0;
             }
 
+            .nav-list-divider {
+                width: 100%;
+                height: 1px;
+                margin: 2px 0 8px;
+                background: #e5e7eb;
+            }
+
             .nav-dropdown-toggle {
                 color: #1f2937;
                 width: 100%;
@@ -449,6 +617,10 @@
 
             .nav-dropdown-menu a {
                 padding: 10px 12px !important;
+            }
+
+            .notif-dropdown-menu {
+                min-width: 100%;
             }
 
             .nav-list li a:not(.logout-btn)::after {
@@ -538,6 +710,10 @@
             background: rgba(255, 255, 255, 0.22);
         }
 
+        html[data-theme="dark"] .nav-list-divider {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
         html[data-theme="dark"] .nav-dropdown-menu {
             background: #171d27;
             border-color: #2f3847;
@@ -552,6 +728,38 @@
         html[data-theme="dark"] .nav-dropdown-menu a.active {
             background: rgba(139, 0, 0, 0.22);
             color: #ffd166 !important;
+        }
+
+        html[data-theme="dark"] .notif-toggle-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .notif-dropdown-header {
+            background: rgba(139, 0, 0, 0.18);
+            border-bottom-color: #2f3847;
+        }
+
+        html[data-theme="dark"] .notif-dropdown-title,
+        html[data-theme="dark"] .notif-read-all {
+            color: #ffd7b5;
+        }
+
+        html[data-theme="dark"] .notif-dropdown-list {
+            background: #171d27;
+        }
+
+        html[data-theme="dark"] .notif-dropdown-item {
+            border-bottom-color: #253041;
+        }
+
+        html[data-theme="dark"] .notif-dropdown-item.unread {
+            background: rgba(139, 0, 0, 0.14);
+        }
+
+        html[data-theme="dark"] .notif-item-message {
+            color: #e5eaf3;
         }
 
         html[data-theme="dark"] h1,
@@ -779,12 +987,15 @@
             <nav id="main-menu" class="main-nav">
                 @php
                     $isMyAccountSection = Request::is('student/account') || Request::is('student/history') || Request::is('student/barcode-register') || Request::is('student/print-health-form');
+                    $layoutNotifications = collect($notifications ?? [])->take(5);
+                    $notificationCount = $layoutNotifications->where('is_unread', true)->count();
                 @endphp
                 <ul class="nav-list">
                     <li><a href="{{ url('/student/home') }}" class="{{ Request::is('student/home') ? 'active' : '' }}">Home</a></li>
-
-                    <li><a href="{{ url('/student/home') }}#about">About Us</a></li>
                     <li><a href="{{ url('/student/booking') }}" class="{{ Request::is('student/booking') ? 'active' : '' }}">Appointments</a></li>
+                    <li><a href="{{ url('/student/home') }}#about">About Us</a></li>
+                    <li><a href="{{ url('/student/faq') }}" class="{{ Request::is('student/faq') ? 'active' : '' }}">FAQs</a></li>
+                    <li class="nav-list-divider" aria-hidden="true"></li>
                     <li class="nav-dropdown {{ $isMyAccountSection ? 'is-open-on-route' : '' }}" data-nav-dropdown>
                         <button
                             type="button"
@@ -796,13 +1007,62 @@
                             <span class="nav-dropdown-caret" aria-hidden="true"></span>
                         </button>
                         <ul class="nav-dropdown-menu">
-                            <li><a href="{{ url('/student/account') }}" class="{{ Request::is('student/account') ? 'active' : '' }}">Profile</a></li>
+                            <li><a href="{{ url('/student/account?view=profile') }}" class="{{ Request::is('student/account') && request('view', 'profile') === 'profile' ? 'active' : '' }}">Profile</a></li>
                             <li><a href="{{ url('/student/history') }}" class="{{ Request::is('student/history') ? 'active' : '' }}">Appointment History</a></li>
-                            <li><a href="{{ route('print.health.form') }}" class="{{ Request::is('student/print-health-form') ? 'active' : '' }}">Health Record</a></li>
+                            <li><a href="{{ url('/student/account?view=health-record') }}" class="{{ Request::is('student/account') && request('view') === 'health-record' ? 'active' : '' }}">Health Record</a></li>
                             <li><a href="{{ url('/student/barcode-register') }}" class="{{ Request::is('student/barcode-register') ? 'active' : '' }}">Scan / Bio</a></li>
                         </ul>
                     </li>
-                    <li><a href="{{ url('/student/faq') }}" class="{{ Request::is('student/faq') ? 'active' : '' }}">FAQ</a></li>
+                    <li class="nav-dropdown" data-nav-dropdown>
+                        <button
+                            type="button"
+                            class="notif-toggle-btn"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                            aria-label="Notifications"
+                            title="Notifications"
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
+                                <path d="M10 17a2 2 0 0 0 4 0"></path>
+                            </svg>
+                            <span class="notif-badge {{ $notificationCount > 0 ? '' : 'is-hidden' }}">{{ $notificationCount }}</span>
+                        </button>
+                        <ul class="nav-dropdown-menu notif-dropdown-menu">
+                            <li class="notif-dropdown-header">
+                                <span class="notif-dropdown-title">Notifications</span>
+                                @if($layoutNotifications->isNotEmpty())
+                                    <form action="{{ route('student.notifications.read_all') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="notif-read-all">Mark all as read</button>
+                                    </form>
+                                @endif
+                            </li>
+                            <ul class="notif-dropdown-list">
+                                @forelse($layoutNotifications as $notif)
+                                    <li>
+                                        <a href="{{ route('student.notifications.open', ['notificationId' => $notif['id']]) }}" class="notif-dropdown-item {{ !empty($notif['is_unread']) ? 'unread' : '' }}">
+                                            @if(!empty($notif['is_unread']))
+                                                <span class="notif-item-dot" aria-hidden="true"></span>
+                                            @endif
+                                            <span class="notif-item-content">
+                                                <span class="notif-item-message">{{ $notif['message'] ?? 'Notification available.' }}</span>
+                                                <span class="notif-item-time">{{ $notif['time'] ?? 'Just now' }}</span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                @empty
+                                    <li>
+                                        <a href="{{ url('/student/account?view=profile') }}" class="notif-dropdown-item">
+                                            <span class="notif-item-content">
+                                                <span class="notif-item-message">No new notifications.</span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endforelse
+                            </ul>
+                        </ul>
+                    </li>
                     <li>
                         <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -884,7 +1144,7 @@
                         }
 
                         dropdown.classList.remove('is-open');
-                        const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                        const toggle = dropdown.querySelector('.nav-dropdown-toggle, .notif-toggle-btn');
                         if (toggle) {
                             toggle.setAttribute('aria-expanded', 'false');
                         }
@@ -896,7 +1156,7 @@
                 });
 
                 navDropdowns.forEach((dropdown) => {
-                    const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                    const toggle = dropdown.querySelector('.nav-dropdown-toggle, .notif-toggle-btn');
                     if (!toggle) {
                         return;
                     }
@@ -916,7 +1176,7 @@
                         return;
                     }
 
-                    if (target.classList.contains('nav-dropdown-toggle')) {
+                    if (target.classList.contains('nav-dropdown-toggle') || target.classList.contains('notif-toggle-btn')) {
                         return;
                     }
 

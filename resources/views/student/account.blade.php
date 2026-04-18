@@ -459,10 +459,10 @@
         ? (str_contains($linkedAccessLevel, 'faculty') ? 'Faculty' : 'Admin')
         : null;
     $accountProfileData = $accountProfileData ?? [];
-    $accountView = in_array(($accountView ?? 'profile'), ['profile', 'health-record'], true) ? $accountView : 'profile';
+    $accountView = in_array(($accountView ?? 'profile'), ['profile', 'health-record', 'notifications'], true) ? $accountView : 'profile';
     $showOfficeField = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin', 'faculty'], true) || str_contains($linkedAccessLevel, 'faculty');
 @endphp
-<div class="container" style="padding: 40px 20px;">
+<div class="container" style="padding: 18px 20px 40px;">
 
     @if(session('health_profile_submitted'))
         <div class="health-submit-overlay" id="healthSubmitOverlay">
@@ -726,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </form>
 </div>
-@else
+@elseif($accountView === 'health-record')
     @php
         $healthFormSubmitted = $hasSubmittedHealthProfile ?? ($user->healthProfile !== null);
         $status = $user->healthProfile->clearance_status ?? 'Pending';
@@ -793,6 +793,43 @@ document.addEventListener('DOMContentLoaded', function () {
             <a href="{{ route('health.form') }}" class="btn-print-form incomplete">Complete Form Now</a>
             <span class="health-status-note">Required for clinic consultations.</span>
         @endif
+    </div>
+@else
+    <div class="widget-card">
+        <div class="section-title" style="font-size: 16px; margin-bottom: 15px;"> Notifications</div>
+        <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+            @if(collect($notifications ?? [])->isNotEmpty())
+                <form action="{{ route('student.notifications.read_all') }}" method="POST">
+                    @csrf
+                    <button type="submit" style="padding:10px 14px; background:#8B0000; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
+                        Mark all as read
+                    </button>
+                </form>
+            @endif
+        </div>
+
+        @forelse(collect($notifications ?? []) as $notif)
+            <a href="{{ route('student.notifications.open', ['notificationId' => $notif['id']]) }}"
+               style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; margin-bottom:12px; border:1px solid {{ !empty($notif['is_unread']) ? '#f5d0d0' : '#e2e8f0' }}; background:{{ !empty($notif['is_unread']) ? '#fff7f7' : '#ffffff' }}; border-radius:12px; text-decoration:none;">
+                @if(!empty($notif['is_unread']))
+                    <span style="width:10px; height:10px; margin-top:6px; border-radius:999px; background:#8B0000; flex:0 0 auto;"></span>
+                @else
+                    <span style="width:10px; height:10px; margin-top:6px; border-radius:999px; background:#cbd5e1; flex:0 0 auto;"></span>
+                @endif
+                <span style="flex:1; min-width:0;">
+                    <span style="display:block; font-size:14px; line-height:1.5; color:#1f2937; font-weight:{{ !empty($notif['is_unread']) ? '800' : '600' }};">
+                        {{ $notif['message'] ?? 'Notification available.' }}
+                    </span>
+                    <span style="display:block; margin-top:5px; font-size:12px; color:#64748b;">
+                        {{ $notif['time'] ?? 'Just now' }}
+                    </span>
+                </span>
+            </a>
+        @empty
+            <div style="padding:18px; border:1px dashed #cbd5e1; border-radius:12px; color:#64748b; text-align:center;">
+                No notifications available right now.
+            </div>
+        @endforelse
     </div>
 @endif
         </div>

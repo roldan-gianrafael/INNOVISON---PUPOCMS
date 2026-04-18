@@ -631,7 +631,7 @@ public function account(Request $request)
     // 5. Return view user
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
     $accountProfileData = $this->buildHealthFormPrefill($user, $linkedAdminProfile, $user->healthProfile);
-    $accountView = in_array((string) $request->query('view', 'profile'), ['profile', 'health-record'], true)
+    $accountView = in_array((string) $request->query('view', 'profile'), ['profile', 'health-record', 'notifications'], true)
         ? (string) $request->query('view', 'profile')
         : 'profile';
 

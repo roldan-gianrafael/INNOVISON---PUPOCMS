@@ -363,6 +363,52 @@
             overflow: hidden;
         }
 
+        .notif-fab-wrap {
+            position: fixed;
+            right: 24px;
+            bottom: 84px;
+            z-index: 1100;
+        }
+
+        .notif-fab {
+            width: 54px;
+            height: 54px;
+            border-radius: 999px;
+            border: 2px solid rgba(255, 255, 255, 0.92);
+            background: linear-gradient(135deg, #8b0000 0%, #6b0011 100%);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 16px 28px rgba(107, 0, 17, 0.34);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .notif-fab:hover,
+        .notif-fab[aria-expanded="true"] {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 30px rgba(107, 0, 17, 0.4);
+            background: linear-gradient(135deg, #9f0712 0%, #7f0014 100%);
+        }
+
+        .notif-fab svg {
+            width: 22px;
+            height: 22px;
+            display: block;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .notif-fab .notif-badge {
+            top: -6px;
+            right: -4px;
+        }
+
         .notif-dropdown-header {
             display: flex;
             align-items: center;
@@ -951,6 +997,16 @@
         }
 
         @media (max-width: 768px) {
+            .notif-fab-wrap {
+                right: 18px;
+                bottom: 76px;
+            }
+
+            .notif-fab {
+                width: 50px;
+                height: 50px;
+            }
+
             html[data-theme="dark"] .nav-list {
                 background: #1a1018 !important;
                 border: 1px solid rgba(255, 255, 255, 0.12);
@@ -1008,59 +1064,10 @@
                         </button>
                         <ul class="nav-dropdown-menu">
                             <li><a href="{{ url('/student/account?view=profile') }}" class="{{ Request::is('student/account') && request('view', 'profile') === 'profile' ? 'active' : '' }}">Profile</a></li>
+                            <li><a href="{{ url('/student/account?view=notifications') }}" class="{{ Request::is('student/account') && request('view') === 'notifications' ? 'active' : '' }}">Notifications @if($notificationCount > 0)<span style="margin-left:6px; font-weight:800; color:#8b0000;">({{ $notificationCount }})</span>@endif</a></li>
                             <li><a href="{{ url('/student/history') }}" class="{{ Request::is('student/history') ? 'active' : '' }}">Appointment History</a></li>
                             <li><a href="{{ url('/student/account?view=health-record') }}" class="{{ Request::is('student/account') && request('view') === 'health-record' ? 'active' : '' }}">Health Record</a></li>
                             <li><a href="{{ url('/student/barcode-register') }}" class="{{ Request::is('student/barcode-register') ? 'active' : '' }}">Scan / Bio</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-dropdown" data-nav-dropdown>
-                        <button
-                            type="button"
-                            class="notif-toggle-btn"
-                            aria-expanded="false"
-                            aria-haspopup="true"
-                            aria-label="Notifications"
-                            title="Notifications"
-                        >
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
-                                <path d="M10 17a2 2 0 0 0 4 0"></path>
-                            </svg>
-                            <span class="notif-badge {{ $notificationCount > 0 ? '' : 'is-hidden' }}">{{ $notificationCount }}</span>
-                        </button>
-                        <ul class="nav-dropdown-menu notif-dropdown-menu">
-                            <li class="notif-dropdown-header">
-                                <span class="notif-dropdown-title">Notifications</span>
-                                @if($layoutNotifications->isNotEmpty())
-                                    <form action="{{ route('student.notifications.read_all') }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="notif-read-all">Mark all as read</button>
-                                    </form>
-                                @endif
-                            </li>
-                            <ul class="notif-dropdown-list">
-                                @forelse($layoutNotifications as $notif)
-                                    <li>
-                                        <a href="{{ route('student.notifications.open', ['notificationId' => $notif['id']]) }}" class="notif-dropdown-item {{ !empty($notif['is_unread']) ? 'unread' : '' }}">
-                                            @if(!empty($notif['is_unread']))
-                                                <span class="notif-item-dot" aria-hidden="true"></span>
-                                            @endif
-                                            <span class="notif-item-content">
-                                                <span class="notif-item-message">{{ $notif['message'] ?? 'Notification available.' }}</span>
-                                                <span class="notif-item-time">{{ $notif['time'] ?? 'Just now' }}</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                @empty
-                                    <li>
-                                        <a href="{{ url('/student/account?view=profile') }}" class="notif-dropdown-item">
-                                            <span class="notif-item-content">
-                                                <span class="notif-item-message">No new notifications.</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                @endforelse
-                            </ul>
                         </ul>
                     </li>
                     <li>
@@ -1093,6 +1100,49 @@
     </main>
 
     @include('partials.post_login_terms_gate')
+
+    @if($notificationCount > 0)
+        <div class="notif-fab-wrap nav-dropdown" data-nav-dropdown>
+            <button
+                type="button"
+                class="notif-fab"
+                aria-expanded="false"
+                aria-haspopup="true"
+                aria-label="Notifications"
+                title="Notifications"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
+                    <path d="M10 17a2 2 0 0 0 4 0"></path>
+                </svg>
+                <span class="notif-badge">{{ $notificationCount }}</span>
+            </button>
+            <ul class="nav-dropdown-menu notif-dropdown-menu" style="right: 0; left: auto; bottom: calc(100% + 12px); top: auto;">
+                <li class="notif-dropdown-header">
+                    <span class="notif-dropdown-title">Notifications</span>
+                    @if($layoutNotifications->isNotEmpty())
+                        <form action="{{ route('student.notifications.read_all') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="notif-read-all">Mark all as read</button>
+                        </form>
+                    @endif
+                </li>
+                <ul class="notif-dropdown-list">
+                    @foreach($layoutNotifications->where('is_unread', true) as $notif)
+                        <li>
+                            <a href="{{ route('student.notifications.open', ['notificationId' => $notif['id']]) }}" class="notif-dropdown-item unread">
+                                <span class="notif-item-dot" aria-hidden="true"></span>
+                                <span class="notif-item-content">
+                                    <span class="notif-item-message">{{ $notif['message'] ?? 'Notification available.' }}</span>
+                                    <span class="notif-item-time">{{ $notif['time'] ?? 'Just now' }}</span>
+                                </span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </ul>
+        </div>
+    @endif
 
     @if(
         Request::is('student/account') ||

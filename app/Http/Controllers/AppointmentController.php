@@ -335,6 +335,25 @@ class AppointmentController extends Controller
         return HealthProfile::query()->where('user_id', $user->id)->exists();
     }
 
+    private function resolveStudentContext(?User $user): array
+    {
+        if (!$user) {
+            return [
+                'student_id' => '',
+                'student_number' => '',
+            ];
+        }
+
+        $user->loadMissing('healthProfile');
+        $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+        $prefill = $this->buildHealthFormPrefill($user, $linkedAdminProfile, $user->healthProfile);
+
+        return [
+            'student_id' => trim((string) ($prefill['student_id'] ?? $user->student_id ?? '')),
+            'student_number' => trim((string) ($prefill['student_number'] ?? $user->student_number ?? '')),
+        ];
+    }
+
     private function resolveLinkedAdminProfile(?User $user): ?Admin
     {
         if (!$user || !Admin::hasColumn('email')) {
@@ -420,7 +439,9 @@ class AppointmentController extends Controller
                                    ->orderBy('date', 'asc')
                                    ->get();
 
-        return view('student.booking', compact('user', 'appointments'));
+        $studentContext = $this->resolveStudentContext($user);
+
+        return view('student.booking', compact('user', 'appointments', 'studentContext'));
     }
 
     // -------------------------------
@@ -483,10 +504,12 @@ class AppointmentController extends Controller
         // Create appointment for student side
   
 
+        $studentContext = $this->resolveStudentContext($user);
+
         $appointment = new Appointment();
         $appointment->user_id = $user->id;
-        $appointment->student_id = $request->input('student_id', '2025-0000-TG-0');
-        $appointment->student_number = $request->input('student_number', (string) ($user->student_number ?? ''));
+        $appointment->student_id = $request->input('student_id', $studentContext['student_id'] ?: '2025-0000-TG-0');
+        $appointment->student_number = $request->input('student_number', $studentContext['student_number']);
         $appointment->name = $user->name;
         $appointment->email = $user->email;
         $appointment->date = $request->date;
@@ -842,7 +865,9 @@ public function account(Request $request)
                                    ->orderBy('time', 'desc')
                                    ->get();
 
-        return view('student.history', compact('appointments'));
+        $studentContext = $this->resolveStudentContext($user);
+
+        return view('student.history', compact('appointments', 'studentContext'));
     }
 
     // -------------------------------
@@ -851,7 +876,9 @@ public function account(Request $request)
     public function barcodeRegister()
     {
         $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
-        return view('student.barcode-register', compact('user'));
+        $studentContext = $this->resolveStudentContext($user);
+
+        return view('student.barcode-register', compact('user', 'studentContext'));
     }
 
     // -------------------------------

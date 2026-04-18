@@ -259,9 +259,9 @@
                     <tr>
                         <td>
                             <div style="font-weight: 700;" class="student-name">{{ $appt->name }}</div>
-                            <div style="font-size: 12px; color: #111827;">{{ $appt->student_number ?: optional($appt->user)->student_number ?: 'N/A' }}</div>
+                            <div style="font-size: 12px; color: #111827;">{{ $appt->student_number ?: optional(optional($appt->user)->healthProfile)->student_number ?: optional($appt->user)->student_number ?: 'N/A' }}</div>
                         </td>
-                        <td>{{ $appt->student_number ?: optional($appt->user)->student_number ?: 'N/A' }}</td>
+                        <td>{{ $appt->student_number ?: optional(optional($appt->user)->healthProfile)->student_number ?: optional($appt->user)->student_number ?: 'N/A' }}</td>
                        <td>
     @php
         // Preferred source field is `type`; fallback for legacy records.

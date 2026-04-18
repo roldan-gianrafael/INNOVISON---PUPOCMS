@@ -74,7 +74,7 @@
                     <div>
                       <div class="apt-service">{{ $appt->service }}</div>
                       <div class="apt-details">
-                        <span>{{ $appt->name }} ({{ $appt->student_number ?: optional($appt->user)->student_number ?: $appt->student_id }})</span>
+                        <span>{{ $appt->name }} ({{ $appt->student_number ?: optional(optional($appt->user)->healthProfile)->student_number ?: optional($appt->user)->student_number ?: ($studentContext['student_number'] ?? $appt->student_id) }})</span>
                         <span>{{ $appt->email }}</span>
                       </div>
                     </div>

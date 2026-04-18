@@ -240,13 +240,27 @@ class PuptasWebhookService
     public function sendWithRetry(string $studentNumber, bool $isCleared = true, int $maxRetries = 3): array
     {
         $attempt = 0;
+        $lastResult = ['success' => false, 'message' => 'No webhook attempts were made.'];
+
         while ($attempt < $maxRetries) {
             $result = $this->sendMedicalClearance($studentNumber, $isCleared);
-            if ($result['success']) return $result;
-            
+            $lastResult = $result;
+
+            if ($result['success']) {
+                return $result;
+            }
+
             $attempt++;
-            if ($attempt < $maxRetries) sleep(2);
+            if ($attempt < $maxRetries) {
+                sleep(2);
+            }
         }
-        return ['success' => false, 'message' => 'Failed after ' . $maxRetries . ' attempts'];
+
+        return [
+            'success' => false,
+            'message' => trim((string) ($lastResult['message'] ?? '')) !== ''
+                ? $lastResult['message']
+                : ('Failed after ' . $maxRetries . ' attempts'),
+        ];
     }
 }

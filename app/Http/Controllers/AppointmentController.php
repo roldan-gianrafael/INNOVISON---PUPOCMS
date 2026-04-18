@@ -278,7 +278,7 @@ class AppointmentController extends Controller
             'student_id' => (string) (optional($healthProfile)->student_id ?? $user->student_id ?? ''),
             'student_number' => (string) (
                 data_get($applicantData, 'student_number')
-                ?: (optional($healthProfile)->student_number ?? $user->student_number ?: ($user->student_id ?: ''))
+                ?: (optional($healthProfile)->student_number ?? $user->student_number ?? '')
             ),
             'email' => (string) (
                 optional(optional($healthProfile)->user)->email

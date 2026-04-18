@@ -14,6 +14,24 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
+    .page-intro {
+        margin-bottom: 20px;
+    }
+
+    .page-intro h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        color: #600000;
+    }
+
+    .page-intro p {
+        margin: 6px 0 0;
+        color: #6b7b7d;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
     .scan-bio-grid {
         display: grid;
         grid-template-columns: 1.25fr 0.95fr;
@@ -245,6 +263,10 @@
 
 @section('content')
 <div class="barcode-card">
+    <div class="page-intro">
+        <h1>Scan / Bio</h1>
+        <p>Link your clinic identity using barcode scan today, and keep your account ready for future BioSync support.</p>
+    </div>
 
     {{-- HEADER LOGIC --}}
     @if($user->barcode)

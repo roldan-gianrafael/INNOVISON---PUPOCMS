@@ -73,6 +73,24 @@
         margin: 0 auto;
     }
 
+    .page-intro {
+        margin-bottom: 18px;
+    }
+
+    .page-intro-title {
+        margin: 0;
+        font-size: 28px;
+        color: #600000;
+        font-weight: 800;
+    }
+
+    .page-intro-text {
+        margin: 6px 0 0;
+        font-size: 14px;
+        color: #6b7b7d;
+        line-height: 1.5;
+    }
+
     /* --- APPOINTMENT CARDS --- */
     .section-title {
         color: #20343a;
@@ -461,8 +479,10 @@
     $accountProfileData = $accountProfileData ?? [];
     $accountView = in_array(($accountView ?? 'profile'), ['profile', 'health-record', 'notifications'], true) ? $accountView : 'profile';
     $showOfficeField = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin', 'faculty'], true) || str_contains($linkedAccessLevel, 'faculty');
+    $displayStudentNumber = trim((string) ($accountProfileData['student_number'] ?? $user->student_number ?? ''));
+    $displayCourse = trim((string) ($accountProfileData['course_college'] ?? $user->course ?? ''));
 @endphp
-<div class="container" style="padding: 18px 20px 40px;">
+<div class="container" style="padding: 0 20px 40px;">
 
     @if(session('health_profile_submitted'))
         <div class="health-submit-overlay" id="healthSubmitOverlay">
@@ -555,6 +575,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 @if($accountView === 'profile')
 {{-- Full Profile Widget --}}
+            <div class="page-intro">
+    <h1 class="page-intro-title">Profile Information</h1>
+    <p class="page-intro-text">Review your personal account details and keep your clinic information up to date.</p>
+</div>
             <div class="widget-card">
     <div class="section-title" style="font-size: 16px; margin-bottom: 15px;"> Profile Information</div>
     
@@ -734,6 +758,10 @@ document.addEventListener('DOMContentLoaded', function () {
         $puptasSyncMessage = trim((string) optional($user->healthProfile)->puptas_sync_message);
         $puptasSyncedAt = optional(optional($user->healthProfile)->puptas_synced_at)->format('M d, Y g:i A');
     @endphp
+    <div class="page-intro">
+        <h1 class="page-intro-title">Health Record</h1>
+        <p class="page-intro-text">Check the status of your submitted health form, review clinic approval, and open your printable record.</p>
+    </div>
     <div class="health-status-card">
         <span class="health-status-title">Health Information Record</span>
 
@@ -795,6 +823,10 @@ document.addEventListener('DOMContentLoaded', function () {
         @endif
     </div>
 @else
+    <div class="page-intro">
+        <h1 class="page-intro-title">Notifications</h1>
+        <p class="page-intro-text">Stay updated with appointment changes, health record progress, and important clinic activity.</p>
+    </div>
     <div class="widget-card">
         <div class="section-title" style="font-size: 16px; margin-bottom: 15px;"> Notifications</div>
         <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
@@ -855,3 +887,5 @@ function enableEditing() {
 }
 </script>
 @endsection
+
+

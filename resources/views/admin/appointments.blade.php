@@ -261,7 +261,7 @@
                             <div style="font-weight: 700;" class="student-name">{{ $appt->name }}</div>
                             <div style="font-size: 12px; color: #111827;">{{ $appt->student_id }}</div>
                         </td>
-                        <td>{{ $appt->student_number ?: 'N/A' }}</td>
+                        <td>{{ $appt->student_number ?: optional($appt->user)->student_number ?: 'N/A' }}</td>
                        <td>
     @php
         // Preferred source field is `type`; fallback for legacy records.

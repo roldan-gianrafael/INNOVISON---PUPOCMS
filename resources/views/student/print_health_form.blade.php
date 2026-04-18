@@ -120,6 +120,9 @@
 @endpush
 
 @section('content')
+@php
+    $printStudentNumber = trim((string) ($profile->student_number ?? optional($profile->user)->student_number ?? ''));
+@endphp
 <div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
     
     @if($profile->clearance_status == 'Issued')
@@ -168,7 +171,7 @@
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     <div class="row">
         <span class="label">Name:</span> <div class="field">{{ Auth::user()->name }}</div>
-        <span class="label">Student No.:</span> <div class="field">{{ Auth::user()->student_number }}</div>
+        <span class="label">Student No.:</span> <div class="field">{{ $printStudentNumber !== '' ? $printStudentNumber : 'N/A' }}</div>
     </div>
     <div class="row">
         <span class="label">Home Address:</span> <div class="field">{{ $profile->home_address ?? '' }}</div>

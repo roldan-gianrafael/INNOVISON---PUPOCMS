@@ -332,7 +332,7 @@
 
         <section class="scan-section biosync-card">
             <h3>BioSync</h3>
-            <p class="scan-section-note">This section is reserved for biometric or external identity sync once your BioSync flow is available.</p>
+            <p class="scan-section-note">This section is reserved for biometric.</p>
 
             <div class="biosync-status">Pending Setup</div>
 

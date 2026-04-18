@@ -198,6 +198,8 @@ class PuptasWebhookService
                 throw new \RuntimeException('PUPTAS webhook configuration is incomplete.');
             }
 
+            // PUPTAS production currently validates `is_health_profile_completed`
+            // in addition to the documented `medical_status` field, so we send both.
             $payload = json_encode([
                 'student_number' => $studentNumber,
                 'medical_status' => $isCleared ? 'cleared' : 'failed',

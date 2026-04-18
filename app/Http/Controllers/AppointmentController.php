@@ -550,6 +550,7 @@ class AppointmentController extends Controller
     
     $hasSubmittedHealthProfile = $this->hasSubmittedHealthProfile($user);
     $healthProfileStatus = optional($user->healthProfile)->clearance_status;
+    $puptasSyncStatus = optional($user->healthProfile)->puptas_sync_status;
 
     $notifications = collect($notifications);
 
@@ -562,6 +563,21 @@ class AppointmentController extends Controller
                 : 'Your health profile was submitted and is awaiting medical review.',
             'time' => 'Health form status',
         ]);
+
+        if ($healthProfileStatus === 'Issued' && $puptasSyncStatus !== null) {
+            $notifications->prepend([
+                'type' => $puptasSyncStatus === 'synced' ? 'success' : ($puptasSyncStatus === 'syncing' ? 'info' : 'warning'),
+                'icon' => $puptasSyncStatus === 'synced' ? 'OK' : ($puptasSyncStatus === 'syncing' ? '...' : '!'),
+                'message' => match ($puptasSyncStatus) {
+                    'synced' => 'Your approved health clearance was synced to PUPTAS.',
+                    'syncing' => 'Your approved health clearance is being prepared for PUPTAS sync.',
+                    'missing_student_number' => 'Your clearance is approved, but PUPTAS sync is waiting for a valid student number.',
+                    'failed' => 'Your clearance is approved, but the PUPTAS sync still needs attention.',
+                    default => 'Your clearance approval is being checked for PUPTAS sync.',
+                },
+                'time' => 'PUPTAS sync status',
+            ]);
+        }
     }
 
     // 5. Return view user

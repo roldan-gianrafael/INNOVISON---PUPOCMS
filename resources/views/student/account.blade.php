@@ -373,6 +373,27 @@
         margin: 8px 0 0;
         line-height: 1.45;
     }
+    .health-status-sync {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 12px;
+        line-height: 1.45;
+        text-align: left;
+    }
+    .health-status-sync.syncing {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+    .health-status-sync.synced {
+        background: #ecfdf5;
+        color: #166534;
+    }
+    .health-status-sync.failed,
+    .health-status-sync.missing {
+        background: #fef2f2;
+        color: #991b1b;
+    }
     .health-status-actions {
         display: flex;
         flex-direction: column;
@@ -598,6 +619,34 @@
                     Your health profile is now approved and ready for printing.
                 </p>
             </div>
+            @php
+                $puptasSyncStatus = optional($user->healthProfile)->puptas_sync_status;
+                $puptasSyncMessage = trim((string) optional($user->healthProfile)->puptas_sync_message);
+                $puptasSyncedAt = optional(optional($user->healthProfile)->puptas_synced_at)->format('M d, Y g:i A');
+            @endphp
+            @if($puptasSyncStatus === 'synced')
+                <div class="health-status-sync synced">
+                    <strong>PUPTAS sync complete.</strong>
+                    @if($puptasSyncedAt)
+                        Synced on {{ $puptasSyncedAt }}.
+                    @endif
+                </div>
+            @elseif($puptasSyncStatus === 'syncing')
+                <div class="health-status-sync syncing">
+                    <strong>PUPTAS sync in progress.</strong>
+                    {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'Your approved clearance is being prepared for admission sync.' }}
+                </div>
+            @elseif($puptasSyncStatus === 'failed')
+                <div class="health-status-sync failed">
+                    <strong>PUPTAS sync failed.</strong>
+                    {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The approved clearance has not been accepted by PUPTAS yet.' }}
+                </div>
+            @elseif($puptasSyncStatus === 'missing_student_number')
+                <div class="health-status-sync missing">
+                    <strong>PUPTAS sync is waiting for a valid student number.</strong>
+                    {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The clinic approval is complete, but the admission sync cannot finish until the school student number is resolved.' }}
+                </div>
+            @endif
             
             <div class="health-status-actions">
                 <a href="{{ route('print.health.form') }}" class="btn-print-form approved">

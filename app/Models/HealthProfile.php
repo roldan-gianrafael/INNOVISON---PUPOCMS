@@ -22,6 +22,9 @@ class HealthProfile extends Model
         'is_smoker', 'is_drinker', 'vaccine_history', 'digital_signature', 'clearance_status',
     'pending_reason',
     'verified_at',
+    'puptas_sync_status',
+    'puptas_synced_at',
+    'puptas_sync_message',
         
     ];
 
@@ -31,6 +34,7 @@ class HealthProfile extends Model
         'medicine_allergies' => 'array',
         'vaccine_history' => 'array',
         'no_allergies' => 'boolean',
+        'puptas_synced_at' => 'datetime',
 
     ];
 

@@ -231,6 +231,27 @@ class AdminController extends Controller
         return $studentNumber;
     }
 
+    private function updatePuptasSyncState(HealthProfile $record, ?string $status, ?string $message = null, bool $markSyncedAt = false): void
+    {
+        if (!Schema::hasColumn('health_profiles', 'puptas_sync_status')) {
+            return;
+        }
+
+        $updates = [
+            'puptas_sync_status' => $status,
+        ];
+
+        if (Schema::hasColumn('health_profiles', 'puptas_sync_message')) {
+            $updates['puptas_sync_message'] = $message ? trim($message) : null;
+        }
+
+        if (Schema::hasColumn('health_profiles', 'puptas_synced_at')) {
+            $updates['puptas_synced_at'] = $markSyncedAt ? now() : null;
+        }
+
+        $record->forceFill($updates)->save();
+    }
+
     private function logActivity(string $action, string $description, ?string $module = null, ?string $eventType = null): void
     {
         $user = Auth::user();
@@ -1096,19 +1117,32 @@ public function updateClearance(Request $request, $id)
                     $puptasService = app(PuptasWebhookService::class);
                     $studentNumber = $this->resolvePuptasStudentNumber($record);
                     if ($studentNumber === '') {
+                        $this->updatePuptasSyncState($record, 'missing_student_number', 'PUPTAS sync skipped because the student number is still missing.');
                         \Log::warning("PUPTAS Sync Skipped for User {$record->user->id}: missing student_number.");
                         return redirect()->route('admin.health_records')
                             ->with('success', 'Medical clearance updated, but PUPTAS sync was skipped because student number is missing.');
                     }
+
+                    $this->updatePuptasSyncState($record, 'syncing', 'Preparing the approved health clearance for PUPTAS.');
                     $syncResult = $puptasService->sendWithRetry($studentNumber, true);
 
                     if (!$syncResult['success']) {
+                        $this->updatePuptasSyncState(
+                            $record,
+                            'failed',
+                            $syncResult['message'] ?? 'The PUPTAS sync attempt failed.',
+                        );
                         \Log::error("PUPTAS Sync Failed for User {$studentNumber}: " . ($syncResult['message'] ?? 'Unknown error'));
+                    } else {
+                        $this->updatePuptasSyncState($record, 'synced', 'Approved health clearance synced to PUPTAS.', true);
                     }
                 } catch (\Exception $e) {
                     $studentNumber = trim((string) ($record->user->student_number ?? ''));
+                    $this->updatePuptasSyncState($record, 'failed', $e->getMessage());
                     \Log::error("PUPTAS Sync Failed for User {$studentNumber}: " . $e->getMessage());
                 }
+            } else {
+                $this->updatePuptasSyncState($record, null, null);
             }
         }
 

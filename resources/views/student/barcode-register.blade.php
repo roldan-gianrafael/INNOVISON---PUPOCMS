@@ -263,10 +263,7 @@
 
 @section('content')
 <div class="barcode-card">
-    <div class="page-intro">
-        <h1>Scan / Bio</h1>
-        <p>Link your clinic identity using barcode scan today, and keep your account ready for future BioSync support.</p>
-    </div>
+   
 
     {{-- HEADER LOGIC --}}
     @if($user->barcode)

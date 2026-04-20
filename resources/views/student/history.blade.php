@@ -96,6 +96,19 @@
           font-weight: 800;
           box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
           animation: bubbleFloat 2s ease-in-out infinite;
+          min-width: 110px;
+      }
+
+      .bubble-text {
+          display: inline-block;
+          transition: opacity 0.18s ease, transform 0.18s ease;
+      }
+
+      .bubble-text-yay {
+          position: absolute;
+          inset: 10px 16px;
+          opacity: 0;
+          transform: translateY(4px);
       }
 
       .empty-bubble::after {
@@ -206,6 +219,8 @@
           border-radius: 999px;
           background: #ffd7b5;
           border: 3px solid #7c2d12;
+          transform-origin: top center;
+          transition: transform 0.28s ease;
       }
 
       .cartoon-arm.left {
@@ -243,6 +258,20 @@
           border-radius: 999px;
           font-weight: 700;
           box-shadow: 0 10px 24px rgba(139, 0, 0, 0.08);
+      }
+
+      .empty-state.is-celebrating .cartoon-arm.right {
+          transform: rotate(-72deg) translateY(-10px);
+      }
+
+      .empty-state.is-celebrating .bubble-text-book {
+          opacity: 0;
+          transform: translateY(-4px);
+      }
+
+      .empty-state.is-celebrating .bubble-text-yay {
+          opacity: 1;
+          transform: translateY(0);
       }
 
       @keyframes bubbleFloat {
@@ -313,9 +342,12 @@
 </div>
                 </div>
             @empty
-                <div class="empty-state">
+                <div class="empty-state" id="emptyHistoryState">
                   <div class="empty-illustration" aria-hidden="true">
-                    <div class="empty-bubble">Book Now!</div>
+                    <div class="empty-bubble">
+                        <span class="bubble-text bubble-text-book">Book Now!</span>
+                        <span class="bubble-text bubble-text-yay">Yay!</span>
+                    </div>
                     <div class="empty-shadow"></div>
                     <div class="clinic-cartoon">
                         <div class="cartoon-hair"></div>
@@ -333,7 +365,7 @@
                     </div>
                   </div>
                   <h2 class="empty-title">You have no appointment history yet</h2>
-                  <a href="{{ url('/student/booking') }}" class="btn-outline">Book your first appointment</a>
+                  <a href="{{ url('/student/booking') }}" class="btn-outline empty-cta" id="emptyHistoryCta">Book your first appointment</a>
                 </div>
             @endforelse
         </div>
@@ -341,3 +373,24 @@
       </section>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const emptyState = document.getElementById('emptyHistoryState');
+    const cta = document.getElementById('emptyHistoryCta');
+
+    if (!emptyState || !cta) {
+        return;
+    }
+
+    const activate = () => emptyState.classList.add('is-celebrating');
+    const deactivate = () => emptyState.classList.remove('is-celebrating');
+
+    cta.addEventListener('mouseenter', activate);
+    cta.addEventListener('mouseleave', deactivate);
+    cta.addEventListener('focus', activate);
+    cta.addEventListener('blur', deactivate);
+});
+</script>
+@endpush

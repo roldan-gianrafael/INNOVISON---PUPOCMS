@@ -6,15 +6,54 @@
 <style>
     .notification-toast {
         position: fixed; top: 25px; right: 25px;
-        background: #15803d; color: white; padding: 15px 20px;
+        background: linear-gradient(135deg, #15803d, #166534); color: #ffffff; padding: 15px 20px;
         border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         z-index: 10000; display: flex; align-items: center;
         justify-content: space-between; min-width: 380px;
+        gap: 16px;
         animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .toast-copy {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #ffffff;
+    }
+    .toast-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 48px;
+        height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.28);
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+    .toast-title {
+        display: block;
+        font-size: 14px;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.2;
+    }
+    .toast-subtitle {
+        display: block;
+        font-size: 11px;
+        opacity: 0.95;
+        color: rgba(255,255,255,0.92);
+        margin-top: 2px;
     }
     .btn-toast-action {
         background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.4);
-        color: white; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;
+        color: #ffffff; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;
+        flex-shrink: 0;
     }
 
     .mode-header {
@@ -258,11 +297,11 @@
 
 @if(session('consultation_done'))
 <div id="successToast" class="notification-toast">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <span>DONE</span>
+    <div class="toast-copy">
+        <span class="toast-badge">Done</span>
         <div>
-            <strong style="display: block; font-size: 14px;">Consultation Done!</strong>
-            <span style="font-size: 11px; opacity: 0.9;">Record saved successfully.</span>
+            <strong class="toast-title">Consultation Done!</strong>
+            <span class="toast-subtitle">Record saved successfully.</span>
         </div>
     </div>
     <button onclick="location.href='{{ url($basePrefix . '/walkin') }}?mode=scan'" class="btn-toast-action">Open Scan / Bio</button>

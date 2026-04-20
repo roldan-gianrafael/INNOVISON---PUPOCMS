@@ -905,6 +905,39 @@
                 </div>
             </section>
 
+            @if($canManageClearanceSignature)
+            <section class="panel">
+                <div class="panel-head">
+                    <div class="panel-head-top">
+                        <div>
+                            <div class="section-spot">Clearance Signature</div>
+                            <h3>Nurse Digital Signature</h3>
+                            <p>Upload the signature that should appear automatically whenever the nurse issues a clearance.</p>
+                        </div>
+                        <button type="button" class="mini-edit-btn" onclick="openSettingsModal('clearanceSignatureModal')">Upload</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="profile-list">
+                        <div class="profile-row">
+                            <div class="key">Current Signature</div>
+                            <div class="val">
+                                @if($clearanceSignatureUrl)
+                                    <img src="{{ $clearanceSignatureUrl }}" alt="Current clearance signature" style="max-height:72px; width:auto; display:block; margin-left:auto;">
+                                @else
+                                    No signature uploaded yet
+                                @endif
+                            </div>
+                        </div>
+                        <div class="profile-row">
+                            <div class="key">Usage</div>
+                            <div class="val">Shown on issued clearance preview and printable health forms.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            @endif
+
             <form action="{{ url('/admin/settings/update') }}" method="POST">
                 @csrf @method('PUT')
                 <input type="hidden" name="preferences_form" value="1">
@@ -991,6 +1024,39 @@
             </form>
         </div>
     </div>
+
+    @if($canManageClearanceSignature)
+    <div id="clearanceSignatureModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-head">
+                <div class="section-spot">Clearance Signature</div>
+                <h3>Upload Nurse Digital Signature</h3>
+                <p>This signature will appear automatically once a health clearance is marked as issued.</p>
+            </div>
+            <form action="{{ url('/admin/settings/update') }}" method="POST" enctype="multipart/form-data">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    @if($clearanceSignatureUrl)
+                        <div style="margin-bottom:16px; text-align:center;">
+                            <img src="{{ $clearanceSignatureUrl }}" alt="Current clearance signature" style="max-height:110px; width:auto;">
+                        </div>
+                    @endif
+                    <div class="field-grid">
+                        <div class="field">
+                            <label>Digital Signature File</label>
+                            <input type="file" name="clearance_signature" accept="image/png,image/jpeg,image/jpg" required>
+                            <p class="field-help">Use a clear PNG or JPG image. Transparent background works best.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeSettingsModal('clearanceSignatureModal')">Cancel</button>
+                    <button type="submit" class="btn-save">Save Signature</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 
     <div id="profileModal" class="modal-overlay">
         <div class="modal-box">
@@ -1149,6 +1215,9 @@
         }
         if (e.target === document.getElementById('clinicHoursModal')) {
             closeSettingsModal('clinicHoursModal');
+        }
+        if (e.target === document.getElementById('clearanceSignatureModal')) {
+            closeSettingsModal('clearanceSignatureModal');
         }
     });
 

@@ -5,16 +5,17 @@
 @push('styles')
 <style>
     .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; margin-bottom: 24px; }
-    .card h3 { margin-top: 0; color: #8B0000; margin-bottom: 20px; font-size: 18px; }
+    .card h3 { margin-top: 0; color: #000; margin-bottom: 20px; font-size: 18px; }
     .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; color: #64748b; }
-    .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #334155; }
-    .form-help { margin-top: 6px; font-size: 11px; color: #94a3b8; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; color: #000; }
+    .form-control { width: 100%; padding: 10px 12px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 14px; color: #000; }
+    .form-control::placeholder { color: #475569; }
+    .form-help { margin-top: 6px; font-size: 11px; color: #000; }
     .btn-save { background: #8B0000; color: white; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; }
     .btn-save:hover { background: #600000; }
     .patient-header { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8B0000; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .badge-role { background: #e2e8f0; color: #334155; padding: 4px 10px; border-radius: 6px; font-size: 11px; text-transform: uppercase; font-weight: 700; }
+    .badge-role { background: #e2e8f0; color: #000; padding: 4px 10px; border-radius: 6px; font-size: 11px; text-transform: uppercase; font-weight: 700; }
     .mar-required { border: 1px solid #fecaca; background-color: #fef2f2; }
     .badge-source {
         padding: 4px 12px;
@@ -28,11 +29,41 @@
     .source-walkin { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
     .appt-date-info {
         font-size: 13px;
-        color: #1e293b;
+        color: #000;
         background: #f1f5f9;
         padding: 2px 8px;
         border-radius: 4px;
         font-weight: 600;
+    }
+    .choice-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .choice-input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .choice-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        color: #000;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .18s ease;
+    }
+    .choice-input:checked + .choice-card {
+        background: #8B0000;
+        border-color: #8B0000;
+        color: #fff;
+        box-shadow: 0 10px 22px rgba(139, 0, 0, 0.16);
     }
 </style>
 @endpush
@@ -110,7 +141,7 @@
 
                 <div class="grid-2">
                     <div class="form-group">
-                        <label>Temperature (°C)</label>
+                        <label>Temperature (C)</label>
                         <input type="number" step="0.1" name="temp" class="form-control" placeholder="36.5" value="{{ old('temp') }}">
                     </div>
                     <div class="form-group">
@@ -122,19 +153,25 @@
                 <div class="grid-2" style="margin-top: 10px;">
                     <div class="form-group">
                         <label>Pulse Rate (bpm)</label>
-                        <input type="number" name="pr" class="form-control" placeholder="72" value="{{ old('pr') }}">
+                        <input type="number" name="pulse_rate" class="form-control" placeholder="72" value="{{ old('pulse_rate') }}">
                     </div>
                     <div class="form-group">
                         <label>Respiratory Rate (cpm)</label>
-                        <input type="number" name="rr" class="form-control" placeholder="18" value="{{ old('rr') }}">
+                        <input type="number" name="respiratory_rate" class="form-control" placeholder="18" value="{{ old('respiratory_rate') }}">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>Covid Positive?</label>
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer;">Yes</button>
-                        <button type="button" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer;">No</button>
+                    <div class="choice-grid">
+                        <label>
+                            <input type="radio" name="covid_status" class="choice-input" value="Yes" {{ old('covid_status') === 'Yes' ? 'checked' : '' }}>
+                            <span class="choice-card">Yes</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="covid_status" class="choice-input" value="No" {{ old('covid_status', 'No') === 'No' ? 'checked' : '' }}>
+                            <span class="choice-card">No</span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -144,8 +181,8 @@
             <div class="card">
                 <h3>Visit Details</h3>
                 <div class="form-group">
-                    <label>{{ $user_source == 'online' ? 'Appointment Remarks' : 'Student Reason' }}</label>
-                    <input type="text" name="student_reason" class="form-control" {{ $user_source == 'online' ? 'readonly' : '' }} value="{{ old('student_reason', $latestAppointment->remarks ?? '') }}">
+                    <label>{{ $user_source == 'online' ? 'Appointment Remarks' : 'Reason for Visiting Clinic' }}</label>
+                    <input type="text" name="reason_for_visit" class="form-control" {{ $user_source == 'online' ? 'readonly' : '' }} value="{{ old('reason_for_visit', $latestAppointment->remarks ?? '') }}">
                 </div>
 
                 <div class="form-group">
@@ -168,7 +205,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label style="color: #8B0000;">Medical Condition (MAR Classification)</label>
+                    <label style="color: #000;">Medical Condition (MAR Classification)</label>
                     <select name="condition_id" class="form-control mar-required" required>
                         <option value="" disabled {{ old('condition_id') ? '' : 'selected' }}>-- Select Diagnosis --</option>
                         @foreach($conditions as $cond)
@@ -177,7 +214,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <small style="color: #94a3b8; font-size: 11px;">Required for MAR Report.</small>
+                    <small style="color: #000; font-size: 11px;">Required for MAR Report.</small>
                 </div>
             </div>
 
@@ -211,7 +248,7 @@
 
         <div style="display: flex; gap: 15px; margin-top: 10px;">
             <button type="submit" class="btn-save">Save & Finalize Consultation</button>
-            <a href="{{ route($walkinIndexRoute) }}" style="text-decoration: none; padding: 12px; color: #64748b; font-weight: 600; font-size: 14px;">Cancel</a>
+            <a href="{{ route($walkinIndexRoute) }}" style="text-decoration: none; padding: 12px; color: #000; font-weight: 600; font-size: 14px;">Cancel</a>
         </div>
     </div>
 </form>

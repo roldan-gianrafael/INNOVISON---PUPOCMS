@@ -13,7 +13,8 @@ class Consultation extends Model
 
     protected $fillable = [
     'name', 'consultation_date', 'user_type', 'user_role', 'service', 
-    'medical_condition_id', 'temperature', 'medicine', 
+    'medical_condition_id', 'temperature', 'blood_pressure', 'pulse_rate',
+    'respiratory_rate', 'covid_status', 'reason_for_visit', 'medicine', 
     'medicine_quantity', 'comments'
 ];
     public function user(): BelongsTo

@@ -15,6 +15,7 @@ class Setting extends Model
         'open_time',
         'close_time',
         'email_notifications',
-        'auto_approve'
+        'auto_approve',
+        'clearance_signature_path'
     ];
 }

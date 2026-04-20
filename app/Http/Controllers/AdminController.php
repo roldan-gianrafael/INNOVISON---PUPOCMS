@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use App\Models\HealthProfile;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
@@ -1211,8 +1212,12 @@ public function updateClearance(Request $request, $id)
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
         $cmsProfile = $admin ? $this->buildCmsAdminProfile($admin) : [];
+        $canManageClearanceSignature = $admin ? $this->isSuperadminAccount($admin) : false;
+        $clearanceSignatureUrl = !empty($settings->clearance_signature_path)
+            ? Storage::disk('public')->url($settings->clearance_signature_path)
+            : null;
 
-        return view('admin.settings', compact('admin', 'settings', 'cmsProfile'));
+        return view('admin.settings', compact('admin', 'settings', 'cmsProfile', 'canManageClearanceSignature', 'clearanceSignatureUrl'));
     }
 
     // ==========================================
@@ -1375,6 +1380,10 @@ public function deleteItem($id)
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
 
+        $request->validate([
+            'clearance_signature' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
+        ]);
+
         $settings->clinic_name = $request->input('clinic_name', $settings->clinic_name);
         $settings->clinic_location = $request->input('clinic_location', $settings->clinic_location);
         $settings->open_time = $request->input('open_time', $settings->open_time);
@@ -1392,19 +1401,47 @@ public function deleteItem($id)
             $settings->auto_approve = false;
         }
 
+        $signatureUpdated = false;
+        if ($request->hasFile('clearance_signature')) {
+            if (!$this->canSignHealthClearance()) {
+                abort(403, 'Only superadmin accounts can update the clearance signature.');
+            }
+
+            if (!empty($settings->clearance_signature_path)) {
+                Storage::disk('public')->delete($settings->clearance_signature_path);
+            }
+
+            $settings->clearance_signature_path = $request->file('clearance_signature')->store('settings/clearance-signatures', 'public');
+            $signatureUpdated = true;
+        }
+
         $settings->save();
+
+        $logParts = [];
+        if ($request->filled('clinic_name') || $request->filled('clinic_location') || $request->filled('open_time') || $request->filled('close_time')) {
+            $logParts[] = "clinic configuration (Name: {$request->clinic_name}, Hours: {$request->open_time} - {$request->close_time})";
+        }
+        if ($request->boolean('preferences_form')) {
+            $logParts[] = 'system preferences';
+        }
+        if ($signatureUpdated) {
+            $logParts[] = 'clearance digital signature';
+        }
+        $logDescription = $logParts !== []
+            ? 'Modified ' . implode(', ', $logParts)
+            : 'Updated system settings';
 
         // --- LOGS CODES ---
     \App\Models\ActivityLog::create([
         'user_id'     => auth()->id(),
         'user_name'   => auth()->user()->name,
         'action'      => 'System Settings Updated',
-        'description' => "Modified clinic configuration (Name: $request->clinic_name, Hours: $request->open_time - $request->close_time)",
+        'description' => $logDescription,
         'ip_address'  => request()->ip(),
         'user_agent'  => request()->userAgent(),
     ]);
 
-        return redirect()->back()->with('success', 'System settings saved.');
+        return redirect()->back()->with('success', $signatureUpdated ? 'System settings saved and digital signature updated.' : 'System settings saved.');
     }
 
     public function updateProfile(Request $request)

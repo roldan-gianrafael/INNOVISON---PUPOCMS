@@ -6,11 +6,99 @@ use Illuminate\Support\Facades\DB;
 use App\Models\MedicalConditions;
 use App\Models\Category;
 use App\Models\Consultation;
+use App\Models\AppointmentFeedback;
 use App\Models\Item;
 use Carbon\Carbon;
 
 class ReportsController extends Controller
 {
+    public function feedbackReport(Request $request)
+    {
+        $search = trim((string) $request->query('q', ''));
+        $monthFilter = trim((string) $request->query('month', now()->format('Y-m')));
+
+        $query = AppointmentFeedback::query()
+            ->with(['appointment', 'user'])
+            ->whereNotNull('submitted_at');
+
+        if ($monthFilter !== '') {
+            $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+            $monthEnd = (clone $monthStart)->endOfMonth();
+            $query->whereBetween('submitted_at', [$monthStart, $monthEnd]);
+        }
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                $builder->where('feedback', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('student_number', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('appointment', function ($appointmentQuery) use ($search) {
+                        $appointmentQuery->where('service', 'like', "%{$search}%")
+                            ->orWhere('type', 'like', "%{$search}%")
+                            ->orWhere('user_type', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $feedbackItems = (clone $query)
+            ->latest('submitted_at')
+            ->paginate(12)
+            ->through(function (AppointmentFeedback $feedback) {
+                $appointment = $feedback->appointment;
+                $user = $feedback->user;
+                $fullName = trim((string) ($user->name ?? implode(' ', array_filter([$user->first_name ?? '', $user->last_name ?? '']))));
+                $displayName = $fullName !== '' ? $fullName : 'Clinic User';
+                $initials = collect(preg_split('/\s+/', $displayName) ?: [])
+                    ->filter()
+                    ->take(2)
+                    ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                    ->implode('');
+
+                return (object) [
+                    'id' => $feedback->id,
+                    'name' => $displayName,
+                    'initials' => $initials !== '' ? $initials : 'CU',
+                    'student_number' => trim((string) ($user->student_number ?? '')),
+                    'role' => trim((string) ($appointment->user_type ?? $user->user_role ?? 'User')),
+                    'service' => trim((string) ($appointment->service ?? 'General Consultation')),
+                    'appointment_type' => trim((string) ($appointment->type ?? '')),
+                    'rating' => (int) $feedback->rating,
+                    'score_out_of_ten' => number_format(((int) $feedback->rating) * 2, 1),
+                    'message' => trim((string) $feedback->feedback),
+                    'submitted_at' => $feedback->submitted_at,
+                    'time_ago' => optional($feedback->submitted_at)->diffForHumans() ?? 'Recently',
+                ];
+            });
+
+        $summaryBaseQuery = AppointmentFeedback::query()->whereNotNull('submitted_at');
+        if ($monthFilter !== '') {
+            $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+            $monthEnd = (clone $monthStart)->endOfMonth();
+            $summaryBaseQuery->whereBetween('submitted_at', [$monthStart, $monthEnd]);
+        }
+
+        $totalFeedbacks = (clone $summaryBaseQuery)->count();
+        $averageRating = round((float) ((clone $summaryBaseQuery)->avg('rating') ?? 0), 1);
+        $clinicScore = round($averageRating * 2, 1);
+        $recommendedCount = (clone $summaryBaseQuery)->where('rating', '>=', 4)->count();
+        $lowRatingCount = (clone $summaryBaseQuery)->where('rating', '<=', 2)->count();
+
+        return view('admin.reports.feedbacks', compact(
+            'feedbackItems',
+            'totalFeedbacks',
+            'averageRating',
+            'clinicScore',
+            'recommendedCount',
+            'lowRatingCount',
+            'search',
+            'monthFilter'
+        ));
+    }
+
     private function buildInventoryReportData(string $monthFilter)
     {
         $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();

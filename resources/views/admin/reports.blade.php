@@ -113,6 +113,7 @@
     $dashboardUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/dashboard') : url('/admin/dashboard');
     $marUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/mar') : url('/admin/reports/mar');
     $inventorySummaryUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/inventory-summary') : url('/admin/reports/inventory-summary');
+    $feedbacksUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/feedbacks') : url('/admin/reports/feedbacks');
     $exportHubUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/export-hub') : url('/admin/reports/export-hub');
 @endphp
 <div class="dashboard-container">
@@ -132,7 +133,7 @@
         </div>
     </div>
 
-    <h2 style="font-size: 18px; color: #ffffff; margin-bottom: 20px; font-weight: 700;">Select Report to Generate</h2>
+    <h2 style="font-size: 18px; color: #000000; margin-bottom: 20px; font-weight: 700;">Select Report to Generate</h2>
 
     <div class="report-grid">
         
@@ -166,6 +167,14 @@
                 <div class="report-main-title">Export Reports</div>
             </div>
             <div class="report-badge">All Reports</div>
+        </a>
+
+        <a href="{{ $feedbacksUrl }}" class="report-card">
+            <div>
+                <div class="report-label">Patient Experience</div>
+                <div class="report-main-title">Feedbacks</div>
+            </div>
+            <div class="report-badge">Rate of Clinic</div>
         </a>
 
         @if($role !== \App\Models\User::ROLE_ADMIN)

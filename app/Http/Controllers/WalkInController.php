@@ -330,6 +330,12 @@ class WalkInController extends Controller
             'dob'          => 'nullable|date',
             'height'       => 'nullable|numeric|min:0|max:400',
             'weight'       => 'nullable|numeric|min:0|max:1000',
+            'temp'         => 'nullable|numeric|min:30|max:45',
+            'bp'           => 'nullable|string|max:20',
+            'pulse_rate'   => 'nullable|integer|min:0|max:300',
+            'respiratory_rate' => 'nullable|integer|min:0|max:120',
+            'covid_status' => 'required|in:Yes,No',
+            'reason_for_visit' => 'nullable|string|max:255',
         ]);
 
         $student = $this->findUserByIdentifier((string) $request->student_number);
@@ -402,7 +408,7 @@ class WalkInController extends Controller
                 $appointment->name       = $student->first_name . ' ' . $student->last_name;
                 $appointment->email      = $student->email; 
                 $appointment->service    = $request->service;
-                $appointment->remarks    = $request->remarks;
+                $appointment->remarks    = $request->input('reason_for_visit') ?: $request->remarks;
                 $appointment->status     = 'Completed';
                 $appointment->date       = now()->format('Y-m-d');
                 $appointment->time       = now()->format('H:i:s'); 
@@ -432,6 +438,11 @@ class WalkInController extends Controller
                 'service'              => $request->service,
                 'medical_condition_id' => $request->condition_id,
                 'temperature'          => $request->temp,
+                'blood_pressure'       => $request->bp,
+                'pulse_rate'           => $request->input('pulse_rate'),
+                'respiratory_rate'     => $request->input('respiratory_rate'),
+                'covid_status'         => $request->input('covid_status'),
+                'reason_for_visit'     => $request->input('reason_for_visit'),
                 'medicine'             => $medicineName,
                 'medicine_quantity'    => $request->input('issued_quantity') ?? 0, // Fallback to 0 to avoid SQL error
                 'comments'             => $request->remarks,

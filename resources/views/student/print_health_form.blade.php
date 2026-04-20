@@ -121,6 +121,7 @@
 
 @section('content')
 @php
+    $clearanceSignaturePath = optional(\App\Models\Setting::first())->clearance_signature_path ?: 'health_profiles/signatures/nurse-sign.png';
     $printProfileData = $printProfileData ?? [];
     $printStudentNumber = trim((string) ($printProfileData['student_number'] ?? $profile->student_number ?? optional($profile->user)->student_number ?? ''));
     $printName = trim((string) ($printProfileData['full_name'] ?? optional($profile->user)->name ?? Auth::user()->name ?? ''));
@@ -395,7 +396,7 @@ for the improvement of healthcare services.
     <div style="flex: 0.6; text-align: center; position: relative;">
         @if($profile->clearance_status == 'Issued')
             <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                <img src="{{ asset('storage/health_profiles/signatures/nurse-sign.png') }}" 
+                <img src="{{ asset('storage/' . $clearanceSignaturePath) }}" 
                      alt="Nurse Signature" 
                      style="height: 85px; width: auto; pointer-events: none;">
             </div>

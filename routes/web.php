@@ -110,6 +110,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
         Route::get('/admin/reports/mar', [ReportsController::class, 'marReport'])->name('reports.mar');
         Route::get('/admin/reports/inventory-summary', [AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
+        Route::get('/admin/reports/feedbacks', [ReportsController::class, 'feedbackReport'])->name('reports.feedbacks');
         Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
         Route::get('/admin/user-management', [AdminUserController::class, 'index'])->name('admin.user-management');
@@ -165,6 +166,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
         Route::get('/reports/mar', [ReportsController::class, 'marReport'])->name('reports.mar');
         Route::get('/reports/inventory-summary', [AdminController::class, 'inventorySummary'])->name('reports.inventory-summary');
+        Route::get('/reports/feedbacks', [ReportsController::class, 'feedbackReport'])->name('reports.feedbacks');
         Route::get('/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
         Route::get('/api-testing', [AdminController::class, 'apiTesting'])->name('api-testing');

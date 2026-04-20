@@ -221,7 +221,7 @@
 
     <hr style="border: 0.5px solid #000;">
 
-    <div class="form-title">HEALTH INFORMATION FORM FOR STUDENTS</div>
+    <div class="form-title">HEALTH INFORMATION FORM</div>
 
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     <div class="row">

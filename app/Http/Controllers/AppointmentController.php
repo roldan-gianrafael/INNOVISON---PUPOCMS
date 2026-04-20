@@ -1044,6 +1044,7 @@ public function storeHealthForm(Request $request)
         'school_year'       => 'required|string',
         'home_address'      => 'required|string|max:255',
         'zipcode'           => 'required|string|max:20',
+        'birthday'          => 'required|date',
         'student_photo'     => 'required|image|mimes:jpeg,png,jpg|max:2048',
         'height'            => 'required|string|max:50',
         'weight'            => 'required|string|max:50',
@@ -1090,6 +1091,7 @@ public function storeHealthForm(Request $request)
     $normalizedHeight = $this->normalizeMeasurement($request->input('height'), 'cm');
     $normalizedWeight = $this->normalizeMeasurement($request->input('weight'), 'kg');
     $normalizedDoctorName = $this->normalizeDoctorName($request->input('medical_certificate_issued_by'));
+    $user->DOB = $request->input('birthday');
     $user->contact_no = $request->input('contact_no');
     $user->save();
 

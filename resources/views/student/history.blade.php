@@ -260,6 +260,10 @@
           box-shadow: 0 10px 24px rgba(139, 0, 0, 0.08);
       }
 
+      .empty-state.is-celebrating .cartoon-arm.left {
+          transform: rotate(72deg) translateY(-10px);
+      }
+
       .empty-state.is-celebrating .cartoon-arm.right {
           transform: rotate(-72deg) translateY(-10px);
       }
@@ -287,7 +291,7 @@
 @endpush
 
 @section('content')
-    <div class="container" style="padding-top: 40px; padding-bottom: 60px;">
+    <div class="container" style="padding-top: 12px; padding-bottom: 60px;">
       <div class="page-header">
         <div>
           <h1 style="margin:0; font-size: 28px; color: #600000;">Appointment History</h1>

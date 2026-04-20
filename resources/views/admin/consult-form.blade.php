@@ -61,7 +61,7 @@
         </div>
 
         <span class="badge-role">{{ $studentDisplayRole }}</span>
-        <span style="font-size: 13px; color: #64748b; margin-left: 10px;">ID: {{ $student->student_id }}</span>
+        <span style="font-size: 13px; color: #64748b; margin-left: 10px;">Student Number: {{ $student->student_number ?: 'N/A' }}</span>
 
         @if(($user_source ?? '') == 'online' && isset($latestAppointment))
             <div style="margin-top: 10px;">
@@ -82,7 +82,7 @@
 
 <form action="{{ route($walkinStoreRoute) }}" method="POST">
     @csrf
-    <input type="hidden" name="student_id" value="{{ $student->student_id }}">
+    <input type="hidden" name="student_number" value="{{ $student->student_number ?: $student->student_id }}">
     <input type="hidden" name="user_role" value="{{ $studentDisplayRole }}">
     <input type="hidden" name="user_type" value="{{ $user_source ?? 'walkin' }}">
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Appointment;
+use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,95 @@ use Illuminate\Support\Str;
 
 class WalkInController extends Controller
 {
+    private function findUserByIdentifier(string $identifier): ?User
+    {
+        $identifier = trim($identifier);
+        if ($identifier === '') {
+            return null;
+        }
+
+        return User::with('healthProfile')
+            ->where(function ($query) use ($identifier) {
+                if (\Schema::hasColumn('users', 'student_number')) {
+                    $query->orWhere('student_number', $identifier);
+                }
+
+                $query->orWhere('barcode', $identifier)
+                    ->orWhere('student_id', $identifier);
+            })
+            ->first();
+    }
+
+    private function resolveUniqueStudentId(string $seed): string
+    {
+        $candidate = trim($seed) !== '' ? trim($seed) : ('idp-' . Str::lower(Str::random(12)));
+        $base = $candidate;
+        $counter = 1;
+
+        while (User::where('student_id', $candidate)->exists()) {
+            $candidate = $base . '-' . $counter;
+            $counter++;
+        }
+
+        return $candidate;
+    }
+
+    private function resolveLocalUserFromApplicant(array $applicant): User
+    {
+        $studentNumber = trim((string) data_get($applicant, 'student_number'));
+        $idpUserId = trim((string) data_get($applicant, 'idp_user_id'));
+        $email = trim((string) data_get($applicant, 'email'));
+
+        $user = User::query()
+            ->when($idpUserId !== '', fn ($query) => $query->orWhere('student_id', $idpUserId))
+            ->when($studentNumber !== '' && \Schema::hasColumn('users', 'student_number'), fn ($query) => $query->orWhere('student_number', $studentNumber))
+            ->when($email !== '', fn ($query) => $query->orWhere('email', $email))
+            ->first();
+
+        $firstName = trim((string) data_get($applicant, 'first_name'));
+        $lastName = trim((string) data_get($applicant, 'last_name'));
+        $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+
+        if (!$user) {
+            $user = new User();
+            $user->student_id = $this->resolveUniqueStudentId($idpUserId !== '' ? $idpUserId : $studentNumber);
+            $user->password = Hash::make(Str::random(40));
+            $user->user_role = User::ROLE_STUDENT;
+            $user->status = \Schema::hasColumn('users', 'status') ? 'active' : null;
+        }
+
+        if ($studentNumber !== '' && \Schema::hasColumn('users', 'student_number')) {
+            $user->student_number = $studentNumber;
+        }
+
+        if ($idpUserId !== '' && trim((string) $user->student_id) === '') {
+            $user->student_id = $this->resolveUniqueStudentId($idpUserId);
+        }
+
+        if ($firstName !== '') {
+            $user->first_name = $firstName;
+        }
+
+        if ($lastName !== '') {
+            $user->last_name = $lastName;
+        }
+
+        if ($fullName !== '') {
+            $user->name = $fullName;
+        }
+
+        if ($email !== '') {
+            $user->email = $email;
+        } elseif (!$user->exists || trim((string) $user->email) === '') {
+            $seed = $studentNumber !== '' ? $studentNumber : ($idpUserId !== '' ? $idpUserId : Str::lower(Str::random(8)));
+            $user->email = Str::slug($seed, '.') . '@idp.local';
+        }
+
+        $user->save();
+
+        return $user;
+    }
+
     private function resolveAssistedEmail(string $referenceId): string
     {
         $base = Str::slug($referenceId, '.');
@@ -60,17 +150,25 @@ class WalkInController extends Controller
     // 2. SHOW WALKIN FORM
     public function showWalkinForm(Request $request, $student_id)
     {
-        $student = User::with('healthProfile')->where('student_id', $student_id)->firstOrFail();
+        $student = $this->findUserByIdentifier((string) $student_id);
+        abort_if(!$student, 404);
         $user_source = $request->query('source', 'walkin');
 
         $latestAppointment = null;
 
         // Kukuha lang tayo ng data kung ang source link ay 'online'
         if ($user_source === 'online') {
-            $latestAppointment = Appointment::where('student_id', $student_id)
-                                            ->where('status', 'Approved')
-                                            ->latest()
-                                            ->first();
+            $latestAppointment = Appointment::query()
+                ->where('status', 'Approved')
+                ->where(function ($query) use ($student) {
+                    $query->where('student_id', $student->student_id);
+
+                    if (!empty($student->student_number)) {
+                        $query->orWhere('student_number', $student->student_number);
+                    }
+                })
+                ->latest()
+                ->first();
 
             if ($latestAppointment) {
                 $appointmentDate = \Carbon\Carbon::parse($latestAppointment->date)->startOfDay();
@@ -113,45 +211,41 @@ class WalkInController extends Controller
     }
 
     // 3. GET STUDENT INFO
-    public function getStudent(Request $request)
-{
-    $barcode = $request->student_id; 
-    
-    $student = User::where('barcode', $barcode)
-                   ->orWhere('student_id', $barcode)
-                   ->first();
+    public function getStudent(Request $request, PuptasWebhookService $puptasWebhookService)
+    {
+        $lookup = trim((string) $request->student_id);
 
-    if ($student) {
-        // --- SMART REDIRECT LOGIC ---
-        // Check kung may Approved appointment siya NGAYONG ARAW
-        $hasOnlineAppt = Appointment::where('student_id', $student->student_id)
-                                    ->where('status', 'Approved')
-                                    ->whereDate('date', now()->format('Y-m-d'))
-                                    ->exists();
+        $student = $this->findUserByIdentifier($lookup);
 
-        // Kung may online appt, dagdagan natin ng ?source=online yung URL
-        $source = $hasOnlineAppt ? 'online' : 'walkin';
+        if (!$student && $lookup !== '') {
+            $applicant = $puptasWebhookService->fetchApplicantByStudentNumber($lookup);
 
-        return response()->json([
-            'status' => 'found',
-            'redirect_url' => route($this->walkinRouteName($request, 'form'), [
-                'student_id' => $student->student_id, 
-                'source' => $source // Ito ang magsasabi sa form kung online or walkin
-            ])
-        ]);
-    } else {
+            if (is_array($applicant)) {
+                $student = $this->resolveLocalUserFromApplicant($applicant);
+            }
+        }
+
+        if ($student) {
+            return response()->json([
+                'status' => 'found',
+                'redirect_url' => route($this->walkinRouteName($request, 'form'), [
+                    'student_id' => $student->student_number ?: $student->student_id,
+                    'source' => 'walkin'
+                ])
+            ]);
+        }
+
         return response()->json([
             'status' => 'not_found',
-            'scanned_barcode' => $barcode
+            'scanned_barcode' => $lookup
         ]);
     }
-}
 
     // 4. REGISTER STUDENT
     public function registerStudent(Request $request)
     {
         $request->validate([
-            'student_id' => 'required',
+            'student_number' => 'required',
             'first_name' => 'required',
             'last_name'  => 'required',
             'email'      => 'nullable|email',
@@ -165,7 +259,16 @@ class WalkInController extends Controller
         $email = trim((string) $request->email);
         $password = trim((string) $request->password);
 
-        $existingUser = User::where('student_id', $request->student_id)
+        $studentNumber = trim((string) $request->student_number);
+
+        $existingUser = User::query()
+                            ->where(function ($query) use ($studentNumber) {
+                                if (\Schema::hasColumn('users', 'student_number')) {
+                                    $query->orWhere('student_number', $studentNumber);
+                                }
+
+                                $query->orWhere('student_id', $studentNumber);
+                            })
                             ->when($email !== '', function ($query) use ($email) {
                                 $query->orWhere('email', $email);
                             })
@@ -175,12 +278,12 @@ class WalkInController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'This account already exists.',
-                'redirect_url' => route($this->walkinRouteName($request, 'form'), ['student_id' => $existingUser->student_id])
+                'redirect_url' => route($this->walkinRouteName($request, 'form'), ['student_id' => $existingUser->student_number ?: $existingUser->student_id])
             ], 409);
         }
 
         if ($email === '') {
-            $email = $this->resolveAssistedEmail((string) $request->student_id);
+            $email = $this->resolveAssistedEmail($studentNumber);
         }
 
         if ($password === '') {
@@ -188,7 +291,8 @@ class WalkInController extends Controller
         }
 
         $user = User::create([
-            'student_id' => $request->student_id,
+            'student_id' => $this->resolveUniqueStudentId('assisted-' . Str::slug($studentNumber, '-')),
+            'student_number' => $studentNumber,
             'first_name' => $request->first_name,
             'last_name'  => $request->last_name,
             'name'       => $request->first_name . ' ' . $request->last_name,
@@ -204,7 +308,7 @@ class WalkInController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Student registered successfully!',
-            'redirect_url' => route($this->walkinRouteName($request, 'form'), ['student_id' => $user->student_id])
+            'redirect_url' => route($this->walkinRouteName($request, 'form'), ['student_id' => $user->student_number ?: $user->student_id])
         ]);
     }
 
@@ -212,7 +316,7 @@ class WalkInController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'student_id'   => 'required',
+            'student_number' => 'required',
             'service'      => 'required',
             'remarks'      => 'required',
             'condition_id' => 'required|exists:medical_conditions,id',
@@ -221,7 +325,7 @@ class WalkInController extends Controller
             'weight'       => 'nullable|numeric|min:0|max:1000',
         ]);
 
-        $student = User::where('student_id', $request->student_id)->first();
+        $student = $this->findUserByIdentifier((string) $request->student_number);
 
         if (!$student) {
             return redirect()->back()->with('error', 'Student not found.');
@@ -258,25 +362,36 @@ class WalkInController extends Controller
         }
 
         DB::transaction(function () use ($request, $student) {
-            
-            // --- SMART CHECK: May Approved Online Appointment ba siya NGAYONG ARAW? ---
-            $existingAppt = Appointment::where('student_id', $student->student_id)
-                                        ->where('status', 'Approved')
-                                        ->whereDate('date', now()->format('Y-m-d'))
-                                        ->first();
+            $requestedSource = trim((string) $request->input('user_type', 'walkin'));
+            $isOnlineSource = $requestedSource === 'online';
+            $finalSource = 'walkin';
 
-            if ($existingAppt) {
-                // Kung may Approved Online: I-update lang yung record to 'Completed'
-                $existingAppt->status = 'Completed';
-                $existingAppt->service = $request->service; 
-                $existingAppt->save();
-                
-                $finalSource = 'online';
-            } else {
-                // Kung wala: Gawa ng bagong 'walkin' record sa Appointment Table
+            if ($isOnlineSource) {
+                $existingAppt = Appointment::where('student_id', $student->student_id)
+                    ->where('status', 'Approved')
+                    ->whereDate('date', now()->format('Y-m-d'))
+                    ->first();
+
+                if (!$existingAppt && !empty($student->student_number)) {
+                    $existingAppt = Appointment::where('student_number', $student->student_number)
+                        ->where('status', 'Approved')
+                        ->whereDate('date', now()->format('Y-m-d'))
+                        ->first();
+                }
+
+                if ($existingAppt) {
+                    $existingAppt->status = 'Completed';
+                    $existingAppt->service = $request->service;
+                    $existingAppt->save();
+                    $finalSource = 'online';
+                }
+            }
+
+            if ($finalSource !== 'online') {
                 $appointment = new Appointment();
                 $appointment->user_id    = $student->id;
                 $appointment->student_id = $student->student_id;
+                $appointment->student_number = $student->student_number ?? null;
                 $appointment->name       = $student->first_name . ' ' . $student->last_name;
                 $appointment->email      = $student->email; 
                 $appointment->service    = $request->service;
@@ -287,8 +402,6 @@ class WalkInController extends Controller
                 $appointment->type       = 'walkin';
                 $appointment->user_type  = Appointment::normalizeUserType($student->user_role ?? $student->user_type);
                 $appointment->save();
-                
-                $finalSource = 'walkin';
             }
 
             // --- MEDICINE LOGIC ---

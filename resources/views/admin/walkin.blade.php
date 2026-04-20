@@ -18,20 +18,57 @@
     }
 
     .mode-header {
-        padding: 20px; color: white; display: flex; align-items: center;
+        padding: 22px 24px; color: white; display: flex; align-items: center;
         justify-content: center; gap: 12px; border-radius: 12px 12px 0 0;
         margin: -25px -25px 25px -25px;
         transition: background 0.4s ease;
     }
-    .bg-scan { background: #8B0000; }
-    .bg-register { background: #334155; }
+    .bg-scan { background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c); }
+    .bg-register { background: linear-gradient(135deg, #1e293b, #334155 58%, #475569); }
+
+    .mode-header-badge {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.16);
+        border: 1px solid rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+    }
+
+    .mode-header-copy {
+        text-align: left;
+    }
+
+    .mode-header-copy p {
+        margin: 4px 0 0;
+        font-size: 12px;
+        opacity: 0.9;
+        line-height: 1.45;
+        letter-spacing: 0.01em;
+    }
 
     .scanner-box {
         width: 100% !important; max-width: 480px; aspect-ratio: 16 / 9;
-        margin: 0 auto; background: #1a1a1a; border: 2px dashed #cbd5e1;
-        border-radius: 12px; overflow: hidden; position: relative;
+        margin: 0 auto; background: radial-gradient(circle at top, #1f2937 0%, #0f172a 58%, #020617 100%);
+        border: 2px solid #cbd5e1;
+        border-radius: 16px; overflow: hidden; position: relative;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 20px 40px rgba(15, 23, 42, 0.18);
     }
     .scanner-box video { object-fit: cover !important; }
+    .scanner-box::before {
+        content: '';
+        position: absolute;
+        inset: 16px;
+        border: 1px dashed rgba(255,255,255,0.18);
+        border-radius: 12px;
+        pointer-events: none;
+        z-index: 2;
+    }
 
     .scan-stage {
         transform-style: preserve-3d;
@@ -45,10 +82,26 @@
     }
 
     .scan-line-overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-        background: rgba(255, 255, 255, 0.6); z-index: 10;
-        box-shadow: 0 0 10px white;
-        animation: scan-animation 2s linear infinite;
+        position: absolute;
+        left: 8%;
+        width: 84%;
+        height: 4px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(16,185,129,0) 0%, rgba(52,211,153,0.95) 20%, rgba(167,243,208,1) 50%, rgba(52,211,153,0.95) 80%, rgba(16,185,129,0) 100%);
+        z-index: 10;
+        box-shadow: 0 0 14px rgba(110, 231, 183, 0.95), 0 0 28px rgba(16, 185, 129, 0.45);
+        animation: scan-animation 2.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    .scan-line-overlay::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -22px;
+        height: 48px;
+        background: linear-gradient(180deg, rgba(16,185,129,0) 0%, rgba(52,211,153,0.16) 45%, rgba(16,185,129,0) 100%);
+        filter: blur(4px);
+        pointer-events: none;
     }
 
     .form-control { display: block; width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px; }
@@ -80,11 +133,12 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        margin-bottom: 16px;
-        padding: 12px 14px;
-        border: 1px solid #e2e8f0;
+        margin-bottom: 18px;
+        padding: 14px 16px;
+        border: 1px solid #e5e7eb;
         border-radius: 12px;
-        background: #f8fafc;
+        background: linear-gradient(135deg, #fffaf9, #f8fafc);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
     }
 
     .scan-method-title {
@@ -111,6 +165,7 @@
         font-weight: 800;
         cursor: pointer;
         white-space: nowrap;
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
     }
 
     .scan-method-badge {
@@ -129,8 +184,57 @@
         letter-spacing: 0.04em;
     }
 
+    .scan-surface {
+        padding: 16px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        border: 1px solid #e2e8f0;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 12px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .scan-inline-note {
+        margin: 0 0 14px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .manual-find-btn {
+        min-width: 128px;
+        padding: 0 20px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c);
+        color: #ffffff;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        box-shadow: 0 12px 24px rgba(127, 29, 29, 0.24);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }
+
+    .manual-find-btn:hover,
+    .manual-find-btn:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 28px rgba(127, 29, 29, 0.3);
+        filter: brightness(1.03);
+        outline: none;
+    }
+
+    .manual-find-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 8px 18px rgba(127, 29, 29, 0.22);
+    }
+
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    @keyframes scan-animation { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+    @keyframes scan-animation {
+        0% { top: 16%; opacity: 0.9; }
+        50% { top: 78%; opacity: 1; }
+        100% { top: 16%; opacity: 0.9; }
+    }
     @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 </style>
 @endpush
@@ -208,10 +312,15 @@
 <div class="card p-4 shadow-sm" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
     
     <div id="dynamicHeader" class="mode-header {{ $currentMode === 'assisted' ? 'bg-register' : 'bg-scan' }}">
-        <span id="headerIcon" style="font-size: 24px;">{{ $currentMode === 'assisted' ? 'ASSIST' : 'SCAN' }}</span>
-        <h3 id="headerTitle" style="margin: 0; font-weight: 700; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
-            {{ $currentMode === 'assisted' ? 'Assisted Intake Ready' : 'Scanner Ready' }}
-        </h3>
+        <div id="headerIcon" class="mode-header-badge">{{ $currentMode === 'assisted' ? 'AI' : 'SB' }}</div>
+        <div class="mode-header-copy">
+            <h3 id="headerTitle" style="margin: 0; font-weight: 800; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
+                {{ $currentMode === 'assisted' ? 'Assisted Intake Ready' : 'Scan / Bio Ready' }}
+            </h3>
+            <p id="headerSubtitle">
+                {{ $currentMode === 'assisted' ? 'Capture the patient basics first, then continue to consultation.' : 'Choose barcode scanning or BioSync mode to identify the patient.' }}
+            </p>
+        </div>
     </div>
 
     <div id="scanForm" style="{{ $currentMode === 'assisted' ? 'display:none;' : '' }}">
@@ -225,7 +334,8 @@
                 <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">Switch to BioSync</button>
             </div>
 
-            <div id="scanner-container-scan" style="position: relative;">
+            <div id="scanner-container-scan" class="scan-surface" style="position: relative;">
+                <p id="scanInlineNote" class="scan-inline-note">Barcode mode is active. Point the camera at the patient barcode, or switch to BioSync for the upcoming biometric flow.</p>
                 <div id="barcodeScanPanel">
                     <div id="scan-loading">
                         <div class="spinner"></div>
@@ -236,8 +346,8 @@
                     </div>
                 </div>
 
-                <div id="bioSyncPendingPanel" style="display:none; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:30px 22px; text-align:center;">
-                    <div style="width:60px; height:60px; margin:0 auto 14px; border-radius:18px; background:#e2e8f0; color:#334155; display:flex; align-items:center; justify-content:center; font-weight:900;">BIO</div>
+                <div id="bioSyncPendingPanel" style="display:none; background:linear-gradient(180deg, #f8fafc, #eef2ff); border:1px dashed #cbd5e1; border-radius:12px; padding:30px 22px; text-align:center;">
+                    <div style="width:60px; height:60px; margin:0 auto 14px; border-radius:18px; background:#dbeafe; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 10px 20px rgba(59,130,246,0.12);">BIO</div>
                     <h4 style="margin:0 0 8px; font-size:18px; color:#0f172a; font-weight:800;">BioSync Pending</h4>
                     <p style="margin:0; color:#64748b; line-height:1.6; font-size:13px;">This mode is reserved for the upcoming BioSync integration. For now, please switch back to barcode scanning or use assisted intake.</p>
                 </div>
@@ -245,14 +355,14 @@
         
             <div class="text-center mt-3">
                 <button type="button" id="btnShowManual" style="background:none; border:none; color:#8B0000; text-decoration:underline; cursor:pointer; font-weight:600; font-size: 0.85rem;">
-                    Type ID Number Manually
+                    Type Student Number Manually
                 </button>
             </div>
 
             <div id="manualInputArea" style="display:none;" class="mt-3">
                 <form id="walkinFormManual" class="d-flex gap-2">
-                    <input type="text" id="student_id_manual" placeholder="Enter ID Number" class="form-control" style="margin-bottom:0;" required>
-                    <button type="submit" style="background:#8B0000; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:700;">Find</button>
+                    <input type="text" id="student_id_manual" placeholder="Enter student number" class="form-control" style="margin-bottom:0;" required>
+                    <button type="submit" class="manual-find-btn">Find</button>
                 </form>
             </div>
 
@@ -279,9 +389,9 @@
             </div>
 
             <div class="mb-3">
-                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Reference ID / School ID</label>
+                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Student Number / Reference ID</label>
                 <div class="d-flex gap-2">
-                    <input type="text" id="reg_student_id" class="form-control mb-0" style="background: #ffffff; font-weight: bold; border: 2px solid #cbd5e1;" placeholder="Enter patient reference or ID" required>
+                    <input type="text" id="reg_student_id" class="form-control mb-0" style="background: #ffffff; font-weight: bold; border: 2px solid #cbd5e1;" placeholder="Enter student number or reference ID" required>
                     <input type="hidden" id="reg_barcode">
                 </div>
             </div>
@@ -433,8 +543,18 @@
             );
             $('#scanMethodBadge').text(isBioSync ? 'BioSync Active' : 'Barcode Active');
             $('#btnSwitchScanMode').text(isBioSync ? 'Switch to Scan Barcode' : 'Switch to BioSync');
-            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : 'Scanner Ready');
-            $('#headerIcon').text(isBioSync ? 'BIO' : 'SCAN');
+            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : 'Scan / Bio Ready');
+            $('#headerSubtitle').text(
+                isBioSync
+                    ? 'BioSync is selected. The biometric integration panel is reserved for the next implementation step.'
+                    : 'Choose barcode scanning or BioSync mode to identify the patient.'
+            );
+            $('#headerIcon').text(isBioSync ? 'BIO' : 'SB');
+            $('#scanInlineNote').text(
+                isBioSync
+                    ? 'BioSync mode is selected. This section is currently in pending state while we complete the biometric workflow.'
+                    : 'Barcode mode is active. Point the camera at the patient barcode, or switch to BioSync for the upcoming biometric flow.'
+            );
             $('#barcodeScanPanel').toggle(!isBioSync);
             $('#bioSyncPendingPanel').toggle(isBioSync);
             $('#btnShowManual').toggle(!isBioSync);
@@ -480,7 +600,7 @@
                 role: role,
                 user_role: role,
                 user_type: role,
-                student_id: $('#reg_student_id').val(),
+                student_number: $('#reg_student_id').val(),
                 first_name: $('#reg_first_name').val(),
                 last_name: $('#reg_last_name').val(),
                 email: $('#reg_email').val(),

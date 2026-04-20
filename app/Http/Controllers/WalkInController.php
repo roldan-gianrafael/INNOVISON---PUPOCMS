@@ -8,9 +8,26 @@ use App\Models\Appointment;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class WalkInController extends Controller
 {
+    private function resolveAssistedEmail(string $referenceId): string
+    {
+        $base = Str::slug($referenceId, '.');
+        $base = $base !== '' ? $base : ('assisted.' . Str::lower(Str::random(8)));
+
+        $email = $base . '@assisted.local';
+        $counter = 1;
+
+        while (User::where('email', $email)->exists()) {
+            $email = $base . '.' . $counter . '@assisted.local';
+            $counter++;
+        }
+
+        return $email;
+    }
+
     private function inAssistantWorkspace(Request $request): bool
     {
         return $request->is('assistant/*');
@@ -43,7 +60,7 @@ class WalkInController extends Controller
     // 2. SHOW WALKIN FORM
     public function showWalkinForm(Request $request, $student_id)
     {
-        $student = User::where('student_id', $student_id)->firstOrFail();
+        $student = User::with('healthProfile')->where('student_id', $student_id)->firstOrFail();
         $user_source = $request->query('source', 'walkin');
 
         $latestAppointment = null;
@@ -71,7 +88,28 @@ class WalkInController extends Controller
 
         $conditions = \App\Models\MedicalConditions::with('category')->get();
 
-        return view('admin.walkin-form', compact('student', 'items', 'conditions', 'latestAppointment', 'user_source'));
+        $consultationDob = (string) ($student->healthProfile->birthday ?? $student->DOB ?? '');
+        if ($consultationDob !== '') {
+            try {
+                $consultationDob = \Carbon\Carbon::parse($consultationDob)->format('Y-m-d');
+            } catch (\Throwable $exception) {
+                $consultationDob = '';
+            }
+        }
+
+        $consultationHeight = $student->healthProfile->height ?? $student->height ?? null;
+        $consultationWeight = $student->healthProfile->weight ?? $student->weight ?? null;
+
+        return view('admin.consult-form', compact(
+            'student',
+            'items',
+            'conditions',
+            'latestAppointment',
+            'user_source',
+            'consultationDob',
+            'consultationHeight',
+            'consultationWeight'
+        ));
     }
 
     // 3. GET STUDENT INFO
@@ -116,13 +154,21 @@ class WalkInController extends Controller
             'student_id' => 'required',
             'first_name' => 'required',
             'last_name'  => 'required',
-            'email'      => 'required|email',
-            'password'   => 'required|min:6',
+            'email'      => 'nullable|email',
+            'password'   => 'nullable|min:6',
             'user_role'  => 'required',
+            'dob'        => 'nullable|date',
+            'gender'     => 'nullable|string|max:50',
+            'contact_no' => 'nullable|string|max:20',
         ]);
 
+        $email = trim((string) $request->email);
+        $password = trim((string) $request->password);
+
         $existingUser = User::where('student_id', $request->student_id)
-                            ->orWhere('email', $request->email)
+                            ->when($email !== '', function ($query) use ($email) {
+                                $query->orWhere('email', $email);
+                            })
                             ->first();
 
         if ($existingUser) {
@@ -133,15 +179,26 @@ class WalkInController extends Controller
             ], 409);
         }
 
+        if ($email === '') {
+            $email = $this->resolveAssistedEmail((string) $request->student_id);
+        }
+
+        if ($password === '') {
+            $password = Str::random(12);
+        }
+
         $user = User::create([
             'student_id' => $request->student_id,
             'first_name' => $request->first_name,
             'last_name'  => $request->last_name,
             'name'       => $request->first_name . ' ' . $request->last_name,
-            'email'      => $request->email,
-            'password'   => Hash::make($request->password),
+            'email'      => $email,
+            'password'   => Hash::make($password),
             'user_role'  => $request->user_role, 
             'barcode'    => $request->barcode,
+            'DOB'        => $request->input('dob'),
+            'gender'     => $request->input('gender'),
+            'contact_no' => $request->input('contact_no'),
         ]);
 
         return response()->json([
@@ -159,12 +216,45 @@ class WalkInController extends Controller
             'service'      => 'required',
             'remarks'      => 'required',
             'condition_id' => 'required|exists:medical_conditions,id',
+            'dob'          => 'nullable|date',
+            'height'       => 'nullable|numeric|min:0|max:400',
+            'weight'       => 'nullable|numeric|min:0|max:1000',
         ]);
 
         $student = User::where('student_id', $request->student_id)->first();
 
         if (!$student) {
             return redirect()->back()->with('error', 'Student not found.');
+        }
+
+        if ($request->filled('dob')) {
+            $student->DOB = $request->input('dob');
+        }
+
+        if ($request->filled('height')) {
+            $student->height = $request->input('height');
+        }
+
+        if ($request->filled('weight')) {
+            $student->weight = $request->input('weight');
+        }
+
+        $student->save();
+
+        if ($student->healthProfile) {
+            if ($request->filled('dob')) {
+                $student->healthProfile->birthday = $request->input('dob');
+            }
+
+            if ($request->filled('height')) {
+                $student->healthProfile->height = (string) $request->input('height');
+            }
+
+            if ($request->filled('weight')) {
+                $student->healthProfile->weight = (string) $request->input('weight');
+            }
+
+            $student->healthProfile->save();
         }
 
         DB::transaction(function () use ($request, $student) {

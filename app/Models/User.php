@@ -55,6 +55,7 @@ class User extends Authenticatable
     'status',
     'password',
     'is_health_profile_completed',
+    'notification_read_map',
 
 ];
 
@@ -72,6 +73,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'is_admin' => 'boolean',
+        'notification_read_map' => 'array',
     ];
 
     /**

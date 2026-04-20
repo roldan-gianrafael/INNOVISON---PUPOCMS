@@ -14,21 +14,18 @@ use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
-    private function notificationReadStateKey(User $user): string
-    {
-        return 'student_notifications_read.' . $user->id;
-    }
-
     private function getNotificationReadMap(User $user): array
     {
-        return session($this->notificationReadStateKey($user), []);
+        $readMap = $user->notification_read_map ?? [];
+        return is_array($readMap) ? $readMap : [];
     }
 
     private function markNotificationAsRead(User $user, string $notificationId): void
     {
         $readMap = $this->getNotificationReadMap($user);
         $readMap[$notificationId] = now()->toIso8601String();
-        session([$this->notificationReadStateKey($user) => $readMap]);
+        $user->notification_read_map = $readMap;
+        $user->save();
     }
 
     private function buildNotificationId(string $prefix, array $parts = []): string
@@ -741,7 +738,8 @@ public function account(Request $request)
             $readMap[$notification['id']] = now()->toIso8601String();
         }
 
-        session([$this->notificationReadStateKey($user) => $readMap]);
+        $user->notification_read_map = $readMap;
+        $user->save();
 
         return back()->with('success', 'All notifications marked as read.');
     }
@@ -843,7 +841,6 @@ public function updateContact(Request $request)
     $user->section = $validated['section'] ?? $user->section;
     $user->height = $validated['height'] ?? $user->height;
     $user->weight = $validated['weight'] ?? $user->weight;
-    $user->DOB = $validated['birthday'] ?? $user->DOB;
     if ($linkedAdminProfile && isset($validated['admin_profile_id']) && (int) $validated['admin_profile_id'] === (int) $linkedAdminProfile->admin_id) {
         $linkedAdminProfile->first_name = $validated['first_name'] ?? $linkedAdminProfile->first_name;
         $linkedAdminProfile->middle_name = $validated['middle_name'] ?? $linkedAdminProfile->middle_name;
@@ -867,11 +864,6 @@ public function updateContact(Request $request)
     }
 
     $user->save();
-
-    if ($user->healthProfile && !empty($validated['birthday'])) {
-        $user->healthProfile->birthday = $validated['birthday'];
-        $user->healthProfile->save();
-    }
 
     // 5. SYSTEM LOG ---
     \App\Models\ActivityLog::create([

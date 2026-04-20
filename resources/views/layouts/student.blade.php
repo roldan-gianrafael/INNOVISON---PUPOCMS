@@ -402,11 +402,27 @@
             stroke-width: 2;
             stroke-linecap: round;
             stroke-linejoin: round;
+            transform-origin: top center;
+        }
+
+        .notif-fab:hover svg,
+        .notif-fab:focus-visible svg {
+            animation: notifBellRing 0.6s ease-in-out;
         }
 
         .notif-fab .notif-badge {
             top: -6px;
             right: -4px;
+        }
+
+        @keyframes notifBellRing {
+            0% { transform: rotate(0deg); }
+            15% { transform: rotate(14deg); }
+            30% { transform: rotate(-12deg); }
+            45% { transform: rotate(10deg); }
+            60% { transform: rotate(-8deg); }
+            75% { transform: rotate(5deg); }
+            100% { transform: rotate(0deg); }
         }
 
         .notif-dropdown-header {
@@ -1102,12 +1118,10 @@
     @include('partials.post_login_terms_gate')
 
     @if($notificationCount > 0)
-        <div class="notif-fab-wrap nav-dropdown" data-nav-dropdown>
-            <button
-                type="button"
+        <div class="notif-fab-wrap">
+            <a
+                href="{{ url('/student/account?view=notifications') }}"
                 class="notif-fab"
-                aria-expanded="false"
-                aria-haspopup="true"
                 aria-label="Notifications"
                 title="Notifications"
             >
@@ -1116,31 +1130,7 @@
                     <path d="M10 17a2 2 0 0 0 4 0"></path>
                 </svg>
                 <span class="notif-badge">{{ $notificationCount }}</span>
-            </button>
-            <ul class="nav-dropdown-menu notif-dropdown-menu" style="right: 0; left: auto; bottom: calc(100% + 12px); top: auto;">
-                <li class="notif-dropdown-header">
-                    <span class="notif-dropdown-title">Notifications</span>
-                    @if($layoutNotifications->isNotEmpty())
-                        <form action="{{ route('student.notifications.read_all') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="notif-read-all">Mark all as read</button>
-                        </form>
-                    @endif
-                </li>
-                <ul class="notif-dropdown-list">
-                    @foreach($layoutNotifications->where('is_unread', true) as $notif)
-                        <li>
-                            <a href="{{ route('student.notifications.open', ['notificationId' => $notif['id']]) }}" class="notif-dropdown-item unread">
-                                <span class="notif-item-dot" aria-hidden="true"></span>
-                                <span class="notif-item-content">
-                                    <span class="notif-item-message">{{ $notif['message'] ?? 'Notification available.' }}</span>
-                                    <span class="notif-item-time">{{ $notif['time'] ?? 'Just now' }}</span>
-                                </span>
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </ul>
+            </a>
         </div>
     @endif
 

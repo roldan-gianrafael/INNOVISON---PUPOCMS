@@ -615,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div>
                     <label class="input-label">Birthday (DOB)</label>
-                    <input type="date" name="birthday" class="form-control editable-input" value="{{ old('birthday', $accountProfileData['birthday'] ?? $user->DOB) }}" disabled>
+                    <input type="text" class="form-control" value="{{ $accountProfileData['birthday'] ?? $user->DOB }}" readonly style="background-color: #f8fafc;">
                 </div>
             </div>
         @endif
@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="profile-grid-2">
                 <div>
                     <label class="input-label">Birthday</label>
-                    <input type="date" name="birthday" class="form-control editable-input" value="{{ old('birthday', $accountProfileData['birthday'] ?? $linkedAdminProfile->birthday) }}" disabled>
+                    <input type="date" name="birthday" class="form-control" value="{{ old('birthday', $accountProfileData['birthday'] ?? $linkedAdminProfile->birthday) }}" disabled>
                 </div>
                 <div>
                     <label class="input-label">Gender</label>

@@ -122,7 +122,7 @@
 @section('content')
 @php
     $printProfileData = $printProfileData ?? [];
-    $printStudentNumber = trim((string) ($profile->student_number ?? optional($profile->user)->student_number ?? ''));
+    $printStudentNumber = trim((string) ($printProfileData['student_number'] ?? $profile->student_number ?? optional($profile->user)->student_number ?? ''));
     $printName = trim((string) ($printProfileData['full_name'] ?? optional($profile->user)->name ?? Auth::user()->name ?? ''));
     $printAddress = trim((string) ($printProfileData['home_address'] ?? $profile->home_address ?? ''));
     $printSchoolYear = trim((string) ($printProfileData['school_year'] ?? $profile->school_year ?? '2025-2026'));

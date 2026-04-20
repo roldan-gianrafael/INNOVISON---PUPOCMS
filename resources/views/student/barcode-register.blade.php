@@ -276,7 +276,7 @@
 
     <div class="student-info-box">
         <p><strong>Student Name:</strong> {{ $user->name }}</p>
-        <p><strong>Student Number:</strong> {{ $studentContext['student_number'] ?? $user->student_number ?? 'N/A' }}</p>
+        <p><strong>Student Number:</strong> {{ ($studentContext['student_number'] ?? '') !== '' ? $studentContext['student_number'] : 'N/A' }}</p>
     </div>
 
     @if(session('success'))

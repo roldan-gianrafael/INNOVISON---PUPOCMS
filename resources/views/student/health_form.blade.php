@@ -914,7 +914,7 @@
         <div class="form-row">
             <label class="form-label">PUP Student No.<span class="required-mark">*</span></label>
             <input type="text" name="student_number" class="form-control bg-light api-prefill-field"
-                value="{{ old('student_number', $healthFormPrefill['student_number'] ?? Auth::user()->student_number) }}" readonly>
+                value="{{ old('student_number', $healthFormPrefill['student_number'] ?? '') }}" readonly>
         </div>
     </div>
 

@@ -136,7 +136,6 @@
         <div class="hero-actions">
           <a href="{{ url('/student/booking') }}" class="btn btn-primary">Book Appointment</a>
           <a href="{{ url('/student/history') }}" class="btn btn-secondary">View Appointments</a>
-          @endforelse
         </div>
       </div>
     </section>
@@ -202,6 +201,7 @@
               <div class="comment-footer"><span class="comment-chip">Mental Health</span></div>
             </div>
           </article>
+          @endforelse
         </div>
       </div>
     </section>

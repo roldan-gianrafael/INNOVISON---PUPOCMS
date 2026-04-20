@@ -136,6 +136,7 @@
         <div class="hero-actions">
           <a href="{{ url('/student/booking') }}" class="btn btn-primary">Book Appointment</a>
           <a href="{{ url('/student/history') }}" class="btn btn-secondary">View Appointments</a>
+          @endforelse
         </div>
       </div>
     </section>

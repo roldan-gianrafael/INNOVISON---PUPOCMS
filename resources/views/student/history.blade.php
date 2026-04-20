@@ -233,17 +233,9 @@
 
       .empty-title {
           margin: 0;
-          font-size: 22px;
+          font-size: 18px;
           color: #7f1d1d;
           font-weight: 800;
-      }
-
-      .empty-text {
-          margin: 0;
-          max-width: 420px;
-          font-size: 14px;
-          line-height: 1.6;
-          color: #6b7280;
       }
 
       .empty-state .btn-outline {
@@ -341,7 +333,6 @@
                     </div>
                   </div>
                   <h2 class="empty-title">You have no appointment history yet</h2>
-                  <p class="empty-text">Start your first clinic visit whenever you’re ready. Once you book, your upcoming and past consultations will appear here.</p>
                   <a href="{{ url('/student/booking') }}" class="btn-outline">Book your first appointment</a>
                 </div>
             @endforelse

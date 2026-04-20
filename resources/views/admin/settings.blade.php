@@ -881,7 +881,7 @@
                     <div>
                         <div class="section-spot">Clearance Signature</div>
                         <h3>Nurse Digital Signature</h3>
-                        <p>Upload the signature that should appear automatically whenever the nurse issues a clearance.</p>
+                        <p>Upload your digital signature to be used for official clearances..</p>
                     </div>
                     <button type="button" class="mini-edit-btn" onclick="openSettingsModal('clearanceSignatureModal')">Upload</button>
                 </div>

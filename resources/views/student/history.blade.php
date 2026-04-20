@@ -291,7 +291,7 @@
 @endpush
 
 @section('content')
-    <div class="container" style="padding-top: 12px; padding-bottom: 60px;">
+    <div class="container" style="padding-top: 5px; padding-bottom: 60px;">
       <div class="page-header">
         <div>
           <h1 style="margin:0; font-size: 28px; color: #600000;">Appointment History</h1>

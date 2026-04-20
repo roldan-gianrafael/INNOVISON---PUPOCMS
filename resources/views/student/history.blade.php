@@ -20,7 +20,7 @@
           border: 1px solid #8B0000; 
           color: #8B0000; 
           background: transparent; 
-          padding: 8px 14px; 
+          padding: 7.9px 14px; 
           border-radius: 8px; 
           text-decoration: none; 
           font-weight: 600; 

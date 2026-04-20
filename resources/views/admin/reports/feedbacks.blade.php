@@ -336,7 +336,7 @@
                 <div class="clinic-score-kicker">Clinic Score</div>
                 <div class="clinic-score-number">{{ number_format($clinicScore, 1) }}/10</div>
                 <div class="clinic-score-copy">
-                    Based on submitted ratings for the selected month. Lower ratings this period: <strong>{{ $lowRatingCount }}</strong>.
+                    rack patient satisfaction to identify and resolve operational bottlenecks.
                 </div>
             </div>
         </aside>

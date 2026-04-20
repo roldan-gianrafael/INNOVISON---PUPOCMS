@@ -58,10 +58,29 @@
 
     /* Modal */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 400px; }
+    .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 760px; max-width: 94vw; }
+    .modal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .modal-form-panel {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        background: #fcfcfd;
+    }
+    .modal-panel-title {
+        margin: 0 0 14px;
+        font-size: 15px;
+        font-weight: 800;
+        color: #70131B;
+    }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600; color: #111827; }
     .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; color: #111827; }
+
+    @media (max-width: 760px) {
+        .modal-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 @endpush
 
@@ -163,53 +182,80 @@
                 <form id="itemForm" method="POST" action="{{ url('/admin/inventory/store') }}">
                     @csrf
                     <div id="methodField"></div> 
-                    
-                    <div class="form-group">
-                        <label>Item Name</label>
-                        <input name="name" id="iName" class="form-control" required placeholder="e.g. Paracetamol">
-                    </div>
 
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select name="category" id="iCategory" class="form-control" onchange="toggleMedicineFields()">
-                            <option value="Medicine">Medicine</option>
-                            <option value="Equipment">Equipment</option>
-                            <option value="Supplies">Supplies</option>
-                        </select>
-                    </div>
+                    <div class="modal-form-grid">
+                        <div class="modal-form-panel">
+                            <h4 class="modal-panel-title">Item Information</h4>
 
-                    <div id="medicineFields" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">
-                        <div class="form-group">
-                            <label>Medicine Type</label>
-                            <select name="medicine_type" id="iMedicineType" class="form-control">
-                                <option value="">-- Select Type --</option>
-                                <option value="Antibiotic">Antibiotic</option>
-                                <option value="Asthma">For Asthma</option>
-                                <option value="Analgesic">Analgesic</option>
-                                <option value="Antipyretic">Antipyretic</option>
-                                <option value="Others">Others</option>
-                            </select>
+                            <div class="form-group">
+                                <label>Item Name</label>
+                                <input name="name" id="iName" class="form-control" required placeholder="e.g. Paracetamol">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select name="category" id="iCategory" class="form-control" onchange="toggleMedicineFields()">
+                                    <option value="Medicine">Medicine</option>
+                                    <option value="Equipment">Equipment</option>
+                                    <option value="Supplies">Supplies</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date Added</label>
+                                <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Expiration Date</label>
-                            <input type="date" name="expiration_date" id="iExpDate" class="form-control">
+                        <div class="modal-form-panel">
+                            <h4 class="modal-panel-title">Stock Details</h4>
+
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input type="number" name="quantity" id="iQty" class="form-control" required min="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Unit</label>
+                                <input type="text" name="unit" id="iUnit" class="form-control" list="inventoryUnitSuggestions" required placeholder="e.g. pcs, box, bottle, vial">
+                                <datalist id="inventoryUnitSuggestions">
+                                    <option value="pcs">
+                                    <option value="box">
+                                    <option value="bottle">
+                                    <option value="vial">
+                                    <option value="ampule">
+                                    <option value="tablet">
+                                    <option value="capsule">
+                                    <option value="pack">
+                                    <option value="set">
+                                    <option value="tube">
+                                    <option value="sachet">
+                                    <option value="roll">
+                                    <option value="pair">
+                                    <option value="ml">
+                                    <option value="mg">
+                                </datalist>
+                            </div>
+
+                            <div id="medicineFields" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Medicine Type</label>
+                                    <select name="medicine_type" id="iMedicineType" class="form-control">
+                                        <option value="">-- Select Type --</option>
+                                        <option value="Antibiotic">Antibiotic</option>
+                                        <option value="Asthma">For Asthma</option>
+                                        <option value="Analgesic">Analgesic</option>
+                                        <option value="Antipyretic">Antipyretic</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Expiration Date</label>
+                                    <input type="date" name="expiration_date" id="iExpDate" class="form-control">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Date Added</label>
-                        <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Quantity</label>
-                        <input type="number" name="quantity" id="iQty" class="form-control" required min="0">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Unit</label>
-                        <input type="text" name="unit" id="iUnit" class="form-control" required placeholder="e.g. pcs, box, bottle, vial">
                     </div>
 
                     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">

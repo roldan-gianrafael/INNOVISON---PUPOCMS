@@ -272,7 +272,8 @@ class AppointmentController extends Controller
         $resolvedCivilStatus = in_array($resolvedCivilStatus, ['Single', 'Married'], true) ? $resolvedCivilStatus : 'Single';
 
         $resolvedBirthday = (string) (
-            $user->DOB
+            optional($healthProfile)->birthday
+            ?: $user->DOB
             ?: optional($linkedAdminProfile)->birthday
             ?: data_get($applicantData, 'birthday')
             ?: ''
@@ -1136,6 +1137,7 @@ public function storeHealthForm(Request $request)
                 'school_year'        => $request->school_year,
                 'home_address'       => $request->home_address,
                 'zipcode'            => $request->zipcode,
+                'birthday'           => $request->input('birthday'),
                 'student_photo'      => $photoPath,
                 'height'             => $normalizedHeight,
                 'weight'             => $normalizedWeight,

@@ -1384,10 +1384,10 @@ public function deleteItem($id)
             'clearance_signature' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
         ]);
 
-        $settings->clinic_name = $request->input('clinic_name', $settings->clinic_name);
-        $settings->clinic_location = $request->input('clinic_location', $settings->clinic_location);
-        $settings->open_time = $request->input('open_time', $settings->open_time);
-        $settings->close_time = $request->input('close_time', $settings->close_time);
+        $settings->clinic_name = $request->input('clinic_name', $settings->clinic_name ?: 'PUP Taguig Clinic');
+        $settings->clinic_location = $request->input('clinic_location', $settings->clinic_location ?: 'Santos Ave, Lower Bicutan, Taguig');
+        $settings->open_time = $request->input('open_time', $settings->open_time ?: '08:00');
+        $settings->close_time = $request->input('close_time', $settings->close_time ?: '17:00');
 
         if ($request->has('email_notifications')) {
             $settings->email_notifications = true;

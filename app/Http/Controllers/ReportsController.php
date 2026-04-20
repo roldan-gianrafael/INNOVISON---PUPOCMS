@@ -50,12 +50,26 @@ class ReportsController extends Controller
             ->through(function (AppointmentFeedback $feedback) {
                 $appointment = $feedback->appointment;
                 $user = $feedback->user;
-                $fullName = trim((string) ($user->name ?? implode(' ', array_filter([$user->first_name ?? '', $user->last_name ?? '']))));
-                $displayName = $fullName !== '' ? $fullName : 'Clinic User';
+                $firstName = trim((string) ($user->first_name ?? ''));
+                $lastName = trim((string) ($user->last_name ?? ''));
+                $fallbackName = trim((string) ($user->name ?? ''));
+
+                if ($firstName === '' && $fallbackName !== '') {
+                    $nameParts = preg_split('/\s+/', $fallbackName) ?: [];
+                    $firstName = trim((string) ($nameParts[0] ?? ''));
+                    $lastName = trim((string) ($nameParts[count($nameParts) - 1] ?? ''));
+                }
+
+                $surnameInitial = $lastName !== '' ? strtoupper(substr($lastName, 0, 1)) . '.' : '';
+                $displayName = trim($firstName . ($surnameInitial !== '' ? ' ' . $surnameInitial : ''));
+                if ($displayName === '') {
+                    $displayName = 'Clinic User';
+                }
+
                 $initials = collect(preg_split('/\s+/', $displayName) ?: [])
                     ->filter()
                     ->take(2)
-                    ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                    ->map(fn ($part) => strtoupper(substr(rtrim($part, '.'), 0, 1)))
                     ->implode('');
 
                 return (object) [
@@ -90,7 +104,6 @@ class ReportsController extends Controller
         return view('admin.reports.feedbacks', compact(
             'feedbackItems',
             'totalFeedbacks',
-            'averageRating',
             'clinicScore',
             'recommendedCount',
             'lowRatingCount',

@@ -39,7 +39,7 @@
     }
     .feedback-stat-grid {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 18px;
         margin-bottom: 24px;
     }
@@ -303,10 +303,6 @@
         <div class="feedback-stat-card">
             <span>Total Feedbacks</span>
             <strong>{{ $totalFeedbacks }}</strong>
-        </div>
-        <div class="feedback-stat-card">
-            <span>Average Rating</span>
-            <strong>{{ number_format($averageRating, 1) }}/5</strong>
         </div>
         <div class="feedback-stat-card">
             <span>Rate of Clinic</span>

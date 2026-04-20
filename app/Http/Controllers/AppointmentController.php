@@ -840,6 +840,7 @@ public function account(Request $request)
     $user->section = $validated['section'] ?? $user->section;
     $user->height = $validated['height'] ?? $user->height;
     $user->weight = $validated['weight'] ?? $user->weight;
+    $user->DOB = $validated['birthday'] ?? $user->DOB;
     if ($linkedAdminProfile && isset($validated['admin_profile_id']) && (int) $validated['admin_profile_id'] === (int) $linkedAdminProfile->admin_id) {
         $linkedAdminProfile->first_name = $validated['first_name'] ?? $linkedAdminProfile->first_name;
         $linkedAdminProfile->middle_name = $validated['middle_name'] ?? $linkedAdminProfile->middle_name;
@@ -863,6 +864,11 @@ public function account(Request $request)
     }
 
     $user->save();
+
+    if ($user->healthProfile && !empty($validated['birthday'])) {
+        $user->healthProfile->birthday = $validated['birthday'];
+        $user->healthProfile->save();
+    }
 
     // 5. SYSTEM LOG ---
     \App\Models\ActivityLog::create([

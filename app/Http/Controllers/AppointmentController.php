@@ -87,12 +87,14 @@ class AppointmentController extends Controller
                     'time' => $timeAgo,
                     'link' => url('/student/history'),
                 ];
-            } elseif ($appt->status === 'Completed' && !$appt->feedback) {
+            } elseif ($appt->status === 'Completed') {
                 $notifications[] = [
                     'id' => $this->buildNotificationId('appointment-feedback', [$appt->id, $appt->status, optional($appt->updated_at)->timestamp]),
                     'type' => 'info',
                     'icon' => '!',
-                    'message' => "Your consultation for {$appt->service} on {$dateStr} has been completed. Please share your feedback.",
+                    'message' => $appt->feedback
+    ? "You already submitted feedback for {$appt->service} on {$dateStr}."
+    : "Your consultation for {$appt->service} on {$dateStr} has been completed. Please share your feedback.",
                     'time' => $timeAgo,
                     'link' => route('student.feedback.show', ['appointment' => $appt->id]),
                 ];

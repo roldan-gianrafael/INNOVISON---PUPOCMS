@@ -41,6 +41,27 @@
     .comments-section .section-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:22px; }
     .comments-section h3 { margin:0; font-size:22px; color: #2d3748; }
     .comments-section p.lead { margin:6px 0 0; color:#5b6d70; }
+    .feedback-more {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        background: #ffffff;
+        border: 1px solid #ead7d7;
+        color: #8B0000;
+        font-size: 22px;
+        font-weight: 800;
+        box-shadow: 0 8px 20px rgba(16,24,28,0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .feedback-more:hover {
+        transform: translateX(2px);
+        background: #fff7f7;
+        box-shadow: 0 14px 28px rgba(16,24,28,0.10);
+    }
     
     .comments-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:18px; }
     .comment-card { background:#ffffff; padding:18px; border-radius:12px; box-shadow:0 8px 28px rgba(16,24,28,0.06); display:flex; gap:12px; align-items:flex-start; transition:transform 220ms ease; }
@@ -115,6 +136,7 @@
         <div class="hero-actions">
           <a href="{{ url('/student/booking') }}" class="btn btn-primary">Book Appointment</a>
           <a href="{{ url('/student/history') }}" class="btn btn-secondary">View Appointments</a>
+          @endforelse
         </div>
       </div>
     </section>
@@ -138,9 +160,22 @@
             <h3>What people are saying</h3>
             <p class="lead">Recent feedback from students and staff about our clinic services.</p>
           </div>
+          @if(($feedbackCount ?? 0) > 3)
+            <a href="{{ route('student.feedback.index') }}" class="feedback-more" aria-label="View more feedback" title="View more feedback">&gt;</a>
+          @endif
         </div>
 
         <div class="comments-grid">
+          @forelse(($recentFeedback ?? []) as $feedback)
+          <article class="comment-card" tabindex="0">
+            <svg class="avatar" role="img" aria-label="User avatar"><use href="#avatar-placeholder"></use></svg>
+            <div class="comment-body">
+              <h4>{{ $feedback['name'] }} <span class="comment-meta">· {{ $feedback['role'] }} · {{ $feedback['time'] }}</span></h4>
+              <p>{{ $feedback['message'] }}</p>
+              <div class="comment-footer"><span class="comment-chip">{{ $feedback['service'] }}</span></div>
+            </div>
+          </article>
+          @empty
           <article class="comment-card" tabindex="0">
             <svg class="avatar" role="img" aria-label="User avatar"><use href="#avatar-placeholder"></use></svg>
             <div class="comment-body">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Appointment;
+use App\Models\AppointmentFeedback;
 use App\Models\HealthProfile;
 use App\Models\User;
 use App\Services\PuptasWebhookService;
@@ -14,6 +15,26 @@ use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
+    private function formatFeedbackDisplayName(?User $user, ?Appointment $appointment = null): string
+    {
+        $firstName = trim((string) ($user?->first_name ?? ''));
+        $lastName = trim((string) ($user?->last_name ?? ''));
+
+        if ($firstName === '' && $lastName === '' && $appointment) {
+            $nameParts = preg_split('/\s+/', trim((string) $appointment->name)) ?: [];
+            $firstName = $nameParts[0] ?? '';
+            $lastName = count($nameParts) > 1 ? ($nameParts[count($nameParts) - 1] ?? '') : '';
+        }
+
+        if ($firstName === '' && $lastName === '') {
+            return 'Clinic User';
+        }
+
+        $lastInitial = $lastName !== '' ? strtoupper(substr($lastName, 0, 1)) . '.' : '';
+
+        return trim($firstName . ' ' . $lastInitial);
+    }
+
     private function getNotificationReadMap(User $user): array
     {
         $readMap = $user->notification_read_map ?? [];
@@ -39,6 +60,7 @@ class AppointmentController extends Controller
         $user->loadMissing('healthProfile');
 
         $appointments = Appointment::where('user_id', $user->id)
+            ->with('feedback')
             ->orderBy('updated_at', 'desc')
             ->get();
 
@@ -64,6 +86,15 @@ class AppointmentController extends Controller
                     'message' => "Your {$appt->service} on {$dateStr} was cancelled.",
                     'time' => $timeAgo,
                     'link' => url('/student/history'),
+                ];
+            } elseif ($appt->status === 'Completed' && !$appt->feedback) {
+                $notifications[] = [
+                    'id' => $this->buildNotificationId('appointment-feedback', [$appt->id, $appt->status, optional($appt->updated_at)->timestamp]),
+                    'type' => 'info',
+                    'icon' => '!',
+                    'message' => "Your consultation for {$appt->service} on {$dateStr} has been completed. Please share your feedback.",
+                    'time' => $timeAgo,
+                    'link' => route('student.feedback.show', ['appointment' => $appt->id]),
                 ];
             }
         }
@@ -131,6 +162,46 @@ class AppointmentController extends Controller
         }
 
         return null;
+    }
+
+    private function buildRecentFeedbackCollection()
+    {
+        return AppointmentFeedback::query()
+            ->with(['user', 'appointment'])
+            ->whereNotNull('submitted_at')
+            ->latest('submitted_at')
+            ->get()
+            ->map(function (AppointmentFeedback $feedback) {
+                $appointment = $feedback->appointment;
+                $user = $feedback->user;
+
+                return [
+                    'name' => $this->formatFeedbackDisplayName($user, $appointment),
+                    'role' => trim((string) ($appointment?->user_type ?? $user?->user_role ?? 'Student')),
+                    'time' => optional($feedback->submitted_at)->diffForHumans() ?? 'Recently',
+                    'message' => trim((string) $feedback->feedback) !== '' ? trim((string) $feedback->feedback) : 'Shared positive feedback about the clinic experience.',
+                    'service' => trim((string) ($appointment?->service ?? 'Clinic Service')),
+                ];
+            });
+    }
+
+    public function home()
+    {
+        $allFeedback = $this->buildRecentFeedbackCollection();
+        $feedbackCount = $allFeedback->count();
+        $recentFeedback = $allFeedback->take(3);
+
+        return view('student.home', compact('recentFeedback', 'feedbackCount'));
+    }
+
+    public function feedbackIndex()
+    {
+        $allFeedback = $this->buildRecentFeedbackCollection();
+
+        return view('student.feedback-index', [
+            'allFeedback' => $allFeedback,
+            'feedbackCount' => $allFeedback->count(),
+        ]);
     }
 
     private function looksLikeIdpIdentifier(?string $value, ?User $user = null): bool
@@ -742,6 +813,65 @@ public function account(Request $request)
         $user->save();
 
         return back()->with('success', 'All notifications marked as read.');
+    }
+
+    public function showFeedbackForm(Appointment $appointment)
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user || $appointment->user_id !== $user->id) {
+            return redirect('/student/history')->with('error', 'Feedback form not available for this appointment.');
+        }
+
+        if ($appointment->status !== 'Completed') {
+            return redirect('/student/history')->with('error', 'You can only send feedback for completed appointments.');
+        }
+
+        $appointment->load('feedback');
+
+        return view('student.feedback', [
+            'appointment' => $appointment,
+            'existingFeedback' => $appointment->feedback,
+        ]);
+    }
+
+    public function storeFeedback(Request $request, Appointment $appointment)
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user || $appointment->user_id !== $user->id) {
+            return redirect('/student/history')->with('error', 'Feedback form not available for this appointment.');
+        }
+
+        if ($appointment->status !== 'Completed') {
+            return redirect('/student/history')->with('error', 'You can only send feedback for completed appointments.');
+        }
+
+        $validated = $request->validate([
+            'rating' => ['required', 'integer', 'between:1,5'],
+            'feedback' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        AppointmentFeedback::updateOrCreate(
+            ['appointment_id' => $appointment->id],
+            [
+                'user_id' => $user->id,
+                'rating' => $validated['rating'],
+                'feedback' => trim((string) ($validated['feedback'] ?? '')),
+                'submitted_at' => now(),
+            ]
+        );
+
+        \App\Models\ActivityLog::create([
+            'user_id'     => $user->id,
+            'user_name'   => $user->name,
+            'action'      => 'Appointment Feedback Submitted',
+            'description' => "Submitted feedback for Appointment #{$appointment->id}.",
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
+
+        return redirect('/student/account?view=notifications')->with('success', 'Thank you for sharing your feedback.');
     }
 
 

@@ -73,6 +73,11 @@ class Appointment extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function feedback()
+    {
+        return $this->hasOne(AppointmentFeedback::class);
+    }
+
     /**
      * Scope: Only walk-in appointments
      */

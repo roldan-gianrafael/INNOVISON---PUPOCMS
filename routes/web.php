@@ -33,9 +33,8 @@ Route::middleware(['auth:student', 'audit'])->group(function () {
             return response()->json(['status' => 'success']);
         });
 
-        Route::get('/student/home', function () {
-            return view('student.home');
-        });
+        Route::get('/student/home', [AppointmentController::class, 'home']);
+        Route::get('/student/feedbacks', [AppointmentController::class, 'feedbackIndex'])->name('student.feedback.index');
 
         // 1. Route para ipakita ang blankong form
         Route::get('/student/health-form', [AppointmentController::class, 'showHealthForm'])->name('health.form');
@@ -64,6 +63,8 @@ Route::middleware(['auth:student', 'audit'])->group(function () {
         Route::post('/student/reset-barcode', [AppointmentController::class, 'resetBarcode'])->name('barcode.reset');
         Route::get('/student/notifications/{notificationId}', [AppointmentController::class, 'openNotification'])->name('student.notifications.open');
         Route::post('/student/notifications/mark-all-read', [AppointmentController::class, 'markAllNotificationsRead'])->name('student.notifications.read_all');
+        Route::get('/student/appointments/{appointment}/feedback', [AppointmentController::class, 'showFeedbackForm'])->name('student.feedback.show');
+        Route::post('/student/appointments/{appointment}/feedback', [AppointmentController::class, 'storeFeedback'])->name('student.feedback.store');
     });
 
     Route::get('/account', [AppointmentController::class, 'index'])->name('account');

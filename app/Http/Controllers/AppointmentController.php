@@ -849,20 +849,24 @@ public function account(Request $request)
             return redirect('/student/history')->with('error', 'You can only send feedback for completed appointments.');
         }
 
+        if ($appointment->feedback && $appointment->feedback->submitted_at) {
+            return redirect()
+                ->route('student.feedback.show', ['appointment' => $appointment->id])
+                ->with('success', 'Your feedback has already been submitted and is now view-only.');
+        }
+
         $validated = $request->validate([
             'rating' => ['required', 'integer', 'between:1,5'],
             'feedback' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        AppointmentFeedback::updateOrCreate(
-            ['appointment_id' => $appointment->id],
-            [
-                'user_id' => $user->id,
-                'rating' => $validated['rating'],
-                'feedback' => trim((string) ($validated['feedback'] ?? '')),
-                'submitted_at' => now(),
-            ]
-        );
+        AppointmentFeedback::create([
+            'appointment_id' => $appointment->id,
+            'user_id' => $user->id,
+            'rating' => $validated['rating'],
+            'feedback' => trim((string) ($validated['feedback'] ?? '')),
+            'submitted_at' => now(),
+        ]);
 
         \App\Models\ActivityLog::create([
             'user_id'     => $user->id,
@@ -1372,5 +1376,4 @@ public function printHealthForm()
         return redirect()->back()->with('success', 'Barcode reset successfully! You can scan again.');
     }
 } 
-
 

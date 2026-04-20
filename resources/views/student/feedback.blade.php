@@ -144,14 +144,44 @@
         color: #b91c1c;
         font-size: 14px;
     }
+
+    .feedback-readonly-banner {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 1px solid #bbf7d0;
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .feedback-text-static {
+        width: 100%;
+        min-height: 140px;
+        border-radius: 14px;
+        border: 1px solid #d6dbe0;
+        padding: 14px 16px;
+        font-size: 14px;
+        color: #334155;
+        background: #f8fafc;
+        white-space: pre-wrap;
+    }
 </style>
 @endpush
 
 @section('content')
+@php
+    $isReadonly = (bool) optional($existingFeedback)->submitted_at;
+@endphp
 <div class="feedback-shell">
     <div class="feedback-card">
         <h1 class="feedback-title">Appointment Feedback</h1>
-        <p class="feedback-subtitle">Your appointment is complete. A short review helps the clinic improve service quality and student experience.</p>
+        <p class="feedback-subtitle">
+            {{ $isReadonly
+                ? 'Your feedback has already been submitted. You can review it here anytime from your notifications.'
+                : 'Your appointment is complete. A short review helps the clinic improve service quality and student experience.' }}
+        </p>
 
         <div class="feedback-meta">
             <strong>{{ $appointment->service }}</strong><br>
@@ -159,29 +189,54 @@
             at {{ \Carbon\Carbon::parse($appointment->time)->format('g:i A') }}
         </div>
 
+        @if($isReadonly)
+            <div class="feedback-readonly-banner">
+                Feedback submitted {{ optional($existingFeedback->submitted_at)->format('M d, Y g:i A') }}. Editing is disabled after submission.
+            </div>
+        @endif
+
         @if($errors->any())
             <div class="feedback-errors">{{ $errors->first() }}</div>
         @endif
 
-        <form action="{{ route('student.feedback.store', ['appointment' => $appointment->id]) }}" method="POST" style="margin-top: 24px;">
-            @csrf
+        @if($isReadonly)
+            <div style="margin-top: 24px;">
+                <label class="feedback-label">Your Rating</label>
+                <div class="feedback-rating">
+                    @for($i = 1; $i <= 5; $i++)
+                        <input type="radio" id="ratingRead{{ $i }}" value="{{ $i }}" {{ (string) optional($existingFeedback)->rating === (string) $i ? 'checked' : '' }} disabled>
+                        <label for="ratingRead{{ $i }}" style="{{ (string) optional($existingFeedback)->rating === (string) $i ? '' : 'cursor:default;' }}">{{ $i }}</label>
+                    @endfor
+                </div>
 
-            <label class="feedback-label">How would you rate your appointment?</label>
-            <div class="feedback-rating">
-                @for($i = 1; $i <= 5; $i++)
-                    <input type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ (string) old('rating', optional($existingFeedback)->rating) === (string) $i ? 'checked' : '' }}>
-                    <label for="rating{{ $i }}">{{ $i }}</label>
-                @endfor
+                <label class="feedback-label">Comments</label>
+                <div class="feedback-text-static">{{ trim((string) optional($existingFeedback)->feedback) !== '' ? $existingFeedback->feedback : 'No written comments were added.' }}</div>
+
+                <div class="feedback-actions">
+                    <a href="{{ url('/student/account?view=notifications') }}" class="feedback-btn secondary">Back to Notifications</a>
+                </div>
             </div>
+        @else
+            <form action="{{ route('student.feedback.store', ['appointment' => $appointment->id]) }}" method="POST" style="margin-top: 24px;">
+                @csrf
 
-            <label class="feedback-label" for="feedbackText">Comments</label>
-            <textarea id="feedbackText" name="feedback" class="feedback-textarea" placeholder="Share anything helpful about your clinic experience.">{{ old('feedback', optional($existingFeedback)->feedback) }}</textarea>
+                <label class="feedback-label">How would you rate your appointment?</label>
+                <div class="feedback-rating">
+                    @for($i = 1; $i <= 5; $i++)
+                        <input type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ (string) old('rating', optional($existingFeedback)->rating) === (string) $i ? 'checked' : '' }}>
+                        <label for="rating{{ $i }}">{{ $i }}</label>
+                    @endfor
+                </div>
 
-            <div class="feedback-actions">
-                <a href="{{ url('/student/account?view=notifications') }}" class="feedback-btn secondary">Back</a>
-                <button type="submit" class="feedback-btn primary">Submit Feedback</button>
-            </div>
-        </form>
+                <label class="feedback-label" for="feedbackText">Comments</label>
+                <textarea id="feedbackText" name="feedback" class="feedback-textarea" placeholder="Share anything helpful about your clinic experience.">{{ old('feedback', optional($existingFeedback)->feedback) }}</textarea>
+
+                <div class="feedback-actions">
+                    <a href="{{ url('/student/account?view=notifications') }}" class="feedback-btn secondary">Back</a>
+                    <button type="submit" class="feedback-btn primary">Submit Feedback</button>
+                </div>
+            </form>
+        @endif
     </div>
 </div>
 @endsection

@@ -1890,5 +1890,6 @@ public function exportInventory()
             'moduleOptions'
         ));
     }
+    
 
 }

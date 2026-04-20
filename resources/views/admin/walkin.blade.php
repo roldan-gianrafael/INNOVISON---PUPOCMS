@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', 'Walk-in Management')
+@section('title', 'Patient Intake')
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,6 +33,17 @@
     }
     .scanner-box video { object-fit: cover !important; }
 
+    .scan-stage {
+        transform-style: preserve-3d;
+        transform-origin: center;
+        transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+    }
+
+    .scan-stage.is-flipping {
+        transform: rotateY(180deg) scale(0.98);
+        opacity: 0.82;
+    }
+
     .scan-line-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 4px;
         background: rgba(255, 255, 255, 0.6); z-index: 10;
@@ -64,6 +75,60 @@
         animation: spin 1s linear infinite;
     }
 
+    .scan-method-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 12px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+    }
+
+    .scan-method-title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .scan-method-note {
+        margin: 4px 0 0;
+        font-size: 12px;
+        color: #64748b;
+        line-height: 1.5;
+    }
+
+    .btn-scan-switch {
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #334155;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .scan-method-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @keyframes scan-animation { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
     @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -74,6 +139,12 @@
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
+    $currentMode = in_array($mode ?? 'scan', ['scan', 'assisted'], true) ? $mode : 'scan';
+    $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
+    $idpClientId = trim((string) config('services.idp.client_id', ''));
+    $portalRegisterUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
+        ? $idpBaseUrl . '/login?' . http_build_query(['client_id' => $idpClientId])
+        : route('login');
 @endphp
 
 @if(session('consultation_done'))
@@ -85,78 +156,129 @@
             <span style="font-size: 11px; opacity: 0.9;">Record saved successfully.</span>
         </div>
     </div>
-    <button onclick="location.href='{{ url($basePrefix . '/walkin') }}'" class="btn-toast-action">Scan Again</button>
+    <button onclick="location.href='{{ url($basePrefix . '/walkin') }}?mode=scan'" class="btn-toast-action">Open Scan / Bio</button>
 </div>
 @endif
 
-<div class="card p-4 shadow-sm" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
-    
-    <div id="dynamicHeader" class="mode-header bg-scan">
-        <span id="headerIcon" style="font-size: 24px;">SCAN</span>
-        <h3 id="headerTitle" style="margin: 0; font-weight: 700; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
-            Scanner Ready
-        </h3>
-    </div>
-
-    <div id="scanForm">
-        <div id="scanner-container-scan" style="position: relative;">
-            <div id="scan-loading">
-                <div class="spinner"></div>
-                <p style="margin-top:10px; color:#8B0000; font-weight:bold; font-size: 12px;">Verifying...</p>
+<div style="max-width: 980px; margin: 20px auto;">
+    <div class="card p-4 shadow-sm" style="border-radius: 18px; border: none; margin-bottom: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;">
+            <div>
+                <p style="margin:0 0 8px; font-size:12px; font-weight:800; letter-spacing:1px; color:#8B0000; text-transform:uppercase;">Patient Intake</p>
+                <h2 style="margin:0; font-size:28px; font-weight:800; color:#0f172a;">Choose how you want to begin the consultation flow</h2>
+                <p style="margin:10px 0 0; color:#475569; max-width:680px;">
+                    Use the identity portal for official account registration, scan an existing school user through barcode or BioSync, or let clinic staff complete an assisted intake when the patient cannot register alone.
+                </p>
             </div>
-            <div id="readerScan" class="scanner-box">
-                <div class="scan-line-overlay"></div>
-            </div>
-        </div>
-        
-        <div class="text-center mt-3">
-            <button type="button" id="btnShowManual" style="background:none; border:none; color:#8B0000; text-decoration:underline; cursor:pointer; font-weight:600; font-size: 0.85rem;">
-                Type ID Number Manually
-            </button>
+            <a href="{{ url($basePrefix . '/appointments') }}" class="btn" style="background:#f8fafc; border:1px solid #cbd5e1; color:#334155; font-weight:700; border-radius:12px; white-space:nowrap;">
+                BACK TO APPOINTMENTS
+            </a>
         </div>
 
-        <div id="manualInputArea" style="display:none;" class="mt-3">
-            <form id="walkinFormManual" class="d-flex gap-2">
-                <input type="text" id="student_id_manual" placeholder="Enter ID Number" class="form-control" style="margin-bottom:0;" required>
-                <button type="submit" style="background:#8B0000; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:700;">Find</button>
-            </form>
-        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-top:24px;">
+            <a href="{{ $portalRegisterUrl }}" target="_blank" rel="noopener noreferrer" style="text-decoration:none; color:inherit;">
+                <div style="height:100%; padding:20px; border-radius:16px; border:1px solid #e2e8f0; background:linear-gradient(135deg, #fff7ed, #ffffff); box-shadow:0 10px 24px rgba(15, 23, 42, 0.05);">
+                    <div style="width:48px; height:48px; border-radius:14px; background:#8B0000; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:14px;">IDP</div>
+                    <h3 style="margin:0 0 8px; font-size:18px; font-weight:800; color:#111827;">Register via IDP</h3>
+                    <p style="margin:0; color:#475569; line-height:1.55;">Open the centralized identity portal in a new tab so the patient can create or complete their official account first.</p>
+                </div>
+            </a>
 
-        <div class="mt-4 pt-3" style="border-top: 1px dashed #cbd5e1;">
-            <a href="{{ url($basePrefix . '/appointments') }}" class="btn w-100 py-2" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
-                 BACK TO APPOINTMENTS LIST
+            <a href="{{ url()->current() }}?mode=scan" style="text-decoration:none; color:inherit;">
+                <div style="height:100%; padding:20px; border-radius:16px; border:{{ $currentMode === 'scan' ? '2px solid #8B0000' : '1px solid #e2e8f0' }}; background:{{ $currentMode === 'scan' ? 'linear-gradient(135deg, #fff5f5, #ffffff)' : 'linear-gradient(135deg, #f8fafc, #ffffff)' }}; box-shadow:0 10px 24px rgba(15, 23, 42, 0.05);">
+                    <div style="width:48px; height:48px; border-radius:14px; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:14px;">SB</div>
+                    <h3 style="margin:0 0 8px; font-size:18px; font-weight:800; color:#111827;">Scan / Bio</h3>
+                    <p style="margin:0; color:#475569; line-height:1.55;">Use barcode scanning, BioSync, or manual ID entry to identify an existing school user and continue directly to consultation.</p>
+                </div>
+            </a>
+
+            <a href="{{ url()->current() }}?mode=assisted" style="text-decoration:none; color:inherit;">
+                <div style="height:100%; padding:20px; border-radius:16px; border:{{ $currentMode === 'assisted' ? '2px solid #334155' : '1px solid #e2e8f0' }}; background:{{ $currentMode === 'assisted' ? 'linear-gradient(135deg, #eef2ff, #ffffff)' : 'linear-gradient(135deg, #f8fafc, #ffffff)' }}; box-shadow:0 10px 24px rgba(15, 23, 42, 0.05);">
+                    <div style="width:48px; height:48px; border-radius:14px; background:#334155; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:14px;">AI</div>
+                    <h3 style="margin:0 0 8px; font-size:18px; font-weight:800; color:#111827;">Assisted Intake</h3>
+                    <p style="margin:0; color:#475569; line-height:1.55;">Let clinic staff capture the patient record on their behalf when illness or urgency makes self-registration impractical.</p>
+                </div>
             </a>
         </div>
     </div>
 
-    <div id="registerForm" style="display:none;">
+<div class="card p-4 shadow-sm" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
+    
+    <div id="dynamicHeader" class="mode-header {{ $currentMode === 'assisted' ? 'bg-register' : 'bg-scan' }}">
+        <span id="headerIcon" style="font-size: 24px;">{{ $currentMode === 'assisted' ? 'ASSIST' : 'SCAN' }}</span>
+        <h3 id="headerTitle" style="margin: 0; font-weight: 700; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
+            {{ $currentMode === 'assisted' ? 'Assisted Intake Ready' : 'Scanner Ready' }}
+        </h3>
+    </div>
+
+    <div id="scanForm" style="{{ $currentMode === 'assisted' ? 'display:none;' : '' }}">
+        <div id="scanStage" class="scan-stage">
+            <div class="scan-method-bar">
+                <div>
+                <p id="scanMethodTitle" class="scan-method-title">Scan Barcode</p>
+                <p id="scanMethodNote" class="scan-method-note">Use the camera to capture the patient barcode, or switch to BioSync mode for identity matching.</p>
+                <span id="scanMethodBadge" class="scan-method-badge">Barcode Active</span>
+                </div>
+                <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">Switch to BioSync</button>
+            </div>
+
+            <div id="scanner-container-scan" style="position: relative;">
+                <div id="scan-loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top:10px; color:#8B0000; font-weight:bold; font-size: 12px;">Verifying...</p>
+                </div>
+                <div id="readerScan" class="scanner-box">
+                    <div class="scan-line-overlay"></div>
+                </div>
+            </div>
+        
+            <div class="text-center mt-3">
+                <button type="button" id="btnShowManual" style="background:none; border:none; color:#8B0000; text-decoration:underline; cursor:pointer; font-weight:600; font-size: 0.85rem;">
+                    Type ID Number Manually
+                </button>
+            </div>
+
+            <div id="manualInputArea" style="display:none;" class="mt-3">
+                <form id="walkinFormManual" class="d-flex gap-2">
+                    <input type="text" id="student_id_manual" placeholder="Enter ID Number" class="form-control" style="margin-bottom:0;" required>
+                    <button type="submit" style="background:#8B0000; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:700;">Find</button>
+                </form>
+            </div>
+
+            <div class="mt-4 pt-3" style="border-top: 1px dashed #cbd5e1;">
+                <a href="{{ url($basePrefix . '/appointments') }}" class="btn w-100 py-2" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                     BACK TO APPOINTMENTS LIST
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerForm" style="{{ $currentMode === 'assisted' ? '' : 'display:none;' }}">
         <form id="formRegisterStudent">
             @csrf
-            
-            <div id="registerScannerContainer" style="display:none;">
-                <div id="readerRegister" class="scanner-box mb-2">
-                    <div class="scan-line-overlay" style="background: rgba(255, 255, 255, 0.6);"></div>
-                </div>
-                <p class="text-center text-muted mb-3" style="font-size: 11px;">Scan barcode now</p>
+
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; margin-bottom:16px;">
+                <strong style="display:block; color:#0f172a; font-size:13px; margin-bottom:4px;">Staff-assisted patient capture</strong>
+                <p style="margin:0; color:#64748b; font-size:12px; line-height:1.5;">Capture the patient’s basic identity details here, then continue to the consult form for the clinical information and assessment.</p>
             </div>
 
             <div class="mb-3">
-                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Barcode / ID Number</label>
+                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Reference ID / School ID</label>
                 <div class="d-flex gap-2">
-                    <input type="text" id="reg_student_id" class="form-control mb-0" style="background: #f1f5f9; font-weight: bold; border: 2px solid #cbd5e1;" readonly>
-                    <input type="hidden" id="reg_barcode"> 
-                    <button type="button" id="btnRescan" class="btn btn-secondary" style="border-radius: 8px; font-size: 12px; white-space: nowrap;">Rescan</button>
+                    <input type="text" id="reg_student_id" class="form-control mb-0" style="background: #ffffff; font-weight: bold; border: 2px solid #cbd5e1;" placeholder="Enter patient reference or ID" required>
+                    <input type="hidden" id="reg_barcode">
                 </div>
             </div>
             
             <div class="mb-2">
-                <label style="font-size: 11px; font-weight: 700; color: #475569;">SELECT USER ROLE</label>
+                <label style="font-size: 11px; font-weight: 700; color: #475569;">PATIENT ROLE</label>
                 <select id="reg_user_type" class="form-control" required>
-                    <option value="" disabled selected>-- Choose Role --</option>
+                    <option value="" disabled selected>-- Choose Patient Role --</option>
+                    <option value="Guest">Guest</option>
+                    <option value="Dependent">Dependent</option>
                     <option value="Student">Student</option>
                     <option value="Faculty">Faculty</option>
                     <option value="Admin">Admin</option>
-                    <option value="Dependent">Dependent</option>
                 </select>
             </div>
             
@@ -164,30 +286,37 @@
                 <input type="text" id="reg_first_name" placeholder="First Name" class="form-control" required>
                 <input type="text" id="reg_last_name" placeholder="Last Name" class="form-control" required>
             </div>
-            
-            <input type="email" id="reg_email" placeholder="Email Address" class="form-control" required>
-            
-            <div class="password-wrapper">
-                <input type="password" id="reg_password" placeholder="Initial Password" class="form-control" required>
-                <i class="fa-solid fa-eye password-toggle" onclick="togglePass('reg_password', this)"></i>
+
+            <div class="d-flex gap-2">
+                <input type="date" id="reg_dob" class="form-control" style="margin-bottom:10px;" aria-label="Birthday">
+                <select id="reg_gender" class="form-control" style="margin-bottom:10px;">
+                    <option value="">Sex / Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
             </div>
 
-            <div class="password-wrapper">
-                <input type="password" id="reg_password_confirmation" placeholder="Confirm Password" class="form-control" required>
-                <i class="fa-solid fa-eye password-toggle" onclick="togglePass('reg_password_confirmation', this)"></i>
+            <input type="text" id="reg_contact_no" placeholder="Contact Number" class="form-control">
+            <input type="email" id="reg_email" placeholder="Email Address (optional)" class="form-control">
+
+            <div style="background:#fff7ed; border:1px dashed #fdba74; border-radius:10px; padding:12px 14px; margin-bottom:10px;">
+                <strong style="display:block; font-size:12px; color:#9a3412; margin-bottom:4px;">No password needed for assisted intake</strong>
+                <p style="margin:0; font-size:12px; color:#7c2d12; line-height:1.5;">If no email is provided, the system will create a temporary assisted record and proceed straight to consultation.</p>
             </div>
             
             <div id="notification" style="margin: 10px 0;"></div>
             
             <button type="button" id="confirmBtn" class="btn btn-success w-100 fw-bold py-3 mt-2" style="border-radius: 8px; background: #15803d; border: none; color: white;">
-                CONFIRM REGISTRATION
+                SAVE ASSISTED INTAKE
             </button>
             
             <div class="text-center mt-3">
-                <a href="javascript:location.reload()" style="font-size: 12px; color: #64748b; text-decoration: none;">Cancel and back to scan</a>
+                <a href="{{ url()->current() }}?mode=scan" style="font-size: 12px; color: #64748b; text-decoration: none;">Switch back to Scan / Bio</a>
             </div>
         </form>
     </div>
+</div>
 </div>
 @endsection
 
@@ -196,7 +325,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
     let mainScanner;
-    let registerScanner;
+    const initialMode = @json($currentMode);
+    let scanMethod = 'barcode';
     const supportedFormats = window.Html5QrcodeSupportedFormats ? [
         Html5QrcodeSupportedFormats.CODE_128,
         Html5QrcodeSupportedFormats.CODE_39,
@@ -227,20 +357,12 @@
         return new Html5Qrcode(targetId);
     }
 
-    // Show/Hide Password Logic
-    function togglePass(id, icon) {
-        const input = document.getElementById(id);
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.replace("fa-eye", "fa-eye-slash");
-        } else {
-            input.type = "password";
-            icon.classList.replace("fa-eye-slash", "fa-eye");
-        }
-    }
-
     $(document).ready(function() {
-        startMainScanner();
+        updateScanModeUI();
+
+        if (initialMode === 'scan') {
+            startMainScanner();
+        }
 
         function startMainScanner() {
             if (!mainScanner) {
@@ -263,7 +385,7 @@
                     if(mainScanner) {
                         mainScanner.stop().then(() => {
                             mainScanner = null;
-                            if (confirm("User ID: " + id + " not found. Register?")) {
+                            if (confirm("User ID: " + id + " was not found. Open Assisted Intake instead?")) {
                                 showRegisterUI(id);
                             } else { window.location.reload(); }
                         });
@@ -276,43 +398,48 @@
             $('#scanForm').hide();
             $('#registerForm').show();
             $('#dynamicHeader').removeClass('bg-scan').addClass('bg-register');
-            $('#headerTitle').text('New User Registration');
-            $('#headerIcon').text('REG');
+            $('#headerTitle').text('Assisted Intake Ready');
+            $('#headerIcon').text('ASSIST');
             if(scannedId) {
                 $('#reg_barcode').val(scannedId);
                 $('#reg_student_id').val(scannedId);
-                $('#registerScannerContainer').hide();
-            } else {
-                $('#registerScannerContainer').show();
-                startRegisterScanner();
             }
         }
 
-        function startRegisterScanner() {
-            if (!registerScanner) {
-                registerScanner = createScanner("readerRegister");
-                registerScanner.start(
-                    { facingMode: "environment" },
-                    scannerConfig,
-                    (decodedText) => {
-                        $('#reg_barcode').val(decodedText);
-                        $('#reg_student_id').val(decodedText);
-                        $('#registerScannerContainer').slideUp();
-                        if(registerScanner) {
-                            registerScanner.stop().then(() => { registerScanner = null; });
-                        }
-                    }
-                ).catch(err => console.warn(err));
-            }
+        function updateScanModeUI() {
+            const isBioSync = scanMethod === 'biosync';
+            $('#scanMethodTitle').text(isBioSync ? 'BioSync' : 'Scan Barcode');
+            $('#scanMethodNote').text(
+                isBioSync
+                    ? 'BioSync mode uses the same patient lookup path for now, while presenting the intake flow as biometric identification.'
+                    : 'Use the camera to capture the patient barcode, or switch to BioSync mode for identity matching.'
+            );
+            $('#scanMethodBadge').text(isBioSync ? 'BioSync Active' : 'Barcode Active');
+            $('#btnSwitchScanMode').text(isBioSync ? 'Switch to Scan Barcode' : 'Switch to BioSync');
+            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : 'Scanner Ready');
+            $('#headerIcon').text(isBioSync ? 'BIO' : 'SCAN');
         }
-
-        $('#btnRescan').on('click', function() {
-            $('#registerScannerContainer').slideDown();
-            startRegisterScanner();
-        });
 
         $('#btnShowManual').on('click', function() {
             $('#manualInputArea').toggle();
+        });
+
+        $('#btnSwitchScanMode').on('click', function() {
+            const $scanStage = $('#scanStage');
+            if ($scanStage.hasClass('is-flipping')) {
+                return;
+            }
+
+            $scanStage.addClass('is-flipping');
+
+            window.setTimeout(function () {
+            scanMethod = scanMethod === 'biosync' ? 'barcode' : 'biosync';
+            updateScanModeUI();
+            }, 180);
+
+            window.setTimeout(function () {
+                $scanStage.removeClass('is-flipping');
+            }, 560);
         });
 
         $('#walkinFormManual').on('submit', function(e) {
@@ -322,14 +449,8 @@
 
         $('#confirmBtn').on('click', function() {
             const role = $('#reg_user_type').val();
-            const pass = $('#reg_password').val();
-            const confirmPass = $('#reg_password_confirmation').val();
 
             if(!role) { alert("Please select a User Role!"); return; }
-            if(pass !== confirmPass) { 
-                $('#notification').html('<p style="color:red; font-size:12px; font-weight:bold;">Passwords do not match!</p>');
-                return; 
-            }
 
             $(this).prop('disabled', true).text('PROCESSING...');
             
@@ -342,8 +463,9 @@
                 first_name: $('#reg_first_name').val(),
                 last_name: $('#reg_last_name').val(),
                 email: $('#reg_email').val(),
-                password: pass,
-                password_confirmation: confirmPass,
+                dob: $('#reg_dob').val(),
+                gender: $('#reg_gender').val(),
+                contact_no: $('#reg_contact_no').val(),
                 barcode: $('#reg_barcode').val() || $('#reg_student_id').val()
             };
 
@@ -352,7 +474,7 @@
                 else window.location.reload();
             }).fail(function(xhr) {
                 $('#confirmBtn').prop('disabled', false).text('CONFIRM REGISTRATION');
-                let errorMsg = "Registration Failed.";
+                let errorMsg = "Assisted intake failed.";
                 if(xhr.responseJSON && xhr.responseJSON.errors) {
                     errorMsg = Object.values(xhr.responseJSON.errors)[0][0];
                 }

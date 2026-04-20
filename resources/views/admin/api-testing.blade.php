@@ -957,6 +957,8 @@
                 { name: 'last_name', label: 'Last Name', type: 'text' },
                 { name: 'email', label: 'Email', type: 'email' },
                 { name: 'student_id', label: 'Student ID', type: 'text' },
+                { name: 'student_number', label: 'Student Number', type: 'text' },
+                { name: 'gender', label: 'Gender', type: 'text' },
                 { name: 'user_role', label: 'Role', type: 'select', options: ['student', 'student_assistant', 'admin', 'superadmin'] },
                 { name: 'status', label: 'Status', type: 'select', options: ['active', 'inactive'] },
             ],

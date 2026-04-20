@@ -575,6 +575,8 @@ class AdminController extends Controller
                 'last_name' => 'nullable|string|max:255',
                 'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($id)],
                 'student_id' => 'nullable|string|max:255',
+                'student_number' => 'nullable|string|max:255',
+                'gender' => 'nullable|string|max:255',
                 'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
                 'status' => ['nullable', Rule::in(['active', 'inactive'])],
             ]);
@@ -585,6 +587,12 @@ class AdminController extends Controller
             $user->name = trim(implode(' ', array_filter([$request->input('first_name'), $request->input('last_name')]))) ?: $user->name;
             $user->email = $request->input('email');
             $user->student_id = $request->input('student_id');
+            if (Schema::hasColumn('users', 'student_number')) {
+                $user->student_number = $request->input('student_number');
+            }
+            if (Schema::hasColumn('users', 'gender')) {
+                $user->gender = $request->input('gender');
+            }
             $user->user_role = User::normalizeRole($request->input('user_role'));
             if (Schema::hasColumn('users', 'status')) {
                 $user->status = $request->input('status', 'active');

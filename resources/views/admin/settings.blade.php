@@ -599,6 +599,13 @@
     .field-grid + .field-grid {
         margin-top: 0;
     }
+    .profile-stack {
+        display: grid;
+        gap: 16px;
+    }
+    .profile-stack .panel {
+        margin-bottom: 0;
+    }
 
     html[data-theme="dark"] .settings-page::before {
         background:
@@ -816,6 +823,7 @@
     </section>
 
     <div class="grid">
+        <div class="profile-stack">
         <section class="panel">
             <div class="panel-head">
                 <div class="panel-head-top">
@@ -866,6 +874,40 @@
             </div>
         </section>
 
+        @if($canManageClearanceSignature)
+        <section class="panel">
+            <div class="panel-head">
+                <div class="panel-head-top">
+                    <div>
+                        <div class="section-spot">Clearance Signature</div>
+                        <h3>Nurse Digital Signature</h3>
+                        <p>Upload the signature that should appear automatically whenever the nurse issues a clearance.</p>
+                    </div>
+                    <button type="button" class="mini-edit-btn" onclick="openSettingsModal('clearanceSignatureModal')">Upload</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="profile-list">
+                    <div class="profile-row">
+                        <div class="key">Current Signature</div>
+                        <div class="val">
+                            @if($clearanceSignatureUrl)
+                                <img src="{{ $clearanceSignatureUrl }}" alt="Current clearance signature" style="max-height:72px; width:auto; display:block; margin-left:auto;">
+                            @else
+                                No signature uploaded yet
+                            @endif
+                        </div>
+                    </div>
+                    <div class="profile-row">
+                        <div class="key">Usage</div>
+                        <div class="val">Shown on issued clearance preview and printable health forms.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        @endif
+        </div>
+
         <div style="display:grid; gap:22px;">
             <section class="panel">
                 <div class="panel-head">
@@ -904,39 +946,6 @@
                     </div>
                 </div>
             </section>
-
-            @if($canManageClearanceSignature)
-            <section class="panel">
-                <div class="panel-head">
-                    <div class="panel-head-top">
-                        <div>
-                            <div class="section-spot">Clearance Signature</div>
-                            <h3>Nurse Digital Signature</h3>
-                            <p>Upload the signature that should appear automatically whenever the nurse issues a clearance.</p>
-                        </div>
-                        <button type="button" class="mini-edit-btn" onclick="openSettingsModal('clearanceSignatureModal')">Upload</button>
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <div class="profile-list">
-                        <div class="profile-row">
-                            <div class="key">Current Signature</div>
-                            <div class="val">
-                                @if($clearanceSignatureUrl)
-                                    <img src="{{ $clearanceSignatureUrl }}" alt="Current clearance signature" style="max-height:72px; width:auto; display:block; margin-left:auto;">
-                                @else
-                                    No signature uploaded yet
-                                @endif
-                            </div>
-                        </div>
-                        <div class="profile-row">
-                            <div class="key">Usage</div>
-                            <div class="val">Shown on issued clearance preview and printable health forms.</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            @endif
 
             <form action="{{ url('/admin/settings/update') }}" method="POST">
                 @csrf @method('PUT')

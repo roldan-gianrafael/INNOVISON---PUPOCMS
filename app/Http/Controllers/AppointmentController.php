@@ -794,7 +794,7 @@ public function account(Request $request)
     //-------------------------------
     // 7. UPDATE CONTACT
     //-------------------------------
-    public function updateContact(Request $request)
+public function updateContact(Request $request)
 {
     // 1. Kunin ang user
     $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
@@ -804,6 +804,9 @@ public function account(Request $request)
     }
 
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+    $request->merge([
+        'contact_no' => preg_replace('/\D+/', '', (string) $request->input('contact_no', '')),
+    ]);
 
     // 2. I-validate ang lahat ng fields (Contact, Year, Section, etc.)
     $validated = $request->validate([
@@ -827,7 +830,7 @@ public function account(Request $request)
         'emergency_contact_no' => ['nullable', 'string', 'max:255'],
         'office' => ['nullable', 'string', 'max:255'],
     ], [
-        'contact_no.regex' => 'Contact number must be 10 to 13 digits.',
+        'contact_no.regex' => 'Please enter a valid contact number using 10 to 13 digits.',
     ]);
 
     // 3. I-track ang changes para sa Log (Optional: Para alam ng Admin kung ano ang binago)

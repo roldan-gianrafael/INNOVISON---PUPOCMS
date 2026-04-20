@@ -509,7 +509,7 @@
     
     @if($errors->any())
         <div style="background:#fee2e2; color:#b91c1c; padding:12px; border-radius:8px; margin-bottom:20px; text-align:center; font-size:14px; border:1px solid #fecaca;">
-            Please enter a valid numeric contact number.
+            {{ $errors->first() }}
         </div>
     @endif
 

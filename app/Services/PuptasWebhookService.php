@@ -112,15 +112,32 @@ class PuptasWebhookService
 
     public function fetchApplicantByStudentNumber(string $studentNumber): ?array
     {
+        $result = $this->fetchApplicantByStudentNumberDetailed($studentNumber);
+
+        return $result['success'] ? ($result['data'] ?? null) : null;
+    }
+
+    public function fetchApplicantByStudentNumberDetailed(string $studentNumber): array
+    {
         try {
             $studentNumber = trim($studentNumber);
             if ($studentNumber === '') {
-                return null;
+                return [
+                    'success' => false,
+                    'status' => null,
+                    'message' => 'Student number is required.',
+                    'data' => null,
+                ];
             }
 
             $applicantsBaseUrl = $this->resolveApplicantsBaseUrl();
             if ($applicantsBaseUrl === '') {
-                return null;
+                return [
+                    'success' => false,
+                    'status' => null,
+                    'message' => 'PUPTAS applicants endpoint is not configured.',
+                    'data' => null,
+                ];
             }
 
             $response = Http::timeout($this->timeout)
@@ -134,31 +151,65 @@ class PuptasWebhookService
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
-                return null;
+                return [
+                    'success' => false,
+                    'status' => $response->status(),
+                    'message' => 'PUPTAS lookup failed with status ' . $response->status() . '.',
+                    'body' => $response->body(),
+                    'data' => null,
+                ];
             }
 
             $data = $response->json('data');
-            return is_array($data) ? $data : null;
+            return [
+                'success' => is_array($data),
+                'status' => $response->status(),
+                'message' => is_array($data) ? 'Applicant found.' : 'PUPTAS response did not include applicant data.',
+                'body' => $response->body(),
+                'data' => is_array($data) ? $data : null,
+            ];
         } catch (\Throwable $exception) {
             Log::warning('PUPTAS applicant lookup exception', [
                 'student_number' => $studentNumber,
                 'error' => $exception->getMessage(),
             ]);
-            return null;
+            return [
+                'success' => false,
+                'status' => null,
+                'message' => $exception->getMessage(),
+                'data' => null,
+            ];
         }
     }
 
     public function fetchApplicantByIdpUserId(string $idpUserId): ?array
     {
+        $result = $this->fetchApplicantByIdpUserIdDetailed($idpUserId);
+
+        return $result['success'] ? ($result['data'] ?? null) : null;
+    }
+
+    public function fetchApplicantByIdpUserIdDetailed(string $idpUserId): array
+    {
         try {
             $idpUserId = trim($idpUserId);
             if ($idpUserId === '') {
-                return null;
+                return [
+                    'success' => false,
+                    'status' => null,
+                    'message' => 'IDP user ID is required.',
+                    'data' => null,
+                ];
             }
 
             $applicantsBaseUrl = $this->resolveApplicantsBaseUrl();
             if ($applicantsBaseUrl === '') {
-                return null;
+                return [
+                    'success' => false,
+                    'status' => null,
+                    'message' => 'PUPTAS applicants endpoint is not configured.',
+                    'data' => null,
+                ];
             }
 
             $response = Http::timeout($this->timeout)
@@ -172,17 +223,34 @@ class PuptasWebhookService
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
-                return null;
+                return [
+                    'success' => false,
+                    'status' => $response->status(),
+                    'message' => 'PUPTAS IDP lookup failed with status ' . $response->status() . '.',
+                    'body' => $response->body(),
+                    'data' => null,
+                ];
             }
 
             $data = $response->json('data');
-            return is_array($data) ? $data : null;
+            return [
+                'success' => is_array($data),
+                'status' => $response->status(),
+                'message' => is_array($data) ? 'Applicant found.' : 'PUPTAS response did not include applicant data.',
+                'body' => $response->body(),
+                'data' => is_array($data) ? $data : null,
+            ];
         } catch (\Throwable $exception) {
             Log::warning('PUPTAS applicant IDP lookup exception', [
                 'idp_user_id' => $idpUserId,
                 'error' => $exception->getMessage(),
             ]);
-            return null;
+            return [
+                'success' => false,
+                'status' => null,
+                'message' => $exception->getMessage(),
+                'data' => null,
+            ];
         }
     }
 

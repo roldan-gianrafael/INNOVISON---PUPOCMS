@@ -216,9 +216,14 @@ class WalkInController extends Controller
         $lookup = trim((string) $request->student_id);
 
         $student = $this->findUserByIdentifier($lookup);
+        $lookupMessage = 'No patient matched that student number in local records or PUPTAS.';
+        $lookupStatus = null;
 
         if (!$student && $lookup !== '') {
-            $applicant = $puptasWebhookService->fetchApplicantByStudentNumber($lookup);
+            $lookupResult = $puptasWebhookService->fetchApplicantByStudentNumberDetailed($lookup);
+            $lookupStatus = $lookupResult['status'] ?? null;
+            $lookupMessage = trim((string) ($lookupResult['message'] ?? '')) ?: $lookupMessage;
+            $applicant = $lookupResult['data'] ?? null;
 
             if (is_array($applicant)) {
                 $student = $this->resolveLocalUserFromApplicant($applicant);
@@ -237,7 +242,9 @@ class WalkInController extends Controller
 
         return response()->json([
             'status' => 'not_found',
-            'scanned_barcode' => $lookup
+            'scanned_barcode' => $lookup,
+            'lookup_status' => $lookupStatus,
+            'message' => $lookupMessage,
         ]);
     }
 

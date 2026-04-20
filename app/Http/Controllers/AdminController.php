@@ -456,10 +456,11 @@ class AdminController extends Controller
                             $errorMessage = 'No matching records were found for the current search.';
                         }
                     } elseif ($source === 'puptas_applicant') {
-                        $applicant = app(PuptasWebhookService::class)->fetchApplicantByStudentNumber($search);
+                        $lookupResult = app(PuptasWebhookService::class)->fetchApplicantByStudentNumberDetailed($search);
+                        $applicant = $lookupResult['data'] ?? null;
                         $results = $applicant ? [$applicant] : [];
                         $apiResponseMeta = [
-                            'status' => $applicant ? 200 : 404,
+                            'status' => $lookupResult['status'] ?? ($applicant ? 200 : 404),
                             'ok' => !empty($results),
                             'endpoint' => $endpoint,
                             'result_count' => count($results),
@@ -468,13 +469,15 @@ class AdminController extends Controller
                         ];
 
                         if (empty($results)) {
-                            $errorMessage = 'No PUPTAS applicant record matched the provided student number.';
+                            $errorMessage = trim((string) ($lookupResult['message'] ?? '')) ?: 'No PUPTAS applicant record matched the provided student number.';
+                            $errorDetails = trim((string) ($lookupResult['body'] ?? ''));
                         }
                     } elseif ($source === 'puptas_applicant_idp') {
-                        $applicant = app(PuptasWebhookService::class)->fetchApplicantByIdpUserId($search);
+                        $lookupResult = app(PuptasWebhookService::class)->fetchApplicantByIdpUserIdDetailed($search);
+                        $applicant = $lookupResult['data'] ?? null;
                         $results = $applicant ? [$applicant] : [];
                         $apiResponseMeta = [
-                            'status' => $applicant ? 200 : 404,
+                            'status' => $lookupResult['status'] ?? ($applicant ? 200 : 404),
                             'ok' => !empty($results),
                             'endpoint' => $endpoint,
                             'result_count' => count($results),
@@ -483,7 +486,8 @@ class AdminController extends Controller
                         ];
 
                         if (empty($results)) {
-                            $errorMessage = 'No PUPTAS applicant record matched the provided IDP user ID.';
+                            $errorMessage = trim((string) ($lookupResult['message'] ?? '')) ?: 'No PUPTAS applicant record matched the provided IDP user ID.';
+                            $errorDetails = trim((string) ($lookupResult['body'] ?? ''));
                         }
                     } elseif ($source === 'database_info') {
                         $dbTable = in_array($dbTable, ['users', 'admins'], true) ? $dbTable : 'users';

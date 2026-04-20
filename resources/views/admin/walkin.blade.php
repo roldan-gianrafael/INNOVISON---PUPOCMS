@@ -44,10 +44,15 @@
         text-align: left;
     }
 
+    .mode-header-copy h3 {
+        color: #ffffff;
+    }
+
     .mode-header-copy p {
         margin: 4px 0 0;
         font-size: 12px;
-        opacity: 0.9;
+        color: rgba(255, 255, 255, 0.96);
+        opacity: 1;
         line-height: 1.45;
         letter-spacing: 0.01em;
     }
@@ -504,15 +509,23 @@
 
         function verifyUser(id) {
             $('#scan-loading').css('display', 'flex');
+            $('#notification').html('');
             $.get("{{ url($basePrefix . '/walkin/get-student') }}", { student_id: id }, function(res) {
                 $('#scan-loading').hide();
                 if (res.status === 'found') {
                     window.location.href = res.redirect_url;
                 } else {
+                    const statusText = res.lookup_status ? ` (PUPTAS status ${res.lookup_status})` : '';
+                    const failureMessage = res.message
+                        ? `${res.message}${statusText}`
+                        : `No patient matched ${id} locally or in PUPTAS${statusText}.`;
+
+                    $('#notification').html(`<p style="color:#991b1b; font-size:12px; font-weight:700; background:#fff1f2; padding:10px 12px; border-radius:10px; border:1px solid #fecdd3; margin-bottom:12px;">${failureMessage}</p>`);
+
                     if(mainScanner) {
                         mainScanner.stop().then(() => {
                             mainScanner = null;
-                            if (confirm("User ID: " + id + " was not found. Open Assisted Intake instead?")) {
+                            if (confirm(`${failureMessage}\n\nOpen Assisted Intake instead?`)) {
                                 showRegisterUI(id);
                             } else { window.location.reload(); }
                         });

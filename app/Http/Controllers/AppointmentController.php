@@ -243,6 +243,52 @@ class AppointmentController extends Controller
         return '';
     }
 
+    private function persistResolvedStudentNumber(User $user, ?HealthProfile $healthProfile, ?string $studentNumber): void
+    {
+        $studentNumber = trim((string) $studentNumber);
+        if ($studentNumber === '' || $this->looksLikeIdpIdentifier($studentNumber, $user)) {
+            return;
+        }
+
+        if (trim((string) $user->student_number) === '') {
+            $user->student_number = $studentNumber;
+            $user->save();
+        }
+
+        if ($healthProfile && trim((string) $healthProfile->student_number) === '') {
+            $healthProfile->student_number = $studentNumber;
+            $healthProfile->save();
+        }
+    }
+
+    private function persistResolvedUserProfileFields(User $user, array $prefill): void
+    {
+        $resolvedStudentNumber = trim((string) ($prefill['student_number'] ?? ''));
+        $resolvedGender = trim((string) ($prefill['sex'] ?? ''));
+        $resolvedCourse = trim((string) ($prefill['course_college'] ?? ''));
+
+        $shouldSave = false;
+
+        if ($resolvedStudentNumber !== '' && !$this->looksLikeIdpIdentifier($resolvedStudentNumber, $user) && trim((string) $user->student_number) === '') {
+            $user->student_number = $resolvedStudentNumber;
+            $shouldSave = true;
+        }
+
+        if ($resolvedGender !== '' && trim((string) $user->gender) === '') {
+            $user->gender = $resolvedGender;
+            $shouldSave = true;
+        }
+
+        if ($resolvedCourse !== '' && trim((string) $user->course) === '') {
+            $user->course = $resolvedCourse;
+            $shouldSave = true;
+        }
+
+        if ($shouldSave) {
+            $user->save();
+        }
+    }
+
     private function normalizeSexValue(?string $value): string
     {
         $value = strtolower(trim((string) $value));
@@ -1167,6 +1213,8 @@ public function showHealthForm()
     // Resolve the linked admin profile (Required by your view to avoid Undefined Variable error)
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
     $healthFormPrefill = $this->buildHealthFormPrefill($user, $linkedAdminProfile);
+    $this->persistResolvedUserProfileFields($user, $healthFormPrefill);
+    $this->persistResolvedStudentNumber($user, $user->healthProfile, $healthFormPrefill['student_number'] ?? '');
     $calculatedAge = $healthFormPrefill['age'] ?? null;
 
     // Return the view with all required variables
@@ -1231,6 +1279,18 @@ public function storeHealthForm(Request $request)
     $normalizedDoctorName = $this->normalizeDoctorName($request->input('medical_certificate_issued_by'));
     $user->DOB = $request->input('birthday');
     $user->contact_no = $request->input('contact_no');
+    $resolvedStudentNumber = trim((string) $request->input('student_number'));
+    if ($resolvedStudentNumber !== '' && !$this->looksLikeIdpIdentifier($resolvedStudentNumber, $user)) {
+        $user->student_number = $resolvedStudentNumber;
+    }
+    $resolvedGender = trim((string) $request->input('sex'));
+    if ($resolvedGender !== '') {
+        $user->gender = $resolvedGender;
+    }
+    $resolvedCourse = trim((string) $request->input('course_college'));
+    if ($resolvedCourse !== '') {
+        $user->course = $resolvedCourse;
+    }
     $user->save();
 
     try {
@@ -1376,4 +1436,3 @@ public function printHealthForm()
         return redirect()->back()->with('success', 'Barcode reset successfully! You can scan again.');
     }
 } 
-

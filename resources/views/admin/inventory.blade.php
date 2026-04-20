@@ -215,10 +215,6 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>Date Added</label>
-                                <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
-                            </div>
                         </div>
 
                         <div class="modal-form-panel">
@@ -249,6 +245,11 @@
                                     <option value="ml">
                                     <option value="mg">
                                 </datalist>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date Added</label>
+                                <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
                             </div>
 
                             <div id="medicineExpiryField" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">

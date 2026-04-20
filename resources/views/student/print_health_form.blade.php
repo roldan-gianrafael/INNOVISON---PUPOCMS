@@ -121,7 +121,21 @@
 
 @section('content')
 @php
+    $printProfileData = $printProfileData ?? [];
     $printStudentNumber = trim((string) ($profile->student_number ?? optional($profile->user)->student_number ?? ''));
+    $printName = trim((string) ($printProfileData['full_name'] ?? optional($profile->user)->name ?? Auth::user()->name ?? ''));
+    $printAddress = trim((string) ($printProfileData['home_address'] ?? $profile->home_address ?? ''));
+    $printSchoolYear = trim((string) ($printProfileData['school_year'] ?? $profile->school_year ?? '2025-2026'));
+    $printBirthday = trim((string) ($printProfileData['birthday'] ?? ''));
+    $printAge = trim((string) ($printProfileData['age'] ?? $profile->age ?? ''));
+    $printSex = trim((string) ($printProfileData['sex'] ?? $profile->sex ?? ''));
+    $printCivilStatus = trim((string) ($printProfileData['civil_status'] ?? $profile->civil_status ?? ''));
+    $printCourse = trim((string) ($printProfileData['course_college'] ?? $profile->course_college ?? ''));
+    $printBloodType = trim((string) ($printProfileData['blood_type'] ?? $profile->blood_type ?? ''));
+    $printEmail = trim((string) ($printProfileData['email'] ?? optional($profile->user)->email ?? Auth::user()->email ?? ''));
+    $printGuardianName = trim((string) ($printProfileData['guardian_name'] ?? $profile->guardian_name ?? ''));
+    $printLandline = trim((string) ($printProfileData['landline'] ?? $profile->landline ?? ''));
+    $printCellphone = trim((string) ($printProfileData['cellphone'] ?? $profile->cellphone ?? ''));
 @endphp
 <div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
     
@@ -170,12 +184,12 @@
 
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     <div class="row">
-        <span class="label">Name:</span> <div class="field">{{ Auth::user()->name }}</div>
+        <span class="label">Name:</span> <div class="field">{{ $printName !== '' ? $printName : 'N/A' }}</div>
         <span class="label">Student No.:</span> <div class="field">{{ $printStudentNumber !== '' ? $printStudentNumber : 'N/A' }}</div>
     </div>
     <div class="row">
-        <span class="label">Home Address:</span> <div class="field">{{ $profile->home_address ?? '' }}</div>
-        <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
+        <span class="label">Home Address:</span> <div class="field">{{ $printAddress !== '' ? $printAddress : 'N/A' }}</div>
+        <span class="label">School Year:</span> <div class="field">{{ $printSchoolYear !== '' ? $printSchoolYear : 'N/A' }}</div>
     </div>
     <div class="row">
         @php
@@ -193,22 +207,22 @@
         <span class="label">Weight:</span> <div class="field">{{ $formattedWeight !== '' ? $formattedWeight : 'N/A' }}</div>
     </div>
     <div class="row">
-        <span class="label">Birthday:</span> <div class="field">{{ optional(optional($profile->user)->DOB ? \Carbon\Carbon::parse($profile->user->DOB) : null)->format('m/d/Y') ?? 'N/A' }}</div>
-        <span class="label">Age:</span> <div class="field">{{ $profile->age ?? '' }}</div>
-        <span class="label">Sex:</span> <div class="field">{{ $profile->sex ?? '' }}</div>
-        <span class="label">Civil Status:</span> <div class="field">{{ $profile->civil_status ?? '' }}</div>
+        <span class="label">Birthday:</span> <div class="field">{{ $printBirthday !== '' ? $printBirthday : 'N/A' }}</div>
+        <span class="label">Age:</span> <div class="field">{{ $printAge !== '' ? $printAge : 'N/A' }}</div>
+        <span class="label">Sex:</span> <div class="field">{{ $printSex !== '' ? $printSex : 'N/A' }}</div>
+        <span class="label">Civil Status:</span> <div class="field">{{ $printCivilStatus !== '' ? $printCivilStatus : 'N/A' }}</div>
     </div>
     <div class="row">
-        <span class="label">Course:</span> <div class="field">{{ $profile->course_college ?? '' }}</div>
+        <span class="label">Course:</span> <div class="field">{{ $printCourse !== '' ? $printCourse : 'N/A' }}</div>
     </div>
     <div class="row">
-        <span class="label">Blood Type:</span> <div class="field">{{ $profile->blood_type ?? 'N/A' }}</div>
-        <span class="label">Email:</span> <div class="field">{{ Auth::user()->email }}</div>
+        <span class="label">Blood Type:</span> <div class="field">{{ $printBloodType !== '' ? $printBloodType : 'N/A' }}</div>
+        <span class="label">Email:</span> <div class="field">{{ $printEmail !== '' ? $printEmail : 'N/A' }}</div>
     </div>
     <div class="row">
-        <span class="label">Parent/Guardian:</span> <div class="field">{{ $profile->guardian_name ?? '' }}</div>
-        <span class="label">Landline:</span> <div class="field">{{ $profile->landline ?? 'N/A' }}</div>
-        <span class="label">Cellphone:</span> <div class="field">{{ $profile->cellphone ?? '' }}</div>
+        <span class="label">Parent/Guardian:</span> <div class="field">{{ $printGuardianName !== '' ? $printGuardianName : 'N/A' }}</div>
+        <span class="label">Landline:</span> <div class="field">{{ $printLandline !== '' ? $printLandline : 'N/A' }}</div>
+        <span class="label">Cellphone:</span> <div class="field">{{ $printCellphone !== '' ? $printCellphone : 'N/A' }}</div>
     </div>
 
     <div class="section-header">PART II. MEDICAL HISTORY</div>

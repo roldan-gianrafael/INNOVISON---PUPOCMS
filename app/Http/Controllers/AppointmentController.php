@@ -1168,6 +1168,7 @@ public function storeHealthForm(Request $request)
 
 public function printHealthForm()
 {
+    /** @var \App\Models\User $user */
     $user = Auth::user();
     // Kunin ang profile record
     $profile = \App\Models\HealthProfile::where('user_id', $user->id)->first();
@@ -1176,7 +1177,10 @@ public function printHealthForm()
         return redirect()->route('health.form')->with('error', 'Please fill up the form first.');
     }
 
-    return view('student.print_health_form', compact('profile'));
+    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+    $printProfileData = $this->buildHealthFormPrefill($user, $linkedAdminProfile, $profile);
+
+    return view('student.print_health_form', compact('profile', 'printProfileData'));
 }
 
 

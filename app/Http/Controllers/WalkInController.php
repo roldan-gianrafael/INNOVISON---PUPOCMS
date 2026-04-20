@@ -51,7 +51,7 @@ class WalkInController extends Controller
     public function index(Request $request)
 {
 
-    $mode = $request->query('mode', 'scan'); 
+    $mode = $request->query('mode', '');
     $walkins = Appointment::latest()->take(10)->get();
     
     return view('admin.walkin', compact('walkins', 'mode'));

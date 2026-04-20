@@ -1484,12 +1484,14 @@
                     <form method="POST" id="deleteForm" style="margin-top: 10px;">
                         @csrf
                         @method('DELETE')
+                        <input type="hidden" name="management_view" id="deleteManagementView" value="account-access">
                         <input type="hidden" name="admin_profile_id" id="deleteAdminProfileId">
                     </form>
 
                     <form method="POST" id="deleteAdminHubForm" style="display:none;">
                         @csrf
                         @method('DELETE')
+                        <input type="hidden" name="management_view" id="deleteAdminHubManagementView" value="account-access">
                     </form>
                 </div>
             </div>
@@ -1536,6 +1538,8 @@
     const detailAdminProfileStatus = document.getElementById('detailAdminProfileStatus');
     const adminEmailNote = document.getElementById('adminEmailNote');
     const deleteAdminProfileId = document.getElementById('deleteAdminProfileId');
+    const deleteManagementView = document.getElementById('deleteManagementView');
+    const deleteAdminHubManagementView = document.getElementById('deleteAdminHubManagementView');
     const deleteAdminHubForm = document.getElementById('deleteAdminHubForm');
     const deleteAdminHubBtn = document.getElementById('deleteAdminHubBtn');
     const externalNote = document.getElementById('externalNote');
@@ -1554,6 +1558,21 @@
         'admin-hub': document.getElementById('admin-hub-panel'),
     };
     let currentLookupContext = @json($managementView ?: 'account-access');
+
+    const syncModeUrl = (mode) => {
+        const url = new URL(window.location.href);
+        if (mode && ['account-access', 'admin-hub'].includes(mode)) {
+            url.searchParams.set('management_view', mode);
+        } else {
+            url.searchParams.delete('management_view');
+        }
+
+        if (!lookupSearchField || !lookupSearchField.value.trim()) {
+            url.searchParams.delete('lookup_search');
+        }
+
+        window.history.replaceState({}, '', url.toString());
+    };
 
     const applySettingsSectionMode = (managementView, canEdit, canOnboard) => {
         const isAdminHubOnly = managementView === 'admin-hub';
@@ -1617,6 +1636,7 @@
         if (lookupManagementViewField) {
             lookupManagementViewField.value = currentLookupContext;
         }
+        syncModeUrl(currentLookupContext);
 
         if (modePicker) {
             modePicker.classList.add('is-hidden');
@@ -1640,6 +1660,7 @@
         if (lookupManagementViewField) {
             lookupManagementViewField.value = currentLookupContext;
         }
+        syncModeUrl(null);
 
         if (modePicker) {
             modePicker.classList.remove('is-hidden');
@@ -1678,6 +1699,12 @@
         const managementView = row.dataset.managementView || currentLookupContext || 'account-access';
         if (detailManagementView) {
             detailManagementView.value = managementView;
+        }
+        if (deleteManagementView) {
+            deleteManagementView.value = managementView;
+        }
+        if (deleteAdminHubManagementView) {
+            deleteAdminHubManagementView.value = managementView;
         }
 
         detailName.value = row.dataset.name || '';

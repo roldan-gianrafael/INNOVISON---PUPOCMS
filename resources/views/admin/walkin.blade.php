@@ -139,7 +139,7 @@
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
-    $currentMode = in_array($mode ?? 'scan', ['scan', 'assisted'], true) ? $mode : 'scan';
+    $currentMode = in_array($mode ?? '', ['scan', 'assisted'], true) ? $mode : '';
     $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
     $idpClientId = trim((string) config('services.idp.client_id', ''));
     $portalRegisterUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
@@ -161,6 +161,7 @@
 @endif
 
 <div style="max-width: 980px; margin: 20px auto;">
+    @if($currentMode === '')
     <div class="card p-4 shadow-sm" style="border-radius: 18px; border: none; margin-bottom: 20px;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;">
             <div>
@@ -201,7 +202,9 @@
             </a>
         </div>
     </div>
+    @endif
 
+@if($currentMode !== '')
 <div class="card p-4 shadow-sm" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
     
     <div id="dynamicHeader" class="mode-header {{ $currentMode === 'assisted' ? 'bg-register' : 'bg-scan' }}">
@@ -223,12 +226,20 @@
             </div>
 
             <div id="scanner-container-scan" style="position: relative;">
-                <div id="scan-loading">
-                    <div class="spinner"></div>
-                    <p style="margin-top:10px; color:#8B0000; font-weight:bold; font-size: 12px;">Verifying...</p>
+                <div id="barcodeScanPanel">
+                    <div id="scan-loading">
+                        <div class="spinner"></div>
+                        <p style="margin-top:10px; color:#8B0000; font-weight:bold; font-size: 12px;">Verifying...</p>
+                    </div>
+                    <div id="readerScan" class="scanner-box">
+                        <div class="scan-line-overlay"></div>
+                    </div>
                 </div>
-                <div id="readerScan" class="scanner-box">
-                    <div class="scan-line-overlay"></div>
+
+                <div id="bioSyncPendingPanel" style="display:none; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:30px 22px; text-align:center;">
+                    <div style="width:60px; height:60px; margin:0 auto 14px; border-radius:18px; background:#e2e8f0; color:#334155; display:flex; align-items:center; justify-content:center; font-weight:900;">BIO</div>
+                    <h4 style="margin:0 0 8px; font-size:18px; color:#0f172a; font-weight:800;">BioSync Pending</h4>
+                    <p style="margin:0; color:#64748b; line-height:1.6; font-size:13px;">This mode is reserved for the upcoming BioSync integration. For now, please switch back to barcode scanning or use assisted intake.</p>
                 </div>
             </div>
         
@@ -246,9 +257,14 @@
             </div>
 
             <div class="mt-4 pt-3" style="border-top: 1px dashed #cbd5e1;">
-                <a href="{{ url($basePrefix . '/appointments') }}" class="btn w-100 py-2" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
-                     BACK TO APPOINTMENTS LIST
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{{ url($basePrefix . '/walkin') }}" class="btn w-100 py-2" style="flex:1 1 180px; background: #ffffff; border: 1px solid #cbd5e1; color: #475569; font-weight: 700; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                     BACK TO INTAKE OPTIONS
                 </a>
+                <a href="{{ url($basePrefix . '/appointments') }}" class="btn w-100 py-2" style="flex:1 1 180px; background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                 BACK TO APPOINTMENTS LIST
+                </a>
+                </div>
             </div>
         </div>
     </div>
@@ -312,11 +328,12 @@
             </button>
             
             <div class="text-center mt-3">
-                <a href="{{ url()->current() }}?mode=scan" style="font-size: 12px; color: #64748b; text-decoration: none;">Switch back to Scan / Bio</a>
+                <a href="{{ url($basePrefix . '/walkin') }}" style="font-size: 12px; color: #64748b; text-decoration: none;">Back to intake options</a>
             </div>
         </form>
     </div>
 </div>
+@endif
 </div>
 @endsection
 
@@ -418,6 +435,10 @@
             $('#btnSwitchScanMode').text(isBioSync ? 'Switch to Scan Barcode' : 'Switch to BioSync');
             $('#headerTitle').text(isBioSync ? 'BioSync Ready' : 'Scanner Ready');
             $('#headerIcon').text(isBioSync ? 'BIO' : 'SCAN');
+            $('#barcodeScanPanel').toggle(!isBioSync);
+            $('#bioSyncPendingPanel').toggle(isBioSync);
+            $('#btnShowManual').toggle(!isBioSync);
+            $('#manualInputArea').toggle(!isBioSync && $('#manualInputArea').is(':visible'));
         }
 
         $('#btnShowManual').on('click', function() {

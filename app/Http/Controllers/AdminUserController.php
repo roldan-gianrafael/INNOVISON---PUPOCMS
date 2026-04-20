@@ -16,6 +16,20 @@ use Illuminate\Validation\Rule;
 
 class AdminUserController extends Controller
 {
+    private function redirectToManagementView(Request $request, string $messageType, string $message)
+    {
+        $managementView = trim((string) $request->input('management_view', $request->query('management_view', '')));
+        $params = [];
+
+        if (in_array($managementView, ['account-access', 'admin-hub'], true)) {
+            $params['management_view'] = $managementView;
+        }
+
+        return redirect()
+            ->route('admin.user-management', $params)
+            ->with($messageType, $message);
+    }
+
     public function index(Request $request, FacultySyncService $facultySyncService)
     {
         $lookupSearch = trim((string) $request->query('lookup_search', ''));
@@ -187,7 +201,7 @@ class AdminUserController extends Controller
             )
         );
 
-        return redirect()->back()->with('success', 'User account updated successfully.');
+        return $this->redirectToManagementView($request, 'success', 'User account updated successfully.');
     }
 
     public function storeFromLookup(Request $request)
@@ -275,7 +289,7 @@ class AdminUserController extends Controller
                 )
             );
 
-            return redirect()->route('admin.user-management')->with('success', 'Lookup user added to the Admin Hub successfully.');
+            return $this->redirectToManagementView($request, 'success', 'Lookup user added to the Admin Hub successfully.');
         }
 
         $user = User::query()->where('email', $baseEmail)->first();
@@ -353,7 +367,7 @@ class AdminUserController extends Controller
             )
         );
 
-        return redirect()->route('admin.user-management')->with('success', 'Lookup user added to the clinic system successfully.');
+        return $this->redirectToManagementView($request, 'success', 'Lookup user added to the clinic system successfully.');
     }
 
     public function updateAdminHub(Request $request, Admin $admin)
@@ -411,7 +425,7 @@ class AdminUserController extends Controller
             )
         );
 
-        return redirect()->back()->with('success', 'Admin Hub profile updated successfully.');
+        return $this->redirectToManagementView($request, 'success', 'Admin Hub profile updated successfully.');
     }
 
     public function destroyAdminHub(Admin $admin)
@@ -435,7 +449,7 @@ class AdminUserController extends Controller
             )
         );
 
-        return redirect()->back()->with('success', 'Admin Hub access removed successfully.');
+        return $this->redirectToManagementView($request, 'success', 'Admin Hub access removed successfully.');
     }
 
     public function deleteAdminHubRecord(Admin $admin)
@@ -456,7 +470,7 @@ class AdminUserController extends Controller
             )
         );
 
-        return redirect()->back()->with('success', 'Admin Hub record deleted successfully.');
+        return $this->redirectToManagementView($request, 'success', 'Admin Hub record deleted successfully.');
     }
 
     public function destroy(User $user)
@@ -464,7 +478,7 @@ class AdminUserController extends Controller
         $this->ensureCanManageUsers();
 
         if ($this->isProtectedUser($user) || $user->id === Auth::id()) {
-            return redirect()->back()->with('error', 'This account access cannot be removed.');
+            return $this->redirectToManagementView($request, 'error', 'This account access cannot be removed.');
         }
 
         $originalRole = $user->user_role;
@@ -511,7 +525,7 @@ class AdminUserController extends Controller
             )
         );
 
-        return redirect()->back()->with('success', 'User access removed successfully. The account is now back to the default student role.');
+        return $this->redirectToManagementView($request, 'success', 'User access removed successfully. The account is now back to the default student role.');
     }
 
     private function collectLocalUsers(string $search): array

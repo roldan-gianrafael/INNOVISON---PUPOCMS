@@ -201,6 +201,20 @@
                                 </select>
                             </div>
 
+                            <div id="medicineFields" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Medicine Type</label>
+                                    <select name="medicine_type" id="iMedicineType" class="form-control">
+                                        <option value="">-- Select Type --</option>
+                                        <option value="Antibiotic">Antibiotic</option>
+                                        <option value="Asthma">For Asthma</option>
+                                        <option value="Analgesic">Analgesic</option>
+                                        <option value="Antipyretic">Antipyretic</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label>Date Added</label>
                                 <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
@@ -237,19 +251,7 @@
                                 </datalist>
                             </div>
 
-                            <div id="medicineFields" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">
-                                <div class="form-group">
-                                    <label>Medicine Type</label>
-                                    <select name="medicine_type" id="iMedicineType" class="form-control">
-                                        <option value="">-- Select Type --</option>
-                                        <option value="Antibiotic">Antibiotic</option>
-                                        <option value="Asthma">For Asthma</option>
-                                        <option value="Analgesic">Analgesic</option>
-                                        <option value="Antipyretic">Antipyretic</option>
-                                        <option value="Others">Others</option>
-                                    </select>
-                                </div>
-
+                            <div id="medicineExpiryField" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">
                                 <div class="form-group">
                                     <label>Expiration Date</label>
                                     <input type="date" name="expiration_date" id="iExpDate" class="form-control">
@@ -272,6 +274,7 @@
 <script>
     const itemModal = document.getElementById('itemModal');
     const medicineFields = document.getElementById('medicineFields');
+    const medicineExpiryField = document.getElementById('medicineExpiryField');
     const medicineSelect = document.getElementById('iMedicineType');
     const expDateInput = document.getElementById('iExpDate');
     const highlightedRow = document.querySelector('.inventory-row-highlight');
@@ -280,10 +283,12 @@
         const category = document.getElementById('iCategory').value;
         if (category === 'Medicine') {
             medicineFields.style.display = 'block';
+            medicineExpiryField.style.display = 'block';
             medicineSelect.setAttribute('required', 'required');
             expDateInput.setAttribute('required', 'required');
         } else {
             medicineFields.style.display = 'none';
+            medicineExpiryField.style.display = 'none';
             medicineSelect.removeAttribute('required');
             expDateInput.removeAttribute('required');
             medicineSelect.value = ''; 

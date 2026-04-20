@@ -118,7 +118,7 @@ class AppointmentController extends Controller
         $puptasService = app(PuptasWebhookService::class);
 
         $studentNumber = trim((string) ($user->student_number ?? ''));
-        if ($studentNumber !== '') {
+        if ($studentNumber !== '' && !$this->looksLikeIdpIdentifier($studentNumber, $user)) {
             $applicantByStudentNumber = $puptasService->fetchApplicantByStudentNumber($studentNumber);
             if (is_array($applicantByStudentNumber) && !empty($applicantByStudentNumber)) {
                 return $applicantByStudentNumber;
@@ -134,6 +134,43 @@ class AppointmentController extends Controller
         }
 
         return null;
+    }
+
+    private function looksLikeIdpIdentifier(?string $value, ?User $user = null): bool
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return false;
+        }
+
+        $userStudentId = trim((string) optional($user)->student_id);
+        if ($userStudentId !== '' && strcasecmp($value, $userStudentId) === 0) {
+            return true;
+        }
+
+        return (bool) preg_match(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+            $value
+        );
+    }
+
+    private function resolveStudentNumber(User $user, ?HealthProfile $healthProfile = null, ?array $applicantData = null): string
+    {
+        $candidates = [
+            trim((string) data_get($applicantData, 'student_number')),
+            trim((string) optional($healthProfile)->student_number),
+            trim((string) ($user->student_number ?? '')),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if ($candidate === '' || $this->looksLikeIdpIdentifier($candidate, $user)) {
+                continue;
+            }
+
+            return $candidate;
+        }
+
+        return '';
     }
 
     private function normalizeSexValue(?string $value): string
@@ -276,10 +313,7 @@ class AppointmentController extends Controller
             'last_name' => trim((string) (optional($linkedAdminProfile)->last_name ?? $user->last_name ?? data_get($applicantData, 'last_name') ?? data_get($applicantData, 'lastname') ?? '')),
             'suffix_name' => trim((string) (optional($linkedAdminProfile)->suffix_name ?? '')),
             'student_id' => (string) (optional($healthProfile)->student_id ?? $user->student_id ?? ''),
-            'student_number' => (string) (
-                data_get($applicantData, 'student_number')
-                ?: (optional($healthProfile)->student_number ?? $user->student_number ?? '')
-            ),
+            'student_number' => $this->resolveStudentNumber($user, $healthProfile, $applicantData),
             'email' => (string) (
                 optional(optional($healthProfile)->user)->email
                 ?? data_get($applicantData, 'email')

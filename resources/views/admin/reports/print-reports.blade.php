@@ -294,6 +294,7 @@
                 <th style="width: 50px;">ID</th>
                 <th>ITEM DESCRIPTION</th>
                 <th>CATEGORY</th>
+                <th>UNIT</th>
                 <th>STARTING STOCK</th>
                 <th>CONSUMED</th>
                 <th>CURRENT BALANCE</th>
@@ -305,14 +306,15 @@
             <tr>
                 <td>{{ $item->id }}</td>
                 <td class="text-left">{{ $item->name }}</td>
-                <td>{{ $item->medicine_type}}</td>
-                <td>{{ $item->quantity }}</td> {{-- Since matic bumabawas, current qty na ang starting natin --}}
-                <td>0</td> {{-- Placeholder: 0 muna dahil walang consumed column --}}
-                <td style="font-weight: bold;">{{ $item->quantity }}</td>
-                <td>{{ $item->created_at->format('M d, Y') }}</td>
+                <td>{{ $item->report_category }}</td>
+                <td>{{ $item->unit }}</td>
+                <td>{{ $item->starting_stock }}</td>
+                <td>{{ $item->consumed }}</td>
+                <td style="font-weight: bold;">{{ $item->current_balance }}</td>
+                <td>{{ optional($item->date_added)->format('M d, Y') ?? optional($item->created_at)->format('M d, Y') }}</td>
             </tr>
             @empty
-            <tr><td colspan="7">No items found in the inventory.</td></tr>
+            <tr><td colspan="8">No items found in the inventory.</td></tr>
             @endforelse
         </tbody>
     </table>

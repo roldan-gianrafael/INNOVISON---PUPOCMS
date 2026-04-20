@@ -85,6 +85,7 @@
                 <tr>    
                     <th>Item Name</th>
                     <th>Category</th>
+                    <th>Unit</th>
                     <th>Quantity & Dates</th>
                     <th>Stock Status</th>
                     <th>{{ $canManageInventory ? 'Actions' : 'Access' }}</th>
@@ -110,8 +111,9 @@
                                 <small style="display:block; color:#64748b; font-style: italic;">({{ $item->medicine_type }})</small>
                             @endif
                         </td>
+                        <td>{{ $item->unit ?: 'pcs' }}</td>
                         <td>
-                            <div style="font-weight: 700;">{{ $item->quantity }} units</div>
+                            <div style="font-weight: 700;">{{ $item->quantity }} {{ $item->unit ?: 'pcs' }}</div>
                             <small style="display:block; color:#64748b; margin-top:4px;">
                                 📅 Added: {{ $item->date_added ? \Carbon\Carbon::parse($item->date_added)->format('M d, Y') : 'N/A' }}
                             </small>
@@ -133,7 +135,7 @@
                         <td>
                             @if($canManageInventory)
                                 <button class="btn-icon btn-edit" 
-                                    onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}', '{{ $item->medicine_type }}', '{{ $item->date_added }}', '{{ $item->expiration_date }}')">
+                                    onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}', '{{ $item->unit }}', '{{ $item->medicine_type }}', '{{ $item->date_added }}', '{{ $item->expiration_date }}')">
                                     Edit
                                 </button>
 
@@ -147,7 +149,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" style="text-align: center; padding: 30px; color: #888;">No items in inventory.</td></tr>
+                    <tr><td colspan="6" style="text-align: center; padding: 30px; color: #888;">No items in inventory.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -205,6 +207,11 @@
                         <input type="number" name="quantity" id="iQty" class="form-control" required min="0">
                     </div>
 
+                    <div class="form-group">
+                        <label>Unit</label>
+                        <input type="text" name="unit" id="iUnit" class="form-control" required placeholder="e.g. pcs, box, bottle, vial">
+                    </div>
+
                     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                         <button type="button" onclick="closeModal()" style="padding: 8px 16px; border: none; background: #eee; cursor: pointer; border-radius: 6px;">Cancel</button>
                         <button type="submit" class="btn-add">Save Item</button>
@@ -249,13 +256,14 @@
         document.getElementById('iName').value = '';
         document.getElementById('iCategory').value = 'Medicine';
         document.getElementById('iQty').value = '';
+        document.getElementById('iUnit').value = 'pcs';
         document.getElementById('iDateAdded').value = new Date().toISOString().split('T')[0]; // Set today as default
         document.getElementById('iExpDate').value = '';
         
         toggleMedicineFields();
     }
 
-    function editItem(id, name, category, qty, medicineType, dateAdded, expDate) {
+    function editItem(id, name, category, qty, unit, medicineType, dateAdded, expDate) {
         if (!itemModal) return;
         itemModal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Edit Item';
@@ -266,6 +274,7 @@
         document.getElementById('iName').value = name;
         document.getElementById('iCategory').value = category;
         document.getElementById('iQty').value = qty;
+        document.getElementById('iUnit').value = unit || 'pcs';
         document.getElementById('iDateAdded').value = dateAdded;
         
         toggleMedicineFields();

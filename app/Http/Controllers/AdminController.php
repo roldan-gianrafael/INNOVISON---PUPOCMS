@@ -1254,8 +1254,18 @@ public function updateClearance(Request $request, $id)
     }
 
     // --- 2. INVENTORY ACTIONS ---
-   public function storeItem(Request $request)
+public function storeItem(Request $request)
 {
+    $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'category' => ['required', 'string', 'max:255'],
+        'quantity' => ['required', 'integer', 'min:0'],
+        'unit' => ['required', 'string', 'max:50'],
+        'date_added' => ['required', 'date'],
+        'medicine_type' => ['nullable', 'string', 'max:255'],
+        'expiration_date' => ['nullable', 'date'],
+    ]);
+
     // 1. Prepare data and sanitize medicine-specific fields
     $data = $request->all();
     if ($request->category !== 'Medicine') {
@@ -1286,6 +1296,16 @@ public function updateItem($id, Request $request)
     $item = Item::find($id);
     
     if ($item) {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:255'],
+            'quantity' => ['required', 'integer', 'min:0'],
+            'unit' => ['required', 'string', 'max:50'],
+            'date_added' => ['required', 'date'],
+            'medicine_type' => ['nullable', 'string', 'max:255'],
+            'expiration_date' => ['nullable', 'date'],
+        ]);
+
         $oldName = $item->name; // Using 'name' as per your blade file
         
         // 1. Prepare and sanitize data for update
@@ -1592,12 +1612,35 @@ public function deleteItem($id)
     return Response::stream($callback, 200, $headers);
 }
 
-    public function exportInventory()
+public function exportInventory()
 {
-    $items = Item::all();
+    $monthFilter = request()->query('month', now()->format('Y-m'));
+    $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+    $monthEnd = (clone $monthStart)->endOfMonth();
+
+    $consumedByMedicine = \App\Models\Consultation::query()
+        ->select('medicine', DB::raw('SUM(medicine_quantity) as consumed_total'))
+        ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+        ->whereNotNull('medicine')
+        ->where('medicine', '!=', '')
+        ->groupBy('medicine')
+        ->pluck('consumed_total', 'medicine');
+
+    $items = Item::query()
+        ->orderBy('name')
+        ->get()
+        ->map(function ($item) use ($consumedByMedicine) {
+            $consumed = (int) ($consumedByMedicine[$item->name] ?? 0);
+            $item->unit = $item->unit ?: 'pcs';
+            $item->starting_stock = (int) $item->quantity + $consumed;
+            $item->consumed = $consumed;
+            $item->current_balance = (int) $item->quantity;
+            return $item;
+        });
+
     $filename = "inventory_" . date('Y-m-d_H-i-s') . ".csv";
     $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
-    $columns = ['ID','Name','Category','Quantity'];
+    $columns = ['ID','Name','Category','Unit','Starting Stock','Consumed','Current Balance'];
 
     // --- LOGS CODES ---
     \App\Models\ActivityLog::create([
@@ -1617,7 +1660,10 @@ public function deleteItem($id)
                 $item->id,
                 $item->name,
                 $item->category,
-                $item->quantity
+                $item->unit,
+                $item->starting_stock,
+                $item->consumed,
+                $item->current_balance
             ]);
         }
         fclose($file);
@@ -1655,16 +1701,51 @@ public function deleteItem($id)
     // 6. FOR INVENTORY SUMMARY
     public function inventorySummary()
 {
-    $totalItems = Item::count();
-    $totalStock = Item::sum('quantity');
-    $outOfStock = Item::where('quantity', 0)->count();
-    $lowStockItems = Item::where('quantity', '>', 0)->where('quantity', '<', 10)->get();
+    $monthFilter = request()->query('month', now()->format('Y-m'));
+    $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+    $monthEnd = (clone $monthStart)->endOfMonth();
+
+    $consumedByMedicine = \App\Models\Consultation::query()
+        ->select('medicine', DB::raw('SUM(medicine_quantity) as consumed_total'))
+        ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+        ->whereNotNull('medicine')
+        ->where('medicine', '!=', '')
+        ->groupBy('medicine')
+        ->pluck('consumed_total', 'medicine');
+
+    $itemPerformance = Item::query()
+        ->orderBy('name')
+        ->get()
+        ->map(function ($item) use ($consumedByMedicine) {
+            $consumed = (int) ($consumedByMedicine[$item->name] ?? 0);
+            $item->unit = $item->unit ?: 'pcs';
+            $item->consumed = $consumed;
+            $item->current_balance = (int) $item->quantity;
+            $item->starting_stock = $item->current_balance + $consumed;
+            return $item;
+        });
+
+    $totalItems = $itemPerformance->count();
+    $totalStock = $itemPerformance->sum('current_balance');
+    $totalConsumed = $itemPerformance->sum('consumed');
+    $outOfStock = $itemPerformance->where('current_balance', 0)->count();
+    $lowStockItems = $itemPerformance
+        ->filter(fn($item) => $item->current_balance > 0 && $item->current_balance < 10)
+        ->values();
+    $lowStockCount = $lowStockItems->count();
     
-    $categorySummary = Item::select('category', 
-                        DB::raw('count(*) as count'), 
-                        DB::raw('sum(quantity) as total_qty'))
-                        ->groupBy('category')
-                        ->get();
+    $categorySummary = $itemPerformance
+        ->groupBy('category')
+        ->map(function ($items, $category) {
+            return (object) [
+                'category' => $category,
+                'count' => $items->count(),
+                'starting_qty' => $items->sum('starting_stock'),
+                'consumed_qty' => $items->sum('consumed'),
+                'total_qty' => $items->sum('current_balance'),
+            ];
+        })
+        ->values();
 
     // LOGS CODES
     \App\Models\ActivityLog::create([
@@ -1677,7 +1758,7 @@ public function deleteItem($id)
     ]);
 
     return view('admin.reports.inventory-summary', compact(
-        'totalItems', 'totalStock', 'outOfStock', 'lowStockItems', 'categorySummary'
+        'totalItems', 'totalStock', 'totalConsumed', 'outOfStock', 'lowStockItems', 'lowStockCount', 'categorySummary', 'itemPerformance', 'monthFilter'
     ));
 }
 

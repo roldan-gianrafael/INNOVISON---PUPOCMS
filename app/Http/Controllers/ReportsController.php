@@ -6,9 +6,41 @@ use Illuminate\Support\Facades\DB;
 use App\Models\MedicalConditions;
 use App\Models\Category;
 use App\Models\Consultation;
+use App\Models\Item;
+use Carbon\Carbon;
 
 class ReportsController extends Controller
 {
+    private function buildInventoryReportData(string $monthFilter)
+    {
+        $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+        $monthEnd = (clone $monthStart)->endOfMonth();
+
+        $consumedByMedicine = Consultation::query()
+            ->select('medicine', DB::raw('SUM(medicine_quantity) as consumed_total'))
+            ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+            ->whereNotNull('medicine')
+            ->where('medicine', '!=', '')
+            ->groupBy('medicine')
+            ->pluck('consumed_total', 'medicine');
+
+        return Item::query()
+            ->orderBy('name')
+            ->get()
+            ->map(function ($item) use ($consumedByMedicine) {
+                $consumed = (int) ($consumedByMedicine[$item->name] ?? 0);
+                $item->unit = $item->unit ?: 'pcs';
+                $item->consumed = $consumed;
+                $item->current_balance = (int) $item->quantity;
+                $item->starting_stock = $item->current_balance + $consumed;
+                $item->report_category = $item->category === 'Medicine' && $item->medicine_type
+                    ? $item->category . ' (' . $item->medicine_type . ')'
+                    : $item->category;
+
+                return $item;
+            });
+    }
+
     public function marReport(Request $request)
 {
     $monthFilter = $request->input('month', date('Y-m')); 
@@ -90,18 +122,9 @@ public function printReport(Request $request)
         }])->get();
     } 
     elseif ($type == 'inventory') {
-    $title = "INVENTORY STOCK REPORT";
-    
-    // Kunin ang lahat ng items sa table na 'items'
-    $data = \App\Models\Item::all(); 
-
-    // Dahil wala kang 'consumed' column sa DB, i-inject natin ito bilang temporary data
-    $data->transform(function($item) {
-        $item->consumed = 0; // Placeholder muna dahil walang history sa table
-        $item->starting = $item->quantity; // I-assume natin na ito ang starting
-        return $item;
-    });
-}
+        $title = "INVENTORY STOCK REPORT";
+        $data = $this->buildInventoryReportData($monthFilter);
+    }
     elseif ($type == 'appointment') {
     $title = "APPOINTMENT SUMMARY REPORT";
     // for date

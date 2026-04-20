@@ -137,7 +137,7 @@
         <div class="report-card border-inventory">
             <div>
                 <h3>Inventory Stock</h3>
-                <p>Complete list of medical supplies, current stock, expiration date...</p>
+                <p>View unit-based inventory movement with starting stock, consumed quantity, and current balance for the selected month.</p>
             </div>
             <form action="{{ $printReportUrl }}" method="GET" target="_blank">
                 <input type="hidden" name="type" value="inventory">

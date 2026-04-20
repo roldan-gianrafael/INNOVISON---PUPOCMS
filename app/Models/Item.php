@@ -14,6 +14,7 @@ class Item extends Model
         'category',
         'medicine_type',
         'quantity',
+        'unit',
         'date_added',      
         'expiration_date',
         'description'

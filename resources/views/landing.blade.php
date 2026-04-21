@@ -159,10 +159,14 @@
             background: rgba(255, 248, 243, 0.16);
             border: 1px solid rgba(255, 248, 243, 0.18);
             color: var(--pup-gold);
-            font-size: 24px;
-            font-weight: 800;
             position: relative;
             z-index: 1;
+        }
+
+        .role-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke-width: 1.8;
         }
 
         .role-card h2 {
@@ -184,7 +188,9 @@
         }
 
         .role-link {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             margin-top: 26px;
             color: var(--pup-gold);
             font-size: 13px;
@@ -193,6 +199,12 @@
             text-transform: uppercase;
             position: relative;
             z-index: 1;
+        }
+
+        .role-link svg {
+            width: 16px;
+            height: 16px;
+            flex: 0 0 auto;
         }
 
         .footer {
@@ -294,17 +306,27 @@
 
             <div class="cards">
                 <a href="{{ $portalLoginUrl }}" class="role-card" aria-label="Open student portal">
-                    <div class="role-icon">S</div>
+                    <div class="role-icon">
+                        <x-outline-icon name="academic-cap" />
+                    </div>
                     <h2>Student</h2>
                     <p>Access appointments, health forms, account details, and the services built for enrolled students.</p>
-                    <span class="role-link">Open Student Portal</span>
+                    <span class="role-link">
+                        <span>Open Student Portal</span>
+                        <x-outline-icon name="arrow-long-right" />
+                    </span>
                 </a>
 
                 <a href="{{ $portalLoginUrl }}" class="role-card" aria-label="Open admin portal">
-                    <div class="role-icon">A</div>
+                    <div class="role-icon">
+                        <x-outline-icon name="briefcase" />
+                    </div>
                     <h2>Admin</h2>
                     <p>Manage appointments, monitor records, review clinic activity, and handle administrative workflows.</p>
-                    <span class="role-link">Open Admin Portal</span>
+                    <span class="role-link">
+                        <span>Open Admin Portal</span>
+                        <x-outline-icon name="arrow-long-right" />
+                    </span>
                 </a>
             </div>
 

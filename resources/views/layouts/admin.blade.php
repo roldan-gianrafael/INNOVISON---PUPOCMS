@@ -144,28 +144,19 @@
         }
 
         .medicine-alert-fab svg {
-            width: 30px; /* Slightly larger to account for the border thickness */
-            height: 30px;
+            width: 28px;
+            height: 28px;
             display: block;
-        }
-
-        .medicine-alert-fab[data-surface-tone="dark"] svg path:first-child {
-            fill: #5f0012 !important;
-        }
-
-        .medicine-alert-fab[data-surface-tone="dark"] svg path:last-child {
-            fill: #7f1d2d !important;
-            stroke: #ffffff !important;
-        }
-
-        /* Ensure the path inside handles its own colors from the HTML attributes */
-        .medicine-alert-fab svg path {
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
             transition: transform 0.2s ease;
         }
 
-        /* Optional: Slight pulse effect to the warning triangle when hovering */
         .medicine-alert-fab:hover svg {
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
 
         .medicine-alert-badge {
@@ -548,9 +539,17 @@
             border: 1px solid var(--stroke);
             background: var(--surface);
             color: var(--text);
-            font-size: 20px;
-            line-height: 1;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .sidebar-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 1.8;
+            flex: 0 0 auto;
         }
 
         .profile-wrap {
@@ -610,6 +609,14 @@
             letter-spacing: 0.04em;
         }
 
+        .admin-user-chevron {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            opacity: 0.72;
+            stroke-width: 1.8;
+        }
+
         .profile-dropdown {
             display: none;
             position: absolute;
@@ -625,7 +632,9 @@
         }
 
         .profile-dropdown a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             padding: 12px 16px;
             color: #fff2f6;
             text-decoration: none;
@@ -633,6 +642,13 @@
             font-weight: 600;
             transition: background 0.2s ease, color 0.2s ease;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .profile-dropdown a svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            stroke-width: 1.8;
         }
 
         .profile-dropdown a:hover {
@@ -643,10 +659,7 @@
         .profile-dropdown a.logout-link {
             color: #ffd7df;
             border-bottom: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            justify-content: flex-start;
             line-height: 1.2;
             padding: 12px 14px;
         }
@@ -814,12 +827,17 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            font-weight: 800;
             flex-shrink: 0;
-            letter-spacing: 0.1em;
             color: var(--admin-sidebar-title);
-            font-family: "Outfit", "Manrope", sans-serif;
+            font-size: 0;
+            line-height: 0;
+        }
+
+        .sidebar-short svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.8;
+            flex: 0 0 auto;
         }
 
         .sidebar-nav a.active .sidebar-short {
@@ -1307,11 +1325,23 @@
             font-weight: 800;
             cursor: pointer;
             letter-spacing: 0.03em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
         }
 
         .assistant-launch:hover {
             background: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.42);
+            transform: translateY(-1px);
+        }
+
+        .assistant-launch svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            stroke-width: 1.8;
         }
 
         .theme-toggle-admin {
@@ -1998,14 +2028,16 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     </div>
 
     <div class="header-right">
-        <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">&#9776;</button>
-        <button type="button" class="theme-toggle-admin" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="4"></circle>
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-            </svg>
+        <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+            <x-outline-icon name="bars-3" />
         </button>
-        <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">AI Assistant</button>
+        <button type="button" class="theme-toggle-admin" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
+            <x-outline-icon name="sun" />
+        </button>
+        <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">
+            <x-outline-icon name="sparkles" />
+            <span>AI Assistant</span>
+        </button>
 
         <div class="profile-wrap">
             <button type="button" class="admin-user" onclick="toggleProfileMenu()">
@@ -2014,13 +2046,20 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                     <div class="admin-user-role">{{ $displayRole }}</div>
                 </div>
                 <div class="user-avatar">{{ $avatarInitial }}</div>
+                <x-outline-icon name="chevron-down" class="admin-user-chevron" />
             </button>
 
             <div id="profileDropdown" class="profile-dropdown">
                 @if($isAdminLike)
-                    <a href="{{ $settingsUrl }}">Settings</a>
+                    <a href="{{ $settingsUrl }}">
+                        <x-outline-icon name="cog-6-tooth" />
+                        <span>Settings</span>
+                    </a>
                 @endif
-                <a href="#" class="logout-link" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">Logout</a>
+                <a href="#" class="logout-link" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">
+                    <x-outline-icon name="arrow-left-on-rectangle" />
+                    <span>Logout</span>
+                </a>
             </div>
         </div>
     </div>
@@ -2043,51 +2082,49 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     <h4>Main Menu</h4>
     <nav class="sidebar-nav">
       <a href="{{ $dashboardUrl }}" class="{{ (Request::is('admin/dashboard') || Request::is('assistant/dashboard')) ? 'active' : '' }}">
-        <span class="sidebar-short">DB</span><span class="sidebar-label">Dashboard</span>
+        <span class="sidebar-short"><x-outline-icon name="squares-2x2" /></span><span class="sidebar-label">Dashboard</span>
       </a>
       <a href="{{ $appointmentsUrl }}" class="{{ (Request::is('admin/appointments*') || Request::is('assistant/appointments*')) ? 'active' : '' }}">
-        <span class="sidebar-short">AP</span><span class="sidebar-label">Appointments</span>
+        <span class="sidebar-short"><x-outline-icon name="calendar-days" /></span><span class="sidebar-label">Appointments</span>
       </a>
       <a href="{{ $inventoryUrl }}" class="{{ (Request::is('admin/inventory*') || Request::is('assistant/inventory*')) ? 'active' : '' }}">
-        <span class="sidebar-short">IN</span><span class="sidebar-label">Inventory</span>
+        <span class="sidebar-short"><x-outline-icon name="cube" /></span><span class="sidebar-label">Inventory</span>
       </a>
       <a href="{{ $reportsUrl }}" class="{{ (Request::is('admin/reports*') || Request::is('assistant/reports*')) ? 'active' : '' }}">
-        <span class="sidebar-short">RP</span><span class="sidebar-label">Reports</span>
+        <span class="sidebar-short"><x-outline-icon name="chart-bar" /></span><span class="sidebar-label">Reports</span>
       </a>
      
       <a href="{{ $walkinUrl }}" class="{{ (Request::is('admin/walkin*') || Request::is('assistant/walkin*')) ? 'active' : '' }}">
-        <span class="sidebar-short">WK</span><span class="sidebar-label">Walk-in</span>
+        <span class="sidebar-short"><x-outline-icon name="user-plus" /></span><span class="sidebar-label">Walk-in</span>
       </a>
       <a href="{{ route('admin.health_records') }}" class="{{ Request::is('admin/health-records*') ? 'active' : '' }}">
-    <span class="sidebar-short">HR</span>
+    <span class="sidebar-short"><x-outline-icon name="document-text" /></span>
     <span class="sidebar-label">Student Health Form</span>
     </a>
       @if($isAdminLike)
           <a href="{{ $userManagementUrl }}" class="{{ Request::is('admin/user-management*') ? 'active' : '' }}">
-            <span class="sidebar-short">UM</span><span class="sidebar-label">Users Management</span>
+            <span class="sidebar-short"><x-outline-icon name="users" /></span><span class="sidebar-label">Users Management</span>
           </a>
           <a href="{{ route('admin.logs') }}" class="{{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
-            <span class="sidebar-short">LG</span><span class="sidebar-label">Audit Trail</span>
+            <span class="sidebar-short"><x-outline-icon name="clipboard-document-list" /></span><span class="sidebar-label">Audit Trail</span>
           </a>
           <a href="{{ $settingsUrl }}" class="{{ Request::is('admin/settings*') ? 'active' : '' }}">
-            <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>
+            <span class="sidebar-short"><x-outline-icon name="cog-6-tooth" /></span><span class="sidebar-label">Settings</span>
           </a>
       @endif
       <a href="{{ $apiTestingUrl }}" class="{{ (Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
-        <span class="sidebar-short">FT</span><span class="sidebar-label">For API Testing</span>
+        <span class="sidebar-short"><x-outline-icon name="code-bracket-square" /></span><span class="sidebar-label">For API Testing</span>
       </a>
 
     </nav>
 
     <button type="button" class="sidebar-scroll-indicator" id="sidebarScrollIndicator" aria-label="Scroll navigation">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M6 9l6 6 6-6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
-      </svg>
+      <x-outline-icon name="chevron-down" />
     </button>
 
     <div class="sidebar-logout">
       <a href="#" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">
-        <span class="sidebar-short">LO</span><span class="sidebar-label">Logout</span>
+        <span class="sidebar-short"><x-outline-icon name="arrow-left-on-rectangle" /></span><span class="sidebar-label">Logout</span>
       </a>
     </div>
   </aside>
@@ -2105,15 +2142,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
 @if($medicineAlertCount > 0)
     <button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts">
-        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-            <path d="M416.7 51.5c-44.1-44.1-115.7-44.1-159.8 0L193.3 115l159.8 159.8 63.6-63.6c44.1-44.1 44.1-115.6 0-159.7zM159.4 148.9L44.5 263.8c-44.1 44.1-44.1 115.7 0 159.8s115.7 44.1 159.8 0l114.9-114.9-159.8-159.8z" fill="#ffffff" stroke="none"/>
-            
-            <path d="M495.4 416.6l-114.3-206c-13.4-24.1-48.4-24.1-61.7 0L205 416.6c-13.1 23.5 3.9 52.3 30.9 52.3h228.6c27 0 44-28.8 30.9-52.3zM350.2 432.1c-10.1 0-18.2-8.1-18.2-18.2s8.1-18.2 18.2-18.2 18.2 8.1 18.2 18.2-8.1 18.2-18.2 18.2zm18.2-64.1c0 10.1-8.1 18.2-18.2 18.2s-18.2-8.1-18.2-18.2V288.5c0-10.1 8.1-18.2 18.2-18.2s18.2 8.1 18.2 18.2v79.5z" 
-                  fill="#ffffff" 
-                  stroke="#000000" 
-                  stroke-width="20" 
-                  stroke-linejoin="round"/>
-        </svg>
+        <x-outline-icon name="exclamation-triangle" />
         <span class="medicine-alert-badge">{{ $medicineAlertCount }}</span>
     </button>
 
@@ -2241,8 +2270,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     function applyAdminTheme(theme) {
         const normalizedTheme = theme === 'light' ? 'light' : 'dark';
         const toggle = document.getElementById('adminThemeToggle');
-        const moonIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"></path></svg>';
-        const sunIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>';
+        const moonIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"></path></svg>';
+        const sunIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"></path></svg>';
 
         document.documentElement.setAttribute('data-theme', normalizedTheme);
 

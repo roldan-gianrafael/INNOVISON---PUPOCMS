@@ -77,7 +77,11 @@
         .brand-logo--clinic {
             width: 82px;
             height: 82px;
-            mix-blend-mode: multiply;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22);
+            mix-blend-mode: normal;
+            padding: 6px;
         }
 
         .eyebrow {

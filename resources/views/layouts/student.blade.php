@@ -1044,7 +1044,10 @@
         <div class="container header-inner">
             <div class="header-left">
                 <a class="brand-link" href="{{ url('/student/home') }}">
-                    <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="brand-img">
+                    <span class="brand-badges">
+                        <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="brand-img">
+                        <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="brand-img brand-img--clinic">
+                    </span>
                     <span class="brand-text">
                         <span class="brand-title">PUP TAGUIG</span>
                         <span class="brand-subtitle">ONLINE CLINIC</span>

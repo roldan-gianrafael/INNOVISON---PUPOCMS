@@ -1098,7 +1098,7 @@
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" class="um-btn um-btn-ghost" data-back-to-modes>Back</button>
                     <button type="button" class="um-btn um-btn-primary" data-open-lookup="account-access">
-                        <span>+</span> Add User Role
+                        <span>+</span> Add User Roles
                     </button>
                 </div>
             </div>

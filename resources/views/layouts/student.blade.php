@@ -195,6 +195,9 @@
             position: relative;
             transition: color 0.3s ease;
             padding: 5px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .nav-list li.nav-dropdown {
@@ -222,6 +225,22 @@
             gap: 8px;
             transition: color 0.3s ease;
             font-family: inherit;
+        }
+
+        .nav-link-content,
+        .nav-dropdown-link-content {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .nav-link-icon,
+        .nav-dropdown-link-icon {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            stroke-width: 1.8;
         }
 
         .nav-dropdown-toggle:hover,
@@ -282,11 +301,21 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 12px;
             padding: 10px 12px !important;
             border-radius: 10px;
             color: #1f2937 !important;
             font-size: 14px !important;
             font-weight: 600 !important;
+        }
+
+        .nav-dropdown-link-accessory {
+            display: inline-flex;
+            align-items: center;
+            flex: 0 0 auto;
+            font-size: 12px;
+            font-weight: 800;
+            color: #8b0000;
         }
 
         .nav-dropdown-menu a::after {
@@ -592,6 +621,14 @@
             min-width: 96px;
             white-space: nowrap;
             opacity: 1;
+            gap: 8px;
+        }
+
+        .nav-list li .logout-btn svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            stroke-width: 1.8;
         }
 
         .nav-list li .theme-toggle-btn:hover,
@@ -649,7 +686,8 @@
             .nav-list li a:not(.logout-btn) {
                 color: #1f2937;
                 width: 100%;
-                display: block;
+                display: flex;
+                align-items: center;
                 padding: 8px 0;
             }
 
@@ -663,6 +701,8 @@
             .nav-dropdown-toggle {
                 color: #1f2937;
                 width: 100%;
+                display: flex;
+                align-items: center;
                 justify-content: space-between;
                 padding: 8px 0;
             }
@@ -700,6 +740,7 @@
             .nav-list li .logout-btn {
                 margin-left: 0;
                 width: 100%;
+                justify-content: center;
             }
 
             main table {
@@ -1044,7 +1085,10 @@
         <div class="container header-inner">
             <div class="header-left">
                 <a class="brand-link" href="{{ url('/student/home') }}">
-                    <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="brand-img">
+                    <span class="brand-badges">
+                        <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="brand-img">
+                        <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="brand-img brand-img--clinic">
+                    </span>
                     <span class="brand-text">
                         <span class="brand-title">PUP TAGUIG</span>
                         <span class="brand-subtitle">ONLINE CLINIC</span>
@@ -1053,7 +1097,7 @@
             </div>
 
             <button class="nav-toggle" aria-label="Open menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                <x-outline-icon name="bars-3" width="24" height="24" stroke="#fff" stroke-width="2" />
             </button>
 
             <nav id="main-menu" class="main-nav">
@@ -1063,10 +1107,38 @@
                     $notificationCount = $layoutNotifications->where('is_unread', true)->count();
                 @endphp
                 <ul class="nav-list">
-                    <li><a href="{{ url('/student/home') }}" class="{{ Request::is('student/home') ? 'active' : '' }}">Home</a></li>
-                    <li><a href="{{ url('/student/booking') }}" class="{{ Request::is('student/booking') ? 'active' : '' }}">Appointments</a></li>
-                    <li><a href="{{ url('/student/home') }}#about">About Us</a></li>
-                    <li><a href="{{ url('/student/faq') }}" class="{{ Request::is('student/faq') ? 'active' : '' }}">FAQs</a></li>
+                    <li>
+                        <a href="{{ url('/student/home') }}" class="{{ Request::is('student/home') ? 'active' : '' }}">
+                            <span class="nav-link-content">
+                                <x-outline-icon name="home" class="nav-link-icon" />
+                                <span>Home</span>
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/student/booking') }}" class="{{ Request::is('student/booking') ? 'active' : '' }}">
+                            <span class="nav-link-content">
+                                <x-outline-icon name="calendar-days" class="nav-link-icon" />
+                                <span>Appointments</span>
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/student/home') }}#about">
+                            <span class="nav-link-content">
+                                <x-outline-icon name="information-circle" class="nav-link-icon" />
+                                <span>About Us</span>
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/student/faq') }}" class="{{ Request::is('student/faq') ? 'active' : '' }}">
+                            <span class="nav-link-content">
+                                <x-outline-icon name="question-mark-circle" class="nav-link-icon" />
+                                <span>FAQs</span>
+                            </span>
+                        </a>
+                    </li>
                     <li class="nav-list-divider" aria-hidden="true"></li>
                     <li class="nav-dropdown {{ $isMyAccountSection ? 'is-open-on-route' : '' }}" data-nav-dropdown>
                         <button
@@ -1075,29 +1147,68 @@
                             aria-expanded="{{ $isMyAccountSection ? 'true' : 'false' }}"
                             aria-haspopup="true"
                         >
-                            <span>My Account</span>
+                            <span class="nav-link-content">
+                                <x-outline-icon name="user-circle" class="nav-link-icon" />
+                                <span>My Account</span>
+                            </span>
                             <span class="nav-dropdown-caret" aria-hidden="true"></span>
                         </button>
                         <ul class="nav-dropdown-menu">
-                            <li><a href="{{ url('/student/account?view=profile') }}" class="{{ Request::is('student/account') && request('view', 'profile') === 'profile' ? 'active' : '' }}">Profile</a></li>
-                            <li><a href="{{ url('/student/account?view=notifications') }}" class="{{ Request::is('student/account') && request('view') === 'notifications' ? 'active' : '' }}">Notifications @if($notificationCount > 0)<span style="margin-left:6px; font-weight:800; color:#8b0000;">({{ $notificationCount }})</span>@endif</a></li>
-                            <li><a href="{{ url('/student/history') }}" class="{{ Request::is('student/history') ? 'active' : '' }}">Appointment History</a></li>
-                            <li><a href="{{ url('/student/account?view=health-record') }}" class="{{ Request::is('student/account') && request('view') === 'health-record' ? 'active' : '' }}">Health Record</a></li>
-                            <li><a href="{{ url('/student/barcode-register') }}" class="{{ Request::is('student/barcode-register') ? 'active' : '' }}">Scan / Bio</a></li>
+                            <li>
+                                <a href="{{ url('/student/account?view=profile') }}" class="{{ Request::is('student/account') && request('view', 'profile') === 'profile' ? 'active' : '' }}">
+                                    <span class="nav-dropdown-link-content">
+                                        <x-outline-icon name="user-circle" class="nav-dropdown-link-icon" />
+                                        <span>Profile</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('/student/account?view=notifications') }}" class="{{ Request::is('student/account') && request('view') === 'notifications' ? 'active' : '' }}">
+                                    <span class="nav-dropdown-link-content">
+                                        <x-outline-icon name="bell" class="nav-dropdown-link-icon" />
+                                        <span>Notifications</span>
+                                    </span>
+                                    @if($notificationCount > 0)
+                                        <span class="nav-dropdown-link-accessory">({{ $notificationCount }})</span>
+                                    @endif
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('/student/history') }}" class="{{ Request::is('student/history') ? 'active' : '' }}">
+                                    <span class="nav-dropdown-link-content">
+                                        <x-outline-icon name="clock" class="nav-dropdown-link-icon" />
+                                        <span>Appointment History</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('/student/account?view=health-record') }}" class="{{ Request::is('student/account') && request('view') === 'health-record' ? 'active' : '' }}">
+                                    <span class="nav-dropdown-link-content">
+                                        <x-outline-icon name="document-text" class="nav-dropdown-link-icon" />
+                                        <span>Health Record</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('/student/barcode-register') }}" class="{{ Request::is('student/barcode-register') ? 'active' : '' }}">
+                                    <span class="nav-dropdown-link-content">
+                                        <x-outline-icon name="qr-code" class="nav-dropdown-link-icon" />
+                                        <span>Scan / Bio</span>
+                                    </span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li>
                         <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="12" cy="12" r="4"></circle>
-                                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-                            </svg>
+                            <x-outline-icon name="sun" />
                         </button>
                     </li>
                     <li>
                         <a href="#" class="logout-btn" 
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            Logout
+                            <x-outline-icon name="arrow-left-on-rectangle" />
+                            <span>Logout</span>
                         </a>
 
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -1125,10 +1236,7 @@
                 aria-label="Notifications"
                 title="Notifications"
             >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
-                    <path d="M10 17a2 2 0 0 0 4 0"></path>
-                </svg>
+                <x-outline-icon name="bell" />
                 <span class="notif-badge">{{ $notificationCount }}</span>
             </a>
         </div>
@@ -1253,8 +1361,8 @@
 
                 if (themeToggleBtn) {
                     const isDark = normalizedTheme === 'dark';
-                    const moonIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"></path></svg>';
-                    const sunIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>';
+                    const moonIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"></path></svg>';
+                    const sunIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"></path></svg>';
                     themeToggleBtn.innerHTML = isDark ? moonIcon : sunIcon;
                     themeToggleBtn.setAttribute('aria-label', isDark ? 'Dark mode enabled' : 'Light mode enabled');
                     themeToggleBtn.setAttribute('title', isDark ? 'Dark mode' : 'Light mode');

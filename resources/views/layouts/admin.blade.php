@@ -144,28 +144,19 @@
         }
 
         .medicine-alert-fab svg {
-            width: 30px; /* Slightly larger to account for the border thickness */
-            height: 30px;
+            width: 28px;
+            height: 28px;
             display: block;
-        }
-
-        .medicine-alert-fab[data-surface-tone="dark"] svg path:first-child {
-            fill: #5f0012 !important;
-        }
-
-        .medicine-alert-fab[data-surface-tone="dark"] svg path:last-child {
-            fill: #7f1d2d !important;
-            stroke: #ffffff !important;
-        }
-
-        /* Ensure the path inside handles its own colors from the HTML attributes */
-        .medicine-alert-fab svg path {
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
             transition: transform 0.2s ease;
         }
 
-        /* Optional: Slight pulse effect to the warning triangle when hovering */
         .medicine-alert-fab:hover svg {
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
 
         .medicine-alert-badge {
@@ -377,6 +368,59 @@
             --radius-xl: 22px;
             --radius-lg: 16px;
             --radius-md: 12px;
+            --sidebar-collapsed-width: 86px;
+            --sidebar-expanded-width: 272px;
+            --admin-shell-bg: linear-gradient(180deg, rgba(112, 19, 35, 0.24) 0%, rgba(62, 7, 18, 0.34) 100%);
+            --admin-shell-border: rgba(255, 255, 255, 0.14);
+            --admin-card-bg: linear-gradient(165deg, rgba(111, 19, 35, 0.96) 0%, rgba(74, 11, 23, 0.98) 100%);
+            --admin-card-border: rgba(255, 255, 255, 0.12);
+            --admin-card-shadow: 0 16px 34px rgba(10, 2, 5, 0.28);
+            --admin-card-text: #fff4f7;
+            --admin-heading: #fff9fb;
+            --admin-link: #ffd7df;
+            --admin-link-hover: #fff0f4;
+            --admin-table-head-border: rgba(255, 255, 255, 0.14);
+            --admin-table-head-text: #ffd3dc;
+            --admin-table-head-bg: rgba(255, 255, 255, 0.08);
+            --admin-table-body-border: rgba(255, 255, 255, 0.1);
+            --admin-table-body-text: #fff1f4;
+            --admin-input-border: rgba(255, 255, 255, 0.16);
+            --admin-input-bg: rgba(255, 255, 255, 0.08);
+            --admin-input-text: #fff7fa;
+            --admin-input-placeholder: rgba(255, 241, 244, 0.64);
+            --admin-input-focus-shadow: 0 0 0 3px rgba(255, 184, 28, 0.18);
+            --admin-primary-btn-bg: #8b0000;
+            --admin-primary-btn-border: #8b0000;
+            --admin-primary-btn-hover: #6f0015;
+            --admin-secondary-btn-bg: rgba(255, 255, 255, 0.12);
+            --admin-secondary-btn-text: #fff3f6;
+            --admin-secondary-btn-border: rgba(255, 255, 255, 0.18);
+            --admin-secondary-btn-hover: rgba(255, 255, 255, 0.18);
+            --admin-danger-btn-bg: rgba(255, 216, 223, 0.12);
+            --admin-danger-btn-text: #ffdbe3;
+            --admin-danger-btn-border: rgba(255, 216, 223, 0.24);
+            --admin-status-completed-bg: rgba(255, 255, 255, 0.12);
+            --admin-status-completed-text: #fff8fb;
+            --admin-sidebar-bg:
+                linear-gradient(180deg, rgba(140, 72, 89, 0.18) 0%, rgba(98, 33, 47, 0.24) 100%),
+                linear-gradient(180deg, #281217 0%, #160a0e 100%);
+            --admin-sidebar-border: rgba(255, 255, 255, 0.08);
+            --admin-sidebar-divider: rgba(255, 255, 255, 0.16);
+            --admin-sidebar-title: #ffffff;
+            --admin-sidebar-muted: rgba(255, 255, 255, 0.68);
+            --admin-sidebar-text: rgba(255, 255, 255, 0.9);
+            --admin-sidebar-hover-bg: rgba(255, 255, 255, 0.1);
+            --admin-sidebar-hover-border: rgba(255, 255, 255, 0.2);
+            --admin-sidebar-active-bg: rgba(255, 255, 255, 0.14);
+            --admin-sidebar-active-border: rgba(255, 255, 255, 0.26);
+            --admin-sidebar-short-bg: rgba(255, 255, 255, 0.08);
+            --admin-sidebar-short-border: rgba(255, 255, 255, 0.2);
+            --admin-sidebar-logout-bg: rgba(0, 0, 0, 0.18);
+            --admin-sidebar-logout-border: rgba(255, 255, 255, 0.2);
+            --admin-sidebar-indicator-bg: rgba(255, 255, 255, 0.08);
+            --admin-sidebar-indicator-border: rgba(255, 255, 255, 0.14);
+            --admin-brand-logo-bg: rgba(255, 255, 255, 0.96);
+            --admin-brand-logo-border: rgba(255, 255, 255, 0.18);
         }
 
         * { box-sizing: border-box; }
@@ -423,15 +467,27 @@
             gap: 12px;
         }
 
-        .header-brand-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #ffffff;
-            border: 2px solid rgba(255, 255, 255, 0.32);
-            padding: 2px;
+        .header-brand-lockup {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             flex-shrink: 0;
+        }
+
+        .header-brand-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: var(--admin-brand-logo-bg);
+            border: 1px solid var(--admin-brand-logo-border);
+            padding: 5px;
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.16);
+            flex-shrink: 0;
+        }
+
+        .header-brand-avatar--clinic {
+            padding: 4px;
         }
 
         .header-copy {
@@ -483,9 +539,17 @@
             border: 1px solid var(--stroke);
             background: var(--surface);
             color: var(--text);
-            font-size: 20px;
-            line-height: 1;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .sidebar-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 1.8;
+            flex: 0 0 auto;
         }
 
         .profile-wrap {
@@ -545,49 +609,63 @@
             letter-spacing: 0.04em;
         }
 
+        .admin-user-chevron {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            opacity: 0.72;
+            stroke-width: 1.8;
+        }
+
         .profile-dropdown {
             display: none;
             position: absolute;
             top: 54px;
             right: 0;
-            background: #f4dde4;
+            background: linear-gradient(180deg, #4f1520 0%, #391019 100%);
             width: 190px;
             box-shadow: var(--shadow-soft);
             border-radius: 12px;
-            border: 1px solid #cb97a3;
+            border: 1px solid rgba(255, 255, 255, 0.12);
             overflow: hidden;
             z-index: 1000;
         }
 
         .profile-dropdown a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             padding: 12px 16px;
-            color: #4b0f19;
+            color: #fff2f6;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
             transition: background 0.2s ease, color 0.2s ease;
-            border-bottom: 1px solid #e4bdc7;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .profile-dropdown a svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            stroke-width: 1.8;
         }
 
         .profile-dropdown a:hover {
-            background: #edd0d8;
-            color: #5c0e1a;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
         }
 
         .profile-dropdown a.logout-link {
-            color: var(--danger);
+            color: #ffd7df;
             border-bottom: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            justify-content: flex-start;
             line-height: 1.2;
             padding: 12px 14px;
         }
 
         .profile-dropdown a.logout-link:hover {
-            background: #f4cfd8;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .admin-layout {
@@ -600,11 +678,9 @@
         }
 
         .sidebar {
-            width: 86px;
-            background:
-                linear-gradient(180deg, rgba(140, 72, 89, 0.16) 0%, rgba(98, 33, 47, 0.22) 100%),
-                linear-gradient(180deg, #281217 0%, #160a0e 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: var(--sidebar-collapsed-width);
+            background: var(--admin-sidebar-bg);
+            border: 1px solid var(--admin-sidebar-border);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-soft);
             padding: 20px 14px;
@@ -613,11 +689,17 @@
             flex-shrink: 0;
             overflow-y: auto;
             overflow-x: hidden;
-            transition: width 0.28s ease;
+            transition:
+                width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                background 0.28s ease,
+                border-color 0.28s ease,
+                box-shadow 0.28s ease;
+            will-change: width;
         }
 
-        .sidebar:hover {
-            width: 258px;
+        .sidebar:hover,
+        .sidebar:focus-within {
+            width: var(--sidebar-expanded-width);
         }
 
         .sidebar-logo {
@@ -626,18 +708,30 @@
             gap: 12px;
             margin-bottom: 20px;
             padding-bottom: 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+            border-bottom: 1px solid var(--admin-sidebar-divider);
             min-width: 210px;
         }
 
-        .sidebar-logo img {
+        .sidebar-logo-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo-badge {
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            object-fit: cover;
-            padding: 2px;
+            background: var(--admin-brand-logo-bg);
+            border: 1px solid var(--admin-brand-logo-border);
+            object-fit: contain;
+            padding: 4px;
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.14);
+        }
+
+        .sidebar-logo-badge--clinic {
+            padding: 3px;
         }
 
         .sidebar-logo-title {
@@ -646,13 +740,13 @@
             font-size: 14px;
             letter-spacing: 0.02em;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--admin-sidebar-title);
             line-height: 1.2;
         }
 
         .sidebar-logo-sub {
             margin: 3px 0 0;
-            color: rgba(255, 255, 255, 0.68);
+            color: var(--admin-sidebar-muted);
             font-size: 10px;
             font-weight: 600;
             letter-spacing: 0.08em;
@@ -662,11 +756,17 @@
         .sidebar-logo-text {
             opacity: 0;
             transform: translateX(-8px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            max-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition:
+                max-width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.2s ease,
+                transform 0.24s ease;
         }
 
         .sidebar h4 {
-            color: rgba(255, 255, 255, 0.62);
+            color: var(--admin-sidebar-muted);
             margin: 0 0 12px;
             font-size: 10px;
             letter-spacing: 0.16em;
@@ -675,7 +775,12 @@
             white-space: nowrap;
             opacity: 0;
             transform: translateX(-8px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            max-width: 0;
+            overflow: hidden;
+            transition:
+                max-width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.2s ease,
+                transform 0.24s ease;
         }
 
         .sidebar-nav a {
@@ -685,27 +790,31 @@
             padding: 10px 12px;
             border-radius: var(--radius-md);
             border: 1px solid transparent;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--admin-sidebar-text);
             text-decoration: none;
             margin-bottom: 8px;
             font-size: 13px;
             font-weight: 700;
             letter-spacing: 0.01em;
-            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.22s ease;
             min-width: 210px;
             white-space: nowrap;
         }
 
         .sidebar-nav a:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: var(--admin-sidebar-hover-bg);
+            border-color: var(--admin-sidebar-hover-border);
             transform: translateX(1px);
         }
 
         .sidebar-nav a.active {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.26);
-            color: #ffffff;
+            background: var(--admin-sidebar-active-bg);
+            border-color: var(--admin-sidebar-active-border);
+            color: var(--admin-sidebar-title);
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
         }
 
@@ -713,17 +822,22 @@
             width: 34px;
             height: 34px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--admin-sidebar-short-border);
+            background: var(--admin-sidebar-short-bg);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            font-weight: 800;
             flex-shrink: 0;
-            letter-spacing: 0.1em;
-            color: #ffffff;
-            font-family: "Outfit", "Manrope", sans-serif;
+            color: var(--admin-sidebar-title);
+            font-size: 0;
+            line-height: 0;
+        }
+
+        .sidebar-short svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.8;
+            flex: 0 0 auto;
         }
 
         .sidebar-nav a.active .sidebar-short {
@@ -735,12 +849,27 @@
         .sidebar-label {
             opacity: 0;
             transform: translateX(-8px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            max-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition:
+                max-width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.2s ease,
+                transform 0.24s ease;
         }
 
         .sidebar:hover .sidebar-logo-text,
+        .sidebar:focus-within .sidebar-logo-text,
         .sidebar:hover h4,
+        .sidebar:focus-within h4,
         .sidebar:hover .sidebar-label {
+            max-width: 180px;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .sidebar:focus-within .sidebar-label {
+            max-width: 180px;
             opacity: 1;
             transform: translateX(0);
         }
@@ -748,7 +877,7 @@
         .sidebar-logout {
             margin-top: auto;
             padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.16);
+            border-top: 1px solid var(--admin-sidebar-divider);
         }
 
         .sidebar-logout a {
@@ -757,19 +886,19 @@
             gap: 12px;
             padding: 10px 12px;
             border-radius: var(--radius-md);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--admin-sidebar-logout-border);
             text-decoration: none;
             min-width: 210px;
             transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
             margin-bottom: 0;
-            color: rgba(255, 255, 255, 0.95);
-            background: rgba(0, 0, 0, 0.18);
+            color: var(--admin-sidebar-text);
+            background: var(--admin-sidebar-logout-bg);
             line-height: 1.2;
         }
 
         .sidebar-logout a:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: var(--admin-sidebar-hover-bg);
+            border-color: var(--admin-sidebar-hover-border);
             transform: translateX(1px);
         }
 
@@ -787,9 +916,9 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             padding: 14px;
-            color: #3c0f18;
-            background: linear-gradient(180deg, rgba(140, 72, 89, 0.22) 0%, rgba(98, 33, 47, 0.26) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: var(--admin-card-text);
+            background: var(--admin-shell-bg);
+            border: 1px solid var(--admin-shell-border);
             border-radius: var(--radius-xl);
         }
 
@@ -878,9 +1007,9 @@
             width: 34px;
             height: 34px;
             border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--admin-sidebar-indicator-border);
+            background: var(--admin-sidebar-indicator-bg);
+            color: var(--admin-sidebar-title);
             box-shadow: 0 10px 18px rgba(15, 23, 42, 0.16);
             backdrop-filter: blur(8px);
             display: none;
@@ -895,7 +1024,7 @@
             display: inline-flex;
         }
 
-        .sidebar:not(:hover) .sidebar-scroll-indicator.is-visible {
+        .sidebar:not(:hover):not(:focus-within) .sidebar-scroll-indicator.is-visible {
             display: none;
         }
 
@@ -974,10 +1103,11 @@
                 width: min(86vw, 300px);
                 z-index: 60;
                 transform: translateX(-115%);
-                transition: transform 0.22s ease;
+                transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
             }
 
-            .sidebar:hover {
+            .sidebar:hover,
+            .sidebar:focus-within {
                 width: min(86vw, 300px);
             }
 
@@ -1021,6 +1151,7 @@
             .sidebar .sidebar-logo-text,
             .sidebar h4,
             .sidebar .sidebar-label {
+                max-width: 180px;
                 opacity: 1;
                 transform: translateX(0);
             }
@@ -1063,24 +1194,24 @@
     <style>
         /* Global Admin Theme Overrides */
         .main :where(.card, .panel, .stat-card-mini, .modal-box) {
-            background: linear-gradient(165deg, #f2dee4 0%, #eacbd3 100%) !important;
-            border: 1px solid #cc97a3 !important;
+            background: var(--admin-card-bg) !important;
+            border: 1px solid var(--admin-card-border) !important;
             border-radius: 14px !important;
-            box-shadow: 0 10px 24px rgba(47, 8, 16, 0.16) !important;
-            color: #3b0f18 !important;
+            box-shadow: var(--admin-card-shadow) !important;
+            color: var(--admin-card-text) !important;
         }
 
         .main :where(h1, h2, h3, h4, h5) {
-            color: #4b0f17;
+            color: var(--admin-heading);
             letter-spacing: -0.01em;
         }
 
         .main :where(a):not(.report-card) {
-            color: #70131B;
+            color: var(--admin-link);
         }
 
         .main :where(a:hover):not(.report-card) {
-            color: #5a0f16;
+            color: var(--admin-link-hover);
         }
 
         /* Keep Reports cards high-contrast even on hover */
@@ -1110,61 +1241,65 @@
         }
 
         .main :where(table th) {
-            border-bottom-color: #ca97a2 !important;
-            color: #61202d !important;
+            border-bottom-color: var(--admin-table-head-border) !important;
+            color: var(--admin-table-head-text) !important;
             letter-spacing: 0.06em;
-            background: rgba(255, 255, 255, 0.24) !important;
+            background: var(--admin-table-head-bg) !important;
         }
 
         .main :where(table td) {
-            border-bottom-color: #d7b0b9 !important;
-            color: #43111a !important;
+            border-bottom-color: var(--admin-table-body-border) !important;
+            color: var(--admin-table-body-text) !important;
         }
 
         .main :where(.form-control, .form-input, .input-month, input, select, textarea) {
-            border-color: #c88f9b !important;
+            border-color: var(--admin-input-border) !important;
             border-radius: 10px !important;
-            background: #fff6f8 !important;
-            color: #41111b !important;
+            background: var(--admin-input-bg) !important;
+            color: var(--admin-input-text) !important;
+        }
+
+        .main :where(.form-control, .form-input, .input-month, input, select, textarea)::placeholder {
+            color: var(--admin-input-placeholder) !important;
         }
 
         .main :where(.form-control, .form-input, .input-month, input, select, textarea):focus {
             outline: none;
-            border-color: #70131B !important;
-            box-shadow: 0 0 0 3px rgba(112, 19, 27, 0.15);
+            border-color: var(--admin-primary-btn-border) !important;
+            box-shadow: var(--admin-input-focus-shadow);
         }
 
         .main :where(.btn-save, .btn-add, .btn-add-walkin, .btn-filter, .btn-change, .btn-generate, .btn-primary, .btn-complete) {
-            background: #720f1e !important;
+            background: var(--admin-primary-btn-bg) !important;
             color: #ffffff !important;
-            border: 1px solid #720f1e !important;
+            border: 1px solid var(--admin-primary-btn-border) !important;
         }
 
         .main :where(.btn-save:hover, .btn-add:hover, .btn-add-walkin:hover, .btn-filter:hover, .btn-change:hover, .btn-generate:hover, .btn-primary:hover, .btn-complete:hover) {
-            background: #590b17 !important;
-            border-color: #590b17 !important;
+            background: var(--admin-primary-btn-hover) !important;
+            border-color: var(--admin-primary-btn-hover) !important;
             color: #ffffff !important;
         }
 
         .main :where(.btn-edit, .btn-view, .btn-outline) {
-            background: #f7e2e8 !important;
-            color: #65101d !important;
-            border: 1px solid #d6a2ad !important;
+            background: var(--admin-secondary-btn-bg) !important;
+            color: var(--admin-secondary-btn-text) !important;
+            border: 1px solid var(--admin-secondary-btn-border) !important;
         }
 
         .main :where(.btn-edit:hover, .btn-view:hover, .btn-outline:hover) {
-            background: #efd0d8 !important;
+            background: var(--admin-secondary-btn-hover) !important;
         }
 
         .main :where(.btn-delete, .btn-cancel) {
-            background: #f6d9e2 !important;
-            color: #b42339 !important;
-            border: 1px solid #e6a8b7 !important;
+            background: var(--admin-danger-btn-bg) !important;
+            color: var(--admin-danger-btn-text) !important;
+            border: 1px solid var(--admin-danger-btn-border) !important;
         }
 
         .main :where(.status.completed) {
-            background: #f3d2dc !important;
-            color: #781826 !important;
+            background: var(--admin-status-completed-bg) !important;
+            color: var(--admin-status-completed-text) !important;
         }
 
         .main :where(.switch-row input) {
@@ -1190,11 +1325,23 @@
             font-weight: 800;
             cursor: pointer;
             letter-spacing: 0.03em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
         }
 
         .assistant-launch:hover {
             background: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.42);
+            transform: translateY(-1px);
+        }
+
+        .assistant-launch svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            stroke-width: 1.8;
         }
 
         .theme-toggle-admin {
@@ -1271,23 +1418,54 @@
             display: block;
         }
 
+        html[data-theme="light"] {
+            --admin-shell-bg: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+            --admin-shell-border: rgba(128, 0, 0, 0.12);
+            --admin-card-bg: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
+            --admin-card-border: rgba(128, 0, 0, 0.12);
+            --admin-card-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+            --admin-card-text: #1f2937;
+            --admin-heading: #111827;
+            --admin-link: #7f1d2d;
+            --admin-link-hover: #5a0f16;
+            --admin-table-head-border: rgba(128, 0, 0, 0.12);
+            --admin-table-head-text: #6b1321;
+            --admin-table-head-bg: rgba(128, 0, 0, 0.05);
+            --admin-table-body-border: #ece7ea;
+            --admin-table-body-text: #1f2937;
+            --admin-input-border: #d5dbe4;
+            --admin-input-bg: #ffffff;
+            --admin-input-text: #111827;
+            --admin-input-placeholder: #94a3b8;
+            --admin-input-focus-shadow: 0 0 0 3px rgba(128, 0, 0, 0.12);
+            --admin-secondary-btn-bg: #fff7f8;
+            --admin-secondary-btn-text: #65101d;
+            --admin-secondary-btn-border: rgba(128, 0, 0, 0.16);
+            --admin-secondary-btn-hover: #fdecee;
+            --admin-danger-btn-bg: #fff4f5;
+            --admin-danger-btn-text: #b42339;
+            --admin-danger-btn-border: rgba(180, 35, 57, 0.18);
+            --admin-status-completed-bg: rgba(128, 0, 0, 0.08);
+            --admin-status-completed-text: #781826;
+        }
+
         html[data-theme="light"] body {
             background:
-                radial-gradient(circle at -10% -10%, rgba(128, 0, 0, 0.06) 0%, transparent 42%),
-                radial-gradient(circle at 110% 120%, rgba(128, 0, 0, 0.08) 0%, transparent 36%),
-                linear-gradient(180deg, #faf2f5 0%, #f4e6eb 80%);
-            color: #3f111b;
+                radial-gradient(circle at -10% -10%, rgba(128, 0, 0, 0.04) 0%, transparent 42%),
+                radial-gradient(circle at 110% 120%, rgba(128, 0, 0, 0.05) 0%, transparent 36%),
+                linear-gradient(180deg, #ffffff 0%, #f8fafc 86%);
+            color: #1f2937;
         }
 
         html[data-theme="light"] .admin-header {
-            background: linear-gradient(180deg, #ffffff 0%, #faf7f9 100%);
+            background: linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
             border-bottom-color: rgba(128, 0, 0, 0.12);
             box-shadow: inset 0 -12px 24px rgba(15, 23, 42, 0.06);
         }
 
         html[data-theme="light"] .header-kicker,
         html[data-theme="light"] .header-subtitle {
-            color: #111827;
+            color: #64748b;
         }
 
         html[data-theme="light"] .header-title {
@@ -1317,7 +1495,7 @@
 
         html[data-theme="light"] .admin-user {
             border-color: rgba(128, 0, 0, 0.24);
-            background: rgba(255, 255, 255, 0.78);
+            background: rgba(255, 255, 255, 0.96);
         }
 
         :where(
@@ -1372,16 +1550,16 @@
         }
 
         html[data-theme="light"] .admin-user-role {
-            color: #111827;
+            color: #64748b;
         }
 
         html[data-theme="light"] .sidebar {
-            background: linear-gradient(180deg, #f9edf1 0%, #efd8df 100%);
-            border-color: rgba(128, 0, 0, 0.18);
+            background: linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
+            border-color: rgba(128, 0, 0, 0.12);
         }
 
         html[data-theme="light"] .sidebar-logo {
-            border-bottom-color: rgba(128, 0, 0, 0.18);
+            border-bottom-color: rgba(128, 0, 0, 0.12);
         }
 
         html[data-theme="light"] .sidebar-logo-title {
@@ -1398,13 +1576,13 @@
         }
 
         html[data-theme="light"] .sidebar-nav a:hover {
-            background: rgba(128, 0, 0, 0.08);
-            border-color: rgba(128, 0, 0, 0.18);
+            background: rgba(128, 0, 0, 0.06);
+            border-color: rgba(128, 0, 0, 0.14);
         }
 
         html[data-theme="light"] .sidebar-nav a.active {
-            background: rgba(128, 0, 0, 0.13);
-            border-color: rgba(128, 0, 0, 0.26);
+            background: rgba(128, 0, 0, 0.1);
+            border-color: rgba(128, 0, 0, 0.22);
             color: #4a0f1a;
         }
 
@@ -1415,18 +1593,18 @@
         }
 
         html[data-theme="light"] .sidebar-logout {
-            border-top-color: rgba(128, 0, 0, 0.18);
+            border-top-color: rgba(128, 0, 0, 0.12);
         }
 
         html[data-theme="light"] .sidebar-logout a {
-            background: rgba(128, 0, 0, 0.08);
-            border-color: rgba(128, 0, 0, 0.2);
+            background: #fff7f8;
+            border-color: rgba(128, 0, 0, 0.14);
             color: #561320;
         }
 
         html[data-theme="light"] .sidebar-logout a:hover {
-            background: rgba(128, 0, 0, 0.14);
-            border-color: rgba(128, 0, 0, 0.28);
+            background: #fdecee;
+            border-color: rgba(128, 0, 0, 0.2);
         }
 
         html[data-theme="light"] .sidebar-scroll-indicator {
@@ -1442,9 +1620,9 @@
         }
 
         html[data-theme="light"] .main {
-            color: #3c0f18;
-            background: linear-gradient(180deg, rgba(242, 220, 227, 0.96) 0%, rgba(234, 208, 217, 0.96) 100%);
-            border-color: rgba(128, 0, 0, 0.16);
+            color: #1f2937;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+            border-color: rgba(128, 0, 0, 0.12);
         }
 
         html[data-theme="light"] .main,
@@ -1479,17 +1657,17 @@
         }
 
         html[data-theme="light"] .profile-dropdown {
-            background: #fff4f7;
-            border-color: #d5a4af;
+            background: #ffffff;
+            border-color: #e4d8dc;
         }
 
         html[data-theme="light"] .profile-dropdown a {
             color: #5b1623;
-            border-bottom-color: #e7c2ca;
+            border-bottom-color: #f0e5e8;
         }
 
         html[data-theme="light"] .profile-dropdown a:hover {
-            background: #f8e4ea;
+            background: #f8f5f6;
             color: #56111d;
         }
 
@@ -1497,15 +1675,63 @@
             color: #a2263f;
         }
 
+        html[data-theme="light"] .assistant-panel {
+            background: #ffffff;
+            border-color: #e4d8dc;
+            box-shadow: 0 20px 40px rgba(112, 19, 27, 0.12);
+        }
+
+        html[data-theme="light"] .assistant-messages {
+            background: #f8f5f6;
+        }
+
+        html[data-theme="light"] .assistant-bubble {
+            border-color: #efe1e5;
+        }
+
+        html[data-theme="light"] .assistant-bubble.user {
+            background: #efd2d9;
+            border-color: #d49faa;
+            color: #5b0e1a;
+        }
+
+        html[data-theme="light"] .assistant-bubble.assistant {
+            background: #f3dde4;
+            border-color: #dbb1bb;
+            color: #3e0f18;
+        }
+
+        html[data-theme="light"] .assistant-controls {
+            border-top-color: #e8dde1;
+            background: #ffffff;
+        }
+
+        html[data-theme="light"] .assistant-input {
+            border-color: #d5dbe4;
+            color: #40111b;
+            background: #ffffff;
+        }
+
+        html[data-theme="light"] .assistant-input:focus {
+            border-color: #70131B;
+            box-shadow: 0 0 0 3px rgba(112, 19, 27, 0.14);
+        }
+
+        html[data-theme="light"] .assistant-note {
+            color: #5d2833;
+            border-top-color: #e8dde1;
+            background: #f8f5f6;
+        }
+
         .assistant-panel {
             position: fixed;
             right: 20px;
             bottom: 18px;
             width: min(420px, calc(100vw - 24px));
-            background: #f2dde3;
-            border: 1px solid #bf8592;
+            background: linear-gradient(180deg, #4f1520 0%, #391019 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(112, 19, 27, 0.14);
+            box-shadow: 0 20px 40px rgba(12, 2, 6, 0.32);
             z-index: 1200;
             display: none;
             overflow: hidden;
@@ -1553,7 +1779,7 @@
             max-height: 300px;
             overflow-y: auto;
             padding: 12px;
-            background: #f8eaee;
+            background: rgba(255, 255, 255, 0.04);
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -1564,31 +1790,31 @@
             border-radius: 11px;
             font-size: 13px;
             line-height: 1.4;
-            border: 1px solid #efe1e5;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             max-width: 92%;
             white-space: pre-wrap;
         }
 
         .assistant-bubble.user {
             margin-left: auto;
-            background: #efd2d9;
-            border-color: #d49faa;
-            color: #5b0e1a;
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
         }
 
         .assistant-bubble.assistant {
-            background: #f3dde4;
-            border-color: #dbb1bb;
-            color: #3e0f18;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #fff4f7;
         }
 
         .assistant-controls {
-            border-top: 1px solid #c7909e;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             padding: 10px;
             display: flex;
             gap: 8px;
             align-items: center;
-            background: #f2dce3;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .assistant-mic,
@@ -1617,27 +1843,27 @@
 
         .assistant-input {
             flex: 1;
-            border: 1px solid #c18895;
+            border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: 10px;
             padding: 9px 10px;
             font-size: 13px;
-            color: #40111b;
-            background: #fff6f8;
+            color: #fff7fa;
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .assistant-input:focus {
             outline: none;
-            border-color: #70131B;
-            box-shadow: 0 0 0 3px rgba(112, 19, 27, 0.14);
+            border-color: var(--pup-gold);
+            box-shadow: 0 0 0 3px rgba(255, 184, 28, 0.16);
         }
 
         .assistant-note {
             margin: 0;
             padding: 8px 11px 11px;
             font-size: 11px;
-            color: #5d2833;
-            border-top: 1px solid #d9b0bb;
-            background: #ebd2d9;
+            color: #f0c5cf;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         @media (max-width: 860px) {
@@ -1767,6 +1993,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $welcomeName = in_array($displayName, ['Admin Account', 'Super Admin Account'], true) ? 'Nurse Joyce' : $displayName;
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
     $brandLogo = asset('images/clinic_logo.png');
+    $brandUniversityLogo = asset('images/pup_logo.png');
     $roleLabelMap = [
         'superadmin' => 'Super Admin',
         'admin' => 'Admin',
@@ -1789,7 +2016,10 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
 <header class="admin-header">
     <div class="header-left">
-        <img src="{{ $brandLogo }}" alt="Clinic Logo" class="header-brand-avatar">
+        <div class="header-brand-lockup">
+            <img src="{{ $brandUniversityLogo }}" alt="PUP Logo" class="header-brand-avatar">
+            <img src="{{ $brandLogo }}" alt="Clinic Logo" class="header-brand-avatar header-brand-avatar--clinic">
+        </div>
         <div class="header-copy">
             <p class="header-kicker">{{ $adminTypeLabel ? 'Clinic Administration' : ($isStudentAssistant ? 'Clinic Assistant Console' : 'Clinic Administration') }}</p>
             <h1 class="header-title">Welcome back, <span>{{ $welcomeName }}</span></h1>
@@ -1798,14 +2028,16 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     </div>
 
     <div class="header-right">
-        <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">&#9776;</button>
-        <button type="button" class="theme-toggle-admin" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="4"></circle>
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-            </svg>
+        <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+            <x-outline-icon name="bars-3" />
         </button>
-        <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">AI Assistant</button>
+        <button type="button" class="theme-toggle-admin" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
+            <x-outline-icon name="sun" />
+        </button>
+        <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">
+            <x-outline-icon name="sparkles" />
+            <span>AI Assistant</span>
+        </button>
 
         <div class="profile-wrap">
             <button type="button" class="admin-user" onclick="toggleProfileMenu()">
@@ -1814,13 +2046,20 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                     <div class="admin-user-role">{{ $displayRole }}</div>
                 </div>
                 <div class="user-avatar">{{ $avatarInitial }}</div>
+                <x-outline-icon name="chevron-down" class="admin-user-chevron" />
             </button>
 
             <div id="profileDropdown" class="profile-dropdown">
                 @if($isAdminLike)
-                    <a href="{{ $settingsUrl }}">Settings</a>
+                    <a href="{{ $settingsUrl }}">
+                        <x-outline-icon name="cog-6-tooth" />
+                        <span>Settings</span>
+                    </a>
                 @endif
-                <a href="#" class="logout-link" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">Logout</a>
+                <a href="#" class="logout-link" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">
+                    <x-outline-icon name="arrow-left-on-rectangle" />
+                    <span>Logout</span>
+                </a>
             </div>
         </div>
     </div>
@@ -1830,7 +2069,10 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
   
   <aside class="sidebar" id="adminSidebar">
     <div class="sidebar-logo">
-      <img src="{{ $brandLogo }}" alt="Clinic Logo">
+      <div class="sidebar-logo-badges">
+        <img src="{{ $brandUniversityLogo }}" alt="PUP Logo" class="sidebar-logo-badge">
+        <img src="{{ $brandLogo }}" alt="Clinic Logo" class="sidebar-logo-badge sidebar-logo-badge--clinic">
+      </div>
       <div class="sidebar-logo-text">
         <div class="sidebar-logo-title">PUP TAGUIG</div>
         <div class="sidebar-logo-sub">{{ $adminTypeLabel ? 'Clinic Admin' : ($isStudentAssistant ? 'Clinic Assistant' : 'Clinic Admin') }}</div>
@@ -1840,51 +2082,49 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     <h4>Main Menu</h4>
     <nav class="sidebar-nav">
       <a href="{{ $dashboardUrl }}" class="{{ (Request::is('admin/dashboard') || Request::is('assistant/dashboard')) ? 'active' : '' }}">
-        <span class="sidebar-short">DB</span><span class="sidebar-label">Dashboard</span>
+        <span class="sidebar-short"><x-outline-icon name="squares-2x2" /></span><span class="sidebar-label">Dashboard</span>
       </a>
       <a href="{{ $appointmentsUrl }}" class="{{ (Request::is('admin/appointments*') || Request::is('assistant/appointments*')) ? 'active' : '' }}">
-        <span class="sidebar-short">AP</span><span class="sidebar-label">Appointments</span>
+        <span class="sidebar-short"><x-outline-icon name="calendar-days" /></span><span class="sidebar-label">Appointments</span>
       </a>
       <a href="{{ $inventoryUrl }}" class="{{ (Request::is('admin/inventory*') || Request::is('assistant/inventory*')) ? 'active' : '' }}">
-        <span class="sidebar-short">IN</span><span class="sidebar-label">Inventory</span>
+        <span class="sidebar-short"><x-outline-icon name="cube" /></span><span class="sidebar-label">Inventory</span>
       </a>
       <a href="{{ $reportsUrl }}" class="{{ (Request::is('admin/reports*') || Request::is('assistant/reports*')) ? 'active' : '' }}">
-        <span class="sidebar-short">RP</span><span class="sidebar-label">Reports</span>
+        <span class="sidebar-short"><x-outline-icon name="chart-bar" /></span><span class="sidebar-label">Reports</span>
       </a>
      
       <a href="{{ $walkinUrl }}" class="{{ (Request::is('admin/walkin*') || Request::is('assistant/walkin*')) ? 'active' : '' }}">
-        <span class="sidebar-short">WK</span><span class="sidebar-label">Walk-in</span>
+        <span class="sidebar-short"><x-outline-icon name="user-plus" /></span><span class="sidebar-label">Walk-in</span>
       </a>
       <a href="{{ route('admin.health_records') }}" class="{{ Request::is('admin/health-records*') ? 'active' : '' }}">
-    <span class="sidebar-short">HR</span>
+    <span class="sidebar-short"><x-outline-icon name="document-text" /></span>
     <span class="sidebar-label">Student Health Form</span>
     </a>
       @if($isAdminLike)
           <a href="{{ $userManagementUrl }}" class="{{ Request::is('admin/user-management*') ? 'active' : '' }}">
-            <span class="sidebar-short">UM</span><span class="sidebar-label">Users Management</span>
+            <span class="sidebar-short"><x-outline-icon name="users" /></span><span class="sidebar-label">Users Management</span>
           </a>
           <a href="{{ route('admin.logs') }}" class="{{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
-            <span class="sidebar-short">LG</span><span class="sidebar-label">Audit Trail</span>
+            <span class="sidebar-short"><x-outline-icon name="clipboard-document-list" /></span><span class="sidebar-label">Audit Trail</span>
           </a>
           <a href="{{ $settingsUrl }}" class="{{ Request::is('admin/settings*') ? 'active' : '' }}">
-            <span class="sidebar-short">ST</span><span class="sidebar-label">Settings</span>
+            <span class="sidebar-short"><x-outline-icon name="cog-6-tooth" /></span><span class="sidebar-label">Settings</span>
           </a>
       @endif
       <a href="{{ $apiTestingUrl }}" class="{{ (Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
-        <span class="sidebar-short">FT</span><span class="sidebar-label">For API Testing</span>
+        <span class="sidebar-short"><x-outline-icon name="code-bracket-square" /></span><span class="sidebar-label">For API Testing</span>
       </a>
 
     </nav>
 
     <button type="button" class="sidebar-scroll-indicator" id="sidebarScrollIndicator" aria-label="Scroll navigation">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M6 9l6 6 6-6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
-      </svg>
+      <x-outline-icon name="chevron-down" />
     </button>
 
     <div class="sidebar-logout">
       <a href="#" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">
-        <span class="sidebar-short">LO</span><span class="sidebar-label">Logout</span>
+        <span class="sidebar-short"><x-outline-icon name="arrow-left-on-rectangle" /></span><span class="sidebar-label">Logout</span>
       </a>
     </div>
   </aside>
@@ -1902,15 +2142,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
 @if($medicineAlertCount > 0)
     <button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts">
-        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-            <path d="M416.7 51.5c-44.1-44.1-115.7-44.1-159.8 0L193.3 115l159.8 159.8 63.6-63.6c44.1-44.1 44.1-115.6 0-159.7zM159.4 148.9L44.5 263.8c-44.1 44.1-44.1 115.7 0 159.8s115.7 44.1 159.8 0l114.9-114.9-159.8-159.8z" fill="#ffffff" stroke="none"/>
-            
-            <path d="M495.4 416.6l-114.3-206c-13.4-24.1-48.4-24.1-61.7 0L205 416.6c-13.1 23.5 3.9 52.3 30.9 52.3h228.6c27 0 44-28.8 30.9-52.3zM350.2 432.1c-10.1 0-18.2-8.1-18.2-18.2s8.1-18.2 18.2-18.2 18.2 8.1 18.2 18.2-8.1 18.2-18.2 18.2zm18.2-64.1c0 10.1-8.1 18.2-18.2 18.2s-18.2-8.1-18.2-18.2V288.5c0-10.1 8.1-18.2 18.2-18.2s18.2 8.1 18.2 18.2v79.5z" 
-                  fill="#ffffff" 
-                  stroke="#000000" 
-                  stroke-width="20" 
-                  stroke-linejoin="round"/>
-        </svg>
+        <x-outline-icon name="exclamation-triangle" />
         <span class="medicine-alert-badge">{{ $medicineAlertCount }}</span>
     </button>
 
@@ -2038,8 +2270,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     function applyAdminTheme(theme) {
         const normalizedTheme = theme === 'light' ? 'light' : 'dark';
         const toggle = document.getElementById('adminThemeToggle');
-        const moonIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"></path></svg>';
-        const sunIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>';
+        const moonIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"></path></svg>';
+        const sunIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"></path></svg>';
 
         document.documentElement.setAttribute('data-theme', normalizedTheme);
 
@@ -2122,7 +2354,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const updateIndicator = () => {
             const canScroll = sidebar.scrollHeight - sidebar.clientHeight > 6;
             const hasMoreBelow = sidebar.scrollTop + sidebar.clientHeight < sidebar.scrollHeight - 6;
-            const isExpanded = window.innerWidth <= 860 || sidebar.matches(':hover') || document.body.classList.contains('sidebar-open');
+            const isExpanded = window.innerWidth <= 860 || sidebar.matches(':hover') || sidebar.matches(':focus-within') || document.body.classList.contains('sidebar-open');
             indicator.classList.toggle('is-visible', canScroll && hasMoreBelow && isExpanded);
         };
 

@@ -23,7 +23,8 @@
     .PUPBG-lead { color:#bfcfd6; margin:0 auto 28px; max-width:720px; font-size:18px; }
 
     .hero-actions { display:flex; gap:16px; justify-content:center; margin-top:18px; }
-    .btn { display:inline-block; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:700; cursor: pointer; border: none; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:700; cursor: pointer; border: none; }
+    .btn svg { width:18px; height:18px; flex:0 0 auto; stroke-width:1.8; }
     .btn-primary { background:#8B0000; color:#fff; border:2px solid rgba(0,0,0,0.08); box-shadow:0 6px 18px rgba(0,0,0,0.25); }
     .btn-secondary { background:#fff; color:#15222a; border:0; }
 
@@ -33,7 +34,8 @@
     .welcome-text { flex:1; }
     .welcome-text h2 { margin-top:0; font-size: 28px; color: #2d3748; }
     .welcome-text p { color:#666; line-height:1.6; }
-    .btn-outline { display:inline-block; padding:10px 14px; border-radius:8px; border:1px solid #8B0000; color:#8B0000; text-decoration:none; margin-top:14px; }
+    .btn-outline { display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:8px; border:1px solid #8B0000; color:#8B0000; text-decoration:none; margin-top:14px; }
+    .btn-outline svg { width:18px; height:18px; flex:0 0 auto; stroke-width:1.8; }
     .welcome-art { width:320px; flex:0 0 320px; }
 
     /* --- TESTIMONIALS / COMMENTS --- */
@@ -52,11 +54,10 @@
         background: #ffffff;
         border: 1px solid #ead7d7;
         color: #8B0000;
-        font-size: 22px;
-        font-weight: 800;
         box-shadow: 0 8px 20px rgba(16,24,28,0.06);
         transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     }
+    .feedback-more svg { width:18px; height:18px; stroke-width:2; }
     .feedback-more:hover {
         transform: translateX(2px);
         background: #fff7f7;
@@ -86,17 +87,20 @@
     .brand-desc { color:#9fb0bd; max-width:420px; line-height:1.6; margin:12px 0; }
     
     .social { display:flex; gap:10px; margin-top:8px; }
-    .social-link svg { width:18px; height:18px; fill:rgba(255,255,255,0.92); }
+    .social-link { width:40px; height:40px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.92); transition:background 0.2s ease, transform 0.2s ease, border-color 0.2s ease; }
+    .social-link:hover { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.32); transform:translateY(-1px); }
+    .social-link svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.8; }
 
     .site-footer h4 { color:#fff; margin:0 0 12px 0; font-size:16px; }
     .footer-links { list-style:none; padding:0; margin:0; }
     .footer-links li { margin:10px 0; color:#b9c8d2; }
-    .footer-links a { color:#b9c8d2; text-decoration:none; }
+    .footer-links a { color:#b9c8d2; text-decoration:none; display:inline-flex; align-items:center; gap:10px; }
     .footer-links a:hover { color:#fff; text-decoration:underline; }
+    .footer-link-icon { width:18px; height:18px; flex:0 0 auto; stroke-width:1.8; }
 
     .contact-list { list-style:none; padding:0; margin:0; }
     .contact-list li { display:flex; align-items:flex-start; gap:12px; color:#b9c8d2; margin:12px 0; line-height:1.4; }
-    .contact-icon { width:20px; height:20px; fill:#ffb3a9; flex:0 0 20px; margin-top:4px; }
+    .contact-icon { width:20px; height:20px; stroke:#ffb3a9; fill:none; stroke-width:1.8; flex:0 0 20px; margin-top:4px; }
     .footer-bottom { border-top:1px solid rgba(255,255,255,0.04); padding-top:22px; text-align:center; color:rgba(255,255,255,0.6); font-size:14px; margin-top:18px; }
 
     /* Modal Animation */
@@ -134,8 +138,14 @@
         <p class="PUPBG-lead">Access quality healthcare services online, anytime, anywhere.</p>
 
         <div class="hero-actions">
-          <a href="{{ url('/student/booking') }}" class="btn btn-primary">Book Appointment</a>
-          <a href="{{ url('/student/history') }}" class="btn btn-secondary">View Appointments</a>
+          <a href="{{ url('/student/booking') }}" class="btn btn-primary">
+            <x-outline-icon name="calendar-days" />
+            <span>Book Appointment</span>
+          </a>
+          <a href="{{ url('/student/history') }}" class="btn btn-secondary">
+            <x-outline-icon name="clock" />
+            <span>View Appointments</span>
+          </a>
         </div>
       </div>
     </section>
@@ -147,8 +157,9 @@
             you can make a consultation request here online. Additionally, you can check and evaluate all the
             information and status related to your appointment.
         </p>
-        <a href="#" style="color: #8B0000; font-weight: 700; text-decoration: none; border: 1px solid #8B0000; padding: 10px 24px; border-radius: 6px; display: inline-block; transition: 0.2s;">
-            Learn More
+        <a href="#" class="btn-outline">
+            <x-outline-icon name="arrow-long-right" />
+            <span>Learn More</span>
         </a>
     </section>  
 
@@ -160,7 +171,9 @@
             <p class="lead">Recent feedback from students and staff about our clinic services.</p>
           </div>
           @if(($feedbackCount ?? 0) > 3)
-            <a href="{{ route('student.feedback.index') }}" class="feedback-more" aria-label="View more feedback" title="View more feedback">&gt;</a>
+            <a href="{{ route('student.feedback.index') }}" class="feedback-more" aria-label="View more feedback" title="View more feedback">
+              <x-outline-icon name="arrow-long-right" />
+            </a>
           @endif
         </div>
 
@@ -221,11 +234,11 @@
             <p class="brand-desc">Providing quality healthcare services to the PUP Taguig community.</p>
 
             <div class="social">
-              <a class="social-link" href="#" aria-label="facebook">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.12 8.44 9.88v-6.99H7.9v-2.9h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.88h2.74l-.44 2.9h-2.3V21.9C18.34 21.12 22 17 22 12z"/></svg>
+              <a class="social-link" href="#" aria-label="Official clinic site">
+                <x-outline-icon name="globe-alt" />
               </a>
-              <a class="social-link" href="#" aria-label="twitter">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 5.92c-.63.28-1.3.47-2 .55.72-.43 1.27-1.1 1.53-1.9-.68.4-1.43.68-2.23.84A3.49 3.49 0 0015.5 5c-1.92 0-3.48 1.57-3.48 3.5 0 .27.03.54.09.8-2.89-.14-5.45-1.53-7.16-3.64-.3.52-.47 1.12-.47 1.76 0 1.21.62 2.28 1.56 2.91-.58-.02-1.12-.18-1.6-.44v.04c0 1.7 1.2 3.12 2.8 3.45-.29.08-.6.12-.92.12-.23 0-.46-.02-.68-.06.46 1.44 1.8 2.49 3.38 2.52A7.03 7.03 0 012 19.54 9.93 9.93 0 008.56 21c6.54 0 10.12-5.42 10.12-10.12 0-.15 0-.3-.01-.45.7-.5 1.3-1.12 1.78-1.83-.64.28-1.32.48-2.03.57z"/></svg>
+              <a class="social-link" href="#" aria-label="Clinic announcements">
+                <x-outline-icon name="megaphone" />
               </a>
             </div>
           </div>
@@ -233,11 +246,11 @@
           <div class="footer-col">
             <h4>Quick Links</h4>
             <ul class="footer-links">
-              <li><a href="{{ url('/student/home') }}">Home</a></li>
-              <li><a href="#">About Us</a></li>
-              <li><a href="{{ url('/student/booking') }}">Book Appointment</a></li>
-               <li><a href="{{ url('/student/barcode-register') }}">Scan / Bio</a></li>
-              <li><a href="{{ url('/student/faq') }}">FAQ</a></li>
+              <li><a href="{{ url('/student/home') }}"><x-outline-icon name="home" class="footer-link-icon" /><span>Home</span></a></li>
+              <li><a href="#"><x-outline-icon name="information-circle" class="footer-link-icon" /><span>About Us</span></a></li>
+              <li><a href="{{ url('/student/booking') }}"><x-outline-icon name="calendar-days" class="footer-link-icon" /><span>Book Appointment</span></a></li>
+              <li><a href="{{ url('/student/barcode-register') }}"><x-outline-icon name="qr-code" class="footer-link-icon" /><span>Scan / Bio</span></a></li>
+              <li><a href="{{ url('/student/faq') }}"><x-outline-icon name="question-mark-circle" class="footer-link-icon" /><span>FAQ</span></a></li>
             </ul>
           </div>
 
@@ -255,15 +268,15 @@
             <h4>Contact Us</h4>
             <ul class="contact-list">
               <li>
-                <svg viewBox="0 0 24 24" class="contact-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1112 6a2.5 2.5 0 010 5.5z"/></svg>
+                <x-outline-icon name="map-pin" class="contact-icon" />
                 General Santos Ave, Taguig City
               </li>
               <li>
-                <svg viewBox="0 0 24 24" class="contact-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm-1 4l-7 4-7-4V6l7 4 7-4v2z"/></svg>
+                <x-outline-icon name="envelope" class="contact-icon" />
                 pupt_clinic@pup.edu.ph
               </li>
               <li>
-                <svg viewBox="0 0 24 24" class="contact-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1v3.5a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1H7.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.24 1.02l-2.2 2.2z"/></svg>
+                <x-outline-icon name="phone" class="contact-icon" />
                 (02) 8837-5858
               </li>
             </ul>

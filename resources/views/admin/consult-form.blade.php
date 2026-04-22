@@ -19,12 +19,12 @@
     .badge-number { background: #e2e8f0; color: #000; padding: 4px 10px; border-radius: 6px; font-size: 11px; text-transform: uppercase; font-weight: 700; font-size: 13px; color: #64748b; margin-left: 10px; }
     .mar-required { border: 1px solid #fecaca; background-color: #fef2f2; }
     .badge-source {
-        padding: 4px 12px;
+        padding: 4px 10px;
         border-radius: 50px;
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
-        margin-left: 8px;
+        margin-left: 5px;
     }
     .source-online { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
     .source-walkin { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }

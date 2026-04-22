@@ -730,6 +730,7 @@
     let manualStudentNameEdited = false;
     let lastPreviewedStudentNumber = '';
     let lastPreviewedStudentName = '';
+    let ocrNameLocked = false;
     let aiAssistCooldown = false;
     const initialMode = @json($currentMode);
     let scanMethod = 'ocr';
@@ -951,8 +952,9 @@
                 $('#ocr_student_number').val(studentNumber);
             }
 
-            if (allowNameAutofill && studentName && (!manualStudentNameEdited || $('#ocr_student_name').val().trim() === '')) {
+            if (allowNameAutofill && studentName && !ocrNameLocked && (!manualStudentNameEdited || $('#ocr_student_name').val().trim() === '')) {
                 $('#ocr_student_name').val(studentName);
+                ocrNameLocked = true;
             }
 
             $('#ocrConfidenceText').text(confidence ? `Student no. confidence: ${confidence}%` : 'Student number confidence will appear here after analysis.');
@@ -1073,9 +1075,41 @@
             return canvas;
         }
 
+        function captureStudentNumberCanvas() {
+            const sourceCanvas = capturePreparedIdCanvas(true);
+            if (!sourceCanvas) {
+                return null;
+            }
+
+            const width = sourceCanvas.width;
+            const height = sourceCanvas.height;
+            const numberZoneCanvas = document.createElement('canvas');
+            const zoneWidth = Math.floor(width * 0.72);
+            const zoneHeight = Math.floor(height * 0.18);
+            const zoneX = Math.floor((width - zoneWidth) / 2);
+            const zoneY = Math.floor(height * 0.48);
+
+            numberZoneCanvas.width = zoneWidth;
+            numberZoneCanvas.height = zoneHeight;
+            numberZoneCanvas.getContext('2d', { willReadFrequently: true }).drawImage(
+                sourceCanvas,
+                zoneX,
+                zoneY,
+                zoneWidth,
+                zoneHeight,
+                0,
+                0,
+                zoneWidth,
+                zoneHeight
+            );
+
+            return numberZoneCanvas;
+        }
+
         async function captureAndAnalyzeId(isAutoPass = false) {
             const canvas = capturePreparedIdCanvas(true);
-            if (!canvas) {
+            const studentNumberCanvas = captureStudentNumberCanvas();
+            if (!canvas || !studentNumberCanvas) {
                 if (!isAutoPass) {
                     buildStatus('Camera preview is not ready yet. Please wait a moment, then try again.', 'error');
                 }
@@ -1090,11 +1124,15 @@
 
             try {
                 const worker = await getOcrWorker();
-                const result = await worker.recognize(canvas);
-                const ocrText = result.data.text || '';
-                const studentNumber = extractStudentNumber(ocrText, ocrText);
-                const studentName = extractStudentName(ocrText, ocrText);
-                const confidence = Math.round(result.data.confidence || 0);
+                const [fullResult, numberResult] = await Promise.all([
+                    worker.recognize(canvas),
+                    worker.recognize(studentNumberCanvas),
+                ]);
+                const fullText = fullResult.data.text || '';
+                const numberText = numberResult.data.text || '';
+                const studentNumber = extractStudentNumber(`${numberText} ${fullText}`, numberText);
+                const studentName = extractStudentName(fullText, fullText);
+                const confidence = Math.round(((numberResult.data.confidence || 0) * 0.8) + ((fullResult.data.confidence || 0) * 0.2));
                 const hasNumberCandidate = studentNumber !== '';
                 const hasNameCandidate = studentName !== '';
 
@@ -1118,7 +1156,7 @@
                     studentNameStableCount = 0;
                 }
 
-                const allowNameAutofill = hasNameCandidate && studentNameStableCount >= 1;
+                const allowNameAutofill = hasNameCandidate && studentNameStableCount >= 2;
                 const stableStudentNumber = hasNumberCandidate && studentNumberStableCount >= 2 ? studentNumber : '';
                 const stableStudentName = allowNameAutofill ? studentName : '';
                 const signature = `${stableStudentNumber}|${stableStudentName}|${confidence}`;
@@ -1158,18 +1196,9 @@
                         lastOcrSignature = signature;
                     }
                 } else if (stableStudentName) {
-                    requestStudentNumberPreviewByName(stableStudentName, function(res) {
-                        buildStatus(
-                            'The name was detected first, and we matched a student number from local records. Please review before continuing.',
-                            'success',
-                            `Student no. confidence ${confidence}%`
-                        );
-                        lastOcrSignature = signature;
-                    });
-
                     if (signature !== lastOcrSignature) {
                         buildStatus(
-                            'The name was detected first. We are checking local records to fill the student number automatically.',
+                            'The name is stable now. Keep the ID steady and we will keep reading the student number.',
                             'info',
                             `Student no. confidence ${confidence}%`
                         );
@@ -1395,6 +1424,7 @@
             manualStudentNameEdited = false;
             lastPreviewedStudentNumber = '';
             lastPreviewedStudentName = '';
+            ocrNameLocked = false;
             $('#ocrLockBadge').hide();
             buildStatus('We cleared the last OCR result. Capture the ID again when you are ready.', 'info');
         });
@@ -1409,6 +1439,7 @@
         $('#ocr_student_name').on('input', function() {
             manualStudentNameEdited = true;
             lastPreviewedStudentName = '';
+            ocrNameLocked = true;
             const hasBoth = $('#ocr_student_number').val().trim() !== '' && $('#ocr_student_name').val().trim() !== '';
             $('#btnConfirmOcr').prop('disabled', !hasBoth);
         });

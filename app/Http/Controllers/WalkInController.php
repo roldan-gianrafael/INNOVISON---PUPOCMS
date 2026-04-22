@@ -13,6 +13,65 @@ use Illuminate\Support\Str;
 
 class WalkInController extends Controller
 {
+    private function normalizeLookupName(?string $value): string
+    {
+        $value = Str::upper((string) $value);
+        $value = preg_replace('/[^A-Z\s]/', ' ', $value) ?? '';
+        $value = preg_replace('/\s+/', ' ', $value) ?? '';
+
+        return trim($value);
+    }
+
+    private function namesRoughlyMatch(?string $extractedName, User $student): bool
+    {
+        $needle = $this->normalizeLookupName($extractedName);
+        if ($needle === '') {
+            return true;
+        }
+
+        $candidates = array_filter([
+            $student->name ?? '',
+            trim(implode(' ', array_filter([
+                $student->first_name ?? '',
+                $student->middle_name ?? '',
+                $student->last_name ?? '',
+            ]))),
+            trim(implode(' ', array_filter([
+                $student->first_name ?? '',
+                $student->last_name ?? '',
+            ]))),
+        ]);
+
+        foreach ($candidates as $candidate) {
+            $normalizedCandidate = $this->normalizeLookupName($candidate);
+            if ($normalizedCandidate === '') {
+                continue;
+            }
+
+            if ($normalizedCandidate === $needle) {
+                return true;
+            }
+
+            if (Str::contains($normalizedCandidate, $needle) || Str::contains($needle, $normalizedCandidate)) {
+                return true;
+            }
+
+            $needleParts = array_values(array_filter(explode(' ', $needle)));
+            $candidateParts = array_values(array_filter(explode(' ', $normalizedCandidate)));
+
+            if (count($needleParts) >= 2 && count($candidateParts) >= 2) {
+                $firstMatches = ($needleParts[0] ?? null) === ($candidateParts[0] ?? null);
+                $lastMatches = ($needleParts[count($needleParts) - 1] ?? null) === ($candidateParts[count($candidateParts) - 1] ?? null);
+
+                if ($firstMatches && $lastMatches) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private function findUserByIdentifier(string $identifier): ?User
     {
         $identifier = trim($identifier);
@@ -214,6 +273,7 @@ class WalkInController extends Controller
     public function getStudent(Request $request, PuptasWebhookService $puptasWebhookService)
     {
         $lookup = trim((string) $request->student_id);
+        $lookupName = trim((string) $request->student_name);
 
         $student = $this->findUserByIdentifier($lookup);
         $lookupMessage = 'No patient matched that student number in local records or PUPTAS.';
@@ -231,6 +291,18 @@ class WalkInController extends Controller
         }
 
         if ($student) {
+            if (!$this->namesRoughlyMatch($lookupName, $student)) {
+                return response()->json([
+                    'status' => 'name_mismatch',
+                    'lookup_status' => $lookupStatus,
+                    'message' => 'The student number matched a record, but the extracted name does not match our saved name yet.',
+                    'candidate' => [
+                        'student_number' => $student->student_number ?: $student->student_id,
+                        'name' => trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? '')))),
+                    ],
+                ]);
+            }
+
             return response()->json([
                 'status' => 'found',
                 'redirect_url' => route($this->walkinRouteName($request, 'form'), [

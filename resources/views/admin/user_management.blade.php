@@ -1557,7 +1557,7 @@
         'account-access': document.getElementById('account-access-panel'),
         'admin-hub': document.getElementById('admin-hub-panel'),
     };
-    let currentLookupContext = @json($managementView ?: 'account-access');
+    let currentLookupContext = @json($managementView ?: '');
 
     const syncModeUrl = (mode) => {
         const url = new URL(window.location.href);
@@ -1832,7 +1832,7 @@
         settingsModal.classList.add('show');
     };
 
-    if (currentLookupContext) {
+    if (currentLookupContext && ['account-access', 'admin-hub'].includes(currentLookupContext)) {
         setUserManagementMode(currentLookupContext);
     }
 

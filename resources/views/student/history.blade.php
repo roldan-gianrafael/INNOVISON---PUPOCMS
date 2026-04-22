@@ -36,6 +36,7 @@
           border-radius: 10px;
           background: #fff;
           border: 1px solid #eef2f3;
+          border-left: 4px solid #8B0000;
           display: flex;
           flex-direction: column;
           gap: 10px; 

@@ -33,7 +33,9 @@ class AdminUserController extends Controller
     public function index(Request $request, FacultySyncService $facultySyncService)
     {
         $lookupSearch = trim((string) $request->query('lookup_search', ''));
-        $managementView = trim((string) $request->query('management_view', ''));
+        $managementView = $request->query('entry') === 'menu'
+            ? ''
+            : trim((string) $request->query('management_view', ''));
         if (!in_array($managementView, ['account-access', 'admin-hub'], true)) {
             $managementView = '';
         }

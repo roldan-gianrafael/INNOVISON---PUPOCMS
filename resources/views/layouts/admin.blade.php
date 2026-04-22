@@ -1760,7 +1760,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $reportsUrl = $isStudentAssistant ? url('/assistant/reports') : url('/admin/reports');
     $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
     $settingsUrl = url('/admin/settings');
-    $userManagementUrl = url('/admin/user-management');
+    $userManagementUrl = url('/admin/user-management?entry=menu');
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
     $assistantEndpoint = $isStudentAssistant ? route('assistant.intent') : route('admin.assistant.intent');
     $displayName = optional($authUser)->name ?? 'Clinic User';

@@ -16,6 +16,7 @@
     .patient-header { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8B0000; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .badge-role { background: #e2e8f0; color: #000; padding: 4px 10px; border-radius: 6px; font-size: 11px; text-transform: uppercase; font-weight: 700; }
+    .badge-number { background: #e2e8f0; color: #000; padding: 4px 10px; border-radius: 6px; font-size: 11px; text-transform: uppercase; font-weight: 700; font-size: 13px; color: #64748b; margin-left: 10px; }
     .mar-required { border: 1px solid #fecaca; background-color: #fef2f2; }
     .badge-source {
         padding: 4px 12px;
@@ -92,7 +93,7 @@
         </div>
 
         <span class="badge-role">{{ $studentDisplayRole }}</span>
-        <span style="font-size: 13px; color: #64748b; margin-left: 10px;">: {{ $student->student_number ?: 'N/A' }}</span>
+        <span class="badge-number" >Student Number: {{ $student->student_number ?: 'N/A' }}</span>
 
         @if(($user_source ?? '') == 'online' && isset($latestAppointment))
             <div style="margin-top: 10px;">

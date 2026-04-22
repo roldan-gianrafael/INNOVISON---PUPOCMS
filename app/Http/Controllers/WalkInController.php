@@ -93,6 +93,31 @@ class WalkInController extends Controller
             ->first();
     }
 
+    private function findUniqueUserByName(string $name): ?User
+    {
+        $name = $this->normalizeLookupName($name);
+        if ($name === '') {
+            return null;
+        }
+
+        $parts = array_values(array_filter(explode(' ', $name)));
+        $query = User::with('healthProfile');
+
+        foreach (array_slice($parts, 0, 3) as $part) {
+            $query->where(function ($inner) use ($part) {
+                $inner->orWhere('name', 'like', '%' . $part . '%')
+                    ->orWhere('first_name', 'like', '%' . $part . '%')
+                    ->orWhere('last_name', 'like', '%' . $part . '%');
+            });
+        }
+
+        $matches = $query->limit(12)->get()->filter(function (User $student) use ($name) {
+            return $this->namesRoughlyMatch($name, $student);
+        })->values();
+
+        return $matches->count() === 1 ? $matches->first() : null;
+    }
+
     private function resolveUniqueStudentId(string $seed): string
     {
         $candidate = trim($seed) !== '' ? trim($seed) : ('idp-' . Str::lower(Str::random(12)));
@@ -335,6 +360,13 @@ class WalkInController extends Controller
 
             if (is_array($applicant)) {
                 $student = $this->resolveLocalUserFromApplicant($applicant);
+            }
+        }
+
+        if (!$student && $lookup === '' && $lookupName !== '') {
+            $student = $this->findUniqueUserByName($lookupName);
+            if (!$student) {
+                $lookupMessage = 'No unique patient matched that name in local records yet.';
             }
         }
 

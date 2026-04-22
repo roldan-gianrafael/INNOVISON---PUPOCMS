@@ -36,12 +36,16 @@
           border-radius: 10px;
           background: #fff;
           border: 1px solid #eef2f3;
-          border-left: 4px solid #8B0000;
           display: flex;
           flex-direction: column;
           gap: 10px; 
           transition: box-shadow 0.2s; 
       }
+      .apt-card.status-pending { border-left: 4px solid #d97706; }
+      .apt-card.status-approved { border-left: 4px solid #15803d; }
+      .apt-card.status-completed { border-left: 4px solid #8B0000; }
+      .apt-card.status-cancelled { border-left: 4px solid #64748b; }
+      .apt-card.status-default { border-left: 4px solid #8B0000; }
       .apt-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #e0e6e8; }
       
       .apt-header { display: flex; justify-content: space-between; align-items: flex-start; }
@@ -52,6 +56,11 @@
       .apt-notes { background: #f3f6f5; padding: 10px; border-radius: 6px; font-size: 14px; color: #445; margin-top: 4px; }
       
       .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+      .status-badge.status-pending { background: #fff3cd; color: #856404; }
+      .status-badge.status-approved { background: #d4edda; color: #155724; }
+      .status-badge.status-completed { background: #f3e8ea; color: #7f1d2d; }
+      .status-badge.status-cancelled { background: #e5e7eb; color: #4b5563; }
+      .status-badge.status-default { background: #eee; color: #555; }
       
       .empty-state {
           min-height: 360px;
@@ -304,7 +313,16 @@
         
         <div class="history-grid">
             @forelse($appointments as $appt)
-                <div class="apt-card">
+                @php
+                    $statusClass = match (strtolower((string) $appt->status)) {
+                        'pending' => 'status-pending',
+                        'approved' => 'status-approved',
+                        'completed' => 'status-completed',
+                        'cancelled' => 'status-cancelled',
+                        default => 'status-default',
+                    };
+                @endphp
+                <div class="apt-card {{ $statusClass }}">
                   <div class="apt-header">
                     <div>
                       <div class="apt-service">{{ $appt->service }}</div>
@@ -316,9 +334,7 @@
                     <div style="text-align:right">
                       <div class="apt-date">{{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }} at {{ \Carbon\Carbon::parse($appt->time)->format('g:i A') }}</div>
                       <div style="margin-top:6px">
-                          <span class="status-badge" 
-                                style="background: {{ $appt->status == 'Pending' ? '#fff3cd' : ($appt->status == 'Approved' ? '#d4edda' : '#eee') }};
-                                       color: {{ $appt->status == 'Pending' ? '#856404' : ($appt->status == 'Approved' ? '#155724' : '#555') }};">
+                          <span class="status-badge {{ $statusClass }}">
                               {{ $appt->status }}
                           </span>
                       </div>

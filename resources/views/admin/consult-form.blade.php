@@ -83,6 +83,11 @@
     <div>
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
             <h3 style="margin: 0;">{{ $student->first_name }} {{ $student->last_name }}</h3>
+        </div>
+
+        <span class="badge-role">{{ $studentDisplayRole }}</span>
+        <span class="badge-number" > {{ $student->student_number ?: 'N/A' }}</span>
+        <span class="badge-source">
             @if($user_source == 'online' && $latestAppointment)
                 <span class="badge-source source-online">Online Appointment Found</span>
             @elseif($isAssistedIntake)
@@ -90,10 +95,7 @@
             @else
                 <span class="badge-source source-walkin">Walk-in Patient</span>
             @endif
-        </div>
-
-        <span class="badge-role">{{ $studentDisplayRole }}</span>
-        <span class="badge-number" > {{ $student->student_number ?: 'N/A' }}</span>
+        </span>
 
         @if(($user_source ?? '') == 'online' && isset($latestAppointment))
             <div style="margin-top: 10px;">

@@ -732,9 +732,11 @@
     let lastPreviewedStudentName = '';
     let ocrNameLocked = false;
     let aiAssistCooldown = false;
+    let autoProceedInFlight = false;
+    let lastAutoProceedKey = '';
     const initialMode = @json($currentMode);
     let scanMethod = 'ocr';
-    const liveOcrIntervalMs = 1300;
+    const liveOcrIntervalMs = 900;
     const ocrCanvasScale = 1;
     const supportedFormats = window.Html5QrcodeSupportedFormats ? [
         Html5QrcodeSupportedFormats.CODE_128,
@@ -990,6 +992,21 @@
             });
         }
 
+        function attemptAutoProceed(studentNumber, studentName) {
+            const normalizedStudentNumber = (studentNumber || '').trim();
+            const normalizedStudentName = (studentName || '').trim();
+            const autoProceedKey = `${normalizedStudentNumber}|${normalizedStudentName}`;
+
+            if (!normalizedStudentNumber || !normalizedStudentName || autoProceedInFlight || lastAutoProceedKey === autoProceedKey) {
+                return;
+            }
+
+            autoProceedInFlight = true;
+            lastAutoProceedKey = autoProceedKey;
+            buildStatus('Student number and name matched. Opening the consultation form now.', 'success', 'Auto proceed');
+            verifyUser(normalizedStudentNumber, normalizedStudentName, true);
+        }
+
         function requestStudentNumberPreviewByName(studentName, onApplied = null) {
             const normalizedStudentName = (studentName || '').trim();
             if (!normalizedStudentName || lastPreviewedStudentName === normalizedStudentName) {
@@ -1180,6 +1197,10 @@
                             buildStatus('Student number matched an official record, but the scanned name still looks different. Please review the card before continuing.', 'info', 'Record name applied');
                         } else {
                             buildStatus('Student number matched an official record and the system applied the saved name automatically. Please review before continuing.', 'success', 'Record name applied');
+                            attemptAutoProceed(
+                                stableStudentNumber,
+                                ($('#ocr_student_name').val() || preview.student_name || stableStudentName || studentName)
+                            );
                         }
                     });
 
@@ -1262,6 +1283,7 @@
                         requestMatchedNamePreview(studentNumber, '', function(preview) {
                             if (preview && preview.student_name) {
                                 buildStatus('AI read the student number and the system filled the saved name from records. Please review before continuing.', 'success', 'AI + records');
+                                attemptAutoProceed(studentNumber, preview.student_name);
                                 return;
                             }
 
@@ -1271,6 +1293,7 @@
 
                             $('#btnConfirmOcr').prop('disabled', !(studentNumber && $('#ocr_student_name').val().trim()));
                             buildStatus(note, 'success', 'AI assist');
+                            attemptAutoProceed(studentNumber, $('#ocr_student_name').val().trim());
                         });
                     } else if (studentName) {
                         $('#ocr_student_name').val(studentName);
@@ -1290,11 +1313,12 @@
             });
         }
 
-        function verifyUser(id, studentName = '') {
+        function verifyUser(id, studentName = '', autoProceed = false) {
             $('#scan-loading').css('display', 'flex');
             $('#notification').html('');
             $.get("{{ url($basePrefix . '/walkin/get-student') }}", { student_id: id, student_name: studentName }, function(res) {
                 $('#scan-loading').hide();
+                autoProceedInFlight = false;
                 if (res.status === 'found') {
                     window.location.href = res.redirect_url;
                 } else if (res.status === 'name_mismatch') {
@@ -1307,6 +1331,11 @@
                     const failureMessage = res.message
                         ? `${res.message}${statusText}`
                         : `No patient matched ${id} locally or in PUPTAS${statusText}.`;
+
+                    if (autoProceed) {
+                        buildStatus(`Auto proceed stopped: ${failureMessage}`, 'info');
+                        return;
+                    }
 
                     $('#notification').html(`<p style="color:#991b1b; font-size:12px; font-weight:700; background:#fff1f2; padding:10px 12px; border-radius:10px; border:1px solid #fecdd3; margin-bottom:12px;">${failureMessage}</p>`);
 
@@ -1321,7 +1350,10 @@
                         });
                     }
                 }
-            }).fail(() => { $('#scan-loading').hide(); });
+            }).fail(() => {
+                $('#scan-loading').hide();
+                autoProceedInFlight = false;
+            });
         }
 
         function showRegisterUI(scannedId = '') {
@@ -1425,6 +1457,8 @@
             lastPreviewedStudentNumber = '';
             lastPreviewedStudentName = '';
             ocrNameLocked = false;
+            autoProceedInFlight = false;
+            lastAutoProceedKey = '';
             $('#ocrLockBadge').hide();
             buildStatus('We cleared the last OCR result. Capture the ID again when you are ready.', 'info');
         });
@@ -1432,6 +1466,7 @@
         $('#ocr_student_number').on('input', function() {
             manualStudentNumberEdited = true;
             lastPreviewedStudentNumber = '';
+            lastAutoProceedKey = '';
             const hasBoth = $('#ocr_student_number').val().trim() !== '' && $('#ocr_student_name').val().trim() !== '';
             $('#btnConfirmOcr').prop('disabled', !hasBoth);
         });
@@ -1440,6 +1475,7 @@
             manualStudentNameEdited = true;
             lastPreviewedStudentName = '';
             ocrNameLocked = true;
+            lastAutoProceedKey = '';
             const hasBoth = $('#ocr_student_number').val().trim() !== '' && $('#ocr_student_name').val().trim() !== '';
             $('#btnConfirmOcr').prop('disabled', !hasBoth);
         });

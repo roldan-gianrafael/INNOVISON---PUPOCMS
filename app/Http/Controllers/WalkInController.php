@@ -409,19 +409,17 @@ class WalkInController extends Controller
 
         $prompt = <<<'PROMPT'
 You are reading a school ID card for clinic intake.
-Extract only the printed identity fields and return strict JSON with these keys:
+Your top priority is extracting the student number correctly.
+Return strict JSON with these keys:
 student_number, first_name, surname, full_name, confidence_note
 
 Rules:
-- The card layout is vertical:
-  1. given/first name on an upper line
-  2. surname on the line below
-  3. student number below the name lines
+- Focus on the student number first. It is the most important field.
 - Student number format may look like: 2025-00523-TG-0
 - Preserve hyphens in the student number.
-- If a field is unclear, return an empty string for that field.
-- full_name should combine first_name and surname when both are readable.
-- confidence_note should be a short plain-English note about the extraction quality.
+- If the student number is readable but the name is unclear, return the student number and leave the name fields empty.
+- Only fill first_name, surname, and full_name when they are clearly readable from the card.
+- confidence_note should be a short plain-English note focused on how reliable the student number extraction is.
 - Return JSON only. No markdown fence. No explanation.
 PROMPT;
 

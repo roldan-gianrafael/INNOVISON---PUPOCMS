@@ -577,7 +577,7 @@
                     </div>
 
                     <div class="ocr-actions">
-                        <button type="button" id="btnRunAiOcr" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg, #1d4ed8, #2563eb 55%, #3b82f6); box-shadow:0 12px 24px rgba(37,99,235,0.22);">AI Verify ID</button>
+                        <button type="button" id="btnRunAiOcr" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg, #1d4ed8, #2563eb 55%, #3b82f6); box-shadow:0 12px 24px rgba(37,99,235,0.22);">AI Read Student No.</button>
                         <button type="button" id="btnRetryOcr" class="btn-ocr btn-ocr-secondary">Clear OCR Result</button>
                     </div>
 
@@ -595,7 +595,7 @@
                             </div>
                         </div>
 
-                        <div id="ocrStatus" class="ocr-status info" style="display:block;">Live OCR is ready. Hold the ID steady inside the frame, then confirm the detected student number and name.</div>
+                        <div id="ocrStatus" class="ocr-status info" style="display:block;">Live OCR is ready. Hold the ID steady inside the frame so we can detect the student number and fill the saved name from records.</div>
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                             <div id="ocrConfidenceText" class="ocr-meta">OCR confidence will appear here after analysis.</div>
                             <div id="ocrLockBadge" class="ocr-lock-badge" style="display:none;">Locked on ID</div>
@@ -1177,12 +1177,12 @@
         function verifyWithAi() {
             const canvas = capturePreparedIdCanvas();
             if (!canvas) {
-                buildStatus('Camera preview is not ready yet. Please wait a moment, then try AI verification again.', 'error');
+                buildStatus('Camera preview is not ready yet. Please wait a moment, then try AI student-number reading again.', 'error');
                 return;
             }
 
-            $('#btnRunAiOcr').prop('disabled', true).text('AI Verifying...');
-            buildStatus('Sending the captured ID frame to AI for a more accurate read. This may take a few seconds.', 'info');
+            $('#btnRunAiOcr').prop('disabled', true).text('AI Reading...');
+            buildStatus('Sending the captured ID frame to AI to read the student number first. This may take a few seconds.', 'info');
 
             $.ajax({
                 url: "{{ url($basePrefix . '/walkin/verify-id-ai') }}",
@@ -1194,38 +1194,44 @@
                 success: function(res) {
                     const studentNumber = (res.student_number || '').trim();
                     const studentName = (res.student_name || '').trim();
-                    const note = (res.confidence_note || 'AI verification completed.').trim();
+                    const note = (res.confidence_note || 'AI student-number reading completed.').trim();
 
                     if (studentNumber) {
                         $('#ocr_student_number').val(studentNumber);
                     }
 
-                    if (studentName) {
-                        $('#ocr_student_name').val(studentName);
-                    }
-
                     $('#ocrResultPanel').show();
-                    $('#btnConfirmOcr').prop('disabled', !(studentNumber && studentName));
-                    $('#ocrLockBadge').show().text('AI Verified');
+                    $('#btnConfirmOcr').prop('disabled', !(studentNumber && $('#ocr_student_name').val().trim()));
+                    $('#ocrLockBadge').show().text('AI Read');
 
                     if (studentNumber) {
-                        requestMatchedNamePreview(studentNumber, studentName, function(preview) {
-                            if (preview.name_matches === false) {
-                                buildStatus('We matched the student number and filled the official name from your records. The name read from the ID still needs a quick visual double-check.', 'info', 'AI + records');
-                            } else {
-                                buildStatus('We matched the student number and filled the official name from your records. Please review before continuing.', 'success', 'AI + records');
+                        requestMatchedNamePreview(studentNumber, '', function(preview) {
+                            if (preview && preview.student_name) {
+                                buildStatus('AI read the student number and the system filled the saved name from records. Please review before continuing.', 'success', 'AI + records');
+                                return;
                             }
+
+                            if (studentName) {
+                                $('#ocr_student_name').val(studentName);
+                            }
+
+                            $('#btnConfirmOcr').prop('disabled', !(studentNumber && $('#ocr_student_name').val().trim()));
+                            buildStatus(note, 'success', 'AI assist');
                         });
+                    } else if (studentName) {
+                        $('#ocr_student_name').val(studentName);
+                        $('#btnConfirmOcr').prop('disabled', !(studentNumber && $('#ocr_student_name').val().trim()));
+                        buildStatus(note, 'info', 'AI assist');
                     } else {
-                        buildStatus(note, 'success', 'AI assist');
+                        buildStatus(note, 'error', 'AI assist');
                     }
                 },
                 error: function(xhr) {
                     const response = xhr.responseJSON || {};
-                    buildStatus(response.message || 'AI verification could not complete right now. Please keep using OCR or manual review.', 'error');
+                    buildStatus(response.message || 'AI student-number reading could not complete right now. Please keep using OCR or manual review.', 'error');
                 },
                 complete: function() {
-                    $('#btnRunAiOcr').prop('disabled', false).text('AI Verify ID');
+                    $('#btnRunAiOcr').prop('disabled', false).text('AI Read Student No.');
                 }
             });
         }
@@ -1282,7 +1288,7 @@
             $('#scanMethodNote').text(
                 isBioSync
                     ? 'BioSync mode uses the same patient lookup path for now, while presenting the intake flow as biometric identification.'
-                    : 'Use the live camera feed to continuously extract the printed student number and student name from the physical ID card.'
+                    : 'Use the live camera feed to extract the printed student number from the physical ID card, then fill the saved name from records.'
             );
             $('#scanMethodBadge').text(isBioSync ? 'BioSync Active' : 'OCR Active');
             $('#btnSwitchScanMode').text(isBioSync ? 'Switch to OCR Scan' : 'Switch to BioSync');
@@ -1296,7 +1302,7 @@
             $('#scanInlineNote').text(
                 isBioSync
                     ? 'BioSync mode is selected. This section is currently in pending state while we complete the biometric workflow.'
-                    : 'OCR mode is active. Align the physical ID inside the frame and the system will keep reading the card live until staff confirms the extracted student number and name.'
+                    : 'OCR mode is active. Align the physical ID inside the frame and the system will keep reading the student number live, then match the saved name automatically.'
             );
             $('#barcodeScanPanel').toggle(!isBioSync);
             $('#bioSyncPendingPanel').toggle(isBioSync);

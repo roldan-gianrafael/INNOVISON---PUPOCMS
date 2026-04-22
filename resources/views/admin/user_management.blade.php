@@ -1098,7 +1098,7 @@
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" class="um-btn um-btn-ghost" data-back-to-modes>Back</button>
                     <button type="button" class="um-btn um-btn-primary" data-open-lookup="account-access">
-                        <span>+</span> Add New User
+                        <span>+</span> Add User Role
                     </button>
                 </div>
             </div>
@@ -1186,7 +1186,7 @@
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" class="um-btn um-btn-ghost" data-back-to-modes>Back</button>
                     <button type="button" class="um-btn um-btn-primary" data-open-lookup="admin-hub">
-                        <span>+</span> Add New User
+                        <span>+</span> Add User Roles
                     </button>
                 </div>
             </div>
@@ -1268,8 +1268,8 @@
     <div class="um-modal-content">
         <div class="um-modal-head">
             <div>
-                <h3>Add New User</h3>
-                <div class="um-note">Search across students, faculty, or admin profiles from the API and admin hub.</div>
+                <h3>Add User Roles</h3>
+                <div class="um-note">Search across students, faculty, or admin profiles to add roles.</div>
             </div>
             <button type="button" class="um-btn um-btn-soft" data-close-lookup>Close</button>
         </div>
@@ -1280,7 +1280,7 @@
                 <button class="um-btn um-btn-primary" type="submit">Search</button>
             </form>
             <div class="um-directory-toggle" style="padding: 14px 0 10px;">
-                <div class="hint">Type a search term to show matching API and admin users below, or open the list manually.</div>
+                <div class="hint">Type a search term to show matching users below, or find users from the list manually.</div>
             </div>
             <div style="margin-top: 16px;" class="um-directory-panel {{ $lookupSearch !== '' ? 'is-open' : '' }}" id="lookupDirectoryPanel">
             <div class="um-table-wrap">
@@ -1341,7 +1341,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5"><div class="um-empty">No API or admin users matched the current search.</div></td>
+                                <td colspan="5"><div class="um-empty">No Users matched the current search.</div></td>
                             </tr>
                         @endforelse
                     </tbody>

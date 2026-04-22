@@ -418,6 +418,20 @@
         font-weight: 700;
     }
 
+    .ocr-lock-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #047857;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
     .manual-find-btn {
         min-width: 128px;
         padding: 0 20px;
@@ -581,8 +595,11 @@
                             </div>
                         </div>
 
-                        <div id="ocrStatus" class="ocr-status info" style="display:block;">OCR is ready. Capture the card first, then confirm the detected student number and name.</div>
-                        <div id="ocrConfidenceText" class="ocr-meta">OCR confidence will appear here after analysis.</div>
+                        <div id="ocrStatus" class="ocr-status info" style="display:block;">Live OCR is ready. Hold the ID steady inside the frame, then confirm the detected student number and name.</div>
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <div id="ocrConfidenceText" class="ocr-meta">OCR confidence will appear here after analysis.</div>
+                            <div id="ocrLockBadge" class="ocr-lock-badge" style="display:none;">Locked on ID</div>
+                        </div>
 
                         <div class="ocr-actions" style="margin-top:14px;">
                             <button type="button" id="btnConfirmOcr" class="btn-ocr btn-ocr-secondary" disabled>Confirm & Continue</button>
@@ -701,6 +718,10 @@
     let mainScanner;
     let ocrWorkerPromise = null;
     let currentVideoTrack = null;
+    let liveOcrInterval = null;
+    let ocrInFlight = false;
+    let lastOcrSignature = '';
+    let ocrLockCount = 0;
     const initialMode = @json($currentMode);
     let scanMethod = 'ocr';
     const supportedFormats = window.Html5QrcodeSupportedFormats ? [
@@ -755,6 +776,29 @@
             currentVideoTrack = tracks.length ? tracks[0] : null;
         }
 
+        function stopLiveOcr() {
+            if (liveOcrInterval) {
+                window.clearInterval(liveOcrInterval);
+                liveOcrInterval = null;
+            }
+        }
+
+        function startLiveOcr() {
+            if (scanMethod !== 'ocr' || liveOcrInterval) {
+                return;
+            }
+
+            liveOcrInterval = window.setInterval(function () {
+                const video = getScannerVideoElement();
+
+                if (scanMethod !== 'ocr' || ocrInFlight || !video || video.readyState < 2) {
+                    return;
+                }
+
+                captureAndAnalyzeId(true);
+            }, 1600);
+        }
+
         function startMainScanner() {
             if (!mainScanner) {
                 mainScanner = createScanner("readerScan");
@@ -770,7 +814,8 @@
                     }
                 ).then(() => {
                     attachVideoTrack();
-                ).catch(err => console.warn(err));
+                    startLiveOcr();
+                }).catch(err => console.warn(err));
             }
         }
 
@@ -783,28 +828,39 @@
             return (value || '').replace(/\s+/g, ' ').trim();
         }
 
-        function extractStudentNumber(text) {
-            const normalized = (text || '').replace(/\s+/g, ' ').toUpperCase();
+        function cleanOcrLine(value) {
+            return normalizeSpaces((value || '').replace(/[^\w\s-]/g, ' '));
+        }
+
+        function extractStudentNumber(text, focusedText = '') {
+            const normalized = `${focusedText} ${text}`.replace(/\s+/g, ' ').toUpperCase();
             const patterns = [
                 /\b20\d{2}-\d{3}-\d{3}\b/,
                 /\b\d{4}-\d{3}-\d{3}\b/,
-                /\b\d{4}\s*-\s*\d{3}\s*-\s*\d{3}\b/
+                /\b\d{4}\s*-\s*\d{3}\s*-\s*\d{3}\b/,
+                /\b20\d{2}\d{6}\b/
             ];
 
             for (const pattern of patterns) {
                 const match = normalized.match(pattern);
                 if (match) {
-                    return match[0].replace(/\s+/g, '');
+                    const compact = match[0].replace(/\s+/g, '');
+
+                    if (/^20\d{10}$/.test(compact)) {
+                        return `${compact.slice(0, 4)}-${compact.slice(4, 7)}-${compact.slice(7, 10)}`;
+                    }
+
+                    return compact;
                 }
             }
 
             return '';
         }
 
-        function extractStudentName(text) {
-            const lines = (text || '')
+        function extractStudentName(text, focusedText = '') {
+            const lines = `${focusedText}\n${text}`
                 .split(/\r?\n/)
-                .map(line => normalizeSpaces(line))
+                .map(line => cleanOcrLine(line))
                 .filter(Boolean);
 
             let bestLine = '';
@@ -830,26 +886,39 @@
             return bestLine;
         }
 
-        function updateDetectedFields(studentNumber, studentName, confidence) {
+        function updateDetectedFields(studentNumber, studentName, confidence, isLocked = false) {
             $('#ocr_student_number').val(studentNumber || '');
             $('#ocr_student_name').val(studentName || '');
             $('#ocrConfidenceText').text(confidence ? `OCR confidence: ${confidence}%` : 'OCR confidence will appear here after analysis.');
             $('#ocrResultPanel').show();
             $('#btnConfirmOcr').prop('disabled', !(studentNumber && studentName));
+            $('#ocrLockBadge').toggle(isLocked);
         }
 
         async function getOcrWorker() {
             if (!ocrWorkerPromise) {
-                ocrWorkerPromise = Tesseract.createWorker('eng');
+                ocrWorkerPromise = (async () => {
+                    const worker = await Tesseract.createWorker('eng');
+
+                    if (typeof worker.setParameters === 'function') {
+                        await worker.setParameters({
+                            preserve_interword_spaces: '1',
+                        });
+                    }
+
+                    return worker;
+                })();
             }
 
             return ocrWorkerPromise;
         }
 
-        async function captureAndAnalyzeId() {
+        async function captureAndAnalyzeId(isAutoPass = false) {
             const video = getScannerVideoElement();
             if (!video || video.readyState < 2) {
-                buildStatus('Camera preview is not ready yet. Please wait a moment, then try again.', 'error');
+                if (!isAutoPass) {
+                    buildStatus('Camera preview is not ready yet. Please wait a moment, then try again.', 'error');
+                }
                 return;
             }
 
@@ -861,6 +930,9 @@
             const cropHeight = Math.floor(height * 0.56);
             const cropX = Math.floor((width - cropWidth) / 2);
             const cropY = Math.floor((height - cropHeight) / 2);
+            const numberZoneHeight = Math.floor(cropHeight * 0.24);
+            const nameZoneY = Math.floor(cropHeight * 0.38);
+            const nameZoneHeight = Math.floor(cropHeight * 0.24);
 
             canvas.width = cropWidth;
             canvas.height = cropHeight;
@@ -879,27 +951,90 @@
 
             context.putImageData(imageData, 0, 0);
 
-            $('#btnRunOcr').prop('disabled', true).text('Analyzing ID...');
-            buildStatus('Analyzing the ID card. We are extracting the printed student number and name now.', 'info');
+            ocrInFlight = true;
+            $('#btnRunOcr').prop('disabled', true).text(isAutoPass ? 'Live OCR Running...' : 'Analyzing ID...');
+
+            if (!isAutoPass) {
+                buildStatus('Analyzing the ID card. We are extracting the printed student number and name now.', 'info');
+            }
 
             try {
                 const worker = await getOcrWorker();
                 const result = await worker.recognize(canvas);
                 const rawText = normalizeSpaces(result.data.text || '');
-                const studentNumber = extractStudentNumber(rawText);
-                const studentName = extractStudentName(result.data.text || '');
-                const confidence = Math.round(result.data.confidence || 0);
+                const numberZoneCanvas = document.createElement('canvas');
+                numberZoneCanvas.width = cropWidth;
+                numberZoneCanvas.height = numberZoneHeight;
+                numberZoneCanvas.getContext('2d', { willReadFrequently: true }).drawImage(
+                    canvas,
+                    0,
+                    0,
+                    cropWidth,
+                    numberZoneHeight,
+                    0,
+                    0,
+                    cropWidth,
+                    numberZoneHeight
+                );
 
-                updateDetectedFields(studentNumber, studentName, confidence);
+                const nameZoneCanvas = document.createElement('canvas');
+                nameZoneCanvas.width = cropWidth;
+                nameZoneCanvas.height = nameZoneHeight;
+                nameZoneCanvas.getContext('2d', { willReadFrequently: true }).drawImage(
+                    canvas,
+                    0,
+                    nameZoneY,
+                    cropWidth,
+                    nameZoneHeight,
+                    0,
+                    0,
+                    cropWidth,
+                    nameZoneHeight
+                );
+
+                const [numberZoneResult, nameZoneResult] = await Promise.all([
+                    worker.recognize(numberZoneCanvas),
+                    worker.recognize(nameZoneCanvas),
+                ]);
+
+                const studentNumber = extractStudentNumber(rawText, numberZoneResult.data.text || '');
+                const studentName = extractStudentName(result.data.text || '', nameZoneResult.data.text || '');
+                const confidence = Math.round(result.data.confidence || 0);
+                const signature = `${studentNumber}|${studentName}|${confidence}`;
+                const isStableCandidate = studentNumber && studentName;
+
+                if (isStableCandidate && signature === lastOcrSignature) {
+                    ocrLockCount += 1;
+                } else if (isStableCandidate) {
+                    ocrLockCount = 1;
+                } else {
+                    ocrLockCount = 0;
+                }
+
+                const isLocked = ocrLockCount >= 2 && isStableCandidate;
+
+                updateDetectedFields(studentNumber, studentName, confidence, isLocked);
 
                 if (studentNumber && studentName) {
-                    buildStatus('OCR capture is ready for review. Please confirm the extracted student number and name before continuing.', 'success', `Confidence ${confidence}%`);
-                } else {
+                    if (signature !== lastOcrSignature || !isAutoPass) {
+                        buildStatus(
+                            isLocked
+                                ? 'Live OCR locked onto the card. Please review the extracted student number and name before continuing.'
+                                : 'Live OCR found a candidate match. Hold the card steady for a moment or review the extracted fields below.',
+                            'success',
+                            `Confidence ${confidence}%`
+                        );
+                        lastOcrSignature = signature;
+                    }
+                } else if (!isAutoPass) {
                     buildStatus('OCR could not confidently read both fields yet. You can correct the values manually below or try another capture.', 'error', `Confidence ${confidence}%`);
                 }
             } catch (error) {
-                buildStatus('OCR analysis failed on this capture. Please try again or use manual entry.', 'error');
+                if (!isAutoPass) {
+                    buildStatus('OCR analysis failed on this capture. Please try again or use manual entry.', 'error');
+                }
             } finally {
+                ocrInFlight = false;
                 $('#btnRunOcr').prop('disabled', false).text('Capture & Analyze ID');
             }
         }
@@ -928,6 +1063,7 @@
                         mainScanner.stop().then(() => {
                             mainScanner = null;
                             currentVideoTrack = null;
+                            stopLiveOcr();
                             if (confirm(`${failureMessage}\n\nOpen Assisted Intake instead?`)) {
                                 showRegisterUI(id);
                             } else { window.location.reload(); }
@@ -955,7 +1091,7 @@
             $('#scanMethodNote').text(
                 isBioSync
                     ? 'BioSync mode uses the same patient lookup path for now, while presenting the intake flow as biometric identification.'
-                    : 'Use the camera to capture the printed student number and student name from the physical ID card.'
+                    : 'Use the live camera feed to continuously extract the printed student number and student name from the physical ID card.'
             );
             $('#scanMethodBadge').text(isBioSync ? 'BioSync Active' : 'OCR Active');
             $('#btnSwitchScanMode').text(isBioSync ? 'Switch to OCR Scan' : 'Switch to BioSync');
@@ -969,13 +1105,19 @@
             $('#scanInlineNote').text(
                 isBioSync
                     ? 'BioSync mode is selected. This section is currently in pending state while we complete the biometric workflow.'
-                    : 'OCR mode is active. Align the physical ID inside the frame, capture the card, then confirm the extracted student number and name.'
+                    : 'OCR mode is active. Align the physical ID inside the frame and the system will keep reading the card live until staff confirms the extracted student number and name.'
             );
             $('#barcodeScanPanel').toggle(!isBioSync);
             $('#bioSyncPendingPanel').toggle(isBioSync);
             $('#btnShowManual').toggle(!isBioSync);
             $('#manualInputArea').toggle(!isBioSync && $('#manualInputArea').is(':visible'));
             $('#ocrResultPanel').toggle(!isBioSync && $('#ocrResultPanel').is(':visible'));
+
+            if (isBioSync) {
+                stopLiveOcr();
+            } else {
+                startLiveOcr();
+            }
         }
 
         $('#btnShowManual').on('click', function() {
@@ -1001,7 +1143,7 @@
         });
 
         $('#btnRunOcr').on('click', function() {
-            captureAndAnalyzeId();
+            captureAndAnalyzeId(false);
         });
 
         $('#btnConfirmOcr').on('click', function() {
@@ -1016,11 +1158,14 @@
             verifyUser(studentNumber, studentName);
         });
 
-        $('#btnRetryOcr').on('click', function() {
+            $('#btnRetryOcr').on('click', function() {
             $('#ocr_student_number').val('');
             $('#ocr_student_name').val('');
             $('#btnConfirmOcr').prop('disabled', true);
             $('#ocrConfidenceText').text('OCR confidence will appear here after analysis.');
+            lastOcrSignature = '';
+            ocrLockCount = 0;
+            $('#ocrLockBadge').hide();
             buildStatus('We cleared the last OCR result. Capture the ID again when you are ready.', 'info');
         });
 

@@ -578,6 +578,7 @@
 
                     <div class="ocr-actions">
                         <button type="button" id="btnRunOcr" class="btn-ocr btn-ocr-primary">Capture & Analyze ID</button>
+                        <button type="button" id="btnRunAiOcr" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg, #1d4ed8, #2563eb 55%, #3b82f6); box-shadow:0 12px 24px rgba(37,99,235,0.22);">AI Verify ID</button>
                         <button type="button" id="btnRetryOcr" class="btn-ocr btn-ocr-secondary">Clear OCR Result</button>
                     </div>
 
@@ -970,13 +971,10 @@
             return ocrWorkerPromise;
         }
 
-        async function captureAndAnalyzeId(isAutoPass = false) {
+        function capturePreparedIdCanvas() {
             const video = getScannerVideoElement();
             if (!video || video.readyState < 2) {
-                if (!isAutoPass) {
-                    buildStatus('Camera preview is not ready yet. Please wait a moment, then try again.', 'error');
-                }
-                return;
+                return null;
             }
 
             const canvas = document.getElementById('ocrCanvas');
@@ -987,9 +985,6 @@
             const cropHeight = Math.floor(height * 0.56);
             const cropX = Math.floor((width - cropWidth) / 2);
             const cropY = Math.floor((height - cropHeight) / 2);
-            const numberZoneHeight = Math.floor(cropHeight * 0.24);
-            const nameZoneY = Math.floor(cropHeight * 0.38);
-            const nameZoneHeight = Math.floor(cropHeight * 0.24);
 
             canvas.width = cropWidth;
             canvas.height = cropHeight;
@@ -1007,6 +1002,23 @@
             }
 
             context.putImageData(imageData, 0, 0);
+
+            return canvas;
+        }
+
+        async function captureAndAnalyzeId(isAutoPass = false) {
+            const canvas = capturePreparedIdCanvas();
+            if (!canvas) {
+                if (!isAutoPass) {
+                    buildStatus('Camera preview is not ready yet. Please wait a moment, then try again.', 'error');
+                }
+                return;
+            }
+            const cropWidth = canvas.width;
+            const cropHeight = canvas.height;
+            const numberZoneHeight = Math.floor(cropHeight * 0.24);
+            const nameZoneY = Math.floor(cropHeight * 0.38);
+            const nameZoneHeight = Math.floor(cropHeight * 0.24);
 
             ocrInFlight = true;
             $('#btnRunOcr').prop('disabled', true).text(isAutoPass ? 'Live OCR Running...' : 'Analyzing ID...');
@@ -1124,6 +1136,51 @@
             }
         }
 
+        function verifyWithAi() {
+            const canvas = capturePreparedIdCanvas();
+            if (!canvas) {
+                buildStatus('Camera preview is not ready yet. Please wait a moment, then try AI verification again.', 'error');
+                return;
+            }
+
+            $('#btnRunAiOcr').prop('disabled', true).text('AI Verifying...');
+            buildStatus('Sending the captured ID frame to AI for a more accurate read. This may take a few seconds.', 'info');
+
+            $.ajax({
+                url: "{{ url($basePrefix . '/walkin/verify-id-ai') }}",
+                method: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    image_data: canvas.toDataURL('image/jpeg', 0.92),
+                },
+                success: function(res) {
+                    const studentNumber = (res.student_number || '').trim();
+                    const studentName = (res.student_name || '').trim();
+                    const note = (res.confidence_note || 'AI verification completed.').trim();
+
+                    if (studentNumber) {
+                        $('#ocr_student_number').val(studentNumber);
+                    }
+
+                    if (studentName) {
+                        $('#ocr_student_name').val(studentName);
+                    }
+
+                    $('#ocrResultPanel').show();
+                    $('#btnConfirmOcr').prop('disabled', !(studentNumber && studentName));
+                    $('#ocrLockBadge').show().text('AI Verified');
+                    buildStatus(note, 'success', 'AI assist');
+                },
+                error: function(xhr) {
+                    const response = xhr.responseJSON || {};
+                    buildStatus(response.message || 'AI verification could not complete right now. Please keep using OCR or manual review.', 'error');
+                },
+                complete: function() {
+                    $('#btnRunAiOcr').prop('disabled', false).text('AI Verify ID');
+                }
+            });
+        }
+
         function verifyUser(id, studentName = '') {
             $('#scan-loading').css('display', 'flex');
             $('#notification').html('');
@@ -1229,6 +1286,10 @@
 
         $('#btnRunOcr').on('click', function() {
             captureAndAnalyzeId(false);
+        });
+
+        $('#btnRunAiOcr').on('click', function() {
+            verifyWithAi();
         });
 
         $('#btnConfirmOcr').on('click', function() {

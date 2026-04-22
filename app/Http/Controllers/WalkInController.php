@@ -9,6 +9,8 @@ use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class WalkInController extends Controller
@@ -196,6 +198,51 @@ class WalkInController extends Controller
         return $this->inAssistantWorkspace($request) ? '/assistant' : '/admin';
     }
 
+    private function extractOpenAiOutputText(array $payload): string
+    {
+        $outputText = trim((string) data_get($payload, 'output_text', ''));
+        if ($outputText !== '') {
+            return $outputText;
+        }
+
+        $parts = [];
+        foreach ((array) data_get($payload, 'output', []) as $output) {
+            foreach ((array) data_get($output, 'content', []) as $content) {
+                $text = trim((string) data_get($content, 'text', ''));
+                if ($text !== '') {
+                    $parts[] = $text;
+                }
+            }
+        }
+
+        return trim(implode("\n", $parts));
+    }
+
+    private function decodeAiVerificationText(string $text): ?array
+    {
+        $text = trim($text);
+        if ($text === '') {
+            return null;
+        }
+
+        $text = preg_replace('/^```json\s*/i', '', $text) ?? $text;
+        $text = preg_replace('/^```\s*/', '', $text) ?? $text;
+        $text = preg_replace('/\s*```$/', '', $text) ?? $text;
+
+        $decoded = json_decode($text, true);
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        return [
+            'student_number' => trim((string) ($decoded['student_number'] ?? '')),
+            'first_name' => trim((string) ($decoded['first_name'] ?? '')),
+            'surname' => trim((string) ($decoded['surname'] ?? '')),
+            'full_name' => trim((string) ($decoded['full_name'] ?? '')),
+            'confidence_note' => trim((string) ($decoded['confidence_note'] ?? '')),
+        ];
+    }
+
     // 1. INDEX PAGE
     public function index(Request $request)
 {
@@ -318,6 +365,107 @@ class WalkInController extends Controller
             'lookup_status' => $lookupStatus,
             'message' => $lookupMessage,
         ]);
+    }
+
+    public function verifyStudentIdWithAi(Request $request)
+    {
+        $request->validate([
+            'image_data' => 'required|string',
+        ]);
+
+        $apiKey = trim((string) config('services.openai.api_key'));
+        if ($apiKey === '') {
+            return response()->json([
+                'status' => 'unavailable',
+                'message' => 'AI verification is not configured yet. Please add OPENAI_API_KEY first.',
+            ], 422);
+        }
+
+        $imageData = trim((string) $request->input('image_data'));
+        if (!Str::startsWith($imageData, 'data:image/')) {
+            return response()->json([
+                'status' => 'invalid_image',
+                'message' => 'The captured ID image is invalid. Please capture the card again.',
+            ], 422);
+        }
+
+        $model = trim((string) config('services.openai.model', ''));
+        if ($model === '') {
+            $model = 'gpt-4.1-mini';
+        }
+
+        $prompt = <<<'PROMPT'
+You are reading a school ID card for clinic intake.
+Extract only the printed identity fields and return strict JSON with these keys:
+student_number, first_name, surname, full_name, confidence_note
+
+Rules:
+- The card layout is vertical:
+  1. given/first name on an upper line
+  2. surname on the line below
+  3. student number below the name lines
+- Student number format may look like: 2025-00523-TG-0
+- Preserve hyphens in the student number.
+- If a field is unclear, return an empty string for that field.
+- full_name should combine first_name and surname when both are readable.
+- confidence_note should be a short plain-English note about the extraction quality.
+- Return JSON only. No markdown fence. No explanation.
+PROMPT;
+
+        try {
+            $response = Http::withToken($apiKey)
+                ->acceptJson()
+                ->timeout(30)
+                ->post('https://api.openai.com/v1/responses', [
+                    'model' => $model,
+                    'input' => [[
+                        'role' => 'user',
+                        'content' => [
+                            ['type' => 'input_text', 'text' => $prompt],
+                            ['type' => 'input_image', 'image_url' => $imageData, 'detail' => 'high'],
+                        ],
+                    ]],
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'status' => 'api_error',
+                    'message' => 'AI verification could not finish right now.',
+                    'details' => $response->json() ?: $response->body(),
+                ], $response->status());
+            }
+
+            $payload = $response->json() ?: [];
+            $text = $this->extractOpenAiOutputText($payload);
+            $decoded = $this->decodeAiVerificationText($text);
+
+            if (!$decoded) {
+                Log::warning('AI ID verification returned non-JSON text.', ['text' => $text]);
+
+                return response()->json([
+                    'status' => 'parse_error',
+                    'message' => 'AI verification returned an unreadable response. Please try again.',
+                ], 422);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'student_number' => $decoded['student_number'],
+                'student_name' => trim($decoded['full_name'] !== '' ? $decoded['full_name'] : trim($decoded['first_name'] . ' ' . $decoded['surname'])),
+                'first_name' => $decoded['first_name'],
+                'surname' => $decoded['surname'],
+                'confidence_note' => $decoded['confidence_note'],
+            ]);
+        } catch (\Throwable $exception) {
+            Log::error('AI ID verification failed.', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return response()->json([
+                'status' => 'server_error',
+                'message' => 'AI verification failed. Please try again or use manual confirmation.',
+            ], 500);
+        }
     }
 
     // 4. REGISTER STUDENT

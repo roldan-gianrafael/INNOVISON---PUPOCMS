@@ -103,6 +103,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
 
         Route::get('/admin/walkin', [WalkInController::class, 'index'])->name('walkin.index');
         Route::get('/admin/walkin/get-student', [WalkInController::class, 'getStudent'])->name('walkin.getStudent');
+        Route::post('/admin/walkin/verify-id-ai', [WalkInController::class, 'verifyStudentIdWithAi'])->name('walkin.verify-id-ai');
         Route::post('/admin/walkin/register', [WalkInController::class, 'registerStudent'])->name('walkin.registerStudent');
         Route::get('/admin/walkin/form/{student_id}', [WalkInController::class, 'showWalkinForm'])->name('walkin.form');
         Route::post('/admin/walkin/store', [WalkInController::class, 'store'])->name('walkin.store');
@@ -159,6 +160,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
 
         Route::get('/walkin', [WalkInController::class, 'index'])->name('walkin.index');
         Route::get('/walkin/get-student', [WalkInController::class, 'getStudent'])->name('walkin.getStudent');
+        Route::post('/walkin/verify-id-ai', [WalkInController::class, 'verifyStudentIdWithAi'])->name('walkin.verify-id-ai');
         Route::post('/walkin/register', [WalkInController::class, 'registerStudent'])->name('walkin.registerStudent');
         Route::get('/walkin/form/{student_id}', [WalkInController::class, 'showWalkinForm'])->name('walkin.form');
         Route::post('/walkin/store', [WalkInController::class, 'store'])->name('walkin.store');

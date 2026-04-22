@@ -729,6 +729,7 @@
     let studentNameStableCount = 0;
     let manualStudentNumberEdited = false;
     let manualStudentNameEdited = false;
+    let lastPreviewedStudentNumber = '';
     const initialMode = @json($currentMode);
     let scanMethod = 'ocr';
     const supportedFormats = window.Html5QrcodeSupportedFormats ? [
@@ -953,6 +954,33 @@
             $('#ocrLockBadge').toggle(isLocked);
         }
 
+        function requestMatchedNamePreview(studentNumber, extractedName = '', onApplied = null) {
+            const normalizedStudentNumber = (studentNumber || '').trim();
+            if (!normalizedStudentNumber || lastPreviewedStudentNumber === normalizedStudentNumber) {
+                return;
+            }
+
+            lastPreviewedStudentNumber = normalizedStudentNumber;
+
+            $.get("{{ url($basePrefix . '/walkin/get-student') }}", {
+                student_id: normalizedStudentNumber,
+                student_name: extractedName,
+                preview_only: 1
+            }, function(res) {
+                if (res.status !== 'preview' || !res.student_name) {
+                    return;
+                }
+
+                $('#ocr_student_name').val(res.student_name);
+                $('#btnConfirmOcr').prop('disabled', !($('#ocr_student_number').val().trim() && $('#ocr_student_name').val().trim()));
+                $('#ocrLockBadge').show().text('Matched in records');
+
+                if (typeof onApplied === 'function') {
+                    onApplied(res);
+                }
+            });
+        }
+
         async function getOcrWorker() {
             if (!ocrWorkerPromise) {
                 ocrWorkerPromise = (async () => {
@@ -1111,6 +1139,14 @@
                 updateDetectedFields(stableStudentNumber || studentNumber, stableStudentName, confidence, isLocked, allowNameAutofill);
 
                 if (stableStudentNumber) {
+                    requestMatchedNamePreview(stableStudentNumber, stableStudentName || studentName, function(preview) {
+                        if (preview.name_matches === false) {
+                            buildStatus('Student number matched an official record, but the name read from the ID looks different. Please double-check the card before continuing.', 'info', 'Record name applied');
+                        } else {
+                            buildStatus('Student number matched an official record and the system applied the saved name automatically. Please review before continuing.', 'success', 'Record name applied');
+                        }
+                    });
+
                     if (signature !== lastOcrSignature || !isAutoPass) {
                         buildStatus(
                             isLocked
@@ -1169,7 +1205,18 @@
                     $('#ocrResultPanel').show();
                     $('#btnConfirmOcr').prop('disabled', !(studentNumber && studentName));
                     $('#ocrLockBadge').show().text('AI Verified');
-                    buildStatus(note, 'success', 'AI assist');
+
+                    if (studentNumber) {
+                        requestMatchedNamePreview(studentNumber, studentName, function(preview) {
+                            if (preview.name_matches === false) {
+                                buildStatus('We matched the student number and filled the official name from your records. The name read from the ID still needs a quick visual double-check.', 'info', 'AI + records');
+                            } else {
+                                buildStatus('We matched the student number and filled the official name from your records. Please review before continuing.', 'success', 'AI + records');
+                            }
+                        });
+                    } else {
+                        buildStatus(note, 'success', 'AI assist');
+                    }
                 },
                 error: function(xhr) {
                     const response = xhr.responseJSON || {};
@@ -1317,12 +1364,14 @@
             studentNameStableCount = 0;
             manualStudentNumberEdited = false;
             manualStudentNameEdited = false;
+            lastPreviewedStudentNumber = '';
             $('#ocrLockBadge').hide();
             buildStatus('We cleared the last OCR result. Capture the ID again when you are ready.', 'info');
         });
 
         $('#ocr_student_number').on('input', function() {
             manualStudentNumberEdited = true;
+            lastPreviewedStudentNumber = '';
             const hasBoth = $('#ocr_student_number').val().trim() !== '' && $('#ocr_student_name').val().trim() !== '';
             $('#btnConfirmOcr').prop('disabled', !hasBoth);
         });

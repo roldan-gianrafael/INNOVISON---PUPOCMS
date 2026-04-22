@@ -321,6 +321,7 @@ class WalkInController extends Controller
     {
         $lookup = trim((string) $request->student_id);
         $lookupName = trim((string) $request->student_name);
+        $previewOnly = $request->boolean('preview_only');
 
         $student = $this->findUserByIdentifier($lookup);
         $lookupMessage = 'No patient matched that student number in local records or PUPTAS.';
@@ -338,6 +339,18 @@ class WalkInController extends Controller
         }
 
         if ($student) {
+            $resolvedName = trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? ''))));
+
+            if ($previewOnly) {
+                return response()->json([
+                    'status' => 'preview',
+                    'student_number' => $student->student_number ?: $student->student_id,
+                    'student_name' => $resolvedName,
+                    'name_matches' => $lookupName !== '' ? $this->namesRoughlyMatch($lookupName, $student) : null,
+                    'lookup_status' => $lookupStatus,
+                ]);
+            }
+
             if (!$this->namesRoughlyMatch($lookupName, $student)) {
                 return response()->json([
                     'status' => 'name_mismatch',
@@ -345,7 +358,7 @@ class WalkInController extends Controller
                     'message' => 'The student number matched a record, but the extracted name does not match our saved name yet.',
                     'candidate' => [
                         'student_number' => $student->student_number ?: $student->student_id,
-                        'name' => trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? '')))),
+                        'name' => $resolvedName,
                     ],
                 ]);
             }

@@ -775,6 +775,10 @@
             return document.querySelector('#readerScan video');
         }
 
+        function isOcrMode() {
+            return scanMethod !== 'biosync';
+        }
+
         function attachVideoTrack() {
             const video = getScannerVideoElement();
             if (!video || !video.srcObject) {
@@ -793,14 +797,14 @@
         }
 
         function startLiveOcr() {
-            if (scanMethod !== 'ocr' || liveOcrInterval) {
+            if (!isOcrMode() || liveOcrInterval) {
                 return;
             }
 
             liveOcrInterval = window.setInterval(function () {
                 const video = getScannerVideoElement();
 
-                if (scanMethod !== 'ocr' || ocrInFlight || !video || video.readyState < 2) {
+                if (!isOcrMode() || ocrInFlight || !video || video.readyState < 2) {
                     return;
                 }
 
@@ -815,7 +819,7 @@
                     { facingMode: "environment" },
                     scannerConfig,
                     (decodedText) => {
-                        if (scanMethod === 'ocr') {
+                        if (isOcrMode()) {
                             return;
                         }
 
@@ -1320,7 +1324,7 @@
             $scanStage.addClass('is-flipping');
 
             window.setTimeout(function () {
-            scanMethod = scanMethod === 'biosync' ? 'barcode' : 'biosync';
+            scanMethod = scanMethod === 'biosync' ? 'ocr' : 'biosync';
             updateScanModeUI();
             }, 180);
 

@@ -722,6 +722,12 @@
     let ocrInFlight = false;
     let lastOcrSignature = '';
     let ocrLockCount = 0;
+    let lastStudentNumberCandidate = '';
+    let studentNumberStableCount = 0;
+    let lastStudentNameCandidate = '';
+    let studentNameStableCount = 0;
+    let manualStudentNumberEdited = false;
+    let manualStudentNameEdited = false;
     const initialMode = @json($currentMode);
     let scanMethod = 'ocr';
     const supportedFormats = window.Html5QrcodeSupportedFormats ? [
@@ -835,16 +841,22 @@
         function extractStudentNumber(text, focusedText = '') {
             const normalized = `${focusedText} ${text}`.replace(/\s+/g, ' ').toUpperCase();
             const patterns = [
+                /\b20\d{2}\s*-\s*\d{5}\s*-\s*[A-Z]{2}\s*-\s*\d\b/,
                 /\b20\d{2}-\d{3}-\d{3}\b/,
                 /\b\d{4}-\d{3}-\d{3}\b/,
                 /\b\d{4}\s*-\s*\d{3}\s*-\s*\d{3}\b/,
-                /\b20\d{2}\d{6}\b/
+                /\b20\d{2}\d{6}\b/,
+                /\b20\d{2}\d{5}[A-Z]{2}\d\b/
             ];
 
             for (const pattern of patterns) {
                 const match = normalized.match(pattern);
                 if (match) {
-                    const compact = match[0].replace(/\s+/g, '');
+                    const compact = match[0].replace(/\s+/g, '').toUpperCase();
+
+                    if (/^20\d{2}\d{5}[A-Z]{2}\d$/.test(compact)) {
+                        return `${compact.slice(0, 4)}-${compact.slice(4, 9)}-${compact.slice(9, 11)}-${compact.slice(11, 12)}`;
+                    }
 
                     if (/^20\d{10}$/.test(compact)) {
                         return `${compact.slice(0, 4)}-${compact.slice(4, 7)}-${compact.slice(7, 10)}`;
@@ -857,41 +869,86 @@
             return '';
         }
 
+        function isLikelyNameLine(line, allowSingleToken = false) {
+            const cleaned = line.replace(/[^A-Za-z\s]/g, '').trim();
+            const upper = cleaned.toUpperCase();
+            const tokens = upper.split(' ').filter(Boolean);
+
+            if (!tokens.length) {
+                return false;
+            }
+
+            if (!allowSingleToken && tokens.length < 2) {
+                return false;
+            }
+
+            if (tokens.length > 5) {
+                return false;
+            }
+
+            if (tokens.some(token => ocrSkipWords.includes(token))) {
+                return false;
+            }
+
+            if (tokens.some(token => token.length < 2 && !['R', 'J'].includes(token))) {
+                return false;
+            }
+
+            if (!tokens.every(token => /^[A-Z]+$/.test(token))) {
+                return false;
+            }
+
+            return true;
+        }
+
         function extractStudentName(text, focusedText = '') {
             const lines = `${focusedText}\n${text}`
                 .split(/\r?\n/)
                 .map(line => cleanOcrLine(line))
                 .filter(Boolean);
-
-            let bestLine = '';
+            const uniqueLines = [];
 
             lines.forEach((line) => {
-                const cleaned = line.replace(/[^A-Za-z\s]/g, '').trim();
-                const upper = cleaned.toUpperCase();
-                const tokens = upper.split(' ').filter(Boolean);
-
-                if (tokens.length < 2 || tokens.length > 5) {
-                    return;
-                }
-
-                if (tokens.some(token => ocrSkipWords.includes(token))) {
-                    return;
-                }
-
-                if (upper.length > bestLine.length) {
-                    bestLine = upper;
+                const upper = line.toUpperCase();
+                if (!uniqueLines.includes(upper) && !/\d/.test(upper)) {
+                    uniqueLines.push(upper);
                 }
             });
 
-            return bestLine;
+            for (let i = 0; i < uniqueLines.length - 1; i += 1) {
+                const topLine = uniqueLines[i];
+                const nextLine = uniqueLines[i + 1];
+
+                if (isLikelyNameLine(topLine, false) && isLikelyNameLine(nextLine, true)) {
+                    return `${topLine} ${nextLine}`.replace(/\s+/g, ' ').trim();
+                }
+            }
+
+            const singleLineCandidate = uniqueLines.find(line => isLikelyNameLine(line, false));
+            if (singleLineCandidate) {
+                return singleLineCandidate;
+            }
+
+            const twoSingleTokenLines = uniqueLines.filter(line => isLikelyNameLine(line, true)).slice(0, 2);
+            if (twoSingleTokenLines.length === 2) {
+                return twoSingleTokenLines.join(' ');
+            }
+
+            return '';
         }
 
-        function updateDetectedFields(studentNumber, studentName, confidence, isLocked = false) {
-            $('#ocr_student_number').val(studentNumber || '');
-            $('#ocr_student_name').val(studentName || '');
+        function updateDetectedFields(studentNumber, studentName, confidence, isLocked = false, allowNameAutofill = false) {
+            if (studentNumber && (!manualStudentNumberEdited || $('#ocr_student_number').val().trim() === '')) {
+                $('#ocr_student_number').val(studentNumber);
+            }
+
+            if (allowNameAutofill && studentName && (!manualStudentNameEdited || $('#ocr_student_name').val().trim() === '')) {
+                $('#ocr_student_name').val(studentName);
+            }
+
             $('#ocrConfidenceText').text(confidence ? `OCR confidence: ${confidence}%` : 'OCR confidence will appear here after analysis.');
             $('#ocrResultPanel').show();
-            $('#btnConfirmOcr').prop('disabled', !(studentNumber && studentName));
+            $('#btnConfirmOcr').prop('disabled', !($('#ocr_student_number').val().trim() && $('#ocr_student_name').val().trim()));
             $('#ocrLockBadge').toggle(isLocked);
         }
 
@@ -1000,8 +1057,34 @@
                 const studentNumber = extractStudentNumber(rawText, numberZoneResult.data.text || '');
                 const studentName = extractStudentName(result.data.text || '', nameZoneResult.data.text || '');
                 const confidence = Math.round(result.data.confidence || 0);
-                const signature = `${studentNumber}|${studentName}|${confidence}`;
-                const isStableCandidate = studentNumber && studentName;
+                const hasNumberCandidate = studentNumber !== '';
+                const hasNameCandidate = studentName !== '';
+
+                if (hasNumberCandidate && studentNumber === lastStudentNumberCandidate) {
+                    studentNumberStableCount += 1;
+                } else if (hasNumberCandidate) {
+                    lastStudentNumberCandidate = studentNumber;
+                    studentNumberStableCount = 1;
+                } else {
+                    lastStudentNumberCandidate = '';
+                    studentNumberStableCount = 0;
+                }
+
+                if (hasNameCandidate && studentName === lastStudentNameCandidate) {
+                    studentNameStableCount += 1;
+                } else if (hasNameCandidate) {
+                    lastStudentNameCandidate = studentName;
+                    studentNameStableCount = 1;
+                } else {
+                    lastStudentNameCandidate = '';
+                    studentNameStableCount = 0;
+                }
+
+                const allowNameAutofill = hasNameCandidate && studentNameStableCount >= 3 && confidence >= 55;
+                const stableStudentNumber = hasNumberCandidate && studentNumberStableCount >= 2 ? studentNumber : '';
+                const stableStudentName = allowNameAutofill ? studentName : '';
+                const signature = `${stableStudentNumber}|${stableStudentName}|${confidence}`;
+                const isStableCandidate = stableStudentNumber && stableStudentName;
 
                 if (isStableCandidate && signature === lastOcrSignature) {
                     ocrLockCount += 1;
@@ -1013,14 +1096,16 @@
 
                 const isLocked = ocrLockCount >= 2 && isStableCandidate;
 
-                updateDetectedFields(studentNumber, studentName, confidence, isLocked);
+                updateDetectedFields(stableStudentNumber || studentNumber, stableStudentName, confidence, isLocked, allowNameAutofill);
 
-                if (studentNumber && studentName) {
+                if (stableStudentNumber) {
                     if (signature !== lastOcrSignature || !isAutoPass) {
                         buildStatus(
                             isLocked
                                 ? 'Live OCR locked onto the card. Please review the extracted student number and name before continuing.'
-                                : 'Live OCR found a candidate match. Hold the card steady for a moment or review the extracted fields below.',
+                                : allowNameAutofill
+                                    ? 'Live OCR found a stable student number and a usable name guess. Please review the extracted fields below.'
+                                    : 'Live OCR found a stable student number. Please review or type the name if OCR is still unsure.',
                             'success',
                             `Confidence ${confidence}%`
                         );
@@ -1158,18 +1243,31 @@
             verifyUser(studentNumber, studentName);
         });
 
-            $('#btnRetryOcr').on('click', function() {
+        $('#btnRetryOcr').on('click', function() {
             $('#ocr_student_number').val('');
             $('#ocr_student_name').val('');
             $('#btnConfirmOcr').prop('disabled', true);
             $('#ocrConfidenceText').text('OCR confidence will appear here after analysis.');
             lastOcrSignature = '';
             ocrLockCount = 0;
+            lastStudentNumberCandidate = '';
+            studentNumberStableCount = 0;
+            lastStudentNameCandidate = '';
+            studentNameStableCount = 0;
+            manualStudentNumberEdited = false;
+            manualStudentNameEdited = false;
             $('#ocrLockBadge').hide();
             buildStatus('We cleared the last OCR result. Capture the ID again when you are ready.', 'info');
         });
 
-        $('#ocr_student_number, #ocr_student_name').on('input', function() {
+        $('#ocr_student_number').on('input', function() {
+            manualStudentNumberEdited = true;
+            const hasBoth = $('#ocr_student_number').val().trim() !== '' && $('#ocr_student_name').val().trim() !== '';
+            $('#btnConfirmOcr').prop('disabled', !hasBoth);
+        });
+
+        $('#ocr_student_name').on('input', function() {
+            manualStudentNameEdited = true;
             const hasBoth = $('#ocr_student_number').val().trim() !== '' && $('#ocr_student_name').val().trim() !== '';
             $('#btnConfirmOcr').prop('disabled', !hasBoth);
         });

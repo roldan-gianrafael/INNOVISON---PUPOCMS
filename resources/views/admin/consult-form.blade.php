@@ -92,7 +92,7 @@
         </div>
 
         <span class="badge-role">{{ $studentDisplayRole }}</span>
-        <span style="font-size: 13px; color: #64748b; margin-left: 10px;">Student Number: {{ $student->student_number ?: 'N/A' }}</span>
+        <span style="font-size: 13px; color: #64748b; margin-left: 10px;">: {{ $student->student_number ?: 'N/A' }}</span>
 
         @if(($user_source ?? '') == 'online' && isset($latestAppointment))
             <div style="margin-top: 10px;">

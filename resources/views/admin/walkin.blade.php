@@ -432,31 +432,6 @@
         font-weight: 800;
     }
 
-    .freeze-preview {
-        margin-top: 14px;
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid #cbd5e1;
-        background: #0f172a;
-        display: none;
-    }
-
-    .freeze-preview img {
-        display: block;
-        width: 100%;
-        max-height: 260px;
-        object-fit: contain;
-        background: #0f172a;
-    }
-
-    .freeze-caption {
-        padding: 10px 12px;
-        font-size: 12px;
-        color: #334155;
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
-    }
-
     .manual-find-btn {
         min-width: 128px;
         padding: 0 20px;
@@ -602,15 +577,8 @@
                     </div>
 
                     <div class="ocr-actions">
-                        <button type="button" id="btnRunOcr" class="btn-ocr btn-ocr-primary">Capture & Analyze ID</button>
-                        <button type="button" id="btnFreezeFrame" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg, #475569, #334155 55%, #1e293b); box-shadow:0 12px 24px rgba(51,65,85,0.18);">Freeze Frame</button>
                         <button type="button" id="btnRunAiOcr" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg, #1d4ed8, #2563eb 55%, #3b82f6); box-shadow:0 12px 24px rgba(37,99,235,0.22);">AI Verify ID</button>
                         <button type="button" id="btnRetryOcr" class="btn-ocr btn-ocr-secondary">Clear OCR Result</button>
-                    </div>
-
-                    <div id="freezePreview" class="freeze-preview">
-                        <img id="freezePreviewImage" alt="Frozen ID frame">
-                        <div id="freezeCaption" class="freeze-caption">Frozen frame ready. Run OCR or AI on this still image, or unfreeze to resume the live camera.</div>
                     </div>
 
                     <div id="ocrResultPanel" class="ocr-result-panel" style="display:none;">
@@ -761,11 +729,10 @@
     let manualStudentNumberEdited = false;
     let manualStudentNameEdited = false;
     let lastPreviewedStudentNumber = '';
-    let frozenFrameDataUrl = '';
     const initialMode = @json($currentMode);
     let scanMethod = 'ocr';
     const liveOcrIntervalMs = 1100;
-    const ocrCanvasScale = 0.78;
+    const ocrCanvasScale = 0.9;
     const supportedFormats = window.Html5QrcodeSupportedFormats ? [
         Html5QrcodeSupportedFormats.CODE_128,
         Html5QrcodeSupportedFormats.CODE_39,
@@ -825,44 +792,8 @@
             }
         }
 
-        function hasFrozenFrame() {
-            return frozenFrameDataUrl !== '';
-        }
-
-        function setFreezeUiState(isFrozen) {
-            $('#btnFreezeFrame').text(isFrozen ? 'Resume Live View' : 'Freeze Frame');
-            $('#freezePreview').toggle(isFrozen);
-            $('#ocrLockBadge').toggle(isFrozen && $('#ocrLockBadge').is(':visible'));
-        }
-
-        function releaseFrozenFrame() {
-            frozenFrameDataUrl = '';
-            $('#freezePreviewImage').attr('src', '');
-            $('#freezeCaption').text('Frozen frame ready. Run OCR or AI on this still image, or unfreeze to resume the live camera.');
-            setFreezeUiState(false);
-
-            if (scanMethod === 'ocr') {
-                startLiveOcr();
-            }
-        }
-
-        function freezeCurrentFrame() {
-            const canvas = capturePreparedIdCanvas({ useFrozenFrame: false });
-            if (!canvas) {
-                buildStatus('Camera preview is not ready yet. Please wait a moment, then try freezing the frame again.', 'error');
-                return;
-            }
-
-            frozenFrameDataUrl = canvas.toDataURL('image/jpeg', 0.86);
-            $('#freezePreviewImage').attr('src', frozenFrameDataUrl);
-            $('#freezeCaption').text('Frozen frame captured. OCR and AI will now use this still image until you resume the live view.');
-            stopLiveOcr();
-            setFreezeUiState(true);
-            buildStatus('Frozen frame captured. This helps when the camera or card is shaky and usually speeds up a clean confirmation.', 'success', 'Still image locked');
-        }
-
         function startLiveOcr() {
-            if (scanMethod !== 'ocr' || liveOcrInterval || hasFrozenFrame()) {
+            if (scanMethod !== 'ocr' || liveOcrInterval) {
                 return;
             }
 
@@ -1069,28 +1000,16 @@
             return ocrWorkerPromise;
         }
 
-        function capturePreparedIdCanvas(options = {}) {
-            const useFrozenFrame = options.useFrozenFrame !== false && hasFrozenFrame();
-            const frozenImage = useFrozenFrame ? document.getElementById('freezePreviewImage') : null;
-            const video = useFrozenFrame ? null : getScannerVideoElement();
-            const source = useFrozenFrame ? frozenImage : video;
-
-            if (!source) {
-                return null;
-            }
-
-            if (!useFrozenFrame && (!video || video.readyState < 2)) {
-                return null;
-            }
-
-            if (useFrozenFrame && !frozenImage.complete) {
+        function capturePreparedIdCanvas() {
+            const video = getScannerVideoElement();
+            if (!video || video.readyState < 2) {
                 return null;
             }
 
             const canvas = document.getElementById('ocrCanvas');
             const context = canvas.getContext('2d', { willReadFrequently: true });
-            const width = useFrozenFrame ? (frozenImage.naturalWidth || frozenImage.width || 1280) : (video.videoWidth || 1280);
-            const height = useFrozenFrame ? (frozenImage.naturalHeight || frozenImage.height || 720) : (video.videoHeight || 720);
+            const width = video.videoWidth || 1280;
+            const height = video.videoHeight || 720;
             const cropWidth = Math.floor(width * 0.86);
             const cropHeight = Math.floor(height * 0.56);
             const cropX = Math.floor((width - cropWidth) / 2);
@@ -1100,7 +1019,7 @@
 
             canvas.width = outputWidth;
             canvas.height = outputHeight;
-            context.drawImage(source, cropX, cropY, cropWidth, cropHeight, 0, 0, outputWidth, outputHeight);
+            context.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, outputWidth, outputHeight);
 
             const imageData = context.getImageData(0, 0, outputWidth, outputHeight);
             const data = imageData.data;
@@ -1129,6 +1048,8 @@
             const cropWidth = canvas.width;
             const cropHeight = canvas.height;
             const numberZoneHeight = Math.floor(cropHeight * 0.24);
+            const nameZoneY = Math.floor(cropHeight * 0.36);
+            const nameZoneHeight = Math.floor(cropHeight * 0.26);
             ocrInFlight = true;
             $('#btnRunOcr').prop('disabled', true).text(isAutoPass ? 'Live OCR Running...' : 'Analyzing ID...');
 
@@ -1152,10 +1073,28 @@
                     cropWidth,
                     numberZoneHeight
                 );
-                const numberZoneResult = await worker.recognize(numberZoneCanvas);
+                const nameZoneCanvas = document.createElement('canvas');
+                nameZoneCanvas.width = cropWidth;
+                nameZoneCanvas.height = nameZoneHeight;
+                nameZoneCanvas.getContext('2d', { willReadFrequently: true }).drawImage(
+                    canvas,
+                    0,
+                    nameZoneY,
+                    cropWidth,
+                    nameZoneHeight,
+                    0,
+                    0,
+                    cropWidth,
+                    nameZoneHeight
+                );
+
+                const [numberZoneResult, nameZoneResult] = await Promise.all([
+                    worker.recognize(numberZoneCanvas),
+                    worker.recognize(nameZoneCanvas),
+                ]);
                 const studentNumber = extractStudentNumber(numberZoneResult.data.text || '', numberZoneResult.data.text || '');
-                const studentName = '';
-                const confidence = Math.round(numberZoneResult.data.confidence || 0);
+                const studentName = extractStudentName(nameZoneResult.data.text || '', nameZoneResult.data.text || '');
+                const confidence = Math.round(((numberZoneResult.data.confidence || 0) + (nameZoneResult.data.confidence || 0)) / 2);
                 const hasNumberCandidate = studentNumber !== '';
                 const hasNameCandidate = studentName !== '';
 
@@ -1179,11 +1118,11 @@
                     studentNameStableCount = 0;
                 }
 
-                const allowNameAutofill = false;
+                const allowNameAutofill = hasNameCandidate && studentNameStableCount >= 2 && confidence >= 50;
                 const stableStudentNumber = hasNumberCandidate && studentNumberStableCount >= 2 ? studentNumber : '';
                 const stableStudentName = allowNameAutofill ? studentName : '';
                 const signature = `${stableStudentNumber}|${stableStudentName}|${confidence}`;
-                const isStableCandidate = stableStudentNumber !== '';
+                const isStableCandidate = stableStudentNumber !== '' || stableStudentName !== '';
 
                 if (isStableCandidate && signature === lastOcrSignature) {
                     ocrLockCount += 1;
@@ -1198,15 +1137,21 @@
                 updateDetectedFields(stableStudentNumber || studentNumber, stableStudentName, confidence, isLocked, allowNameAutofill);
 
                 if (stableStudentNumber) {
-                    requestMatchedNamePreview(stableStudentNumber, '', function() {
-                        buildStatus('Student number matched an official record and the system applied the saved name automatically. Please review before continuing.', 'success', 'Record name applied');
+                    requestMatchedNamePreview(stableStudentNumber, stableStudentName || studentName, function(preview) {
+                        if (preview.name_matches === false) {
+                            buildStatus('Student number matched an official record, but the scanned name still looks different. Please review the card before continuing.', 'info', 'Record name applied');
+                        } else {
+                            buildStatus('Student number matched an official record and the system applied the saved name automatically. Please review before continuing.', 'success', 'Record name applied');
+                        }
                     });
 
                     if (signature !== lastOcrSignature || !isAutoPass) {
                         buildStatus(
                             isLocked
-                                ? 'Live OCR locked onto the student number. The system is applying the matched official name now.'
-                                : 'Live OCR found a stable student number. Matching the official name now.',
+                                ? 'Live OCR locked onto the card. Please review the extracted student number and name before continuing.'
+                                : allowNameAutofill
+                                    ? 'Live OCR found a stable student number and a usable name guess. Please review the extracted fields below.'
+                                    : 'Live OCR found a stable student number. The system is matching the saved name now.',
                             'success',
                             `Confidence ${confidence}%`
                         );
@@ -1384,20 +1329,6 @@
             }, 560);
         });
 
-        $('#btnRunOcr').on('click', function() {
-            captureAndAnalyzeId(false);
-        });
-
-        $('#btnFreezeFrame').on('click', function() {
-            if (hasFrozenFrame()) {
-                releaseFrozenFrame();
-                buildStatus('Live camera resumed. Hold the ID steady again or freeze another clean frame when needed.', 'info');
-                return;
-            }
-
-            freezeCurrentFrame();
-        });
-
         $('#btnRunAiOcr').on('click', function() {
             verifyWithAi();
         });
@@ -1428,7 +1359,6 @@
             manualStudentNumberEdited = false;
             manualStudentNameEdited = false;
             lastPreviewedStudentNumber = '';
-            releaseFrozenFrame();
             $('#ocrLockBadge').hide();
             buildStatus('We cleared the last OCR result. Capture the ID again when you are ready.', 'info');
         });

@@ -237,7 +237,7 @@
     <div class="action-header">
         <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="btn-add-walkin">
             <span class="btn-icon">📷</span>
-            <span class="btn-text">Scan Barcode</span>
+            <span class="btn-text">Scan ID / Fingerprint</span>
         </a>
     </div>
 

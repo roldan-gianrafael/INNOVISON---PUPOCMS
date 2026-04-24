@@ -194,6 +194,11 @@
 
     .action-header { margin-bottom: 20px; }
 
+    .appointments-page-title {
+        margin: 0;
+        color: #111827;
+    }
+
     .btn-add-walkin {
         display: inline-flex;
         align-items: center;
@@ -218,6 +223,10 @@
         text-decoration: none;
     }
 
+    html[data-theme="dark"] .appointments-page-title {
+        color: #ffffff;
+    }
+
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 @endpush
@@ -229,7 +238,7 @@
     @endphp
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="margin:0; color:#111827;">Appointments</h2>
+        <h2 class="appointments-page-title">Appointments</h2>
         <input type="text" id="searchInput" placeholder="Search by name..." 
                style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 300px; color:#111827;">
     </div>

@@ -259,6 +259,11 @@
         color: #ffffff;
     }
 
+    html[data-theme="dark"] .scan-method-title,
+    html[data-theme="dark"] .scan-method-note {
+        color: #ffffff;
+    }
+
     .scan-surface {
         padding: 16px;
         border-radius: 16px;

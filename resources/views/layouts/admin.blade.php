@@ -593,12 +593,15 @@
 
         .quick-action-btn,
         .quick-action-logo {
-            width: 34px;
-            height: 34px;
-            border: none;
-            border-radius: 0;
-            background: transparent;
-            box-shadow: none;
+            width: 66px;
+            height: 66px;
+            border-radius: 999px;
+            border: 2px solid #facc15;
+            background: linear-gradient(145deg, #9b111e, #6e1220 55%, #4f0b15);
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.12),
+                0 0 18px rgba(250, 204, 21, 0.26),
+                0 10px 22px rgba(95, 0, 18, 0.28);
         }
 
         .quick-actions-toggle {
@@ -626,10 +629,36 @@
         }
 
         .quick-action-btn:hover {
-            background: transparent;
-            border-color: transparent;
-            box-shadow: none;
-            transform: translateY(-1px) scale(1.08);
+            background: linear-gradient(145deg, #b01826, #7f1d2d 55%, #5a0f16);
+            border-color: #fde047;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 22px rgba(250, 204, 21, 0.34),
+                0 14px 28px rgba(95, 0, 18, 0.36);
+            transform: translateY(-1px) scale(1.04);
+        }
+
+        .quick-action-item:hover .quick-action-btn,
+        .quick-action-item:hover .quick-action-logo {
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 10px rgba(255, 0, 102, 0.34),
+                0 0 18px rgba(0, 200, 255, 0.32),
+                0 0 26px rgba(255, 221, 0, 0.3),
+                0 14px 28px rgba(95, 0, 18, 0.36) !important;
+        }
+
+        .quick-action-item:hover .quick-action-btn svg,
+        .quick-action-item:hover .quick-action-logo img {
+            animation: quickActionShake 0.42s ease-in-out;
+            filter:
+                drop-shadow(0 0 6px rgba(255, 0, 102, 0.45))
+                drop-shadow(0 0 10px rgba(0, 200, 255, 0.38))
+                drop-shadow(0 0 14px rgba(255, 221, 0, 0.42));
+        }
+
+        .quick-action-item:hover .accessibility-launch-admin svg {
+            animation: quickActionShakeAccessibility 0.42s ease-in-out;
         }
 
         .quick-actions-toggle:hover {
@@ -650,8 +679,8 @@
 
         .quick-actions-toggle svg,
         .quick-action-btn svg {
-            width: 18px;
-            height: 18px;
+            width: 24px;
+            height: 24px;
             stroke: currentColor;
             fill: none;
             stroke-width: 2;
@@ -660,20 +689,33 @@
             display: block;
         }
 
+        .accessibility-launch-admin svg {
+            width: 45px;
+            height: 45px;
+            stroke-width: 2.4;
+            transform: translateY(-1px) scale(1.18);
+            transform-origin: center;
+            overflow: visible;
+        }
+
+        .quick-action-bell svg {
+            width: 20px;
+            height: 20px;
+        }
+
         .quick-actions-wrap.is-open .quick-actions-toggle svg {
             transform: rotate(45deg);
         }
 
         .quick-actions-panel {
             position: absolute;
-            right: 0;
-            bottom: calc(100% + 12px);
-            right: 0;
+            left: 50%;
+            bottom: calc(100% + 16px);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
+            gap: 4px;
+            padding: 6px 0;
             border-radius: 16px;
             border: none;
             background: transparent;
@@ -681,8 +723,8 @@
             backdrop-filter: none;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(6px) scale(0.96);
-            transform-origin: bottom right;
+            transform: translateX(-50%) translateY(6px) scale(0.96);
+            transform-origin: bottom center;
             transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
             z-index: 1002;
         }
@@ -690,18 +732,63 @@
         .quick-actions-wrap.is-open .quick-actions-panel {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0) scale(1);
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .quick-actions-panel::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -8px;
+            width: 54px;
+            height: 16px;
+            border-bottom: 3px solid #70131B;
+            border-radius: 0 0 999px 999px;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.68));
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .quick-actions-panel::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -18px;
+            width: 10px;
+            height: 10px;
+            border-right: 3px solid #70131B;
+            border-bottom: 3px solid #70131B;
+            transform: translateX(-50%) rotate(45deg);
+            filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.68));
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .quick-actions-wrap.is-open .quick-actions-panel::before,
+        .quick-actions-wrap.is-open .quick-actions-panel::after {
+            opacity: 1;
+            visibility: visible;
         }
 
         .quick-action-logo {
             overflow: hidden;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 2px solid #7f1d2d;
+            box-shadow:
+                0 0 0 3px #ffffff,
+                0 0 0 5px #facc15,
+                0 10px 22px rgba(95, 0, 18, 0.28);
         }
 
         .quick-actions-divider {
             width: 100%;
             height: 1px;
             background: rgba(255, 255, 255, 0.12);
-            margin: 2px 0 1px;
+            margin: 2px 0;
         }
 
         .quick-action-item {
@@ -710,9 +797,11 @@
         }
 
         .quick-action-logo img {
-            width: 30px;
-            height: 30px;
+            width: 38px;
+            height: 38px;
             object-fit: contain;
+            border-radius: 999px;
+            background: #ffffff;
         }
 
         .quick-action-bell {
@@ -785,6 +874,10 @@
             opacity: 1;
             visibility: visible;
             transform: translateY(-50%) translateX(0);
+        }
+
+        .quick-action-logo + .quick-action-tooltip {
+            display: none;
         }
 
         .admin-user {
@@ -1084,7 +1177,9 @@
 
         html[data-theme="dark"] .sidebar-nav a.active .sidebar-short {
             border-color: rgba(255, 255, 255, 0.42);
+            background: rgba(255, 255, 255, 0.08);
             color: #ffffff;
+            border-radius: 999px;
         }
 
         html[data-theme="dark"] .sidebar-nav a.active .sidebar-short svg,
@@ -1666,7 +1761,7 @@
             border: 1px solid var(--stroke);
             border-radius: var(--radius-lg);
             padding: 20px;
-            box-shadow: var(--shadow-soft);
+            box-shadow: 0 18px 34px rgba(15, 23, 42, 0.12);
             margin-bottom: 18px;
         }
 
@@ -1817,7 +1912,7 @@
             background: var(--admin-card-bg) !important;
             border: 1px solid var(--admin-card-border) !important;
             border-radius: 14px !important;
-            box-shadow: var(--admin-card-shadow) !important;
+            box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12) !important;
             color: var(--admin-card-text) !important;
         }
 
@@ -2126,17 +2221,33 @@
 
         html[data-theme="light"] .quick-action-btn,
         html[data-theme="light"] .quick-action-logo {
-            background: transparent;
-            border-color: transparent;
+            background: linear-gradient(145deg, #9b111e, #6e1220 55%, #4f0b15);
+            border-color: #facc15;
             color: #ffffff;
-            box-shadow: none;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.12),
+                0 0 18px rgba(250, 204, 21, 0.26),
+                0 10px 22px rgba(95, 0, 18, 0.28);
         }
 
         html[data-theme="light"] .quick-action-btn:hover {
-            background: transparent;
-            border-color: transparent;
+            background: linear-gradient(145deg, #b01826, #7f1d2d 55%, #5a0f16);
+            border-color: #fde047;
             color: #ffffff;
-            box-shadow: none;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 22px rgba(250, 204, 21, 0.34),
+                0 14px 28px rgba(95, 0, 18, 0.36);
+        }
+
+        html[data-theme="light"] .quick-action-item:hover .quick-action-btn,
+        html[data-theme="light"] .quick-action-item:hover .quick-action-logo {
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 10px rgba(255, 0, 102, 0.34),
+                0 0 18px rgba(0, 200, 255, 0.32),
+                0 0 26px rgba(255, 221, 0, 0.3),
+                0 14px 28px rgba(95, 0, 18, 0.36) !important;
         }
 
         html[data-theme="light"] .quick-action-tooltip {
@@ -2165,6 +2276,42 @@
                     0 0 0 4px rgba(250, 204, 21, 0.16),
                     0 0 24px rgba(250, 204, 21, 0.42),
                     0 14px 30px rgba(95, 0, 18, 0.4);
+            }
+        }
+
+        @keyframes quickActionShake {
+            0%, 100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            20% {
+                transform: translateX(-1px) rotate(-3deg);
+            }
+            40% {
+                transform: translateX(1.5px) rotate(3deg);
+            }
+            60% {
+                transform: translateX(-1px) rotate(-2deg);
+            }
+            80% {
+                transform: translateX(1px) rotate(2deg);
+            }
+        }
+
+        @keyframes quickActionShakeAccessibility {
+            0%, 100% {
+                transform: translateY(-1px) scale(1.18) translateX(0) rotate(0deg);
+            }
+            20% {
+                transform: translateY(-1px) scale(1.18) translateX(-1px) rotate(-3deg);
+            }
+            40% {
+                transform: translateY(-1px) scale(1.18) translateX(1.5px) rotate(3deg);
+            }
+            60% {
+                transform: translateY(-1px) scale(1.18) translateX(-1px) rotate(-2deg);
+            }
+            80% {
+                transform: translateY(-1px) scale(1.18) translateX(1px) rotate(2deg);
             }
         }
 
@@ -2814,7 +2961,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                     <span class="quick-action-logo" aria-hidden="true">
                         <img src="{{ $brandLogo }}" alt="Clinic Logo">
                     </span>
-                    <span class="quick-action-tooltip">Clinic Logo</span>
                 </div>
                 <div class="quick-actions-divider" aria-hidden="true"></div>
                 <div class="quick-action-item">
@@ -2832,9 +2978,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                     </button>
                     <span class="quick-action-tooltip">Theme Mode</span>
                 </div>
-                <div class="quick-action-item">
+                <div class="quick-action-item is-accessibility">
                     <button type="button" class="accessibility-launch-admin quick-action-btn" id="adminAccessibilityLaunch" aria-label="Accessibility menu" title="Accessibility menu">
-                        <x-outline-icon name="academic-cap" />
+                        <x-outline-icon name="accessibility-person" />
                     </button>
                     <span class="quick-action-tooltip">Accessibility</span>
                 </div>
@@ -3028,7 +3174,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     </div>
 
     <div class="assistant-controls">
-        <button type="button" id="assistantMicBtn" class="assistant-mic">Mic</button>
         <input type="text" id="assistantInput" class="assistant-input" placeholder="Type command or question..." maxlength="500">
         <button type="button" id="assistantSendBtn" class="assistant-send">Send</button>
     </div>
@@ -3485,11 +3630,10 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
     function initAssistantUi() {
         const panel = document.getElementById('assistantPanel');
-        const micBtn = document.getElementById('assistantMicBtn');
         const sendBtn = document.getElementById('assistantSendBtn');
         const input = document.getElementById('assistantInput');
 
-        if (!panel || !sendBtn || !input || !micBtn) return;
+        if (!panel || !sendBtn || !input) return;
 
         sendBtn.addEventListener('click', function () {
             const value = input.value;
@@ -3506,51 +3650,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             }
         });
 
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            micBtn.disabled = true;
-            micBtn.title = 'Voice recognition is not supported in this browser.';
-            return;
-        }
-
-        let isListening = false;
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-
-        recognition.onstart = function () {
-            isListening = true;
-            micBtn.classList.add('listening');
-            micBtn.textContent = 'Listening';
-        };
-
-        recognition.onend = function () {
-            isListening = false;
-            micBtn.classList.remove('listening');
-            micBtn.textContent = 'Mic';
-        };
-
-        recognition.onerror = function () {
-            appendAssistantMessage('assistant', 'Mic capture failed. You can type your command instead.');
-        };
-
-        recognition.onresult = function (event) {
-            const transcript = event.results?.[0]?.[0]?.transcript || '';
-            if (transcript) {
-                sendAssistantQuery(transcript);
-            }
-        };
-
-        micBtn.addEventListener('click', function () {
-            if (isListening) {
-                recognition.stop();
-                return;
-            }
-            panel.classList.add('open');
-            recognition.start();
-        });
     }
 
     function forceAccessibilityButtonTheme() {

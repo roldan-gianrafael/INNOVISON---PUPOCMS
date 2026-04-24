@@ -687,6 +687,7 @@
             stroke-linecap: round;
             stroke-linejoin: round;
             display: block;
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .accessibility-launch-admin svg {
@@ -704,7 +705,7 @@
         }
 
         .quick-actions-wrap.is-open .quick-actions-toggle svg {
-            transform: rotate(45deg);
+            transform: rotate(135deg) scale(1.04);
         }
 
         .quick-actions-panel {
@@ -739,7 +740,7 @@
             content: "";
             position: absolute;
             left: 50%;
-            bottom: -8px;
+            bottom: 2px;
             width: 54px;
             height: 16px;
             border-bottom: 3px solid #70131B;
@@ -755,12 +756,13 @@
             content: "";
             position: absolute;
             left: 50%;
-            bottom: -18px;
-            width: 10px;
-            height: 10px;
-            border-right: 3px solid #70131B;
-            border-bottom: 3px solid #70131B;
-            transform: translateX(-50%) rotate(45deg);
+            bottom: -6px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid #70131B;
+            transform: translateX(-50%);
             filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.68));
             pointer-events: none;
             opacity: 0;
@@ -776,7 +778,7 @@
         .quick-action-logo {
             overflow: hidden;
             border-radius: 999px;
-            background: #ffffff;
+            background: #ffffff !important;
             border: 2px solid #7f1d2d;
             box-shadow:
                 0 0 0 3px #ffffff,
@@ -794,11 +796,36 @@
         .quick-action-item {
             position: relative;
             display: inline-flex;
+            opacity: 0;
+            transform: translateY(18px) scale(0.86);
+            transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
+        .quick-actions-wrap.is-open .quick-action-item {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .quick-actions-wrap.is-open .quick-action-item:nth-child(1) {
+            transition-delay: 0.19s;
+        }
+
+        .quick-actions-wrap.is-open .quick-action-item:nth-child(3) {
+            transition-delay: 0.14s;
+        }
+
+        .quick-actions-wrap.is-open .quick-action-item:nth-child(4) {
+            transition-delay: 0.09s;
+        }
+
+        .quick-actions-wrap.is-open .quick-action-item:nth-child(5) {
+            transition-delay: 0.04s;
+        }
+
+
         .quick-action-logo img {
-            width: 38px;
-            height: 38px;
+            width: 24px;
+            height: 24px;
             object-fit: contain;
             border-radius: 999px;
             background: #ffffff;
@@ -1176,10 +1203,11 @@
         }
 
         html[data-theme="dark"] .sidebar-nav a.active .sidebar-short {
-            border-color: rgba(255, 255, 255, 0.42);
-            background: rgba(255, 255, 255, 0.08);
+            border-color: transparent;
+            background: transparent;
             color: #ffffff;
-            border-radius: 999px;
+            border-radius: 0;
+            box-shadow: none;
         }
 
         html[data-theme="dark"] .sidebar-nav a.active .sidebar-short svg,
@@ -1188,7 +1216,7 @@
             color: #ffffff;
             stroke: #ffffff;
             border-color: rgba(255, 255, 255, 0.72);
-            background-color: rgba(255, 255, 255, 0.82);
+            background-color: transparent;
         }
 
         .sidebar-nav a.nav-dashboard.active .sidebar-short svg {
@@ -2196,7 +2224,7 @@
         }
 
         html[data-theme="light"] .quick-actions-toggle:hover {
-            background: linear-gradient(145deg, #b01826, #7f1d2d 55%, #5a0f16);
+            background: linear-gradient(145deg, rgba(176, 24, 38, 0.82), rgba(127, 29, 45, 0.7) 55%, rgba(90, 15, 22, 0.8));
             border-color: #fde047;
             color: #ffffff;
             box-shadow:
@@ -2228,6 +2256,17 @@
                 0 0 0 3px rgba(250, 204, 21, 0.12),
                 0 0 18px rgba(250, 204, 21, 0.26),
                 0 10px 22px rgba(95, 0, 18, 0.28);
+        }
+
+        html[data-theme="light"] .quick-action-logo,
+        html[data-theme="dark"] .quick-action-logo {
+            background: #ffffff !important;
+            border-color: #7f1d2d !important;
+            color: #7f1d2d;
+            box-shadow:
+                0 0 0 3px #ffffff,
+                0 0 0 5px #facc15,
+                0 10px 22px rgba(95, 0, 18, 0.28) !important;
         }
 
         html[data-theme="light"] .quick-action-btn:hover {
@@ -2957,7 +2996,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 @endif
             </button>
             <div class="quick-actions-panel" id="headerQuickActionsPanel">
-                <div class="quick-action-item">
+                <div class="quick-action-item is-logo">
                     <span class="quick-action-logo" aria-hidden="true">
                         <img src="{{ $brandLogo }}" alt="Clinic Logo">
                     </span>
@@ -2973,13 +3012,13 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                     <span class="quick-action-tooltip">Notifications</span>
                 </div>
                 <div class="quick-action-item">
-                    <button type="button" class="theme-toggle-admin quick-action-btn" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
+                    <button type="button" class="theme-toggle-admin quick-action-btn" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode">
                         <x-outline-icon name="sun" />
                     </button>
-                    <span class="quick-action-tooltip">Theme Mode</span>
+                    <span class="quick-action-tooltip" id="themeModeTooltip">Dark Mode</span>
                 </div>
                 <div class="quick-action-item is-accessibility">
-                    <button type="button" class="accessibility-launch-admin quick-action-btn" id="adminAccessibilityLaunch" aria-label="Accessibility menu" title="Accessibility menu">
+                    <button type="button" class="accessibility-launch-admin quick-action-btn" id="adminAccessibilityLaunch" aria-label="Accessibility menu">
                         <x-outline-icon name="accessibility-person" />
                     </button>
                     <span class="quick-action-tooltip">Accessibility</span>
@@ -3200,6 +3239,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     function applyAdminTheme(theme) {
         const normalizedTheme = theme === 'light' ? 'light' : 'dark';
         const toggle = document.getElementById('adminThemeToggle');
+        const tooltip = document.getElementById('themeModeTooltip');
         const moonIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"></path></svg>';
         const sunIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"></path></svg>';
 
@@ -3211,9 +3251,12 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
         const isDark = normalizedTheme === 'dark';
         toggle.innerHTML = isDark ? moonIcon : sunIcon;
-        toggle.setAttribute('aria-label', isDark ? 'Dark mode enabled' : 'Light mode enabled');
-        toggle.setAttribute('title', isDark ? 'Dark mode' : 'Light mode');
+        toggle.setAttribute('aria-label', isDark ? 'Dark mode' : 'Light mode');
         toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+
+        if (tooltip) {
+            tooltip.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+        }
     }
 
     function initThemeToggle() {

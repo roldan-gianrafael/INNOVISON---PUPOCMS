@@ -411,8 +411,8 @@
             --admin-sidebar-text: rgba(255, 255, 255, 0.9);
             --admin-sidebar-hover-bg: rgba(255, 255, 255, 0.1);
             --admin-sidebar-hover-border: rgba(255, 255, 255, 0.2);
-            --admin-sidebar-active-bg: rgba(255, 255, 255, 0.14);
-            --admin-sidebar-active-border: rgba(255, 255, 255, 0.26);
+            --admin-sidebar-active-bg: rgba(255, 255, 255, 0.1);
+            --admin-sidebar-active-border: rgba(255, 255, 255, 0.2);
             --admin-sidebar-short-bg: rgba(255, 255, 255, 0.08);
             --admin-sidebar-short-border: rgba(255, 255, 255, 0.2);
             --admin-sidebar-logout-bg: rgba(0, 0, 0, 0.18);
@@ -678,7 +678,7 @@
         }
 
         .sidebar {
-            width: var(--sidebar-collapsed-width);
+            width: var(--sidebar-expanded-width);
             background: var(--admin-sidebar-bg);
             border: 1px solid var(--admin-sidebar-border);
             border-radius: var(--radius-xl);
@@ -690,16 +690,9 @@
             overflow-y: auto;
             overflow-x: hidden;
             transition:
-                width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
                 background 0.28s ease,
                 border-color 0.28s ease,
                 box-shadow 0.28s ease;
-            will-change: width;
-        }
-
-        .sidebar:hover,
-        .sidebar:focus-within {
-            width: var(--sidebar-expanded-width);
         }
 
         .sidebar-logo {
@@ -754,9 +747,9 @@
         }
 
         .sidebar-logo-text {
-            opacity: 0;
-            transform: translateX(-8px);
-            max-width: 0;
+            opacity: 1;
+            transform: translateX(0);
+            max-width: 180px;
             overflow: hidden;
             white-space: nowrap;
             transition:
@@ -773,9 +766,9 @@
             text-transform: uppercase;
             font-weight: 800;
             white-space: nowrap;
-            opacity: 0;
-            transform: translateX(-8px);
-            max-width: 0;
+            opacity: 1;
+            transform: translateX(0);
+            max-width: 180px;
             overflow: hidden;
             transition:
                 max-width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
@@ -803,6 +796,7 @@
                 transform 0.22s ease;
             min-width: 210px;
             white-space: nowrap;
+            position: relative;
         }
 
         .sidebar-nav a:hover {
@@ -838,40 +832,193 @@
             height: 18px;
             stroke-width: 1.8;
             flex: 0 0 auto;
+            transition: transform 0.22s ease, filter 0.22s ease;
         }
 
         .sidebar-nav a.active .sidebar-short {
-            border-color: rgba(255, 255, 255, 0.35);
+            border-color: #111111;
             background: rgba(255, 255, 255, 0.16);
-            color: #ffffff;
+            color: #111111;
+        }
+
+        .sidebar-nav a.active .sidebar-short svg {
+            filter: drop-shadow(0 2px 6px rgba(17, 17, 17, 0.12));
+        }
+
+        .sidebar-nav a.nav-dashboard.active .sidebar-short svg {
+            animation: navDashboardOrbit 2.8s linear infinite;
+            transform-origin: 50% 50%;
+        }
+
+        .sidebar-nav a.nav-appointments.active .sidebar-short svg {
+            animation: navAppointmentsFlip 1.9s ease-in-out infinite;
+            transform-origin: 50% 40%;
+        }
+
+        .sidebar-nav a.nav-inventory.active .sidebar-short svg path {
+            stroke-dasharray: 64;
+            stroke-dashoffset: 64;
+            animation: navInventoryTrace 1.7s ease-in-out infinite alternate;
+        }
+
+        .sidebar-nav a.nav-walkin.active .sidebar-short svg {
+            animation: navWalkinAdd 1.45s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+            transform-origin: 58% 42%;
+        }
+
+        .sidebar-nav a.nav-users.active .sidebar-short svg {
+            animation: navUsersGather 1.9s ease-in-out infinite;
+            transform-origin: 50% 50%;
+        }
+
+        .sidebar-nav a.nav-reports.active .sidebar-short svg {
+            animation: navReportsRise 1.35s ease-in-out infinite;
+            transform-origin: 50% 100%;
+        }
+
+        .sidebar-nav a.nav-health.active .sidebar-short svg {
+            animation: navHealthWrite 1.75s ease-in-out infinite;
+            transform-origin: 50% 50%;
+        }
+
+        .sidebar-nav a.nav-audit.active .sidebar-short svg {
+            animation: navAuditPulse 1.7s ease-in-out infinite;
+            transform-origin: 50% 50%;
+        }
+
+        .sidebar-nav a.nav-settings.active .sidebar-short svg {
+            animation: navSettingsOrbit 2.4s linear infinite;
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes navDashboardOrbit {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            45% {
+                transform: rotate(180deg) scale(1.06);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        @keyframes navAppointmentsFlip {
+            0% {
+                transform: rotate(0deg) translateY(0);
+            }
+            25% {
+                transform: rotate(-10deg) translateY(-1px);
+            }
+            50% {
+                transform: rotate(8deg) translateY(0);
+            }
+            75% {
+                transform: rotate(-6deg) translateY(1px);
+            }
+            100% {
+                transform: rotate(0deg) translateY(0);
+            }
+        }
+
+        @keyframes navInventoryTrace {
+            0% {
+                stroke-dashoffset: 64;
+                opacity: 0.7;
+            }
+            55% {
+                opacity: 1;
+            }
+            100% {
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+        }
+
+        @keyframes navWalkinAdd {
+            0%, 100% {
+                transform: scale(1);
+            }
+            35% {
+                transform: scale(1.14);
+            }
+            65% {
+                transform: scale(0.96);
+            }
+        }
+
+        @keyframes navUsersGather {
+            0%, 100% {
+                transform: translateX(0) scale(1);
+            }
+            30% {
+                transform: translateX(-1.5px) scale(0.98);
+            }
+            60% {
+                transform: translateX(1.5px) scale(1.04);
+            }
+        }
+
+        @keyframes navReportsRise {
+            0%, 100% {
+                transform: translateY(0) scaleY(1);
+            }
+            20% {
+                transform: translateY(-1px) scaleY(1.02);
+            }
+            45% {
+                transform: translateY(-3px) scaleY(1.08);
+            }
+            70% {
+                transform: translateY(-5px) scaleY(1.12);
+            }
+        }
+
+        @keyframes navHealthWrite {
+            0%, 100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            20% {
+                transform: translateX(-1px) rotate(-4deg);
+            }
+            45% {
+                transform: translateX(2px) rotate(3deg);
+            }
+            70% {
+                transform: translateX(4px) rotate(-2deg);
+            }
+        }
+
+        @keyframes navAuditPulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 2px 6px rgba(17, 17, 17, 0.1));
+            }
+            50% {
+                transform: scale(1.08);
+                filter: drop-shadow(0 4px 10px rgba(17, 17, 17, 0.18));
+            }
+        }
+
+        @keyframes navSettingsOrbit {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .sidebar-label {
-            opacity: 0;
-            transform: translateX(-8px);
-            max-width: 0;
+            opacity: 1;
+            transform: translateX(0);
+            max-width: 180px;
             overflow: hidden;
             white-space: nowrap;
             transition:
                 max-width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
                 opacity 0.2s ease,
                 transform 0.24s ease;
-        }
-
-        .sidebar:hover .sidebar-logo-text,
-        .sidebar:focus-within .sidebar-logo-text,
-        .sidebar:hover h4,
-        .sidebar:focus-within h4,
-        .sidebar:hover .sidebar-label {
-            max-width: 180px;
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .sidebar:focus-within .sidebar-label {
-            max-width: 180px;
-            opacity: 1;
-            transform: translateX(0);
         }
 
         .sidebar-logout {
@@ -1581,10 +1728,11 @@
         }
 
         html[data-theme="light"] .sidebar-nav a.active {
-            background: rgba(128, 0, 0, 0.1);
-            border-color: rgba(128, 0, 0, 0.22);
+            background: rgba(128, 0, 0, 0.06);
+            border-color: rgba(128, 0, 0, 0.14);
             color: #4a0f1a;
         }
+
 
         html[data-theme="light"] .sidebar-short {
             color: #5a1421;
@@ -2081,34 +2229,34 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     
     <h4>Main Menu</h4>
     <nav class="sidebar-nav">
-      <a href="{{ $dashboardUrl }}" class="{{ (Request::is('admin/dashboard') || Request::is('assistant/dashboard')) ? 'active' : '' }}">
+      <a href="{{ $dashboardUrl }}" class="nav-dashboard {{ (Request::is('admin/dashboard') || Request::is('assistant/dashboard')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="squares-2x2" /></span><span class="sidebar-label">Dashboard</span>
       </a>
-      <a href="{{ $appointmentsUrl }}" class="{{ (Request::is('admin/appointments*') || Request::is('assistant/appointments*')) ? 'active' : '' }}">
+      <a href="{{ $appointmentsUrl }}" class="nav-appointments {{ (Request::is('admin/appointments*') || Request::is('assistant/appointments*')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="calendar-days" /></span><span class="sidebar-label">Appointments</span>
       </a>
-      <a href="{{ $inventoryUrl }}" class="{{ (Request::is('admin/inventory*') || Request::is('assistant/inventory*')) ? 'active' : '' }}">
+      <a href="{{ $inventoryUrl }}" class="nav-inventory {{ (Request::is('admin/inventory*') || Request::is('assistant/inventory*')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="cube" /></span><span class="sidebar-label">Inventory</span>
       </a>
-      <a href="{{ $reportsUrl }}" class="{{ (Request::is('admin/reports*') || Request::is('assistant/reports*')) ? 'active' : '' }}">
+      <a href="{{ $reportsUrl }}" class="nav-reports {{ (Request::is('admin/reports*') || Request::is('assistant/reports*')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="chart-bar" /></span><span class="sidebar-label">Reports</span>
       </a>
      
-      <a href="{{ $walkinUrl }}" class="{{ (Request::is('admin/walkin*') || Request::is('assistant/walkin*')) ? 'active' : '' }}">
+      <a href="{{ $walkinUrl }}" class="nav-walkin {{ (Request::is('admin/walkin*') || Request::is('assistant/walkin*')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="user-plus" /></span><span class="sidebar-label">Walk-in</span>
       </a>
-      <a href="{{ route('admin.health_records') }}" class="{{ Request::is('admin/health-records*') ? 'active' : '' }}">
+      <a href="{{ route('admin.health_records') }}" class="nav-health {{ Request::is('admin/health-records*') ? 'active' : '' }}">
     <span class="sidebar-short"><x-outline-icon name="document-text" /></span>
     <span class="sidebar-label">Student Health Form</span>
     </a>
       @if($isAdminLike)
-          <a href="{{ $userManagementUrl }}" class="{{ Request::is('admin/user-management*') ? 'active' : '' }}">
+          <a href="{{ $userManagementUrl }}" class="nav-users {{ Request::is('admin/user-management*') ? 'active' : '' }}">
             <span class="sidebar-short"><x-outline-icon name="users" /></span><span class="sidebar-label">Users Management</span>
           </a>
-          <a href="{{ route('admin.logs') }}" class="{{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
+          <a href="{{ route('admin.logs') }}" class="nav-audit {{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
             <span class="sidebar-short"><x-outline-icon name="clipboard-document-list" /></span><span class="sidebar-label">Audit Trail</span>
           </a>
-          <a href="{{ $settingsUrl }}" class="{{ Request::is('admin/settings*') ? 'active' : '' }}">
+          <a href="{{ $settingsUrl }}" class="nav-settings {{ Request::is('admin/settings*') ? 'active' : '' }}">
             <span class="sidebar-short"><x-outline-icon name="cog-6-tooth" /></span><span class="sidebar-label">Settings</span>
           </a>
       @endif
@@ -2354,7 +2502,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const updateIndicator = () => {
             const canScroll = sidebar.scrollHeight - sidebar.clientHeight > 6;
             const hasMoreBelow = sidebar.scrollTop + sidebar.clientHeight < sidebar.scrollHeight - 6;
-            const isExpanded = window.innerWidth <= 860 || sidebar.matches(':hover') || sidebar.matches(':focus-within') || document.body.classList.contains('sidebar-open');
+            const isExpanded = window.innerWidth > 860 || document.body.classList.contains('sidebar-open');
             indicator.classList.toggle('is-visible', canScroll && hasMoreBelow && isExpanded);
         };
 

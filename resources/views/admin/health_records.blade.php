@@ -89,21 +89,41 @@
         color: #111827;
     }
 
+    .health-records-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
     .health-records-search {
         padding: 10px 16px;
         border-radius: 8px;
         border: 1px solid #cbd5e1;
         width: 350px;
         color: #111827;
+        margin-left: auto;
     }
 
     .health-summary-label {
-        font-size: 11px;
+        font-size: 17px;
         letter-spacing: 0.5px;
+        display: inline-flex;
+        flex-direction: column;
+        line-height: 1.15;
     }
 
     .health-summary-value {
         color: #70131B;
+        font-size: 17px;
+    }
+
+    .health-summary-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
     }
 
     html[data-theme="dark"] .health-records-title,
@@ -125,7 +145,7 @@
     @endphp
 
     {{-- Header with Search --}}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="health-records-toolbar">
         <h2 class="health-records-title">Student Health Records</h2>
         <input type="text" id="recordSearch" class="health-records-search" placeholder="Search by student name or ID...">
     </div>
@@ -134,21 +154,25 @@
     <div class="summary-container">
         <div class="summary-item">
             <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #70131B;">
-                <small class="text-muted fw-bold text-uppercase health-summary-label">Total Submissions</small>
-                <h3 class="fw-bold mb-0 health-summary-value">{{ $records->count() }}</h3>
+                <div class="health-summary-row">
+                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Total</span><span>Submissions</span></small>
+                    <h3 class="fw-bold mb-0 health-summary-value">{{ $records->count() }}</h3>
+                </div>
             </div>
         </div>
         <div class="summary-item">
             <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #dc3545;">
-                <small class="text-muted fw-bold text-uppercase health-summary-label">With Medical Conditions</small>
-                <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_illness', 'Yes')->count() }}</h3>
+                <div class="health-summary-row">
+                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>With Medical</span><span>Conditions</span></small>
+                    <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_illness', 'Yes')->count() }}</h3>
+                </div>
             </div>
         </div>
     </div>
 
     {{-- Main Table Card --}}
 <div class="card">
-    <div class="fw-bold mb-2 text-muted" style="font-size: 13px;">Health Profile Summary</div>
+    <div class="fw-bold mb-2 text-muted" style="font-size: 13px; font-weight: 800;">Health Profile Summary</div>
     <table id="healthTable">
         <thead>
             <tr>

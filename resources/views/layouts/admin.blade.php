@@ -1,10 +1,62 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+    @php
+        $tabIcon = 'CL';
+        $tabAccent = '#70131B';
+        $tabTitlePrefix = '';
+
+        if (request()->routeIs('admin.dashboard') || request()->routeIs('assistant.dashboard')) {
+            $tabIcon = 'DB';
+            $tabAccent = '#7C3AED';
+            $tabTitlePrefix = '[Dashboard] ';
+        } elseif (request()->routeIs('admin.appointments*') || request()->routeIs('assistant.appointments*')) {
+            $tabIcon = 'AP';
+            $tabAccent = '#2563EB';
+            $tabTitlePrefix = '[Appointments] ';
+        } elseif (request()->routeIs('admin.inventory*') || request()->routeIs('assistant.inventory*')) {
+            $tabIcon = 'IN';
+            $tabAccent = '#059669';
+            $tabTitlePrefix = '[Inventory] ';
+        } elseif (request()->routeIs('admin.reports*') || request()->routeIs('assistant.reports*') || request()->is('admin/reports*') || request()->is('assistant/reports*')) {
+            $tabIcon = 'RP';
+            $tabAccent = '#DC2626';
+            $tabTitlePrefix = '[Reports] ';
+        } elseif (request()->is('admin/walkin*') || request()->is('assistant/walkin*')) {
+            $tabIcon = 'WK';
+            $tabAccent = '#EA580C';
+            $tabTitlePrefix = '[Walk-In] ';
+        } elseif (request()->routeIs('admin.health_records') || request()->is('health-records') || request()->is('health-profile/*')) {
+            $tabIcon = 'HF';
+            $tabAccent = '#0F766E';
+            $tabTitlePrefix = '[Health Form] ';
+        } elseif (request()->routeIs('admin.user-management*') || request()->is('admin/user-management*')) {
+            $tabIcon = 'UM';
+            $tabAccent = '#9333EA';
+            $tabTitlePrefix = '[Users] ';
+        } elseif (request()->routeIs('admin.logs') || request()->is('admin/activity-logs*')) {
+            $tabIcon = 'AT';
+            $tabAccent = '#B45309';
+            $tabTitlePrefix = '[Audit Trail] ';
+        } elseif (request()->routeIs('admin.settings*') || request()->is('admin/settings*')) {
+            $tabIcon = 'ST';
+            $tabAccent = '#475569';
+            $tabTitlePrefix = '[Settings] ';
+        }
+
+        $tabIconSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>"
+            . "<rect width='64' height='64' rx='18' fill='{$tabAccent}'/>"
+            . "<rect x='5' y='5' width='54' height='54' rx='15' fill='none' stroke='#FACC15' stroke-width='3'/>"
+            . "<text x='32' y='39' text-anchor='middle' font-family='Arial, sans-serif' font-size='20' font-weight='700' fill='#FFFFFF'>{$tabIcon}</text>"
+            . "</svg>";
+        $tabIconData = 'data:image/svg+xml;utf8,' . rawurlencode($tabIconSvg);
+    @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title') - PUPT Admin</title>
+    <title>{{ $tabTitlePrefix }}@yield('title') - PUPT Admin</title>
+    <link rel="icon" type="image/svg+xml" href="{{ $tabIconData }}">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
     <script
         src="{{ asset('js/sienna-accessibility-custom.umd.js') }}?v={{ filemtime(public_path('js/sienna-accessibility-custom.umd.js')) }}"
         data-asw-position="bottom-right"

@@ -32,6 +32,13 @@
     .stat-card-mini span { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; }
     .stat-card-mini h3 { font-size: 24px; color: #4b0f17; margin: 5px 0 0 0; }
 
+    .reports-section-title {
+        font-size: 18px;
+        color: #000000;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
     /* --- REPORT BUTTONS (Gayang-gaya sa Dashboard Stats Cards) --- */
     .report-grid {
         display: grid;
@@ -104,6 +111,12 @@
     }
 
     .btn-back-dashboard:hover { color: #8B0000; }
+
+    html[data-theme="dark"] .stat-card-mini span,
+    html[data-theme="dark"] .stat-card-mini h3,
+    html[data-theme="dark"] .reports-section-title {
+        color: #ffffff;
+    }
 </style>
 @endpush
 
@@ -133,7 +146,7 @@
         </div>
     </div>
 
-    <h2 style="font-size: 18px; color: #000000; margin-bottom: 20px; font-weight: 700;">Select Report to Generate</h2>
+    <h2 class="reports-section-title">Select Report to Generate</h2>
 
     <div class="report-grid">
         

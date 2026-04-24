@@ -556,6 +556,237 @@
             position: relative;
         }
 
+        .quick-actions-wrap {
+            position: fixed;
+            right: 24px;
+            bottom: 18px;
+            display: flex;
+            align-items: center;
+            z-index: 499997;
+        }
+
+        .quick-actions-toggle,
+        .quick-action-btn,
+        .quick-action-logo {
+            width: 66px;
+            height: 66px;
+            border-radius: 999px;
+            border: 2px solid #facc15;
+            background: linear-gradient(145deg, #9b111e, #6e1220 55%, #4f0b15);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            padding: 0;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.12),
+                0 0 18px rgba(250, 204, 21, 0.26),
+                0 10px 22px rgba(95, 0, 18, 0.28);
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .quick-actions-toggle,
+        .quick-action-btn {
+            cursor: pointer;
+        }
+
+        .quick-action-btn,
+        .quick-action-logo {
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .quick-actions-toggle {
+            width: 66px;
+            height: 66px;
+            border-radius: 999px;
+            background: linear-gradient(145deg, #9b111e, #6e1220 55%, #4f0b15);
+            border: 2px solid #facc15;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.12),
+                0 0 18px rgba(250, 204, 21, 0.32),
+                0 12px 26px rgba(95, 0, 18, 0.34);
+            animation: quickActionsGlow 2.2s ease-in-out infinite;
+        }
+
+        .quick-actions-toggle:hover,
+        .quick-action-btn:hover {
+            background: linear-gradient(145deg, #b01826, #7f1d2d 55%, #5a0f16);
+            border-color: #fde047;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 22px rgba(250, 204, 21, 0.34),
+                0 14px 28px rgba(95, 0, 18, 0.36);
+        }
+
+        .quick-action-btn:hover {
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+            transform: translateY(-1px) scale(1.08);
+        }
+
+        .quick-actions-toggle:hover {
+            background: linear-gradient(145deg, #b01826, #7f1d2d 55%, #5a0f16);
+            border-color: #fde047;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 22px rgba(250, 204, 21, 0.4),
+                0 16px 30px rgba(95, 0, 18, 0.42);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .quick-actions-toggle:focus-visible,
+        .quick-action-btn:focus-visible {
+            outline: 2px solid var(--pup-gold);
+            outline-offset: 2px;
+        }
+
+        .quick-actions-toggle svg,
+        .quick-action-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: block;
+        }
+
+        .quick-actions-wrap.is-open .quick-actions-toggle svg {
+            transform: rotate(45deg);
+        }
+
+        .quick-actions-panel {
+            position: absolute;
+            right: 0;
+            bottom: calc(100% + 12px);
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(6px) scale(0.96);
+            transform-origin: bottom right;
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            z-index: 1002;
+        }
+
+        .quick-actions-wrap.is-open .quick-actions-panel {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .quick-action-logo {
+            overflow: hidden;
+        }
+
+        .quick-actions-divider {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.12);
+            margin: 2px 0 1px;
+        }
+
+        .quick-action-item {
+            position: relative;
+            display: inline-flex;
+        }
+
+        .quick-action-logo img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .quick-action-bell {
+            position: relative;
+        }
+
+        .quick-action-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #ffb81c;
+            color: #5a0f16;
+            border: 2px solid rgba(44, 14, 21, 0.96);
+            font-size: 10px;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .quick-actions-toggle > .quick-action-badge {
+            top: 1px;
+            right: 1px;
+            border-color: #7f1d2d;
+        }
+
+        .quick-action-tooltip {
+            position: absolute;
+            top: 50%;
+            right: calc(100% + 14px);
+            transform: translateY(-50%) translateX(6px);
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(44, 14, 21, 0.96);
+            border: 1px solid #facc15;
+            color: #ffffff;
+            box-shadow: 0 0 18px rgba(250, 204, 21, 0.32);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            z-index: 1003;
+        }
+
+        .quick-action-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: calc(100% - 1px);
+            width: 10px;
+            height: 10px;
+            background: #70131B;
+            border-top: 1px solid #facc15;
+            border-right: 1px solid #facc15;
+            box-shadow: 6px -6px 12px rgba(250, 204, 21, 0.24);
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .quick-action-item:hover .quick-action-tooltip,
+        .quick-action-item:focus-within .quick-action-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) translateX(0);
+        }
+
         .admin-user {
             border: 1px solid rgba(255, 255, 255, 0.24);
             background: rgba(255, 255, 255, 0.1);
@@ -810,6 +1041,10 @@
             border-color: var(--admin-sidebar-active-border);
             color: var(--admin-sidebar-title);
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            margin-right: -14px;
+            padding-right: 26px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
         }
 
         .sidebar-short {
@@ -825,6 +1060,8 @@
             color: var(--admin-sidebar-title);
             font-size: 0;
             line-height: 0;
+            position: relative;
+            overflow: hidden;
         }
 
         .sidebar-short svg {
@@ -845,50 +1082,161 @@
             filter: drop-shadow(0 2px 6px rgba(17, 17, 17, 0.12));
         }
 
+        html[data-theme="dark"] .sidebar-nav a.active .sidebar-short {
+            border-color: rgba(255, 255, 255, 0.42);
+            color: #ffffff;
+        }
+
+        html[data-theme="dark"] .sidebar-nav a.active .sidebar-short svg,
+        html[data-theme="dark"] .sidebar-nav a.active .sidebar-short::before,
+        html[data-theme="dark"] .sidebar-nav a.active .sidebar-short::after {
+            color: #ffffff;
+            stroke: #ffffff;
+            border-color: rgba(255, 255, 255, 0.72);
+            background-color: rgba(255, 255, 255, 0.82);
+        }
+
         .sidebar-nav a.nav-dashboard.active .sidebar-short svg {
-            animation: navDashboardOrbit 2.8s linear infinite;
+            animation: navDashboardOrbit 1s linear 1;
             transform-origin: 50% 50%;
         }
 
         .sidebar-nav a.nav-appointments.active .sidebar-short svg {
-            animation: navAppointmentsFlip 1.9s ease-in-out infinite;
-            transform-origin: 50% 40%;
+            animation: navAppointmentsPageTurn 1s cubic-bezier(0.3, 0, 0.2, 1) 1;
+            transform-origin: 54% 38%;
         }
 
         .sidebar-nav a.nav-inventory.active .sidebar-short svg path {
             stroke-dasharray: 64;
             stroke-dashoffset: 64;
-            animation: navInventoryTrace 1.7s ease-in-out infinite alternate;
+            animation: navInventoryTrace 1s ease-in-out 1 forwards;
         }
 
         .sidebar-nav a.nav-walkin.active .sidebar-short svg {
-            animation: navWalkinAdd 1.45s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+            animation: navWalkinAdd 1s cubic-bezier(0.22, 1, 0.36, 1) 1;
             transform-origin: 58% 42%;
         }
 
         .sidebar-nav a.nav-users.active .sidebar-short svg {
-            animation: navUsersGather 1.9s ease-in-out infinite;
+            animation: navUsersGather 1s cubic-bezier(0.22, 1, 0.36, 1) 1;
             transform-origin: 50% 50%;
         }
 
         .sidebar-nav a.nav-reports.active .sidebar-short svg {
-            animation: navReportsRise 1.35s ease-in-out infinite;
+            animation: navReportsRise 1s ease-in-out 1;
             transform-origin: 50% 100%;
         }
 
         .sidebar-nav a.nav-health.active .sidebar-short svg {
-            animation: navHealthWrite 1.75s ease-in-out infinite;
-            transform-origin: 50% 50%;
+            animation: navHealthWrite 1s cubic-bezier(0.37, 0, 0.63, 1) 1;
+            transform-origin: 42% 60%;
         }
 
         .sidebar-nav a.nav-audit.active .sidebar-short svg {
-            animation: navAuditPulse 1.7s ease-in-out infinite;
+            animation: navAuditPulse 1s ease-in-out 1;
             transform-origin: 50% 50%;
         }
 
         .sidebar-nav a.nav-settings.active .sidebar-short svg {
-            animation: navSettingsOrbit 2.4s linear infinite;
+            animation: navSettingsOrbit 1s linear 1;
             transform-origin: 50% 50%;
+        }
+
+        .sidebar-nav a.nav-health.active .sidebar-short::after {
+            content: "";
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+            width: 0;
+            height: 2px;
+            border-radius: 999px;
+            background: rgba(17, 17, 17, 0.82);
+            animation: navHealthInk 1s cubic-bezier(0.37, 0, 0.63, 1) 1;
+        }
+
+        .sidebar-nav a.nav-users.active .sidebar-short::before,
+        .sidebar-nav a.nav-users.active .sidebar-short::after {
+            content: "";
+            position: absolute;
+            bottom: 7px;
+            width: 6px;
+            height: 8px;
+            border-radius: 999px 999px 6px 6px;
+            border: 1.4px solid rgba(17, 17, 17, 0.7);
+            border-top-width: 2px;
+            opacity: 0;
+        }
+
+        .sidebar-nav a.nav-users.active .sidebar-short::before {
+            left: 7px;
+            animation: navUsersSideLeft 1s ease-out 1;
+        }
+
+        .sidebar-nav a.nav-users.active .sidebar-short::after {
+            right: 7px;
+            animation: navUsersSideRight 1s ease-out 1;
+        }
+
+        .sidebar-nav a.nav-settings.active .sidebar-short::before {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border-radius: 999px;
+            border: 1.5px dashed rgba(17, 17, 17, 0.5);
+            animation: navSettingsRing 1s linear 1;
+        }
+
+        .sidebar-nav a.nav-audit.active .sidebar-short::after {
+            content: "";
+            position: absolute;
+            left: 6px;
+            right: 6px;
+            top: 8px;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(17, 17, 17, 0), rgba(17, 17, 17, 0.72), rgba(17, 17, 17, 0));
+            transform: translateY(0);
+            opacity: 0;
+            animation: navAuditScan 1s ease-in-out 1;
+        }
+
+        .sidebar-nav a.nav-appointments.active .sidebar-short::before,
+        .sidebar-nav a.nav-appointments.active .sidebar-short::after {
+            content: "";
+            position: absolute;
+            left: 9px;
+            right: 9px;
+            height: 1.5px;
+            border-radius: 999px;
+            background: rgba(17, 17, 17, 0.62);
+            opacity: 0;
+            animation: navAppointmentsPageLines 1s cubic-bezier(0.3, 0, 0.2, 1) 1;
+        }
+
+        .sidebar-nav a.nav-appointments.active .sidebar-short::before {
+            top: 11px;
+        }
+
+        .sidebar-nav a.nav-appointments.active .sidebar-short::after {
+            top: 16px;
+            animation-delay: 0.12s;
+        }
+
+        .sidebar-nav a.nav-reports.active .sidebar-short svg path {
+            transform-box: fill-box;
+            transform-origin: 50% 100%;
+        }
+
+        .sidebar-nav a.nav-reports.active .sidebar-short svg path:nth-of-type(1) {
+            animation: navReportsBarOne 1s ease-in-out 1;
+        }
+
+        .sidebar-nav a.nav-reports.active .sidebar-short svg path:nth-of-type(2) {
+            animation: navReportsBarTwo 1s ease-in-out 1;
+        }
+
+        .sidebar-nav a.nav-reports.active .sidebar-short svg path:nth-of-type(3) {
+            animation: navReportsBarThree 1s ease-in-out 1;
         }
 
         @keyframes navDashboardOrbit {
@@ -905,19 +1253,37 @@
 
         @keyframes navAppointmentsFlip {
             0% {
-                transform: rotate(0deg) translateY(0);
+                transform: rotate(0deg) translateX(0) translateY(0) scale(1);
             }
-            25% {
-                transform: rotate(-10deg) translateY(-1px);
+            24% {
+                transform: rotate(-8deg) translateX(-1px) translateY(-1px) scale(0.98);
             }
-            50% {
-                transform: rotate(8deg) translateY(0);
+            52% {
+                transform: rotate(7deg) translateX(1.5px) translateY(0) scale(1.02);
             }
-            75% {
-                transform: rotate(-6deg) translateY(1px);
+            74% {
+                transform: rotate(-4deg) translateX(0.5px) translateY(1px) scale(1);
             }
             100% {
-                transform: rotate(0deg) translateY(0);
+                transform: rotate(0deg) translateX(0) translateY(0) scale(1);
+            }
+        }
+
+        @keyframes navAppointmentsPageTurn {
+            0% {
+                transform: perspective(120px) rotateY(0deg) translateX(0) scale(1);
+            }
+            28% {
+                transform: perspective(120px) rotateY(-24deg) translateX(-1px) scale(0.98);
+            }
+            55% {
+                transform: perspective(120px) rotateY(18deg) translateX(1px) scale(1.01);
+            }
+            78% {
+                transform: perspective(120px) rotateY(-8deg) translateX(0) scale(1);
+            }
+            100% {
+                transform: perspective(120px) rotateY(0deg) translateX(0) scale(1);
             }
         }
 
@@ -948,44 +1314,48 @@
         }
 
         @keyframes navUsersGather {
-            0%, 100% {
-                transform: translateX(0) scale(1);
+            0% {
+                transform: translateY(1px) scale(0.84);
+                opacity: 0.68;
             }
-            30% {
-                transform: translateX(-1.5px) scale(0.98);
+            34% {
+                transform: translateY(0) scale(0.94);
+                opacity: 0.88;
             }
-            60% {
-                transform: translateX(1.5px) scale(1.04);
+            62% {
+                transform: translateY(-0.5px) scale(1.06);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
             }
         }
 
         @keyframes navReportsRise {
             0%, 100% {
-                transform: translateY(0) scaleY(1);
+                transform: translateY(0) scale(1);
             }
-            20% {
-                transform: translateY(-1px) scaleY(1.02);
-            }
-            45% {
-                transform: translateY(-3px) scaleY(1.08);
-            }
-            70% {
-                transform: translateY(-5px) scaleY(1.12);
+            50% {
+                transform: translateY(-1px) scale(1.02);
             }
         }
 
         @keyframes navHealthWrite {
-            0%, 100% {
-                transform: translateX(0) rotate(0deg);
+            0% {
+                transform: translateX(-2px) translateY(1px) rotate(-14deg);
             }
-            20% {
-                transform: translateX(-1px) rotate(-4deg);
+            26% {
+                transform: translateX(0) translateY(0) rotate(-4deg);
             }
-            45% {
-                transform: translateX(2px) rotate(3deg);
+            56% {
+                transform: translateX(5px) translateY(-1px) rotate(7deg);
             }
-            70% {
-                transform: translateX(4px) rotate(-2deg);
+            82% {
+                transform: translateX(3px) translateY(0) rotate(-1deg);
+            }
+            100% {
+                transform: translateX(0) translateY(0) rotate(0deg);
             }
         }
 
@@ -994,7 +1364,11 @@
                 transform: scale(1);
                 filter: drop-shadow(0 2px 6px rgba(17, 17, 17, 0.1));
             }
-            50% {
+            35% {
+                transform: scale(1.03);
+                filter: drop-shadow(0 3px 8px rgba(17, 17, 17, 0.14));
+            }
+            60% {
                 transform: scale(1.08);
                 filter: drop-shadow(0 4px 10px rgba(17, 17, 17, 0.18));
             }
@@ -1006,6 +1380,143 @@
             }
             100% {
                 transform: rotate(360deg);
+            }
+        }
+
+        @keyframes navHealthInk {
+            0%, 14% {
+                width: 0;
+                opacity: 0;
+            }
+            24% {
+                opacity: 0.9;
+            }
+            58% {
+                width: 16px;
+                opacity: 0.9;
+            }
+            82% {
+                width: 16px;
+                opacity: 0.9;
+            }
+            100% {
+                width: 12px;
+                opacity: 0;
+            }
+        }
+
+        @keyframes navUsersSideLeft {
+            0%, 18% {
+                transform: translateX(-4px) scale(0.7);
+                opacity: 0;
+            }
+            42% {
+                transform: translateX(-1px) scale(0.88);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes navUsersSideRight {
+            0%, 30% {
+                transform: translateX(4px) scale(0.7);
+                opacity: 0;
+            }
+            58% {
+                transform: translateX(1px) scale(0.88);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes navSettingsRing {
+            0% {
+                transform: rotate(0deg) scale(0.98);
+                opacity: 0.5;
+            }
+            50% {
+                transform: rotate(180deg) scale(1.02);
+                opacity: 0.78;
+            }
+            100% {
+                transform: rotate(360deg) scale(0.98);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes navAuditScan {
+            0%, 18% {
+                transform: translateY(-5px);
+                opacity: 0;
+            }
+            32% {
+                opacity: 0.9;
+            }
+            62% {
+                transform: translateY(9px);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(9px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes navAppointmentsPageLines {
+            0%, 16% {
+                transform: translateX(-5px) scaleX(0.76);
+                opacity: 0;
+            }
+            30% {
+                transform: translateX(-1px) scaleX(0.96);
+                opacity: 0.78;
+            }
+            58% {
+                transform: translateX(3px) scaleX(1);
+                opacity: 0.78;
+            }
+            100% {
+                transform: translateX(6px) scaleX(0.82);
+                opacity: 0;
+            }
+        }
+
+        @keyframes navReportsBarOne {
+            0%, 12% {
+                transform: scaleY(0);
+                opacity: 0;
+            }
+            22%, 100% {
+                transform: scaleY(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes navReportsBarTwo {
+            0%, 34% {
+                transform: scaleY(0);
+                opacity: 0;
+            }
+            46%, 100% {
+                transform: scaleY(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes navReportsBarThree {
+            0%, 56% {
+                transform: scaleY(0);
+                opacity: 0;
+            }
+            70%, 100% {
+                transform: scaleY(1);
+                opacity: 1;
             }
         }
 
@@ -1062,6 +1573,8 @@
             overflow-y: auto;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
             padding: 14px;
             color: var(--admin-card-text);
             background: var(--admin-shell-bg);
@@ -1091,48 +1604,7 @@
             height: 0;
         }
 
-        .main.scrollbar-visible::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
         .main::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .main.scrollbar-visible::-webkit-scrollbar-thumb {
-            background: linear-gradient(
-                180deg,
-                #8b0000 0%,
-                #c02626 46%,
-                #4a1a22 46%,
-                #2d1016 100%
-            );
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.12),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.16),
-                0 8px 16px rgba(75, 17, 25, 0.18);
-            animation: scrollbarGlow 2.2s ease-in-out infinite;
-            transition: background 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .main.scrollbar-visible::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(
-                180deg,
-                #990000 0%,
-                #dc2626 46%,
-                #5b2028 46%,
-                #361219 100%
-            );
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.16),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-                0 10px 18px rgba(75, 17, 25, 0.24);
-        }
-
-        .main.scrollbar-visible::-webkit-scrollbar-corner {
             background: transparent;
         }
 
@@ -1156,7 +1628,7 @@
             border-radius: 999px;
             border: 1px solid var(--admin-sidebar-indicator-border);
             background: var(--admin-sidebar-indicator-bg);
-            color: var(--admin-sidebar-title);
+            color: #ffffff;
             box-shadow: 0 10px 18px rgba(15, 23, 42, 0.16);
             backdrop-filter: blur(8px);
             display: none;
@@ -1186,6 +1658,7 @@
             height: 14px;
             display: block;
             stroke: currentColor;
+            color: #ffffff;
         }
 
         .card {
@@ -1492,24 +1965,11 @@
         }
 
         .theme-toggle-admin {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-            padding: 0;
+            box-shadow: none;
         }
 
         .theme-toggle-admin:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.42);
-            transform: translateY(-1px);
+            box-shadow: none;
         }
 
         .theme-toggle-admin:focus-visible {
@@ -1529,24 +1989,11 @@
         }
 
         .accessibility-launch-admin {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-            padding: 0;
+            box-shadow: none;
         }
 
         .accessibility-launch-admin:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.42);
-            transform: translateY(-1px);
+            box-shadow: none;
         }
 
         .accessibility-launch-admin:focus-visible {
@@ -1626,6 +2073,8 @@
         html[data-theme="light"] .assistant-launch,
         html[data-theme="light"] .accessibility-launch-admin,
         html[data-theme="light"] .theme-toggle-admin,
+        html[data-theme="light"] .quick-action-btn,
+        html[data-theme="light"] .quick-action-logo,
         html[data-theme="light"] .sidebar-toggle {
             background: rgba(128, 0, 0, 0.08);
             border-color: rgba(128, 0, 0, 0.24);
@@ -1635,9 +2084,88 @@
         html[data-theme="light"] .assistant-launch:hover,
         html[data-theme="light"] .accessibility-launch-admin:hover,
         html[data-theme="light"] .theme-toggle-admin:hover,
+        html[data-theme="light"] .quick-action-btn:hover,
         html[data-theme="light"] .sidebar-toggle:hover {
             background: rgba(128, 0, 0, 0.14);
             border-color: rgba(128, 0, 0, 0.34);
+        }
+
+        html[data-theme="light"] .quick-actions-toggle {
+            background: linear-gradient(145deg, #9b111e, #6e1220 55%, #4f0b15);
+            border-color: #facc15;
+            color: #ffffff;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.12),
+                0 0 18px rgba(250, 204, 21, 0.32),
+                0 12px 26px rgba(95, 0, 18, 0.34);
+        }
+
+        html[data-theme="light"] .quick-actions-toggle:hover {
+            background: linear-gradient(145deg, #b01826, #7f1d2d 55%, #5a0f16);
+            border-color: #fde047;
+            color: #ffffff;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 22px rgba(250, 204, 21, 0.4),
+                0 16px 30px rgba(95, 0, 18, 0.42);
+        }
+
+        html[data-theme="light"] .quick-actions-panel {
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        html[data-theme="light"] .quick-actions-divider {
+            background: rgba(128, 0, 0, 0.12);
+        }
+
+        html[data-theme="light"] .quick-action-badge {
+            border-color: rgba(255, 255, 255, 0.98);
+        }
+
+        html[data-theme="light"] .quick-action-btn,
+        html[data-theme="light"] .quick-action-logo {
+            background: transparent;
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: none;
+        }
+
+        html[data-theme="light"] .quick-action-btn:hover {
+            background: transparent;
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: none;
+        }
+
+        html[data-theme="light"] .quick-action-tooltip {
+            background: #70131B;
+            border-color: #facc15;
+            color: #ffffff;
+            box-shadow: 0 0 18px rgba(250, 204, 21, 0.38);
+        }
+
+        html[data-theme="light"] .quick-action-tooltip::after {
+            background: #70131B;
+            border-top-color: #facc15;
+            border-right-color: #facc15;
+            box-shadow: 6px -6px 12px rgba(250, 204, 21, 0.28);
+        }
+
+        @keyframes quickActionsGlow {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 3px rgba(250, 204, 21, 0.12),
+                    0 0 18px rgba(250, 204, 21, 0.28),
+                    0 12px 26px rgba(95, 0, 18, 0.34);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 4px rgba(250, 204, 21, 0.16),
+                    0 0 24px rgba(250, 204, 21, 0.42),
+                    0 14px 30px rgba(95, 0, 18, 0.4);
+            }
         }
 
         html[data-theme="light"] .admin-user {
@@ -1756,15 +2284,30 @@
         }
 
         html[data-theme="light"] .sidebar-scroll-indicator {
-            background: rgba(255, 255, 255, 0.94);
-            color: #7f1d2d;
-            border-color: rgba(127, 29, 45, 0.14);
-            box-shadow: 0 10px 18px rgba(127, 29, 45, 0.12);
+            background: #ffffff !important;
+            color: #7f1d2d !important;
+            border-color: rgba(127, 29, 45, 0.14) !important;
+            box-shadow: 0 10px 18px rgba(127, 29, 45, 0.12) !important;
+        }
+
+        html[data-theme="light"] .sidebar-scroll-indicator svg {
+            color: #7f1d2d !important;
+            stroke: #7f1d2d !important;
         }
 
         html[data-theme="light"] .sidebar-scroll-indicator:hover {
-            background: #ffffff;
-            box-shadow: 0 14px 24px rgba(127, 29, 45, 0.16);
+            background: #ffffff !important;
+            box-shadow: 0 14px 24px rgba(127, 29, 45, 0.16) !important;
+        }
+
+        html[data-theme="dark"] .sidebar-scroll-indicator svg {
+            color: #ffffff !important;
+            stroke: #ffffff !important;
+        }
+
+        html[data-theme="dark"] .sidebar-scroll-indicator {
+            background: rgba(255, 255, 255, 0.08) !important;
+            color: #ffffff !important;
         }
 
         html[data-theme="light"] .main {
@@ -2049,6 +2592,16 @@
     border-right: 4px solid #dc3545;
     background: rgba(220, 53, 69, 0.05);
 }
+
+.is-notification-appointment {
+    border-right: 4px solid #2563eb;
+    background: rgba(37, 99, 235, 0.06);
+}
+
+.is-notification-scheduled {
+    border-right: 4px solid #059669;
+    background: rgba(5, 150, 105, 0.06);
+}
 .medicine-alert-more-wrapper {
     padding: 12px;
     text-align: center;
@@ -2158,8 +2711,72 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $medicineAlerts = $medicineAlertsQuery
         ->limit(8)
         ->get();
-    $medicineAlertPreview = $medicineAlerts->take(2);
-    $medicineAlertOverflow = $medicineAlerts->slice(2)->values();
+    $recentPendingAppointments = \App\Models\Appointment::query()
+        ->where('status', 'Pending')
+        ->orderByDesc('created_at')
+        ->limit(4)
+        ->get();
+    $todayApprovedAppointments = \App\Models\Appointment::query()
+        ->where('status', 'Approved')
+        ->whereDate('date', now()->toDateString())
+        ->orderBy('time')
+        ->limit(3)
+        ->get();
+
+    $adminNotifications = collect();
+
+    foreach ($recentPendingAppointments as $appointment) {
+        $adminNotifications->push([
+            'type' => 'appointment',
+            'title' => 'New appointment request',
+            'link' => $appointmentsUrl,
+            'hover_hint' => 'Open appointments',
+            'state_class' => 'is-notification-appointment',
+            'chips' => array_filter([
+                'Patient: ' . trim((string) ($appointment->name ?? 'Unknown patient')),
+                'Date: ' . trim((string) ($appointment->date ?? 'N/A')),
+                'Time: ' . trim((string) ($appointment->time ?? 'N/A')),
+            ]),
+        ]);
+    }
+
+    foreach ($todayApprovedAppointments as $appointment) {
+        $adminNotifications->push([
+            'type' => 'appointment',
+            'title' => 'Scheduled consultation today',
+            'link' => $appointmentsUrl,
+            'hover_hint' => 'Open appointments',
+            'state_class' => 'is-notification-scheduled',
+            'chips' => array_filter([
+                'Patient: ' . trim((string) ($appointment->name ?? 'Unknown patient')),
+                'Time: ' . trim((string) ($appointment->time ?? 'N/A')),
+                'Status: Approved',
+            ]),
+        ]);
+    }
+
+    foreach ($medicineAlerts as $medicineAlert) {
+        $isExpired = optional($medicineAlert->expiration_date)->isPast();
+        $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
+
+        $adminNotifications->push([
+            'type' => 'medicine',
+            'title' => (string) $medicineAlert->name,
+            'link' => $inventoryUrl . '?highlight_item=' . $medicineAlert->id,
+            'hover_hint' => 'Open inventory',
+            'state_class' => $isExpired ? 'is-expired' : 'is-near-expiry',
+            'chips' => array_filter([
+                'Stock: ' . $medicineAlert->quantity . ' units',
+                'Exp: ' . (optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A'),
+                $isExpired ? 'Expired' : ($daysLeft !== null ? $daysLeft . ' day(s) left' : 'Near expiry'),
+            ]),
+        ]);
+    }
+
+    $adminNotifications = $adminNotifications->take(10)->values();
+    $adminNotificationCount = $adminNotifications->count();
+    $adminNotificationPreview = $adminNotifications->take(4);
+    $adminNotificationOverflow = $adminNotifications->slice(4)->values();
 @endphp
 
 <header class="admin-header">
@@ -2179,13 +2796,50 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
             <x-outline-icon name="bars-3" />
         </button>
-        <button type="button" class="theme-toggle-admin" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
-            <x-outline-icon name="sun" />
-        </button>
         <button type="button" class="assistant-launch" id="assistantLaunchBtn" onclick="toggleAssistantPanel()">
             <x-outline-icon name="sparkles" />
             <span>AI Assistant</span>
         </button>
+        <div class="quick-actions-wrap" id="headerQuickActions">
+            <button type="button" class="quick-actions-toggle" aria-label="Open quick actions" aria-expanded="false" onclick="toggleHeaderQuickActions()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5.25v13.5M5.25 12h13.5" />
+                </svg>
+                @if($adminNotificationCount > 0)
+                    <span class="quick-action-badge">{{ $adminNotificationCount }}</span>
+                @endif
+            </button>
+            <div class="quick-actions-panel" id="headerQuickActionsPanel">
+                <div class="quick-action-item">
+                    <span class="quick-action-logo" aria-hidden="true">
+                        <img src="{{ $brandLogo }}" alt="Clinic Logo">
+                    </span>
+                    <span class="quick-action-tooltip">Clinic Logo</span>
+                </div>
+                <div class="quick-actions-divider" aria-hidden="true"></div>
+                <div class="quick-action-item">
+                    <button type="button" class="quick-action-btn quick-action-bell" data-medicine-alert-toggle aria-label="Notifications">
+                        <x-outline-icon name="bell" />
+                        @if($adminNotificationCount > 0)
+                            <span class="quick-action-badge">{{ $adminNotificationCount }}</span>
+                        @endif
+                    </button>
+                    <span class="quick-action-tooltip">Notifications</span>
+                </div>
+                <div class="quick-action-item">
+                    <button type="button" class="theme-toggle-admin quick-action-btn" id="adminThemeToggle" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
+                        <x-outline-icon name="sun" />
+                    </button>
+                    <span class="quick-action-tooltip">Theme Mode</span>
+                </div>
+                <div class="quick-action-item">
+                    <button type="button" class="accessibility-launch-admin quick-action-btn" id="adminAccessibilityLaunch" aria-label="Accessibility menu" title="Accessibility menu">
+                        <x-outline-icon name="academic-cap" />
+                    </button>
+                    <span class="quick-action-tooltip">Accessibility</span>
+                </div>
+            </div>
+        </div>
 
         <div class="profile-wrap">
             <button type="button" class="admin-user" onclick="toggleProfileMenu()">
@@ -2229,34 +2883,34 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     
     <h4>Main Menu</h4>
     <nav class="sidebar-nav">
-      <a href="{{ $dashboardUrl }}" class="nav-dashboard {{ (Request::is('admin/dashboard') || Request::is('assistant/dashboard')) ? 'active' : '' }}">
+      <a href="{{ $dashboardUrl }}" class="nav-dashboard {{ (request()->routeIs('admin.dashboard') || request()->routeIs('assistant.dashboard')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="squares-2x2" /></span><span class="sidebar-label">Dashboard</span>
       </a>
-      <a href="{{ $appointmentsUrl }}" class="nav-appointments {{ (Request::is('admin/appointments*') || Request::is('assistant/appointments*')) ? 'active' : '' }}">
+      <a href="{{ $appointmentsUrl }}" class="nav-appointments {{ (request()->routeIs('admin.appointments*') || request()->routeIs('assistant.appointments*')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="calendar-days" /></span><span class="sidebar-label">Appointments</span>
       </a>
-      <a href="{{ $inventoryUrl }}" class="nav-inventory {{ (Request::is('admin/inventory*') || Request::is('assistant/inventory*')) ? 'active' : '' }}">
+      <a href="{{ $inventoryUrl }}" class="nav-inventory {{ (request()->routeIs('admin.inventory*') || request()->routeIs('assistant.inventory*')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="cube" /></span><span class="sidebar-label">Inventory</span>
       </a>
-      <a href="{{ $reportsUrl }}" class="nav-reports {{ (Request::is('admin/reports*') || Request::is('assistant/reports*')) ? 'active' : '' }}">
+      <a href="{{ $reportsUrl }}" class="nav-reports {{ (request()->routeIs('admin.reports*') || request()->routeIs('assistant.reports*') || Request::is('admin/reports*') || Request::is('assistant/reports*')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="chart-bar" /></span><span class="sidebar-label">Reports</span>
       </a>
      
       <a href="{{ $walkinUrl }}" class="nav-walkin {{ (Request::is('admin/walkin*') || Request::is('assistant/walkin*')) ? 'active' : '' }}">
         <span class="sidebar-short"><x-outline-icon name="user-plus" /></span><span class="sidebar-label">Walk-in</span>
       </a>
-      <a href="{{ route('admin.health_records') }}" class="nav-health {{ Request::is('admin/health-records*') ? 'active' : '' }}">
+      <a href="{{ route('admin.health_records') }}" class="nav-health {{ (request()->routeIs('admin.health_records') || Request::is('health-records') || Request::is('health-profile/*')) ? 'active' : '' }}">
     <span class="sidebar-short"><x-outline-icon name="document-text" /></span>
     <span class="sidebar-label">Student Health Form</span>
     </a>
       @if($isAdminLike)
-          <a href="{{ $userManagementUrl }}" class="nav-users {{ Request::is('admin/user-management*') ? 'active' : '' }}">
+          <a href="{{ $userManagementUrl }}" class="nav-users {{ (request()->routeIs('admin.user-management*') || Request::is('admin/user-management*')) ? 'active' : '' }}">
             <span class="sidebar-short"><x-outline-icon name="users" /></span><span class="sidebar-label">Users Management</span>
           </a>
-          <a href="{{ route('admin.logs') }}" class="nav-audit {{ Request::is('admin/activity-logs*') ? 'active' : '' }}">
+          <a href="{{ route('admin.logs') }}" class="nav-audit {{ (request()->routeIs('admin.logs') || Request::is('admin/activity-logs*')) ? 'active' : '' }}">
             <span class="sidebar-short"><x-outline-icon name="clipboard-document-list" /></span><span class="sidebar-label">Audit Trail</span>
           </a>
-          <a href="{{ $settingsUrl }}" class="nav-settings {{ Request::is('admin/settings*') ? 'active' : '' }}">
+          <a href="{{ $settingsUrl }}" class="nav-settings {{ (request()->routeIs('admin.settings*') || Request::is('admin/settings*')) ? 'active' : '' }}">
             <span class="sidebar-short"><x-outline-icon name="cog-6-tooth" /></span><span class="sidebar-label">Settings</span>
           </a>
       @endif
@@ -2288,43 +2942,32 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     <input type="hidden" name="portal_guard" value="admin">
 </form>
 
-@if($medicineAlertCount > 0)
-    <button type="button" class="medicine-alert-fab" id="medicineAlertToggle" aria-label="Medicine expiry alerts">
-        <x-outline-icon name="exclamation-triangle" />
-        <span class="medicine-alert-badge">{{ $medicineAlertCount }}</span>
-    </button>
-
+@if($adminNotificationCount > 0)
     <section class="medicine-alert-panel" id="medicineAlertPanel" aria-live="polite">
         <div class="medicine-alert-head">
             <div>
-                <p class="medicine-alert-title">Medicine Alerts</p>
-                <p class="medicine-alert-subtitle">Near-expiry medicines and current stock levels.</p>
+                <p class="medicine-alert-title">Notifications</p>
+                <p class="medicine-alert-subtitle">New appointments, today's schedules, and medicine alerts.</p>
             </div>
         </div>
 
         <div class="medicine-alert-list" id="medicineAlertList">
-            @foreach($medicineAlertPreview as $medicineAlert)
-                @php
-                    $isExpired = optional($medicineAlert->expiration_date)->isPast();
-                    $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
-                @endphp
-            <article class="medicine-alert-item {{ $isExpired ? 'is-expired' : 'is-near-expiry' }}">
+            @foreach($adminNotificationPreview as $notification)
+            <article class="medicine-alert-item {{ $notification['state_class'] }}">
                 <a
-                    href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
+                    href="{{ $notification['link'] }}"
                     class="medicine-alert-item-link"
-                    data-hover-hint="Press to enter"
+                    data-hover-hint="{{ $notification['hover_hint'] }}"
                 >
                 <div class="medicine-alert-content" style="width: 100%;">
                     <div class="medicine-alert-name-row">
-                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
+                        <p class="medicine-alert-item-name">{{ $notification['title'] }}</p>
                     </div>
                     
                     <div class="medicine-alert-item-meta">
-                        <span class="medicine-alert-chip">Stock: {{ $medicineAlert->quantity }} units</span>
-                        <span class="medicine-alert-chip">Exp: {{ optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A' }}</span>
-                        <span class="medicine-alert-chip">
-                            {{ $isExpired ? 'Expired' : ($daysLeft !== null ? $daysLeft . ' day(s) left' : 'Near expiry') }}
-                        </span>
+                        @foreach($notification['chips'] as $chip)
+                            <span class="medicine-alert-chip">{{ $chip }}</span>
+                        @endforeach
                     </div>
                     
                 </div>
@@ -2334,30 +2977,24 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
             @endforeach
         </div>
-        @if($medicineAlertOverflow->isNotEmpty())
+        @if($adminNotificationOverflow->isNotEmpty())
         <div class="medicine-alert-extra-list" id="medicineAlertExtraList">
-            @foreach($medicineAlertOverflow as $medicineAlert)
-                @php
-                    $isExpired = optional($medicineAlert->expiration_date)->isPast();
-                    $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
-                @endphp
-            <article class="medicine-alert-item is-hidden {{ $isExpired ? 'is-expired' : 'is-near-expiry' }}" data-medicine-alert-extra="true">
+            @foreach($adminNotificationOverflow as $notification)
+            <article class="medicine-alert-item is-hidden {{ $notification['state_class'] }}" data-medicine-alert-extra="true">
                 <a
-                    href="{{ $inventoryUrl }}?highlight_item={{ $medicineAlert->id }}"
+                    href="{{ $notification['link'] }}"
                     class="medicine-alert-item-link"
-                    data-hover-hint="Press to enter"
+                    data-hover-hint="{{ $notification['hover_hint'] }}"
                 >
                 <div class="medicine-alert-content" style="width: 100%;">
                     <div class="medicine-alert-name-row">
-                        <p class="medicine-alert-item-name">{{ $medicineAlert->name }}</p>
+                        <p class="medicine-alert-item-name">{{ $notification['title'] }}</p>
                     </div>
 
                     <div class="medicine-alert-item-meta">
-                        <span class="medicine-alert-chip">Stock: {{ $medicineAlert->quantity }} units</span>
-                        <span class="medicine-alert-chip">Exp: {{ optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A' }}</span>
-                        <span class="medicine-alert-chip">
-                            {{ $isExpired ? 'Expired' : ($daysLeft !== null ? $daysLeft . ' day(s) left' : 'Near expiry') }}
-                        </span>
+                        @foreach($notification['chips'] as $chip)
+                            <span class="medicine-alert-chip">{{ $chip }}</span>
+                        @endforeach
                     </div>
                 </div>
                 </a>
@@ -2365,10 +3002,10 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             @endforeach
         </div>
         @endif
-        @if($medicineAlertCount > 2)
+        @if($adminNotificationCount > 4)
         <div class="medicine-alert-more-wrapper">
             <button type="button" class="medicine-see-more-link" id="medicineAlertMoreBtn">
-                Show more ({{ $medicineAlertCount - 2 }})
+                Show more ({{ $adminNotificationCount - 4 }})
             </button>
         </div>
     @endif
@@ -2457,47 +3094,32 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         });
     }
 
-    function initAutoHideScrollbars() {
-        const targets = Array.from(document.querySelectorAll('.main'));
-
-        if (!targets.length) {
-            return;
-        }
-
-        targets.forEach((target) => {
-            let hideTimer = null;
-
-            const show = () => {
-                target.classList.add('scrollbar-visible');
-                if (hideTimer) {
-                    clearTimeout(hideTimer);
-                }
-                hideTimer = window.setTimeout(() => {
-                    target.classList.remove('scrollbar-visible');
-                }, 900);
-            };
-
-            target.addEventListener('mouseenter', show);
-            target.addEventListener('focusin', show);
-            target.addEventListener('scroll', show, { passive: true });
-            target.addEventListener('mouseleave', () => {
-                if (hideTimer) {
-                    clearTimeout(hideTimer);
-                }
-                hideTimer = window.setTimeout(() => {
-                    target.classList.remove('scrollbar-visible');
-                }, 250);
-            });
-        });
-    }
-
     function initSidebarScrollIndicator() {
         const sidebar = document.getElementById('adminSidebar');
         const indicator = document.getElementById('sidebarScrollIndicator');
+        const activeLink = sidebar ? sidebar.querySelector('.sidebar-nav a.active') : null;
 
         if (!sidebar || !indicator) {
             return;
         }
+
+        const revealActiveLink = () => {
+            if (!activeLink) {
+                return;
+            }
+
+            const sidebarRect = sidebar.getBoundingClientRect();
+            const linkRect = activeLink.getBoundingClientRect();
+            const topOverflow = linkRect.top < sidebarRect.top + 84;
+            const bottomOverflow = linkRect.bottom > sidebarRect.bottom - 76;
+
+            if (topOverflow || bottomOverflow) {
+                activeLink.scrollIntoView({
+                    block: 'center',
+                    behavior: 'auto'
+                });
+            }
+        };
 
         const updateIndicator = () => {
             const canScroll = sidebar.scrollHeight - sidebar.clientHeight > 6;
@@ -2516,69 +3138,33 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         sidebar.addEventListener('scroll', updateIndicator, { passive: true });
         sidebar.addEventListener('mouseenter', updateIndicator);
         sidebar.addEventListener('mouseleave', updateIndicator);
-        window.addEventListener('resize', updateIndicator, { passive: true });
+        window.addEventListener('resize', () => {
+            revealActiveLink();
+            updateIndicator();
+        }, { passive: true });
+        revealActiveLink();
         updateIndicator();
+        window.setTimeout(revealActiveLink, 80);
         window.setTimeout(updateIndicator, 150);
     }
 
     function initMedicineAlerts() {
-        const toggle = document.getElementById('medicineAlertToggle');
+        const toggles = Array.from(document.querySelectorAll('[data-medicine-alert-toggle]'));
         const panel = document.getElementById('medicineAlertPanel');
         const moreButton = document.getElementById('medicineAlertMoreBtn');
         const hiddenItems = Array.from(document.querySelectorAll('[data-medicine-alert-extra="true"]'));
         const hoverHint = document.getElementById('medicineHoverHint');
         const hintTargets = Array.from(document.querySelectorAll('.medicine-alert-item-link[data-hover-hint]'));
 
-        if (!toggle || !panel) {
+        if (!toggles.length || !panel) {
             return;
         }
 
-        const updateMedicineAlertTone = function () {
-            const rect = toggle.getBoundingClientRect();
-            const sampleX = Math.max(1, Math.floor(rect.left + rect.width / 2));
-            const sampleY = Math.max(1, Math.floor(rect.top + rect.height / 2));
-            const sampledElements = document.elementsFromPoint(sampleX, sampleY);
-
-            const resolveBackgroundColor = function (elements) {
-                for (const element of elements) {
-                    if (!element || element === toggle || element === panel || toggle.contains(element) || panel.contains(element)) {
-                        continue;
-                    }
-
-                    let current = element;
-                    while (current && current !== document.documentElement) {
-                        if (current === toggle || current === panel || toggle.contains(current) || panel.contains(current)) {
-                            break;
-                        }
-
-                        const computed = window.getComputedStyle(current);
-                        const bg = computed.backgroundColor;
-                        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-                            return bg;
-                        }
-                        current = current.parentElement;
-                    }
-                }
-
-                const theme = document.documentElement.getAttribute('data-theme');
-                return theme === 'dark' ? 'rgb(42, 14, 22)' : 'rgb(255, 255, 255)';
-            };
-
-            const color = resolveBackgroundColor(sampledElements);
-            const matches = color.match(/\d+/g) || [];
-            const [r, g, b] = matches.slice(0, 3).map(Number);
-            const luminance = (0.2126 * (r || 255)) + (0.7152 * (g || 255)) + (0.0722 * (b || 255));
-
-            if (luminance < 135) {
-                toggle.setAttribute('data-surface-tone', 'dark');
-            } else {
-                toggle.removeAttribute('data-surface-tone');
-            }
-        };
-
-        toggle.addEventListener('click', function (event) {
-            event.stopPropagation();
-            panel.classList.toggle('is-open');
+        toggles.forEach(function (toggle) {
+            toggle.addEventListener('click', function (event) {
+                event.stopPropagation();
+                panel.classList.toggle('is-open');
+            });
         });
 
         document.addEventListener('click', function (event) {
@@ -2586,7 +3172,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 return;
             }
 
-            if (!panel.contains(event.target) && !toggle.contains(event.target)) {
+            const clickedToggle = toggles.some(function (toggle) {
+                return toggle.contains(event.target);
+            });
+
+            if (!panel.contains(event.target) && !clickedToggle) {
                 panel.classList.remove('is-open');
             }
         });
@@ -2637,9 +3227,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             });
         }
 
-        updateMedicineAlertTone();
-        window.addEventListener('scroll', updateMedicineAlertTone, { passive: true });
-        window.addEventListener('resize', updateMedicineAlertTone);
     }
 
     function initAccessibilityLaunch() {
@@ -2827,6 +3414,18 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 
+    function toggleHeaderQuickActions(forceOpen) {
+        const wrap = document.getElementById('headerQuickActions');
+        const toggle = wrap ? wrap.querySelector('.quick-actions-toggle') : null;
+        if (!wrap || !toggle) {
+            return;
+        }
+
+        const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !wrap.classList.contains('is-open');
+        wrap.classList.toggle('is-open', shouldOpen);
+        toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+    }
+
     function toggleAssistantPanel() {
         const panel = document.getElementById('assistantPanel');
         panel.classList.toggle('open');
@@ -2983,9 +3582,14 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const sidebarToggle = document.querySelector('.sidebar-toggle');
         const panel = document.getElementById('assistantPanel');
         const assistantLaunch = document.getElementById('assistantLaunchBtn');
+        const quickActions = document.getElementById('headerQuickActions');
 
         if (menu.style.display === 'block' && trigger && !menu.contains(event.target) && !trigger.contains(event.target)) {
             menu.style.display = 'none';
+        }
+
+        if (quickActions && quickActions.classList.contains('is-open') && !quickActions.contains(event.target)) {
+            toggleHeaderQuickActions(false);
         }
 
         if (
@@ -3013,12 +3617,12 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         if (window.innerWidth > 860) {
             document.body.classList.remove('sidebar-open');
         }
+        toggleHeaderQuickActions(false);
     });
 
     document.addEventListener('DOMContentLoaded', function () {
         initAssistantUi();
         initThemeToggle();
-        initAutoHideScrollbars();
         initSidebarScrollIndicator();
         initMedicineAlerts();
         initAccessibilityLaunch();

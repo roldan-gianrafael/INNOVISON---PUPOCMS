@@ -22,6 +22,7 @@
 
     /* Controls */
     .controls { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .inventory-page-title { margin: 0; color: #000000; }
     .btn-add { background: #8B0000; color: white; padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
     .btn-add:hover { background: #600000; }
 
@@ -81,6 +82,10 @@
             grid-template-columns: 1fr;
         }
     }
+
+    html[data-theme="dark"] .inventory-page-title {
+        color: #ffffff;
+    }
 </style>
 @endpush
 
@@ -92,7 +97,7 @@
     @endphp
 
     <div class="controls">
-        <h2 style="margin:0; color:#000000;">Clinic Inventory</h2>
+        <h2 class="inventory-page-title">Clinic Inventory</h2>
         @if($canManageInventory)
             <button class="btn-add" onclick="openModal()">+ Add New Item</button>
         @endif

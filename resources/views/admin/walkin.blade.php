@@ -228,6 +228,37 @@
         letter-spacing: 0.04em;
     }
 
+    .intake-heading-kicker {
+        margin: 0 0 8px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #8b0000;
+        text-transform: uppercase;
+    }
+
+    .intake-heading-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .intake-heading-copy {
+        margin: 10px 0 0;
+        color: #475569;
+        max-width: 680px;
+    }
+
+    html[data-theme="dark"] .intake-heading-title,
+    html[data-theme="dark"] .intake-heading-copy {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .intake-heading-kicker {
+        color: #ffffff;
+    }
+
     .scan-surface {
         padding: 16px;
         border-radius: 16px;
@@ -498,9 +529,9 @@
     <div class="card p-4 shadow-sm" style="border-radius: 18px; border: none; margin-bottom: 20px;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;">
             <div>
-                <p style="margin:0 0 8px; font-size:12px; font-weight:800; letter-spacing:1px; color:#8B0000; text-transform:uppercase;">Patient Intake</p>
-                <h2 style="margin:0; font-size:28px; font-weight:800; color:#0f172a;">Choose how you want to begin the consultation flow</h2>
-                <p style="margin:10px 0 0; color:#475569; max-width:680px;">
+                <p class="intake-heading-kicker">Patient Intake</p>
+                <h2 class="intake-heading-title">Choose how you want to begin the consultation flow</h2>
+                <p class="intake-heading-copy">
                     Use the identity portal for official account registration, scan an existing school user through barcode or BioSync, or let clinic staff complete an assisted intake when the patient cannot register alone.
                 </p>
             </div>

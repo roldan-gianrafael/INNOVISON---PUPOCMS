@@ -83,6 +83,37 @@
     .summary-item {
         flex: 1; /* Hahatiin ang space sa dalawa (50/50) */
     }
+
+    .health-records-title {
+        margin: 0;
+        color: #111827;
+    }
+
+    .health-records-search {
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        width: 350px;
+        color: #111827;
+    }
+
+    .health-summary-label {
+        font-size: 11px;
+        letter-spacing: 0.5px;
+    }
+
+    .health-summary-value {
+        color: #70131B;
+    }
+
+    html[data-theme="dark"] .health-records-title,
+    html[data-theme="dark"] .health-records-search,
+    html[data-theme="dark"] .health-records-search::placeholder,
+    html[data-theme="dark"] .health-summary-label,
+    html[data-theme="dark"] .health-summary-value,
+    html[data-theme="dark"] .summary-item .text-danger {
+        color: #ffffff !important;
+    }
 </style>
 @endpush
 
@@ -95,22 +126,21 @@
 
     {{-- Header with Search --}}
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="margin:0; color:#111827;">Student Health Records</h2>
-        <input type="text" id="recordSearch" placeholder="Search by student name or ID..." 
-               style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 350px; color:#111827;">
+        <h2 class="health-records-title">Student Health Records</h2>
+        <input type="text" id="recordSearch" class="health-records-search" placeholder="Search by student name or ID...">
     </div>
 
     {{-- Summary Cards - Hardcoded Side by Side --}}
     <div class="summary-container">
         <div class="summary-item">
             <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #70131B;">
-                <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Total Submissions</small>
-                <h3 class="fw-bold mb-0" style="color: #70131B;">{{ $records->count() }}</h3>
+                <small class="text-muted fw-bold text-uppercase health-summary-label">Total Submissions</small>
+                <h3 class="fw-bold mb-0 health-summary-value">{{ $records->count() }}</h3>
             </div>
         </div>
         <div class="summary-item">
             <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #dc3545;">
-                <small class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">With Medical Conditions</small>
+                <small class="text-muted fw-bold text-uppercase health-summary-label">With Medical Conditions</small>
                 <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_illness', 'Yes')->count() }}</h3>
             </div>
         </div>

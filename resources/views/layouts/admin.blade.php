@@ -357,6 +357,8 @@
       min-width: 0;
       max-width: 100%;
       overflow: hidden;
+      background: inherit;
+      border-radius: inherit;
   }
 
 .medicine-alert-item-link:hover .medicine-alert-item-name {
@@ -2966,6 +2968,7 @@
     min-width: 0;
     max-width: 100%;
     overflow: hidden;
+    background: inherit;
 }
 
 /* Alert state indicators */
@@ -2975,22 +2978,22 @@
 
 .is-expired {
     border-right: 4px solid #dc3545;
-    background: rgba(220, 53, 69, 0.05);
+    background: #fee2e2;
 }
 
 .is-notification-appointment {
     border-right: 4px solid #2563eb;
-    background: rgba(37, 99, 235, 0.06);
+    background: #dbeafe;
 }
 
 .is-notification-scheduled {
     border-right: 4px solid #059669;
-    background: rgba(5, 150, 105, 0.06);
+    background: #d1fae5;
 }
 
 .is-notification-health {
     border-right: 4px solid #7c3aed;
-    background: rgba(124, 58, 237, 0.06);
+    background: #ede9fe;
 }
 .medicine-alert-more-wrapper {
     padding: 12px;
@@ -3048,12 +3051,14 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     width: 100%;
     max-width: 100%;
     overflow: hidden;
+    background: inherit;
 }
 
 .medicine-alert-chip {
     display: inline-flex;
     min-width: 0;
     max-width: 100%;
+    background: #fff7ea;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;

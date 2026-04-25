@@ -243,6 +243,7 @@
             padding: 18px;
             display: none;
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         .medicine-alert-panel.is-open {
@@ -255,6 +256,10 @@
             align-items: flex-start;
             gap: 12px;
             margin-bottom: 14px;
+            padding: 0 0 12px;
+            border-bottom: 1px solid rgba(127, 29, 45, 0.12);
+            position: relative;
+            z-index: 1;
         }
 
         .medicine-alert-title {
@@ -262,12 +267,14 @@
             font-size: 16px;
             font-weight: 800;
             color: #7f1d2d;
+            line-height: 1.2;
         }
 
         .medicine-alert-subtitle {
             margin: 4px 0 0;
             font-size: 12px;
             color: #475569;
+            line-height: 1.45;
         }
 
         .medicine-alert-list {
@@ -283,6 +290,7 @@
      background: rgba(127, 29, 45, 0.06);
       border: 1px solid rgba(127, 29, 45, 0.08);
       min-width: 0;
+      max-width: 100%;
       overflow: hidden;
   }
   
@@ -291,6 +299,8 @@
       color: inherit;
       text-decoration: none;
       min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
   }
 
 .medicine-alert-item-link:hover .medicine-alert-item-name {
@@ -313,7 +323,9 @@
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.02em;
-    white-space: nowrap;
+    max-width: min(320px, calc(100vw - 24px));
+    white-space: normal;
+    line-height: 1.45;
     box-shadow: 0 10px 22px rgba(15, 23, 42, 0.22);
     opacity: 0;
     visibility: hidden;
@@ -370,6 +382,10 @@
         html[data-theme="dark"] .medicine-alert-panel {
             background: rgba(35, 17, 25, 0.97);
             border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-theme="dark"] .medicine-alert-head {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
         }
 
         html[data-theme="dark"] .medicine-alert-title {
@@ -2880,6 +2896,8 @@
 .medicine-alert-content {
     width: 100%;
     min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 /* Alert state indicators */
@@ -2900,6 +2918,11 @@
 .is-notification-scheduled {
     border-right: 4px solid #059669;
     background: rgba(5, 150, 105, 0.06);
+}
+
+.is-notification-health {
+    border-right: 4px solid #7c3aed;
+    background: rgba(124, 58, 237, 0.06);
 }
 .medicine-alert-more-wrapper {
     padding: 12px;
@@ -2949,18 +2972,33 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 .medicine-alert-list {
       max-height: 400px;
       overflow-y: auto;
+      overflow-x: hidden;
   }
 
 .medicine-alert-item-meta {
     min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .medicine-alert-chip {
+    display: inline-flex;
+    min-width: 0;
     max-width: 100%;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 }
+
+        @media (max-width: 860px) {
+            .medicine-alert-panel {
+                right: 12px;
+                bottom: 82px;
+                width: min(360px, calc(100vw - 24px));
+                max-width: calc(100vw - 24px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -2995,6 +3033,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
     $inventoryUrl = $isStudentAssistant ? url('/assistant/inventory') : url('/admin/inventory');
     $reportsUrl = $isStudentAssistant ? url('/assistant/reports') : url('/admin/reports');
+    $healthRecordsUrl = url('/admin/health-records');
     $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
     $settingsUrl = url('/admin/settings');
     $userManagementUrl = url('/admin/user-management?entry=menu');
@@ -3032,6 +3071,13 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         ->orderBy('time')
         ->limit(3)
         ->get();
+    $recentHealthFormSubmissions = $isStudentAssistant
+        ? collect()
+        : \App\Models\HealthProfile::query()
+            ->with('user')
+            ->latest('created_at')
+            ->limit(3)
+            ->get();
 
     $adminNotifications = collect();
 
@@ -3039,13 +3085,15 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         $adminNotifications->push([
             'type' => 'appointment',
             'title' => 'New appointment request',
-            'link' => $appointmentsUrl,
-            'hover_hint' => 'Open appointments',
-            'state_class' => 'is-notification-appointment',
-            'chips' => array_filter([
-                'Patient: ' . trim((string) ($appointment->name ?? 'Unknown patient')),
+            'link' => $appointmentsUrl . '?highlight_appointment=' . $appointment->id,
+            'hover_hint' => implode(' | ', array_filter([
+                'Name: ' . trim((string) ($appointment->name ?? 'Unknown patient')),
                 'Date: ' . trim((string) ($appointment->date ?? 'N/A')),
                 'Time: ' . trim((string) ($appointment->time ?? 'N/A')),
+            ])),
+            'state_class' => 'is-notification-appointment',
+            'chips' => array_filter([
+                'Pending',
             ]),
         ]);
     }
@@ -3054,13 +3102,36 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         $adminNotifications->push([
             'type' => 'appointment',
             'title' => 'Scheduled consultation today',
-            'link' => $appointmentsUrl,
-            'hover_hint' => 'Open appointments',
+            'link' => $appointmentsUrl . '?highlight_appointment=' . $appointment->id,
+            'hover_hint' => implode(' | ', array_filter([
+                'Name: ' . trim((string) ($appointment->name ?? 'Unknown patient')),
+                'Date: ' . trim((string) ($appointment->date ?? now()->toDateString())),
+                'Time: ' . trim((string) ($appointment->time ?? 'N/A')),
+            ])),
             'state_class' => 'is-notification-scheduled',
             'chips' => array_filter([
-                'Patient: ' . trim((string) ($appointment->name ?? 'Unknown patient')),
-                'Time: ' . trim((string) ($appointment->time ?? 'N/A')),
                 'Status: Approved',
+            ]),
+        ]);
+    }
+
+    foreach ($recentHealthFormSubmissions as $healthProfile) {
+        $profileUser = $healthProfile->user;
+        $studentName = trim((string) ($profileUser->name ?? 'Unknown student'));
+        $studentNumber = trim((string) ($profileUser->student_number ?? $profileUser->student_id ?? 'N/A'));
+
+        $adminNotifications->push([
+            'type' => 'health-form',
+            'title' => 'New health form submission',
+            'link' => $healthRecordsUrl . '?highlight_health=' . $healthProfile->id,
+            'hover_hint' => implode(' | ', array_filter([
+                'Name: ' . $studentName,
+                'Student No: ' . $studentNumber,
+                'Submitted: ' . optional($healthProfile->created_at)->format('M d, Y g:i A'),
+            ])),
+            'state_class' => 'is-notification-health',
+            'chips' => array_filter([
+                'Pending review',
             ]),
         ]);
     }
@@ -3071,14 +3142,17 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
         $adminNotifications->push([
             'type' => 'medicine',
-            'title' => (string) $medicineAlert->name,
+            'title' => $isExpired ? 'Expired medicine alert' : 'Medicine expiry alert',
             'link' => $inventoryUrl . '?highlight_item=' . $medicineAlert->id,
-            'hover_hint' => 'Open inventory',
+            'hover_hint' => implode(' | ', array_filter([
+                'Medicine: ' . trim((string) $medicineAlert->name),
+                'Stock: ' . $medicineAlert->quantity . ' units',
+                'Expiry: ' . (optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A'),
+                $isExpired ? 'Status: Expired' : ($daysLeft !== null ? 'Status: ' . $daysLeft . ' day(s) left' : 'Status: Near expiry'),
+            ])),
             'state_class' => $isExpired ? 'is-expired' : 'is-near-expiry',
             'chips' => array_filter([
-                'Stock: ' . $medicineAlert->quantity . ' units',
-                'Exp: ' . (optional($medicineAlert->expiration_date)->format('M d, Y') ?? 'N/A'),
-                $isExpired ? 'Expired' : ($daysLeft !== null ? $daysLeft . ' day(s) left' : 'Near expiry'),
+                $isExpired ? 'Expired' : 'Near expiry',
             ]),
         ]);
     }

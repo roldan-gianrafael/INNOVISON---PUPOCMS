@@ -263,6 +263,31 @@
         text-decoration: none;
     }
 
+    .appointment-highlight-row {
+        position: relative;
+        background: linear-gradient(180deg, rgba(255, 248, 208, 0.98), rgba(255, 243, 191, 0.98));
+        box-shadow: inset 4px 0 0 #f59e0b;
+        animation: appointmentHighlightPulse 2.2s ease-in-out 2;
+    }
+
+    .appointment-highlight-row td {
+        background: transparent;
+    }
+
+    html[data-theme="dark"] .appointment-highlight-row {
+        background: linear-gradient(180deg, rgba(120, 53, 15, 0.34), rgba(146, 64, 14, 0.28));
+        box-shadow: inset 4px 0 0 #fbbf24;
+    }
+
+    @keyframes appointmentHighlightPulse {
+        0%, 100% {
+            box-shadow: inset 4px 0 0 #f59e0b, 0 0 0 rgba(245, 158, 11, 0);
+        }
+        50% {
+            box-shadow: inset 4px 0 0 #f59e0b, 0 0 0 6px rgba(245, 158, 11, 0.14);
+        }
+    }
+
     html[data-theme="dark"] .appointments-page-title {
         color: #ffffff;
     }
@@ -275,6 +300,7 @@
     @php
         $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
         $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
+        $highlightAppointmentId = trim((string) request()->query('highlight_appointment', ''));
     @endphp
 
     <div class="appointments-toolbar">
@@ -304,7 +330,11 @@
             </thead>
             <tbody>
                 @forelse($appointments as $appt)
-                    <tr>
+                    <tr
+                        data-appointment-row
+                        data-appointment-id="{{ $appt->id }}"
+                        class="{{ $highlightAppointmentId !== '' && $highlightAppointmentId === (string) $appt->id ? 'appointment-highlight-row' : '' }}"
+                    >
                         <td>
                             <div style="font-weight: 700;" class="student-name">{{ $appt->name }}</div>
                             <div style="font-size: 12px; color: #111827;">{{ $appt->student_number ?: optional(optional($appt->user)->healthProfile)->student_number ?: optional($appt->user)->student_number ?: 'N/A' }}</div>
@@ -446,6 +476,7 @@
 @push('scripts')
 <script>
     const appointmentsBaseUrl = @json(url($basePrefix . '/appointments'));
+    const highlightedAppointmentId = @json($highlightAppointmentId);
 
     function safeText(value) {
         return (value ?? '').toString().trim() || '-';
@@ -642,6 +673,13 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+        if (highlightedAppointmentId) {
+            const highlightedRow = document.querySelector('[data-appointment-row][data-appointment-id="' + highlightedAppointmentId + '"]');
+            if (highlightedRow) {
+                highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('keyup', function() {

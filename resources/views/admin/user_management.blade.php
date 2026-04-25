@@ -104,7 +104,7 @@
     }
 
     html[data-theme="dark"] .um-mode-btn {
-        background: linear-gradient(145deg, #5f0012 0%, #7d0b17 42%, #c18a10 100%);
+        background: linear-gradient(145deg, #5f0012 0%, #7d0b17 45%, #5a0010 100%);
         border-color: rgba(255, 214, 102, 0.5);
         box-shadow:
             0 0 0 1px rgba(255, 214, 102, 0.16),
@@ -114,7 +114,7 @@
 
     html[data-theme="dark"] .um-mode-btn.active {
         border-color: rgba(255, 214, 102, 0.68);
-        background: linear-gradient(145deg, #6d0014 0%, #8a0d19 40%, #d09510 100%);
+        background: linear-gradient(145deg, #6d0014 0%, #8a0d19 42%, #670012 100%);
         box-shadow:
             0 0 0 1px rgba(255, 214, 102, 0.22),
             0 26px 40px rgba(95, 0, 18, 0.38),

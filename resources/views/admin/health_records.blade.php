@@ -126,13 +126,43 @@
         gap: 16px;
     }
 
+    .health-highlight-row {
+        position: relative;
+        background: linear-gradient(180deg, rgba(243, 232, 255, 0.98), rgba(237, 233, 254, 0.98));
+        box-shadow: inset 4px 0 0 #7c3aed;
+        animation: healthHighlightPulse 2.2s ease-in-out 2;
+    }
+
+    .health-highlight-row td {
+        background: transparent;
+    }
+
+    @keyframes healthHighlightPulse {
+        0%, 100% {
+            box-shadow: inset 4px 0 0 #7c3aed, 0 0 0 rgba(124, 58, 237, 0);
+        }
+        50% {
+            box-shadow: inset 4px 0 0 #7c3aed, 0 0 0 6px rgba(124, 58, 237, 0.12);
+        }
+    }
+
     html[data-theme="dark"] .health-records-title,
     html[data-theme="dark"] .health-records-search,
     html[data-theme="dark"] .health-records-search::placeholder,
     html[data-theme="dark"] .health-summary-label,
     html[data-theme="dark"] .health-summary-value,
-    html[data-theme="dark"] .summary-item .text-danger {
+    html[data-theme="dark"] .summary-item .text-danger,
+    html[data-theme="dark"] .card .text-muted,
+    html[data-theme="dark"] .card th,
+    html[data-theme="dark"] .card td,
+    html[data-theme="dark"] .card td *,
+    html[data-theme="dark"] .student-name {
         color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .health-highlight-row {
+        background: linear-gradient(180deg, rgba(76, 29, 149, 0.34), rgba(91, 33, 182, 0.28));
+        box-shadow: inset 4px 0 0 #a855f7;
     }
 </style>
 @endpush
@@ -142,6 +172,7 @@
         $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
         $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
         $canSignHealth = $role === \App\Models\User::ROLE_SUPERADMIN;
+        $highlightHealthId = trim((string) request()->query('highlight_health', ''));
     @endphp
 
     {{-- Header with Search --}}
@@ -187,7 +218,11 @@
         </thead>
         <tbody>
             @forelse($records as $record)
-                <tr>
+                <tr
+                    data-health-row
+                    data-health-id="{{ $record->id }}"
+                    class="{{ $highlightHealthId !== '' && $highlightHealthId === (string) $record->id ? 'health-highlight-row' : '' }}"
+                >
                     <td class="fw-bold">{{ $record->user->student_number ?: $record->user->student_id }}</td>
                     <td>
                         <div class="student-name" style="font-weight: 700;">{{ $record->user->name }}</div>
@@ -257,6 +292,17 @@
 
 @push('scripts')
 <script>
+    const highlightedHealthId = @json($highlightHealthId);
+
+    if (highlightedHealthId) {
+        window.addEventListener('DOMContentLoaded', function () {
+            const highlightedRow = document.querySelector('[data-health-row][data-health-id="' + highlightedHealthId + '"]');
+            if (highlightedRow) {
+                highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
+
     document.getElementById('recordSearch').addEventListener('keyup', function() {
         let filter = this.value.toUpperCase();
         let tr = document.getElementById("healthTable").getElementsByTagName("tr");

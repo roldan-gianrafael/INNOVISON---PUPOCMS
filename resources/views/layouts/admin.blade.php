@@ -494,6 +494,11 @@
             --admin-sidebar-indicator-border: rgba(255, 255, 255, 0.14);
             --admin-brand-logo-bg: rgba(255, 255, 255, 0.96);
             --admin-brand-logo-border: rgba(255, 255, 255, 0.18);
+            --admin-sidebar-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 18px 28px rgba(255, 255, 255, 0.03),
+                inset 0 -18px 28px rgba(0, 0, 0, 0.16),
+                0 8px 16px rgba(15, 23, 42, 0.08);
         }
 
         * { box-sizing: border-box; }
@@ -1152,7 +1157,7 @@
             background: var(--admin-sidebar-bg);
             border: 1px solid var(--admin-sidebar-border);
             border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-soft);
+            box-shadow: var(--admin-sidebar-shadow);
             padding: 20px 14px;
             display: flex;
             flex-direction: column;
@@ -2536,6 +2541,11 @@
         html[data-theme="light"] .sidebar {
             background: linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
             border-color: rgba(128, 0, 0, 0.12);
+            box-shadow:
+                inset 0 0 0 1px rgba(128, 0, 0, 0.04),
+                inset 0 14px 20px rgba(255, 255, 255, 0.9),
+                inset 0 -14px 20px rgba(127, 29, 45, 0.05),
+                0 6px 14px rgba(15, 23, 42, 0.05);
         }
 
         html[data-theme="light"] .sidebar-logo {

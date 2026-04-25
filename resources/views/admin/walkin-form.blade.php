@@ -57,9 +57,9 @@
             <h3 style="margin: 0;">{{ $student->first_name }} {{ $student->last_name }}</h3>
         
         @if($user_source == 'online' && $latestAppointment)
-            <span class="badge-source source-online">Online Appointment Found</span>
+            <span class="badge-source source-online">Online Appointment</span>
         @else
-            <span class="badge-source source-walkin">Walk-in Patient</span>
+            <span class="badge-source source-walkin">Walk-in</span>
         @endif
         </div>
         

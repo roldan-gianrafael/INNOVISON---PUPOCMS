@@ -88,32 +88,12 @@ body { background-color: #e2e8f0; }
     box-sizing: border-box;
 }
 
-.header-section {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 12px;
-}
-
-.logo {
-    width: 74px;
-    height: 74px;
-    margin-left: 42px;
-}
-
-.header-text p {
-    margin: 0;
-    line-height: 1.3;
-}
-
-.univ-name { font-size: 15px; font-weight: bold; }
-.dept-name { font-size: 17px; font-weight: bold; }
 .form-title {
     text-align: center;
     font-weight: bold;
     font-style: italic;
     font-size: 16px;
-    margin: 18px 0 22px;
+    margin: 0 0 22px;
 }
 
 .row {
@@ -139,48 +119,6 @@ body { background-color: #e2e8f0; }
     color: #000;
 }
 
-.section-header {
-    font-weight: bold;
-    font-style: italic;
-    margin-top: 18px;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    font-size: 13px;
-    padding-left: 5px;
-}
-
-.notes-box {
-    min-height: 88px;
-    border: 1px solid #000;
-    margin-top: 8px;
-    padding: 10px 12px;
-    font-size: 13px;
-}
-
-.signature-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 42px;
-    align-items: flex-end;
-}
-
-.sig-block {
-    width: 35%;
-    text-align: center;
-}
-
-.sig-line {
-    border-bottom: 1px solid #000;
-    min-height: 18px;
-    margin-bottom: 4px;
-    font-weight: bold;
-}
-
-.sig-label {
-    font-size: 10px;
-    font-weight: bold;
-    color: #000;
-}
 </style>
 @endpush
 
@@ -198,26 +136,8 @@ body { background-color: #e2e8f0; }
 </div>
 
 <div class="print-container">
-    <div class="header-section">
-        <img src="{{ asset('images/pup_logo.png') }}" class="logo" alt="PUP Logo">
-        <div class="header-text">
-            <p style="font-size: 9px;">Republic of the Philippines</p>
-            <p class="univ-name">POLYTECHNIC UNIVERSITY OF THE PHILIPPINES</p>
-            <p style="font-size: 10px;">Office of the Vice President for Administration</p>
-            <p class="dept-name">MEDICAL SERVICES DEPARTMENT</p>
-        </div>
-    </div>
+    <div class="form-title">MEDICAL ASSESSMENT SUMMARY</div>
 
-    <hr style="border: 0.5px solid #000;">
-
-    <div class="form-title">MEDICAL ASSESSMENT</div>
-
-    <div class="row">
-        <span class="label">Student Name:</span>
-        <div class="field">{{ $profile->user->name ?? '' }}</div>
-        <span class="label">Student No.:</span>
-        <div class="field">{{ $profile->user->student_number ?? '' }}</div>
-    </div>
     <div class="row">
         <span class="label">Date:</span>
         <div class="field">{{ optional($profile->created_at)->format('m/d/Y') }}</div>
@@ -225,20 +145,12 @@ body { background-color: #e2e8f0; }
         <div class="field">{{ !empty($profile->user->DOB) ? \Carbon\Carbon::parse($profile->user->DOB)->format('m/d/Y') : '' }}</div>
     </div>
     <div class="row">
-        <span class="label">Age:</span>
-        <div class="field">{{ $calculatedAge ?? '' }}</div>
-        <span class="label">Sex:</span>
-        <div class="field">{{ $profile->sex ?? $profile->user->gender ?? '' }}</div>
-        <span class="label">Course:</span>
-        <div class="field">{{ $profile->course_college ?? $profile->user->course ?? '' }}</div>
-    </div>
-
-    <div class="section-header">Vital Signs</div>
-    <div class="row">
         <span class="label">Height:</span>
         <div class="field">{{ $profile->height ?? '' }}</div>
+        <span class="label">ft</span>
         <span class="label">Weight:</span>
         <div class="field">{{ $profile->weight ?? '' }}</div>
+        <span class="label">lbs</span>
     </div>
     <div class="row">
         <span class="label">BP:</span>
@@ -247,8 +159,6 @@ body { background-color: #e2e8f0; }
         <div class="field">&nbsp;</div>
         <span class="label">Temp:</span>
         <div class="field">&nbsp;</div>
-        <span class="label">BPM:</span>
-        <div class="field">&nbsp;</div>
     </div>
     <div class="row">
         <span class="label">Covid Positive?</span>
@@ -256,32 +166,17 @@ body { background-color: #e2e8f0; }
         <span class="label">Date:</span>
         <div class="field">&nbsp;</div>
     </div>
-
-    <div class="section-header">Clinic Notes</div>
     <div class="row">
-        <span class="label">Known Illness:</span>
-        <div class="field">{{ $profile->has_illness === 'Yes' ? 'Yes' : 'No' }}</div>
+        <span class="label">Medical certificate issued by: Dr</span>
+        <div class="field">{{ $profile->medical_certificate_issued_by ?? '' }}</div>
+        <span class="label">Date:</span>
+        <div class="field">&nbsp;</div>
+    </div>
+    <div class="row">
         <span class="label">Chest X-ray Result:</span>
         <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : '' }}</div>
-    </div>
-    <div class="row">
-        <span class="label">Medical Certificate Issued By:</span>
-        <div class="field">{{ $profile->medical_certificate_issued_by ?? '' }}</div>
-    </div>
-
-    <div class="notes-box">
-        Assessment notes / remarks:
-    </div>
-
-    <div class="signature-row">
-        <div class="sig-block">
-            <div class="sig-line">&nbsp;</div>
-            <div class="sig-label">ASSESSING NURSE / DOCTOR</div>
-        </div>
-        <div class="sig-block">
-            <div class="sig-line">&nbsp;</div>
-            <div class="sig-label">DATE SIGNED</div>
-        </div>
+        <span class="label">Date:</span>
+        <div class="field">&nbsp;</div>
     </div>
 </div>
 @endsection

@@ -61,8 +61,6 @@
     }
     .btn-view { background: #fff3f5; color: #70131B; border: 1px solid #f0d7dc; }
     .btn-view:hover { background: #fae9ed; }
-    .btn-assessment { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
-    .btn-assessment:hover { background: #fde68a; }
     
    .btn-sign { 
         background: #0804ff; 
@@ -261,9 +259,6 @@
                         <div class="d-flex justify-content-center gap-2">
                             <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-view">
                                 View
-                            </a>
-                            <a href="{{ route('admin.medical_assessment', $record->id) }}" class="btn-action btn-assessment">
-                                Assessment
                             </a>
                             
                             @if($canSignHealth)

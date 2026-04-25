@@ -83,6 +83,12 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
     Route::get('/health-profile/{id}', [AdminController::class, 'showHealth'])
         ->middleware('role:superadmin,admin')
         ->name('admin.show_health');
+    Route::get('/health-profile/{id}/plain', [AdminController::class, 'showHealthPlain'])
+        ->middleware('role:superadmin,admin')
+        ->name('admin.show_health_plain');
+    Route::get('/health-profile/{id}/pdf', [AdminController::class, 'exportHealthPdf'])
+        ->middleware('role:superadmin,admin')
+        ->name('admin.health_pdf');
     Route::get('/health-profile/{id}/medical-assessment', [AdminController::class, 'showMedicalAssessment'])
         ->middleware('role:superadmin,admin')
         ->name('admin.medical_assessment');

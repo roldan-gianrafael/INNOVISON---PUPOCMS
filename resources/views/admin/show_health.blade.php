@@ -163,9 +163,9 @@
     <a href="{{ route('admin.medical_assessment', $profile->id) }}" class="btn" style="background: #f59e0b; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
         MEDICAL ASSESSMENT
     </a>
-    <button onclick="window.print()" class="btn" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
-        PRINT FORM 🖨️
-    </button>
+    <a href="{{ route('admin.show_health_plain', $profile->id) }}" target="_blank" rel="noopener" class="btn" style="display: inline-block; background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer; text-decoration: none;">
+        OPEN FORM ONLY
+    </a>
 
 </div>
 

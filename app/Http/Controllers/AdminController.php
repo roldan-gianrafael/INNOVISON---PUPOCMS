@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use App\Models\HealthProfile;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
@@ -1116,6 +1117,32 @@ class AdminController extends Controller
             : null;
 
         return view('admin.medical_assessment', compact('profile', 'calculatedAge'));
+    }
+
+    public function exportHealthPdf($id)
+    {
+        $profile = HealthProfile::with('user')->findOrFail($id);
+        $calculatedAge = !empty($profile->user->DOB)
+            ? Carbon::parse($profile->user->DOB)->age
+            : null;
+
+        $pdf = Pdf::loadView('admin.show_health_pdf', compact('profile', 'calculatedAge'));
+        $pdf->setPaper([0, 0, 612, 936]);
+
+        $studentNumber = trim((string) ($profile->user->student_number ?: $profile->user->student_id ?: $profile->id));
+        $fileName = 'health-form-' . preg_replace('/[^A-Za-z0-9\\-_]+/', '-', $studentNumber) . '.pdf';
+
+        return $pdf->download($fileName);
+    }
+
+    public function showHealthPlain($id)
+    {
+        $profile = HealthProfile::with('user')->findOrFail($id);
+        $calculatedAge = !empty($profile->user->DOB)
+            ? Carbon::parse($profile->user->DOB)->age
+            : null;
+
+        return view('admin.show_health_pdf', compact('profile', 'calculatedAge'));
     }
 
 // 1. Para lumabas 'yung page (GET)

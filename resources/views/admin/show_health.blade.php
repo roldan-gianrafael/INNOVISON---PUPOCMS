@@ -157,8 +157,8 @@
     .vax-table th, .vax-table td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 12px; } /* From 10px */
     
     .cert-text { font-style: italic; font-size: 11px; text-align: justify; margin-top: 15px; line-height: 1.3; } /* From 9px */
-    .signature-row { display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-end; }
-    .sig-block { width: 35%; text-align: center; }
+    .signature-row { display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-end; gap: 16px; }
+    .sig-block { flex: 1; width: auto; text-align: center; }
     .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
     /* --- I-update ang sig-line sa <style> section --- */
 .sig-line { 
@@ -375,7 +375,7 @@ for the improvement of healthcare services.
     </div>
 </div>
 
-    <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
+    <div style="display: block; width: 100%; clear: both; border: 2px solid #000; margin-top: 28px; padding: 15px; position: relative;">
         <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
         
         <div class="row" style="display: flex; align-items: center; gap: 15px;">

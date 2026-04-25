@@ -39,6 +39,14 @@
         font-weight: 700;
     }
 
+    .reports-frame {
+        border-radius: 22px;
+        border: 1px solid rgba(250, 204, 21, 0.42);
+        padding: 24px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,248,236,0.96));
+        box-shadow: 0 18px 34px rgba(112, 19, 27, 0.08);
+    }
+
     /* --- REPORT BUTTONS (Gayang-gaya sa Dashboard Stats Cards) --- */
     .report-grid {
         display: grid;
@@ -58,14 +66,24 @@
         min-height: 160px;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
-        border: none;
+        border: 2px solid #facc15;
         cursor: pointer;
+        position: relative;
     }
 
     .report-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
         filter: brightness(1.2);
+    }
+
+    .report-card.report-card-primary::before {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border-radius: 12px;
+        border: 2px solid rgba(112, 19, 27, 0.92);
+        pointer-events: none;
     }
 
     .report-label {
@@ -117,6 +135,12 @@
     html[data-theme="dark"] .reports-section-title {
         color: #ffffff;
     }
+
+    html[data-theme="dark"] .reports-frame {
+        background: linear-gradient(180deg, rgba(70, 19, 27, 0.92), rgba(46, 13, 19, 0.96));
+        border-color: rgba(250, 204, 21, 0.34);
+        box-shadow: 0 20px 38px rgba(0, 0, 0, 0.24);
+    }
 </style>
 @endpush
 
@@ -146,11 +170,12 @@
         </div>
     </div>
 
-    <h2 class="reports-section-title">Select Report to Generate</h2>
+    <div class="reports-frame">
+        <h2 class="reports-section-title">Select Report to Generate</h2>
 
-    <div class="report-grid">
+        <div class="report-grid">
         
-        <a href="{{ $marUrl }}" class="report-card">
+        <a href="{{ $marUrl }}" class="report-card report-card-primary">
             <div>
                 <div class="report-label">Personnel Records</div>
                 <div class="report-main-title">Medical Accomplishment (MAR)</div>
@@ -158,7 +183,7 @@
             <div class="report-badge">Action Needed</div>
         </a>
 
-        <a href="{{ $inventorySummaryUrl }}" class="report-card">
+        <a href="{{ $inventorySummaryUrl }}" class="report-card report-card-primary">
             <div>
                 <div class="report-label">Stocks & Supplies</div>
                 <div class="report-main-title">Inventory Summary</div>
@@ -166,7 +191,7 @@
             <div class="report-badge">All Records</div>
         </a>
 
-        <a href="#" class="report-card">
+        <a href="#" class="report-card report-card-primary">
             <div>
                 <div class="report-label">Consultations</div>
                 <div class="report-main-title">Appointment Statistics</div>
@@ -200,6 +225,7 @@
             </a>
         @endif
 
+        </div>
     </div>
 
     <div class="back-nav">

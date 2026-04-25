@@ -292,6 +292,16 @@
         color: #ffffff;
     }
 
+    html[data-theme="dark"] .appointments-summary-title,
+    html[data-theme="dark"] .student-name,
+    html[data-theme="dark"] #apptTable td,
+    html[data-theme="dark"] #apptTable td div,
+    html[data-theme="dark"] #apptTable td span:not(.status):not(.type-badge),
+    html[data-theme="dark"] #apptTable td[style],
+    html[data-theme="dark"] #apptTable td div[style] {
+        color: #ffffff !important;
+    }
+
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 @endpush

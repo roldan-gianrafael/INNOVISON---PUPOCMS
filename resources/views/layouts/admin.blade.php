@@ -237,17 +237,42 @@
             width: min(360px, calc(100vw - 32px));
             max-width: calc(100vw - 32px);
             border-radius: 20px;
-            background: rgba(255, 248, 249, 0.98);
-            border: 1px solid rgba(128, 0, 0, 0.14);
+            background: rgba(255, 248, 249, 0.68);
+            border: 1px solid rgba(250, 204, 21, 0.48);
             box-shadow: 0 22px 48px rgba(15, 23, 42, 0.18);
             padding: 18px;
-            display: none;
+            display: block;
             overflow: hidden;
             box-sizing: border-box;
+            backdrop-filter: blur(18px) saturate(155%);
+            -webkit-backdrop-filter: blur(18px) saturate(155%);
+            opacity: 0;
+            transform: translateY(16px) scale(0.96);
+            transform-origin: bottom right;
+            pointer-events: none;
+            visibility: hidden;
+            transition:
+                opacity 0.22s ease,
+                transform 0.24s ease,
+                visibility 0s linear 0.24s;
         }
 
         .medicine-alert-panel.is-open {
-            display: block;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+            visibility: visible;
+            transition:
+                opacity 0.22s ease,
+                transform 0.24s ease,
+                visibility 0s linear 0s;
+        }
+
+        .medicine-alert-panel.is-closing {
+            opacity: 0;
+            transform: translateY(16px) scale(0.96);
+            pointer-events: none;
+            visibility: visible;
         }
 
         .medicine-alert-head {
@@ -260,6 +285,34 @@
             border-bottom: 1px solid rgba(127, 29, 45, 0.12);
             position: relative;
             z-index: 1;
+        }
+
+        .medicine-alert-close {
+            flex: 0 0 auto;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            border: 1px solid rgba(250, 204, 21, 0.34);
+            background: rgba(255, 255, 255, 0.48);
+            color: #7f1d2d;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        }
+
+        .medicine-alert-close:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.68);
+            border-color: rgba(250, 204, 21, 0.52);
+        }
+
+        .medicine-alert-close svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 2;
         }
 
         .medicine-alert-title {
@@ -380,12 +433,23 @@
         }
 
         html[data-theme="dark"] .medicine-alert-panel {
-            background: rgba(35, 17, 25, 0.97);
-            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(35, 17, 25, 0.72);
+            border-color: rgba(250, 204, 21, 0.42);
         }
 
         html[data-theme="dark"] .medicine-alert-head {
             border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        html[data-theme="dark"] .medicine-alert-close {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+            border-color: rgba(250, 204, 21, 0.28);
+        }
+
+        html[data-theme="dark"] .medicine-alert-close:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(250, 204, 21, 0.46);
         }
 
         html[data-theme="dark"] .medicine-alert-title {
@@ -3332,6 +3396,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 <p class="medicine-alert-title">Notifications</p>
                 <p class="medicine-alert-subtitle">New appointments, today's schedules, and medicine alerts.</p>
             </div>
+            <button type="button" class="medicine-alert-close" id="medicineAlertCloseBtn" aria-label="Close notifications">
+                <x-outline-icon name="x-mark" />
+            </button>
         </div>
 
         <div class="medicine-alert-list" id="medicineAlertList">
@@ -3537,21 +3604,62 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     function initMedicineAlerts() {
         const toggles = Array.from(document.querySelectorAll('[data-medicine-alert-toggle]'));
         const panel = document.getElementById('medicineAlertPanel');
+        const closeButton = document.getElementById('medicineAlertCloseBtn');
         const moreButton = document.getElementById('medicineAlertMoreBtn');
         const hiddenItems = Array.from(document.querySelectorAll('[data-medicine-alert-extra="true"]'));
         const hoverHint = document.getElementById('medicineHoverHint');
         const hintTargets = Array.from(document.querySelectorAll('.medicine-alert-item-link[data-hover-hint]'));
+        let closeTimer = null;
 
         if (!toggles.length || !panel) {
             return;
         }
 
+        const openPanel = function () {
+            if (closeTimer) {
+                window.clearTimeout(closeTimer);
+                closeTimer = null;
+            }
+
+            panel.classList.remove('is-closing');
+            window.requestAnimationFrame(function () {
+                panel.classList.add('is-open');
+            });
+        };
+
+        const closePanel = function () {
+            if (!panel.classList.contains('is-open')) {
+                return;
+            }
+
+            panel.classList.remove('is-open');
+            panel.classList.add('is-closing');
+
+            if (closeTimer) {
+                window.clearTimeout(closeTimer);
+            }
+
+            closeTimer = window.setTimeout(function () {
+                panel.classList.remove('is-closing');
+                closeTimer = null;
+            }, 240);
+        };
+
         toggles.forEach(function (toggle) {
             toggle.addEventListener('click', function (event) {
                 event.stopPropagation();
-                panel.classList.toggle('is-open');
+                if (!panel.classList.contains('is-open')) {
+                    openPanel();
+                }
             });
         });
+
+        if (closeButton) {
+            closeButton.addEventListener('click', function (event) {
+                event.stopPropagation();
+                closePanel();
+            });
+        }
 
         document.addEventListener('click', function (event) {
             if (!panel.classList.contains('is-open')) {
@@ -3563,7 +3671,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             });
 
             if (!panel.contains(event.target) && !clickedToggle) {
-                panel.classList.remove('is-open');
+                closePanel();
             }
         });
 

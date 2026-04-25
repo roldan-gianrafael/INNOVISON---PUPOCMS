@@ -86,6 +86,16 @@
     html[data-theme="dark"] .inventory-page-title {
         color: #ffffff;
     }
+
+    html[data-theme="dark"] table td,
+    html[data-theme="dark"] table td div,
+    html[data-theme="dark"] table td small,
+    html[data-theme="dark"] table td span:not(.status),
+    html[data-theme="dark"] table td[style],
+    html[data-theme="dark"] table td div[style],
+    html[data-theme="dark"] table td small[style] {
+        color: #ffffff !important;
+    }
 </style>
 @endpush
 

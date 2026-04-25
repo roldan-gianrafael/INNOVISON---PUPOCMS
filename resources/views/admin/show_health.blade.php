@@ -175,17 +175,6 @@
     color: #000;
 }
 
-.screen-page-separator {
-    margin: 34px 0 26px;
-    padding-top: 18px;
-    border-top: 2px dashed rgba(0, 0, 0, 0.2);
-    text-align: center;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: #64748b;
-    text-transform: uppercase;
-}
 </style>
 @endpush
 
@@ -196,6 +185,9 @@
 <div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto;">
     <a href="{{ route('admin.health_records') }}" class="btn" style="background: #64748b; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
         BACK TO RECORDS
+    </a>
+    <a href="{{ route('admin.medical_assessment', $profile->id) }}" class="btn" style="background: #f59e0b; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
+        MEDICAL ASSESSMENT
     </a>
     <button onclick="window.print()" class="btn" style="background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
         PRINT FORM 🖨️
@@ -431,44 +423,6 @@ for the improvement of healthcare services.
         </div>
     </div>
 
-    </div>
-
-    <div class="screen-page-separator">Page 2</div>
-
-    <div class="print-page" style="margin-top: 28px;">
-        <div class="form-title" style="margin-top: 0;">MEDICAL ASSESSMENT SUMMARY</div>
-
-        <div class="row">
-            <span class="label">Date:</span> <div class="field">{{ $profile->created_at ? $profile->created_at->format('m/d/Y') : '' }}</div>
-            <span class="label">Date of Birth:</span> <div class="field">{{ !empty($profile->user->DOB) ? \Carbon\Carbon::parse($profile->user->DOB)->format('m/d/Y') : '' }}</div>
-        </div>
-        <div class="row">
-            <span class="label">Height:</span> <div class="field">{{ $profile->height ?? '' }}</div>
-            <span class="label">ft</span>
-            <span class="label">Weight:</span> <div class="field">{{ $profile->weight ?? '' }}</div>
-            <span class="label">lbs</span>
-        </div>
-        <div class="row">
-            <span class="label">BP:</span> <div class="field">&nbsp;</div>
-            <span class="label">RR:</span> <div class="field">&nbsp;</div>
-            <span class="label">Temp:</span> <div class="field">&nbsp;</div>
-        </div>
-        <div class="row">
-            <span class="label">Covid Positive?</span> <div class="field">&nbsp;</div>
-            <span class="label">Date:</span> <div class="field">&nbsp;</div>
-        </div>
-        <div class="row">
-            <span class="label">Medical certificate issued by: Dr</span>
-            <div class="field">{{ $profile->medical_certificate_issued_by ?? '' }}</div>
-            <span class="label">Date:</span>
-            <div class="field">&nbsp;</div>
-        </div>
-        <div class="row">
-            <span class="label">Chest X-ray Result:</span>
-            <div class="field">{{ $profile->chest_xray_result ? 'Uploaded' : '' }}</div>
-            <span class="label">Date:</span>
-            <div class="field">&nbsp;</div>
-        </div>
     </div>
 </div>
 @endsection

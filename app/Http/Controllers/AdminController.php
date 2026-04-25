@@ -1107,6 +1107,17 @@ class AdminController extends Controller
         return view('admin.show_health', compact('profile', 'calculatedAge'));
     }
 
+    public function showMedicalAssessment($id)
+    {
+        $profile = HealthProfile::with('user')->findOrFail($id);
+
+        $calculatedAge = !empty($profile->user->DOB)
+            ? Carbon::parse($profile->user->DOB)->age
+            : null;
+
+        return view('admin.medical_assessment', compact('profile', 'calculatedAge'));
+    }
+
 // 1. Para lumabas 'yung page (GET)
 public function showSignPage($id)
 {

@@ -285,7 +285,7 @@
             border-bottom: 1px solid rgba(127, 29, 45, 0.12);
             position: relative;
             z-index: 1;
-            background: rgba(255, 252, 245, 0.82);
+            background: #fffaf2;
             border-radius: 14px;
             padding: 12px 12px 14px;
         }
@@ -296,7 +296,7 @@
             height: 34px;
             border-radius: 999px;
             border: 1px solid rgba(250, 204, 21, 0.34);
-            background: rgba(255, 255, 255, 0.48);
+            background: #fff7e6;
             color: #7f1d2d;
             display: inline-flex;
             align-items: center;
@@ -307,7 +307,7 @@
 
         .medicine-alert-close:hover {
             transform: scale(1.05);
-            background: rgba(255, 255, 255, 0.68);
+            background: #fff2cc;
             border-color: rgba(250, 204, 21, 0.52);
         }
 
@@ -343,7 +343,7 @@
 .medicine-alert-item {
      border-radius: 16px;
      padding: 12px 14px;
-     background: rgba(255, 251, 247, 0.94);
+     background: #fffaf7;
       border: 1px solid rgba(127, 29, 45, 0.08);
       min-width: 0;
       max-width: 100%;
@@ -394,12 +394,12 @@
 }
 
         .medicine-alert-item.is-near-expiry {
-            background: rgba(254, 240, 138, 0.55);
+            background: #fef3c7;
             border-color: rgba(245, 158, 11, 0.26);
         }
 
         .medicine-alert-item.is-expired {
-            background: rgba(254, 226, 226, 0.88);
+            background: #fee2e2;
             border-color: rgba(220, 38, 38, 0.22);
         }
 
@@ -442,17 +442,17 @@
 
         html[data-theme="dark"] .medicine-alert-head {
             border-bottom-color: rgba(255, 255, 255, 0.1);
-            background: rgba(48, 21, 29, 0.92);
+            background: #2f161d;
         }
 
         html[data-theme="dark"] .medicine-alert-close {
-            background: rgba(255, 255, 255, 0.08);
+            background: #3a1a23;
             color: #f8fafc;
             border-color: rgba(250, 204, 21, 0.28);
         }
 
         html[data-theme="dark"] .medicine-alert-close:hover {
-            background: rgba(255, 255, 255, 0.14);
+            background: #4a212c;
             border-color: rgba(250, 204, 21, 0.46);
         }
 
@@ -466,17 +466,17 @@
         }
 
         html[data-theme="dark"] .medicine-alert-item {
-            background: rgba(33, 15, 21, 0.94);
+            background: #241117;
             border-color: rgba(255, 255, 255, 0.08);
         }
 
         html[data-theme="dark"] .medicine-alert-item.is-near-expiry {
-            background: rgba(245, 158, 11, 0.18);
+            background: #4a3412;
             border-color: rgba(253, 224, 71, 0.22);
         }
 
         html[data-theme="dark"] .medicine-alert-item.is-expired {
-            background: rgba(185, 28, 28, 0.18);
+            background: #4a171b;
             border-color: rgba(252, 165, 165, 0.22);
         }
 

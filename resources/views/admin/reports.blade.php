@@ -39,11 +39,22 @@
         font-weight: 700;
     }
 
+    .reports-title-frame {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 18px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        padding: 12px 18px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(250,244,246,0.96));
+        box-shadow: 0 12px 24px rgba(112, 19, 27, 0.08);
+        margin-bottom: 20px;
+    }
+
     .reports-frame {
         border-radius: 22px;
-        border: 1px solid rgba(250, 204, 21, 0.42);
+        border: 1px solid rgba(112, 19, 27, 0.10);
         padding: 24px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,248,236,0.96));
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(250,244,246,0.96));
         box-shadow: 0 18px 34px rgba(112, 19, 27, 0.08);
     }
 
@@ -136,9 +147,15 @@
         color: #ffffff;
     }
 
+    html[data-theme="dark"] .reports-title-frame {
+        background: linear-gradient(180deg, rgba(70, 19, 27, 0.92), rgba(46, 13, 19, 0.96));
+        border-color: rgba(255, 255, 255, 0.10);
+        box-shadow: 0 14px 26px rgba(0, 0, 0, 0.22);
+    }
+
     html[data-theme="dark"] .reports-frame {
         background: linear-gradient(180deg, rgba(70, 19, 27, 0.92), rgba(46, 13, 19, 0.96));
-        border-color: rgba(250, 204, 21, 0.34);
+        border-color: rgba(255, 255, 255, 0.08);
         box-shadow: 0 20px 38px rgba(0, 0, 0, 0.24);
     }
 </style>
@@ -171,7 +188,9 @@
     </div>
 
     <div class="reports-frame">
-        <h2 class="reports-section-title">Select Report to Generate</h2>
+        <div class="reports-title-frame">
+            <h2 class="reports-section-title" style="margin: 0;">Select Report to Generate</h2>
+        </div>
 
         <div class="report-grid">
         

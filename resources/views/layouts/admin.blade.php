@@ -285,6 +285,9 @@
             border-bottom: 1px solid rgba(127, 29, 45, 0.12);
             position: relative;
             z-index: 1;
+            background: rgba(255, 252, 245, 0.82);
+            border-radius: 14px;
+            padding: 12px 12px 14px;
         }
 
         .medicine-alert-close {
@@ -340,7 +343,7 @@
 .medicine-alert-item {
      border-radius: 16px;
      padding: 12px 14px;
-     background: rgba(127, 29, 45, 0.06);
+     background: rgba(255, 251, 247, 0.94);
       border: 1px solid rgba(127, 29, 45, 0.08);
       min-width: 0;
       max-width: 100%;
@@ -439,6 +442,7 @@
 
         html[data-theme="dark"] .medicine-alert-head {
             border-bottom-color: rgba(255, 255, 255, 0.1);
+            background: rgba(48, 21, 29, 0.92);
         }
 
         html[data-theme="dark"] .medicine-alert-close {
@@ -462,7 +466,7 @@
         }
 
         html[data-theme="dark"] .medicine-alert-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(33, 15, 21, 0.94);
             border-color: rgba(255, 255, 255, 0.08);
         }
 

@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Models\Admin;
 use App\Services\FacultySyncService;
 use App\Services\PuptasWebhookService;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response; 
 use Illuminate\Support\Facades\DB;
@@ -545,6 +546,26 @@ class AdminController extends Controller
                             $errorMessage = 'No matching records were found for the current search.';
                         }
                     }
+                } catch (RequestException $exception) {
+                    $response = $exception->response;
+                    $status = $response?->status() ?? 500;
+                    $body = trim((string) ($response?->body() ?? ''));
+
+                    if ($source === 'faculty') {
+                        $errorMessage = "FLSS returned an error response (HTTP {$status}).";
+                        $apiResponseMeta = [
+                            'status' => $status,
+                            'ok' => false,
+                            'endpoint' => $facultyEndpoint ?: $endpoint,
+                            'result_count' => 0,
+                            'auth_mode' => 'faculty-hmac',
+                            'source' => $source,
+                        ];
+                    } else {
+                        $errorMessage = "The external API returned an error response (HTTP {$status}).";
+                    }
+
+                    $errorDetails = $body !== '' ? $body : $exception->getMessage();
                 } catch (\Throwable $exception) {
                     $errorMessage = 'Unable to reach the external API right now: ' . $exception->getMessage();
                     $errorDetails = $exception->getMessage();

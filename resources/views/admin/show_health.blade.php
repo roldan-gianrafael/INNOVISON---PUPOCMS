@@ -399,15 +399,15 @@ for the improvement of healthcare services.
             </div>
         </div>
 
-        <div class="row" style="margin-top: 25px; display: block;">
-            <div style="max-width: 220px;">
+        <div class="row" style="margin-top: 25px; display: flex; align-items: flex-end; justify-content: space-between; gap: 28px;">
+            <div style="flex: 0 0 220px; max-width: 220px;">
                 <div class="field" style="border-bottom: 1px solid #000; text-align: center; font-weight: bold; min-height: 20px;">
                     {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
                 </div>
                 <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
             </div>
 
-            <div style="text-align: center; position: relative; min-height: 80px; margin-top: 22px;">
+            <div style="flex: 1; text-align: center; position: relative; min-height: 80px;">
                 @if($profile->clearance_status == 'Issued')
                     <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
                         <img src="{{ asset('storage/' . $clearanceSignaturePath) }}" 

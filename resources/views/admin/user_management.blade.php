@@ -146,7 +146,7 @@
     html[data-theme="dark"] .um-mode-icon {
         background: linear-gradient(145deg, rgba(255, 214, 102, 0.26), rgba(193, 138, 16, 0.52));
         border-color: rgba(255, 214, 102, 0.34);
-        color: #ffd84d;
+        color: #111827;
         box-shadow:
             inset 0 1px 0 rgba(255, 210, 90, 0.12),
             0 18px 28px rgba(95, 0, 18, 0.28);
@@ -336,7 +336,7 @@
         justify-content: center;
         background: linear-gradient(145deg, rgba(254, 240, 138, 0.98), rgba(250, 204, 21, 0.9));
         border: 1px solid rgba(234, 179, 8, 0.34);
-        color: #eab308;
+        color: #111827;
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.96),
             0 18px 28px rgba(234, 179, 8, 0.18);

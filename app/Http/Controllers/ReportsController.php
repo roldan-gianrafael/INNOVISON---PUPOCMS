@@ -18,7 +18,7 @@ class ReportsController extends Controller
         $search = trim((string) $request->query('q', ''));
         $monthFilter = trim((string) $request->query('month', now()->format('Y-m')));
 
-        $query = HealthProfile::query()
+        $issuedBaseQuery = HealthProfile::query()
             ->with('user')
             ->where('clearance_status', 'Issued');
 
@@ -26,7 +26,7 @@ class ReportsController extends Controller
             $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
             $monthEnd = (clone $monthStart)->endOfMonth();
 
-            $query->where(function ($builder) use ($monthStart, $monthEnd) {
+            $issuedBaseQuery->where(function ($builder) use ($monthStart, $monthEnd) {
                 $builder->whereBetween('verified_at', [$monthStart, $monthEnd])
                     ->orWhere(function ($fallback) use ($monthStart, $monthEnd) {
                         $fallback->whereNull('verified_at')
@@ -36,21 +36,38 @@ class ReportsController extends Controller
         }
 
         if ($search !== '') {
-            $query->where(function ($builder) use ($search) {
-                $builder->where('student_number', 'like', "%{$search}%")
-                    ->orWhere('course_college', 'like', "%{$search}%")
+            $issuedBaseQuery->where(function ($builder) use ($search) {
+                $builder->where('course_college', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'like', "%{$search}%")
-                            ->orWhere('first_name', 'like', "%{$search}%")
-                            ->orWhere('last_name', 'like', "%{$search}%")
-                            ->orWhere('student_number', 'like', "%{$search}%");
+                        $userQuery->where('course', 'like', "%{$search}%");
                     });
             });
         }
 
-        $issuedForms = (clone $query)
-            ->latest(DB::raw('COALESCE(verified_at, created_at)'))
-            ->paginate(12);
+        $issuedForms = (clone $issuedBaseQuery)
+            ->get()
+            ->groupBy(function (HealthProfile $form) {
+                $course = trim((string) ($form->course_college ?: optional($form->user)->course ?: 'Unspecified Course'));
+                return $course !== '' ? $course : 'Unspecified Course';
+            })
+            ->map(function ($forms, $course) {
+                $sortedForms = $forms->sortByDesc(function (HealthProfile $form) {
+                    return $form->verified_at ?? $form->created_at;
+                })->values();
+
+                $withConditionCount = $forms->where('has_illness', 'Yes')->count();
+                $issuedCount = $forms->count();
+
+                return (object) [
+                    'course' => $course,
+                    'issued_count' => $issuedCount,
+                    'with_condition_count' => $withConditionCount,
+                    'no_condition_count' => $issuedCount - $withConditionCount,
+                    'last_issued_at' => optional($sortedForms->first())->verified_at ?? optional($sortedForms->first())->created_at,
+                ];
+            })
+            ->sortByDesc('issued_count')
+            ->values();
 
         $summaryQuery = HealthProfile::query()->where('clearance_status', 'Issued');
 
@@ -68,16 +85,16 @@ class ReportsController extends Controller
         }
 
         $totalIssued = (clone $summaryQuery)->count();
+        $totalCourses = $issuedForms->count();
         $issuedWithConditions = (clone $summaryQuery)->where('has_illness', 'Yes')->count();
-        $issuedThisWeek = (clone $summaryQuery)
-            ->whereBetween(DB::raw('COALESCE(verified_at, created_at)'), [now()->startOfWeek(), now()->endOfWeek()])
-            ->count();
+        $topCourse = optional($issuedForms->first())->course ?? 'No course data yet';
 
         return view('admin.reports.health-forms', compact(
             'issuedForms',
             'totalIssued',
+            'totalCourses',
             'issuedWithConditions',
-            'issuedThisWeek',
+            'topCourse',
             'search',
             'monthFilter'
         ));
@@ -319,8 +336,29 @@ public function printReport(Request $request)
                             ->whereBetween('created_at', [$monthStart, $monthEnd]);
                     });
             })
-            ->latest(DB::raw('COALESCE(verified_at, created_at)'))
-            ->get();
+            ->get()
+            ->groupBy(function (HealthProfile $form) {
+                $course = trim((string) ($form->course_college ?: optional($form->user)->course ?: 'Unspecified Course'));
+                return $course !== '' ? $course : 'Unspecified Course';
+            })
+            ->map(function ($forms, $course) {
+                $sortedForms = $forms->sortByDesc(function (HealthProfile $form) {
+                    return $form->verified_at ?? $form->created_at;
+                })->values();
+
+                $withConditionCount = $forms->where('has_illness', 'Yes')->count();
+                $issuedCount = $forms->count();
+
+                return (object) [
+                    'course' => $course,
+                    'issued_count' => $issuedCount,
+                    'with_condition_count' => $withConditionCount,
+                    'no_condition_count' => $issuedCount - $withConditionCount,
+                    'last_issued_at' => optional($sortedForms->first())->verified_at ?? optional($sortedForms->first())->created_at,
+                ];
+            })
+            ->sortByDesc('issued_count')
+            ->values();
     }
 
     // Siguraduhin na ang view name ay tumutugma sa ginawa mong file

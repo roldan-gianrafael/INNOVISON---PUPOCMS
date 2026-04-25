@@ -209,7 +209,7 @@
     <div class="health-forms-head">
         <div>
             <h1 class="health-forms-title">Health Forms</h1>
-            <p class="health-forms-copy">Issued health forms only. Use the filters to review released forms and check issuance activity by month.</p>
+            <p class="health-forms-copy">Issued health forms summarized by course. Use the filters to review how many forms were released per course for the selected month.</p>
         </div>
         <a href="{{ $reportsUrl }}" class="health-forms-back">&larr; Back to Reports</a>
     </div>
@@ -220,12 +220,12 @@
             <strong>{{ $totalIssued }}</strong>
         </div>
         <div class="health-forms-stat-card">
-            <span>With Medical Conditions</span>
-            <strong>{{ $issuedWithConditions }}</strong>
+            <span>Courses Covered</span>
+            <strong>{{ $totalCourses }}</strong>
         </div>
         <div class="health-forms-stat-card">
-            <span>Issued This Week</span>
-            <strong>{{ $issuedThisWeek }}</strong>
+            <span>Top Course</span>
+            <strong style="font-size: 20px; line-height: 1.3;">{{ $topCourse }}</strong>
         </div>
     </div>
 
@@ -239,7 +239,7 @@
                 </div>
                 <div class="health-forms-field">
                     <label for="healthFormsSearch">Search</label>
-                    <input id="healthFormsSearch" type="text" name="q" value="{{ $search }}" placeholder="Student name, number, course">
+                    <input id="healthFormsSearch" type="text" name="q" value="{{ $search }}" placeholder="Course name">
                 </div>
                 <div class="health-forms-filter-actions">
                     <button type="submit" class="health-forms-btn primary">Apply</button>
@@ -253,31 +253,25 @@
                 <table class="health-forms-table">
                     <thead>
                         <tr>
-                            <th>Student Number</th>
-                            <th>Name</th>
                             <th>Course</th>
-                            <th>Condition</th>
-                            <th>Status</th>
-                            <th>Issued At</th>
+                            <th>Issued Forms</th>
+                            <th>With Condition</th>
+                            <th>No Condition</th>
+                            <th>Last Issued</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($issuedForms as $form)
                             <tr>
-                                <td>{{ $form->user->student_number ?: $form->student_number ?: 'N/A' }}</td>
-                                <td>{{ $form->user->name ?? 'Unknown Student' }}</td>
-                                <td>{{ $form->course_college ?: ($form->user->course ?? 'N/A') }}</td>
-                                <td>
-                                    <span class="health-condition-badge {{ $form->has_illness === 'Yes' ? '' : 'none' }}">
-                                        {{ $form->has_illness === 'Yes' ? 'With Condition' : 'No Condition' }}
-                                    </span>
-                                </td>
-                                <td><span class="health-status-badge">{{ $form->clearance_status }}</span></td>
-                                <td>{{ optional($form->verified_at ?? $form->created_at)->format('M d, Y') }}</td>
+                                <td>{{ $form->course }}</td>
+                                <td><span class="health-status-badge">{{ $form->issued_count }}</span></td>
+                                <td><span class="health-condition-badge">{{ $form->with_condition_count }}</span></td>
+                                <td><span class="health-condition-badge none">{{ $form->no_condition_count }}</span></td>
+                                <td>{{ optional($form->last_issued_at)->format('M d, Y') }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="health-forms-empty">No issued health forms found for this filter.</td>
+                                <td colspan="5" class="health-forms-empty">No issued health forms found for this filter.</td>
                             </tr>
                         @endforelse
                     </tbody>

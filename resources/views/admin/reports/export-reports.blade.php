@@ -104,8 +104,6 @@
     .border-appointment { border-top: 5px solid #800000; }
     .bg-appointment { background: #800000; }
 
-    .border-health { border-top: 5px solid #800000; }
-    .bg-health { background: #800000; }
 </style>
 
 <div class="export-hub-container">
@@ -170,23 +168,6 @@
                 </div>
                 <button type="submit" class="btn-generate bg-appointment">
                     Generate Appointment Report
-                </button>
-            </form>
-        </div>
-
-        <div class="report-card border-health">
-            <div>
-                <h3>Health Forms</h3>
-                <p>View all issued health forms for the selected month, including student details and issuance date.</p>
-            </div>
-            <form action="{{ $printReportUrl }}" method="GET" target="_blank">
-                <input type="hidden" name="type" value="health_forms">
-                <div class="form-group">
-                    <label>SELECT MONTH:</label>
-                    <input type="month" name="month" value="{{ date('Y-m') }}" class="input-month">
-                </div>
-                <button type="submit" class="btn-generate bg-health">
-                    Generate Health Forms Report
                 </button>
             </form>
         </div>

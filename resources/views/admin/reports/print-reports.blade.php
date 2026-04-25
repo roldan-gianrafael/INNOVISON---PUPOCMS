@@ -351,26 +351,24 @@
         <table>
             <thead>
                 <tr>
-                    <th>STUDENT NUMBER</th>
-                    <th>PATIENT NAME</th>
                     <th>COURSE</th>
-                    <th>MEDICAL CONDITION</th>
-                    <th>CLEARANCE STATUS</th>
-                    <th>ISSUED AT</th>
+                    <th>ISSUED FORMS</th>
+                    <th>WITH CONDITION</th>
+                    <th>NO CONDITION</th>
+                    <th>LAST ISSUED</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($data as $form)
                 <tr>
-                    <td>{{ optional($form->user)->student_number ?: $form->student_number ?: 'N/A' }}</td>
-                    <td class="text-left">{{ optional($form->user)->name ?? 'Unknown Student' }}</td>
-                    <td>{{ $form->course_college ?: (optional($form->user)->course ?? 'N/A') }}</td>
-                    <td>{{ $form->has_illness === 'Yes' ? 'With Condition' : 'No Condition' }}</td>
-                    <td>{{ $form->clearance_status }}</td>
-                    <td>{{ optional($form->verified_at ?? $form->created_at)->format('M d, Y') }}</td>
+                    <td class="text-left">{{ $form->course }}</td>
+                    <td>{{ $form->issued_count }}</td>
+                    <td>{{ $form->with_condition_count }}</td>
+                    <td>{{ $form->no_condition_count }}</td>
+                    <td>{{ optional($form->last_issued_at)->format('M d, Y') }}</td>
                 </tr>
                 @empty
-                <tr><td colspan="6">No issued health forms found.</td></tr>
+                <tr><td colspan="5">No issued health forms found.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -412,7 +412,7 @@ for the improvement of healthcare services.
                     <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
                         <img src="{{ asset('storage/' . $clearanceSignaturePath) }}" 
                              alt="Nurse Signature" 
-                             style="height: 80px; width: auto; pointer-events: none;">
+                             style="height: 60px; width: auto; pointer-events: none;">
                     </div>
                 @endif
 

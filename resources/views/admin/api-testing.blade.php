@@ -237,6 +237,36 @@
         color: #7f1d2d;
     }
 
+    .api-connection-note {
+        margin-top: 16px;
+        border-radius: 18px;
+        padding: 16px 18px;
+        background: linear-gradient(180deg, rgba(255, 248, 230, 0.98), rgba(255, 252, 244, 0.98));
+        border: 1px solid rgba(234, 179, 8, 0.28);
+        box-shadow: 0 16px 28px rgba(234, 179, 8, 0.10);
+    }
+
+    .api-connection-note strong {
+        color: #7c2d12;
+    }
+
+    .api-connection-note code {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 6px 10px;
+        border-radius: 10px;
+        background: rgba(120, 53, 15, 0.08);
+        color: #7c2d12;
+        word-break: break-all;
+    }
+
+    .api-connection-note small {
+        display: block;
+        margin-top: 8px;
+        color: #92400e;
+        line-height: 1.5;
+    }
+
     .api-results {
         display: grid;
         gap: 18px;
@@ -252,6 +282,23 @@
     html[data-theme="dark"] .api-result-card {
         background: linear-gradient(180deg, rgba(59, 24, 33, 0.96), rgba(35, 17, 25, 0.98));
         border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="dark"] .api-connection-note {
+        background: linear-gradient(180deg, rgba(84, 45, 12, 0.92), rgba(55, 28, 9, 0.96));
+        border-color: rgba(255, 214, 102, 0.24);
+        box-shadow: 0 16px 28px rgba(0, 0, 0, 0.18);
+        color: #fde68a;
+    }
+
+    html[data-theme="dark"] .api-connection-note strong,
+    html[data-theme="dark"] .api-connection-note small,
+    html[data-theme="dark"] .api-connection-note code {
+        color: #fde68a;
+    }
+
+    html[data-theme="dark"] .api-connection-note code {
+        background: rgba(255, 255, 255, 0.08);
     }
 
     .api-result-grid {
@@ -559,6 +606,17 @@
                 <strong>{{ config('services.pupt_flss.faculty_profiles_url') }}</strong>
             </p>
         </div>
+
+        @if(($source ?? 'faculty') === 'faculty')
+            <div class="api-connection-note">
+                <strong>FLSS Connection Check</strong>
+                <code>{{ config('services.pupt_flss.faculty_profiles_url') }}</code>
+                <small>
+                    This is the exact faculty endpoint the page is using right now. If production still behaves differently after updating
+                    <code>PUPT_FLSS_FACULTY_PROFILES_URL</code>, run <code>php artisan optimize:clear</code> on the server first.
+                </small>
+            </div>
+        @endif
 
         <form method="GET" class="api-search-form" id="apiTestingForm">
             <div>

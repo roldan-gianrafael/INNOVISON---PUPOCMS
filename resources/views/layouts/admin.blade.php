@@ -235,12 +235,14 @@
             bottom: 82px;
             z-index: 499998;
             width: min(360px, calc(100vw - 32px));
+            max-width: calc(100vw - 32px);
             border-radius: 20px;
             background: rgba(255, 248, 249, 0.98);
             border: 1px solid rgba(128, 0, 0, 0.14);
             box-shadow: 0 22px 48px rgba(15, 23, 42, 0.18);
             padding: 18px;
             display: none;
+            overflow: hidden;
         }
 
         .medicine-alert-panel.is-open {
@@ -276,17 +278,20 @@
         }
 
 .medicine-alert-item {
-    border-radius: 16px;
-    padding: 12px 14px;
-    background: rgba(127, 29, 45, 0.06);
-    border: 1px solid rgba(127, 29, 45, 0.08);
-}
-
+     border-radius: 16px;
+     padding: 12px 14px;
+     background: rgba(127, 29, 45, 0.06);
+      border: 1px solid rgba(127, 29, 45, 0.08);
+      min-width: 0;
+      overflow: hidden;
+  }
+  
 .medicine-alert-item-link {
-    display: block;
-    color: inherit;
-    text-decoration: none;
-}
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      min-width: 0;
+  }
 
 .medicine-alert-item-link:hover .medicine-alert-item-name {
     text-decoration: underline;
@@ -2853,18 +2858,28 @@
         }
         /* Container for the name and button */
 .medicine-alert-name-row {
-    display: flex;
-    justify-content: space-between; /* Pushes name to left, button to right */
-    align-items: center;
-    width: 100%;
-    margin-bottom: 5px; /* Space between name and chips */
-}
-
-/* The name itself */
+      display: flex;
+      justify-content: space-between; /* Pushes name to left, button to right */
+      align-items: center;
+      width: 100%;
+      min-width: 0;
+      margin-bottom: 5px; /* Space between name and chips */
+  }
+  
+  /* The name itself */
 .medicine-alert-item-name {
-    margin: 0;
-    font-weight: bold;
-    font-size: 1rem;
+      margin: 0;
+      font-weight: bold;
+      font-size: 1rem;
+      min-width: 0;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+  }
+
+.medicine-alert-content {
+    width: 100%;
+    min-width: 0;
 }
 
 /* Alert state indicators */
@@ -2932,8 +2947,19 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
 /* Ensure the list has a max height if there are many items */
 .medicine-alert-list {
-    max-height: 400px;
-    overflow-y: auto;
+      max-height: 400px;
+      overflow-y: auto;
+  }
+
+.medicine-alert-item-meta {
+    min-width: 0;
+}
+
+.medicine-alert-chip {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
     </style>
 </head>

@@ -105,16 +105,18 @@
 
     html[data-theme="dark"] .um-mode-btn {
         background: linear-gradient(145deg, #5f0012 0%, #7d0b17 42%, #c18a10 100%);
-        border-color: rgba(255, 230, 165, 0.34);
+        border-color: rgba(255, 214, 102, 0.5);
         box-shadow:
+            0 0 0 1px rgba(255, 214, 102, 0.16),
             0 24px 38px rgba(95, 0, 18, 0.34),
             0 52px 72px -38px rgba(193, 138, 16, 0.56);
     }
 
     html[data-theme="dark"] .um-mode-btn.active {
-        border-color: rgba(255, 230, 165, 0.52);
+        border-color: rgba(255, 214, 102, 0.68);
         background: linear-gradient(145deg, #6d0014 0%, #8a0d19 40%, #d09510 100%);
         box-shadow:
+            0 0 0 1px rgba(255, 214, 102, 0.22),
             0 26px 40px rgba(95, 0, 18, 0.38),
             0 56px 76px -38px rgba(193, 138, 16, 0.52);
     }
@@ -143,8 +145,8 @@
 
     html[data-theme="dark"] .um-mode-icon {
         background: linear-gradient(145deg, rgba(193, 138, 16, 0.20), rgba(95, 0, 18, 0.34));
-        border-color: rgba(255, 210, 90, 0.24);
-        color: #ffd86b;
+        border-color: rgba(255, 214, 102, 0.34);
+        color: #ffd84d;
         box-shadow:
             inset 0 1px 0 rgba(255, 210, 90, 0.12),
             0 18px 28px rgba(95, 0, 18, 0.28);
@@ -254,13 +256,14 @@
     .um-mode-btn {
         width: min(360px, 100%);
         min-height: 280px;
-        border: 1px solid rgba(203, 213, 225, 0.78);
+        border: 1px solid rgba(234, 179, 8, 0.42);
         border-radius: 28px;
         padding: 28px 24px 30px;
         background: linear-gradient(145deg, #ffffff 0%, #f8fafc 48%, #e5e7eb 100%);
         box-shadow:
-            0 22px 36px rgba(148, 163, 184, 0.18),
-            0 48px 60px -36px rgba(203, 213, 225, 0.74);
+            0 0 0 1px rgba(250, 204, 21, 0.12),
+            0 22px 36px rgba(234, 179, 8, 0.18),
+            0 48px 60px -36px rgba(202, 138, 4, 0.36);
         text-align: left;
         cursor: pointer;
         position: relative;
@@ -292,16 +295,19 @@
 
     .um-mode-btn:hover {
         transform: translateY(-4px);
+        border-color: rgba(234, 179, 8, 0.62);
         box-shadow:
-            0 26px 42px rgba(148, 163, 184, 0.22),
-            0 54px 76px -38px rgba(203, 213, 225, 0.82);
+            0 0 0 1px rgba(250, 204, 21, 0.22),
+            0 26px 42px rgba(234, 179, 8, 0.22),
+            0 54px 76px -38px rgba(202, 138, 4, 0.42);
     }
 
     .um-mode-btn.active {
-        border-color: rgba(148, 163, 184, 0.95);
+        border-color: rgba(202, 138, 4, 0.72);
         box-shadow:
-            0 28px 48px rgba(148, 163, 184, 0.24),
-            0 56px 78px -38px rgba(226, 232, 240, 0.88);
+            0 0 0 1px rgba(250, 204, 21, 0.26),
+            0 28px 48px rgba(234, 179, 8, 0.24),
+            0 56px 78px -38px rgba(202, 138, 4, 0.48);
     }
 
     .um-mode-btn .eyebrow {
@@ -329,11 +335,11 @@
         align-items: center;
         justify-content: center;
         background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(226, 232, 240, 0.96);
-        color: #800000;
+        border: 1px solid rgba(234, 179, 8, 0.34);
+        color: #eab308;
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.96),
-            0 18px 28px rgba(148, 163, 184, 0.18);
+            0 18px 28px rgba(234, 179, 8, 0.18);
         position: relative;
         z-index: 1;
         animation: umModeFloat 3.8s ease-in-out infinite;

@@ -260,6 +260,9 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td colspan="6" class="bg-category">1. CONSULTATION / TREATMENT</td>
+                </tr>
                 @foreach($data as $cat)
                     <tr class="bg-category">
                         <td colspan="1">CATEGORY: {{ $cat->name }}</td>

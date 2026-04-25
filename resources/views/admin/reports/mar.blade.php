@@ -81,6 +81,9 @@
             </tr>
         </thead>
         <tbody>
+            <tr style="background: #70131B; color: #ffffff; font-weight: 800;">
+                <td colspan="5" style="color: #ffffff;">1. Consultation / Treatment</td>
+            </tr>
             @foreach($categories as $cat)
     <tr style="background-color: #f8f9fa; font-weight: bold;">
         <td colspan="5">Category {{ $cat->code }} - {{ $cat->name }}</td>

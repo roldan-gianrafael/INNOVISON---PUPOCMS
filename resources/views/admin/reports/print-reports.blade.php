@@ -347,6 +347,33 @@
                 @endforelse
             </tbody>
         </table>
+    @elseif($type == 'health_forms')
+        <table>
+            <thead>
+                <tr>
+                    <th>STUDENT NUMBER</th>
+                    <th>PATIENT NAME</th>
+                    <th>COURSE</th>
+                    <th>MEDICAL CONDITION</th>
+                    <th>CLEARANCE STATUS</th>
+                    <th>ISSUED AT</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($data as $form)
+                <tr>
+                    <td>{{ optional($form->user)->student_number ?: $form->student_number ?: 'N/A' }}</td>
+                    <td class="text-left">{{ optional($form->user)->name ?? 'Unknown Student' }}</td>
+                    <td>{{ $form->course_college ?: (optional($form->user)->course ?? 'N/A') }}</td>
+                    <td>{{ $form->has_illness === 'Yes' ? 'With Condition' : 'No Condition' }}</td>
+                    <td>{{ $form->clearance_status }}</td>
+                    <td>{{ optional($form->verified_at ?? $form->created_at)->format('M d, Y') }}</td>
+                </tr>
+                @empty
+                <tr><td colspan="6">No issued health forms found.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
     @endif
 
     <div class="footer-signatures">

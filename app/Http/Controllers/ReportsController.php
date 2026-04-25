@@ -8,10 +8,81 @@ use App\Models\Category;
 use App\Models\Consultation;
 use App\Models\AppointmentFeedback;
 use App\Models\Item;
+use App\Models\HealthProfile;
 use Carbon\Carbon;
 
 class ReportsController extends Controller
 {
+    public function healthFormsReport(Request $request)
+    {
+        $search = trim((string) $request->query('q', ''));
+        $monthFilter = trim((string) $request->query('month', now()->format('Y-m')));
+
+        $query = HealthProfile::query()
+            ->with('user')
+            ->where('clearance_status', 'Issued');
+
+        if ($monthFilter !== '') {
+            $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+            $monthEnd = (clone $monthStart)->endOfMonth();
+
+            $query->where(function ($builder) use ($monthStart, $monthEnd) {
+                $builder->whereBetween('verified_at', [$monthStart, $monthEnd])
+                    ->orWhere(function ($fallback) use ($monthStart, $monthEnd) {
+                        $fallback->whereNull('verified_at')
+                            ->whereBetween('created_at', [$monthStart, $monthEnd]);
+                    });
+            });
+        }
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                $builder->where('student_number', 'like', "%{$search}%")
+                    ->orWhere('course_college', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('student_number', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $issuedForms = (clone $query)
+            ->latest(DB::raw('COALESCE(verified_at, created_at)'))
+            ->paginate(12);
+
+        $summaryQuery = HealthProfile::query()->where('clearance_status', 'Issued');
+
+        if ($monthFilter !== '') {
+            $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+            $monthEnd = (clone $monthStart)->endOfMonth();
+
+            $summaryQuery->where(function ($builder) use ($monthStart, $monthEnd) {
+                $builder->whereBetween('verified_at', [$monthStart, $monthEnd])
+                    ->orWhere(function ($fallback) use ($monthStart, $monthEnd) {
+                        $fallback->whereNull('verified_at')
+                            ->whereBetween('created_at', [$monthStart, $monthEnd]);
+                    });
+            });
+        }
+
+        $totalIssued = (clone $summaryQuery)->count();
+        $issuedWithConditions = (clone $summaryQuery)->where('has_illness', 'Yes')->count();
+        $issuedThisWeek = (clone $summaryQuery)
+            ->whereBetween(DB::raw('COALESCE(verified_at, created_at)'), [now()->startOfWeek(), now()->endOfWeek()])
+            ->count();
+
+        return view('admin.reports.health-forms', compact(
+            'issuedForms',
+            'totalIssued',
+            'issuedWithConditions',
+            'issuedThisWeek',
+            'search',
+            'monthFilter'
+        ));
+    }
+
     public function feedbackReport(Request $request)
     {
         $search = trim((string) $request->query('q', ''));
@@ -232,7 +303,25 @@ public function printReport(Request $request)
     $data = \App\Models\Appointment::whereYear('date', $year)
             ->whereMonth('date', $month)
             ->get();
-}
+    }
+    elseif ($type == 'health_forms') {
+        $title = "ISSUED HEALTH FORMS REPORT";
+        $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+        $monthEnd = (clone $monthStart)->endOfMonth();
+
+        $data = HealthProfile::query()
+            ->with('user')
+            ->where('clearance_status', 'Issued')
+            ->where(function ($builder) use ($monthStart, $monthEnd) {
+                $builder->whereBetween('verified_at', [$monthStart, $monthEnd])
+                    ->orWhere(function ($fallback) use ($monthStart, $monthEnd) {
+                        $fallback->whereNull('verified_at')
+                            ->whereBetween('created_at', [$monthStart, $monthEnd]);
+                    });
+            })
+            ->latest(DB::raw('COALESCE(verified_at, created_at)'))
+            ->get();
+    }
 
     // Siguraduhin na ang view name ay tumutugma sa ginawa mong file
     return view('admin.reports.print-reports', compact('data', 'type', 'title', 'monthFilter'));

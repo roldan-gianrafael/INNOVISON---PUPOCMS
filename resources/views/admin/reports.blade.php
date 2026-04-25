@@ -167,6 +167,7 @@
     $dashboardUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/dashboard') : url('/admin/dashboard');
     $marUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/mar') : url('/admin/reports/mar');
     $inventorySummaryUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/inventory-summary') : url('/admin/reports/inventory-summary');
+    $healthFormsUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/health-forms') : url('/admin/reports/health-forms');
     $feedbacksUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/feedbacks') : url('/admin/reports/feedbacks');
     $exportHubUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/export-hub') : url('/admin/reports/export-hub');
 @endphp
@@ -232,6 +233,14 @@
                 <div class="report-main-title">Feedbacks</div>
             </div>
             <div class="report-badge">Rate of Clinic</div>
+        </a>
+
+        <a href="{{ $healthFormsUrl }}" class="report-card">
+            <div>
+                <div class="report-label">Issued Documents</div>
+                <div class="report-main-title">Health Forms</div>
+            </div>
+            <div class="report-badge">Issued Only</div>
         </a>
 
         @if($role !== \App\Models\User::ROLE_ADMIN)

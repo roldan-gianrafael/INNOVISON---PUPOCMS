@@ -373,6 +373,8 @@ for the improvement of healthcare services.
         </div>
         <div class="sig-line">Date Signed</div>
     </div>
+</div>
+
     <div style="border: 2px solid #000; margin-top: 15px; padding: 15px; position: relative;">
         <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
         
@@ -419,10 +421,7 @@ for the improvement of healthcare services.
                 </div>
                 <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
             </div>
-            </div>
         </div>
-    </div>
-
     </div>
 </div>
 @endsection

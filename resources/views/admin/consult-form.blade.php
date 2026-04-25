@@ -90,7 +90,7 @@
         <span class="badge-number" > {{ $student->student_number ?: 'N/A' }}</span>
         <span class="badge-source">
             @if($user_source == 'online' && $latestAppointment)
-                <span class="badge-source source-online">Online Appointment Found</span>
+                <span class="badge-source source-online">Online Appointment</span>
             @elseif($isAssistedIntake)
                 <span class="badge-source source-walkin">Assisted Intake Patient</span>
             @else

@@ -10,6 +10,7 @@ use App\Models\AppointmentFeedback;
 use App\Models\Item;
 use App\Models\HealthProfile;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ReportsController extends Controller
 {
@@ -44,7 +45,7 @@ class ReportsController extends Controller
             });
         }
 
-        $issuedForms = (clone $issuedBaseQuery)
+        $issuedFormsCollection = (clone $issuedBaseQuery)
             ->get()
             ->groupBy(function (HealthProfile $form) {
                 $course = trim((string) ($form->course_college ?: optional($form->user)->course ?: 'Unspecified Course'));
@@ -69,6 +70,20 @@ class ReportsController extends Controller
             ->sortByDesc('issued_count')
             ->values();
 
+        $perPage = 12;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = $issuedFormsCollection->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $issuedForms = new LengthAwarePaginator(
+            $currentItems,
+            $issuedFormsCollection->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
+
         $summaryQuery = HealthProfile::query()->where('clearance_status', 'Issued');
 
         if ($monthFilter !== '') {
@@ -85,9 +100,9 @@ class ReportsController extends Controller
         }
 
         $totalIssued = (clone $summaryQuery)->count();
-        $totalCourses = $issuedForms->count();
+        $totalCourses = $issuedFormsCollection->count();
         $issuedWithConditions = (clone $summaryQuery)->where('has_illness', 'Yes')->count();
-        $topCourse = optional($issuedForms->first())->course ?? 'No course data yet';
+        $topCourse = optional($issuedFormsCollection->first())->course ?? 'No course data yet';
 
         return view('admin.reports.health-forms', compact(
             'issuedForms',

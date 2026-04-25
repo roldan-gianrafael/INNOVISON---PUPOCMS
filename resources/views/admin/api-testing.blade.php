@@ -553,14 +553,18 @@
     <section class="api-testing-card">
         <div class="api-testing-head">
             <h2>For API Testing</h2>
-            <p>Temporary admin tool for checking if another site's API is reachable and returning faculty profile information.</p>
+            <p>
+                Temporary admin tool for checking if another system API is reachable and returning faculty profile information.
+                Current faculty test endpoint:
+                <strong>{{ config('services.pupt_flss.faculty_profiles_url') }}</strong>
+            </p>
         </div>
 
         <form method="GET" class="api-search-form" id="apiTestingForm">
             <div>
                 <label for="source">API Source</label>
                 <select id="source" name="source">
-                    <option value="faculty" {{ ($source ?? 'faculty') === 'faculty' ? 'selected' : '' }}>Faculty API</option>
+                    <option value="faculty" {{ ($source ?? 'faculty') === 'faculty' ? 'selected' : '' }}>Faculty API (Test FLSS)</option>
                     <option value="puptas_applicant" {{ ($source ?? 'faculty') === 'puptas_applicant' ? 'selected' : '' }}>PUPTAS Applicant API</option>
                     <option value="puptas_applicant_idp" {{ ($source ?? 'faculty') === 'puptas_applicant_idp' ? 'selected' : '' }}>PUPTAS Applicant API by IDP User ID</option>
                     <option value="admin_api" {{ ($source ?? 'faculty') === 'admin_api' ? 'selected' : '' }}>Our Admin API</option>

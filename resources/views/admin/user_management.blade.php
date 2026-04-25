@@ -31,6 +31,7 @@
         color: #475569;
     }
 
+
     .um-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -53,6 +54,10 @@
         color: #e5eefb;
         border-color: rgba(148, 163, 184, 0.14);
         box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+    }
+
+
+    html[data-theme="dark"] .um-hero {
     }
 
     html[data-theme="dark"] .user-management-shell,
@@ -109,6 +114,9 @@
     html[data-theme="dark"] .um-mode-btn.active {
         border-color: rgba(255, 230, 165, 0.52);
         background: linear-gradient(145deg, #6d0014 0%, #8a0d19 40%, #d09510 100%);
+        box-shadow:
+            0 26px 40px rgba(95, 0, 18, 0.38),
+            0 56px 76px -38px rgba(193, 138, 16, 0.52);
     }
 
     html[data-theme="dark"] .um-mode-btn::before {
@@ -260,6 +268,7 @@
         transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
     }
 
+
     .um-mode-btn::before {
         content: "";
         position: absolute;
@@ -328,6 +337,21 @@
         position: relative;
         z-index: 1;
         animation: umModeFloat 3.8s ease-in-out infinite;
+    }
+
+    .um-mode-icon::after {
+        content: "";
+        position: absolute;
+        left: 12%;
+        right: 12%;
+        bottom: -14px;
+        height: 16px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(148, 163, 184, 0.24) 0%, rgba(148, 163, 184, 0.1) 44%, transparent 82%);
+        filter: blur(8px);
+        opacity: 0.72;
+        z-index: -1;
+        pointer-events: none;
     }
 
     .um-mode-icon svg {

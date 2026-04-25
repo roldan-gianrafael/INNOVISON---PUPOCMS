@@ -12,6 +12,10 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         border: 1px solid #f0f0f0;
     }
+
+    .appointments-summary-title {
+        font-weight: 800;
+    }
     
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     
@@ -199,6 +203,42 @@
         color: #111827;
     }
 
+    .appointments-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .appointments-toolbar-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-left: auto;
+        flex-wrap: wrap;
+    }
+
+    .appointments-search-wrap {
+        width: 300px;
+        max-width: 100%;
+        flex: 0 0 300px;
+    }
+
+    .appointments-search-wrap .voice-field-wrap {
+        width: 100%;
+    }
+
+    .appointments-search-input {
+        width: 100%;
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        color: #111827;
+        background: #ffffff;
+    }
+
     .btn-add-walkin {
         display: inline-flex;
         align-items: center;
@@ -237,21 +277,20 @@
         $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
     @endphp
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="appointments-toolbar">
         <h2 class="appointments-page-title">Appointments</h2>
-        <input type="text" id="searchInput" placeholder="Search by name..." 
-               style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; width: 300px; color:#111827;">
+        <div class="appointments-toolbar-actions">
+            <div class="appointments-search-wrap">
+                <input type="text" id="searchInput" class="appointments-search-input" placeholder="Search by name...">
+            </div>
+            <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="btn-add-walkin">
+                <span class="btn-icon">&#128247;</span>
+                <span class="btn-text">Scan ID / Fingerprint</span>
+            </a>
+        </div>
     </div>
-
-    <div class="action-header">
-        <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="btn-add-walkin">
-            <span class="btn-icon">📷</span>
-            <span class="btn-text">Scan ID / Fingerprint</span>
-        </a>
-    </div>
-
-    <div class="card">
-        Appointments Summary
+<div class="card">
+        <div class="appointments-summary-title">Appointments Summary</div>
         <table id="apptTable">
             <thead>
                 <tr>

@@ -509,7 +509,53 @@
             align-items: center;
             gap: 16px;
             flex-shrink: 0;
+            overflow: hidden;
             z-index: 70;
+        }
+
+        .admin-header::after {
+            content: "";
+            position: absolute;
+            top: -34%;
+            left: -24%;
+            width: 36%;
+            height: 176%;
+            pointer-events: none;
+            opacity: 0;
+            background: linear-gradient(
+                105deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(145, 42, 68, 0.10) 18%,
+                rgba(188, 70, 98, 0.38) 50%,
+                rgba(145, 42, 68, 0.14) 80%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            filter: blur(2px);
+            transform: translateX(-150%) skewX(-24deg);
+            transform-origin: center;
+            animation: adminHeaderReflection 9s ease-in-out infinite;
+        }
+
+        @keyframes adminHeaderReflection {
+            0% {
+                opacity: 0;
+                transform: translateX(-150%) skewX(-24deg);
+            }
+            8% {
+                opacity: 0.28;
+            }
+            56% {
+                opacity: 0.48;
+                transform: translateX(360%) skewX(-24deg);
+            }
+            62% {
+                opacity: 0;
+                transform: translateX(385%) skewX(-24deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(385%) skewX(-24deg);
+            }
         }
 
         .header-left {

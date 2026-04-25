@@ -6,6 +6,15 @@
 <style>
     /* --- PRINT SETTINGS --- */
 @media print {
+    header, footer, nav, .sidebar, .navbar, .no-print,
+    .admin-header, .sidebar-toggle, .sidebar-scroll-indicator,
+    .medicine-alert-fab, .medicine-alert-panel, .medicine-hover-hint,
+    .accessibility-launch-admin, .asw-menu-btn, .asw-widget, .asw-menu,
+    .asw-overlay, .profile-dropdown, .logout-link, aside,
+    .admin-layout > .sidebar {
+        display: none !important;
+    }
+
     html, body {
         background: white !important;
         margin: 0 !important;
@@ -14,39 +23,7 @@
     }
 
     body {
-        visibility: visible !important;
-    }
-
-    body * {
         visibility: hidden !important;
-    }
-
-    .no-print {
-        display: none !important;
-    }
-
-    .no-print,
-    .no-print *,
-    .sidebar,
-    .sidebar-toggle,
-    .sidebar-scroll-indicator,
-    .medicine-alert-fab,
-    .medicine-alert-panel,
-    .medicine-hover-hint,
-    .accessibility-launch-admin,
-    .asw-menu-btn,
-    .asw-widget,
-    .asw-menu,
-    .asw-overlay,
-    .profile-dropdown,
-    .logout-link,
-    header,
-    nav,
-    footer,
-    aside,
-    .admin-layout > .sidebar,
-    .admin-layout > .main > *:not(.print-container) {
-        display: none !important;
     }
 
     .admin-layout,
@@ -60,20 +37,17 @@
         box-shadow: none !important;
     }
 
-    .main > *:not(.print-container) {
-        display: none !important;
-    }
-
     .print-container, .print-container * {
         visibility: visible !important;
     }
 
-    /* 4. I-dikit sa pinakataas ang container */
-    .print-container { 
-        position: static !important; 
-        width: 100% !important; 
-        margin: 0 !important; 
-        padding: 0.2in 0.5in !important; 
+    .print-container {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0.2in 0.5in !important;
         box-shadow: none !important;
         line-height: 1.2;
         border: none !important;
@@ -412,7 +386,7 @@ for the improvement of healthcare services.
                     <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
                         <img src="{{ asset('storage/' . $clearanceSignaturePath) }}" 
                              alt="Nurse Signature" 
-                             style="height: 60px; width: auto; pointer-events: none;">
+                             style="height: 44px; width: auto; pointer-events: none;">
                     </div>
                 @endif
 

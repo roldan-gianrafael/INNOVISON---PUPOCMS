@@ -3652,7 +3652,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         toggles.forEach(function (toggle) {
             toggle.addEventListener('click', function (event) {
                 event.stopPropagation();
-                if (!panel.classList.contains('is-open')) {
+                if (panel.classList.contains('is-open')) {
+                    closePanel();
+                } else {
                     openPanel();
                 }
             });

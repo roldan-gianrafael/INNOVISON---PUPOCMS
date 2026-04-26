@@ -94,6 +94,7 @@
         gap: 10px;
         position: relative;
         overflow: hidden;
+        white-space: nowrap;
         background: #fef3c7;
         color: #70131B;
         padding: 11px 18px;
@@ -112,7 +113,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, #fde68a, #facc15 52%, #f59e0b);
+        background: linear-gradient(135deg, #70131B 0%, #8f2230 32%, #facc15 72%, #f59e0b 100%);
         transform: scaleX(0);
         transform-origin: left center;
         transition: transform .26s ease;
@@ -132,6 +133,8 @@
         font-weight: 900;
         letter-spacing: 0.04em;
         flex: 0 0 auto;
+        position: relative;
+        z-index: 1;
     }
     .mar-manage-btn-label {
         position: relative;
@@ -143,11 +146,11 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
-        color: #4a1500;
+        color: #ffffff;
         background: #fef3c7;
     }
     .mar-manage-btn:hover .mar-manage-btn-label {
-        color: #4a1500;
+        color: #ffffff;
     }
     .mar-manage-btn:hover::after {
         transform: scaleX(1);

@@ -8,25 +8,88 @@
     h2 { color: #8B0000; font-size: 22px; margin-bottom: 20px; border-bottom: 2px solid #8B0000; padding-bottom: 10px; }
     h3 { color: #334155; font-size: 18px; margin-top: 30px; }
 
-    /* Stats Widget */
-    .stats-container { display: flex; gap: 20px; margin-bottom: 25px; }
-    .stat-card { background: #8B0000; color: white; padding: 15px 25px; border-radius: 10px; flex: 1; }
-    .stat-card span { display: block; font-size: 12px; opacity: 0.8; text-transform: uppercase; }
-    .stat-card strong { font-size: 24px; }
+    .mar-top-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 18px;
+    }
+    .mar-manage-btn {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 800;
+        border: 1px solid #facc15;
+        box-shadow: 0 10px 22px rgba(112, 19, 27, 0.18);
+        transition: .18s ease;
+    }
+    .mar-manage-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 24px rgba(112, 19, 27, 0.24);
+    }
 
     /* Table Styling */
     .mar-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     .mar-table th { background: #f8fafc; color: #64748b; text-align: left; padding: 12px; border-bottom: 2px solid #eee; font-size: 13px; }
     .mar-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155; }
-    .category-row { background: #fff5f5; font-weight: 700; color: #8B0000; }
-    .section-row td { background: #70131B; color: #ffffff; font-weight: 800; }
-    .subsection-row td { background: #fef2f2; color: #7f1d2d; font-weight: 800; }
+    .category-row { background: #70131B; font-weight: 700; color: #ffffff; }
+    .section-row td { background: linear-gradient(135deg, #70131B, #8f2230); color: #ffffff !important; font-weight: 800; }
+    .subsection-row td { background: #8f2230; color: #ffffff !important; font-weight: 800; }
     .nested-row td:first-child { padding-left: 30px; }
     .deep-nested-row td:first-child { padding-left: 48px; }
     .gad-table { width: 100%; border-collapse: collapse; margin-top: 26px; }
     .gad-table th { background: #f8fafc; color: #64748b; text-align: left; padding: 12px; border-bottom: 2px solid #eee; font-size: 13px; }
     .gad-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155; }
-    .gad-section-row td { background: #8f2230; color: #ffffff; font-weight: 800; }
+    .gad-section-row td { background: linear-gradient(135deg, #70131B, #8f2230); color: #ffffff !important; font-weight: 800; }
+    .report-switcher { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 8px; }
+    .report-switch-btn {
+        border: 1px solid #facc15;
+        background: #fff7db;
+        color: #70131B;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: .18s ease;
+        box-shadow: 0 8px 18px rgba(112, 19, 27, 0.08);
+    }
+    .report-switch-btn:hover {
+        transform: translateY(-1px);
+        background: #ffefb5;
+    }
+    .report-switch-btn.is-active {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #fff;
+        border-color: #70131B;
+        box-shadow: 0 12px 24px rgba(112, 19, 27, 0.18);
+    }
+    .report-panel {
+        display: none;
+        animation: marPanelFade .18s ease;
+    }
+    .report-panel.is-active {
+        display: block;
+    }
+    .table-panel-title {
+        margin: 18px 0 8px;
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: #70131B;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+    @keyframes marPanelFade {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
     
     /* CRUD Form */
     .manage-section { background: #fdfdfd; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 10px; margin-top: 40px; }
@@ -56,32 +119,28 @@
 
 
 
-<div class="stats-container">
-    <div class="stat-card">
-        <span>Total Consultations Today</span>
-        <strong>{{ $totalToday ?? 0 }}</strong>
-    </div>
-    <div class="stat-card" style="background: #8f2230;">
-        <span>Current Filter Month</span>
-        <strong>{{ date('F Y', strtotime($month)) }}</strong>
-    </div>
-</div>
-
-@if($isAdminLike)
-    <a href="{{ route('admin.reports.manage-mar', ['month' => $month]) }}" 
-       class="btn-filter" 
-       style="background:#70131B; color:white; padding:8px 15px; border-radius:6px; text-decoration:none; font-size:14px;">
-       Manage MAR
-    </a>
-@endif
 <div class="card">
+    @if($isAdminLike)
+        <div class="mar-top-actions">
+            <a href="{{ route('admin.reports.manage-mar', ['month' => $month]) }}" class="mar-manage-btn">
+                Manage Medical Categories
+            </a>
+        </div>
+    @endif
     <h2>Medical Accomplishment Report</h2>
 
     <form method="GET" class="filter-box" style="display: flex; gap: 10px; margin-bottom: 20px;">
         <input type="month" name="month" class="form-control" value="{{ $month }}">
         <button class="btn-filter" type="submit" style="background:#8B0000; color:white; padding:8px 15px; border-radius:6px; border:none;">Generate</button>
     </form>
-   
+    
+    <div class="report-switcher" id="marReportSwitcher">
+        <button type="button" class="report-switch-btn is-active" data-target="mar-main-table">Consultation & Services</button>
+        <button type="button" class="report-switch-btn" data-target="mar-gad-consultation">GAD Consultation</button>
+        <button type="button" class="report-switch-btn" data-target="mar-gad-certificate">GAD Certificate</button>
+        <button type="button" class="report-switch-btn" data-target="mar-gad-triage">GAD Triage Online</button>
+        <button type="button" class="report-switch-btn" data-target="mar-gad-combined">GAD Combined</button>
+    </div>
 
     
 
@@ -187,6 +246,8 @@
         }
     @endphp
 
+    <div class="report-panel is-active" id="mar-main-table">
+    <div class="table-panel-title">Consultation & Services</div>
     <table class="mar-table">
         <thead>
             <tr>
@@ -295,7 +356,10 @@
             <tr><td class="nested-row">Bulletin Updates</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
         </tbody>
     </table>
+    </div>
 
+    <div class="report-panel" id="mar-gad-consultation">
+    <div class="table-panel-title">GAD Consultation</div>
     <table class="gad-table">
         <thead>
             <tr>
@@ -320,7 +384,10 @@
             <tr class="subsection-row"><td>Total</td><td class="text-center">{{ $consultationGad['total']['student'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['total']['faculty'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['total']['admin'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['total']['dependent'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['total']['total'] ?? 0 }}</td></tr>
         </tbody>
     </table>
+    </div>
 
+    <div class="report-panel" id="mar-gad-certificate">
+    <div class="table-panel-title">GAD Certificate</div>
     <table class="gad-table">
         <thead>
             <tr>
@@ -345,7 +412,10 @@
             <tr class="subsection-row"><td>Total</td><td class="text-center">{{ $certificateGad['total']['student'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['total']['faculty'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['total']['admin'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['total']['dependent'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['total']['total'] ?? 0 }}</td></tr>
         </tbody>
     </table>
+    </div>
 
+    <div class="report-panel" id="mar-gad-triage">
+    <div class="table-panel-title">GAD Triage Online</div>
     <table class="gad-table">
         <thead>
             <tr>
@@ -370,7 +440,10 @@
             <tr class="subsection-row"><td>Total</td><td class="text-center">{{ $triageOnlineGad['total']['student'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['total']['faculty'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['total']['admin'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['total']['dependent'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['total']['total'] ?? 0 }}</td></tr>
         </tbody>
     </table>
+    </div>
 
+    <div class="report-panel" id="mar-gad-combined">
+    <div class="table-panel-title">GAD Combined</div>
     <table class="gad-table">
         <thead>
             <tr>
@@ -395,8 +468,37 @@
             <tr class="subsection-row"><td>Total</td><td class="text-center">{{ $combinedGad['total']['student'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['total']['faculty'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['total']['admin'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['total']['dependent'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['total']['total'] ?? 0 }}</td></tr>
         </tbody>
     </table>
+    </div>
 </div>
 
 
 
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const switcher = document.getElementById('marReportSwitcher');
+    if (!switcher) return;
+
+    const buttons = Array.from(switcher.querySelectorAll('.report-switch-btn'));
+    const panels = Array.from(document.querySelectorAll('.report-panel'));
+
+    const activatePanel = function (targetId) {
+        buttons.forEach(function (button) {
+            button.classList.toggle('is-active', button.dataset.target === targetId);
+        });
+
+        panels.forEach(function (panel) {
+            panel.classList.toggle('is-active', panel.id === targetId);
+        });
+    };
+
+    buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            activatePanel(button.dataset.target);
+        });
+    });
+});
+</script>
+@endpush

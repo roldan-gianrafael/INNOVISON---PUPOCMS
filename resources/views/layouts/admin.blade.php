@@ -600,7 +600,7 @@
             align-items: center;
             gap: 16px;
             flex-shrink: 0;
-            overflow: hidden;
+            overflow: visible;
             z-index: 70;
         }
 
@@ -718,6 +718,7 @@
             align-items: center;
             gap: 12px;
             flex-shrink: 0;
+            overflow: visible;
         }
 
         .sidebar-toggle {
@@ -743,6 +744,8 @@
 
         .profile-wrap {
             position: relative;
+            overflow: visible;
+            z-index: 80;
         }
 
         .quick-actions-wrap {

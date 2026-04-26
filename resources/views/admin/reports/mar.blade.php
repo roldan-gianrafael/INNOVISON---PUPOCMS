@@ -92,6 +92,8 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
+        position: relative;
+        overflow: hidden;
         background: #ffffff;
         color: #70131B;
         padding: 11px 18px;
@@ -103,7 +105,18 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.12),
             0 10px 22px rgba(112, 19, 27, 0.12);
-        transition: .18s ease;
+        transition: color .18s ease, transform .18s ease, box-shadow .18s ease, background .18s ease;
+        z-index: 0;
+    }
+    .mar-manage-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform .26s ease;
+        z-index: -1;
     }
     .mar-manage-btn::before {
         content: "MC";
@@ -125,7 +138,11 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
-        background: #fffdf7;
+        color: #ffffff;
+        background: #ffffff;
+    }
+    .mar-manage-btn:hover::after {
+        transform: scaleX(1);
     }
 
     /* Table Styling */

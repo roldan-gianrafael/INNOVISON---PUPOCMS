@@ -260,6 +260,9 @@
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $consultationTotals = ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0];
+                @endphp
                 <tr>
                     <td colspan="6" class="bg-category">1. CONSULTATION / TREATMENT</td>
                 </tr>
@@ -271,9 +274,17 @@
                         @php
                             $stu = $condition->consultations->where('user_type', 'Student')->count();
                             $fac = $condition->consultations->where('user_type', 'Faculty')->count();
-                            $sta = $condition->consultations->where('user_type', 'Admin')->count();
-                            $dep = $condition->consultations->where('user_type', 'Dependendents')->count();
+                            $sta = $condition->consultations->filter(function ($consultation) {
+                                return in_array($consultation->user_type, ['Admin', 'Staff'], true);
+                            })->count();
+                            $dep = $condition->consultations->filter(function ($consultation) {
+                                return in_array($consultation->user_type, ['Dependent', 'Dependents'], true);
+                            })->count();
                             $rowTotal = $stu + $fac + $sta +$dep;
+                            $consultationTotals['student'] += $stu;
+                            $consultationTotals['faculty'] += $fac;
+                            $consultationTotals['admin'] += $sta;
+                            $consultationTotals['dependent'] += $dep;
                         @endphp
                         <tr>
                             <td class="text-left" style="padding-left: 15px;">{{ $condition->name }}</td>
@@ -285,6 +296,135 @@
                         </tr>
                     @endforeach
                 @endforeach
+                <tr class="bg-category">
+                    <td>Total Consultation</td>
+                    <td>{{ $consultationTotals['student'] }}</td>
+                    <td>{{ $consultationTotals['faculty'] }}</td>
+                    <td>{{ $consultationTotals['admin'] }}</td>
+                    <td>{{ $consultationTotals['dependent'] }}</td>
+                    <td><strong>{{ array_sum($consultationTotals) }}</strong></td>
+                </tr>
+                <tr class="bg-category"><td colspan="6">2. MEDICAL CERTIFICATE / CLEARANCE - CERTIFICATE OF COMPLIANCE</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">A. Excused Letter</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 30px;">1. Category-based excused letter</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">B. COC for IJT</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">C. COC for Ladderized</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">3. INJECTIONS</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Injection Services</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">4. REFERRALS</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">A. Ref. to Hospital without nurse</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">B. Ref. to Hospital with nurse</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">C. Referral</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">5. OTHERS</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Other Services</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">6. ON-LINE CONSULTATION</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">A. Consultation</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">B. Medical Clearance</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">C. Others</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">7. TRIAGE SURVEY</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">A. Online</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">8. BULLETIN UPDATES</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Bulletin Updates</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            </tbody>
+        </table>
+
+        <table style="margin-top: 28px;">
+            <thead>
+                <tr>
+                    <th>GAD (CONSULTATION)</th>
+                    <th>STUDENTS</th>
+                    <th>FACULTY</th>
+                    <th>ADMIN</th>
+                    <th>DEPENDENT</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-category"><td colspan="6">GAD SUMMARY</td></tr>
+                <tr><td class="text-left">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">PWD</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">Senior</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td>Total</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            </tbody>
+        </table>
+
+        <table style="margin-top: 28px;">
+            <thead>
+                <tr>
+                    <th>GAD (OJT/MEDICAL COMPLIANCE/MEDICAL FOR PROMOTION/EXCUSED LETTER)</th>
+                    <th>STUDENTS</th>
+                    <th>FACULTY</th>
+                    <th>ADMIN</th>
+                    <th>DEPENDENT</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-category"><td colspan="6">GAD SUMMARY</td></tr>
+                <tr><td class="text-left">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">PWD</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">Senior</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td>Total</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            </tbody>
+        </table>
+
+        <table style="margin-top: 28px;">
+            <thead>
+                <tr>
+                    <th>GAD (TRIAGE ONLINE)</th>
+                    <th>STUDENTS</th>
+                    <th>FACULTY</th>
+                    <th>ADMIN</th>
+                    <th>DEPENDENT</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-category"><td colspan="6">GAD SUMMARY</td></tr>
+                <tr><td class="text-left">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">PWD</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">Senior</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td>Total</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            </tbody>
+        </table>
+
+        <table style="margin-top: 28px;">
+            <thead>
+                <tr>
+                    <th>GAD (CONSULTATION + OJT/MEDICAL COMPLIANCE/MEDICAL FOR PROMOTION + TRIAGE)</th>
+                    <th>STUDENTS</th>
+                    <th>FACULTY</th>
+                    <th>ADMIN</th>
+                    <th>DEPENDENT</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-category"><td colspan="6">GAD SUMMARY</td></tr>
+                <tr><td class="text-left">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">PWD</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td colspan="6">Senior</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Male</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">Female</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr class="bg-category"><td>Total</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
             </tbody>
         </table>
 

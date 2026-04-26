@@ -12,9 +12,9 @@ class Consultation extends Model
     use SoftDeletes;
 
     protected $fillable = [
-    'name', 'consultation_date', 'user_type', 'user_role', 'service', 
+    'user_id', 'name', 'consultation_date', 'user_type', 'user_role', 'consultation_source', 'service', 
     'medical_condition_id', 'temperature', 'blood_pressure', 'pulse_rate',
-    'respiratory_rate', 'covid_status', 'reason_for_visit', 'medicine', 
+    'respiratory_rate', 'covid_status', 'reason_for_visit', 'certificate_type', 'medicine', 
     'medicine_quantity', 'comments'
 ];
     public function user(): BelongsTo

@@ -599,6 +599,7 @@ PROMPT;
             'respiratory_rate' => 'nullable|integer|min:0|max:120',
             'covid_status' => 'required|in:Yes,No',
             'reason_for_visit' => 'nullable|string|max:255',
+            'certificate_type' => 'nullable|in:none,excused_letter,coc_ijt,coc_ladderized',
         ]);
 
         $student = $this->findUserByIdentifier((string) $request->student_number);
@@ -641,6 +642,7 @@ PROMPT;
             $requestedSource = trim((string) $request->input('user_type', 'walkin'));
             $isOnlineSource = $requestedSource === 'online';
             $finalSource = 'walkin';
+            $patientType = Appointment::normalizeUserType($student->user_role ?? $student->user_type);
 
             if ($isOnlineSource) {
                 $existingAppt = Appointment::where('student_id', $student->student_id)
@@ -676,7 +678,7 @@ PROMPT;
                 $appointment->date       = now()->format('Y-m-d');
                 $appointment->time       = now()->format('H:i:s'); 
                 $appointment->type       = 'walkin';
-                $appointment->user_type  = Appointment::normalizeUserType($student->user_role ?? $student->user_type);
+                $appointment->user_type  = $patientType;
                 $appointment->save();
             }
 
@@ -694,10 +696,12 @@ PROMPT;
 
             // --- SAVE TO CONSULTATIONS TABLE ---
             \App\Models\Consultation::create([
+                'user_id'              => $student->id,
                 'name'                 => $student->first_name . ' ' . $student->last_name,
                 'consultation_date'    => now()->format('Y-m-d'),
-                'user_role'            => $student->user_role, 
-                'user_type'            => $finalSource, 
+                'user_role'            => $patientType,
+                'user_type'            => $patientType,
+                'consultation_source'  => $finalSource,
                 'service'              => $request->service,
                 'medical_condition_id' => $request->condition_id,
                 'temperature'          => $request->temp,
@@ -706,6 +710,7 @@ PROMPT;
                 'respiratory_rate'     => $request->input('respiratory_rate'),
                 'covid_status'         => $request->input('covid_status'),
                 'reason_for_visit'     => $request->input('reason_for_visit'),
+                'certificate_type'     => $request->input('certificate_type') ?: 'none',
                 'medicine'             => $medicineName,
                 'medicine_quantity'    => $request->input('issued_quantity') ?? 0, // Fallback to 0 to avoid SQL error
                 'comments'             => $request->remarks,

@@ -43,6 +43,13 @@
     $reportsHomeUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports') : url('/admin/reports');
 @endphp
 
+@php
+    $consultationGad = $gadTables['consultation'] ?? [];
+    $certificateGad = $gadTables['certificate'] ?? [];
+    $triageOnlineGad = $gadTables['triage_online'] ?? [];
+    $combinedGad = $gadTables['combined'] ?? [];
+@endphp
+
 
 
  <a href="{{ $reportsHomeUrl }}" style="color: #64748b; text-decoration: none;">&larr; Back to Reports</a>
@@ -79,20 +86,105 @@
     
 
     @php
+        $resolveConsultationPatientType = function ($consultation) {
+            $value = strtolower(trim((string) ($consultation->user_role ?: $consultation->user_type ?: '')));
+
+            return match ($value) {
+                'student' => 'student',
+                'faculty' => 'faculty',
+                'admin', 'staff' => 'admin',
+                'dependent', 'dependents' => 'dependent',
+                default => null,
+            };
+        };
+
+        $countByPatientType = function ($consultations, string $type) use ($resolveConsultationPatientType) {
+            return $consultations->filter(function ($consultation) use ($resolveConsultationPatientType, $type) {
+                return $resolveConsultationPatientType($consultation) === $type;
+            })->count();
+        };
+
+        $countCertificateByType = function ($consultations, string $certificateType, string $patientType) use ($countByPatientType) {
+            $filtered = $consultations->filter(function ($consultation) use ($certificateType) {
+                return trim((string) ($consultation->certificate_type ?? 'none')) === $certificateType;
+            });
+
+            return $countByPatientType($filtered, $patientType);
+        };
+
         $consultationTotals = ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0];
         foreach ($categories as $cat) {
             foreach ($cat->medicalConditions as $condition) {
-                $consultationTotals['student'] += $condition->consultations->where('user_type', 'Student')->count();
-                $consultationTotals['faculty'] += $condition->consultations->where('user_type', 'Faculty')->count();
-                $consultationTotals['admin'] += $condition->consultations->filter(function ($consultation) {
-                    return in_array($consultation->user_type, ['Admin', 'Staff'], true);
-                })->count();
-                $consultationTotals['dependent'] += $condition->consultations->filter(function ($consultation) {
-                    return in_array($consultation->user_type, ['Dependent', 'Dependents'], true);
-                })->count();
+                $consultationTotals['student'] += $countByPatientType($condition->consultations, 'student');
+                $consultationTotals['faculty'] += $countByPatientType($condition->consultations, 'faculty');
+                $consultationTotals['admin'] += $countByPatientType($condition->consultations, 'admin');
+                $consultationTotals['dependent'] += $countByPatientType($condition->consultations, 'dependent');
             }
         }
         $consultationGrandTotal = array_sum($consultationTotals);
+
+        $excusedLetterTotals = ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0];
+        $cocIjtTotals = ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0];
+        $cocLadderizedTotals = ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0];
+        $excusedLetterCategoryRows = collect();
+        $onlineTotals = [
+            'consultation' => ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0],
+            'medical_clearance' => ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0],
+            'others' => ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0],
+        ];
+
+        foreach ($categories as $cat) {
+            $categoryConsultations = $cat->medicalConditions->flatMap->consultations;
+
+            $categoryExcused = [
+                'student' => $countCertificateByType($categoryConsultations, 'excused_letter', 'student'),
+                'faculty' => $countCertificateByType($categoryConsultations, 'excused_letter', 'faculty'),
+                'admin' => $countCertificateByType($categoryConsultations, 'excused_letter', 'admin'),
+                'dependent' => $countCertificateByType($categoryConsultations, 'excused_letter', 'dependent'),
+            ];
+
+            if (array_sum($categoryExcused) > 0) {
+                $excusedLetterCategoryRows->push([
+                    'label' => 'Category ' . $cat->code . ' - ' . $cat->name,
+                    'student' => $categoryExcused['student'],
+                    'faculty' => $categoryExcused['faculty'],
+                    'admin' => $categoryExcused['admin'],
+                    'dependent' => $categoryExcused['dependent'],
+                    'total' => array_sum($categoryExcused),
+                ]);
+            }
+
+            foreach (['student', 'faculty', 'admin', 'dependent'] as $type) {
+                $excusedLetterTotals[$type] += $categoryExcused[$type];
+                $cocIjtTotals[$type] += $countCertificateByType($categoryConsultations, 'coc_ijt', $type);
+                $cocLadderizedTotals[$type] += $countCertificateByType($categoryConsultations, 'coc_ladderized', $type);
+            }
+
+            $onlineConsultations = $categoryConsultations->filter(function ($consultation) {
+                return trim((string) ($consultation->consultation_source ?? '')) === 'online';
+            });
+
+            $onlineBuckets = [
+                'consultation' => $onlineConsultations->filter(function ($consultation) {
+                    $service = strtolower(trim((string) ($consultation->service ?? '')));
+                    return in_array($service, ['general consultation', 'consultation'], true);
+                }),
+                'medical_clearance' => $onlineConsultations->filter(function ($consultation) {
+                    $service = strtolower(trim((string) ($consultation->service ?? '')));
+                    return str_contains($service, 'clearance');
+                }),
+            ];
+            $onlineBuckets['others'] = $onlineConsultations->reject(function ($consultation) {
+                $service = strtolower(trim((string) ($consultation->service ?? '')));
+                return in_array($service, ['general consultation', 'consultation'], true) || str_contains($service, 'clearance');
+            });
+
+            foreach ($onlineBuckets as $bucket => $consultations) {
+                foreach (['student', 'faculty', 'admin', 'dependent'] as $type) {
+                    $onlineTotals[$bucket][$type] += $countByPatientType($consultations, $type);
+                }
+            }
+        }
     @endphp
 
     <table class="mar-table">
@@ -115,16 +207,12 @@
         <td colspan="6">Category {{ $cat->code }} - {{ $cat->name }}</td>
     </tr>
 
-    @foreach($cat->medicalConditions as $condition)
+        @foreach($cat->medicalConditions as $condition)
         @php
-            $stu = $condition->consultations->where('user_type', 'Student')->count();
-            $fac = $condition->consultations->where('user_type', 'Faculty')->count();
-            $adm = $condition->consultations->filter(function ($consultation) {
-                return in_array($consultation->user_type, ['Admin', 'Staff'], true);
-            })->count();
-            $dep = $condition->consultations->filter(function ($consultation) {
-                return in_array($consultation->user_type, ['Dependent', 'Dependents'], true);
-            })->count();
+            $stu = $countByPatientType($condition->consultations, 'student');
+            $fac = $countByPatientType($condition->consultations, 'faculty');
+            $adm = $countByPatientType($condition->consultations, 'admin');
+            $dep = $countByPatientType($condition->consultations, 'dependent');
             $total = $stu + $fac + $adm + $dep;
         @endphp
         <tr>
@@ -147,10 +235,42 @@
             </tr>
 
             <tr class="section-row"><td colspan="6">ii. Medical Certificate / Clearance - Certificate of Compliance</td></tr>
-            <tr class="subsection-row nested-row"><td>A. Excused Letter</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="nested-row deep-nested-row"><td>1. Category-based excused letter</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row nested-row"><td>B. COC for IJT</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row nested-row"><td>C. COC for Ladderized</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr class="subsection-row nested-row">
+                <td>A. Excused Letter</td>
+                <td class="text-center">{{ $excusedLetterTotals['student'] }}</td>
+                <td class="text-center">{{ $excusedLetterTotals['faculty'] }}</td>
+                <td class="text-center">{{ $excusedLetterTotals['admin'] }}</td>
+                <td class="text-center">{{ $excusedLetterTotals['dependent'] }}</td>
+                <td class="text-center">{{ array_sum($excusedLetterTotals) }}</td>
+            </tr>
+            @forelse($excusedLetterCategoryRows as $categoryRow)
+                <tr class="nested-row deep-nested-row">
+                    <td>{{ $categoryRow['label'] }}</td>
+                    <td class="text-center">{{ $categoryRow['student'] }}</td>
+                    <td class="text-center">{{ $categoryRow['faculty'] }}</td>
+                    <td class="text-center">{{ $categoryRow['admin'] }}</td>
+                    <td class="text-center">{{ $categoryRow['dependent'] }}</td>
+                    <td class="text-center">{{ $categoryRow['total'] }}</td>
+                </tr>
+            @empty
+                <tr class="nested-row deep-nested-row"><td>No excused letter category recorded yet.</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            @endforelse
+            <tr class="subsection-row nested-row">
+                <td>B. COC for IJT</td>
+                <td class="text-center">{{ $cocIjtTotals['student'] }}</td>
+                <td class="text-center">{{ $cocIjtTotals['faculty'] }}</td>
+                <td class="text-center">{{ $cocIjtTotals['admin'] }}</td>
+                <td class="text-center">{{ $cocIjtTotals['dependent'] }}</td>
+                <td class="text-center">{{ array_sum($cocIjtTotals) }}</td>
+            </tr>
+            <tr class="subsection-row nested-row">
+                <td>C. COC for Ladderized</td>
+                <td class="text-center">{{ $cocLadderizedTotals['student'] }}</td>
+                <td class="text-center">{{ $cocLadderizedTotals['faculty'] }}</td>
+                <td class="text-center">{{ $cocLadderizedTotals['admin'] }}</td>
+                <td class="text-center">{{ $cocLadderizedTotals['dependent'] }}</td>
+                <td class="text-center">{{ array_sum($cocLadderizedTotals) }}</td>
+            </tr>
 
             <tr class="section-row"><td colspan="6">iii. Injections</td></tr>
             <tr><td class="nested-row">Injection Services</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
@@ -164,9 +284,9 @@
             <tr><td class="nested-row">Other Services</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
 
             <tr class="section-row"><td colspan="6">vi. On-line Consultation</td></tr>
-            <tr class="subsection-row nested-row"><td>A. Consultation</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row nested-row"><td>B. Medical Clearance</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row nested-row"><td>C. Others</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr class="subsection-row nested-row"><td>A. Consultation</td><td class="text-center">{{ $onlineTotals['consultation']['student'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['admin'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['consultation']) }}</td></tr>
+            <tr class="subsection-row nested-row"><td>B. Medical Clearance</td><td class="text-center">{{ $onlineTotals['medical_clearance']['student'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['admin'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['medical_clearance']) }}</td></tr>
+            <tr class="subsection-row nested-row"><td>C. Others</td><td class="text-center">{{ $onlineTotals['others']['student'] }}</td><td class="text-center">{{ $onlineTotals['others']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['others']['admin'] }}</td><td class="text-center">{{ $onlineTotals['others']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['others']) }}</td></tr>
 
             <tr class="section-row"><td colspan="6">vii. Triage Survey</td></tr>
             <tr class="subsection-row nested-row"><td>A. Online</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
@@ -189,15 +309,15 @@
         </thead>
         <tbody>
             <tr class="gad-section-row"><td colspan="6">GAD Summary</td></tr>
-            <tr><td>Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td>Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td>Female</td><td class="text-center">{{ $consultationGad['female']['student'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['female']['admin'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['female']['total'] ?? 0 }}</td></tr>
+            <tr><td>Male</td><td class="text-center">{{ $consultationGad['male']['student'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['male']['admin'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['male']['total'] ?? 0 }}</td></tr>
             <tr class="subsection-row"><td colspan="6">PWD</td></tr>
-            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">{{ $consultationGad['pwd_male']['student'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['pwd_male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['pwd_male']['admin'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['pwd_male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['pwd_male']['total'] ?? 0 }}</td></tr>
+            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">{{ $consultationGad['pwd_female']['student'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['pwd_female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['pwd_female']['admin'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['pwd_female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['pwd_female']['total'] ?? 0 }}</td></tr>
             <tr class="subsection-row"><td colspan="6">Senior</td></tr>
-            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row"><td>Total</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">{{ $consultationGad['senior_male']['student'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['senior_male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['senior_male']['admin'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['senior_male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['senior_male']['total'] ?? 0 }}</td></tr>
+            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">{{ $consultationGad['senior_female']['student'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['senior_female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['senior_female']['admin'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['senior_female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['senior_female']['total'] ?? 0 }}</td></tr>
+            <tr class="subsection-row"><td>Total</td><td class="text-center">{{ $consultationGad['total']['student'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['total']['faculty'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['total']['admin'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['total']['dependent'] ?? 0 }}</td><td class="text-center">{{ $consultationGad['total']['total'] ?? 0 }}</td></tr>
         </tbody>
     </table>
 
@@ -214,15 +334,15 @@
         </thead>
         <tbody>
             <tr class="gad-section-row"><td colspan="6">GAD Summary</td></tr>
-            <tr><td>Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td>Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td>Female</td><td class="text-center">{{ $certificateGad['female']['student'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['female']['admin'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['female']['total'] ?? 0 }}</td></tr>
+            <tr><td>Male</td><td class="text-center">{{ $certificateGad['male']['student'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['male']['admin'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['male']['total'] ?? 0 }}</td></tr>
             <tr class="subsection-row"><td colspan="6">PWD</td></tr>
-            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">{{ $certificateGad['pwd_male']['student'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['pwd_male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['pwd_male']['admin'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['pwd_male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['pwd_male']['total'] ?? 0 }}</td></tr>
+            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">{{ $certificateGad['pwd_female']['student'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['pwd_female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['pwd_female']['admin'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['pwd_female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['pwd_female']['total'] ?? 0 }}</td></tr>
             <tr class="subsection-row"><td colspan="6">Senior</td></tr>
-            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row"><td>Total</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">{{ $certificateGad['senior_male']['student'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['senior_male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['senior_male']['admin'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['senior_male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['senior_male']['total'] ?? 0 }}</td></tr>
+            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">{{ $certificateGad['senior_female']['student'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['senior_female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['senior_female']['admin'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['senior_female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['senior_female']['total'] ?? 0 }}</td></tr>
+            <tr class="subsection-row"><td>Total</td><td class="text-center">{{ $certificateGad['total']['student'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['total']['faculty'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['total']['admin'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['total']['dependent'] ?? 0 }}</td><td class="text-center">{{ $certificateGad['total']['total'] ?? 0 }}</td></tr>
         </tbody>
     </table>
 
@@ -239,15 +359,15 @@
         </thead>
         <tbody>
             <tr class="gad-section-row"><td colspan="6">GAD Summary</td></tr>
-            <tr><td>Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td>Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td>Female</td><td class="text-center">{{ $triageOnlineGad['female']['student'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['female']['admin'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['female']['total'] ?? 0 }}</td></tr>
+            <tr><td>Male</td><td class="text-center">{{ $triageOnlineGad['male']['student'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['male']['admin'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['male']['total'] ?? 0 }}</td></tr>
             <tr class="subsection-row"><td colspan="6">PWD</td></tr>
-            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">{{ $triageOnlineGad['pwd_male']['student'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['pwd_male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['pwd_male']['admin'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['pwd_male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['pwd_male']['total'] ?? 0 }}</td></tr>
+            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">{{ $triageOnlineGad['pwd_female']['student'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['pwd_female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['pwd_female']['admin'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['pwd_female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['pwd_female']['total'] ?? 0 }}</td></tr>
             <tr class="subsection-row"><td colspan="6">Senior</td></tr>
-            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row"><td>Total</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">{{ $triageOnlineGad['senior_male']['student'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['senior_male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['senior_male']['admin'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['senior_male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['senior_male']['total'] ?? 0 }}</td></tr>
+            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">{{ $triageOnlineGad['senior_female']['student'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['senior_female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['senior_female']['admin'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['senior_female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['senior_female']['total'] ?? 0 }}</td></tr>
+            <tr class="subsection-row"><td>Total</td><td class="text-center">{{ $triageOnlineGad['total']['student'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['total']['faculty'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['total']['admin'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['total']['dependent'] ?? 0 }}</td><td class="text-center">{{ $triageOnlineGad['total']['total'] ?? 0 }}</td></tr>
         </tbody>
     </table>
 
@@ -264,15 +384,15 @@
         </thead>
         <tbody>
             <tr class="gad-section-row"><td colspan="6">GAD Summary</td></tr>
-            <tr><td>Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td>Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td>Female</td><td class="text-center">{{ $combinedGad['female']['student'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['female']['admin'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['female']['total'] ?? 0 }}</td></tr>
+            <tr><td>Male</td><td class="text-center">{{ $combinedGad['male']['student'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['male']['admin'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['male']['total'] ?? 0 }}</td></tr>
             <tr class="subsection-row"><td colspan="6">PWD</td></tr>
-            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">{{ $combinedGad['pwd_male']['student'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['pwd_male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['pwd_male']['admin'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['pwd_male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['pwd_male']['total'] ?? 0 }}</td></tr>
+            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">{{ $combinedGad['pwd_female']['student'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['pwd_female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['pwd_female']['admin'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['pwd_female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['pwd_female']['total'] ?? 0 }}</td></tr>
             <tr class="subsection-row"><td colspan="6">Senior</td></tr>
-            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row"><td>Total</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr><td style="padding-left: 30px;">Male</td><td class="text-center">{{ $combinedGad['senior_male']['student'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['senior_male']['faculty'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['senior_male']['admin'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['senior_male']['dependent'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['senior_male']['total'] ?? 0 }}</td></tr>
+            <tr><td style="padding-left: 30px;">Female</td><td class="text-center">{{ $combinedGad['senior_female']['student'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['senior_female']['faculty'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['senior_female']['admin'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['senior_female']['dependent'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['senior_female']['total'] ?? 0 }}</td></tr>
+            <tr class="subsection-row"><td>Total</td><td class="text-center">{{ $combinedGad['total']['student'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['total']['faculty'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['total']['admin'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['total']['dependent'] ?? 0 }}</td><td class="text-center">{{ $combinedGad['total']['total'] ?? 0 }}</td></tr>
         </tbody>
     </table>
 </div>

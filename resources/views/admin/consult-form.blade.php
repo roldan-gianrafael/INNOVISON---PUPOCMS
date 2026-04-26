@@ -220,6 +220,17 @@
                     </select>
                     <small style="color: #000; font-size: 11px;">Required for MAR Report.</small>
                 </div>
+
+                <div class="form-group">
+                    <label>Medical Certificate / Clearance</label>
+                    <select name="certificate_type" class="form-control">
+                        <option value="none" {{ old('certificate_type', 'none') === 'none' ? 'selected' : '' }}>None</option>
+                        <option value="excused_letter" {{ old('certificate_type') === 'excused_letter' ? 'selected' : '' }}>Excused Letter</option>
+                        <option value="coc_ijt" {{ old('certificate_type') === 'coc_ijt' ? 'selected' : '' }}>COC for IJT</option>
+                        <option value="coc_ladderized" {{ old('certificate_type') === 'coc_ladderized' ? 'selected' : '' }}>COC for Ladderized</option>
+                    </select>
+                    <small style="color: #000; font-size: 11px;">If Excused Letter is selected, the chosen MAR condition category will also be used in Part II of the MAR report.</small>
+                </div>
             </div>
 
             <div class="card">

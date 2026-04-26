@@ -7,14 +7,252 @@ use App\Models\MedicalConditions;
 use App\Models\Category;
 use App\Models\Consultation;
 use App\Models\AppointmentFeedback;
+use App\Models\Appointment;
 use App\Models\Item;
 use App\Models\HealthProfile;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class ReportsController extends Controller
 {
+    private function normalizeReportPatientType(?string $value): ?string
+    {
+        return match (strtolower(trim((string) $value))) {
+            'student' => 'student',
+            'faculty' => 'faculty',
+            'admin', 'staff' => 'admin',
+            'dependent', 'dependents' => 'dependent',
+            default => null,
+        };
+    }
+
+    private function normalizeReportGender(?string $value): ?string
+    {
+        $gender = strtolower(trim((string) $value));
+
+        return match ($gender) {
+            'male' => 'male',
+            'female' => 'female',
+            default => null,
+        };
+    }
+
+    private function emptyGadTable(): array
+    {
+        $row = ['student' => 0, 'faculty' => 0, 'admin' => 0, 'dependent' => 0, 'total' => 0];
+
+        return [
+            'female' => $row,
+            'male' => $row,
+            'pwd_male' => $row,
+            'pwd_female' => $row,
+            'senior_male' => $row,
+            'senior_female' => $row,
+            'total' => $row,
+        ];
+    }
+
+    private function incrementGadRow(array &$table, string $rowKey, string $patientType): void
+    {
+        $table[$rowKey][$patientType]++;
+        $table[$rowKey]['total']++;
+    }
+
+    private function addGadEntry(array &$table, string $patientType, ?string $gender, bool $isPwd, bool $isSenior): void
+    {
+        $this->incrementGadRow($table, 'total', $patientType);
+
+        if ($gender === 'female') {
+            $this->incrementGadRow($table, 'female', $patientType);
+        } elseif ($gender === 'male') {
+            $this->incrementGadRow($table, 'male', $patientType);
+        }
+
+        if ($isPwd && $gender === 'male') {
+            $this->incrementGadRow($table, 'pwd_male', $patientType);
+        }
+
+        if ($isPwd && $gender === 'female') {
+            $this->incrementGadRow($table, 'pwd_female', $patientType);
+        }
+
+        if ($isSenior && $gender === 'male') {
+            $this->incrementGadRow($table, 'senior_male', $patientType);
+        }
+
+        if ($isSenior && $gender === 'female') {
+            $this->incrementGadRow($table, 'senior_female', $patientType);
+        }
+    }
+
+    private function combineGadTables(array ...$tables): array
+    {
+        $combined = $this->emptyGadTable();
+
+        foreach ($tables as $table) {
+            foreach ($combined as $rowKey => $row) {
+                foreach (array_keys($row) as $columnKey) {
+                    $combined[$rowKey][$columnKey] += (int) ($table[$rowKey][$columnKey] ?? 0);
+                }
+            }
+        }
+
+        return $combined;
+    }
+
+    private function resolveConsultationUser(?Consultation $consultation): ?User
+    {
+        static $cache = [];
+
+        if (!$consultation) {
+            return null;
+        }
+
+        $userId = $consultation->user_id ?? null;
+        if ($userId) {
+            $cacheKey = 'id:' . $userId;
+            if (!array_key_exists($cacheKey, $cache)) {
+                $cache[$cacheKey] = User::with('healthProfile')->find($userId);
+            }
+
+            return $cache[$cacheKey];
+        }
+
+        $name = trim((string) $consultation->name);
+        $role = $this->normalizeReportPatientType($consultation->user_role ?: $consultation->user_type ?: '');
+        $cacheKey = 'name:' . strtolower($name) . '|' . $role;
+
+        if (!array_key_exists($cacheKey, $cache)) {
+            $matches = User::with('healthProfile')
+                ->where('name', $name)
+                ->get();
+
+            if ($matches->count() > 1 && $role !== null) {
+                $filtered = $matches->filter(function (User $user) use ($role) {
+                    return $this->normalizeReportPatientType($user->user_role ?? $user->user_type ?? '') === $role;
+                })->values();
+
+                $cache[$cacheKey] = $filtered->count() === 1 ? $filtered->first() : $matches->first();
+            } else {
+                $cache[$cacheKey] = $matches->first();
+            }
+        }
+
+        return $cache[$cacheKey];
+    }
+
+    private function extractUserDemographics(?User $user): array
+    {
+        $gender = $this->normalizeReportGender(
+            $user?->gender
+            ?: optional($user?->healthProfile)->sex
+        );
+
+        $birthday = trim((string) (
+            $user?->DOB
+            ?: optional($user?->healthProfile)->birthday
+        ));
+
+        $isSenior = false;
+        if ($birthday !== '') {
+            try {
+                $isSenior = Carbon::parse($birthday)->age >= 60;
+            } catch (\Throwable $e) {
+                $isSenior = false;
+            }
+        }
+
+        $isPwd = trim((string) optional($user?->healthProfile)->has_disability) === 'Yes';
+
+        return compact('gender', 'isSenior', 'isPwd');
+    }
+
+    private function buildConsultationGadTable(Collection $consultations): array
+    {
+        $table = $this->emptyGadTable();
+
+        foreach ($consultations as $consultation) {
+            $patientType = $this->normalizeReportPatientType($consultation->user_role ?: $consultation->user_type ?: '');
+            if ($patientType === null) {
+                continue;
+            }
+
+            $user = $this->resolveConsultationUser($consultation);
+            $demographics = $this->extractUserDemographics($user);
+
+            $this->addGadEntry(
+                $table,
+                $patientType,
+                $demographics['gender'],
+                $demographics['isPwd'],
+                $demographics['isSenior']
+            );
+        }
+
+        return $table;
+    }
+
+    private function buildAppointmentGadTable(Collection $appointments): array
+    {
+        $table = $this->emptyGadTable();
+
+        foreach ($appointments as $appointment) {
+            $patientType = $this->normalizeReportPatientType($appointment->user_type ?? '');
+            if ($patientType === null) {
+                continue;
+            }
+
+            $user = $appointment->user;
+            if ($user && !$user->relationLoaded('healthProfile')) {
+                $user->load('healthProfile');
+            }
+
+            $demographics = $this->extractUserDemographics($user);
+
+            $this->addGadEntry(
+                $table,
+                $patientType,
+                $demographics['gender'],
+                $demographics['isPwd'],
+                $demographics['isSenior']
+            );
+        }
+
+        return $table;
+    }
+
+    private function buildMarGadTables(Collection $categories, int $year, int $month): array
+    {
+        $consultations = $categories->flatMap(function ($category) {
+            return $category->medicalConditions->flatMap->consultations;
+        })->unique('id')->values();
+
+        $certificateConsultations = $consultations->filter(function ($consultation) {
+            return in_array(trim((string) ($consultation->certificate_type ?? 'none')), ['excused_letter', 'coc_ijt', 'coc_ladderized'], true);
+        })->values();
+
+        $onlineAppointments = Appointment::with('user.healthProfile')
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->where('type', 'online')
+            ->where('status', '!=', 'Cancelled')
+            ->get();
+
+        $consultationTable = $this->buildConsultationGadTable($consultations);
+        $certificateTable = $this->buildConsultationGadTable($certificateConsultations);
+        $triageOnlineTable = $this->buildAppointmentGadTable($onlineAppointments);
+
+        return [
+            'consultation' => $consultationTable,
+            'certificate' => $certificateTable,
+            'triage_online' => $triageOnlineTable,
+            'combined' => $this->combineGadTables($consultationTable, $certificateTable, $triageOnlineTable),
+        ];
+    }
+
     public function healthFormsReport(Request $request)
     {
         $search = trim((string) $request->query('q', ''));
@@ -257,6 +495,7 @@ class ReportsController extends Controller
         $query->whereYear('consultation_date', $year)
               ->whereMonth('consultation_date', $month);
     }])->get();
+    $gadTables = $this->buildMarGadTables($categories, (int) $year, (int) $month);
 
     $allConditions = MedicalConditions::with('category')->get();
     $categoryList = Category::all();
@@ -264,6 +503,7 @@ class ReportsController extends Controller
 
     return view('admin.reports.mar', [
         'categories' => $categories,
+        'gadTables' => $gadTables,
         'allConditions' => $allConditions,
         'categoryList' => $categoryList,
         'month' => $monthFilter,
@@ -326,6 +566,7 @@ public function printReport(Request $request)
             $query->whereYear('consultation_date', $year)
                   ->whereMonth('consultation_date', $month);
         }])->get();
+        $gadTables = $this->buildMarGadTables($data, (int) $year, (int) $month);
     } 
     elseif ($type == 'inventory') {
         $title = "INVENTORY STOCK REPORT";
@@ -384,6 +625,7 @@ public function printReport(Request $request)
             'type' => $type,
             'title' => $title,
             'monthFilter' => $monthFilter,
+            'gadTables' => $gadTables ?? [],
             'isPdf' => true,
         ])->setPaper('a4', 'portrait');
 
@@ -398,6 +640,7 @@ public function printReport(Request $request)
         'type' => $type,
         'title' => $title,
         'monthFilter' => $monthFilter,
+        'gadTables' => $gadTables ?? [],
         'isPdf' => false,
     ]);
 }

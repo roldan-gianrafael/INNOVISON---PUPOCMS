@@ -7,27 +7,125 @@
     .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; margin-bottom: 24px; }
     h2 { color: #8B0000; font-size: 22px; margin-bottom: 20px; border-bottom: 2px solid #8B0000; padding-bottom: 10px; }
     h3 { color: #334155; font-size: 18px; margin-top: 30px; }
+    .mar-header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+    .mar-header-bar h2 {
+        margin: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    .mar-filter-bar {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 16px 18px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #fffaf5 0%, #ffffff 100%);
+        border: 1px solid #f3e8d1;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+        margin-bottom: 20px;
+    }
+    .mar-filter-copy {
+        min-width: 0;
+        flex: 1 1 220px;
+    }
+    .mar-filter-title {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #70131B;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .mar-filter-subtitle {
+        margin: 0;
+        font-size: 13px;
+        color: #64748b;
+    }
+    .mar-filter-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .mar-month-input {
+        min-width: 170px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #d5c4a1;
+        background: #ffffff;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 700;
+    }
+    .mar-generate-btn {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 1px solid #70131B;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(112, 19, 27, 0.14);
+        transition: .18s ease;
+    }
+    .mar-generate-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 24px rgba(112, 19, 27, 0.18);
+    }
 
     .mar-top-actions {
         display: flex;
         justify-content: flex-end;
-        margin-bottom: 18px;
     }
     .mar-manage-btn {
-        background: linear-gradient(135deg, #70131B, #8f2230);
-        color: #fff;
-        padding: 10px 16px;
-        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: #ffffff;
+        color: #70131B;
+        padding: 11px 18px;
+        border-radius: 999px;
         text-decoration: none;
         font-size: 14px;
         font-weight: 800;
         border: 1px solid #facc15;
-        box-shadow: 0 10px 22px rgba(112, 19, 27, 0.18);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.12);
         transition: .18s ease;
+    }
+    .mar-manage-btn::before {
+        content: "MC";
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        flex: 0 0 auto;
     }
     .mar-manage-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 14px 24px rgba(112, 19, 27, 0.24);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+        background: #fffdf7;
     }
 
     /* Table Styling */
@@ -37,6 +135,7 @@
     .category-row { background: #70131B; font-weight: 700; color: #ffffff; }
     .section-row td { background: linear-gradient(135deg, #70131B, #8f2230); color: #ffffff !important; font-weight: 800; }
     .subsection-row td { background: #8f2230; color: #ffffff !important; font-weight: 800; }
+    .detail-row td { background: #e5e7eb; color: #334155 !important; font-weight: 800; }
     .nested-row td:first-child { padding-left: 30px; }
     .deep-nested-row td:first-child { padding-left: 48px; }
     .gad-table { width: 100%; border-collapse: collapse; margin-top: 26px; }
@@ -120,18 +219,26 @@
 
 
 <div class="card">
-    @if($isAdminLike)
+    <div class="mar-header-bar">
+        <h2>Medical Accomplishment Report</h2>
+        @if($isAdminLike)
         <div class="mar-top-actions">
             <a href="{{ route('admin.reports.manage-mar', ['month' => $month]) }}" class="mar-manage-btn">
                 Manage Medical Categories
             </a>
         </div>
-    @endif
-    <h2>Medical Accomplishment Report</h2>
+        @endif
+    </div>
 
-    <form method="GET" class="filter-box" style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <input type="month" name="month" class="form-control" value="{{ $month }}">
-        <button class="btn-filter" type="submit" style="background:#8B0000; color:white; padding:8px 15px; border-radius:6px; border:none;">Generate</button>
+    <form method="GET" class="mar-filter-bar">
+        <div class="mar-filter-copy">
+            <p class="mar-filter-title">Report Filter</p>
+            <p class="mar-filter-subtitle">Choose the month you want to review, then regenerate the MAR tables below.</p>
+        </div>
+        <div class="mar-filter-controls">
+            <input type="month" name="month" class="mar-month-input" value="{{ $month }}">
+            <button class="mar-generate-btn" type="submit">Generate</button>
+        </div>
     </form>
     
     <div class="report-switcher" id="marReportSwitcher">
@@ -296,7 +403,7 @@
             </tr>
 
             <tr class="section-row"><td colspan="6">ii. Medical Certificate / Clearance - Certificate of Compliance</td></tr>
-            <tr class="subsection-row nested-row">
+            <tr class="detail-row nested-row">
                 <td>A. Excused Letter</td>
                 <td class="text-center">{{ $excusedLetterTotals['student'] }}</td>
                 <td class="text-center">{{ $excusedLetterTotals['faculty'] }}</td>
@@ -316,7 +423,7 @@
             @empty
                 <tr class="nested-row deep-nested-row"><td>No excused letter category recorded yet.</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
             @endforelse
-            <tr class="subsection-row nested-row">
+            <tr class="detail-row nested-row">
                 <td>B. COC for IJT</td>
                 <td class="text-center">{{ $cocIjtTotals['student'] }}</td>
                 <td class="text-center">{{ $cocIjtTotals['faculty'] }}</td>
@@ -324,7 +431,7 @@
                 <td class="text-center">{{ $cocIjtTotals['dependent'] }}</td>
                 <td class="text-center">{{ array_sum($cocIjtTotals) }}</td>
             </tr>
-            <tr class="subsection-row nested-row">
+            <tr class="detail-row nested-row">
                 <td>C. COC for Ladderized</td>
                 <td class="text-center">{{ $cocLadderizedTotals['student'] }}</td>
                 <td class="text-center">{{ $cocLadderizedTotals['faculty'] }}</td>
@@ -337,20 +444,20 @@
             <tr><td class="nested-row">Injection Services</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
 
             <tr class="section-row"><td colspan="6">iv. Referrals</td></tr>
-            <tr class="subsection-row nested-row"><td>A. Ref. to Hospital without nurse</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row nested-row"><td>B. Ref. to Hospital with nurse</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
-            <tr class="subsection-row nested-row"><td>C. Referral</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr class="detail-row nested-row"><td>A. Ref. to Hospital without nurse</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr class="detail-row nested-row"><td>B. Ref. to Hospital with nurse</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr class="detail-row nested-row"><td>C. Referral</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
 
             <tr class="section-row"><td colspan="6">v. Others</td></tr>
             <tr><td class="nested-row">Other Services</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
 
             <tr class="section-row"><td colspan="6">vi. On-line Consultation</td></tr>
-            <tr class="subsection-row nested-row"><td>A. Consultation</td><td class="text-center">{{ $onlineTotals['consultation']['student'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['admin'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['consultation']) }}</td></tr>
-            <tr class="subsection-row nested-row"><td>B. Medical Clearance</td><td class="text-center">{{ $onlineTotals['medical_clearance']['student'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['admin'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['medical_clearance']) }}</td></tr>
-            <tr class="subsection-row nested-row"><td>C. Others</td><td class="text-center">{{ $onlineTotals['others']['student'] }}</td><td class="text-center">{{ $onlineTotals['others']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['others']['admin'] }}</td><td class="text-center">{{ $onlineTotals['others']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['others']) }}</td></tr>
+            <tr class="detail-row nested-row"><td>A. Consultation</td><td class="text-center">{{ $onlineTotals['consultation']['student'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['admin'] }}</td><td class="text-center">{{ $onlineTotals['consultation']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['consultation']) }}</td></tr>
+            <tr class="detail-row nested-row"><td>B. Medical Clearance</td><td class="text-center">{{ $onlineTotals['medical_clearance']['student'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['admin'] }}</td><td class="text-center">{{ $onlineTotals['medical_clearance']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['medical_clearance']) }}</td></tr>
+            <tr class="detail-row nested-row"><td>C. Others</td><td class="text-center">{{ $onlineTotals['others']['student'] }}</td><td class="text-center">{{ $onlineTotals['others']['faculty'] }}</td><td class="text-center">{{ $onlineTotals['others']['admin'] }}</td><td class="text-center">{{ $onlineTotals['others']['dependent'] }}</td><td class="text-center">{{ array_sum($onlineTotals['others']) }}</td></tr>
 
             <tr class="section-row"><td colspan="6">vii. Triage Survey</td></tr>
-            <tr class="subsection-row nested-row"><td>A. Online</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+            <tr class="detail-row nested-row"><td>A. Online</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>
 
             <tr class="section-row"><td colspan="6">viii. Bulletin Updates</td></tr>
             <tr><td class="nested-row">Bulletin Updates</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td></tr>

@@ -619,7 +619,7 @@ public function printReport(Request $request)
             ->values();
     }
 
-    if ($output === 'pdf') {
+    if ($output === 'pdf' && class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
         $pdf = Pdf::loadView('admin.reports.print-reports', [
             'data' => $data,
             'type' => $type,
@@ -642,6 +642,7 @@ public function printReport(Request $request)
         'monthFilter' => $monthFilter,
         'gadTables' => $gadTables ?? [],
         'isPdf' => false,
+        'pdfUnavailable' => $output === 'pdf',
     ]);
 }
 }

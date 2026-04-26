@@ -327,6 +327,17 @@
     .btn-print:hover {
         background: #dc2626;
     }
+
+    .pdf-warning {
+        margin: 0 0 14px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: #fff4d6;
+        border: 1px solid #facc15;
+        color: #7c2d12;
+        font-size: 13px;
+        line-height: 1.45;
+    }
 </style>
 </head>
 <body class="{{ !empty($isPdf) ? 'pdf-mode' : '' }}">
@@ -365,6 +376,12 @@
             <button onclick="window.close()" style="padding: 8px 15px; cursor: pointer;">Close</button>
         </div>
     </div>
+
+    @if(!empty($pdfUnavailable))
+        <div class="no-print pdf-warning">
+            PDF export is not available on this server yet, so this report opened in the HTML preview instead.
+        </div>
+    @endif
 
     <div class="header-top">
     <div class="pup-logo-section">

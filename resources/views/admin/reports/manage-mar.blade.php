@@ -37,6 +37,71 @@
         white-space: nowrap;
         align-self: stretch;
     }
+    .add-new-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+        background: #ffffff;
+        color: #70131B;
+        padding: 11px 18px;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 800;
+        border: 1px solid #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.12);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, background .18s ease;
+        z-index: 0;
+    }
+    .add-new-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform .26s ease;
+        z-index: -1;
+    }
+    .add-new-btn::before {
+        content: "AN";
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        flex: 0 0 auto;
+    }
+    .add-new-btn-label {
+        position: relative;
+        z-index: 1;
+        transition: color .08s linear;
+    }
+    .add-new-btn:hover {
+        transform: translateY(-1px);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+        color: #ffffff;
+        background: #ffffff;
+    }
+    .add-new-btn:hover::after {
+        transform: scaleX(1);
+    }
+    .add-new-btn:hover .add-new-btn-label {
+        color: #ffffff;
+    }
     .table-action-cell {
         text-align: center;
         white-space: nowrap;
@@ -90,7 +155,7 @@
 
         <input type="text" name="name" class="form-control condition-input" placeholder="Condition Name (e.g. Fever)" required>
         
-        <button type="submit" class="btn-save">Add New</button>
+        <button type="submit" class="btn-save add-new-btn"><span class="add-new-btn-label">Add New</span></button>
     </form>
     <table class="mar-table">
         <thead>

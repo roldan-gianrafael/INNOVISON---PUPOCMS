@@ -97,7 +97,7 @@
 <div class="card manage-section">
     <h3>Manage Medical Conditions (Sub-categories)</h3>
 
-```
+
 <form action="{{ route('conditions.store') }}" method="POST" class="manage-form">
     @csrf
 
@@ -165,7 +165,7 @@
     @endforelse
     </tbody>
 </table>
-```
+
 
 </div>
 
@@ -174,7 +174,7 @@
 <div id="changeModal" class="modal-overlay">
     <div class="modal-box">
 
-```
+
     <h3>Change Category</h3>
     <p id="conditionDisplayName"></p>
 
@@ -197,7 +197,7 @@
     </form>
 
 </div>
-```
+
 
 </div>
 

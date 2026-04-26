@@ -225,7 +225,7 @@
     <table class="mar-table">
         <thead>
             <tr>
-                <th>Category</th>
+                <th>Categories</th>
                 <th>Condition Name</th>
                 <th style="text-align: center;">Action</th>
             </tr>

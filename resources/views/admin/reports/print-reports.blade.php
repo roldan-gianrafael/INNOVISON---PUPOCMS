@@ -118,13 +118,14 @@
         border: 1px solid #000; 
         padding: 10px 6px; 
         font-size: 11px; 
-        text-align: center; 
+        text-align: left; 
     }
 
     th { 
         background-color: #f2f2f2; 
         font-weight: bold; 
         text-transform: uppercase;
+        text-align: center;
     }
 
     .text-left { text-align: left; }

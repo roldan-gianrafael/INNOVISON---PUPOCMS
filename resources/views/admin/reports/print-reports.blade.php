@@ -7,9 +7,28 @@
 
     <style>
     /* 1. Print & Base Styles */
-    @media print { 
-        .no-print { display: none !important; } 
-        body { margin: 0; padding: 10px; }
+    @page {
+        margin: 115px 28px 85px;
+    }
+
+    @media print {
+        .no-print { display: none !important; }
+        body { margin: 0; padding: 0; }
+        .page-header,
+        .page-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+        }
+        .page-header {
+            top: -95px;
+        }
+        .page-footer {
+            bottom: -65px;
+        }
+        .report-shell {
+            margin: 0;
+        }
     }
     
     body { 
@@ -17,6 +36,60 @@
         color: #000; 
         line-height: 1.2; 
         margin: 40px; 
+    }
+
+    .report-shell {
+        position: relative;
+    }
+
+    .page-header {
+        display: none;
+        border-bottom: 2px solid #800000;
+        padding: 0 28px 10px;
+        background: #fff;
+    }
+
+    .page-header-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .page-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-header-left img {
+        width: 44px;
+        height: auto;
+    }
+
+    .page-header-copy {
+        line-height: 1.15;
+    }
+
+    .page-header-copy strong {
+        display: block;
+        font-size: 14px;
+        color: #800000;
+        letter-spacing: 0.35px;
+    }
+
+    .page-header-copy span {
+        display: block;
+        font-size: 10px;
+        color: #374151;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .page-header-meta {
+        font-size: 10px;
+        text-align: right;
+        line-height: 1.3;
     }
 
     /* 2. Header & Logo Layout */
@@ -109,6 +182,7 @@
     /* 4. Table Customization */
     table { 
         width: 100%; 
+        table-layout: fixed;
         border-collapse: collapse; 
         margin-top: 15px; 
         background: #fff; 
@@ -119,6 +193,9 @@
         padding: 10px 6px; 
         font-size: 11px; 
         text-align: left; 
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        vertical-align: top;
     }
 
     th { 
@@ -178,6 +255,40 @@
         color: #000;
     }
 
+    .page-footer {
+        display: none;
+        padding: 8px 28px 0;
+        background: #fff;
+        border-top: 2px solid #800000;
+        font-size: 9px;
+        color: #374151;
+    }
+
+    .page-footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-footer-copy {
+        line-height: 1.3;
+    }
+
+    .page-footer-motto {
+        font-weight: 800;
+        text-transform: uppercase;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    @media print {
+        .page-header,
+        .page-footer {
+            display: block;
+        }
+    }
+
     /* 6. UI Components (No-Print) */
     .no-print-bar { 
         background: #1e293b; 
@@ -208,8 +319,33 @@
 </head>
 <body>
 
+    <div class="page-header" aria-hidden="true">
+        <div class="page-header-inner">
+            <div class="page-header-left">
+                <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
+                <div class="page-header-copy">
+                    <strong>PUP TAGUIG</strong>
+                    <span>{{ strtoupper($title) }}</span>
+                </div>
+            </div>
+            <div class="page-header-meta">
+                <div>Medical Services Unit</div>
+                <div>{{ date('F d, Y') }}</div>
+            </div>
+        </div>
+    </div>
 
+    <div class="page-footer" aria-hidden="true">
+        <div class="page-footer-inner">
+            <div class="page-footer-copy">
+                General Santos Avenue, Lower Bicutan, Taguig City, Philippines 1632
+                <br>Direct Line (02) 8837 5658 to 60 | Website: www.pup.edu.ph | Email: taguig@pup.edu.ph
+            </div>
+            <div class="page-footer-motto">The Country's First PolytechnicU</div>
+        </div>
+    </div>
 
+    <div class="report-shell">
     <div class="no-print no-print-bar">
         <span><strong>Preview Mode:</strong> {{ $title }}</span>
         <div>
@@ -435,7 +571,7 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 50px;">ID</th>
+                    <th>ID</th>
                 <th>ITEM DESCRIPTION</th>
                 <th>CATEGORY</th>
                 <th>UNIT</th>
@@ -538,6 +674,7 @@
         <div class="footer-motto">
             THE COUNTRY'S FIRST POLYTECHNICU
         </div>
+    </div>
     </div>
 
 </body>

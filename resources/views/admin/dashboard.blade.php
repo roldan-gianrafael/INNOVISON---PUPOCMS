@@ -24,12 +24,30 @@
         border-radius: 16px;
         padding: 24px 20px;
         position: relative;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         min-height: 140px;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        z-index: 0;
+    }
+
+    .stat-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: 0;
     }
 
     .stat-card:hover {
@@ -37,10 +55,16 @@
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
     }
 
+    .stat-card:hover::after {
+        transform: translateX(135%);
+    }
+
     /* Distinct Colors for active states if needed, 
        but keeping them uniform looks more professional like the reference */
     
     .stat-label {
+        position: relative;
+        z-index: 1;
         font-size: 13px;
         font-weight: 500;
         color: #94a3b8; /* Muted gray text */
@@ -50,6 +74,8 @@
     }
 
     .stat-value {
+        position: relative;
+        z-index: 1;
         font-size: 38px;
         font-weight: 700;
         color: #fff;
@@ -59,6 +85,8 @@
 
     /* The "Pill" at the bottom (e.g. "Last 7 days") */
     .stat-badge {
+        position: relative;
+        z-index: 1;
         display: inline-block;
         font-size: 11px;
         font-weight: 600;

@@ -13,7 +13,56 @@
     .mar-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155; }
     
     .manage-section { background: #fdfdfd; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 10px; }
-    .btn-save { background: #70131B; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .btn-save {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        border: 1px solid #8f2230;
+        padding: 10px 16px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 800;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+    .btn-save::after,
+    .btn-change::after,
+    .btn-cancel::after,
+    .btn-remove::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+    .btn-save:hover,
+    .btn-change:hover,
+    .btn-cancel:hover,
+    .btn-remove:hover {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+    .btn-save:hover::after,
+    .btn-change:hover::after,
+    .btn-cancel:hover::after,
+    .btn-remove:hover::after {
+        transform: translateX(135%);
+    }
     .form-control { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
     .manage-form {
         display: grid;
@@ -44,17 +93,17 @@
         gap: 10px;
         position: relative;
         overflow: hidden;
-        background: #fef3c7;
-        color: #70131B;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
         padding: 11px 18px;
         border-radius: 999px;
         text-decoration: none;
         font-size: 14px;
         font-weight: 800;
-        border: 1px solid #facc15;
+        border: 1px solid #8f2230;
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.12),
-            0 10px 22px rgba(112, 19, 27, 0.12);
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
         transition: color .08s linear, transform .18s ease, box-shadow .18s ease, background .18s ease;
         z-index: 0;
     }
@@ -62,10 +111,15 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, #9f3341, #b74a58);
-        transform: scaleX(0);
-        transform-origin: left center;
-        transition: transform .26s ease;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
         z-index: -1;
     }
     .add-new-btn::before {
@@ -73,8 +127,8 @@
         width: 28px;
         height: 28px;
         border-radius: 999px;
-        background: linear-gradient(135deg, #70131B, #8f2230);
-        color: #ffffff;
+        background: #ffefb5;
+        color: #70131B;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -82,25 +136,29 @@
         font-weight: 900;
         letter-spacing: 0.04em;
         flex: 0 0 auto;
+        position: relative;
+        z-index: 1;
     }
     .add-new-btn-label {
         position: relative;
         z-index: 1;
         transition: color .08s linear;
+        color: #ffffff;
     }
     .add-new-btn:hover {
         transform: translateY(-1px);
+        border-color: #facc15;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
-        color: #70131B;
-        background: #fef3c7;
+        color: #ffffff;
+        background: linear-gradient(135deg, #70131B, #8f2230);
     }
     .add-new-btn:hover::after {
-        transform: scaleX(1);
+        transform: translateX(135%);
     }
     .add-new-btn:hover .add-new-btn-label {
-        color: #70131B;
+        color: #ffffff;
     }
     .table-action-cell {
         text-align: center;
@@ -117,9 +175,29 @@
     /* Modal Styles for .btn-change */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
 .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: min(560px, calc(100vw - 32px)); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-.btn-change { background: #8f2230; color: white; border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-right: 5px; }
-.btn-cancel { background: #e2e8f0; color: #475569; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
-.btn-filter { background: #70131B; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.btn-change,
+.btn-cancel,
+.btn-filter,
+.btn-remove {
+    background: linear-gradient(135deg, #70131B, #8f2230);
+    color: #ffffff;
+    border: 1px solid #8f2230;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 800;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 0 0 3px rgba(112, 19, 27, 0.12),
+        0 10px 20px rgba(112, 19, 27, 0.16);
+    transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    z-index: 0;
+    text-decoration: none;
+}
+.btn-change { margin-right: 5px; }
+.btn-filter { font-weight: 800; }
 
     @media (max-width: 900px) {
         .manage-form {
@@ -187,7 +265,7 @@
             <form action="{{ route('conditions.destroy', $cond->id) }}" method="POST" onsubmit="return confirm('Delete this condition?')">
                 @csrf 
                 @method('DELETE')
-                <button type="submit" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight: bold; font-size: 12px; padding: 4px 0;">Remove</button>
+                <button type="submit" class="btn-remove">Remove</button>
             </form>
         </div>
     </td>

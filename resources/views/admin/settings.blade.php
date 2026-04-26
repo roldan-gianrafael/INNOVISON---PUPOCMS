@@ -452,11 +452,42 @@
         background: linear-gradient(135deg, var(--stg-maroon), #9a1010 48%, var(--stg-maroon-deep));
         color: #fff;
         padding: 13px 24px;
-        border: none;
-        border-radius: 16px;
+        border: 1px solid #8f2230;
+        border-radius: 999px;
         font-weight: 900;
-        box-shadow: 0 16px 30px rgba(127,0,0,0.22);
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
         cursor: pointer;
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+    .btn-save::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+    .btn-save:hover {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+    .btn-save:hover::after {
+        transform: translateX(135%);
     }
 
     .modal-overlay {
@@ -582,6 +613,50 @@
     .modal-body .field-help {
         margin: 8px 0 0;
         padding-left: 2px;
+    }
+    .modal-section {
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px solid rgba(127,0,0,0.10);
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
+        box-shadow: 0 12px 26px rgba(15,23,42,0.06);
+    }
+    .modal-section + .modal-section {
+        margin-top: 18px;
+    }
+    .modal-section-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(127, 0, 0, 0.08);
+        color: var(--stg-maroon);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.10em;
+        text-transform: uppercase;
+    }
+    .modal-section-kicker::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--stg-maroon);
+        box-shadow: 0 0 0 4px rgba(127,0,0,0.10);
+    }
+    .modal-section-title {
+        margin: 0 0 6px;
+        color: var(--stg-maroon);
+        font-size: 18px;
+        font-weight: 900;
+    }
+    .modal-section-copy {
+        margin: 0 0 14px;
+        color: var(--stg-muted);
+        font-size: 13px;
+        line-height: 1.6;
     }
 
     .alert {
@@ -765,6 +840,25 @@
     html[data-theme="dark"] .modal-body .field select:focus {
         border-color: #ffb8c6;
         box-shadow: 0 0 0 4px rgba(255,184,198,0.10);
+    }
+    html[data-theme="dark"] .modal-section {
+        background: rgba(255,255,255,0.05);
+        border-color: rgba(255,255,255,0.08);
+        box-shadow: 0 18px 34px rgba(0,0,0,0.18);
+    }
+    html[data-theme="dark"] .modal-section-kicker {
+        background: rgba(255,255,255,0.08);
+        color: #ffd7df;
+    }
+    html[data-theme="dark"] .modal-section-kicker::before {
+        background: #ffb8c6;
+        box-shadow: 0 0 0 4px rgba(255,184,198,0.10);
+    }
+    html[data-theme="dark"] .modal-section-title {
+        color: #ffd7df;
+    }
+    html[data-theme="dark"] .modal-section-copy {
+        color: #d7b3bc;
     }
     html[data-theme="dark"] .alert-success {
         background: rgba(22, 101, 52, 0.18);
@@ -1078,106 +1172,118 @@
             <form action="{{ url('/admin/profile/update') }}" method="POST">
                 @csrf @method('PUT')
                 <div class="modal-body">
-                    <div class="field-grid three">
-                        <div class="field">
-                            <label>Admin ID</label>
-                            <input type="text" value="{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}" disabled>
-                        </div>
-                        <div class="field">
-                            <label>First Name</label>
-                            <input type="text" name="first_name" value="{{ old('first_name', $cmsProfile['first_name'] ?? '') }}" required>
-                        </div>
-                        <div class="field">
-                            <label>Middle Name</label>
-                            <input type="text" name="middle_name" value="{{ old('middle_name', $cmsProfile['middle_name'] ?? '') }}" placeholder="Middle name">
-                        </div>
-                        <div class="field">
-                            <label>Last Name</label>
-                            <input type="text" name="last_name" value="{{ old('last_name', $cmsProfile['last_name'] ?? '') }}" required>
-                        </div>
-                        <div class="field">
-                            <label>Suffix Name</label>
-                            <input type="text" name="suffix_name" value="{{ old('suffix_name', $cmsProfile['suffix_name'] ?? '') }}" placeholder="Jr., Sr., III">
-                        </div>
-                        <div class="field">
-                            <label>Email</label>
-                            <input type="email" name="email" value="{{ old('email', $cmsProfile['email'] ?? ($admin->email ?? '')) }}" required>
-                        </div>
-                    </div>
+                    <section class="modal-section">
+                        <div class="modal-section-kicker">Profile Details</div>
+                        <h4 class="modal-section-title">Personal Information</h4>
+                        <p class="modal-section-copy">Update the main identity details shown in the CMS Admin Profile card.</p>
 
-                    <div class="field-grid two" style="margin-top:16px;">
-                        <div class="field">
-                            <label>Birthday</label>
-                            <input type="date" id="cmsBirthdayInput" name="birthday" value="{{ old('birthday', $cmsProfile['birthday'] ?? '') }}">
+                        <div class="field-grid three">
+                            <div class="field">
+                                <label>Admin ID</label>
+                                <input type="text" value="{{ !empty($cmsProfile['admin_id']) ? str_pad((string) $cmsProfile['admin_id'], 3, '0', STR_PAD_LEFT) : 'N/A' }}" disabled>
+                            </div>
+                            <div class="field">
+                                <label>First Name</label>
+                                <input type="text" name="first_name" value="{{ old('first_name', $cmsProfile['first_name'] ?? '') }}" required>
+                            </div>
+                            <div class="field">
+                                <label>Middle Name</label>
+                                <input type="text" name="middle_name" value="{{ old('middle_name', $cmsProfile['middle_name'] ?? '') }}" placeholder="Middle name">
+                            </div>
+                            <div class="field">
+                                <label>Last Name</label>
+                                <input type="text" name="last_name" value="{{ old('last_name', $cmsProfile['last_name'] ?? '') }}" required>
+                            </div>
+                            <div class="field">
+                                <label>Suffix Name</label>
+                                <input type="text" name="suffix_name" value="{{ old('suffix_name', $cmsProfile['suffix_name'] ?? '') }}" placeholder="Jr., Sr., III">
+                            </div>
+                            <div class="field">
+                                <label>Email</label>
+                                <input type="email" name="email" value="{{ old('email', $cmsProfile['email'] ?? ($admin->email ?? '')) }}" required>
+                            </div>
                         </div>
-                        <div class="field">
-                            <label>Age</label>
-                            <input type="text" id="cmsAgeInput" value="{{ old('age', $cmsProfile['age'] ?? '') }}" readonly>
-                            <p class="field-help">Auto-calculated from birthday.</p>
-                        </div>
-                    </div>
 
-                    <div class="field-grid two">
-                        <div class="field">
-                            <label>Address</label>
-                            <input type="text" name="address" value="{{ old('address', $cmsProfile['address'] ?? '') }}" placeholder="Complete address">
+                        <div class="field-grid two" style="margin-top:16px;">
+                            <div class="field">
+                                <label>Birthday</label>
+                                <input type="date" id="cmsBirthdayInput" name="birthday" value="{{ old('birthday', $cmsProfile['birthday'] ?? '') }}">
+                            </div>
+                            <div class="field">
+                                <label>Age</label>
+                                <input type="text" id="cmsAgeInput" value="{{ old('age', $cmsProfile['age'] ?? '') }}" readonly>
+                                <p class="field-help">Auto-calculated from birthday.</p>
+                            </div>
                         </div>
-                        <div class="field">
-                            <label>Contact Number</label>
-                            <input type="text" name="contact_number" value="{{ old('contact_number', $cmsProfile['contact_number'] ?? '') }}" placeholder="Contact number">
-                        </div>
-                    </div>
 
-                    <div class="field-grid two">
-                        <div class="field">
-                            <label>Gender</label>
-                            <input type="text" name="gender" value="{{ old('gender', $cmsProfile['gender'] ?? '') }}" placeholder="Gender">
+                        <div class="field-grid two">
+                            <div class="field">
+                                <label>Gender</label>
+                                <input type="text" name="gender" value="{{ old('gender', $cmsProfile['gender'] ?? '') }}" placeholder="Gender">
+                            </div>
+                            <div class="field">
+                                <label>Civil Status</label>
+                                <input type="text" name="civil_status" value="{{ old('civil_status', $cmsProfile['civil_status'] ?? '') }}" placeholder="Civil status">
+                            </div>
                         </div>
-                        <div class="field">
-                            <label>Civil Status</label>
-                            <input type="text" name="civil_status" value="{{ old('civil_status', $cmsProfile['civil_status'] ?? '') }}" placeholder="Civil status">
-                        </div>
-                    </div>
+                    </section>
 
-                    <div class="field-grid two">
-                        <div class="field">
-                            <label>Emergency Contact Person</label>
-                            <input type="text" name="emergency_contact_person" value="{{ old('emergency_contact_person', $cmsProfile['emergency_contact_person'] ?? '') }}" placeholder="Emergency contact person">
-                        </div>
-                        <div class="field">
-                            <label>Emergency Contact No.</label>
-                            <input type="text" name="emergency_contact_no" value="{{ old('emergency_contact_no', $cmsProfile['emergency_contact_no'] ?? ($cmsProfile['contact_number'] ?? '')) }}" placeholder="Emergency contact number">
-                        </div>
-                    </div>
+                    <section class="modal-section">
+                        <div class="modal-section-kicker">Clinic Access</div>
+                        <h4 class="modal-section-title">Contact, Office, and Security</h4>
+                        <p class="modal-section-copy">Keep clinic-facing contact details and login-related settings in one place.</p>
 
-                    <div class="field-grid two">
-                        <div class="field">
-                            <label>Office</label>
-                            <input type="text" name="office" value="{{ old('office', $cmsProfile['office'] ?? 'Admission Office') }}" placeholder="Office">
+                        <div class="field-grid two">
+                            <div class="field">
+                                <label>Address</label>
+                                <input type="text" name="address" value="{{ old('address', $cmsProfile['address'] ?? '') }}" placeholder="Complete address">
+                            </div>
+                            <div class="field">
+                                <label>Contact Number</label>
+                                <input type="text" name="contact_number" value="{{ old('contact_number', $cmsProfile['contact_number'] ?? '') }}" placeholder="Contact number">
+                            </div>
                         </div>
-                        <div class="field">
-                            <label>Status</label>
-                            <select name="status">
-                                <option value="active" {{ old('status', $cmsProfile['status'] ?? 'active') === 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="inactive" {{ old('status', $cmsProfile['status'] ?? 'active') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div style="margin: 6px 0 4px; padding-top: 10px; border-top: 1px solid rgba(127,0,0,0.10);">
-                        <p class="field-help" style="margin:0; font-weight:900; letter-spacing:0.06em; text-transform:uppercase;">Change Password (Optional)</p>
-                    </div>
+                        <div class="field-grid two">
+                            <div class="field">
+                                <label>Emergency Contact Person</label>
+                                <input type="text" name="emergency_contact_person" value="{{ old('emergency_contact_person', $cmsProfile['emergency_contact_person'] ?? '') }}" placeholder="Emergency contact person">
+                            </div>
+                            <div class="field">
+                                <label>Emergency Contact No.</label>
+                                <input type="text" name="emergency_contact_no" value="{{ old('emergency_contact_no', $cmsProfile['emergency_contact_no'] ?? ($cmsProfile['contact_number'] ?? '')) }}" placeholder="Emergency contact number">
+                            </div>
+                        </div>
 
-                    <div class="field-grid two">
-                        <div class="field">
-                            <label>New Password</label>
-                            <input type="password" name="password" placeholder="Leave blank to keep current">
+                        <div class="field-grid two">
+                            <div class="field">
+                                <label>Office</label>
+                                <input type="text" name="office" value="{{ old('office', $cmsProfile['office'] ?? 'Admission Office') }}" placeholder="Office">
+                            </div>
+                            <div class="field">
+                                <label>Status</label>
+                                <select name="status">
+                                    <option value="active" {{ old('status', $cmsProfile['status'] ?? 'active') === 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ old('status', $cmsProfile['status'] ?? 'active') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="field">
-                            <label>Confirm Password</label>
-                            <input type="password" name="password_confirmation" placeholder="Retype password">
+
+                        <div style="margin: 6px 0 4px; padding-top: 10px; border-top: 1px solid rgba(127,0,0,0.10);">
+                            <p class="field-help" style="margin:0; font-weight:900; letter-spacing:0.06em; text-transform:uppercase;">Change Password (Optional)</p>
                         </div>
-                    </div>
+
+                        <div class="field-grid two">
+                            <div class="field">
+                                <label>New Password</label>
+                                <input type="password" name="password" placeholder="Leave blank to keep current">
+                            </div>
+                            <div class="field">
+                                <label>Confirm Password</label>
+                                <input type="password" name="password_confirmation" placeholder="Retype password">
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
                 <div class="modal-actions">

@@ -242,25 +242,73 @@
     .btn-add-walkin {
         display: inline-flex;
         align-items: center;
-        background-color: #8B0000; 
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #70131B, #8f2230);
         color: #ffffff !important; 
-        padding: 12px 24px;
-        border-radius: 10px;
+        padding: 11px 18px;
+        border-radius: 999px;
         text-decoration: none;
-        font-weight: 700;
-        font-size: 16px;
-        box-shadow: 0 4px 15px rgba(139, 0, 0, 0.3);
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
+        font-weight: 800;
+        font-size: 14px;
+        white-space: nowrap;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        border: 1px solid #8f2230;
+        z-index: 0;
     }
 
-    .btn-icon { font-size: 20px; margin-right: 10px; line-height: 1; }
+    .btn-add-walkin::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+
+    .btn-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: #ffefb5;
+        color: #70131B;
+        font-size: 15px;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+        margin-right: 0;
+    }
+
+    .btn-text {
+        position: relative;
+        z-index: 1;
+    }
 
     .btn-add-walkin:hover {
-        background-color: #a50000;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(139, 0, 0, 0.4);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
         text-decoration: none;
+    }
+    .btn-add-walkin:hover::after {
+        transform: translateX(135%);
     }
 
     .appointment-highlight-row {

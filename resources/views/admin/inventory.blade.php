@@ -23,8 +23,54 @@
     /* Controls */
     .controls { display: flex; justify-content: space-between; margin-bottom: 20px; }
     .inventory-page-title { margin: 0; color: #000000; }
-    .btn-add { background: #8B0000; color: white; padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
-    .btn-add:hover { background: #600000; }
+    .btn-add,
+    .inventory-btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        padding: 11px 18px;
+        border-radius: 999px;
+        border: 1px solid #8f2230;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+    .btn-add::after,
+    .inventory-btn-cancel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+    .btn-add:hover,
+    .inventory-btn-cancel:hover {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+    .btn-add:hover::after,
+    .inventory-btn-cancel:hover::after {
+        transform: translateX(135%);
+    }
 
     /* Status Badges */
     .status { padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
@@ -277,7 +323,7 @@
                     </div>
 
                     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                        <button type="button" onclick="closeModal()" style="padding: 8px 16px; border: none; background: #eee; cursor: pointer; border-radius: 6px;">Cancel</button>
+                        <button type="button" class="inventory-btn-cancel" onclick="closeModal()">Cancel</button>
                         <button type="submit" class="btn-add">Save Item</button>
                     </div>
                 </form>

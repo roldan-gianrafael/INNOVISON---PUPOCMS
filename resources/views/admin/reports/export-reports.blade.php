@@ -103,10 +103,15 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, #9f3341, #b74a58);
-        transform: scaleX(0);
-        transform-origin: left center;
-        transition: transform .26s ease;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
         z-index: -1;
     }
 
@@ -116,10 +121,11 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
+        color: #ffffff;
     }
 
     .btn-generate:hover::after {
-        transform: scaleX(1);
+        transform: translateX(135%);
     }
 
     /* Dynamic Border & Button Colors */

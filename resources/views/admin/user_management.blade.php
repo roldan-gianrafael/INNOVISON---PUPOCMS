@@ -532,33 +532,64 @@
     }
 
     .um-btn {
-        border: none;
-        border-radius: 12px;
-        padding: 11px 16px;
-        font-weight: 700;
+        border: 1px solid #8f2230;
+        border-radius: 999px;
+        padding: 11px 18px;
+        font-weight: 800;
         cursor: pointer;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+        position: relative;
+        overflow: hidden;
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+
+    .um-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
     }
 
     .um-btn:hover {
         transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+
+    .um-btn:hover::after {
+        transform: translateX(135%);
     }
 
     .um-btn-primary {
-        background: linear-gradient(135deg, #800000, #b11b1b);
+        background: linear-gradient(135deg, #70131B, #8f2230);
         color: #fff;
-        box-shadow: 0 12px 20px rgba(128, 0, 0, 0.24);
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
     }
 
     .um-btn-soft {
-        background: #f8fafc;
-        color: #111827;
-        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
     }
 
     .um-table-wrap {

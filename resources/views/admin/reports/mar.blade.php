@@ -121,7 +121,7 @@
                 rgba(255, 239, 181, 0.14) 72%,
                 rgba(255, 248, 196, 0) 100%);
         transform: translateX(-135%);
-        transition: transform 2s ease;
+        transition: transform 1.5s ease;
         z-index: -1;
     }
     .mar-manage-btn::before {
@@ -179,26 +179,54 @@
     .gad-section-row td { background: linear-gradient(135deg, #70131B, #8f2230); color: #ffffff !important; font-weight: 800; }
     .report-switcher { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 8px; }
     .report-switch-btn {
-        border: 1px solid #facc15;
-        background: #fff7db;
-        color: #70131B;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
         border-radius: 999px;
         padding: 10px 14px;
         font-size: 13px;
         font-weight: 800;
         cursor: pointer;
-        transition: .18s ease;
-        box-shadow: 0 8px 18px rgba(112, 19, 27, 0.08);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        z-index: 0;
+    }
+    .report-switch-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
     }
     .report-switch-btn:hover {
         transform: translateY(-1px);
-        background: #ffefb5;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+    .report-switch-btn:hover::after {
+        transform: translateX(135%);
     }
     .report-switch-btn.is-active {
         background: linear-gradient(135deg, #70131B, #8f2230);
         color: #fff;
-        border-color: #70131B;
-        box-shadow: 0 12px 24px rgba(112, 19, 27, 0.18);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
     }
     .report-panel {
         display: none;

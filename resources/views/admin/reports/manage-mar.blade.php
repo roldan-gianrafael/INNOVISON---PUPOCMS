@@ -169,7 +169,8 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        white-space: nowrap;
     }
 
     /* Modal Styles for .btn-change */
@@ -195,8 +196,16 @@
     transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     z-index: 0;
     text-decoration: none;
+    min-width: 92px;
 }
-.btn-change { margin-right: 5px; }
+.btn-change {
+    background: linear-gradient(135deg, #e5e7eb, #cbd5e1);
+    color: #334155;
+    border-color: #cbd5e1;
+    box-shadow:
+        0 0 0 3px rgba(148, 163, 184, 0.12),
+        0 10px 20px rgba(148, 163, 184, 0.16);
+}
 .btn-filter { font-weight: 800; }
 
     @media (max-width: 900px) {

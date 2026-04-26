@@ -17,8 +17,23 @@ class MedicalConditionController extends Controller
             'category_id' => 'required|exists:categories,id',
         ]);
 
+        $normalizedName = mb_strtolower(trim((string) $request->name));
+
+        $duplicateExists = MedicalConditions::query()
+            ->whereRaw('LOWER(TRIM(name)) = ?', [$normalizedName])
+            ->exists();
+
+        if ($duplicateExists) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors([
+                    'name' => 'This medical condition already exists in the MAR list.',
+                ]);
+        }
+
         MedicalConditions::create([
-            'name' => $request->name,
+            'name' => trim((string) $request->name),
             'category_id' => $request->category_id,
         ]);
 

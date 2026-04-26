@@ -95,17 +95,17 @@
         position: relative;
         overflow: hidden;
         white-space: nowrap;
-        background: #fef3c7;
-        color: #70131B;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
         padding: 11px 18px;
         border-radius: 999px;
         text-decoration: none;
         font-size: 14px;
         font-weight: 800;
-        border: 1px solid #facc15;
+        border: 1px solid #8f2230;
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.12),
-            0 10px 22px rgba(112, 19, 27, 0.12);
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
         transition: color .08s linear, transform .18s ease, box-shadow .18s ease, background .18s ease;
         z-index: 0;
     }
@@ -124,8 +124,8 @@
         width: 28px;
         height: 28px;
         border-radius: 999px;
-        background: linear-gradient(135deg, #70131B, #8f2230);
-        color: #ffffff;
+        background: #ffefb5;
+        color: #70131B;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -140,14 +140,16 @@
         position: relative;
         z-index: 1;
         transition: color .08s linear;
+        color: inherit;
     }
     .mar-manage-btn:hover {
         transform: translateY(-1px);
+        border-color: #facc15;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
         color: #70131B;
-        background: #fef3c7;
+        background: linear-gradient(135deg, #70131B, #8f2230);
     }
     .mar-manage-btn:hover .mar-manage-btn-label {
         color: #70131B;

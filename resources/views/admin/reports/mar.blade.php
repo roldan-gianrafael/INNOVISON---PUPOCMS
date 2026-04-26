@@ -105,7 +105,7 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.12),
             0 10px 22px rgba(112, 19, 27, 0.12);
-        transition: color .18s ease, transform .18s ease, box-shadow .18s ease, background .18s ease;
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, background .18s ease;
         z-index: 0;
     }
     .mar-manage-btn::after {
@@ -133,6 +133,11 @@
         letter-spacing: 0.04em;
         flex: 0 0 auto;
     }
+    .mar-manage-btn-label {
+        position: relative;
+        z-index: 1;
+        transition: color .08s linear;
+    }
     .mar-manage-btn:hover {
         transform: translateY(-1px);
         box-shadow:
@@ -140,6 +145,9 @@
             0 14px 24px rgba(112, 19, 27, 0.16);
         color: #ffffff;
         background: #ffffff;
+    }
+    .mar-manage-btn:hover .mar-manage-btn-label {
+        color: #ffffff;
     }
     .mar-manage-btn:hover::after {
         transform: scaleX(1);
@@ -241,7 +249,7 @@
         @if($isAdminLike)
         <div class="mar-top-actions">
             <a href="{{ route('admin.reports.manage-mar', ['month' => $month]) }}" class="mar-manage-btn">
-                Manage Medical Categories
+                <span class="mar-manage-btn-label">Manage Medical Categories</span>
             </a>
         </div>
         @endif

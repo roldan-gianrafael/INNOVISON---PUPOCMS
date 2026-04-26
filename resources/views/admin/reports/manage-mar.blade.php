@@ -4,7 +4,8 @@
 
 @push('styles')
 <style>
-/* ===================== CARD ===================== */
+
+/* ================= CARD ================= */
 .card {
     background: #fff;
     border-radius: 12px;
@@ -13,7 +14,7 @@
     border: 1px solid #f0f0f0;
 }
 
-/* ===================== TABLE ===================== */
+/* ================= TABLE ================= */
 .mar-table {
     width: 100%;
     border-collapse: collapse;
@@ -35,15 +36,38 @@
     color: #334155;
 }
 
-/* ===================== INPUTS (YOUR REQUEST) ===================== */
+/* ================= FORM ================= */
+.manage-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 14px;
+    align-items: end;
+    margin-bottom: 20px;
+}
+
+/* labels */
+.input-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* wrapper */
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ================= INPUT (YELLOW + ROUND) ================= */
 .form-control {
-    width: 100%;
+    height: 44px;
     padding: 12px 18px;
     border-radius: 999px;
     border: 2px solid #facc15;
     background: #fff;
     font-size: 14px;
-
     box-shadow: 0 4px 12px rgba(250, 204, 21, 0.15);
     transition: 0.25s ease;
 }
@@ -54,16 +78,7 @@
     box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
 }
 
-/* ===================== FORM LAYOUT ===================== */
-.manage-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-/* ===================== BUTTON SAVE ===================== */
+/* ================= ADD BUTTON ================= */
 .btn-save {
     height: 44px;
     padding: 0 20px;
@@ -75,7 +90,7 @@
     background: linear-gradient(135deg, #70131B, #8f2230);
 }
 
-/* ===================== ACTION BUTTON FIX (IMPORTANT) ===================== */
+/* ================= ACTION BUTTONS ================= */
 .action-wrapper {
     display: flex;
     align-items: center;
@@ -83,14 +98,38 @@
     gap: 8px;
 }
 
-/* IMPORTANT: fix form spacing issue */
 .inline-form {
     margin: 0;
     display: inline-flex;
 }
 
-/* shared button style */
-.btn-change,
+/* ================= CHANGE (GREY) ================= */
+.btn-change {
+    height: 38px;
+    min-width: 110px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+
+    border: 1px solid #cbd5e1;
+    background: #e5e7eb;
+    color: #334155;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-change:hover {
+    background: #d1d5db;
+    transform: translateY(-1px);
+}
+
+/* ================= REMOVE (RED) ================= */
 .btn-remove {
     height: 38px;
     min-width: 110px;
@@ -102,23 +141,21 @@
     border-radius: 999px;
     font-size: 13px;
     font-weight: 700;
+
     border: none;
-    cursor: pointer;
-}
-
-/* change */
-.btn-change {
-    background: #e2e8f0;
-    color: #334155;
-}
-
-/* remove */
-.btn-remove {
     background: #70131B;
     color: #fff;
+
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
-/* ===================== MODAL ===================== */
+.btn-remove:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+/* ================= MODAL ================= */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -135,6 +172,26 @@
     width: 100%;
     max-width: 500px;
 }
+
+/* ================= CANCEL BUTTON ================= */
+.btn-cancel {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+
+    border: 1px solid #cbd5e1;
+    background: #e5e7eb;
+    color: #334155;
+
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    background: #d1d5db;
+}
+
 </style>
 @endpush
 
@@ -148,18 +205,28 @@
     <form action="{{ route('conditions.store') }}" method="POST" class="manage-form">
         @csrf
 
-        <select name="category_id" class="form-control" required>
-            <option value="">Select Category</option>
-            @foreach($categoryList as $c)
-                <option value="{{ $c->id }}">
-                    Category {{ $c->code }} - {{ $c->name }}
-                </option>
-            @endforeach
-        </select>
+        <div class="input-group">
+            <label>Category</label>
+            <select name="category_id" class="form-control" required>
+                <option value="">Select Category</option>
+                @foreach($categoryList as $c)
+                    <option value="{{ $c->id }}">
+                        Category {{ $c->code }} - {{ $c->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-        <input type="text" name="name" class="form-control" placeholder="Condition Name" required>
+        <div class="input-group">
+            <label>Condition Name</label>
+            <input type="text" name="name" class="form-control"
+                   placeholder="e.g. Fever, Headache" required>
+        </div>
 
-        <button type="submit" class="btn-save">Add</button>
+        <div class="input-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn-save">Add New</button>
+        </div>
     </form>
 
     {{-- TABLE --}}
@@ -236,7 +303,7 @@
             </select>
 
             <div style="margin-top:20px; text-align:right;">
-                <button type="button" onclick="closeChangeModal()">Cancel</button>
+                <button type="button" class="btn-cancel" onclick="closeChangeModal()">Cancel</button>
                 <button type="submit" class="btn-save">Save</button>
             </div>
         </form>

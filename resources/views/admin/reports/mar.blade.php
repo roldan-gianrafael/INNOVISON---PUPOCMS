@@ -121,7 +121,7 @@
                 rgba(255, 239, 181, 0.14) 72%,
                 rgba(255, 248, 196, 0) 100%);
         transform: translateX(-135%);
-        transition: transform 1s ease;
+        transition: transform 2s ease;
         z-index: -1;
     }
     .mar-manage-btn::before {

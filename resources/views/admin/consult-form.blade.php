@@ -229,7 +229,7 @@
                         <option value="coc_ijt" {{ old('certificate_type') === 'coc_ijt' ? 'selected' : '' }}>COC for IJT</option>
                         <option value="coc_ladderized" {{ old('certificate_type') === 'coc_ladderized' ? 'selected' : '' }}>COC for Ladderized</option>
                     </select>
-                    <small style="color: #000; font-size: 11px;">If Excused Letter is selected, the chosen MAR condition category will also be used in Part II of the MAR report.</small>
+                    <small style="color: #000; font-size: 11px;"></small>
                 </div>
             </div>
 

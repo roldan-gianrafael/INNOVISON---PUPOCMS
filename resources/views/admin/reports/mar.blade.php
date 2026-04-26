@@ -140,7 +140,7 @@
         position: relative;
         z-index: 1;
         transition: color .08s linear;
-        color: inherit;
+        color: #ffffff;
     }
     .mar-manage-btn:hover {
         transform: translateY(-1px);
@@ -148,11 +148,11 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
-        color: #70131B;
+        color: #ffffff;
         background: linear-gradient(135deg, #70131B, #8f2230);
     }
     .mar-manage-btn:hover .mar-manage-btn-label {
-        color: #70131B;
+        color: #ffffff;
     }
     .mar-manage-btn:hover::after {
         transform: scaleX(1);

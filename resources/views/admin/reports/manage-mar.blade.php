@@ -62,7 +62,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: #ffefb5;
+        background: linear-gradient(135deg, #9f3341, #b74a58);
         transform: scaleX(0);
         transform-origin: left center;
         transition: transform .26s ease;

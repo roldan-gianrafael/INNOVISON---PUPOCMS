@@ -155,7 +155,7 @@
         z-index: -1;
     }
     .feedback-btn.primary::after {
-        background: #ffefb5;
+        background: linear-gradient(135deg, #9f3341, #b74a58);
     }
     .feedback-btn.secondary::after {
         background: #dbe3ee;

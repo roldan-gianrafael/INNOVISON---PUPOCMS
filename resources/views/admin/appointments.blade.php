@@ -380,7 +380,7 @@
                 <tr>
                     <th>Student</th>
                     <th>Student Number</th>
-                    <th>Type</th> <th>Service</th>
+                    <th>Appointment Type</th> <th>Service</th>
                     <th>Date & Time</th>
                     <th>Status</th>
                     <th>Actions</th>

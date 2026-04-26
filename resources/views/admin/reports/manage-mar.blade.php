@@ -62,7 +62,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, #70131B 0%, #8f2230 32%, #facc15 72%, #f59e0b 100%);
+        background: #ffefb5;
         transform: scaleX(0);
         transform-origin: left center;
         transition: transform .26s ease;
@@ -93,14 +93,14 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
-        color: #ffffff;
+        color: #70131B;
         background: #fef3c7;
     }
     .add-new-btn:hover::after {
         transform: scaleX(1);
     }
     .add-new-btn:hover .add-new-btn-label {
-        color: #ffffff;
+        color: #70131B;
     }
     .table-action-cell {
         text-align: center;

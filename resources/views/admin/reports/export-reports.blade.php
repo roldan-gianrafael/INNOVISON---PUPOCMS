@@ -78,31 +78,59 @@
     /* Buttons & Links */
     .btn-generate {
         width: 100%;
-        border: none;
-        padding: 10px;
-        border-radius: 6px;
+        border: 1px solid #8f2230;
+        padding: 11px 16px;
+        border-radius: 999px;
         cursor: pointer;
-        font-weight: bold;
-        color: white;
+        font-weight: 800;
+        color: #ffffff;
         text-align: center;
         text-decoration: none;
-        display: block;
-        transition: opacity 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+
+    .btn-generate::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: #ffefb5;
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform .26s ease;
+        z-index: -1;
     }
 
     .btn-generate:hover {
-        opacity: 0.9;
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+
+    .btn-generate:hover::after {
+        transform: scaleX(1);
     }
 
     /* Dynamic Border & Button Colors */
     .border-mar { border-top: 5px solid #800000; }
-    .bg-mar { background: #800000; }
+    .bg-mar { background: linear-gradient(135deg, #70131B, #8f2230); }
 
     .border-inventory { border-top: 5px solid #800000; }
-    .bg-inventory { background: #800000; }
+    .bg-inventory { background: linear-gradient(135deg, #70131B, #8f2230); }
 
     .border-appointment { border-top: 5px solid #800000; }
-    .bg-appointment { background: #800000; }
+    .bg-appointment { background: linear-gradient(135deg, #70131B, #8f2230); }
 
 </style>
 

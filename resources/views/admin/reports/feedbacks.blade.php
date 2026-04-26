@@ -117,20 +117,68 @@
         align-items: center;
         justify-content: center;
         min-height: 44px;
-        border-radius: 12px;
-        padding: 0 16px;
+        border-radius: 999px;
+        padding: 0 18px;
         text-decoration: none;
         font-weight: 800;
         cursor: pointer;
-        border: none;
+        border: 1px solid transparent;
+        position: relative;
+        overflow: hidden;
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
     }
     .feedback-btn.primary {
-        background: #7f1d2d;
+        background: linear-gradient(135deg, #70131B, #8f2230);
         color: #ffffff;
+        border-color: #8f2230;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
     }
     .feedback-btn.secondary {
         background: #eef2f7;
         color: #334155;
+        border-color: #cbd5e1;
+        box-shadow:
+            0 0 0 3px rgba(148, 163, 184, 0.10),
+            0 10px 20px rgba(148, 163, 184, 0.14);
+    }
+    .feedback-btn.primary::after,
+    .feedback-btn.secondary::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform .26s ease;
+        z-index: -1;
+    }
+    .feedback-btn.primary::after {
+        background: #ffefb5;
+    }
+    .feedback-btn.secondary::after {
+        background: #dbe3ee;
+    }
+    .feedback-btn:hover {
+        transform: translateY(-1px);
+    }
+    .feedback-btn.primary:hover {
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+        color: #ffffff;
+    }
+    .feedback-btn.secondary:hover {
+        border-color: #94a3b8;
+        box-shadow:
+            0 0 0 3px rgba(148, 163, 184, 0.14),
+            0 14px 24px rgba(148, 163, 184, 0.18);
+        color: #334155;
+    }
+    .feedback-btn:hover::after {
+        transform: scaleX(1);
     }
     .clinic-score-block {
         margin-top: 18px;

@@ -38,6 +38,10 @@
         margin: 40px; 
     }
 
+    .pdf-mode .no-print {
+        display: none !important;
+    }
+
     .report-shell {
         position: relative;
     }
@@ -206,6 +210,14 @@
     }
 
     .text-left { text-align: left; }
+    .mar-report-table col:first-child {
+        width: 38%;
+    }
+
+    .mar-report-table col.metric-col {
+        width: 12.4%;
+    }
+
     .bg-category { 
         background-color: #f9f9f9; 
         font-weight: bold; 
@@ -317,7 +329,7 @@
     }
 </style>
 </head>
-<body>
+<body class="{{ !empty($isPdf) ? 'pdf-mode' : '' }}">
 
     <div class="page-header" aria-hidden="true">
         <div class="page-header-inner">
@@ -382,7 +394,15 @@
     </div>
 
     @if($type == 'mar')
-        <table>
+        <table class="mar-report-table">
+            <colgroup>
+                <col>
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+            </colgroup>
             <thead>
                 <tr>
                     <th rowspan="2">MEDICAL CONDITIONS / SERVICES</th>
@@ -465,7 +485,15 @@
             </tbody>
         </table>
 
-        <table style="margin-top: 28px;">
+        <table class="mar-report-table" style="margin-top: 28px;">
+            <colgroup>
+                <col>
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+            </colgroup>
             <thead>
                 <tr>
                     <th>GAD (CONSULTATION)</th>
@@ -490,7 +518,15 @@
             </tbody>
         </table>
 
-        <table style="margin-top: 28px;">
+        <table class="mar-report-table" style="margin-top: 28px;">
+            <colgroup>
+                <col>
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+            </colgroup>
             <thead>
                 <tr>
                     <th>GAD (OJT/MEDICAL COMPLIANCE/MEDICAL FOR PROMOTION/EXCUSED LETTER)</th>
@@ -515,7 +551,15 @@
             </tbody>
         </table>
 
-        <table style="margin-top: 28px;">
+        <table class="mar-report-table" style="margin-top: 28px;">
+            <colgroup>
+                <col>
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+            </colgroup>
             <thead>
                 <tr>
                     <th>GAD (TRIAGE ONLINE)</th>
@@ -540,7 +584,15 @@
             </tbody>
         </table>
 
-        <table style="margin-top: 28px;">
+        <table class="mar-report-table" style="margin-top: 28px;">
+            <colgroup>
+                <col>
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+                <col class="metric-col">
+            </colgroup>
             <thead>
                 <tr>
                     <th>GAD (CONSULTATION + OJT/MEDICAL COMPLIANCE/MEDICAL FOR PROMOTION + TRIAGE)</th>

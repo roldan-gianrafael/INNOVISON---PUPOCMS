@@ -122,6 +122,7 @@
             </div>
             <form action="{{ $printReportUrl }}" method="GET" target="_blank">
                 <input type="hidden" name="type" value="mar">
+                <input type="hidden" name="output" value="pdf">
                 <div class="form-group">
                     <label>SELECT MONTH:</label>
                     <input type="month" name="month" value="{{ date('Y-m') }}" class="input-month">
@@ -142,6 +143,7 @@
             </div>
             <form action="{{ $printReportUrl }}" method="GET" target="_blank">
                 <input type="hidden" name="type" value="inventory">
+                <input type="hidden" name="output" value="pdf">
                 <div class="form-group">
                     <label>SELECT MONTH:</label>
                     <input type="month" name="month" value="{{ date('Y-m') }}" class="input-month">
@@ -162,6 +164,7 @@
             </div>
             <form action="{{ $printReportUrl }}" method="GET" target="_blank">
                 <input type="hidden" name="type" value="appointment">
+                <input type="hidden" name="output" value="pdf">
                 <div class="form-group">
                     <label>SELECT MONTH:</label>
                     <input type="month" name="month" value="{{ date('Y-m') }}" class="input-month">

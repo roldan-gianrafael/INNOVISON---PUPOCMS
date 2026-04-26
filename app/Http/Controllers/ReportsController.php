@@ -9,6 +9,7 @@ use App\Models\Consultation;
 use App\Models\AppointmentFeedback;
 use App\Models\Item;
 use App\Models\HealthProfile;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -310,6 +311,7 @@ public function exportHub()
 public function printReport(Request $request)
 {
     $type = $request->query('type'); // mar, inventory, or appointment
+    $output = trim((string) $request->query('output', 'html'));
     $monthFilter = $request->input('month', date('Y-m'));
     $year = date('Y', strtotime($monthFilter));
     $month = date('m', strtotime($monthFilter));
@@ -376,7 +378,27 @@ public function printReport(Request $request)
             ->values();
     }
 
-    // Siguraduhin na ang view name ay tumutugma sa ginawa mong file
-    return view('admin.reports.print-reports', compact('data', 'type', 'title', 'monthFilter'));
+    if ($output === 'pdf') {
+        $pdf = Pdf::loadView('admin.reports.print-reports', [
+            'data' => $data,
+            'type' => $type,
+            'title' => $title,
+            'monthFilter' => $monthFilter,
+            'isPdf' => true,
+        ])->setPaper('a4', 'portrait');
+
+        $fileType = $type !== '' ? $type : 'report';
+        $safeMonth = preg_replace('/[^0-9\-]/', '', $monthFilter) ?: now()->format('Y-m');
+
+        return $pdf->stream("{$fileType}-report-{$safeMonth}.pdf");
+    }
+
+    return view('admin.reports.print-reports', [
+        'data' => $data,
+        'type' => $type,
+        'title' => $title,
+        'monthFilter' => $monthFilter,
+        'isPdf' => false,
+    ]);
 }
 }

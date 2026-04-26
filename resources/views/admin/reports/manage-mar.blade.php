@@ -5,7 +5,7 @@
 @push('styles')
 <style>
 
-/* ================= CARD ================= */
+/* ================= BASE CARD ================= */
 .card {
     background: #fff;
     border-radius: 12px;
@@ -36,7 +36,37 @@
     color: #334155;
 }
 
-/* ================= FORM ================= */
+/* ================= 🔥 FORCED INPUT UI (VISIBLE DIFFERENCE) ================= */
+.form-control {
+    height: 48px !important;
+
+    border: 3px solid #facc15 !important;
+    border-radius: 999px !important;
+
+    padding: 0 18px !important;
+    font-size: 15px !important;
+
+    background: #fff !important;
+
+    box-shadow:
+        0 0 0 4px rgba(250, 204, 21, 0.18),
+        0 10px 20px rgba(0,0,0,0.06) !important;
+
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none !important;
+    border-color: #eab308 !important;
+
+    box-shadow:
+        0 0 0 6px rgba(250, 204, 21, 0.28),
+        0 12px 25px rgba(0,0,0,0.08) !important;
+
+    transform: scale(1.02);
+}
+
+/* ================= FORM LAYOUT ================= */
 .manage-form {
     display: grid;
     grid-template-columns: 1fr 1fr auto;
@@ -45,7 +75,7 @@
     margin-bottom: 20px;
 }
 
-/* labels */
+/* ================= LABEL ================= */
 .input-group label {
     font-size: 12px;
     font-weight: 700;
@@ -54,34 +84,15 @@
     display: block;
 }
 
-/* wrapper */
 .input-group {
     display: flex;
     flex-direction: column;
 }
 
-/* ================= INPUT (YELLOW + ROUND) ================= */
-.form-control {
-    height: 44px;
-    padding: 12px 18px;
-    border-radius: 999px;
-    border: 2px solid #facc15;
-    background: #fff;
-    font-size: 14px;
-    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.15);
-    transition: 0.25s ease;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: #eab308;
-    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
-}
-
 /* ================= ADD BUTTON ================= */
 .btn-save {
-    height: 44px;
-    padding: 0 20px;
+    height: 48px;
+    padding: 0 22px;
     border-radius: 999px;
     border: none;
     cursor: pointer;
@@ -90,7 +101,7 @@
     background: linear-gradient(135deg, #70131B, #8f2230);
 }
 
-/* ================= ACTION BUTTONS ================= */
+/* ================= ACTION AREA ================= */
 .action-wrapper {
     display: flex;
     align-items: center;
@@ -103,7 +114,7 @@
     display: inline-flex;
 }
 
-/* ================= CHANGE (GREY) ================= */
+/* ================= CHANGE BUTTON (GREY) ================= */
 .btn-change {
     height: 38px;
     min-width: 110px;
@@ -121,15 +132,13 @@
     color: #334155;
 
     cursor: pointer;
-    transition: 0.2s ease;
 }
 
 .btn-change:hover {
     background: #d1d5db;
-    transform: translateY(-1px);
 }
 
-/* ================= REMOVE (RED) ================= */
+/* ================= REMOVE BUTTON ================= */
 .btn-remove {
     height: 38px;
     min-width: 110px;
@@ -147,11 +156,9 @@
     color: #fff;
 
     cursor: pointer;
-    transition: 0.2s ease;
 }
 
 .btn-remove:hover {
-    transform: translateY(-1px);
     opacity: 0.9;
 }
 
@@ -173,18 +180,17 @@
     max-width: 500px;
 }
 
-/* ================= CANCEL BUTTON ================= */
+/* ================= CANCEL ================= */
 .btn-cancel {
     height: 38px;
     padding: 0 16px;
     border-radius: 999px;
-    font-size: 13px;
-    font-weight: 700;
 
     border: 1px solid #cbd5e1;
     background: #e5e7eb;
     color: #334155;
 
+    font-weight: 700;
     cursor: pointer;
 }
 

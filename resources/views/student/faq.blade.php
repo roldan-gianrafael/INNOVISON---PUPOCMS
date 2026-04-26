@@ -156,7 +156,7 @@
                     <div class="stat-row"><span>Upcoming</span><span class="stat-val" style="color:#15803d;">{{ $upcomingCount ?? 0 }}</span></div>
                     <div class="stat-row"><span>Completed</span><span class="stat-val">{{ $completedCount ?? 0 }}</span></div>
                     <div class="stat-row"><span>Cancelled</span><span class="stat-val" style="color:#b91c1c;">{{ $cancelledCount ?? 0 }}</span></div>
-                    <a href="{{ url('/student/account') }}" class="btn-action">View Full History ➜</a>
+                    <a href="{{ url('/student/history') }}" class="btn-action">View Full History ➜</a>
                 </div>
 
                 <div class="sidebar-widget" style="background: #20343a; color: white; border: none;">

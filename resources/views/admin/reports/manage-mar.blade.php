@@ -44,7 +44,7 @@
         gap: 10px;
         position: relative;
         overflow: hidden;
-        background: #ffffff;
+        background: #fef3c7;
         color: #70131B;
         padding: 11px 18px;
         border-radius: 999px;
@@ -62,7 +62,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, #70131B, #8f2230);
+        background: linear-gradient(135deg, #fde68a, #facc15 52%, #f59e0b);
         transform: scaleX(0);
         transform-origin: left center;
         transition: transform .26s ease;
@@ -93,14 +93,14 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
-        color: #ffffff;
-        background: #ffffff;
+        color: #4a1500;
+        background: #fef3c7;
     }
     .add-new-btn:hover::after {
         transform: scaleX(1);
     }
     .add-new-btn:hover .add-new-btn-label {
-        color: #ffffff;
+        color: #4a1500;
     }
     .table-action-cell {
         text-align: center;

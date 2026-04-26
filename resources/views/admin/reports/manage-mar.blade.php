@@ -57,6 +57,7 @@
 
     .btn-change {
         background: #e5e7eb;
+        background-color: #cbd5e1;
         color: #334155;
         border: 1px solid #cbd5e1;
     }

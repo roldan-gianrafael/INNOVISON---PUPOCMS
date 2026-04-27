@@ -200,6 +200,49 @@
         font-size: 15px;
         font-weight: 900;
     }
+    .appt-disease-list {
+        display: grid;
+        gap: 10px;
+    }
+    .appt-disease-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+    }
+    .appt-disease-rank {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #70131B;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 900;
+    }
+    .appt-disease-name {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 800;
+        color: #111827;
+    }
+    .appt-disease-category {
+        margin: 3px 0 0;
+        font-size: 12px;
+        color: #64748b;
+    }
+    .appt-disease-count {
+        color: #70131B;
+        font-size: 15px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
     @media (max-width: 1024px) {
         .appt-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .appt-stats-layout { grid-template-columns: 1fr; }
@@ -241,7 +284,7 @@
         <div class="appt-stat-card"><span>Cancelled</span><strong>{{ $cancelledCount }}</strong></div>
         <div class="appt-stat-card"><span>Online</span><strong>{{ $onlineCount }}</strong></div>
         <div class="appt-stat-card"><span>Walk-in</span><strong>{{ $walkInCount }}</strong></div>
-        <div class="appt-stat-card"><span>Month</span><strong>{{ \Carbon\Carbon::parse($monthFilter . '-01')->format('F Y') }}</strong></div>
+        <div class="appt-stat-card"><span>Most Common Illness</span><strong>{{ $topDisease->condition ?? 'No data yet' }}</strong></div>
     </div>
 
     <div class="appt-stats-layout">
@@ -278,6 +321,28 @@
         </section>
 
         <section class="appt-panel">
+            <h3>Most Disease or Illness This Month</h3>
+            @if($monthlyDiseaseBreakdown->count() > 0)
+                <div class="appt-disease-list">
+                    @foreach($monthlyDiseaseBreakdown->take(6) as $index => $disease)
+                        <div class="appt-disease-item">
+                            <span class="appt-disease-rank">{{ $index + 1 }}</span>
+                            <div>
+                                <p class="appt-disease-name">{{ $disease->condition }}</p>
+                                <p class="appt-disease-category">{{ $disease->category }}</p>
+                            </div>
+                            <span class="appt-disease-count">{{ $disease->count }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="appt-empty">No disease or illness data is available for the selected month.</div>
+            @endif
+        </section>
+    </div>
+
+    <div class="appt-stats-layout" style="margin-top: 22px;">
+        <section class="appt-panel">
             <h3>Daily Trend</h3>
             @if($dailyTrend->count() > 0)
                 <div class="appt-trend-list">
@@ -291,6 +356,24 @@
             @else
                 <div class="appt-empty">No daily trend data is available for the selected month.</div>
             @endif
+        </section>
+
+        <section class="appt-panel">
+            <h3>Month Summary</h3>
+            <div class="appt-trend-list">
+                <div class="appt-trend-item">
+                    <span>Reporting Month</span>
+                    <strong>{{ \Carbon\Carbon::parse($monthFilter . '-01')->format('F Y') }}</strong>
+                </div>
+                <div class="appt-trend-item">
+                    <span>Most Common Illness Count</span>
+                    <strong>{{ $topDisease->count ?? 0 }}</strong>
+                </div>
+                <div class="appt-trend-item">
+                    <span>Total Diagnosed Conditions Logged</span>
+                    <strong>{{ $monthlyDiseaseBreakdown->sum('count') }}</strong>
+                </div>
+            </div>
         </section>
     </div>
 </div>

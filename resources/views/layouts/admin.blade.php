@@ -361,9 +361,116 @@
       border-radius: inherit;
   }
 
-.medicine-alert-item-link:hover .medicine-alert-item-name {
-    text-decoration: underline;
-}
+  .medicine-alert-item-link:hover .medicine-alert-item-name {
+      text-decoration: underline;
+  }
+
+  .medicine-alert-actions {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+  }
+
+  .medicine-alert-actions-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid rgba(127, 29, 45, 0.14);
+      background: rgba(255, 255, 255, 0.96);
+      color: #7f1d2d;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  .medicine-alert-actions-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+      border-color: rgba(250, 204, 21, 0.55);
+  }
+
+  .medicine-alert-actions-toggle svg {
+      width: 18px;
+      height: 18px;
+  }
+
+  .medicine-alert-actions-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 200px;
+      padding: 8px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.98);
+      border: 1px solid rgba(127, 29, 45, 0.12);
+      box-shadow: 0 18px 28px rgba(15, 23, 42, 0.16);
+      display: none;
+      z-index: 4;
+  }
+
+  .medicine-alert-actions-menu.is-open {
+      display: block;
+  }
+
+  .medicine-alert-actions-menu form {
+      margin: 0;
+  }
+
+  .medicine-alert-actions-link,
+  .medicine-alert-actions-submit {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 0;
+      background: transparent;
+      color: #111827;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease;
+      text-align: left;
+  }
+
+  .medicine-alert-actions-link:hover,
+  .medicine-alert-actions-submit:hover {
+      background: #fff7ea;
+      color: #7f1d2d;
+  }
+
+  .medicine-alert-actions-submit:disabled {
+      opacity: 0.52;
+      cursor: not-allowed;
+  }
+
+  .medicine-alert-empty {
+      padding: 18px 16px;
+      border-radius: 16px;
+      border: 1px dashed rgba(127, 29, 45, 0.18);
+      background: rgba(255, 255, 255, 0.98);
+      text-align: center;
+  }
+
+  .medicine-alert-empty-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: #111827;
+  }
+
+  .medicine-alert-empty-copy {
+      margin: 6px 0 0;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #64748b;
+  }
 
 .medicine-alert-item-link[data-hover-hint]:hover {
     cursor: pointer;
@@ -3034,9 +3141,33 @@
     border-top: 1px dashed rgba(127, 29, 45, 0.18);
 }
 
-html[data-theme="dark"] .medicine-see-more-link {
-    color: #ffffff;
-}
+  html[data-theme="dark"] .medicine-see-more-link {
+      color: #ffffff;
+  }
+
+  html[data-theme="dark"] .medicine-alert-actions-toggle,
+  html[data-theme="dark"] .medicine-alert-actions-menu,
+  html[data-theme="dark"] .medicine-alert-empty {
+      background: rgba(17, 24, 39, 0.96);
+      border-color: rgba(250, 204, 21, 0.16);
+      color: #f8fafc;
+  }
+
+  html[data-theme="dark"] .medicine-alert-actions-link,
+  html[data-theme="dark"] .medicine-alert-actions-submit,
+  html[data-theme="dark"] .medicine-alert-empty-title {
+      color: #f8fafc;
+  }
+
+  html[data-theme="dark"] .medicine-alert-actions-link:hover,
+  html[data-theme="dark"] .medicine-alert-actions-submit:hover {
+      background: rgba(127, 29, 45, 0.32);
+      color: #fde68a;
+  }
+
+  html[data-theme="dark"] .medicine-alert-empty-copy {
+      color: #cbd5e1;
+  }
 
 html[data-theme="dark"] .medicine-see-more-link:hover {
     color: #f8fafc;
@@ -3142,6 +3273,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $adminMarkAllReadUrl = $isStudentAssistant
         ? route('assistant.notifications.read_all')
         : route('admin.notifications.read_all');
+    $adminNotificationHistoryUrl = $isStudentAssistant
+        ? route('assistant.notifications.history')
+        : route('admin.notifications.history');
     $recentPendingAppointments = \App\Models\Appointment::query()
         ->where('status', 'Pending')
         ->orderByDesc('created_at')
@@ -3418,99 +3552,108 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     <input type="hidden" name="portal_guard" value="admin">
 </form>
 
-@if($adminNotificationCount > 0)
-    <section class="medicine-alert-panel" id="medicineAlertPanel" aria-live="polite">
-        <div class="medicine-alert-head">
-            <div>
-                <p class="medicine-alert-title">Notifications</p>
-                <p class="medicine-alert-subtitle">New appointments, today's schedules, and medicine alerts.</p>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <form method="POST" action="{{ $adminMarkAllReadUrl }}" style="margin:0;">
+<section class="medicine-alert-panel" id="medicineAlertPanel" aria-live="polite">
+    <div class="medicine-alert-head">
+        <div>
+            <p class="medicine-alert-title">Notifications</p>
+            <p class="medicine-alert-subtitle">New appointments, today's schedules, and medicine alerts.</p>
+        </div>
+        <div class="medicine-alert-actions">
+            <button type="button" class="medicine-alert-actions-toggle" id="medicineAlertActionsToggle" aria-label="Notification actions" aria-expanded="false">
+                <x-outline-icon name="ellipsis-horizontal" />
+            </button>
+            <div class="medicine-alert-actions-menu" id="medicineAlertActionsMenu">
+                <form method="POST" action="{{ $adminMarkAllReadUrl }}">
                     @csrf
                     @foreach($adminNotifications as $notification)
                         <input type="hidden" name="notification_ids[]" value="{{ $notification['id'] }}">
                     @endforeach
-                    <button type="submit" class="medicine-see-more-link" style="margin:0;">Mark all read</button>
+                    <button type="submit" class="medicine-alert-actions-submit" {{ $adminNotificationCount === 0 ? 'disabled' : '' }}>
+                        Mark all as read
+                    </button>
                 </form>
-                <button type="button" class="medicine-alert-close" id="medicineAlertCloseBtn" aria-label="Close notifications">
-                    <x-outline-icon name="x-mark" />
-                </button>
+                <a href="{{ $adminNotificationHistoryUrl }}" class="medicine-alert-actions-link">Notification history</a>
             </div>
-        </div>
-
-        <div class="medicine-alert-list" id="medicineAlertList">
-            @foreach($adminNotificationPreview as $notification)
-            <article class="medicine-alert-item {{ $notification['state_class'] }}">
-                <a
-                    href="{{ $notification['link'] }}"
-                    class="medicine-alert-item-link"
-                    data-admin-notification-link="true"
-                    data-admin-notification-target="{{ $notification['link'] }}"
-                    data-hover-hint="{{ $notification['hover_hint'] }}"
-                >
-                <div class="medicine-alert-content" style="width: 100%;">
-                    <div class="medicine-alert-name-row">
-                        <p class="medicine-alert-item-name">{{ $notification['title'] }}</p>
-                    </div>
-                    
-                    <div class="medicine-alert-item-meta">
-                        @foreach($notification['chips'] as $chip)
-                            <span class="medicine-alert-chip">{{ $chip }}</span>
-                        @endforeach
-                    </div>
-                    
-                </div>
-                </a>
-            </article>
-            
-
-            @endforeach
-        </div>
-        @if($adminNotificationOverflow->isNotEmpty())
-        <div class="medicine-alert-extra-list" id="medicineAlertExtraList">
-            @foreach($adminNotificationOverflow as $notification)
-            <article class="medicine-alert-item is-hidden {{ $notification['state_class'] }}" data-medicine-alert-extra="true">
-                <a
-                    href="{{ $notification['link'] }}"
-                    class="medicine-alert-item-link"
-                    data-admin-notification-link="true"
-                    data-admin-notification-target="{{ $notification['link'] }}"
-                    data-hover-hint="{{ $notification['hover_hint'] }}"
-                >
-                <div class="medicine-alert-content" style="width: 100%;">
-                    <div class="medicine-alert-name-row">
-                        <p class="medicine-alert-item-name">{{ $notification['title'] }}</p>
-                    </div>
-
-                    <div class="medicine-alert-item-meta">
-                        @foreach($notification['chips'] as $chip)
-                            <span class="medicine-alert-chip">{{ $chip }}</span>
-                        @endforeach
-                    </div>
-                </div>
-                </a>
-            </article>
-            @endforeach
-        </div>
-        @endif
-        @if($adminNotificationCount > 4)
-        <div class="medicine-alert-more-wrapper">
-            <button type="button" class="medicine-see-more-link" id="medicineAlertMoreBtn">
-                Show more ({{ $adminNotificationCount - 4 }})
+            <button type="button" class="medicine-alert-close" id="medicineAlertCloseBtn" aria-label="Close notifications">
+                <x-outline-icon name="x-mark" />
             </button>
         </div>
-    @endif
-    </section>
+    </div>
 
-    <form method="POST" action="{{ $adminMarkAllReadUrl }}" id="adminNotificationOpenForm" style="display:none;">
-        @csrf
-        @foreach($adminNotifications as $notification)
-            <input type="hidden" name="notification_ids[]" value="{{ $notification['id'] }}">
+    <div class="medicine-alert-list" id="medicineAlertList">
+        @forelse($adminNotificationPreview as $notification)
+        <article class="medicine-alert-item {{ $notification['state_class'] }}">
+            <a
+                href="{{ $notification['link'] }}"
+                class="medicine-alert-item-link"
+                data-admin-notification-link="true"
+                data-admin-notification-target="{{ $notification['link'] }}"
+                data-hover-hint="{{ $notification['hover_hint'] }}"
+            >
+            <div class="medicine-alert-content" style="width: 100%;">
+                <div class="medicine-alert-name-row">
+                    <p class="medicine-alert-item-name">{{ $notification['title'] }}</p>
+                </div>
+                
+                <div class="medicine-alert-item-meta">
+                    @foreach($notification['chips'] as $chip)
+                        <span class="medicine-alert-chip">{{ $chip }}</span>
+                    @endforeach
+                </div>
+                
+            </div>
+            </a>
+        </article>
+        @empty
+        <div class="medicine-alert-empty">
+            <p class="medicine-alert-empty-title">No new notifications</p>
+            <p class="medicine-alert-empty-copy">You're all caught up for now. New appointment, health form, and medicine alerts will appear here.</p>
+        </div>
+        @endforelse
+    </div>
+    @if($adminNotificationOverflow->isNotEmpty())
+    <div class="medicine-alert-extra-list" id="medicineAlertExtraList">
+        @foreach($adminNotificationOverflow as $notification)
+        <article class="medicine-alert-item is-hidden {{ $notification['state_class'] }}" data-medicine-alert-extra="true">
+            <a
+                href="{{ $notification['link'] }}"
+                class="medicine-alert-item-link"
+                data-admin-notification-link="true"
+                data-admin-notification-target="{{ $notification['link'] }}"
+                data-hover-hint="{{ $notification['hover_hint'] }}"
+            >
+            <div class="medicine-alert-content" style="width: 100%;">
+                <div class="medicine-alert-name-row">
+                    <p class="medicine-alert-item-name">{{ $notification['title'] }}</p>
+                </div>
+
+                <div class="medicine-alert-item-meta">
+                    @foreach($notification['chips'] as $chip)
+                        <span class="medicine-alert-chip">{{ $chip }}</span>
+                    @endforeach
+                </div>
+            </div>
+            </a>
+        </article>
         @endforeach
-        <input type="hidden" name="redirect_to" id="adminNotificationRedirectTo" value="">
-    </form>
+    </div>
+    @endif
+    @if($adminNotificationCount > 4)
+    <div class="medicine-alert-more-wrapper">
+        <button type="button" class="medicine-see-more-link" id="medicineAlertMoreBtn">
+            Show more ({{ $adminNotificationCount - 4 }})
+        </button>
+    </div>
 @endif
+</section>
+
+<form method="POST" action="{{ $adminMarkAllReadUrl }}" id="adminNotificationOpenForm" style="display:none;">
+    @csrf
+    @foreach($adminNotifications as $notification)
+        <input type="hidden" name="notification_ids[]" value="{{ $notification['id'] }}">
+    @endforeach
+    <input type="hidden" name="redirect_to" id="adminNotificationRedirectTo" value="">
+</form>
 
 <div id="medicineHoverHint" class="medicine-hover-hint" aria-hidden="true">Press to enter</div>
 
@@ -3655,6 +3798,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const toggles = Array.from(document.querySelectorAll('[data-medicine-alert-toggle]'));
         const panel = document.getElementById('medicineAlertPanel');
         const closeButton = document.getElementById('medicineAlertCloseBtn');
+        const actionsToggle = document.getElementById('medicineAlertActionsToggle');
+        const actionsMenu = document.getElementById('medicineAlertActionsMenu');
         const moreButton = document.getElementById('medicineAlertMoreBtn');
         const openForm = document.getElementById('adminNotificationOpenForm');
         const redirectInput = document.getElementById('adminNotificationRedirectTo');
@@ -3667,6 +3812,24 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         if (!toggles.length || !panel) {
             return;
         }
+
+        const closeActionsMenu = function () {
+            if (!actionsToggle || !actionsMenu) {
+                return;
+            }
+
+            actionsMenu.classList.remove('is-open');
+            actionsToggle.setAttribute('aria-expanded', 'false');
+        };
+
+        const openActionsMenu = function () {
+            if (!actionsToggle || !actionsMenu) {
+                return;
+            }
+
+            actionsMenu.classList.add('is-open');
+            actionsToggle.setAttribute('aria-expanded', 'true');
+        };
 
         const openPanel = function () {
             if (closeTimer) {
@@ -3685,6 +3848,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 return;
             }
 
+            closeActionsMenu();
             panel.classList.remove('is-open');
             panel.classList.add('is-closing');
 
@@ -3716,7 +3880,31 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             });
         }
 
+        if (actionsToggle && actionsMenu) {
+            actionsToggle.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (actionsMenu.classList.contains('is-open')) {
+                    closeActionsMenu();
+                } else {
+                    openActionsMenu();
+                }
+            });
+
+            actionsMenu.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+        }
+
         document.addEventListener('click', function (event) {
+            if (actionsMenu && actionsMenu.classList.contains('is-open')) {
+                const clickedActionsToggle = actionsToggle ? actionsToggle.contains(event.target) : false;
+                if (!clickedActionsToggle && !actionsMenu.contains(event.target)) {
+                    closeActionsMenu();
+                }
+            }
+
             if (!panel.classList.contains('is-open')) {
                 return;
             }

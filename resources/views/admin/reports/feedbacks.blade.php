@@ -414,7 +414,6 @@
                                 <div class="feedback-chip-row">
                                     <span class="feedback-chip">{{ $feedback->service }}</span>
                                     <span class="feedback-chip">{{ ucfirst($feedback->appointment_type ?: 'consultation') }}</span>
-                                    <span class="feedback-chip">{{ $feedback->student_number !== '' ? $feedback->student_number : 'No student number' }}</span>
                                 </div>
                                 <p class="feedback-message">{{ $feedback->message !== '' ? $feedback->message : 'No written comments were added.' }}</p>
                             </div>

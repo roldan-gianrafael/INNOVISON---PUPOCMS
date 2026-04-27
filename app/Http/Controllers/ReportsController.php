@@ -38,6 +38,29 @@ class ReportsController extends Controller
         $onlineCount = $appointments->filter(fn ($appt) => strtolower((string) $appt->type) === 'online')->count();
         $walkInCount = $appointments->filter(fn ($appt) => strtolower((string) $appt->type) === 'walkin')->count();
 
+        $monthlyDiseaseBreakdown = Consultation::query()
+            ->with('medicalCondition.category')
+            ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+            ->get()
+            ->groupBy(function ($consultation) {
+                $conditionName = trim((string) optional($consultation->medicalCondition)->name);
+                return $conditionName !== '' ? $conditionName : 'Unspecified illness / condition';
+            })
+            ->map(function ($items, $condition) {
+                $firstConsultation = $items->first();
+                $categoryName = trim((string) optional(optional($firstConsultation)->medicalCondition)->category->name);
+
+                return (object) [
+                    'condition' => $condition,
+                    'category' => $categoryName !== '' ? $categoryName : 'General',
+                    'count' => $items->count(),
+                ];
+            })
+            ->sortByDesc('count')
+            ->values();
+
+        $topDisease = $monthlyDiseaseBreakdown->first();
+
         $serviceBreakdown = $appointments
             ->groupBy(fn ($appt) => trim((string) ($appt->service ?: 'Unspecified')))
             ->map(function ($items, $service) {
@@ -67,6 +90,8 @@ class ReportsController extends Controller
             'cancelledCount',
             'onlineCount',
             'walkInCount',
+            'monthlyDiseaseBreakdown',
+            'topDisease',
             'serviceBreakdown',
             'dailyTrend'
         ));

@@ -328,34 +328,19 @@
         animation: fadeIn 0.2s;
     }
     .modal-box {
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.28);
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
         padding: 24px;
-        border-radius: 12px;
+        border-radius: 18px;
         width: 560px;
         max-width: 90%;
         position: relative;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(112, 19, 27, 0.14);
-        overflow: hidden;
-    }
-    .modal-box::before,
-    .modal-box::after {
-        content: "";
-        position: absolute;
-        left: 16px;
-        right: 16px;
-        height: 5px;
-        background: #70131B;
-        border-radius: 999px;
-        pointer-events: none;
-    }
-    .modal-box::before {
-        top: 10px;
-    }
-    .modal-box::after {
-        bottom: 10px;
+        border-left: 1px solid rgba(112, 19, 27, 0.12);
+        border-right: 1px solid rgba(112, 19, 27, 0.12);
+        border-top: 4px solid #70131B;
+        border-bottom: 4px solid #70131B;
     }
     .modal-header {
         display: flex;
@@ -882,8 +867,11 @@
     }
 
     html[data-theme="dark"] .modal-box {
-        background: rgba(28, 20, 22, 0.78);
-        border: 1px solid rgba(143, 34, 48, 0.36);
+        background: rgba(28, 20, 22, 0.34);
+        border-left: 1px solid rgba(143, 34, 48, 0.36);
+        border-right: 1px solid rgba(143, 34, 48, 0.36);
+        border-top: 4px solid #facc15;
+        border-bottom: 4px solid #facc15;
         box-shadow:
             0 22px 38px rgba(0, 0, 0, 0.42),
             0 0 0 1px rgba(250, 204, 21, 0.06);

@@ -21,8 +21,64 @@
     td { padding: 16px; border-bottom: 1px solid #f8fafc; font-size: 14px; color: #111827; }
 
     /* Controls */
-    .controls { display: flex; justify-content: space-between; margin-bottom: 20px; }
-    .inventory-page-title { margin: 0; color: #000000; }
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding: 16px 18px;
+        border-radius: 28px;
+        border: 1px solid rgba(234, 215, 160, 0.72);
+        background: linear-gradient(135deg, rgba(255, 253, 246, 0.76) 0%, rgba(255, 249, 231, 0.58) 42%, rgba(255, 255, 255, 0.82) 100%);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.05),
+            0 16px 30px rgba(112, 19, 27, 0.05);
+    }
+    .inventory-page-title {
+        margin: 0;
+        color: #000000;
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid #ead7a0;
+        background: linear-gradient(135deg, #fffdf6 0%, #fff4c6 100%);
+        box-shadow: 0 10px 24px rgba(112, 19, 27, 0.08);
+    }
+    .inventory-toolbar-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-left: auto;
+        flex-wrap: wrap;
+    }
+    .inventory-search-wrap {
+        width: 300px;
+        max-width: 100%;
+        flex: 0 0 300px;
+    }
+    .inventory-search-input {
+        width: 100%;
+        padding: 11px 18px;
+        border-radius: 999px;
+        border: 1px solid #ead7a0;
+        color: #111827;
+        background: linear-gradient(135deg, #fffdf6 0%, #ffffff 100%);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.08),
+            0 10px 22px rgba(112, 19, 27, 0.08);
+        transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .inventory-search-input:focus {
+        outline: none;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 4px rgba(250, 204, 21, 0.14),
+            0 12px 24px rgba(112, 19, 27, 0.10);
+        transform: translateY(-1px);
+    }
     .btn-add,
     .inventory-btn-cancel {
         display: inline-flex;
@@ -133,6 +189,27 @@
         color: #ffffff;
     }
 
+    html[data-theme="dark"] .controls {
+        border-color: rgba(250, 204, 21, 0.24);
+        background: linear-gradient(135deg, rgba(112, 19, 27, 0.68) 0%, rgba(86, 16, 26, 0.64) 48%, rgba(44, 14, 18, 0.72) 100%);
+        box-shadow:
+            0 0 0 2px rgba(250, 204, 21, 0.07),
+            0 16px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-theme="dark"] .inventory-search-input {
+        background: rgba(18, 8, 12, 0.86);
+        color: #ffffff;
+        border-color: rgba(250, 204, 21, 0.28);
+        box-shadow:
+            0 0 0 2px rgba(250, 204, 21, 0.06),
+            0 10px 20px rgba(0, 0, 0, 0.20);
+    }
+
+    html[data-theme="dark"] .inventory-search-input::placeholder {
+        color: #e5e7eb;
+    }
+
     html[data-theme="dark"] .modal-box {
         background: linear-gradient(180deg, rgba(31, 12, 18, 0.98), rgba(20, 8, 12, 0.98));
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -190,13 +267,18 @@
 
     <div class="controls">
         <h2 class="inventory-page-title">Clinic Inventory</h2>
-        @if($canManageInventory)
-            <button class="btn-add" onclick="openModal()">+ Add New Item</button>
-        @endif
+        <div class="inventory-toolbar-actions">
+            <div class="inventory-search-wrap">
+                <input type="text" id="inventorySearchInput" class="inventory-search-input" placeholder="Search by item, category, or unit...">
+            </div>
+            @if($canManageInventory)
+                <button class="btn-add" onclick="openModal()">+ Add New Item</button>
+            @endif
+        </div>
     </div>
 
     <div class="card">
-        <table>
+        <table id="inventoryTable">
             <thead>
                 <tr>    
                     <th>Item Name</th>
@@ -218,6 +300,7 @@
                     @endphp
                     <tr
                         id="inventory-item-{{ $item->id }}"
+                        data-inventory-row
                         class="{{ $highlightClass }}"
                     >
                         <td style="font-weight: 600;">{{ $item->name }}</td>
@@ -376,6 +459,9 @@
     const medicineSelect = document.getElementById('iMedicineType');
     const expDateInput = document.getElementById('iExpDate');
     const highlightedRow = document.querySelector('.inventory-row-highlight');
+    const highlightedExpiredRow = document.querySelector('.inventory-row-highlight-expired');
+    const inventorySearchInput = document.getElementById('inventorySearchInput');
+    const inventoryRows = Array.from(document.querySelectorAll('#inventoryTable tbody tr[data-inventory-row]'));
 
     function toggleMedicineFields() {
         const category = document.getElementById('iCategory').value;
@@ -448,6 +534,23 @@
         setTimeout(function () {
             highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 180);
+    }
+
+    if (highlightedExpiredRow) {
+        setTimeout(function () {
+            highlightedExpiredRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 180);
+    }
+
+    if (inventorySearchInput) {
+        inventorySearchInput.addEventListener('keyup', function () {
+            const searchTerm = this.value.trim().toLowerCase();
+
+            inventoryRows.forEach(function (row) {
+                const rowText = row.innerText.toLowerCase();
+                row.style.display = rowText.includes(searchTerm) ? '' : 'none';
+            });
+        });
     }
 </script>
 @endpush

@@ -218,11 +218,11 @@
         margin-bottom: 20px;
         padding: 16px 18px;
         border-radius: 28px;
-        border: 1px solid #ead7a0;
-        background: linear-gradient(135deg, #fffdf6 0%, #fff9e7 42%, #ffffff 100%);
+        border: 1px solid rgba(234, 215, 160, 0.72);
+        background: linear-gradient(135deg, rgba(255, 253, 246, 0.76) 0%, rgba(255, 249, 231, 0.58) 42%, rgba(255, 255, 255, 0.82) 100%);
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.08),
-            0 18px 36px rgba(112, 19, 27, 0.08);
+            0 0 0 3px rgba(250, 204, 21, 0.05),
+            0 16px 30px rgba(112, 19, 27, 0.05);
     }
 
     .appointments-toolbar-actions {
@@ -368,11 +368,11 @@
     }
 
     html[data-theme="dark"] .appointments-toolbar {
-        border-color: rgba(250, 204, 21, 0.34);
-        background: linear-gradient(135deg, rgba(112, 19, 27, 0.92) 0%, rgba(86, 16, 26, 0.9) 48%, rgba(44, 14, 18, 0.94) 100%);
+        border-color: rgba(250, 204, 21, 0.24);
+        background: linear-gradient(135deg, rgba(112, 19, 27, 0.68) 0%, rgba(86, 16, 26, 0.64) 48%, rgba(44, 14, 18, 0.72) 100%);
         box-shadow:
-            0 0 0 2px rgba(250, 204, 21, 0.10),
-            0 18px 32px rgba(0, 0, 0, 0.28);
+            0 0 0 2px rgba(250, 204, 21, 0.07),
+            0 16px 28px rgba(0, 0, 0, 0.22);
     }
 
     html[data-theme="dark"] .appointments-summary-title,

@@ -206,7 +206,7 @@
         padding: 10px 18px;
         border-radius: 0 0 14px 14px;
         border: 0;
-        border-bottom: 2px solid rgba(234, 215, 160, 0.9);
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
         background: transparent;
         box-shadow: none;
     }
@@ -292,15 +292,14 @@
         min-height: 48px;
         padding: 12px 20px;
         height: 48px;
-        border-radius: 999px !important;
-        -webkit-border-radius: 999px !important;
-        -moz-border-radius: 999px !important;
-        border: 2px solid #8f2230 !important;
+        border-radius: 0 0 14px 14px !important;
+        -webkit-border-radius: 0 0 14px 14px !important;
+        -moz-border-radius: 0 0 14px 14px !important;
+        border: 0 !important;
+        border-bottom: 3px solid #8f2230 !important;
         color: #111827;
-        background: linear-gradient(135deg, #fff3f5 0%, #ffffff 100%) !important;
-        box-shadow:
-            0 0 0 4px rgba(112, 19, 27, 0.10),
-            0 12px 24px rgba(112, 19, 27, 0.12) !important;
+        background: transparent !important;
+        box-shadow: none !important;
         transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
         appearance: none;
         -webkit-appearance: none;
@@ -313,10 +312,8 @@
 
     .main .appointments-search-shell .appointments-search-input:focus {
         outline: none;
-        border-color: #70131B;
-        box-shadow:
-            0 0 0 5px rgba(112, 19, 27, 0.16),
-            0 14px 26px rgba(112, 19, 27, 0.14) !important;
+        border-bottom-color: #70131B;
+        box-shadow: none !important;
         transform: translateY(-1px);
     }
 
@@ -460,7 +457,7 @@
 
     html[data-theme="dark"] .appointments-page-title {
         color: #ffffff;
-        border-bottom-color: rgba(250, 204, 21, 0.30);
+        border-bottom-color: rgba(143, 34, 48, 0.70);
         background: transparent;
         box-shadow: none;
     }
@@ -483,12 +480,10 @@
     }
 
     html[data-theme="dark"] .main .appointments-search-shell .appointments-search-input {
-        background: rgba(18, 8, 12, 0.86) !important;
+        background: transparent !important;
         color: #ffffff;
-        border-color: rgba(143, 34, 48, 0.92) !important;
-        box-shadow:
-            0 0 0 4px rgba(112, 19, 27, 0.14),
-            0 12px 22px rgba(0, 0, 0, 0.22) !important;
+        border-bottom-color: rgba(143, 34, 48, 0.92) !important;
+        box-shadow: none !important;
     }
 
     html[data-theme="dark"] .main .appointments-search-shell .appointments-search-input::placeholder {

@@ -875,6 +875,11 @@
     html[data-theme="dark"] .appointment-inline-pill.is-view svg {
         color: #ffffff !important;
     }
+    html[data-theme="dark"] .appointment-inline-pill.is-view svg,
+    html[data-theme="dark"] .appointment-inline-pill.is-view svg * {
+        stroke: #ffffff !important;
+        color: #ffffff !important;
+    }
     html[data-theme="dark"] .appointment-inline-pill.is-consult {
         background: linear-gradient(135deg, rgba(112, 19, 27, 0.94), rgba(143, 34, 48, 0.90));
         border-color: rgba(244, 114, 182, 0.24);

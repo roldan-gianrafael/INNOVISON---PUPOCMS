@@ -12,6 +12,22 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         border: 1px solid #f0f0f0;
     }
+    .inventory-summary-card {
+        position: relative;
+        overflow: hidden;
+    }
+    .inventory-summary-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 14px;
+        right: 14px;
+        height: 5px;
+        background: #70131B;
+        border-radius: 999px;
+        pointer-events: none;
+        z-index: 1;
+    }
     .card,
     .card *:not(.status):not(.btn-add):not(.btn-icon) {
         color: #111827;
@@ -334,6 +350,10 @@
         color: #e5e7eb;
     }
 
+    html[data-theme="dark"] .inventory-summary-card::before {
+        background: #facc15;
+    }
+
     html[data-theme="dark"] .inventory-search-toggle {
         background: linear-gradient(135deg, #70131B, #8f2230) !important;
         border-color: rgba(250, 204, 21, 0.28) !important;
@@ -477,7 +497,7 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card inventory-summary-card">
         <table id="inventoryTable">
             <thead>
                 <tr>    

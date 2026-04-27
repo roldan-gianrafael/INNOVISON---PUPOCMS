@@ -13,6 +13,22 @@
         border: 1px solid #f0f0f0;
         height: 100%; /* Para pantay ang taas nila */
     }
+    .health-summary-card {
+        position: relative;
+        overflow: hidden;
+    }
+    .health-summary-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 14px;
+        right: 14px;
+        height: 5px;
+        background: #70131B;
+        border-radius: 999px;
+        pointer-events: none;
+        z-index: 1;
+    }
     .card,
     .card *:not(.status):not(.btn-action):not(.btn-sign) {
         color: #111827;
@@ -738,6 +754,10 @@
         border-color: rgba(148, 163, 184, 0.24);
     }
 
+    html[data-theme="dark"] .health-summary-card::before {
+        background: #facc15;
+    }
+
     html[data-theme="dark"] .summary-item .card {
         background: rgba(15, 23, 42, 0.96);
         border-color: rgba(148, 163, 184, 0.14);
@@ -843,7 +863,7 @@
     </div>
 
     {{-- Main Table Card --}}
-<div class="card">
+<div class="card health-summary-card">
     <div class="health-table-head">
         <div class="health-table-title">Health Profile Summary</div>
         <div class="health-filter-shell">

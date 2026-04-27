@@ -33,29 +33,59 @@
     .stat-card-mini h3 { font-size: 24px; color: #4b0f17; margin: 5px 0 0 0; }
 
     .reports-section-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
         font-size: 18px;
-        color: #000000;
-        margin-bottom: 20px;
-        font-weight: 700;
+        color: #111827;
+        margin: 0;
+        font-weight: 800;
+        padding: 10px 18px;
+        border-radius: 0 0 14px 14px;
+        border: 0;
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .reports-section-title svg {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
     }
 
     .reports-title-frame {
         display: inline-flex;
         align-items: center;
-        border-radius: 18px;
-        border: 1px solid rgba(112, 19, 27, 0.12);
-        padding: 12px 18px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(250,244,246,0.96));
-        box-shadow: 0 12px 24px rgba(112, 19, 27, 0.08);
+        border-radius: 0;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
         margin-bottom: 20px;
     }
 
     .reports-frame {
+        position: relative;
+        overflow: hidden;
         border-radius: 22px;
         border: 1px solid rgba(112, 19, 27, 0.10);
         padding: 24px;
         background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(250,244,246,0.96));
         box-shadow: 0 18px 34px rgba(112, 19, 27, 0.08);
+    }
+
+    .reports-frame::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 14px;
+        right: 14px;
+        height: 5px;
+        background: #70131B;
+        border-radius: 999px;
+        pointer-events: none;
+        z-index: 1;
     }
 
     /* --- REPORT BUTTONS (Gayang-gaya sa Dashboard Stats Cards) --- */
@@ -145,18 +175,23 @@
     html[data-theme="dark"] .stat-card-mini h3,
     html[data-theme="dark"] .reports-section-title {
         color: #ffffff;
+        border-bottom-color: rgba(143, 34, 48, 0.70);
     }
 
     html[data-theme="dark"] .reports-title-frame {
-        background: linear-gradient(180deg, rgba(70, 19, 27, 0.92), rgba(46, 13, 19, 0.96));
-        border-color: rgba(255, 255, 255, 0.10);
-        box-shadow: 0 14px 26px rgba(0, 0, 0, 0.22);
+        background: transparent;
+        border: 0;
+        box-shadow: none;
     }
 
     html[data-theme="dark"] .reports-frame {
         background: linear-gradient(180deg, rgba(70, 19, 27, 0.92), rgba(46, 13, 19, 0.96));
         border-color: rgba(255, 255, 255, 0.08);
         box-shadow: 0 20px 38px rgba(0, 0, 0, 0.24);
+    }
+
+    html[data-theme="dark"] .reports-frame::before {
+        background: #facc15;
     }
 </style>
 @endpush
@@ -191,7 +226,7 @@
 
     <div class="reports-frame">
         <div class="reports-title-frame">
-            <h2 class="reports-section-title" style="margin: 0;">Select Report to Generate</h2>
+            <h2 class="reports-section-title"><x-outline-icon name="chart-bar" />Select Report to Generate</h2>
         </div>
 
         <div class="report-grid">

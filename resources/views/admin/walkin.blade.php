@@ -212,6 +212,24 @@
         box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
     }
 
+    .walkin-strip-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .walkin-strip-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 14px;
+        right: 14px;
+        height: 5px;
+        background: #70131B;
+        border-radius: 999px;
+        pointer-events: none;
+        z-index: 2;
+    }
+
     .scan-method-badge {
         display: inline-flex;
         align-items: center;
@@ -440,6 +458,10 @@
         color: #be123c;
     }
 
+    html[data-theme="dark"] .walkin-strip-card::before {
+        background: #facc15;
+    }
+
     .ocr-meta {
         display: inline-flex;
         align-items: center;
@@ -531,7 +553,7 @@
 
 <div style="max-width: 980px; margin: 20px auto;">
     @if($currentMode === '')
-    <div class="card p-4 shadow-sm" style="border-radius: 18px; border: none; margin-bottom: 20px;">
+    <div class="card p-4 shadow-sm walkin-strip-card" style="border-radius: 18px; border: none; margin-bottom: 20px;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;">
             <div>
                 <p class="intake-heading-kicker">Patient Intake</p>
@@ -574,7 +596,7 @@
     @endif
 
 @if($currentMode !== '')
-<div class="card p-4 shadow-sm" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
+<div class="card p-4 shadow-sm walkin-strip-card" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
     
     <div id="dynamicHeader" class="mode-header {{ $currentMode === 'assisted' ? 'bg-register' : 'bg-scan' }}">
         <div id="headerIcon" class="mode-header-badge">{{ $currentMode === 'assisted' ? 'AI' : 'SB' }}</div>

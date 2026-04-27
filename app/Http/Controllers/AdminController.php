@@ -1256,11 +1256,19 @@ public function updateClearance(Request $request, $id)
     ]);
 
     $record = HealthProfile::findOrFail($id);
+    $previousStatus = (string) $record->clearance_status;
 
     // Update Status
     $record->clearance_status = $request->clearance_status;
     $record->pending_reason   = ($request->clearance_status === 'Issued') ? null : $request->pending_reason;
     $record->verified_at      = ($request->clearance_status === 'Issued') ? ($request->verified_at ?? now()) : null;
+
+    if ($request->clearance_status === 'Issued' && ($previousStatus !== 'Issued' || empty($record->clearance_signature_snapshot_path))) {
+        $currentSignaturePath = trim((string) Setting::query()->value('clearance_signature_path'));
+        $record->clearance_signature_snapshot_path = $currentSignaturePath !== ''
+            ? $currentSignaturePath
+            : 'health_profiles/signatures/nurse-sign.png';
+    }
 
     if ($record->save()) {
         if ($record->user) {

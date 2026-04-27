@@ -193,11 +193,10 @@
 </head>
 <body>
 @php
-    $clearanceSignaturePath = optional(\App\Models\Setting::first())->clearance_signature_path ?: 'health_profiles/signatures/nurse-sign.png';
     $logoPath = public_path('images/pup_logo.png');
     $studentPhotoPath = $profile->student_photo ? public_path('storage/' . $profile->student_photo) : null;
     $studentSignaturePath = $profile->digital_signature ? public_path('storage/' . $profile->digital_signature) : null;
-    $nurseSignaturePath = $clearanceSignaturePath ? public_path('storage/' . $clearanceSignaturePath) : null;
+    $nurseSignaturePath = $profile->effective_clearance_signature_path ? public_path('storage/' . $profile->effective_clearance_signature_path) : null;
 @endphp
 
 <div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: 0 auto; display: flex; justify-content: flex-end; gap: 10px;">

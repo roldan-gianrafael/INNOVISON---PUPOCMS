@@ -27,10 +27,6 @@
 @endpush
 
 @section('content')
-@php
-    $clearanceSignaturePath = optional(\App\Models\Setting::first())->clearance_signature_path ?: 'health_profiles/signatures/nurse-sign.png';
-@endphp
-
 <div style="margin-bottom: 20px;">
     <a href="{{ route('admin.health_records') }}" style="text-decoration: none; color: #64748b; font-size: 14px;">&larr; Back to Health Records</a>
 </div>
@@ -111,7 +107,7 @@
                 
                 @if($record->clearance_status == 'Issued')
                     <div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                        <img src="{{ asset('storage/' . $clearanceSignaturePath) }}" 
+                        <img src="{{ asset('storage/' . $record->effective_clearance_signature_path) }}" 
                              alt="Nurse Signature" 
                              style="height: 90px; width: auto; pointer-events: none;">
                     </div>

@@ -20,11 +20,12 @@ class HealthProfile extends Model
         'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies',
         'medical_certificate', 'medical_certificate_issued_by',
         'is_smoker', 'is_drinker', 'vaccine_history', 'digital_signature', 'clearance_status',
-    'pending_reason',
-    'verified_at',
-    'puptas_sync_status',
-    'puptas_synced_at',
-    'puptas_sync_message',
+        'clearance_signature_snapshot_path',
+        'pending_reason',
+        'verified_at',
+        'puptas_sync_status',
+        'puptas_synced_at',
+        'puptas_sync_message',
         
     ];
 
@@ -41,5 +42,17 @@ class HealthProfile extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getEffectiveClearanceSignaturePathAttribute(): string
+    {
+        $snapshotPath = trim((string) ($this->clearance_signature_snapshot_path ?? ''));
+        if ($snapshotPath !== '') {
+            return $snapshotPath;
+        }
+
+        $settingsPath = trim((string) optional(Setting::query()->first())->clearance_signature_path);
+
+        return $settingsPath !== '' ? $settingsPath : 'health_profiles/signatures/nurse-sign.png';
     }
 }

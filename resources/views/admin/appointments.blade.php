@@ -11,7 +11,10 @@
         padding: 24px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         border: 1px solid #f0f0f0;
-        border-top: 3px solid rgba(112, 19, 27, 0.78);
+        border-top: 5px solid #70131B;
+        box-shadow:
+            0 4px 12px rgba(0,0,0,0.05),
+            inset 0 1px 0 rgba(255,255,255,0.72);
     }
 
     .appointments-summary-title {
@@ -478,7 +481,10 @@
     }
 
     html[data-theme="dark"] .card {
-        border-top-color: rgba(250, 204, 21, 0.88);
+        border-top-color: #facc15;
+        box-shadow:
+            0 14px 28px rgba(0, 0, 0, 0.22),
+            inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
     html[data-theme="dark"] .appointments-summary-title,

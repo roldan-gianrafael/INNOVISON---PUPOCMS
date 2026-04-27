@@ -865,10 +865,15 @@
     html[data-theme="dark"] .appointment-inline-pill.is-view {
         background: linear-gradient(135deg, rgba(112, 19, 27, 0.96), rgba(143, 34, 48, 0.92));
         border-color: rgba(244, 114, 182, 0.22);
-        color: #ffffff;
+        color: #ffffff !important;
         box-shadow:
             0 0 0 3px rgba(244, 114, 182, 0.10),
             0 12px 22px rgba(0, 0, 0, 0.24);
+    }
+    html[data-theme="dark"] .appointment-inline-pill.is-view,
+    html[data-theme="dark"] .appointment-inline-pill.is-view span,
+    html[data-theme="dark"] .appointment-inline-pill.is-view svg {
+        color: #ffffff !important;
     }
     html[data-theme="dark"] .appointment-inline-pill.is-consult {
         background: linear-gradient(135deg, rgba(112, 19, 27, 0.94), rgba(143, 34, 48, 0.90));

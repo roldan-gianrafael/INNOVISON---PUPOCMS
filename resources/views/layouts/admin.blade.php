@@ -728,10 +728,11 @@
         .admin-header::after {
             content: "";
             position: absolute;
-            top: -34%;
+            top: 10%;
             left: -24%;
             width: 36%;
-            height: 176%;
+            height: 80%;
+            border-radius: 999px;
             pointer-events: none;
             opacity: 0;
             background: linear-gradient(
@@ -742,7 +743,7 @@
                 rgba(145, 42, 68, 0.14) 80%,
                 rgba(255, 255, 255, 0) 100%
             );
-            filter: blur(2px);
+            filter: blur(1px);
             transform: translateX(-150%) skewX(-24deg);
             transform-origin: center;
             animation: adminHeaderReflection 9s ease-in-out infinite;

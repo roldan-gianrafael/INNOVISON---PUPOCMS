@@ -336,6 +336,7 @@
         position: relative;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         border-top: 4px solid #70131B;
+        border-bottom: 4px solid #70131B;
     }
     .modal-header {
         display: flex;
@@ -377,6 +378,11 @@
         grid-template-columns: 150px minmax(0, 1fr);
         gap: 16px;
         align-items: start;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(112, 19, 27, 0.14);
+        background: linear-gradient(135deg, rgba(255, 251, 245, 0.9), rgba(255, 255, 255, 0.98));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
     }
     .modal-label { font-size: 12px; font-weight: 700; color: #111827; text-transform: uppercase; }
     .modal-val { font-size: 15px; color: #111827; font-weight: 500; }
@@ -398,6 +404,7 @@
         font-size: 13px;
         color: #111827;
         min-height: 72px;
+        border: 1px solid rgba(112, 19, 27, 0.08);
     }
     .dialog-actions {
         display: flex;
@@ -870,6 +877,12 @@
 
     html[data-theme="dark"] .modal-header {
         border-bottom-color: rgba(255, 255, 255, 0.12);
+    }
+
+    html[data-theme="dark"] .modal-row {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+        border-color: rgba(250, 204, 21, 0.14);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
     html[data-theme="dark"] .modal-notes {

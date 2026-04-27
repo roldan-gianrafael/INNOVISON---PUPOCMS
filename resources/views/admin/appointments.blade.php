@@ -275,14 +275,19 @@
         width: 100%;
         min-height: 48px;
         padding: 12px 20px;
-        border-radius: 999px;
-        border: 2px solid #8f2230;
+        height: 48px;
+        border-radius: 999px !important;
+        -webkit-border-radius: 999px !important;
+        -moz-border-radius: 999px !important;
+        border: 2px solid #8f2230 !important;
         color: #111827;
         background: linear-gradient(135deg, #fff3f5 0%, #ffffff 100%);
         box-shadow:
             0 0 0 4px rgba(112, 19, 27, 0.10),
             0 12px 24px rgba(112, 19, 27, 0.12);
         transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+        appearance: none;
+        -webkit-appearance: none;
     }
 
     .appointments-search-input::placeholder {
@@ -300,20 +305,20 @@
     }
 
     .appointments-search-toggle {
-        width: 56px !important;
-        height: 56px !important;
-        min-width: 56px !important;
-        min-height: 56px !important;
-        flex: 0 0 56px !important;
+        width: 50px !important;
+        height: 50px !important;
+        min-width: 50px !important;
+        min-height: 50px !important;
+        flex: 0 0 50px !important;
         padding: 0 !important;
         gap: 0 !important;
         border-radius: 999px !important;
     }
 
     .appointments-search-toggle svg {
-        width: 36px !important;
-        height: 36px !important;
-        stroke-width: 2.2 !important;
+        width: 28px !important;
+        height: 28px !important;
+        stroke-width: 2 !important;
         position: relative;
         z-index: 1;
         display: block;

@@ -245,6 +245,7 @@
         display: inline-flex;
         align-items: center;
         gap: 10px;
+        justify-content: flex-end;
     }
 
     .appointments-search-wrap {
@@ -308,8 +309,8 @@
     }
 
     .appointments-search-toggle svg {
-        width: 24px;
-        height: 24px;
+        width: 30px;
+        height: 30px;
         position: relative;
         z-index: 1;
     }
@@ -497,12 +498,12 @@
         <h2 class="appointments-page-title"><x-outline-icon name="calendar-days" />Appointments</h2>
         <div class="appointments-toolbar-actions">
             <div class="appointments-search-shell" id="appointmentsSearchShell">
-                <button type="button" class="btn-add-walkin appointments-search-toggle" id="appointmentsSearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="searchInput">
-                    <x-outline-icon name="magnifying-glass" />
-                </button>
                 <div class="appointments-search-wrap">
                     <input type="text" id="searchInput" class="appointments-search-input" placeholder="Search by name...">
                 </div>
+                <button type="button" class="btn-add-walkin appointments-search-toggle" id="appointmentsSearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="searchInput">
+                    <x-outline-icon name="magnifying-glass" />
+                </button>
             </div>
             <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="btn-add-walkin">
                 <span class="btn-icon">&#128247;</span>

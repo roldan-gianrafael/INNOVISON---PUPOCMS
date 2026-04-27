@@ -328,15 +328,34 @@
         animation: fadeIn 0.2s;
     }
     .modal-box {
-        background: #fff;
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         padding: 24px;
         border-radius: 12px;
         width: 560px;
         max-width: 90%;
         position: relative;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        border-top: 4px solid #70131B;
-        border-bottom: 4px solid #70131B;
+        border: 1px solid rgba(112, 19, 27, 0.14);
+        overflow: hidden;
+    }
+    .modal-box::before,
+    .modal-box::after {
+        content: "";
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        height: 5px;
+        background: #70131B;
+        border-radius: 999px;
+        pointer-events: none;
+    }
+    .modal-box::before {
+        top: 10px;
+    }
+    .modal-box::after {
+        bottom: 10px;
     }
     .modal-header {
         display: flex;
@@ -381,8 +400,10 @@
         padding: 12px 14px;
         border-radius: 12px;
         border: 1px solid rgba(112, 19, 27, 0.14);
-        background: linear-gradient(135deg, rgba(255, 251, 245, 0.9), rgba(255, 255, 255, 0.98));
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
+        background: #fffdfa;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.82),
+            0 8px 18px rgba(112, 19, 27, 0.05);
     }
     .modal-label { font-size: 12px; font-weight: 700; color: #111827; text-transform: uppercase; }
     .modal-val { font-size: 15px; color: #111827; font-weight: 500; }
@@ -861,7 +882,7 @@
     }
 
     html[data-theme="dark"] .modal-box {
-        background: linear-gradient(180deg, rgba(36, 21, 24, 0.98), rgba(24, 18, 20, 0.98));
+        background: rgba(28, 20, 22, 0.78);
         border: 1px solid rgba(143, 34, 48, 0.36);
         box-shadow:
             0 22px 38px rgba(0, 0, 0, 0.42),
@@ -880,9 +901,11 @@
     }
 
     html[data-theme="dark"] .modal-row {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+        background: rgba(25, 25, 28, 0.96);
         border-color: rgba(250, 204, 21, 0.14);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.04),
+            0 8px 18px rgba(0, 0, 0, 0.18);
     }
 
     html[data-theme="dark"] .modal-notes {

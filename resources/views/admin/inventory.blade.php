@@ -133,6 +133,42 @@
         color: #ffffff;
     }
 
+    html[data-theme="dark"] .modal-box {
+        background: linear-gradient(180deg, rgba(31, 12, 18, 0.98), rgba(20, 8, 12, 0.98));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
+    }
+
+    html[data-theme="dark"] #modalTitle,
+    html[data-theme="dark"] .modal-panel-title {
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .modal-form-panel {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.10);
+    }
+
+    html[data-theme="dark"] .form-group label {
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .form-control,
+    html[data-theme="dark"] .form-control option {
+        background: rgba(18, 8, 12, 0.94);
+        color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    html[data-theme="dark"] .form-control::placeholder {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] #medicineFields,
+    html[data-theme="dark"] #medicineExpiryField {
+        border-left-color: #facc15 !important;
+    }
+
     html[data-theme="dark"] table td,
     html[data-theme="dark"] table td div,
     html[data-theme="dark"] table td small,

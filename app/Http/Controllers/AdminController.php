@@ -1089,12 +1089,83 @@ class AdminController extends Controller
         };
     }
 
-    public function viewHealth()
+    public function viewHealth(Request $request)
     {
-        // Kukunin natin ang lahat ng records mula sa health_profile table
-        $records = HealthProfile::with('user')->latest()->get();
-        
-        return view('admin.health_records', compact('records'));
+        $search = trim((string) $request->query('q', ''));
+        $courseFilter = trim((string) $request->query('course', ''));
+        $monthFilter = trim((string) $request->query('month', ''));
+        $yearFilter = trim((string) $request->query('year', ''));
+
+        $query = HealthProfile::with('user')->latest();
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                $builder->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('student_number', 'like', '%' . $search . '%')
+                        ->orWhere('student_id', 'like', '%' . $search . '%')
+                        ->orWhere('course', 'like', '%' . $search . '%');
+                });
+            });
+        }
+
+        if ($courseFilter !== '') {
+            $query->whereHas('user', function ($userQuery) use ($courseFilter) {
+                $userQuery->where('course', $courseFilter);
+            });
+        }
+
+        if ($monthFilter !== '') {
+            try {
+                $monthDate = Carbon::parse($monthFilter . '-01');
+                $query->whereYear('created_at', $monthDate->year)
+                    ->whereMonth('created_at', $monthDate->month);
+            } catch (\Throwable $e) {
+                // Ignore invalid month input and keep the query usable.
+            }
+        }
+
+        if ($yearFilter !== '') {
+            $yearAliases = [
+                '1st Year' => ['1st year', '1st', '1', 'first year'],
+                '2nd Year' => ['2nd year', '2nd', '2', 'second year'],
+                '3rd Year' => ['3rd year', '3rd', '3', 'third year'],
+                '4th Year' => ['4th year', '4th', '4', 'fourth year'],
+            ];
+
+            $acceptedYearValues = $yearAliases[$yearFilter] ?? [Str::lower($yearFilter)];
+
+            $query->whereHas('user', function ($userQuery) use ($acceptedYearValues) {
+                $userQuery->where(function ($builder) use ($acceptedYearValues) {
+                    foreach ($acceptedYearValues as $index => $acceptedYearValue) {
+                        $method = $index === 0 ? 'whereRaw' : 'orWhereRaw';
+                        $builder->{$method}('LOWER(year) = ?', [$acceptedYearValue]);
+                    }
+                });
+            });
+        }
+
+        $records = $query->get();
+
+        $courseOptions = User::query()
+            ->whereNotNull('course')
+            ->where('course', '!=', '')
+            ->whereHas('healthProfile')
+            ->distinct()
+            ->orderBy('course')
+            ->pluck('course');
+
+        $yearOptions = collect(['1st Year', '2nd Year', '3rd Year', '4th Year']);
+
+        return view('admin.health_records', compact(
+            'records',
+            'search',
+            'courseFilter',
+            'monthFilter',
+            'yearFilter',
+            'courseOptions',
+            'yearOptions'
+        ));
     }
 
     public function showHealth($id)
@@ -1277,6 +1348,42 @@ public function updateClearance(Request $request, $id)
             : null;
 
         return view('admin.settings', compact('admin', 'settings', 'cmsProfile', 'canManageClearanceSignature', 'clearanceSignatureUrl'));
+    }
+
+    public function markAllAdminNotificationsRead(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return back()->with('error', 'Unable to mark notifications as read.');
+        }
+
+        $notificationIds = collect((array) $request->input('notification_ids', []))
+            ->map(fn ($id) => trim((string) $id))
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($notificationIds->isEmpty()) {
+            return back()->with('success', 'No unread notifications to update.');
+        }
+
+        $readMap = is_array($user->notification_read_map) ? $user->notification_read_map : [];
+        $timestamp = now()->toIso8601String();
+
+        foreach ($notificationIds as $notificationId) {
+            $readMap[$notificationId] = $timestamp;
+        }
+
+        $user->notification_read_map = $readMap;
+        $user->save();
+
+        $redirectTo = trim((string) $request->input('redirect_to', ''));
+        if ($redirectTo !== '' && (str_starts_with($redirectTo, '/') || str_starts_with($redirectTo, url('/')))) {
+            return redirect()->to($redirectTo)->with('success', 'All notifications marked as read.');
+        }
+
+        return back()->with('success', 'All notifications marked as read.');
     }
 
     // ==========================================

@@ -91,19 +91,115 @@
 
     .health-records-toolbar {
         display: flex;
-        align-items: center;
-        gap: 16px;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
         width: 100%;
         margin-bottom: 20px;
     }
 
-    .health-records-search {
-        padding: 10px 16px;
-        border-radius: 8px;
-        border: 1px solid #cbd5e1;
-        width: 350px;
-        color: #111827;
+    .health-records-toolbar-actions {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
         margin-left: auto;
+    }
+
+    .health-filter-form {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .health-filter-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .health-filter-field label {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+    }
+
+    .health-records-search,
+    .health-filter-select {
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        min-width: 180px;
+        color: #111827;
+        background: #ffffff;
+    }
+
+    .health-records-search {
+        width: 280px;
+    }
+
+    .health-filter-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+
+    .health-filter-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+
+    .health-filter-btn:hover {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+
+    .health-filter-btn:hover::after {
+        transform: translateX(135%);
+    }
+
+    .health-filter-btn-reset {
+        background: linear-gradient(135deg, #64748b, #475569);
+        border-color: #475569;
+        box-shadow:
+            0 0 0 3px rgba(100, 116, 139, 0.12),
+            0 10px 22px rgba(71, 85, 105, 0.20);
     }
 
     .health-summary-label {
@@ -147,10 +243,13 @@
     }
 
     html[data-theme="dark"] .health-records-title,
+    html[data-theme="dark"] .health-filter-field label,
     html[data-theme="dark"] .health-records-search,
     html[data-theme="dark"] .health-records-search::placeholder,
+    html[data-theme="dark"] .health-filter-select,
     html[data-theme="dark"] .health-summary-label,
     html[data-theme="dark"] .health-summary-value,
+    html[data-theme="dark"] .summary-item h3,
     html[data-theme="dark"] .summary-item .text-danger,
     html[data-theme="dark"] .card .text-muted,
     html[data-theme="dark"] .card th,
@@ -160,9 +259,33 @@
         color: #ffffff !important;
     }
 
+    html[data-theme="dark"] .health-records-search,
+    html[data-theme="dark"] .health-filter-select {
+        background: rgba(15, 23, 42, 0.92);
+        border-color: rgba(148, 163, 184, 0.24);
+    }
+
+    html[data-theme="dark"] .summary-item .card {
+        background: rgba(15, 23, 42, 0.96);
+        border-color: rgba(148, 163, 184, 0.14);
+    }
+
     html[data-theme="dark"] .health-highlight-row {
         background: linear-gradient(180deg, rgba(76, 29, 149, 0.34), rgba(91, 33, 182, 0.28));
         box-shadow: inset 4px 0 0 #a855f7;
+    }
+
+    @media (max-width: 980px) {
+        .health-records-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .health-records-toolbar-actions,
+        .health-filter-form {
+            justify-content: flex-start;
+            margin-left: 0;
+        }
     }
 </style>
 @endpush
@@ -175,10 +298,54 @@
         $highlightHealthId = trim((string) request()->query('highlight_health', ''));
     @endphp
 
-    {{-- Header with Search --}}
+    {{-- Header with Search / Filters --}}
     <div class="health-records-toolbar">
         <h2 class="health-records-title">Student Health Records</h2>
-        <input type="text" id="recordSearch" class="health-records-search" placeholder="Search by student name or ID...">
+        <div class="health-records-toolbar-actions">
+            <form method="GET" class="health-filter-form">
+                <div class="health-filter-field">
+                    <label for="recordSearch">Search</label>
+                    <input
+                        type="text"
+                        id="recordSearch"
+                        name="q"
+                        value="{{ $search ?? '' }}"
+                        class="health-records-search"
+                        placeholder="Search by student name or ID..."
+                    >
+                </div>
+                <div class="health-filter-field">
+                    <label for="courseFilter">Course</label>
+                    <select id="courseFilter" name="course" class="health-filter-select">
+                        <option value="">All Courses</option>
+                        @foreach(($courseOptions ?? collect()) as $courseOption)
+                            <option value="{{ $courseOption }}" {{ ($courseFilter ?? '') === $courseOption ? 'selected' : '' }}>{{ $courseOption }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="health-filter-field">
+                    <label for="monthFilter">Time</label>
+                    <input
+                        type="month"
+                        id="monthFilter"
+                        name="month"
+                        value="{{ $monthFilter ?? '' }}"
+                        class="health-filter-select"
+                    >
+                </div>
+                <div class="health-filter-field">
+                    <label for="yearFilter">Year Level</label>
+                    <select id="yearFilter" name="year" class="health-filter-select">
+                        <option value="">All Year Levels</option>
+                        @foreach(($yearOptions ?? collect()) as $yearOption)
+                            <option value="{{ $yearOption }}" {{ (string) ($yearFilter ?? '') === (string) $yearOption ? 'selected' : '' }}>{{ $yearOption }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit" class="health-filter-btn">Apply Filters</button>
+                <a href="{{ route('admin.health_records') }}" class="health-filter-btn health-filter-btn-reset">Reset</a>
+            </form>
+        </div>
     </div>
 
     {{-- Summary Cards - Hardcoded Side by Side --}}
@@ -303,13 +470,5 @@
         });
     }
 
-    document.getElementById('recordSearch').addEventListener('keyup', function() {
-        let filter = this.value.toUpperCase();
-        let tr = document.getElementById("healthTable").getElementsByTagName("tr");
-        for (let i = 1; i < tr.length; i++) {
-            let rowText = tr[i].textContent || tr[i].innerText;
-            tr[i].style.display = rowText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-        }
-    });
 </script>
 @endpush

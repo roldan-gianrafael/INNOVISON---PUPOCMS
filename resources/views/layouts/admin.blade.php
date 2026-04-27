@@ -3136,6 +3136,12 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $medicineAlerts = $medicineAlertsQuery
         ->limit(8)
         ->get();
+    $adminNotificationReadMap = is_array(optional(auth()->user())->notification_read_map ?? null)
+        ? (optional(auth()->user())->notification_read_map ?? [])
+        : [];
+    $adminMarkAllReadUrl = $isStudentAssistant
+        ? route('assistant.notifications.read_all')
+        : route('admin.notifications.read_all');
     $recentPendingAppointments = \App\Models\Appointment::query()
         ->where('status', 'Pending')
         ->orderByDesc('created_at')
@@ -3159,6 +3165,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
     foreach ($recentPendingAppointments as $appointment) {
         $adminNotifications->push([
+            'id' => 'appointment-pending:' . $appointment->id . ':' . optional($appointment->updated_at)->timestamp,
             'type' => 'appointment',
             'title' => 'New appointment request',
             'link' => $appointmentsUrl . '?highlight_appointment=' . $appointment->id,
@@ -3176,6 +3183,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
     foreach ($todayApprovedAppointments as $appointment) {
         $adminNotifications->push([
+            'id' => 'appointment-approved:' . $appointment->id . ':' . optional($appointment->updated_at)->timestamp,
             'type' => 'appointment',
             'title' => 'Scheduled consultation today',
             'link' => $appointmentsUrl . '?highlight_appointment=' . $appointment->id,
@@ -3197,6 +3205,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         $studentNumber = trim((string) ($profileUser->student_number ?? $profileUser->student_id ?? 'N/A'));
 
         $adminNotifications->push([
+            'id' => 'health-form:' . $healthProfile->id . ':' . optional($healthProfile->updated_at)->timestamp,
             'type' => 'health-form',
             'title' => 'New health form submission',
             'link' => $healthRecordsUrl . '?highlight_health=' . $healthProfile->id,
@@ -3217,6 +3226,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         $daysLeft = $medicineAlert->expiration_date ? now()->diffInDays($medicineAlert->expiration_date, false) : null;
 
         $adminNotifications->push([
+            'id' => 'medicine-alert:' . $medicineAlert->id . ':' . optional($medicineAlert->updated_at)->timestamp . ':' . optional($medicineAlert->expiration_date)->timestamp,
             'type' => 'medicine',
             'title' => $isExpired ? 'Expired medicine alert' : 'Medicine expiry alert',
             'link' => $inventoryUrl . '?highlight_item=' . $medicineAlert->id,
@@ -3233,7 +3243,14 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         ]);
     }
 
-    $adminNotifications = $adminNotifications->take(10)->values();
+    $adminNotifications = $adminNotifications
+        ->map(function (array $notification) use ($adminNotificationReadMap) {
+            $notification['is_unread'] = !isset($adminNotificationReadMap[$notification['id']]);
+            return $notification;
+        })
+        ->filter(fn (array $notification) => $notification['is_unread'])
+        ->take(10)
+        ->values();
     $adminNotificationCount = $adminNotifications->count();
     $adminNotificationPreview = $adminNotifications->take(4);
     $adminNotificationOverflow = $adminNotifications->slice(4)->values();
@@ -3408,9 +3425,18 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 <p class="medicine-alert-title">Notifications</p>
                 <p class="medicine-alert-subtitle">New appointments, today's schedules, and medicine alerts.</p>
             </div>
-            <button type="button" class="medicine-alert-close" id="medicineAlertCloseBtn" aria-label="Close notifications">
-                <x-outline-icon name="x-mark" />
-            </button>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <form method="POST" action="{{ $adminMarkAllReadUrl }}" style="margin:0;">
+                    @csrf
+                    @foreach($adminNotifications as $notification)
+                        <input type="hidden" name="notification_ids[]" value="{{ $notification['id'] }}">
+                    @endforeach
+                    <button type="submit" class="medicine-see-more-link" style="margin:0;">Mark all read</button>
+                </form>
+                <button type="button" class="medicine-alert-close" id="medicineAlertCloseBtn" aria-label="Close notifications">
+                    <x-outline-icon name="x-mark" />
+                </button>
+            </div>
         </div>
 
         <div class="medicine-alert-list" id="medicineAlertList">
@@ -3419,6 +3445,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 <a
                     href="{{ $notification['link'] }}"
                     class="medicine-alert-item-link"
+                    data-admin-notification-link="true"
+                    data-admin-notification-target="{{ $notification['link'] }}"
                     data-hover-hint="{{ $notification['hover_hint'] }}"
                 >
                 <div class="medicine-alert-content" style="width: 100%;">
@@ -3446,6 +3474,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 <a
                     href="{{ $notification['link'] }}"
                     class="medicine-alert-item-link"
+                    data-admin-notification-link="true"
+                    data-admin-notification-target="{{ $notification['link'] }}"
                     data-hover-hint="{{ $notification['hover_hint'] }}"
                 >
                 <div class="medicine-alert-content" style="width: 100%;">
@@ -3472,6 +3502,14 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         </div>
     @endif
     </section>
+
+    <form method="POST" action="{{ $adminMarkAllReadUrl }}" id="adminNotificationOpenForm" style="display:none;">
+        @csrf
+        @foreach($adminNotifications as $notification)
+            <input type="hidden" name="notification_ids[]" value="{{ $notification['id'] }}">
+        @endforeach
+        <input type="hidden" name="redirect_to" id="adminNotificationRedirectTo" value="">
+    </form>
 @endif
 
 <div id="medicineHoverHint" class="medicine-hover-hint" aria-hidden="true">Press to enter</div>
@@ -3618,9 +3656,12 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const panel = document.getElementById('medicineAlertPanel');
         const closeButton = document.getElementById('medicineAlertCloseBtn');
         const moreButton = document.getElementById('medicineAlertMoreBtn');
+        const openForm = document.getElementById('adminNotificationOpenForm');
+        const redirectInput = document.getElementById('adminNotificationRedirectTo');
         const hiddenItems = Array.from(document.querySelectorAll('[data-medicine-alert-extra="true"]'));
         const hoverHint = document.getElementById('medicineHoverHint');
         const hintTargets = Array.from(document.querySelectorAll('.medicine-alert-item-link[data-hover-hint]'));
+        const notificationLinks = Array.from(document.querySelectorAll('.medicine-alert-item-link[data-admin-notification-link="true"]'));
         let closeTimer = null;
 
         if (!toggles.length || !panel) {
@@ -3731,6 +3772,21 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
                 target.addEventListener('mouseleave', function () {
                     hoverHint.classList.remove('is-visible');
+                });
+            });
+        }
+
+        if (openForm && redirectInput && notificationLinks.length > 0) {
+            notificationLinks.forEach(function (link) {
+                link.addEventListener('click', function (event) {
+                    const targetUrl = link.dataset.adminNotificationTarget || link.getAttribute('href') || '';
+                    if (targetUrl.trim() === '') {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    redirectInput.value = targetUrl;
+                    openForm.submit();
                 });
             });
         }

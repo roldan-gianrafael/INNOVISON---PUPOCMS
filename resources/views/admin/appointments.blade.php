@@ -252,7 +252,7 @@
         border-color: #cbd5e1;
         cursor: not-allowed;
     }
-    .appointment-completed-badge {
+    .appointment-inline-pill {
         min-width: 122px;
         min-height: 38px;
         padding: 8px 14px;
@@ -261,16 +261,35 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        background: linear-gradient(135deg, #fff8d6, #ffefb5);
-        color: #7c2d12;
-        border: 1px solid #facc15;
         font-size: 12px;
         font-weight: 800;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.14),
             0 10px 20px rgba(146, 64, 14, 0.10);
     }
-    .appointment-completed-badge svg {
+    .appointment-inline-pill.is-view {
+        background: linear-gradient(135deg, #fff8d6, #ffefb5);
+        color: #7c2d12;
+        border: 1px solid #facc15;
+    }
+    .appointment-inline-pill.is-consult {
+        background: linear-gradient(135deg, #f7e4e8, #f1cfd7);
+        color: #7f1d2d;
+        border: 1px solid #e7aebd;
+        box-shadow:
+            0 0 0 3px rgba(190, 24, 93, 0.10),
+            0 10px 20px rgba(127, 29, 45, 0.10);
+    }
+    .appointment-inline-pill.is-disabled {
+        background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+        color: #64748b;
+        border: 1px solid #cbd5e1;
+        box-shadow:
+            0 0 0 3px rgba(148, 163, 184, 0.10),
+            0 10px 20px rgba(71, 85, 105, 0.08);
+        cursor: not-allowed;
+    }
+    .appointment-inline-pill svg {
         width: 16px;
         height: 16px;
         flex: 0 0 auto;
@@ -767,13 +786,29 @@
         border-color: rgba(148, 163, 184, 0.22);
         color: #cbd5e1;
     }
-    html[data-theme="dark"] .appointment-completed-badge {
+    html[data-theme="dark"] .appointment-inline-pill.is-view {
         background: linear-gradient(135deg, rgba(133, 77, 14, 0.96), rgba(161, 98, 7, 0.90));
         border-color: rgba(250, 204, 21, 0.34);
         color: #fff8dc;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.10),
             0 12px 22px rgba(0, 0, 0, 0.24);
+    }
+    html[data-theme="dark"] .appointment-inline-pill.is-consult {
+        background: linear-gradient(135deg, rgba(112, 19, 27, 0.94), rgba(143, 34, 48, 0.90));
+        border-color: rgba(244, 114, 182, 0.24);
+        color: #fff1f2;
+        box-shadow:
+            0 0 0 3px rgba(244, 114, 182, 0.10),
+            0 12px 22px rgba(0, 0, 0, 0.24);
+    }
+    html[data-theme="dark"] .appointment-inline-pill.is-disabled {
+        background: linear-gradient(135deg, rgba(71, 85, 105, 0.92), rgba(51, 65, 85, 0.92));
+        border-color: rgba(148, 163, 184, 0.26);
+        color: #e2e8f0;
+        box-shadow:
+            0 0 0 3px rgba(148, 163, 184, 0.10),
+            0 12px 22px rgba(0, 0, 0, 0.22);
     }
 
     html[data-theme="dark"] .modal-box {
@@ -934,22 +969,43 @@
                             <span class="status {{ strtolower($appt->status) }}">{{ $appt->status }}</span>
                         </td>
                         <td>
-                            @if($appt->status === 'Completed')
-                                <span class="appointment-completed-badge" title="Click to view">
+                            @php
+                                $scheduledAt = $appt->status === 'Approved'
+                                    ? \Carbon\Carbon::parse($appt->date . ' ' . $appt->time)
+                                    : null;
+                                $consultEligibleAt = $scheduledAt?->copy()->subMinutes(10);
+                                $now = \Carbon\Carbon::now();
+                                $consultLocked = $consultEligibleAt ? $now->lt($consultEligibleAt) : false;
+                            @endphp
+
+                            @if($appt->status === 'Approved')
+                                @if($consultLocked)
+                                    <span class="appointment-inline-pill is-disabled" title="Consult becomes available 10 minutes before the scheduled time on {{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }}">
+                                        <x-outline-icon name="clipboard-document-list" />
+                                        Consult
+                                    </span>
+                                @else
+                                    <a href="{{ url($basePrefix . '/walkin/form/' . $appt->student_id) }}?source=online" class="appointment-inline-pill is-consult" title="Open consult form">
+                                        <x-outline-icon name="clipboard-document-list" />
+                                        Consult
+                                    </a>
+                                @endif
+                            @elseif(in_array($appt->status, ['Completed', 'Cancelled', 'Expired'], true))
+                                <button
+                                    type="button"
+                                    class="appointment-inline-pill is-view"
+                                    title="Click to view"
+                                    data-name="{{ $appt->name }}"
+                                    data-service="{{ $appt->service }}"
+                                    data-date="{{ $appt->date }}"
+                                    data-time="{{ $appt->time }}"
+                                    data-remarks="{{ $appt->remarks ?? 'No notes provided.' }}"
+                                    data-email="{{ $appt->email }}"
+                                    onclick="openInfoModal(this)">
                                     <x-outline-icon name="eye" />
                                     View
-                                </span>
+                                </button>
                             @else
-                                @php
-                                    $scheduledAt = $appt->status === 'Approved'
-                                        ? \Carbon\Carbon::parse($appt->date . ' ' . $appt->time)
-                                        : null;
-                                    $consultEligibleAt = $scheduledAt?->copy()->subMinutes(10);
-                                    $missedEligibleAt = $scheduledAt?->copy()->addHour();
-                                    $now = \Carbon\Carbon::now();
-                                    $consultLocked = $consultEligibleAt ? $now->lt($consultEligibleAt) : false;
-                                    $showMissedAction = $missedEligibleAt ? $now->greaterThanOrEqualTo($missedEligibleAt) : false;
-                                @endphp
                                 <div class="appointment-action-menu-wrap" data-appointment-action-menu>
                                     <button type="button" class="appointment-action-menu-toggle" aria-expanded="false">
                                         <x-outline-icon name="bars-3" />
@@ -984,18 +1040,6 @@
                                                 <x-outline-icon name="x-mark" />
                                                 Reject
                                             </a>
-                                        @elseif($appt->status == 'Approved')
-                                            @if($consultLocked)
-                                                <span class="appointment-action-menu-state" title="Consult becomes available 10 minutes before the scheduled time on {{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }}">
-                                                    <x-outline-icon name="clipboard-document-list" />
-                                                    Consult (Scheduled)
-                                                </span>
-                                            @else
-                                                <a href="{{ url($basePrefix . '/walkin/form/' . $appt->student_id) }}?source=online" class="appointment-action-menu-item is-consult btn-consult">
-                                                    <x-outline-icon name="clipboard-document-list" />
-                                                    Consult
-                                                </a>
-                                            @endif
                                         @endif
                                     </div>
                                 </div>

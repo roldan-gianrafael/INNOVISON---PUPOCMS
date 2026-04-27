@@ -395,9 +395,9 @@
         gap: 16px;
         align-items: start;
         padding: 12px 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(112, 19, 27, 0.14);
-        background: #fffdfa;
+        border-radius: 16px;
+        border: 1px solid rgba(112, 19, 27, 0.34);
+        background: #fff8dc;
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.82),
             0 8px 18px rgba(112, 19, 27, 0.05);
@@ -425,13 +425,13 @@
         margin-bottom: 16px;
     }
     .modal-notes {
-        background: #f8fafc;
+        background: #fff4c7;
         padding: 10px;
-        border-radius: 8px;
+        border-radius: 14px;
         font-size: 13px;
         color: #111827;
         min-height: 72px;
-        border: 1px solid rgba(112, 19, 27, 0.08);
+        border: 1px solid rgba(112, 19, 27, 0.28);
     }
     .dialog-actions {
         display: flex;
@@ -863,11 +863,11 @@
         color: #cbd5e1;
     }
     html[data-theme="dark"] .appointment-inline-pill.is-view {
-        background: linear-gradient(135deg, rgba(133, 77, 14, 0.96), rgba(161, 98, 7, 0.90));
-        border-color: rgba(250, 204, 21, 0.34);
-        color: #fff8dc;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.96), rgba(31, 41, 55, 0.92));
+        border-color: rgba(148, 163, 184, 0.24);
+        color: #ffffff;
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.10),
+            0 0 0 3px rgba(148, 163, 184, 0.10),
             0 12px 22px rgba(0, 0, 0, 0.24);
     }
     html[data-theme="dark"] .appointment-inline-pill.is-consult {

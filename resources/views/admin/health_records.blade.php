@@ -116,9 +116,7 @@
 
     .health-filter-shell {
         display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 10px;
+        align-items: center;
     }
 
     .health-filter-toggle {
@@ -183,20 +181,12 @@
     }
 
     .health-filter-form {
-        display: none;
+        display: flex;
         align-items: flex-end;
-        justify-content: flex-end;
+        justify-content: flex-start;
         gap: 12px;
         flex-wrap: wrap;
-        padding: 16px;
-        border-radius: 18px;
-        background: #ffffff;
-        border: 1px solid rgba(127, 29, 45, 0.12);
-        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
-    }
-
-    .health-filter-form.is-open {
-        display: flex;
+        margin-top: 16px;
     }
 
     .health-filter-field {
@@ -286,6 +276,71 @@
             0 10px 22px rgba(71, 85, 105, 0.20);
     }
 
+    .health-filter-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(15, 23, 42, 0.42);
+        backdrop-filter: blur(6px);
+        z-index: 1200;
+    }
+
+    .health-filter-modal.is-open {
+        display: flex;
+    }
+
+    .health-filter-modal-card {
+        width: min(760px, 100%);
+        border-radius: 22px;
+        background: #ffffff;
+        border: 1px solid rgba(127, 29, 45, 0.12);
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+        padding: 22px;
+    }
+
+    .health-filter-modal-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .health-filter-modal-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 900;
+        color: #70131B;
+    }
+
+    .health-filter-modal-copy {
+        margin: 6px 0 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .health-filter-modal-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid rgba(127, 29, 45, 0.12);
+        border-radius: 999px;
+        background: #ffffff;
+        color: #111827;
+        cursor: pointer;
+    }
+
+    .health-filter-modal-close svg {
+        width: 18px;
+        height: 18px;
+    }
+
     .health-summary-label {
         font-size: 17px;
         letter-spacing: 0.5px;
@@ -369,10 +424,24 @@
         border-color: rgba(148, 163, 184, 0.24);
     }
 
-    html[data-theme="dark"] .health-filter-form {
-        background: rgba(15, 23, 42, 0.96);
+    html[data-theme="dark"] .health-filter-modal-card {
+        background: rgba(15, 23, 42, 0.98);
         border-color: rgba(148, 163, 184, 0.14);
         box-shadow: 0 18px 32px rgba(0, 0, 0, 0.24);
+    }
+
+    html[data-theme="dark"] .health-filter-modal-title,
+    html[data-theme="dark"] .health-filter-modal-close {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .health-filter-modal-copy {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .health-filter-modal-close {
+        background: rgba(15, 23, 42, 0.92);
+        border-color: rgba(148, 163, 184, 0.24);
     }
 
     html[data-theme="dark"] .summary-item .card {
@@ -392,8 +461,7 @@
         }
 
         .health-records-toolbar-actions,
-        .health-filter-shell,
-        .health-filter-form {
+        .health-filter-shell {
             justify-content: flex-start;
             margin-left: 0;
             align-items: stretch;
@@ -451,41 +519,9 @@
     <div class="health-table-head">
         <div class="health-table-title">Health Profile Summary</div>
         <div class="health-filter-shell">
-            <button type="button" class="health-filter-toggle" id="healthFilterToggle" aria-expanded="false" aria-controls="healthFilterForm">
+            <button type="button" class="health-filter-toggle" id="healthFilterToggle" aria-expanded="false" aria-controls="healthFilterModal">
                 Filter Health Forms
             </button>
-            <form method="GET" class="health-filter-form" id="healthFilterForm">
-                <div class="health-filter-field">
-                    <label for="courseFilter">Course</label>
-                    <select id="courseFilter" name="course" class="health-filter-select">
-                        <option value="">All Courses</option>
-                        @foreach(($courseOptions ?? collect()) as $courseOption)
-                            <option value="{{ $courseOption }}" {{ ($courseFilter ?? '') === $courseOption ? 'selected' : '' }}>{{ $courseOption }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="health-filter-field">
-                    <label for="monthFilter">Time</label>
-                    <input
-                        type="month"
-                        id="monthFilter"
-                        name="month"
-                        value="{{ $monthFilter ?? '' }}"
-                        class="health-filter-select"
-                    >
-                </div>
-                <div class="health-filter-field">
-                    <label for="yearFilter">Year Level</label>
-                    <select id="yearFilter" name="year" class="health-filter-select">
-                        <option value="">All Year Levels</option>
-                        @foreach(($yearOptions ?? collect()) as $yearOption)
-                            <option value="{{ $yearOption }}" {{ (string) ($yearFilter ?? '') === (string) $yearOption ? 'selected' : '' }}>{{ $yearOption }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <button type="submit" class="health-filter-btn">Apply</button>
-                <a href="{{ route('admin.health_records') }}" class="health-filter-btn health-filter-btn-reset">Reset</a>
-            </form>
         </div>
     </div>
     <table id="healthTable">
@@ -572,11 +608,60 @@
         </tbody>
     </table>
 </div>
+
+<div class="health-filter-modal" id="healthFilterModal" aria-hidden="true">
+    <div class="health-filter-modal-card">
+        <div class="health-filter-modal-head">
+            <div>
+                <h3 class="health-filter-modal-title">Filter Health Forms</h3>
+                <p class="health-filter-modal-copy">Narrow the student health form list by course, month, or year level.</p>
+            </div>
+            <button type="button" class="health-filter-modal-close" id="healthFilterCloseBtn" aria-label="Close filter popup">
+                <x-outline-icon name="x-mark" />
+            </button>
+        </div>
+
+        <form method="GET" class="health-filter-form" id="healthFilterForm">
+            <div class="health-filter-field">
+                <label for="courseFilter">Course</label>
+                <select id="courseFilter" name="course" class="health-filter-select">
+                    <option value="">All Courses</option>
+                    @foreach(($courseOptions ?? collect()) as $courseOption)
+                        <option value="{{ $courseOption }}" {{ ($courseFilter ?? '') === $courseOption ? 'selected' : '' }}>{{ $courseOption }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="health-filter-field">
+                <label for="monthFilter">Time</label>
+                <input
+                    type="month"
+                    id="monthFilter"
+                    name="month"
+                    value="{{ $monthFilter ?? '' }}"
+                    class="health-filter-select"
+                >
+            </div>
+            <div class="health-filter-field">
+                <label for="yearFilter">Year Level</label>
+                <select id="yearFilter" name="year" class="health-filter-select">
+                    <option value="">All Year Levels</option>
+                    @foreach(($yearOptions ?? collect()) as $yearOption)
+                        <option value="{{ $yearOption }}" {{ (string) ($yearFilter ?? '') === (string) $yearOption ? 'selected' : '' }}>{{ $yearOption }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="health-filter-btn">Apply</button>
+            <a href="{{ route('admin.health_records') }}" class="health-filter-btn health-filter-btn-reset">Reset</a>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
     const healthFilterToggle = document.getElementById('healthFilterToggle');
+    const healthFilterModal = document.getElementById('healthFilterModal');
+    const healthFilterCloseBtn = document.getElementById('healthFilterCloseBtn');
     const healthFilterForm = document.getElementById('healthFilterForm');
     const hasActiveHealthFilters = @json(
         trim((string) ($search ?? '')) !== ''
@@ -587,21 +672,38 @@
     const highlightedHealthId = @json($highlightHealthId);
 
     function setHealthFilterOpenState(isOpen) {
-        if (!healthFilterToggle || !healthFilterForm) {
+        if (!healthFilterToggle || !healthFilterModal) {
             return;
         }
 
         healthFilterToggle.classList.toggle('is-open', isOpen);
         healthFilterToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        healthFilterForm.classList.toggle('is-open', isOpen);
+        healthFilterModal.classList.toggle('is-open', isOpen);
+        healthFilterModal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
     }
 
-    if (healthFilterToggle && healthFilterForm) {
-        setHealthFilterOpenState(hasActiveHealthFilters);
-
+    if (healthFilterToggle && healthFilterModal) {
         healthFilterToggle.addEventListener('click', function () {
-            setHealthFilterOpenState(!healthFilterForm.classList.contains('is-open'));
+            setHealthFilterOpenState(true);
         });
+    }
+
+    if (healthFilterCloseBtn) {
+        healthFilterCloseBtn.addEventListener('click', function () {
+            setHealthFilterOpenState(false);
+        });
+    }
+
+    if (healthFilterModal) {
+        healthFilterModal.addEventListener('click', function (event) {
+            if (event.target === healthFilterModal) {
+                setHealthFilterOpenState(false);
+            }
+        });
+    }
+
+    if (hasActiveHealthFilters) {
+        setHealthFilterOpenState(true);
     }
 
     if (highlightedHealthId) {

@@ -41,7 +41,7 @@
     
     h2,
     .card,
-    .card *:not(.status):not(.type-badge):not(.btn-action):not(.dialog-btn):not(.btn-add-walkin):not(.appointment-action-menu-item):not(.appointment-action-menu-state):not(.appointment-action-menu-item *):not(.appointment-action-menu-state *) {
+    .card *:not(.status):not(.type-badge):not(.btn-action):not(.dialog-btn):not(.btn-add-walkin):not(.appointment-action-menu-toggle):not(.appointment-action-menu-toggle *):not(.appointment-action-menu-item):not(.appointment-action-menu-state):not(.appointment-action-menu-item *):not(.appointment-action-menu-state *) {
         color: #111827;
     }
 
@@ -118,10 +118,16 @@
         justify-content: center;
         gap: 8px;
         cursor: pointer;
+        color: #ffffff !important;
         box-shadow:
             0 0 0 3px rgba(112, 19, 27, 0.10),
             0 10px 20px rgba(112, 19, 27, 0.18);
         transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .appointment-action-menu-toggle,
+    .appointment-action-menu-toggle span,
+    .appointment-action-menu-toggle svg {
+        color: #ffffff !important;
     }
     .appointment-action-menu-toggle:hover,
     .appointment-action-menu-wrap.is-open .appointment-action-menu-toggle {

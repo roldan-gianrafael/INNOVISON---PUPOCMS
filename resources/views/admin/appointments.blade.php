@@ -342,6 +342,18 @@
         border-top: 4px solid #70131B;
         border-bottom: 4px solid #70131B;
     }
+    .main #infoModal .modal-box,
+    .main #statusActionModal .modal-box,
+    .main #rescheduleModal .modal-box {
+        background: rgba(255, 255, 255, 0.28) !important;
+        border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
+        border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
+        border-top: 4px solid #70131B !important;
+        border-bottom: 4px solid #70131B !important;
+        border-radius: 18px !important;
+        backdrop-filter: blur(14px) !important;
+        -webkit-backdrop-filter: blur(14px) !important;
+    }
     .modal-header {
         display: flex;
         align-items: flex-start;
@@ -875,6 +887,16 @@
         box-shadow:
             0 22px 38px rgba(0, 0, 0, 0.42),
             0 0 0 1px rgba(250, 204, 21, 0.06);
+    }
+    html[data-theme="dark"] .main #infoModal .modal-box,
+    html[data-theme="dark"] .main #statusActionModal .modal-box,
+    html[data-theme="dark"] .main #rescheduleModal .modal-box {
+        background: rgba(28, 20, 22, 0.34) !important;
+        border-left: 1px solid rgba(143, 34, 48, 0.36) !important;
+        border-right: 1px solid rgba(143, 34, 48, 0.36) !important;
+        border-top: 4px solid #facc15 !important;
+        border-bottom: 4px solid #facc15 !important;
+        border-radius: 18px !important;
     }
 
     html[data-theme="dark"] .modal-title,

@@ -20,7 +20,7 @@
         padding: 16px 18px;
         border-radius: 0 0 20px 20px;
         border: 0;
-        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+        border-bottom: 2px solid rgba(234, 215, 160, 0.9);
         background: linear-gradient(135deg, rgba(255, 253, 246, 0.76) 0%, rgba(255, 249, 231, 0.58) 42%, rgba(255, 255, 255, 0.82) 100%);
         box-shadow: 0 14px 26px rgba(112, 19, 27, 0.05);
     }

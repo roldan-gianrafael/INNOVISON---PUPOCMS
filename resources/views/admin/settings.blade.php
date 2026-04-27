@@ -38,7 +38,7 @@
         background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,247,249,0.96));
         color: var(--stg-text);
         border: 0;
-        border-bottom: 2px solid rgba(127, 0, 0, 0.72);
+        border-bottom: 2px solid rgba(234, 215, 160, 0.9);
         border-radius: 0 0 20px 20px;
         padding: 28px;
         margin-bottom: 22px;

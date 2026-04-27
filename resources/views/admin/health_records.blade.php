@@ -211,7 +211,7 @@
         padding: 10px 18px;
         border-radius: 0 0 14px 14px;
         border: 0;
-        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+        border-bottom: 2px solid rgba(234, 215, 160, 0.9);
         background: transparent;
         box-shadow: none;
     }
@@ -245,6 +245,39 @@
         gap: 12px;
         flex-wrap: wrap;
         margin-left: auto;
+    }
+    .health-records-search-shell {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    .health-records-search-wrap {
+        width: 0;
+        max-width: 100%;
+        flex: 0 0 0;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transform: translateX(12px) scaleX(0.96);
+        transform-origin: right center;
+        transition:
+            width .32s cubic-bezier(.22, 1, .36, 1),
+            flex-basis .32s cubic-bezier(.22, 1, .36, 1),
+            opacity .24s ease,
+            transform .28s cubic-bezier(.22, 1, .36, 1);
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+    .health-records-search-shell.is-open .health-records-search-wrap {
+        width: 320px;
+        flex: 0 0 320px;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0) scaleX(1);
     }
 
     .health-filter-shell {
@@ -364,6 +397,10 @@
     .health-records-search {
         width: 280px;
     }
+    .health-records-search::placeholder {
+        color: #7f1d2d;
+        font-weight: 700;
+    }
 
     .health-records-search:focus,
     .health-filter-select:focus {
@@ -371,6 +408,38 @@
         border-bottom-color: #70131B;
         box-shadow: none !important;
         transform: translateY(-1px);
+    }
+    .health-records-search-toggle {
+        width: 50px !important;
+        height: 50px !important;
+        min-width: 50px !important;
+        min-height: 50px !important;
+        flex: 0 0 50px !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        border-radius: 999px !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        background: linear-gradient(135deg, #70131B, #8f2230) !important;
+        border: 1px solid #8f2230 !important;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20) !important;
+        outline: none !important;
+    }
+    .health-records-search-toggle svg {
+        width: 28px !important;
+        height: 28px !important;
+        stroke-width: 2 !important;
+        display: block;
+    }
+    .health-records-search-toggle:hover,
+    .health-records-search-toggle:focus {
+        border-color: #facc15 !important;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16) !important;
+        outline: none !important;
     }
 
     .health-filter-btn {
@@ -586,6 +655,10 @@
         color: #ffffff !important;
     }
 
+    html[data-theme="dark"] .health-records-search::placeholder {
+        color: #fecdd3 !important;
+    }
+
     html[data-theme="dark"] .health-records-title {
         border-color: rgba(250, 204, 21, 0.30);
         background: linear-gradient(135deg, rgba(255, 248, 196, 0.14) 0%, rgba(112, 19, 27, 0.42) 100%);
@@ -599,6 +672,14 @@
         box-shadow:
             0 0 0 2px rgba(250, 204, 21, 0.06),
             0 10px 20px rgba(0, 0, 0, 0.20);
+    }
+
+    html[data-theme="dark"] .health-records-search-toggle {
+        background: linear-gradient(135deg, #70131B, #8f2230) !important;
+        border-color: rgba(250, 204, 21, 0.28) !important;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.16),
+            0 12px 22px rgba(0, 0, 0, 0.24) !important;
     }
 
     html[data-theme="dark"] .health-records-toolbar {
@@ -689,6 +770,21 @@
             width: 100%;
         }
 
+        .health-records-search-shell {
+            width: 100%;
+        }
+
+        .health-records-search-wrap,
+        .health-records-search-shell.is-open .health-records-search-wrap {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+
+        .health-records-search-shell:not(.is-open) .health-records-search-wrap {
+            width: 0;
+            flex-basis: 0;
+        }
+
         .health-records-search {
             width: 100%;
         }
@@ -708,15 +804,21 @@
     <div class="health-records-toolbar">
         <h2 class="health-records-title"><x-outline-icon name="document-text" />Student Health Records</h2>
         <div class="health-records-toolbar-actions">
-            <input
-                type="text"
-                id="recordSearch"
-                name="q"
-                value="{{ $search ?? '' }}"
-                class="health-records-search"
-                form="healthFilterForm"
-                placeholder="Search by student name or ID..."
-            >
+            <div class="health-records-search-shell" id="healthRecordsSearchShell">
+                <div class="health-records-search-wrap">
+                    <input
+                        type="text"
+                        id="recordSearch"
+                        name="q"
+                        value="{{ $search ?? '' }}"
+                        class="health-records-search"
+                        placeholder="Search by student name or ID..."
+                    >
+                </div>
+                <button type="button" class="health-filter-toggle health-records-search-toggle" id="healthRecordsSearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="recordSearch">
+                    <x-outline-icon name="magnifying-glass" />
+                </button>
+            </div>
         </div>
     </div>
 
@@ -898,6 +1000,10 @@
     const healthFilterCloseBtn = document.getElementById('healthFilterCloseBtn');
     const healthFilterForm = document.getElementById('healthFilterForm');
     const highlightedHealthId = @json($highlightHealthId);
+    const healthRecordsSearchInput = document.getElementById('recordSearch');
+    const healthRecordsSearchShell = document.getElementById('healthRecordsSearchShell');
+    const healthRecordsSearchToggle = document.getElementById('healthRecordsSearchToggle');
+    const healthRows = Array.from(document.querySelectorAll('#healthTable tbody tr[data-health-row]'));
 
     function setHealthFilterOpenState(isOpen) {
         if (!healthFilterToggle || !healthFilterModal) {
@@ -941,6 +1047,37 @@
             const highlightedRow = document.querySelector('[data-health-row][data-health-id="' + highlightedHealthId + '"]');
             if (highlightedRow) {
                 highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
+
+    if (healthRecordsSearchInput) {
+        healthRecordsSearchInput.addEventListener('input', function () {
+            const searchTerm = this.value.trim().toLowerCase();
+
+            healthRows.forEach(function (row) {
+                const rowText = row.innerText.toLowerCase();
+                row.style.display = rowText.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    }
+
+    if (healthRecordsSearchShell && healthRecordsSearchInput && healthRecordsSearchToggle) {
+        const setHealthRecordsSearchOpenState = function (isOpen) {
+            healthRecordsSearchShell.classList.toggle('is-open', isOpen);
+            healthRecordsSearchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        };
+
+        setHealthRecordsSearchOpenState(healthRecordsSearchInput.value.trim() !== '');
+
+        healthRecordsSearchToggle.addEventListener('click', function () {
+            const shouldOpen = !healthRecordsSearchShell.classList.contains('is-open');
+            setHealthRecordsSearchOpenState(shouldOpen);
+
+            if (shouldOpen) {
+                window.requestAnimationFrame(function () {
+                    healthRecordsSearchInput.focus();
+                });
             }
         });
     }

@@ -30,7 +30,7 @@
         padding: 16px 18px;
         border-radius: 0 0 20px 20px;
         border: 0;
-        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+        border-bottom: 2px solid rgba(234, 215, 160, 0.9);
         background: linear-gradient(135deg, rgba(255, 253, 246, 0.76) 0%, rgba(255, 249, 231, 0.58) 42%, rgba(255, 255, 255, 0.82) 100%);
         box-shadow: 0 14px 26px rgba(112, 19, 27, 0.05);
     }
@@ -60,10 +60,38 @@
         margin-left: auto;
         flex-wrap: wrap;
     }
+    .inventory-search-shell {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: flex-end;
+    }
     .inventory-search-wrap {
-        width: 300px;
+        width: 0;
         max-width: 100%;
-        flex: 0 0 300px;
+        flex: 0 0 0;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transform: translateX(12px) scaleX(0.96);
+        transform-origin: right center;
+        transition:
+            width .32s cubic-bezier(.22, 1, .36, 1),
+            flex-basis .32s cubic-bezier(.22, 1, .36, 1),
+            opacity .24s ease,
+            transform .28s cubic-bezier(.22, 1, .36, 1);
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+    .inventory-search-shell.is-open .inventory-search-wrap {
+        width: 320px;
+        flex: 0 0 320px;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0) scaleX(1);
     }
     .inventory-search-input {
         width: 100%;
@@ -80,11 +108,47 @@
         appearance: none;
         -webkit-appearance: none;
     }
+    .inventory-search-input::placeholder {
+        color: #7f1d2d;
+        font-weight: 700;
+    }
     .inventory-search-input:focus {
         outline: none;
         border-bottom-color: #70131B;
         box-shadow: none !important;
         transform: translateY(-1px);
+    }
+    .inventory-search-toggle {
+        width: 50px !important;
+        height: 50px !important;
+        min-width: 50px !important;
+        min-height: 50px !important;
+        flex: 0 0 50px !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        border-radius: 999px !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        background: linear-gradient(135deg, #70131B, #8f2230) !important;
+        border: 1px solid #8f2230 !important;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20) !important;
+        outline: none !important;
+    }
+    .inventory-search-toggle svg {
+        width: 28px !important;
+        height: 28px !important;
+        stroke-width: 2 !important;
+        display: block;
+    }
+    .inventory-search-toggle:hover,
+    .inventory-search-toggle:focus {
+        border-color: #facc15 !important;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16) !important;
+        outline: none !important;
     }
     .btn-add,
     .inventory-btn-cancel {
@@ -270,6 +334,14 @@
         color: #e5e7eb;
     }
 
+    html[data-theme="dark"] .inventory-search-toggle {
+        background: linear-gradient(135deg, #70131B, #8f2230) !important;
+        border-color: rgba(250, 204, 21, 0.28) !important;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.16),
+            0 12px 22px rgba(0, 0, 0, 0.24) !important;
+    }
+
     @media (max-width: 920px) {
         .controls {
             flex-direction: column;
@@ -283,9 +355,19 @@
             margin-left: 0;
         }
 
-        .inventory-search-wrap {
+        .inventory-search-shell {
+            width: 100%;
+        }
+
+        .inventory-search-wrap,
+        .inventory-search-shell.is-open .inventory-search-wrap {
             width: 100%;
             flex: 1 1 100%;
+        }
+
+        .inventory-search-shell:not(.is-open) .inventory-search-wrap {
+            width: 0;
+            flex-basis: 0;
         }
 
         .btn-add {
@@ -381,8 +463,13 @@
     <div class="controls">
         <h2 class="inventory-page-title"><x-outline-icon name="cube" />Clinic Inventory</h2>
         <div class="inventory-toolbar-actions">
-            <div class="inventory-search-wrap">
-                <input type="text" id="inventorySearchInput" class="inventory-search-input" placeholder="Search by item, category, or unit...">
+            <div class="inventory-search-shell" id="inventorySearchShell">
+                <div class="inventory-search-wrap">
+                    <input type="text" id="inventorySearchInput" class="inventory-search-input" placeholder="Search by item, category, or unit...">
+                </div>
+                <button type="button" class="btn-add inventory-search-toggle" id="inventorySearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="inventorySearchInput">
+                    <x-outline-icon name="magnifying-glass" />
+                </button>
             </div>
             @if($canManageInventory)
                 <button class="btn-add" onclick="openModal()">+ Add New Item</button>
@@ -580,6 +667,8 @@
     const highlightedRow = document.querySelector('.inventory-row-highlight');
     const highlightedExpiredRow = document.querySelector('.inventory-row-highlight-expired');
     const inventorySearchInput = document.getElementById('inventorySearchInput');
+    const inventorySearchShell = document.getElementById('inventorySearchShell');
+    const inventorySearchToggle = document.getElementById('inventorySearchToggle');
     const inventoryRows = Array.from(document.querySelectorAll('#inventoryTable tbody tr[data-inventory-row]'));
 
     function toggleMedicineFields() {
@@ -662,13 +751,33 @@
     }
 
     if (inventorySearchInput) {
-        inventorySearchInput.addEventListener('keyup', function () {
+        inventorySearchInput.addEventListener('input', function () {
             const searchTerm = this.value.trim().toLowerCase();
 
             inventoryRows.forEach(function (row) {
                 const rowText = row.innerText.toLowerCase();
                 row.style.display = rowText.includes(searchTerm) ? '' : 'none';
             });
+        });
+    }
+
+    if (inventorySearchShell && inventorySearchInput && inventorySearchToggle) {
+        const setInventorySearchOpenState = function (isOpen) {
+            inventorySearchShell.classList.toggle('is-open', isOpen);
+            inventorySearchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        };
+
+        setInventorySearchOpenState(inventorySearchInput.value.trim() !== '');
+
+        inventorySearchToggle.addEventListener('click', function () {
+            const shouldOpen = !inventorySearchShell.classList.contains('is-open');
+            setInventorySearchOpenState(shouldOpen);
+
+            if (shouldOpen) {
+                window.requestAnimationFrame(function () {
+                    inventorySearchInput.focus();
+                });
+            }
         });
     }
 </script>

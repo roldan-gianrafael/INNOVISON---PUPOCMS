@@ -24,11 +24,11 @@
         content: "";
         position: absolute;
         top: 0;
-        left: 0;
-        right: 0;
+        left: 14px;
+        right: 14px;
         height: 5px;
         background: #70131B;
-        border-radius: 14px 14px 0 0;
+        border-radius: 999px;
         pointer-events: none;
         z-index: 1;
     }

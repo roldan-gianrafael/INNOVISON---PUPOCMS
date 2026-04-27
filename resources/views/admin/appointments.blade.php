@@ -10,11 +10,27 @@
         border-radius: 12px;
         padding: 24px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        border: 1px solid #f0f0f0;
-        border-top: 5px solid #70131B;
         box-shadow:
             0 4px 12px rgba(0,0,0,0.05),
             inset 0 1px 0 rgba(255,255,255,0.72);
+    }
+
+    .appointments-summary-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .appointments-summary-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: #70131B;
+        border-radius: 14px 14px 0 0;
+        pointer-events: none;
+        z-index: 1;
     }
 
     .appointments-summary-title {
@@ -480,8 +496,11 @@
             0 16px 28px rgba(0, 0, 0, 0.22);
     }
 
+    html[data-theme="dark"] .appointments-summary-card::before {
+        background: #facc15;
+    }
+
     html[data-theme="dark"] .card {
-        border-top-color: #facc15;
         box-shadow:
             0 14px 28px rgba(0, 0, 0, 0.22),
             inset 0 1px 0 rgba(255,255,255,0.04);
@@ -612,7 +631,7 @@
             </a>
         </div>
     </div>
-<div class="card">
+<div class="card appointments-summary-card">
         <div class="appointments-summary-title">Appointments Summary</div>
         <table id="apptTable">
             <thead>

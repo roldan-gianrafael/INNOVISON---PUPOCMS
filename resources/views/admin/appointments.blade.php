@@ -224,12 +224,12 @@
         gap: 16px;
         margin-bottom: 20px;
         padding: 16px 18px;
-        border-radius: 28px;
-        border: 1px solid rgba(234, 215, 160, 0.72);
+        border-radius: 0 0 20px 20px;
+        border: 0;
+        border-bottom: 2px solid rgba(234, 215, 160, 0.9);
         background: linear-gradient(135deg, rgba(255, 253, 246, 0.76) 0%, rgba(255, 249, 231, 0.58) 42%, rgba(255, 255, 255, 0.82) 100%);
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.05),
-            0 16px 30px rgba(112, 19, 27, 0.05);
+            0 14px 26px rgba(112, 19, 27, 0.05);
     }
 
     .appointments-toolbar-actions {
@@ -459,10 +459,9 @@
     }
 
     html[data-theme="dark"] .appointments-toolbar {
-        border-color: rgba(250, 204, 21, 0.24);
+        border-bottom-color: rgba(250, 204, 21, 0.28);
         background: linear-gradient(135deg, rgba(112, 19, 27, 0.68) 0%, rgba(86, 16, 26, 0.64) 48%, rgba(44, 14, 18, 0.72) 100%);
         box-shadow:
-            0 0 0 2px rgba(250, 204, 21, 0.07),
             0 16px 28px rgba(0, 0, 0, 0.22);
     }
 
@@ -500,7 +499,7 @@
         .appointments-toolbar {
             flex-direction: column;
             align-items: stretch;
-            border-radius: 24px;
+            border-radius: 0 0 18px 18px;
         }
 
         .appointments-toolbar-actions {

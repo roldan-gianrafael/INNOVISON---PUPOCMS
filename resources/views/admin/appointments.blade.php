@@ -328,7 +328,7 @@
         animation: fadeIn 0.2s;
     }
     .modal-box {
-        background: rgba(255, 255, 255, 0.28);
+        background: rgba(255, 248, 220, 0.42);
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
         padding: 24px;
@@ -345,7 +345,7 @@
     .main #infoModal .modal-box,
     .main #statusActionModal .modal-box,
     .main #rescheduleModal .modal-box {
-        background: rgba(255, 255, 255, 0.28) !important;
+        background: rgba(255, 248, 220, 0.42) !important;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-top: 4px solid #70131B !important;
@@ -409,6 +409,15 @@
         border-bottom: 0;
         padding-bottom: 0;
         margin-bottom: 4px;
+        color: #111827;
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 18px;
+        border-radius: 0 0 14px 14px;
+        border: 0;
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+        background: transparent;
+        box-shadow: none;
     }
     .modal-subtitle {
         font-size: 14px;
@@ -904,6 +913,10 @@
     html[data-theme="dark"] .modal-val,
     html[data-theme="dark"] .modal-subtitle {
         color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .modal-title {
+        border-bottom-color: rgba(250, 204, 21, 0.82);
     }
 
     html[data-theme="dark"] .modal-header {

@@ -259,8 +259,8 @@
     }
 
     .appointments-search-shell.is-open .appointments-search-wrap {
-        width: 300px;
-        flex: 0 0 300px;
+        width: 340px;
+        flex: 0 0 340px;
         opacity: 1;
         pointer-events: auto;
         transform: translateX(0);
@@ -272,23 +272,29 @@
 
     .appointments-search-input {
         width: 100%;
-        padding: 11px 18px;
+        min-height: 48px;
+        padding: 12px 20px;
         border-radius: 999px;
-        border: 1px solid #8f2230;
+        border: 2px solid #8f2230;
         color: #111827;
-        background: linear-gradient(135deg, #fffafb 0%, #ffffff 100%);
+        background: linear-gradient(135deg, #fff3f5 0%, #ffffff 100%);
         box-shadow:
-            0 0 0 3px rgba(112, 19, 27, 0.08),
-            0 10px 22px rgba(112, 19, 27, 0.08);
+            0 0 0 4px rgba(112, 19, 27, 0.10),
+            0 12px 24px rgba(112, 19, 27, 0.12);
         transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    .appointments-search-input::placeholder {
+        color: #7f1d2d;
+        font-weight: 700;
     }
 
     .appointments-search-input:focus {
         outline: none;
         border-color: #70131B;
         box-shadow:
-            0 0 0 4px rgba(112, 19, 27, 0.14),
-            0 12px 24px rgba(112, 19, 27, 0.10);
+            0 0 0 5px rgba(112, 19, 27, 0.16),
+            0 14px 26px rgba(112, 19, 27, 0.14);
         transform: translateY(-1px);
     }
 
@@ -433,14 +439,14 @@
     html[data-theme="dark"] .appointments-search-input {
         background: rgba(18, 8, 12, 0.86);
         color: #ffffff;
-        border-color: rgba(143, 34, 48, 0.72);
+        border-color: rgba(143, 34, 48, 0.92);
         box-shadow:
-            0 0 0 2px rgba(112, 19, 27, 0.12),
-            0 10px 20px rgba(0, 0, 0, 0.20);
+            0 0 0 4px rgba(112, 19, 27, 0.14),
+            0 12px 22px rgba(0, 0, 0, 0.22);
     }
 
     html[data-theme="dark"] .appointments-search-input::placeholder {
-        color: #e5e7eb;
+        color: #fecdd3;
     }
 
     @media (max-width: 920px) {

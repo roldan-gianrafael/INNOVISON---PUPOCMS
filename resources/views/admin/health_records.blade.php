@@ -54,30 +54,131 @@
 
     /* Buttons */
     .btn-action {
+        min-width: 92px;
+        min-height: 38px;
         padding: 8px 16px;
-        border-radius: 8px;
+        border-radius: 999px;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 800;
+        letter-spacing: 0.01em;
         cursor: pointer;
-        border: none;
-        transition: 0.2s;
+        border: 1px solid transparent;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
     }
-    .btn-view { background: #fff3f5; color: #70131B; border: 1px solid #f0d7dc; }
-    .btn-view:hover { background: #fae9ed; }
-    
-   .btn-sign { 
-        background: #0804ff; 
-        color: #ffffff; 
-        box-shadow: 0 2px 6px rgba(255, 255, 255, 0.2); 
+
+    .btn-action svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 6px;
+        flex: 0 0 auto;
+        stroke-width: 2;
     }
-    
-    .btn-sign:hover { 
-        background: #ffffff; 
-        color: white; 
+    .btn-action:hover {
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, #ffffff, #fff3f5);
+        color: #70131B;
+        border-color: #f0d7dc;
+    }
+
+    .btn-view:hover {
+        background: linear-gradient(135deg, #fff7f8, #ffe7ed);
+        border-color: #d9a9b4;
+        box-shadow: 0 14px 24px rgba(112, 19, 27, 0.12);
+    }
+
+    .btn-sign {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        border-color: #8f2230;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.10),
+            0 12px 24px rgba(112, 19, 27, 0.18);
+    }
+
+    .btn-sign:hover {
+        color: #ffffff;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.16),
+            0 14px 26px rgba(112, 19, 27, 0.20);
+    }
+
+    .btn-signed,
+    .btn-readonly {
+        background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+        color: #475569;
+        border-color: #cbd5e1;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    .btn-signed::before {
+        content: "✓";
+        margin-right: 6px;
+        font-weight: 900;
+    }
+
+    .btn-signed-icon {
+        position: relative;
+        min-width: 40px;
+        width: 40px;
+        min-height: 40px;
+        padding: 0;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        border-color: #86efac;
+        color: #166534;
+        box-shadow:
+            0 0 0 3px rgba(34, 197, 94, 0.12),
+            0 10px 20px rgba(22, 101, 52, 0.14);
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    .btn-signed-icon::before {
+        content: "\2713";
+        line-height: 1;
+    }
+
+    .btn-signed-icon::after {
+        content: "Click to view";
+        position: absolute;
+        left: 50%;
+        bottom: calc(100% + 10px);
+        transform: translateX(-50%) translateY(4px);
+        white-space: nowrap;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(17, 24, 39, 0.94);
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+
+    .btn-signed-icon:hover {
+        color: #166534;
+        border-color: #4ade80;
+        box-shadow:
+            0 0 0 3px rgba(74, 222, 128, 0.16),
+            0 14px 24px rgba(22, 101, 52, 0.18);
+    }
+
+    .btn-signed-icon:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
     }
 
     /* Custom Flex Grid para sa Summary Cards */
@@ -424,6 +525,34 @@
         border-color: rgba(148, 163, 184, 0.24);
     }
 
+    html[data-theme="dark"] .btn-view {
+        background: linear-gradient(135deg, rgba(127, 29, 45, 0.22), rgba(148, 28, 57, 0.18));
+        border-color: rgba(250, 204, 21, 0.18);
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .btn-view:hover {
+        border-color: rgba(250, 204, 21, 0.4);
+        box-shadow: 0 14px 24px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-theme="dark"] .btn-sign {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .btn-signed,
+    html[data-theme="dark"] .btn-readonly {
+        background: linear-gradient(135deg, rgba(71, 85, 105, 0.78), rgba(51, 65, 85, 0.92));
+        border-color: rgba(148, 163, 184, 0.28);
+        color: #e2e8f0;
+    }
+
+    html[data-theme="dark"] .btn-signed-icon {
+        background: linear-gradient(135deg, rgba(20, 83, 45, 0.92), rgba(21, 128, 61, 0.78));
+        border-color: rgba(74, 222, 128, 0.34);
+        color: #ecfdf5;
+    }
+
     html[data-theme="dark"] .health-filter-modal-card {
         background: rgba(15, 23, 42, 0.98);
         border-color: rgba(148, 163, 184, 0.14);
@@ -547,7 +676,7 @@
                     <td>
                         <div class="student-name" style="font-weight: 700;">{{ $record->user->name }}</div>
                     </td>
-                    <td>{{ $record->user->course }} {{ $record->user->year }}-{{ $record->user->section }}</td>
+                    <td>{{ $record->course_college ?: $record->user->course }} {{ $record->user->year }}-{{ $record->user->section }}</td>
                     
                     {{-- Column 1: Medical Condition Status --}}
                     <td>
@@ -576,28 +705,29 @@
                     </td>
 
                     <td style="text-align: center;">
-                        <div class="d-flex justify-content-center gap-2">
-                            <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-view">
-                                View
-                            </a>
-                            
-                            @if($canSignHealth)
-                                {{-- Change Sign Button appearance if already Issued --}}
-                                @if($record->clearance_status == 'Issued')
-                                    <button class="btn-action" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;" disabled>
-                                        Signed
-                                    </button>
-                                @else
+                        @if($record->clearance_status == 'Issued')
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-signed-icon" aria-label="Signed record, click to view" title="Click to view"></a>
+                            </div>
+                        @else
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-view">
+                                    <x-outline-icon name="document-text" />
+                                    View
+                                </a>
+                                
+                                @if($canSignHealth)
                                     <a href="{{ route('admin.sign_page', $record->id) }}" class="btn-action btn-sign">
+                                        <x-outline-icon name="pencil-square" />
                                         Sign
                                     </a>
+                                @else
+                                    <button class="btn-action btn-readonly" disabled>
+                                        View Only
+                                    </button>
                                 @endif
-                            @else
-                                <button class="btn-action" style="background: #e2e8f0; color: #64748b; cursor: default;" disabled>
-                                    View Only
-                                </button>
-                            @endif
-                        </div>
+                            </div>
+                        @endif
                     </td>
                 </tr>
             @empty

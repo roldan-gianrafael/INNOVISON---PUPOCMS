@@ -296,6 +296,14 @@
         gap: 6px;
     }
 
+    .health-filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
+        flex-wrap: nowrap;
+    }
+
     .health-filter-field label {
         font-size: 11px;
         font-weight: 800;
@@ -780,8 +788,10 @@
                     @endforeach
                 </select>
             </div>
-            <button type="submit" class="health-filter-btn">Apply</button>
-            <a href="{{ route('admin.health_records') }}" class="health-filter-btn health-filter-btn-reset">Reset</a>
+            <div class="health-filter-actions">
+                <button type="submit" class="health-filter-btn">Apply</button>
+                <a href="{{ route('admin.health_records') }}" class="health-filter-btn health-filter-btn-reset">Reset</a>
+            </div>
         </form>
     </div>
 </div>
@@ -793,12 +803,6 @@
     const healthFilterModal = document.getElementById('healthFilterModal');
     const healthFilterCloseBtn = document.getElementById('healthFilterCloseBtn');
     const healthFilterForm = document.getElementById('healthFilterForm');
-    const hasActiveHealthFilters = @json(
-        trim((string) ($search ?? '')) !== ''
-        || trim((string) ($courseFilter ?? '')) !== ''
-        || trim((string) ($monthFilter ?? '')) !== ''
-        || trim((string) ($yearFilter ?? '')) !== ''
-    );
     const highlightedHealthId = @json($highlightHealthId);
 
     function setHealthFilterOpenState(isOpen) {
@@ -832,8 +836,10 @@
         });
     }
 
-    if (hasActiveHealthFilters) {
-        setHealthFilterOpenState(true);
+    if (healthFilterForm) {
+        healthFilterForm.addEventListener('submit', function () {
+            setHealthFilterOpenState(false);
+        });
     }
 
     if (highlightedHealthId) {

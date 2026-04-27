@@ -1109,11 +1109,20 @@ class AdminController extends Controller
             });
         }
 
-        if ($courseFilter !== '') {
-            $query->whereHas('user', function ($userQuery) use ($courseFilter) {
-                $userQuery->where('course', $courseFilter);
-            });
-        }
+          if ($courseFilter !== '') {
+              $query->where(function ($builder) use ($courseFilter) {
+                  $builder->where('course_college', $courseFilter)
+                      ->orWhere(function ($innerBuilder) use ($courseFilter) {
+                          $innerBuilder->where(function ($profileBuilder) {
+                                  $profileBuilder->whereNull('course_college')
+                                      ->orWhere('course_college', '');
+                              })
+                              ->whereHas('user', function ($userQuery) use ($courseFilter) {
+                                  $userQuery->where('course', $courseFilter);
+                              });
+                      });
+              });
+          }
 
         if ($monthFilter !== '') {
             try {
@@ -1147,13 +1156,16 @@ class AdminController extends Controller
 
         $records = $query->get();
 
-        $courseOptions = User::query()
-            ->whereNotNull('course')
-            ->where('course', '!=', '')
-            ->whereHas('healthProfile')
-            ->distinct()
-            ->orderBy('course')
-            ->pluck('course');
+          $courseOptions = HealthProfile::query()
+              ->with('user:id,course')
+              ->get()
+              ->map(function (HealthProfile $profile) {
+                  return trim((string) ($profile->course_college ?: optional($profile->user)->course ?: ''));
+              })
+              ->filter(fn ($course) => $course !== '')
+              ->unique()
+              ->sort()
+              ->values();
 
         $yearOptions = collect(['1st Year', '2nd Year', '3rd Year', '4th Year']);
 

@@ -257,6 +257,11 @@
         pointer-events: none;
         transform: translateX(8px);
         transition: width .22s ease, flex-basis .22s ease, opacity .18s ease, transform .18s ease;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
     }
 
     .appointments-search-shell.is-open .appointments-search-wrap {
@@ -269,6 +274,11 @@
 
     .appointments-search-wrap .voice-field-wrap {
         width: 100%;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
     }
 
     .main .appointments-search-shell .appointments-search-input {

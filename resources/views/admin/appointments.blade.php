@@ -366,17 +366,6 @@
     .modal-header-main {
         min-width: 0;
         flex: 1 1 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .modal-title-connector {
-        width: 2px;
-        height: 18px;
-        margin-top: 6px;
-        margin-left: 18px;
-        border-radius: 999px;
-        background: rgba(112, 19, 27, 0.74);
     }
     .modal-status-badge {
         flex: 0 0 auto;
@@ -402,10 +391,21 @@
     .modal-row {
         margin-bottom: 12px;
         display: grid;
-        grid-template-columns: 150px minmax(0, 1fr);
-        gap: 16px;
-        align-items: start;
-        padding: 12px 14px;
+        grid-template-columns: 160px 18px minmax(0, 1fr);
+        gap: 0;
+        align-items: center;
+    }
+    .modal-row::before {
+        content: "";
+        grid-column: 2;
+        justify-self: center;
+        width: 14px;
+        height: 2px;
+        border-radius: 999px;
+        background: rgba(112, 19, 27, 0.74);
+    }
+    .modal-label,
+    .modal-val {
         border-radius: 16px;
         border: 1px solid rgba(112, 19, 27, 0.34);
         background: #fff8dc;
@@ -413,8 +413,19 @@
             inset 0 1px 0 rgba(255,255,255,0.82),
             0 8px 18px rgba(112, 19, 27, 0.05);
     }
-    .modal-label { font-size: 12px; font-weight: 700; color: #111827; text-transform: uppercase; }
-    .modal-val { font-size: 15px; color: #111827; font-weight: 500; }
+    .modal-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #111827;
+        text-transform: uppercase;
+        padding: 12px 14px;
+    }
+    .modal-val {
+        font-size: 15px;
+        color: #111827;
+        font-weight: 500;
+        padding: 12px 14px;
+    }
     .modal-title {
         margin-top: 0;
         border-bottom: 0;
@@ -939,7 +950,7 @@
     html[data-theme="dark"] .modal-title {
         border-bottom-color: rgba(250, 204, 21, 0.82);
     }
-    html[data-theme="dark"] .modal-title-connector {
+    html[data-theme="dark"] .modal-row::before {
         background: rgba(250, 204, 21, 0.86);
     }
 
@@ -947,7 +958,8 @@
         border-bottom-color: rgba(255, 255, 255, 0.12);
     }
 
-    html[data-theme="dark"] .modal-row {
+    html[data-theme="dark"] .modal-label,
+    html[data-theme="dark"] .modal-val {
         background: rgba(25, 25, 28, 0.96);
         border-color: rgba(250, 204, 21, 0.14);
         box-shadow:
@@ -1209,7 +1221,6 @@
             <div class="modal-header">
                 <div class="modal-header-main">
                     <h3 class="modal-title" style="color:#8B0000;">Appointment Details</h3>
-                    <span class="modal-title-connector" aria-hidden="true"></span>
                 </div>
                 <span class="modal-status-badge" id="mStatus">-</span>
             </div>

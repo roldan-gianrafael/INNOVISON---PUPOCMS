@@ -677,8 +677,8 @@
 
     html[data-theme="dark"] .health-records-title {
         border-color: rgba(250, 204, 21, 0.30);
-        background: linear-gradient(135deg, rgba(255, 248, 196, 0.14) 0%, rgba(112, 19, 27, 0.42) 100%);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        background: transparent;
+        box-shadow: none;
     }
 
     html[data-theme="dark"] .health-records-search,

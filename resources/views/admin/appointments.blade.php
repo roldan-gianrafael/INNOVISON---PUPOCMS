@@ -201,6 +201,13 @@
     .appointments-page-title {
         margin: 0;
         color: #111827;
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid #ead7a0;
+        background: linear-gradient(135deg, #fffdf6 0%, #fff4c6 100%);
+        box-shadow: 0 10px 24px rgba(112, 19, 27, 0.08);
     }
 
     .appointments-toolbar {
@@ -209,6 +216,13 @@
         align-items: center;
         gap: 16px;
         margin-bottom: 20px;
+        padding: 16px 18px;
+        border-radius: 28px;
+        border: 1px solid #ead7a0;
+        background: linear-gradient(135deg, #fffdf6 0%, #fff9e7 42%, #ffffff 100%);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.08),
+            0 18px 36px rgba(112, 19, 27, 0.08);
     }
 
     .appointments-toolbar-actions {
@@ -232,11 +246,24 @@
 
     .appointments-search-input {
         width: 100%;
-        padding: 10px 16px;
-        border-radius: 8px;
-        border: 1px solid #cbd5e1;
+        padding: 11px 18px;
+        border-radius: 999px;
+        border: 1px solid #ead7a0;
         color: #111827;
-        background: #ffffff;
+        background: linear-gradient(135deg, #fffdf6 0%, #ffffff 100%);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.08),
+            0 10px 22px rgba(112, 19, 27, 0.08);
+        transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    .appointments-search-input:focus {
+        outline: none;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 4px rgba(250, 204, 21, 0.14),
+            0 12px 24px rgba(112, 19, 27, 0.10);
+        transform: translateY(-1px);
     }
 
     .btn-add-walkin {
@@ -338,6 +365,14 @@
 
     html[data-theme="dark"] .appointments-page-title {
         color: #ffffff;
+    }
+
+    html[data-theme="dark"] .appointments-toolbar {
+        border-color: rgba(250, 204, 21, 0.34);
+        background: linear-gradient(135deg, rgba(112, 19, 27, 0.92) 0%, rgba(86, 16, 26, 0.9) 48%, rgba(44, 14, 18, 0.94) 100%);
+        box-shadow:
+            0 0 0 2px rgba(250, 204, 21, 0.10),
+            0 18px 32px rgba(0, 0, 0, 0.28);
     }
 
     html[data-theme="dark"] .appointments-summary-title,

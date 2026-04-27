@@ -339,6 +339,7 @@
     html[data-theme="dark"] .health-table-title,
     html[data-theme="dark"] .health-filter-toggle,
     html[data-theme="dark"] .text-muted.health-summary-label,
+    html[data-theme="dark"] .summary-item .health-summary-label span,
     html[data-theme="dark"] .health-filter-field label,
     html[data-theme="dark"] .health-records-search,
     html[data-theme="dark"] .health-records-search::placeholder,

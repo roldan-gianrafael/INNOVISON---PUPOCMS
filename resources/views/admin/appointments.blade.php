@@ -97,6 +97,178 @@
         gap: 6px;
         flex-wrap: wrap;
     }
+    .appointment-action-menu-wrap {
+        position: relative;
+        display: inline-flex;
+        justify-content: center;
+    }
+    .appointment-action-menu-toggle {
+        min-width: 108px;
+        min-height: 38px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.10),
+            0 10px 20px rgba(112, 19, 27, 0.18);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .appointment-action-menu-toggle:hover,
+    .appointment-action-menu-wrap.is-open .appointment-action-menu-toggle {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.16),
+            0 14px 24px rgba(112, 19, 27, 0.18);
+    }
+    .appointment-action-menu-toggle svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 auto;
+        stroke-width: 2;
+    }
+    .appointment-action-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        min-width: 220px;
+        padding: 8px;
+        border-radius: 16px;
+        background: #ffffff;
+        border: 1px solid rgba(127, 29, 45, 0.12);
+        box-shadow: 0 18px 32px rgba(15, 23, 42, 0.14);
+        display: none;
+        z-index: 30;
+    }
+    .appointment-action-menu-wrap.is-open .appointment-action-menu {
+        display: grid;
+        gap: 6px;
+    }
+    .appointment-action-menu-item,
+    .appointment-action-menu-state {
+        width: 100%;
+        min-height: 40px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        border: 1px solid transparent;
+        background: #f8fafc;
+        color: #334155;
+        transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+        cursor: pointer;
+    }
+    .appointment-action-menu-item:hover {
+        transform: translateY(-1px);
+        text-decoration: none;
+        box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+    }
+    .appointment-action-menu-item svg,
+    .appointment-action-menu-state svg {
+        width: 15px;
+        height: 15px;
+        flex: 0 0 auto;
+        stroke-width: 2;
+    }
+    .appointment-action-menu-item.is-view {
+        background: #fff3f5;
+        color: #70131B;
+        border-color: #f0d7dc;
+    }
+    .appointment-action-menu-item.is-view:hover {
+        background: #fae9ed;
+        border-color: #dfb7c0;
+    }
+    .appointment-action-menu-item.is-approve {
+        background: #ecfdf5;
+        color: #166534;
+        border-color: #bbf7d0;
+    }
+    .appointment-action-menu-item.is-approve:hover {
+        background: #dcfce7;
+        border-color: #86efac;
+    }
+    .appointment-action-menu-item.is-reschedule {
+        background: #fffbeb;
+        color: #92400e;
+        border-color: #fde68a;
+    }
+    .appointment-action-menu-item.is-reschedule:hover {
+        background: #fef3c7;
+        border-color: #facc15;
+    }
+    .appointment-action-menu-item.is-consult {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+    .appointment-action-menu-item.is-consult:hover {
+        background: #dbeafe;
+        border-color: #93c5fd;
+    }
+    .appointment-action-menu-item.is-missed {
+        background: #fff7ed;
+        color: #9a3412;
+        border-color: #fed7aa;
+    }
+    .appointment-action-menu-item.is-missed:hover {
+        background: #ffedd5;
+        border-color: #fdba74;
+    }
+    .appointment-action-menu-item.is-reject {
+        background: #fff1f2;
+        color: #b91c1c;
+        border-color: #fecdd3;
+    }
+    .appointment-action-menu-item.is-reject:hover {
+        background: #ffe4e6;
+        border-color: #fda4af;
+    }
+    .appointment-action-menu-state {
+        background: #e2e8f0;
+        color: #64748b;
+        border-color: #cbd5e1;
+        cursor: not-allowed;
+    }
+    .appointment-completed-badge {
+        min-width: 122px;
+        min-height: 38px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        color: #166534;
+        border: 1px solid #86efac;
+        font-size: 12px;
+        font-weight: 800;
+        box-shadow:
+            0 0 0 3px rgba(34, 197, 94, 0.10),
+            0 10px 20px rgba(22, 101, 52, 0.10);
+    }
+    .appointment-completed-badge svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 auto;
+        stroke-width: 2;
+    }
     .btn-view { background: #fff3f5; color: #70131B; border: 1px solid #f0d7dc; }
     .btn-view:hover { background: #fae9ed; color: #5a0f16; }
     
@@ -468,9 +640,25 @@
         background: transparent;
     }
 
+    .appointment-row-clickable {
+        cursor: pointer;
+    }
+
+    .appointment-row-clickable td {
+        transition: background 0.16s ease;
+    }
+
+    .appointment-row-clickable:hover td {
+        background: rgba(219, 234, 254, 0.52);
+    }
+
     html[data-theme="dark"] .appointment-highlight-row {
         background: linear-gradient(180deg, rgba(120, 53, 15, 0.34), rgba(146, 64, 14, 0.28));
         box-shadow: inset 4px 0 0 #fbbf24;
+    }
+
+    html[data-theme="dark"] .appointment-row-clickable:hover td {
+        background: rgba(30, 64, 175, 0.28);
     }
 
     @keyframes appointmentHighlightPulse {
@@ -533,6 +721,52 @@
         box-shadow:
             0 0 0 3px rgba(112, 19, 27, 0.16),
             0 12px 22px rgba(0, 0, 0, 0.24) !important;
+    }
+    html[data-theme="dark"] .appointment-action-menu {
+        background: rgba(17, 24, 39, 0.98);
+        border-color: rgba(250, 204, 21, 0.12);
+        box-shadow: 0 20px 34px rgba(0, 0, 0, 0.32);
+    }
+    html[data-theme="dark"] .appointment-action-menu-item,
+    html[data-theme="dark"] .appointment-action-menu-state {
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .appointment-action-menu-item.is-view {
+        background: rgba(127, 29, 45, 0.26);
+        border-color: rgba(250, 204, 21, 0.14);
+    }
+    html[data-theme="dark"] .appointment-action-menu-item.is-approve {
+        background: rgba(20, 83, 45, 0.88);
+        border-color: rgba(74, 222, 128, 0.22);
+    }
+    html[data-theme="dark"] .appointment-action-menu-item.is-reschedule {
+        background: rgba(146, 64, 14, 0.86);
+        border-color: rgba(250, 204, 21, 0.22);
+    }
+    html[data-theme="dark"] .appointment-action-menu-item.is-consult {
+        background: rgba(30, 64, 175, 0.88);
+        border-color: rgba(147, 197, 253, 0.24);
+    }
+    html[data-theme="dark"] .appointment-action-menu-item.is-missed {
+        background: rgba(154, 52, 18, 0.88);
+        border-color: rgba(253, 186, 116, 0.22);
+    }
+    html[data-theme="dark"] .appointment-action-menu-item.is-reject {
+        background: rgba(127, 29, 29, 0.88);
+        border-color: rgba(248, 113, 113, 0.22);
+    }
+    html[data-theme="dark"] .appointment-action-menu-state {
+        background: rgba(71, 85, 105, 0.86);
+        border-color: rgba(148, 163, 184, 0.22);
+        color: #cbd5e1;
+    }
+    html[data-theme="dark"] .appointment-completed-badge {
+        background: linear-gradient(135deg, rgba(20, 83, 45, 0.96), rgba(21, 128, 61, 0.84));
+        border-color: rgba(74, 222, 128, 0.30);
+        color: #ecfdf5;
+        box-shadow:
+            0 0 0 3px rgba(34, 197, 94, 0.10),
+            0 12px 22px rgba(0, 0, 0, 0.24);
     }
 
     html[data-theme="dark"] .modal-box {
@@ -649,7 +883,17 @@
                     <tr
                         data-appointment-row
                         data-appointment-id="{{ $appt->id }}"
-                        class="{{ $highlightAppointmentId !== '' && $highlightAppointmentId === (string) $appt->id ? 'appointment-highlight-row' : '' }}"
+                        data-view-name="{{ $appt->name }}"
+                        data-view-service="{{ $appt->service }}"
+                        data-view-date="{{ $appt->date }}"
+                        data-view-time="{{ $appt->time }}"
+                        data-view-remarks="{{ $appt->remarks ?? 'No notes provided.' }}"
+                        data-view-email="{{ $appt->email }}"
+                        title="{{ $appt->status === 'Completed' ? 'Click to view' : '' }}"
+                        class="{{ implode(' ', array_filter([
+                            $highlightAppointmentId !== '' && $highlightAppointmentId === (string) $appt->id ? 'appointment-highlight-row' : '',
+                            $appt->status === 'Completed' ? 'appointment-row-clickable' : '',
+                        ])) }}"
                     >
                         <td>
                             <div style="font-weight: 700;" class="student-name">{{ $appt->name }}</div>
@@ -683,52 +927,82 @@
                             <span class="status {{ strtolower($appt->status) }}">{{ $appt->status }}</span>
                         </td>
                         <td>
-                            <div class="action-list">
-                            <button
-                                type="button"
-                                class="btn-action btn-view"
-                                title="View Details"
-                                data-name="{{ $appt->name }}"
-                                data-service="{{ $appt->service }}"
-                                data-date="{{ $appt->date }}"
-                                data-time="{{ $appt->time }}"
-                                data-remarks="{{ $appt->remarks ?? 'No notes provided.' }}"
-                                data-email="{{ $appt->email }}"
-                                onclick="openInfoModal(this)">
-                                View
-                            </button>
-
-                            @if($appt->status == 'Pending')
-                                <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Approved') }}" class="btn-action btn-approve" title="Approve" onclick="return confirm('Approve this appointment?')">Approve</a>
-                                <button class="btn-action btn-reschedule" title="Reschedule" onclick="openRescheduleModal('{{ $appt->id }}', '{{ $appt->date }}', '{{ $appt->time }}')">Reschedule</button>
-                                <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Cancelled') }}" class="btn-action btn-reject btn-cancel" title="Reject" onclick="return confirm('Cancel this request?')">Reject</a>
-                            
-                            @elseif($appt->status == 'Approved')
+                            @if($appt->status === 'Completed')
+                                <span class="appointment-completed-badge" title="Appointment completed">
+                                    <x-outline-icon name="check" />
+                                    Completed
+                                </span>
+                            @else
                                 @php
-                                    $scheduledAt = \Carbon\Carbon::parse($appt->date . ' ' . $appt->time);
+                                    $scheduledAt = $appt->status === 'Approved'
+                                        ? \Carbon\Carbon::parse($appt->date . ' ' . $appt->time)
+                                        : null;
+                                    $consultEligibleAt = $scheduledAt?->copy()->subMinutes(10);
+                                    $missedEligibleAt = $scheduledAt?->copy()->addHour();
                                     $now = \Carbon\Carbon::now();
-                                    $isFuture = $scheduledAt->isFuture();
-                                    $showMissedAction = $now->greaterThan($scheduledAt);
+                                    $consultLocked = $consultEligibleAt ? $now->lt($consultEligibleAt) : false;
+                                    $showMissedAction = $missedEligibleAt ? $now->greaterThanOrEqualTo($missedEligibleAt) : false;
                                 @endphp
+                                <div class="appointment-action-menu-wrap" data-appointment-action-menu>
+                                    <button type="button" class="appointment-action-menu-toggle" aria-expanded="false">
+                                        <x-outline-icon name="bars-3" />
+                                        Actions
+                                    </button>
+                                    <div class="appointment-action-menu">
+                                        <button
+                                            type="button"
+                                            class="appointment-action-menu-item is-view"
+                                            title="View Details"
+                                            data-name="{{ $appt->name }}"
+                                            data-service="{{ $appt->service }}"
+                                            data-date="{{ $appt->date }}"
+                                            data-time="{{ $appt->time }}"
+                                            data-remarks="{{ $appt->remarks ?? 'No notes provided.' }}"
+                                            data-email="{{ $appt->email }}"
+                                            onclick="openInfoModal(this)">
+                                            <x-outline-icon name="document-text" />
+                                            View
+                                        </button>
 
-                                @if($isFuture)
-                                    <button class="btn-action" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed; padding: 6px 12px; border-radius: 4px;" title="Scheduled for {{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }}">
-                                        Consult (Scheduled)</button>
-                                @else
-                                    <a href="{{ url($basePrefix . '/walkin/form/' . $appt->student_id) }}?source=online" class="btn-action btn-consult" style="background: #0d6efd; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; margin-right: 5px; display: inline-flex; align-items: center; gap: 5px;">
-                                        Consult</a>
-                                    @if($showMissedAction)
-                                        <a
-                                            href="{{ url($basePrefix . '/appointments/' . $appt->id . '/' . rawurlencode('Missed Scheduled')) }}"
-                                            class="btn-action btn-missed"
-                                            title="Mark as Missed Scheduled"
-                                            data-status-target="Missed Scheduled">
-                                            Missed Scheduled
-                                        </a>
-                                    @endif
-                                @endif
+                                        @if($appt->status == 'Pending')
+                                            <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Approved') }}" class="appointment-action-menu-item is-approve btn-approve" title="Approve" data-status-target="Approved">
+                                                <x-outline-icon name="check" />
+                                                Approve
+                                            </a>
+                                            <button type="button" class="appointment-action-menu-item is-reschedule btn-reschedule" title="Reschedule" data-id="{{ $appt->id }}" data-date="{{ $appt->date }}" data-time="{{ $appt->time }}" data-name="{{ $appt->name }}" data-service="{{ $appt->service }}">
+                                                <x-outline-icon name="calendar-days" />
+                                                Reschedule
+                                            </button>
+                                            <a href="{{ url($basePrefix . '/appointments/' . $appt->id . '/Cancelled') }}" class="appointment-action-menu-item is-reject btn-reject btn-cancel" title="Reject" data-status-target="Cancelled">
+                                                <x-outline-icon name="x-mark" />
+                                                Reject
+                                            </a>
+                                        @elseif($appt->status == 'Approved')
+                                            @if($consultLocked)
+                                                <span class="appointment-action-menu-state" title="Consult becomes available 10 minutes before the scheduled time on {{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }}">
+                                                    <x-outline-icon name="clipboard-document-list" />
+                                                    Consult (Scheduled)
+                                                </span>
+                                            @else
+                                                <a href="{{ url($basePrefix . '/walkin/form/' . $appt->student_id) }}?source=online" class="appointment-action-menu-item is-consult btn-consult">
+                                                    <x-outline-icon name="clipboard-document-list" />
+                                                    Consult
+                                                </a>
+                                                @if($showMissedAction)
+                                                    <a
+                                                        href="{{ url($basePrefix . '/appointments/' . $appt->id . '/' . rawurlencode('Missed Scheduled')) }}"
+                                                        class="appointment-action-menu-item is-missed btn-missed"
+                                                        title="Mark as Missed Scheduled"
+                                                        data-status-target="Missed Scheduled">
+                                                        <x-outline-icon name="clock" />
+                                                        Missed Scheduled
+                                                    </a>
+                                                @endif
+                                            @endif
+                                        @endif
+                                    </div>
+                                </div>
                             @endif
-                            </div>
                         </td>
                     </tr>
                 @empty
@@ -890,7 +1164,7 @@
         document.getElementById('statusActionSubtitle').innerText = isApprove
             ? 'This will mark the appointment as approved and notify the workflow.'
             : (isMissed
-                ? 'Use this when the scheduled appointment time has passed and the patient did not show up.'
+                ? 'Use this only when the appointment is still not consulted and at least 1 hour has passed after the scheduled time.'
                 : 'This will reject the appointment request and mark it as cancelled.');
         document.getElementById('sName').innerText = safeText(name);
         document.getElementById('sService').innerText = safeText(service);
@@ -1048,6 +1322,50 @@
             });
         }
 
+        const actionMenus = document.querySelectorAll('[data-appointment-action-menu]');
+        const closeActionMenus = function(exceptMenu = null) {
+            actionMenus.forEach(function(menu) {
+                if (exceptMenu && menu === exceptMenu) {
+                    return;
+                }
+
+                menu.classList.remove('is-open');
+                const toggle = menu.querySelector('.appointment-action-menu-toggle');
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        };
+
+        actionMenus.forEach(function(menu) {
+            const toggle = menu.querySelector('.appointment-action-menu-toggle');
+            if (!toggle) {
+                return;
+            }
+
+            toggle.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const shouldOpen = !menu.classList.contains('is-open');
+                closeActionMenus(menu);
+                menu.classList.toggle('is-open', shouldOpen);
+                toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+            });
+
+            menu.querySelectorAll('.appointment-action-menu-item, .appointment-action-menu-state').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    closeActionMenus();
+                });
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('[data-appointment-action-menu]')) {
+                closeActionMenus();
+            }
+        });
+
         document.querySelectorAll('a.btn-approve, a.btn-cancel, a.btn-missed, button.btn-reject').forEach((el) => {
             el.removeAttribute('onclick');
             el.addEventListener('click', function(event) {
@@ -1076,6 +1394,25 @@
             el.removeAttribute('onclick');
             el.addEventListener('click', function() {
                 openRescheduleModal(this);
+            });
+        });
+
+        document.querySelectorAll('[data-appointment-row].appointment-row-clickable').forEach((row) => {
+            row.addEventListener('click', function(event) {
+                if (event.target.closest('a, button, input, select, textarea, label')) {
+                    return;
+                }
+
+                openInfoModal({
+                    dataset: {
+                        name: row.dataset.viewName || '',
+                        service: row.dataset.viewService || '',
+                        date: row.dataset.viewDate || '',
+                        time: row.dataset.viewTime || '',
+                        remarks: row.dataset.viewRemarks || '',
+                        email: row.dataset.viewEmail || '',
+                    }
+                });
             });
         });
     });

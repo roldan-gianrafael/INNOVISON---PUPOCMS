@@ -439,6 +439,15 @@
       text-align: left;
   }
 
+  .medicine-alert-actions-link svg,
+  .medicine-alert-actions-submit svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      stroke-width: 2;
+      opacity: 0.9;
+  }
+
   .medicine-alert-actions-link:hover,
   .medicine-alert-actions-submit:hover {
       background: #fff7ea;
@@ -3153,10 +3162,15 @@
       color: #f8fafc;
   }
 
+  html[data-theme="dark"] .medicine-alert-actions-toggle {
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  }
+
   html[data-theme="dark"] .medicine-alert-actions-link,
   html[data-theme="dark"] .medicine-alert-actions-submit,
   html[data-theme="dark"] .medicine-alert-empty-title {
       color: #f8fafc;
+      background: rgba(255, 255, 255, 0.03);
   }
 
   html[data-theme="dark"] .medicine-alert-actions-link:hover,
@@ -3563,17 +3577,21 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 <x-outline-icon name="ellipsis-horizontal" />
             </button>
             <div class="medicine-alert-actions-menu" id="medicineAlertActionsMenu">
-                <form method="POST" action="{{ $adminMarkAllReadUrl }}">
-                    @csrf
-                    @foreach($adminNotifications as $notification)
-                        <input type="hidden" name="notification_ids[]" value="{{ $notification['id'] }}">
-                    @endforeach
-                    <button type="submit" class="medicine-alert-actions-submit" {{ $adminNotificationCount === 0 ? 'disabled' : '' }}>
-                        Mark all as read
-                    </button>
-                </form>
-                <a href="{{ $adminNotificationHistoryUrl }}" class="medicine-alert-actions-link">Notification history</a>
-            </div>
+                    <form method="POST" action="{{ $adminMarkAllReadUrl }}">
+                        @csrf
+                        @foreach($adminNotifications as $notification)
+                            <input type="hidden" name="notification_ids[]" value="{{ $notification['id'] }}">
+                        @endforeach
+                        <button type="submit" class="medicine-alert-actions-submit" {{ $adminNotificationCount === 0 ? 'disabled' : '' }}>
+                            <x-outline-icon name="check" />
+                            Mark all as read
+                        </button>
+                    </form>
+                    <a href="{{ $adminNotificationHistoryUrl }}" class="medicine-alert-actions-link">
+                        <x-outline-icon name="clock" />
+                        Notification history
+                    </a>
+                </div>
             <button type="button" class="medicine-alert-close" id="medicineAlertCloseBtn" aria-label="Close notifications">
                 <x-outline-icon name="x-mark" />
             </button>

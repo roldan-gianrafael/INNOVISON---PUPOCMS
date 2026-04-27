@@ -100,19 +100,88 @@
 
     .health-records-toolbar-actions {
         display: flex;
-        align-items: flex-end;
+        align-items: flex-start;
         justify-content: flex-end;
         gap: 12px;
         flex-wrap: wrap;
         margin-left: auto;
     }
 
-    .health-filter-form {
+    .health-filter-shell {
         display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .health-filter-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+
+    .health-filter-toggle::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+
+    .health-filter-toggle:hover,
+    .health-filter-toggle.is-open {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+
+    .health-filter-toggle:hover::after,
+    .health-filter-toggle.is-open::after {
+        transform: translateX(135%);
+    }
+
+    .health-filter-form {
+        display: none;
         align-items: flex-end;
         justify-content: flex-end;
         gap: 12px;
         flex-wrap: wrap;
+        padding: 16px;
+        border-radius: 18px;
+        background: #ffffff;
+        border: 1px solid rgba(127, 29, 45, 0.12);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .health-filter-form.is-open {
+        display: flex;
     }
 
     .health-filter-field {
@@ -222,6 +291,21 @@
         gap: 16px;
     }
 
+    .health-table-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .health-table-title {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 800;
+        color: #6b7280;
+    }
+
     .health-highlight-row {
         position: relative;
         background: linear-gradient(180deg, rgba(243, 232, 255, 0.98), rgba(237, 233, 254, 0.98));
@@ -243,6 +327,7 @@
     }
 
     html[data-theme="dark"] .health-records-title,
+    html[data-theme="dark"] .health-table-title,
     html[data-theme="dark"] .health-filter-field label,
     html[data-theme="dark"] .health-records-search,
     html[data-theme="dark"] .health-records-search::placeholder,
@@ -265,6 +350,12 @@
         border-color: rgba(148, 163, 184, 0.24);
     }
 
+    html[data-theme="dark"] .health-filter-form {
+        background: rgba(15, 23, 42, 0.96);
+        border-color: rgba(148, 163, 184, 0.14);
+        box-shadow: 0 18px 32px rgba(0, 0, 0, 0.24);
+    }
+
     html[data-theme="dark"] .summary-item .card {
         background: rgba(15, 23, 42, 0.96);
         border-color: rgba(148, 163, 184, 0.14);
@@ -282,9 +373,11 @@
         }
 
         .health-records-toolbar-actions,
+        .health-filter-shell,
         .health-filter-form {
             justify-content: flex-start;
             margin-left: 0;
+            align-items: stretch;
         }
     }
 </style>
@@ -301,8 +394,38 @@
     {{-- Header with Search / Filters --}}
     <div class="health-records-toolbar">
         <h2 class="health-records-title">Student Health Records</h2>
-        <div class="health-records-toolbar-actions">
-            <form method="GET" class="health-filter-form">
+        <div class="health-records-toolbar-actions"></div>
+    </div>
+
+    {{-- Summary Cards - Hardcoded Side by Side --}}
+    <div class="summary-container">
+        <div class="summary-item">
+            <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #70131B;">
+                <div class="health-summary-row">
+                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Total</span><span>Submissions</span></small>
+                    <h3 class="fw-bold mb-0 health-summary-value">{{ $records->count() }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="summary-item">
+            <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #dc3545;">
+                <div class="health-summary-row">
+                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>With Medical</span><span>Conditions</span></small>
+                    <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_illness', 'Yes')->count() }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Main Table Card --}}
+<div class="card">
+    <div class="health-table-head">
+        <div class="health-table-title">Health Profile Summary</div>
+        <div class="health-filter-shell">
+            <button type="button" class="health-filter-toggle" id="healthFilterToggle" aria-expanded="false" aria-controls="healthFilterForm">
+                Filter Health Forms
+            </button>
+            <form method="GET" class="health-filter-form" id="healthFilterForm">
                 <div class="health-filter-field">
                     <label for="recordSearch">Search</label>
                     <input
@@ -342,35 +465,11 @@
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="health-filter-btn">Apply Filters</button>
+                <button type="submit" class="health-filter-btn">Apply</button>
                 <a href="{{ route('admin.health_records') }}" class="health-filter-btn health-filter-btn-reset">Reset</a>
             </form>
         </div>
     </div>
-
-    {{-- Summary Cards - Hardcoded Side by Side --}}
-    <div class="summary-container">
-        <div class="summary-item">
-            <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #70131B;">
-                <div class="health-summary-row">
-                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Total</span><span>Submissions</span></small>
-                    <h3 class="fw-bold mb-0 health-summary-value">{{ $records->count() }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="summary-item">
-            <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #dc3545;">
-                <div class="health-summary-row">
-                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>With Medical</span><span>Conditions</span></small>
-                    <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_illness', 'Yes')->count() }}</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Main Table Card --}}
-<div class="card">
-    <div class="fw-bold mb-2 text-muted" style="font-size: 13px; font-weight: 800;">Health Profile Summary</div>
     <table id="healthTable">
         <thead>
             <tr>
@@ -459,7 +558,33 @@
 
 @push('scripts')
 <script>
+    const healthFilterToggle = document.getElementById('healthFilterToggle');
+    const healthFilterForm = document.getElementById('healthFilterForm');
+    const hasActiveHealthFilters = @json(
+        trim((string) ($search ?? '')) !== ''
+        || trim((string) ($courseFilter ?? '')) !== ''
+        || trim((string) ($monthFilter ?? '')) !== ''
+        || trim((string) ($yearFilter ?? '')) !== ''
+    );
     const highlightedHealthId = @json($highlightHealthId);
+
+    function setHealthFilterOpenState(isOpen) {
+        if (!healthFilterToggle || !healthFilterForm) {
+            return;
+        }
+
+        healthFilterToggle.classList.toggle('is-open', isOpen);
+        healthFilterToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        healthFilterForm.classList.toggle('is-open', isOpen);
+    }
+
+    if (healthFilterToggle && healthFilterForm) {
+        setHealthFilterOpenState(hasActiveHealthFilters);
+
+        healthFilterToggle.addEventListener('click', function () {
+            setHealthFilterOpenState(!healthFilterForm.classList.contains('is-open'));
+        });
+    }
 
     if (highlightedHealthId) {
         window.addEventListener('DOMContentLoaded', function () {

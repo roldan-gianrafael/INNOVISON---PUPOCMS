@@ -366,17 +366,6 @@
     .modal-header-main {
         min-width: 0;
         flex: 1 1 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .modal-title-connector {
-        width: 2px;
-        height: 18px;
-        margin-top: 6px;
-        margin-left: 18px;
-        border-radius: 999px;
-        background: rgba(112, 19, 27, 0.74);
     }
     .modal-status-badge {
         flex: 0 0 auto;
@@ -939,9 +928,6 @@
     html[data-theme="dark"] .modal-title {
         border-bottom-color: rgba(250, 204, 21, 0.82);
     }
-    html[data-theme="dark"] .modal-title-connector {
-        background: rgba(250, 204, 21, 0.86);
-    }
 
     html[data-theme="dark"] .modal-header {
         border-bottom-color: rgba(255, 255, 255, 0.12);
@@ -1209,7 +1195,6 @@
             <div class="modal-header">
                 <div class="modal-header-main">
                     <h3 class="modal-title" style="color:#8B0000;">Appointment Details</h3>
-                    <span class="modal-title-connector" aria-hidden="true"></span>
                 </div>
                 <span class="modal-status-badge" id="mStatus">-</span>
             </div>

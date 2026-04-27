@@ -274,20 +274,20 @@
         width: 100%;
         padding: 11px 18px;
         border-radius: 999px;
-        border: 1px solid #ead7a0;
+        border: 1px solid #8f2230;
         color: #111827;
-        background: linear-gradient(135deg, #fffdf6 0%, #ffffff 100%);
+        background: linear-gradient(135deg, #fffafb 0%, #ffffff 100%);
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.08),
+            0 0 0 3px rgba(112, 19, 27, 0.08),
             0 10px 22px rgba(112, 19, 27, 0.08);
         transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
     }
 
     .appointments-search-input:focus {
         outline: none;
-        border-color: #facc15;
+        border-color: #70131B;
         box-shadow:
-            0 0 0 4px rgba(250, 204, 21, 0.14),
+            0 0 0 4px rgba(112, 19, 27, 0.14),
             0 12px 24px rgba(112, 19, 27, 0.10);
         transform: translateY(-1px);
     }
@@ -302,21 +302,10 @@
     }
 
     .appointments-search-toggle svg {
-        width: 19px;
-        height: 19px;
+        width: 24px;
+        height: 24px;
         position: relative;
         z-index: 1;
-    }
-
-    .appointments-search-toggle.is-open {
-        border-color: #facc15;
-        box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.18),
-            0 14px 24px rgba(112, 19, 27, 0.16);
-    }
-
-    .appointments-search-toggle.is-open::after {
-        transform: translateX(135%);
     }
 
     .btn-add-walkin {
@@ -444,9 +433,9 @@
     html[data-theme="dark"] .appointments-search-input {
         background: rgba(18, 8, 12, 0.86);
         color: #ffffff;
-        border-color: rgba(250, 204, 21, 0.28);
+        border-color: rgba(143, 34, 48, 0.72);
         box-shadow:
-            0 0 0 2px rgba(250, 204, 21, 0.06),
+            0 0 0 2px rgba(112, 19, 27, 0.12),
             0 10px 20px rgba(0, 0, 0, 0.20);
     }
 

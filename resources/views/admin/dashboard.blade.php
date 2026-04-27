@@ -414,6 +414,10 @@
                                 <span class="status-pill st-pending">Pending</span>
                             @elseif($appt->status == 'Completed')
                                 <span class="status-pill st-completed">Completed</span>
+                            @elseif($appt->status == 'Missed')
+                                <span class="status-pill st-cancelled">Missed</span>
+                            @elseif($appt->status == 'Expired')
+                                <span class="status-pill st-cancelled">Expired</span>
                             @else
                                 <span class="status-pill st-cancelled">Cancelled</span>
                             @endif

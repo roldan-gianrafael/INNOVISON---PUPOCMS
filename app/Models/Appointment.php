@@ -104,24 +104,32 @@ class Appointment extends Model
     }
 
     /**
-     * Auto-expire pending appointments once their scheduled date/time has passed.
+     * Sync overdue appointment statuses based on the scheduled date/time.
+     * Pending appointments become Expired once their scheduled time passes.
+     * Approved appointments become Missed once 1 hour has passed with no consult.
      */
     public static function expireOverduePending(): int
     {
         $now = Carbon::now();
+        $nowStamp = $now->format('Y-m-d H:i:s');
+        $missedCutoff = $now->copy()->subHour()->format('Y-m-d H:i:s');
 
-        return static::query()
+        $expiredPending = static::query()
             ->where('status', 'Pending')
-            ->where(function ($query) use ($now) {
-                $query->whereDate('date', '<', $now->toDateString())
-                    ->orWhere(function ($sameDay) use ($now) {
-                        $sameDay->whereDate('date', $now->toDateString())
-                            ->whereTime('time', '<', $now->format('H:i:s'));
-                    });
-            })
+            ->whereRaw('TIMESTAMP(`date`, `time`) <= ?', [$nowStamp])
             ->update([
                 'status' => 'Expired',
                 'updated_at' => $now,
             ]);
+
+        $missedApproved = static::query()
+            ->where('status', 'Approved')
+            ->whereRaw('TIMESTAMP(`date`, `time`) <= ?', [$missedCutoff])
+            ->update([
+                'status' => 'Missed',
+                'updated_at' => $now,
+            ]);
+
+        return $expiredPending + $missedApproved;
     }
 }

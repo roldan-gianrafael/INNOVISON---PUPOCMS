@@ -331,19 +331,60 @@
         background: #fff;
         padding: 24px;
         border-radius: 12px;
-        width: 400px;
+        width: 560px;
         max-width: 90%;
         position: relative;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #70131B;
     }
-    .modal-row { margin-bottom: 12px; }
+    .modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eee;
+    }
+    .modal-header-main {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+    .modal-status-badge {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border: 1px solid transparent;
+        white-space: nowrap;
+    }
+    .modal-status-badge.pending { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+    .modal-status-badge.approved { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .modal-status-badge.completed { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+    .modal-status-badge.cancelled { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+    .modal-status-badge.expired { background: #f3f4f6; color: #4b5563; border-color: #d1d5db; }
+    .modal-status-badge.missed { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
+    .modal-row {
+        margin-bottom: 12px;
+        display: grid;
+        grid-template-columns: 150px minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+    }
     .modal-label { font-size: 12px; font-weight: 700; color: #111827; text-transform: uppercase; }
     .modal-val { font-size: 15px; color: #111827; font-weight: 500; }
     .modal-title {
         margin-top: 0;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 12px;
-        margin-bottom: 14px;
+        border-bottom: 0;
+        padding-bottom: 0;
+        margin-bottom: 4px;
     }
     .modal-subtitle {
         font-size: 14px;
@@ -356,6 +397,7 @@
         border-radius: 8px;
         font-size: 13px;
         color: #111827;
+        min-height: 72px;
     }
     .dialog-actions {
         display: flex;
@@ -826,7 +868,7 @@
         color: #ffffff !important;
     }
 
-    html[data-theme="dark"] .modal-title {
+    html[data-theme="dark"] .modal-header {
         border-bottom-color: rgba(255, 255, 255, 0.12);
     }
 
@@ -835,6 +877,13 @@
         color: #ffffff;
         border: 1px solid rgba(250, 204, 21, 0.12);
     }
+
+    html[data-theme="dark"] .modal-status-badge.pending { background: rgba(194, 65, 12, 0.22); color: #fdba74; border-color: rgba(251, 146, 60, 0.30); }
+    html[data-theme="dark"] .modal-status-badge.approved { background: rgba(21, 128, 61, 0.24); color: #bbf7d0; border-color: rgba(74, 222, 128, 0.28); }
+    html[data-theme="dark"] .modal-status-badge.completed { background: rgba(29, 78, 216, 0.24); color: #bfdbfe; border-color: rgba(96, 165, 250, 0.30); }
+    html[data-theme="dark"] .modal-status-badge.cancelled { background: rgba(127, 29, 29, 0.24); color: #fecaca; border-color: rgba(248, 113, 113, 0.28); }
+    html[data-theme="dark"] .modal-status-badge.expired { background: rgba(71, 85, 105, 0.26); color: #e5e7eb; border-color: rgba(148, 163, 184, 0.30); }
+    html[data-theme="dark"] .modal-status-badge.missed { background: rgba(154, 52, 18, 0.24); color: #fdba74; border-color: rgba(251, 146, 60, 0.28); }
 
     html[data-theme="dark"] .form-input {
         background: rgba(255, 255, 255, 0.06);
@@ -876,6 +925,20 @@
 
         .btn-add-walkin {
             width: 100%;
+        }
+
+        .modal-box {
+            width: min(92vw, 560px);
+        }
+
+        .modal-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .modal-row {
+            grid-template-columns: 1fr;
+            gap: 6px;
         }
     }
 
@@ -931,6 +994,7 @@
                         data-view-time="{{ $appt->time }}"
                         data-view-remarks="{{ $appt->remarks ?? 'No notes provided.' }}"
                         data-view-email="{{ $appt->email }}"
+                        data-view-status="{{ $appt->status }}"
                         title="{{ $appt->status === 'Completed' ? 'Click to view' : '' }}"
                         class="{{ implode(' ', array_filter([
                             $highlightAppointmentId !== '' && $highlightAppointmentId === (string) $appt->id ? 'appointment-highlight-row' : '',
@@ -990,7 +1054,7 @@
                                         Consult
                                     </a>
                                 @endif
-                            @elseif(in_array($appt->status, ['Completed', 'Cancelled', 'Expired'], true))
+                            @elseif(in_array($appt->status, ['Completed', 'Cancelled', 'Expired', 'Missed'], true))
                                 <button
                                     type="button"
                                     class="appointment-inline-pill is-view"
@@ -1001,6 +1065,7 @@
                                     data-time="{{ $appt->time }}"
                                     data-remarks="{{ $appt->remarks ?? 'No notes provided.' }}"
                                     data-email="{{ $appt->email }}"
+                                    data-status="{{ $appt->status }}"
                                     onclick="openInfoModal(this)">
                                     <x-outline-icon name="eye" />
                                     View
@@ -1022,6 +1087,7 @@
                                             data-time="{{ $appt->time }}"
                                             data-remarks="{{ $appt->remarks ?? 'No notes provided.' }}"
                                             data-email="{{ $appt->email }}"
+                                            data-status="{{ $appt->status }}"
                                             onclick="openInfoModal(this)">
                                             <x-outline-icon name="document-text" />
                                             View
@@ -1057,7 +1123,12 @@
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-box">
-            <h3 class="modal-title" style="color:#8B0000;">Appointment Details</h3>
+            <div class="modal-header">
+                <div class="modal-header-main">
+                    <h3 class="modal-title" style="color:#8B0000;">Appointment Details</h3>
+                </div>
+                <span class="modal-status-badge" id="mStatus">-</span>
+            </div>
             <div class="modal-row"><div class="modal-label">Student Name</div><div class="modal-val" id="mName"></div></div>
             <div class="modal-row"><div class="modal-label">Email</div><div class="modal-val" id="mEmail"></div></div>
             <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="mService"></div></div>
@@ -1156,7 +1227,8 @@
             date,
             time,
             remarks,
-            email
+            email,
+            status: ''
         };
 
         if (triggerOrName && typeof triggerOrName === 'object' && triggerOrName.dataset) {
@@ -1166,7 +1238,8 @@
                 date: triggerOrName.dataset.date,
                 time: triggerOrName.dataset.time,
                 remarks: triggerOrName.dataset.remarks,
-                email: triggerOrName.dataset.email
+                email: triggerOrName.dataset.email,
+                status: triggerOrName.dataset.status || triggerOrName.dataset.viewStatus || ''
             };
         }
 
@@ -1175,6 +1248,10 @@
         document.getElementById('mDateTime').innerText = formatSchedule(payload.date, payload.time);
         document.getElementById('mNotes').innerText = safeText(payload.remarks);
         document.getElementById('mEmail').innerText = safeText(payload.email);
+        const statusEl = document.getElementById('mStatus');
+        const normalizedStatus = safeText(payload.status);
+        statusEl.innerText = normalizedStatus;
+        statusEl.className = 'modal-status-badge ' + normalizedStatus.toLowerCase().replace(/\s+/g, '-');
         document.getElementById('infoModal').style.display = 'flex';
     }
 

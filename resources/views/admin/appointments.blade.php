@@ -11,6 +11,7 @@
         padding: 24px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         border: 1px solid #f0f0f0;
+        border-top: 3px solid rgba(112, 19, 27, 0.78);
     }
 
     .appointments-summary-title {
@@ -131,6 +132,13 @@
         font-size: 14px;
         color: #111827;
         margin-bottom: 16px;
+    }
+    .modal-notes {
+        background: #f8fafc;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #111827;
     }
     .dialog-actions {
         display: flex;
@@ -469,6 +477,10 @@
             0 16px 28px rgba(0, 0, 0, 0.22);
     }
 
+    html[data-theme="dark"] .card {
+        border-top-color: rgba(250, 204, 21, 0.88);
+    }
+
     html[data-theme="dark"] .appointments-summary-title,
     html[data-theme="dark"] .student-name,
     html[data-theme="dark"] #apptTable td,
@@ -496,6 +508,41 @@
         box-shadow:
             0 0 0 3px rgba(112, 19, 27, 0.16),
             0 12px 22px rgba(0, 0, 0, 0.24) !important;
+    }
+
+    html[data-theme="dark"] .modal-box {
+        background: linear-gradient(180deg, rgba(36, 21, 24, 0.98), rgba(24, 18, 20, 0.98));
+        border: 1px solid rgba(143, 34, 48, 0.36);
+        box-shadow:
+            0 22px 38px rgba(0, 0, 0, 0.42),
+            0 0 0 1px rgba(250, 204, 21, 0.06);
+    }
+
+    html[data-theme="dark"] .modal-title,
+    html[data-theme="dark"] .modal-label,
+    html[data-theme="dark"] .modal-val,
+    html[data-theme="dark"] .modal-subtitle {
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .modal-title {
+        border-bottom-color: rgba(255, 255, 255, 0.12);
+    }
+
+    html[data-theme="dark"] .modal-notes {
+        background: rgba(255, 255, 255, 0.06);
+        color: #ffffff;
+        border: 1px solid rgba(250, 204, 21, 0.12);
+    }
+
+    html[data-theme="dark"] .form-input {
+        background: rgba(255, 255, 255, 0.06);
+        color: #ffffff;
+        border-color: rgba(250, 204, 21, 0.18);
+    }
+
+    html[data-theme="dark"] .form-input::placeholder {
+        color: rgba(255, 255, 255, 0.62);
     }
 
     @media (max-width: 920px) {
@@ -675,7 +722,7 @@
             <div class="modal-row"><div class="modal-label">Email</div><div class="modal-val" id="mEmail"></div></div>
             <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="mService"></div></div>
             <div class="modal-row"><div class="modal-label">Scheduled For</div><div class="modal-val" id="mDateTime"></div></div>
-            <div class="modal-row"><div class="modal-label">Notes</div><div class="modal-val" id="mNotes" style="background:#f8fafc; padding:10px; border-radius:6px; font-size:13px;"></div></div>
+            <div class="modal-row"><div class="modal-label">Notes</div><div class="modal-val modal-notes" id="mNotes"></div></div>
             <div class="dialog-actions">
                 <button type="button" class="dialog-btn dialog-btn-primary" onclick="closeInfoModal()">Close</button>
             </div>

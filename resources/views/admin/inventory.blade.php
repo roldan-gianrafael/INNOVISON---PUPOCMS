@@ -28,12 +28,11 @@
         gap: 16px;
         margin-bottom: 20px;
         padding: 16px 18px;
-        border-radius: 28px;
-        border: 1px solid rgba(234, 215, 160, 0.72);
+        border-radius: 0 0 20px 20px;
+        border: 0;
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
         background: linear-gradient(135deg, rgba(255, 253, 246, 0.76) 0%, rgba(255, 249, 231, 0.58) 42%, rgba(255, 255, 255, 0.82) 100%);
-        box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.05),
-            0 16px 30px rgba(112, 19, 27, 0.05);
+        box-shadow: 0 14px 26px rgba(112, 19, 27, 0.05);
     }
     .inventory-page-title {
         margin: 0;
@@ -41,10 +40,11 @@
         display: inline-flex;
         align-items: center;
         padding: 10px 18px;
-        border-radius: 999px;
-        border: 1px solid #ead7a0;
-        background: linear-gradient(135deg, #fffdf6 0%, #fff4c6 100%);
-        box-shadow: 0 10px 24px rgba(112, 19, 27, 0.08);
+        border-radius: 0 0 14px 14px;
+        border: 0;
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+        background: transparent;
+        box-shadow: none;
     }
     .inventory-page-title svg {
         width: 18px;
@@ -67,22 +67,23 @@
     }
     .inventory-search-input {
         width: 100%;
-        padding: 11px 18px;
-        border-radius: 999px;
-        border: 1px solid #ead7a0;
+        min-height: 48px;
+        height: 48px;
+        padding: 12px 18px;
+        border-radius: 0 0 14px 14px;
+        border: 0 !important;
+        border-bottom: 3px solid #8f2230 !important;
         color: #111827;
-        background: linear-gradient(135deg, #fffdf6 0%, #ffffff 100%);
-        box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.08),
-            0 10px 22px rgba(112, 19, 27, 0.08);
+        background: transparent !important;
+        box-shadow: none !important;
         transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+        appearance: none;
+        -webkit-appearance: none;
     }
     .inventory-search-input:focus {
         outline: none;
-        border-color: #facc15;
-        box-shadow:
-            0 0 0 4px rgba(250, 204, 21, 0.14),
-            0 12px 24px rgba(112, 19, 27, 0.10);
+        border-bottom-color: #70131B;
+        box-shadow: none !important;
         transform: translateY(-1px);
     }
     .btn-add,
@@ -141,9 +142,63 @@
     .status.out { background: #fee2e2; color: #b91c1c; }
 
     /* Action Buttons */
-    .btn-icon { padding: 6px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; margin-right: 4px; }
-    .btn-edit { background: #fff3f5; color: #70131B; border: 1px solid #f0d7dc; }
-    .btn-delete { background: #fee2e2; color: #b91c1c; }
+    .inventory-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 96px;
+        padding: 9px 14px;
+        border-radius: 999px;
+        border: 1px solid;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1;
+        text-decoration: none;
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+        margin-right: 0;
+        background: transparent;
+    }
+    .btn-icon svg {
+        width: 15px;
+        height: 15px;
+        flex: 0 0 auto;
+    }
+    .btn-edit {
+        background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+        color: #475569;
+        border-color: rgba(112, 19, 27, 0.22);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+    .btn-edit:hover {
+        transform: translateY(-1px);
+        color: #70131B;
+        border-color: rgba(112, 19, 27, 0.46);
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.08),
+            0 10px 22px rgba(112, 19, 27, 0.12);
+    }
+    .btn-delete {
+        background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+        color: #b91c1c;
+        border-color: rgba(220, 38, 38, 0.22);
+        box-shadow: 0 8px 18px rgba(127, 29, 29, 0.08);
+    }
+    .btn-delete:hover {
+        transform: translateY(-1px);
+        background: linear-gradient(180deg, #fee2e2 0%, #fecaca 100%);
+        border-color: rgba(220, 38, 38, 0.42);
+        box-shadow:
+            0 0 0 3px rgba(248, 113, 113, 0.12),
+            0 10px 22px rgba(127, 29, 29, 0.14);
+    }
     .inventory-row-highlight {
         background: #fff7cc;
         outline: 2px solid #f59e0b;
@@ -193,26 +248,22 @@
 
     html[data-theme="dark"] .inventory-page-title {
         color: #ffffff;
-        border-color: rgba(250, 204, 21, 0.30);
-        background: linear-gradient(135deg, rgba(255, 248, 196, 0.14) 0%, rgba(112, 19, 27, 0.42) 100%);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        border-bottom-color: rgba(143, 34, 48, 0.70);
+        background: transparent;
+        box-shadow: none;
     }
 
     html[data-theme="dark"] .controls {
-        border-color: rgba(250, 204, 21, 0.24);
+        border-bottom-color: rgba(143, 34, 48, 0.70);
         background: linear-gradient(135deg, rgba(112, 19, 27, 0.68) 0%, rgba(86, 16, 26, 0.64) 48%, rgba(44, 14, 18, 0.72) 100%);
-        box-shadow:
-            0 0 0 2px rgba(250, 204, 21, 0.07),
-            0 16px 28px rgba(0, 0, 0, 0.22);
+        box-shadow: 0 16px 28px rgba(0, 0, 0, 0.22);
     }
 
     html[data-theme="dark"] .inventory-search-input {
-        background: rgba(18, 8, 12, 0.86);
+        background: transparent !important;
         color: #ffffff;
-        border-color: rgba(250, 204, 21, 0.28);
-        box-shadow:
-            0 0 0 2px rgba(250, 204, 21, 0.06),
-            0 10px 20px rgba(0, 0, 0, 0.20);
+        border-bottom-color: rgba(143, 34, 48, 0.92);
+        box-shadow: none !important;
     }
 
     html[data-theme="dark"] .inventory-search-input::placeholder {
@@ -223,7 +274,7 @@
         .controls {
             flex-direction: column;
             align-items: stretch;
-            border-radius: 24px;
+            border-radius: 0 0 18px 18px;
         }
 
         .inventory-toolbar-actions {
@@ -286,6 +337,36 @@
     html[data-theme="dark"] table td div[style],
     html[data-theme="dark"] table td small[style] {
         color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .btn-edit {
+        background: linear-gradient(180deg, rgba(51, 65, 85, 0.92) 0%, rgba(30, 41, 59, 0.96) 100%);
+        color: #f8fafc;
+        border-color: rgba(250, 204, 21, 0.18);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.26);
+    }
+
+    html[data-theme="dark"] .btn-edit:hover {
+        color: #ffffff;
+        border-color: rgba(250, 204, 21, 0.34);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.10),
+            0 12px 24px rgba(0, 0, 0, 0.30);
+    }
+
+    html[data-theme="dark"] .btn-delete {
+        background: linear-gradient(180deg, rgba(127, 29, 29, 0.92) 0%, rgba(69, 10, 10, 0.96) 100%);
+        color: #fee2e2;
+        border-color: rgba(248, 113, 113, 0.22);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
+    }
+
+    html[data-theme="dark"] .btn-delete:hover {
+        color: #ffffff;
+        border-color: rgba(248, 113, 113, 0.40);
+        box-shadow:
+            0 0 0 3px rgba(248, 113, 113, 0.12),
+            0 12px 24px rgba(0, 0, 0, 0.32);
     }
 </style>
 @endpush
@@ -365,15 +446,21 @@
                         </td>
                         <td>
                             @if($canManageInventory)
-                                <button class="btn-icon btn-edit" 
-                                    onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}', '{{ $item->unit }}', '{{ $item->medicine_type }}', '{{ $item->date_added }}', '{{ $item->expiration_date }}')">
-                                    Edit
-                                </button>
+                                <div class="inventory-actions">
+                                    <button class="btn-icon btn-edit" 
+                                        onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}', '{{ $item->unit }}', '{{ $item->medicine_type }}', '{{ $item->date_added }}', '{{ $item->expiration_date }}')">
+                                        <x-outline-icon name="pencil-square" />
+                                        <span>Edit</span>
+                                    </button>
 
-                                <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="display:inline;">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn-icon btn-delete" onclick="return confirm('Delete this item?')">Delete</button>
-                                </form>
+                                    <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="display:inline;">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn-icon btn-delete" onclick="return confirm('Delete this item?')">
+                                            <x-outline-icon name="trash" />
+                                            <span>Delete</span>
+                                        </button>
+                                    </form>
+                                </div>
                             @else
                                 <span style="font-size: 12px; color: #64748b; font-weight: 700;">View Only</span>
                             @endif

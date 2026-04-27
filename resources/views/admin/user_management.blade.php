@@ -18,12 +18,11 @@
         gap: 16px;
         margin-bottom: 18px;
         padding: 16px 18px;
-        border-radius: 28px;
-        border: 1px solid rgba(234, 215, 160, 0.72);
+        border-radius: 0 0 20px 20px;
+        border: 0;
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
         background: linear-gradient(135deg, rgba(255, 253, 246, 0.76) 0%, rgba(255, 249, 231, 0.58) 42%, rgba(255, 255, 255, 0.82) 100%);
-        box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.05),
-            0 16px 30px rgba(112, 19, 27, 0.05);
+        box-shadow: 0 14px 26px rgba(112, 19, 27, 0.05);
     }
 
     .um-hero h1 {
@@ -35,10 +34,11 @@
         align-items: center;
         gap: 10px;
         padding: 10px 18px;
-        border-radius: 999px;
-        border: 1px solid #ead7a0;
-        background: linear-gradient(135deg, #fffdf6 0%, #fff4c6 100%);
-        box-shadow: 0 10px 24px rgba(112, 19, 27, 0.08);
+        border-radius: 0 0 14px 14px;
+        border: 0;
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+        background: transparent;
+        box-shadow: none;
     }
 
     .um-hero h1 svg {
@@ -79,11 +79,9 @@
 
 
     html[data-theme="dark"] .um-hero {
-        border-color: rgba(250, 204, 21, 0.24);
+        border-bottom-color: rgba(143, 34, 48, 0.70);
         background: linear-gradient(135deg, rgba(112, 19, 27, 0.68) 0%, rgba(86, 16, 26, 0.64) 48%, rgba(44, 14, 18, 0.72) 100%);
-        box-shadow:
-            0 0 0 2px rgba(250, 204, 21, 0.07),
-            0 16px 28px rgba(0, 0, 0, 0.22);
+        box-shadow: 0 16px 28px rgba(0, 0, 0, 0.22);
     }
 
     html[data-theme="dark"] .user-management-shell,
@@ -97,9 +95,9 @@
     }
 
     html[data-theme="dark"] .um-hero h1 {
-        border-color: rgba(250, 204, 21, 0.30);
-        background: linear-gradient(135deg, rgba(255, 248, 196, 0.14) 0%, rgba(112, 19, 27, 0.42) 100%);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        border-bottom-color: rgba(143, 34, 48, 0.70);
+        background: transparent;
+        box-shadow: none;
     }
 
     html[data-theme="dark"] .um-hero p,
@@ -1116,7 +1114,7 @@
         .um-hero {
             align-items: flex-start;
             flex-direction: column;
-            border-radius: 24px;
+            border-radius: 0 0 18px 18px;
         }
 
         .um-summary-card {

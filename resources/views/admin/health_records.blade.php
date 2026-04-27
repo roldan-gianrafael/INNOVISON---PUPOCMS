@@ -209,10 +209,11 @@
         display: inline-flex;
         align-items: center;
         padding: 10px 18px;
-        border-radius: 999px;
-        border: 1px solid #ead7a0;
-        background: linear-gradient(135deg, #fffdf6 0%, #fff4c6 100%);
-        box-shadow: 0 10px 24px rgba(112, 19, 27, 0.08);
+        border-radius: 0 0 14px 14px;
+        border: 0;
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+        background: transparent;
+        box-shadow: none;
     }
 
     .health-records-title svg {
@@ -230,12 +231,11 @@
         width: 100%;
         margin-bottom: 20px;
         padding: 16px 18px;
-        border-radius: 28px;
-        border: 1px solid rgba(234, 215, 160, 0.72);
+        border-radius: 0 0 20px 20px;
+        border: 0;
+        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
         background: linear-gradient(135deg, rgba(255, 253, 246, 0.76) 0%, rgba(255, 249, 231, 0.58) 42%, rgba(255, 255, 255, 0.82) 100%);
-        box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.05),
-            0 16px 30px rgba(112, 19, 27, 0.05);
+        box-shadow: 0 14px 26px rgba(112, 19, 27, 0.05);
     }
 
     .health-records-toolbar-actions {
@@ -346,16 +346,19 @@
 
     .health-records-search,
     .health-filter-select {
-        padding: 11px 18px;
-        border-radius: 999px;
-        border: 1px solid #ead7a0;
+        min-height: 48px;
+        height: 48px;
+        padding: 12px 18px;
+        border-radius: 0 0 14px 14px;
+        border: 0 !important;
+        border-bottom: 3px solid #8f2230 !important;
         min-width: 180px;
         color: #111827;
-        background: linear-gradient(135deg, #fffdf6 0%, #ffffff 100%);
-        box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.08),
-            0 10px 22px rgba(112, 19, 27, 0.08);
+        background: transparent !important;
+        box-shadow: none !important;
         transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+        appearance: none;
+        -webkit-appearance: none;
     }
 
     .health-records-search {
@@ -365,10 +368,8 @@
     .health-records-search:focus,
     .health-filter-select:focus {
         outline: none;
-        border-color: #facc15;
-        box-shadow:
-            0 0 0 4px rgba(250, 204, 21, 0.14),
-            0 12px 24px rgba(112, 19, 27, 0.10);
+        border-bottom-color: #70131B;
+        box-shadow: none !important;
         transform: translateY(-1px);
     }
 

@@ -37,11 +37,12 @@
     .hero {
         background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,247,249,0.96));
         color: var(--stg-text);
-        border: 1px solid rgba(127,0,0,0.10);
-        border-radius: 28px;
+        border: 0;
+        border-bottom: 2px solid rgba(127, 0, 0, 0.72);
+        border-radius: 0 0 20px 20px;
         padding: 28px;
         margin-bottom: 22px;
-        box-shadow: 0 20px 48px rgba(15,23,42,0.08);
+        box-shadow: 0 16px 32px rgba(15,23,42,0.08);
     }
     .hero-top {
         display: flex;
@@ -59,6 +60,10 @@
         display: inline-flex;
         align-items: center;
         gap: 12px;
+        padding: 10px 18px;
+        border-radius: 0 0 14px 14px;
+        border-bottom: 2px solid rgba(127, 0, 0, 0.72);
+        background: transparent;
     }
     .hero h1 svg {
         width: 28px;

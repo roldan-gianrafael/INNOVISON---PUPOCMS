@@ -386,6 +386,11 @@
       transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   }
 
+  .medicine-alert-actions-toggle,
+  .medicine-alert-close {
+      color: #111111;
+  }
+
   .medicine-alert-actions-toggle:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
@@ -3138,6 +3143,34 @@
     text-decoration: underline;
 }
 
+.medicine-alert-mode-btn {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(127, 29, 45, 0.14);
+    background: rgba(255, 255, 255, 0.96);
+    color: #7f1d2d;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.medicine-alert-mode-btn.is-visible {
+    display: inline-flex;
+}
+
+.medicine-alert-mode-btn svg {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+}
+
+.medicine-alert-section.is-hidden {
+    display: none;
+}
+
 .medicine-alert-item.is-hidden {
     display: none;
 }
@@ -3156,7 +3189,8 @@
 
   html[data-theme="dark"] .medicine-alert-actions-toggle,
   html[data-theme="dark"] .medicine-alert-actions-menu,
-  html[data-theme="dark"] .medicine-alert-empty {
+  html[data-theme="dark"] .medicine-alert-empty,
+  html[data-theme="dark"] .medicine-alert-mode-btn {
       background: rgba(17, 24, 39, 0.96);
       border-color: rgba(250, 204, 21, 0.16);
       color: #f8fafc;
@@ -3164,6 +3198,11 @@
 
   html[data-theme="dark"] .medicine-alert-actions-toggle {
       box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  }
+
+  html[data-theme="dark"] .medicine-alert-actions-toggle,
+  html[data-theme="dark"] .medicine-alert-close {
+      color: #ffffff;
   }
 
   html[data-theme="dark"] .medicine-alert-actions-link,
@@ -3287,9 +3326,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $adminMarkAllReadUrl = $isStudentAssistant
         ? route('assistant.notifications.read_all')
         : route('admin.notifications.read_all');
-    $adminNotificationHistoryUrl = $isStudentAssistant
-        ? route('assistant.notifications.history')
-        : route('admin.notifications.history');
     $recentPendingAppointments = \App\Models\Appointment::query()
         ->where('status', 'Pending')
         ->orderByDesc('created_at')
@@ -3391,17 +3427,21 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         ]);
     }
 
-    $adminNotifications = $adminNotifications
+    $allAdminNotifications = $adminNotifications
         ->map(function (array $notification) use ($adminNotificationReadMap) {
             $notification['is_unread'] = !isset($adminNotificationReadMap[$notification['id']]);
             return $notification;
         })
+        ->values();
+
+    $adminNotifications = $allAdminNotifications
         ->filter(fn (array $notification) => $notification['is_unread'])
         ->take(10)
         ->values();
     $adminNotificationCount = $adminNotifications->count();
     $adminNotificationPreview = $adminNotifications->take(4);
     $adminNotificationOverflow = $adminNotifications->slice(4)->values();
+    $adminNotificationHistory = $allAdminNotifications->take(20)->values();
 @endphp
 
 <header class="admin-header">
@@ -3573,8 +3613,12 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             <p class="medicine-alert-subtitle">New appointments, today's schedules, and medicine alerts.</p>
         </div>
         <div class="medicine-alert-actions">
+            <button type="button" class="medicine-alert-mode-btn" id="medicineAlertBackBtn" aria-label="Back to new notifications">
+                <x-outline-icon name="chevron-right" style="transform: rotate(180deg);" />
+                Back
+            </button>
             <button type="button" class="medicine-alert-actions-toggle" id="medicineAlertActionsToggle" aria-label="Notification actions" aria-expanded="false">
-                <x-outline-icon name="ellipsis-horizontal" />
+                <x-outline-icon name="bars-3" />
             </button>
             <div class="medicine-alert-actions-menu" id="medicineAlertActionsMenu">
                     <form method="POST" action="{{ $adminMarkAllReadUrl }}">
@@ -3587,10 +3631,10 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                             Mark all as read
                         </button>
                     </form>
-                    <a href="{{ $adminNotificationHistoryUrl }}" class="medicine-alert-actions-link">
+                    <button type="button" class="medicine-alert-actions-submit" id="medicineAlertHistoryBtn">
                         <x-outline-icon name="clock" />
                         Notification history
-                    </a>
+                    </button>
                 </div>
             <button type="button" class="medicine-alert-close" id="medicineAlertCloseBtn" aria-label="Close notifications">
                 <x-outline-icon name="x-mark" />
@@ -3598,6 +3642,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         </div>
     </div>
 
+    <div class="medicine-alert-section" id="medicineAlertUnreadSection">
     <div class="medicine-alert-list" id="medicineAlertList">
         @forelse($adminNotificationPreview as $notification)
         <article class="medicine-alert-item {{ $notification['state_class'] }}">
@@ -3662,7 +3707,46 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             Show more ({{ $adminNotificationCount - 4 }})
         </button>
     </div>
-@endif
+    @endif
+    </div>
+
+    <div class="medicine-alert-section is-hidden" id="medicineAlertHistorySection">
+        <div class="medicine-alert-list">
+            @forelse($adminNotificationHistory as $notification)
+                <article class="medicine-alert-item {{ $notification['state_class'] }}">
+                    <a
+                        href="{{ $notification['link'] }}"
+                        class="medicine-alert-item-link"
+                        data-admin-notification-link="true"
+                        data-admin-notification-target="{{ $notification['link'] }}"
+                        data-hover-hint="{{ $notification['hover_hint'] }}"
+                    >
+                    <div class="medicine-alert-content" style="width: 100%;">
+                        <div class="medicine-alert-name-row">
+                            <p class="medicine-alert-item-name">
+                                {{ $notification['title'] }}
+                                @if(!($notification['is_unread'] ?? false))
+                                    <span class="medicine-alert-chip" style="margin-left:8px;">Read</span>
+                                @endif
+                            </p>
+                        </div>
+
+                        <div class="medicine-alert-item-meta">
+                            @foreach($notification['chips'] as $chip)
+                                <span class="medicine-alert-chip">{{ $chip }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                    </a>
+                </article>
+            @empty
+                <div class="medicine-alert-empty">
+                    <p class="medicine-alert-empty-title">No notification history yet</p>
+                    <p class="medicine-alert-empty-copy">As notifications come in, this history view will keep them in one place.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
 </section>
 
 <form method="POST" action="{{ $adminMarkAllReadUrl }}" id="adminNotificationOpenForm" style="display:none;">
@@ -3818,6 +3902,10 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const closeButton = document.getElementById('medicineAlertCloseBtn');
         const actionsToggle = document.getElementById('medicineAlertActionsToggle');
         const actionsMenu = document.getElementById('medicineAlertActionsMenu');
+        const historyButton = document.getElementById('medicineAlertHistoryBtn');
+        const backButton = document.getElementById('medicineAlertBackBtn');
+        const unreadSection = document.getElementById('medicineAlertUnreadSection');
+        const historySection = document.getElementById('medicineAlertHistorySection');
         const moreButton = document.getElementById('medicineAlertMoreBtn');
         const openForm = document.getElementById('adminNotificationOpenForm');
         const redirectInput = document.getElementById('adminNotificationRedirectTo');
@@ -3861,11 +3949,25 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             });
         };
 
+        const showUnreadSection = function () {
+            unreadSection?.classList.remove('is-hidden');
+            historySection?.classList.add('is-hidden');
+            backButton?.classList.remove('is-visible');
+        };
+
+        const showHistorySection = function () {
+            unreadSection?.classList.add('is-hidden');
+            historySection?.classList.remove('is-hidden');
+            backButton?.classList.add('is-visible');
+            closeActionsMenu();
+        };
+
         const closePanel = function () {
             if (!panel.classList.contains('is-open')) {
                 return;
             }
 
+            showUnreadSection();
             closeActionsMenu();
             panel.classList.remove('is-open');
             panel.classList.add('is-closing');
@@ -3912,6 +4014,22 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
             actionsMenu.addEventListener('click', function (event) {
                 event.stopPropagation();
+            });
+        }
+
+        if (historyButton) {
+            historyButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                showHistorySection();
+            });
+        }
+
+        if (backButton) {
+            backButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                showUnreadSection();
             });
         }
 

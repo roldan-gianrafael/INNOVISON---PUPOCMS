@@ -135,6 +135,14 @@
             0 10px 22px rgba(112, 19, 27, 0.20);
         transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
         z-index: 0;
+        white-space: nowrap;
+        color: #ffffff !important;
+    }
+
+    .health-filter-toggle,
+    .health-filter-toggle:hover,
+    .health-filter-toggle:focus {
+        color: #ffffff !important;
     }
 
     .health-filter-toggle::after {
@@ -301,9 +309,10 @@
 
     .health-table-title {
         margin: 0;
-        font-size: 13px;
-        font-weight: 800;
-        color: #6b7280;
+        font-size: 18px;
+        font-weight: 900;
+        color: #70131B;
+        letter-spacing: 0.01em;
     }
 
     .health-highlight-row {
@@ -328,6 +337,7 @@
 
     html[data-theme="dark"] .health-records-title,
     html[data-theme="dark"] .health-table-title,
+    html[data-theme="dark"] .health-filter-toggle,
     html[data-theme="dark"] .health-filter-field label,
     html[data-theme="dark"] .health-records-search,
     html[data-theme="dark"] .health-records-search::placeholder,
@@ -394,7 +404,17 @@
     {{-- Header with Search / Filters --}}
     <div class="health-records-toolbar">
         <h2 class="health-records-title">Student Health Records</h2>
-        <div class="health-records-toolbar-actions"></div>
+        <div class="health-records-toolbar-actions">
+            <input
+                type="text"
+                id="recordSearch"
+                name="q"
+                value="{{ $search ?? '' }}"
+                class="health-records-search"
+                form="healthFilterForm"
+                placeholder="Search by student name or ID..."
+            >
+        </div>
     </div>
 
     {{-- Summary Cards - Hardcoded Side by Side --}}
@@ -426,17 +446,6 @@
                 Filter Health Forms
             </button>
             <form method="GET" class="health-filter-form" id="healthFilterForm">
-                <div class="health-filter-field">
-                    <label for="recordSearch">Search</label>
-                    <input
-                        type="text"
-                        id="recordSearch"
-                        name="q"
-                        value="{{ $search ?? '' }}"
-                        class="health-records-search"
-                        placeholder="Search by student name or ID..."
-                    >
-                </div>
                 <div class="health-filter-field">
                     <label for="courseFilter">Course</label>
                     <select id="courseFilter" name="course" class="health-filter-select">

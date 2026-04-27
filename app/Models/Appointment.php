@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Appointment extends Model
 {
@@ -100,5 +101,27 @@ class Appointment extends Model
     public function isCompleted()
     {
         return $this->status === 'Completed';
+    }
+
+    /**
+     * Auto-expire pending appointments once their scheduled date/time has passed.
+     */
+    public static function expireOverduePending(): int
+    {
+        $now = Carbon::now();
+
+        return static::query()
+            ->where('status', 'Pending')
+            ->where(function ($query) use ($now) {
+                $query->whereDate('date', '<', $now->toDateString())
+                    ->orWhere(function ($sameDay) use ($now) {
+                        $sameDay->whereDate('date', $now->toDateString())
+                            ->whereTime('time', '<', $now->format('H:i:s'));
+                    });
+            })
+            ->update([
+                'status' => 'Expired',
+                'updated_at' => $now,
+            ]);
     }
 }

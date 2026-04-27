@@ -69,6 +69,7 @@
     .status.approved { background: #dcfce7; color: #15803d; }
     .status.cancelled { background: #fee2e2; color: #b91c1c; }
     .status.completed { background: #e0f2fe; color: #0369a1; }
+    .status.expired { background: #f3f4f6; color: #4b5563; }
     .status.missed { background: #ffedd5; color: #9a3412; }
     
     /* Type Badges */
@@ -260,14 +261,14 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-        color: #166534;
-        border: 1px solid #86efac;
+        background: linear-gradient(135deg, #fff8d6, #ffefb5);
+        color: #7c2d12;
+        border: 1px solid #facc15;
         font-size: 12px;
         font-weight: 800;
         box-shadow:
-            0 0 0 3px rgba(34, 197, 94, 0.10),
-            0 10px 20px rgba(22, 101, 52, 0.10);
+            0 0 0 3px rgba(250, 204, 21, 0.14),
+            0 10px 20px rgba(146, 64, 14, 0.10);
     }
     .appointment-completed-badge svg {
         width: 16px;
@@ -767,11 +768,11 @@
         color: #cbd5e1;
     }
     html[data-theme="dark"] .appointment-completed-badge {
-        background: linear-gradient(135deg, rgba(20, 83, 45, 0.96), rgba(21, 128, 61, 0.84));
-        border-color: rgba(74, 222, 128, 0.30);
-        color: #ecfdf5;
+        background: linear-gradient(135deg, rgba(133, 77, 14, 0.96), rgba(161, 98, 7, 0.90));
+        border-color: rgba(250, 204, 21, 0.34);
+        color: #fff8dc;
         box-shadow:
-            0 0 0 3px rgba(34, 197, 94, 0.10),
+            0 0 0 3px rgba(250, 204, 21, 0.10),
             0 12px 22px rgba(0, 0, 0, 0.24);
     }
 
@@ -934,9 +935,9 @@
                         </td>
                         <td>
                             @if($appt->status === 'Completed')
-                                <span class="appointment-completed-badge" title="Appointment completed">
-                                    <x-outline-icon name="check" />
-                                    Completed
+                                <span class="appointment-completed-badge" title="Click to view">
+                                    <x-outline-icon name="eye" />
+                                    View
                                 </span>
                             @else
                                 @php

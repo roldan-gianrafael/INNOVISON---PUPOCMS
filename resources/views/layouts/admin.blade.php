@@ -3305,6 +3305,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
     $brandLogo = asset('images/clinic_logo.png');
     $brandUniversityLogo = asset('images/pup_logo.png');
+    \App\Models\Appointment::expireOverduePending();
     $roleLabelMap = [
         'superadmin' => 'Super Admin',
         'admin' => 'Admin',
@@ -3337,6 +3338,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         ->whereDate('date', now()->toDateString())
         ->orderBy('time')
         ->limit(3)
+        ->get();
+    $recentExpiredAppointments = \App\Models\Appointment::query()
+        ->where('status', 'Expired')
+        ->orderByDesc('updated_at')
+        ->limit(4)
         ->get();
     $recentHealthFormSubmissions = $isStudentAssistant
         ? collect()
@@ -3380,6 +3386,26 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             'state_class' => 'is-notification-scheduled',
             'chips' => array_filter([
                 'Status: Approved',
+            ]),
+        ]);
+    }
+
+    foreach ($recentExpiredAppointments as $appointment) {
+        $adminNotifications->push([
+            'id' => 'appointment-expired:' . $appointment->id . ':' . optional($appointment->updated_at)->timestamp,
+            'type' => 'appointment',
+            'title' => 'Appointment expired before approval',
+            'link' => $appointmentsUrl . '?highlight_appointment=' . $appointment->id,
+            'hover_hint' => implode(' | ', array_filter([
+                'Name: ' . trim((string) ($appointment->name ?? 'Unknown patient')),
+                'Service: ' . trim((string) ($appointment->service ?? 'General consultation')),
+                'Date: ' . trim((string) ($appointment->date ?? 'N/A')),
+                'Time: ' . trim((string) ($appointment->time ?? 'N/A')),
+            ])),
+            'state_class' => 'is-expired',
+            'chips' => array_filter([
+                'Expired',
+                'Needs rebooking',
             ]),
         ]);
     }

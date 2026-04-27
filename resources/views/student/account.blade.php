@@ -118,6 +118,7 @@
     .appt-card.pending { border-left-color: #f59e0b; }
     .appt-card.cancelled { border-left-color: #ef4444; }
     .appt-card.completed { border-left-color: #3b82f6; }
+    .appt-card.expired { border-left-color: #6b7280; }
 
     .appt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
     .appt-service { font-size: 18px; font-weight: 700; color: #334155; }
@@ -147,6 +148,7 @@
     .status-badge.pending { background: #fffbeb; color: #b45309; }
     .status-badge.cancelled { background: #fee2e2; color: #b91c1c; }
     .status-badge.completed { background: #dbeafe; color: #1e40af; }
+    .status-badge.expired { background: #f3f4f6; color: #4b5563; }
 
     .profile-grid-3,
     .profile-grid-2 {

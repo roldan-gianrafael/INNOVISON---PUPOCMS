@@ -45,6 +45,7 @@
       .apt-card.status-approved { border-left: 4px solid #15803d; }
       .apt-card.status-completed { border-left: 4px solid #8B0000; }
       .apt-card.status-cancelled { border-left: 4px solid #64748b; }
+      .apt-card.status-expired { border-left: 4px solid #6b7280; }
       .apt-card.status-default { border-left: 4px solid #8B0000; }
       .apt-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #e0e6e8; }
       
@@ -60,6 +61,7 @@
       .status-badge.status-approved { background: #d4edda; color: #155724; }
       .status-badge.status-completed { background: #f3e8ea; color: #7f1d2d; }
       .status-badge.status-cancelled { background: #e5e7eb; color: #4b5563; }
+      .status-badge.status-expired { background: #f3f4f6; color: #4b5563; }
       .status-badge.status-default { background: #eee; color: #555; }
       
       .empty-state {

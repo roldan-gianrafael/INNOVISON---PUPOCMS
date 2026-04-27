@@ -20,6 +20,8 @@ class ReportsController extends Controller
 {
     public function appointmentStatistics(Request $request)
     {
+        Appointment::expireOverduePending();
+
         $monthFilter = trim((string) $request->query('month', now()->format('Y-m')));
         $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
         $monthEnd = (clone $monthStart)->endOfMonth();

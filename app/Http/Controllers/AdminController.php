@@ -285,6 +285,8 @@ class AdminController extends Controller
 
     public function dashboard()
     {
+        Appointment::expireOverduePending();
+
         $total = Appointment::count();
         $pending = Appointment::where('status', 'Pending')->count();
         $upcoming = Appointment::where('status', 'Approved')->count();
@@ -1317,6 +1319,8 @@ public function updateClearance(Request $request, $id)
 }
     public function appointments()
     {
+        Appointment::expireOverduePending();
+
         $appointments = Appointment::latest()->get();
         return view('admin.appointments', compact('appointments'));
     }
@@ -1329,6 +1333,8 @@ public function updateClearance(Request $request, $id)
 
     public function reports()
 {
+    Appointment::expireOverduePending();
+
    
     $appointments = Appointment::all();
     $total = Appointment::count();

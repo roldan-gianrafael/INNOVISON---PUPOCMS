@@ -57,6 +57,8 @@ class AppointmentController extends Controller
 
     public function getStudentNotifications(User $user): array
     {
+        Appointment::expireOverduePending();
+
         $user->loadMissing('healthProfile');
 
         $appointments = Appointment::where('user_id', $user->id)
@@ -86,6 +88,16 @@ class AppointmentController extends Controller
                     'message' => "Your {$appt->service} on {$dateStr} was cancelled.",
                     'time' => $timeAgo,
                     'link' => url('/student/history'),
+                ];
+            } elseif ($appt->status === 'Expired') {
+                $timeLabel = $appt->time ? date('g:i A', strtotime((string) $appt->time)) : 'N/A';
+                $notifications[] = [
+                    'id' => $this->buildNotificationId('appointment-expired', [$appt->id, $appt->status, optional($appt->updated_at)->timestamp]),
+                    'type' => 'warning',
+                    'icon' => '!',
+                    'message' => "Your {$appt->service} on {$dateStr} at {$timeLabel} expired because it was not approved in time. Tap to book again.",
+                    'time' => $timeAgo,
+                    'link' => url('/student/booking'),
                 ];
             } elseif ($appt->status === 'Completed') {
                 $notifications[] = [
@@ -548,6 +560,8 @@ class AppointmentController extends Controller
     // -------------------------------
     public function index()
     {
+        Appointment::expireOverduePending();
+
         $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
 
         if (!$user) {
@@ -564,7 +578,7 @@ class AppointmentController extends Controller
         $appointments = Appointment::where('user_id', $user->id)->get();
         $upcoming = $appointments->where('status', 'Approved');
         $pending = $appointments->where('status', 'Pending');
-        $history = $appointments->whereIn('status', ['Completed', 'Cancelled']);
+        $history = $appointments->whereIn('status', ['Completed', 'Cancelled', 'Expired']);
 
         return view('student.home', compact('upcoming', 'pending', 'history'));
     }
@@ -574,6 +588,8 @@ class AppointmentController extends Controller
     // -------------------------------
     public function create()
     {
+        Appointment::expireOverduePending();
+
         $user = Auth::user() ?? User::firstOrCreate(
             ['email' => 'guest@pup.edu.ph'],
             [
@@ -777,6 +793,8 @@ class AppointmentController extends Controller
     // -------------------------------
 public function account(Request $request)
 {
+    Appointment::expireOverduePending();
+
     // 1. Kunin ang logged-in user. Kung walang session, redirect sa login page.
     $user = Auth::user();
 
@@ -949,6 +967,8 @@ public function account(Request $request)
     // -------------------------------
     public function faq()
     {
+        Appointment::expireOverduePending();
+
         $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
 
         if (!$user) {
@@ -1065,6 +1085,8 @@ public function updateContact(Request $request)
     // -------------------------------
     public function history()
     {
+        Appointment::expireOverduePending();
+
         $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
 
         if (!$user) {

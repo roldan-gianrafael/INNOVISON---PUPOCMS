@@ -286,15 +286,15 @@
         min-height: 48px;
         padding: 12px 20px;
         height: 48px;
-        border-radius: 999px !important;
-        -webkit-border-radius: 999px !important;
-        -moz-border-radius: 999px !important;
-        border: 2px solid #8f2230 !important;
+        border-radius: 0 0 14px 14px !important;
+        -webkit-border-radius: 0 0 14px 14px !important;
+        -moz-border-radius: 0 0 14px 14px !important;
+        border: 0 !important;
+        border-bottom: 3px solid #8f2230 !important;
         color: #111827;
         background: linear-gradient(135deg, #fff3f5 0%, #ffffff 100%);
         box-shadow:
-            0 0 0 4px rgba(112, 19, 27, 0.10),
-            0 12px 24px rgba(112, 19, 27, 0.12);
+            0 10px 22px rgba(112, 19, 27, 0.10);
         transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
         appearance: none;
         -webkit-appearance: none;
@@ -307,10 +307,9 @@
 
     .main .appointments-search-shell .appointments-search-input:focus {
         outline: none;
-        border-color: #70131B;
+        border-bottom-color: #70131B;
         box-shadow:
-            0 0 0 5px rgba(112, 19, 27, 0.16),
-            0 14px 26px rgba(112, 19, 27, 0.14);
+            0 12px 24px rgba(112, 19, 27, 0.14);
         transform: translateY(-1px);
     }
 
@@ -323,6 +322,14 @@
         padding: 0 !important;
         gap: 0 !important;
         border-radius: 999px !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        background: linear-gradient(135deg, #70131B, #8f2230) !important;
+        border: 1px solid #8f2230 !important;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20) !important;
+        outline: none !important;
     }
 
     .appointments-search-toggle svg {
@@ -332,6 +339,19 @@
         position: relative;
         z-index: 1;
         display: block;
+    }
+
+    .appointments-search-toggle:hover,
+    .appointments-search-toggle:focus {
+        border-color: #facc15 !important;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16) !important;
+        outline: none !important;
+    }
+
+    .appointments-search-toggle:focus-visible {
+        outline: none !important;
     }
 
     .btn-add-walkin {
@@ -459,14 +479,21 @@
     html[data-theme="dark"] .main .appointments-search-shell .appointments-search-input {
         background: rgba(18, 8, 12, 0.86);
         color: #ffffff;
-        border-color: rgba(143, 34, 48, 0.92);
+        border-bottom-color: rgba(143, 34, 48, 0.92);
         box-shadow:
-            0 0 0 4px rgba(112, 19, 27, 0.14),
             0 12px 22px rgba(0, 0, 0, 0.22);
     }
 
     html[data-theme="dark"] .main .appointments-search-shell .appointments-search-input::placeholder {
         color: #fecdd3;
+    }
+
+    html[data-theme="dark"] .appointments-search-toggle {
+        background: linear-gradient(135deg, #70131B, #8f2230) !important;
+        border-color: rgba(250, 204, 21, 0.28) !important;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.16),
+            0 12px 22px rgba(0, 0, 0, 0.24) !important;
     }
 
     @media (max-width: 920px) {

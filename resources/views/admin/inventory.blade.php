@@ -46,6 +46,12 @@
         background: linear-gradient(135deg, #fffdf6 0%, #fff4c6 100%);
         box-shadow: 0 10px 24px rgba(112, 19, 27, 0.08);
     }
+    .inventory-page-title svg {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        flex: 0 0 auto;
+    }
     .inventory-toolbar-actions {
         display: flex;
         align-items: center;
@@ -187,6 +193,9 @@
 
     html[data-theme="dark"] .inventory-page-title {
         color: #ffffff;
+        border-color: rgba(250, 204, 21, 0.30);
+        background: linear-gradient(135deg, rgba(255, 248, 196, 0.14) 0%, rgba(112, 19, 27, 0.42) 100%);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
     }
 
     html[data-theme="dark"] .controls {
@@ -208,6 +217,29 @@
 
     html[data-theme="dark"] .inventory-search-input::placeholder {
         color: #e5e7eb;
+    }
+
+    @media (max-width: 920px) {
+        .controls {
+            flex-direction: column;
+            align-items: stretch;
+            border-radius: 24px;
+        }
+
+        .inventory-toolbar-actions {
+            width: 100%;
+            justify-content: stretch;
+            margin-left: 0;
+        }
+
+        .inventory-search-wrap {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+
+        .btn-add {
+            width: 100%;
+        }
     }
 
     html[data-theme="dark"] .modal-box {
@@ -266,7 +298,7 @@
     @endphp
 
     <div class="controls">
-        <h2 class="inventory-page-title">Clinic Inventory</h2>
+        <h2 class="inventory-page-title"><x-outline-icon name="cube" />Clinic Inventory</h2>
         <div class="inventory-toolbar-actions">
             <div class="inventory-search-wrap">
                 <input type="text" id="inventorySearchInput" class="inventory-search-input" placeholder="Search by item, category, or unit...">

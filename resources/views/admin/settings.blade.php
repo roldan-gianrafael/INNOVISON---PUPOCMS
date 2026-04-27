@@ -56,6 +56,14 @@
         line-height: 1.05;
         font-weight: 900;
         letter-spacing: -0.03em;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .hero h1 svg {
+        width: 28px;
+        height: 28px;
+        flex: 0 0 auto;
     }
     .hero p {
         margin: 12px 0 0;
@@ -905,7 +913,7 @@
     <section class="hero">
         <div class="hero-top">
             <div>
-                <h1>Settings</h1>
+                <h1><x-outline-icon name="cog-6-tooth" />Settings</h1>
                 <p>Manage the clinic identity, operating hours, and system preferences from one modern control panel.</p>
                 <div class="badges">
                     <div class="badge"><span></span> CMS Admin Profile</div>

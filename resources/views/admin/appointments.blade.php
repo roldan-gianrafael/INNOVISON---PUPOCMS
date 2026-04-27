@@ -210,6 +210,13 @@
         box-shadow: 0 10px 24px rgba(112, 19, 27, 0.08);
     }
 
+    .appointments-page-title svg {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        flex: 0 0 auto;
+    }
+
     .appointments-toolbar {
         display: flex;
         justify-content: space-between;
@@ -234,10 +241,29 @@
         flex-wrap: wrap;
     }
 
+    .appointments-search-shell {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
     .appointments-search-wrap {
-        width: 300px;
+        width: 0;
         max-width: 100%;
+        flex: 0 0 0;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transform: translateX(8px);
+        transition: width .22s ease, flex-basis .22s ease, opacity .18s ease, transform .18s ease;
+    }
+
+    .appointments-search-shell.is-open .appointments-search-wrap {
+        width: 300px;
         flex: 0 0 300px;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
     }
 
     .appointments-search-wrap .voice-field-wrap {
@@ -264,6 +290,33 @@
             0 0 0 4px rgba(250, 204, 21, 0.14),
             0 12px 24px rgba(112, 19, 27, 0.10);
         transform: translateY(-1px);
+    }
+
+    .appointments-search-toggle {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+        padding: 0;
+        gap: 0;
+        border-radius: 999px;
+    }
+
+    .appointments-search-toggle svg {
+        width: 19px;
+        height: 19px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .appointments-search-toggle.is-open {
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+
+    .appointments-search-toggle.is-open::after {
+        transform: translateX(135%);
     }
 
     .btn-add-walkin {
@@ -365,6 +418,9 @@
 
     html[data-theme="dark"] .appointments-page-title {
         color: #ffffff;
+        border-color: rgba(250, 204, 21, 0.30);
+        background: linear-gradient(135deg, rgba(255, 248, 196, 0.14) 0%, rgba(112, 19, 27, 0.42) 100%);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
     }
 
     html[data-theme="dark"] .appointments-toolbar {
@@ -385,6 +441,52 @@
         color: #ffffff !important;
     }
 
+    html[data-theme="dark"] .appointments-search-input {
+        background: rgba(18, 8, 12, 0.86);
+        color: #ffffff;
+        border-color: rgba(250, 204, 21, 0.28);
+        box-shadow:
+            0 0 0 2px rgba(250, 204, 21, 0.06),
+            0 10px 20px rgba(0, 0, 0, 0.20);
+    }
+
+    html[data-theme="dark"] .appointments-search-input::placeholder {
+        color: #e5e7eb;
+    }
+
+    @media (max-width: 920px) {
+        .appointments-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+            border-radius: 24px;
+        }
+
+        .appointments-toolbar-actions {
+            width: 100%;
+            justify-content: stretch;
+            margin-left: 0;
+        }
+
+        .appointments-search-shell {
+            width: 100%;
+        }
+
+        .appointments-search-wrap,
+        .appointments-search-shell.is-open .appointments-search-wrap {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+
+        .appointments-search-shell:not(.is-open) .appointments-search-wrap {
+            width: 0;
+            flex-basis: 0;
+        }
+
+        .btn-add-walkin {
+            width: 100%;
+        }
+    }
+
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 @endpush
@@ -397,10 +499,15 @@
     @endphp
 
     <div class="appointments-toolbar">
-        <h2 class="appointments-page-title">Appointments</h2>
+        <h2 class="appointments-page-title"><x-outline-icon name="calendar-days" />Appointments</h2>
         <div class="appointments-toolbar-actions">
-            <div class="appointments-search-wrap">
-                <input type="text" id="searchInput" class="appointments-search-input" placeholder="Search by name...">
+            <div class="appointments-search-shell" id="appointmentsSearchShell">
+                <button type="button" class="btn-add-walkin appointments-search-toggle" id="appointmentsSearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="searchInput">
+                    <x-outline-icon name="magnifying-glass" />
+                </button>
+                <div class="appointments-search-wrap">
+                    <input type="text" id="searchInput" class="appointments-search-input" placeholder="Search by name...">
+                </div>
             </div>
             <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="btn-add-walkin">
                 <span class="btn-icon">&#128247;</span>
@@ -774,6 +881,38 @@
         }
 
         const searchInput = document.getElementById('searchInput');
+        const searchShell = document.getElementById('appointmentsSearchShell');
+        const searchToggle = document.getElementById('appointmentsSearchToggle');
+
+        function setSearchOpenState(isOpen) {
+            if (!searchShell || !searchToggle) {
+                return;
+            }
+
+            searchShell.classList.toggle('is-open', isOpen);
+            searchToggle.classList.toggle('is-open', isOpen);
+            searchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        if (searchInput && searchInput.value.trim() !== '') {
+            setSearchOpenState(true);
+        }
+
+        if (searchToggle && searchInput) {
+            searchToggle.addEventListener('click', function() {
+                const isOpening = !searchShell.classList.contains('is-open');
+                setSearchOpenState(isOpening);
+
+                if (isOpening) {
+                    setTimeout(function() {
+                        searchInput.focus();
+                    }, 120);
+                } else if (searchInput.value.trim() === '') {
+                    searchInput.blur();
+                }
+            });
+        }
+
         if (searchInput) {
             searchInput.addEventListener('keyup', function() {
                 const filter = this.value.toUpperCase();
@@ -786,6 +925,10 @@
                         tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? '' : 'none';
                     }
                 }
+            });
+
+            searchInput.addEventListener('focus', function() {
+                setSearchOpenState(true);
             });
         }
 

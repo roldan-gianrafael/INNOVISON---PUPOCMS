@@ -215,6 +215,13 @@
         box-shadow: 0 10px 24px rgba(112, 19, 27, 0.08);
     }
 
+    .health-records-title svg {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        flex: 0 0 auto;
+    }
+
     .health-records-toolbar {
         display: flex;
         align-items: center;
@@ -578,6 +585,12 @@
         color: #ffffff !important;
     }
 
+    html[data-theme="dark"] .health-records-title {
+        border-color: rgba(250, 204, 21, 0.30);
+        background: linear-gradient(135deg, rgba(255, 248, 196, 0.14) 0%, rgba(112, 19, 27, 0.42) 100%);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+
     html[data-theme="dark"] .health-records-search,
     html[data-theme="dark"] .health-filter-select {
         background: rgba(18, 8, 12, 0.86);
@@ -661,6 +674,7 @@
         .health-records-toolbar {
             flex-direction: column;
             align-items: stretch;
+            border-radius: 24px;
         }
 
         .health-records-toolbar-actions,
@@ -668,6 +682,14 @@
             justify-content: flex-start;
             margin-left: 0;
             align-items: stretch;
+        }
+
+        .health-records-toolbar-actions {
+            width: 100%;
+        }
+
+        .health-records-search {
+            width: 100%;
         }
     }
 </style>
@@ -683,7 +705,7 @@
 
     {{-- Header with Search / Filters --}}
     <div class="health-records-toolbar">
-        <h2 class="health-records-title">Student Health Records</h2>
+        <h2 class="health-records-title"><x-outline-icon name="document-text" />Student Health Records</h2>
         <div class="health-records-toolbar-actions">
             <input
                 type="text"

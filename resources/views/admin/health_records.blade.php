@@ -149,7 +149,18 @@
         line-height: 1;
     }
 
-    .btn-signed-icon::after {
+    .signed-action-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 54px;
+        min-height: 48px;
+        border-radius: 999px;
+        text-decoration: none;
+    }
+
+    .signed-action-wrap::after {
         content: "Click to view";
         position: absolute;
         left: 50%;
@@ -176,7 +187,7 @@
             0 14px 24px rgba(22, 101, 52, 0.18);
     }
 
-    .btn-signed-icon:hover::after {
+    .signed-action-wrap:hover::after {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
     }
@@ -493,6 +504,18 @@
         animation: healthHighlightPulse 2.2s ease-in-out 2;
     }
 
+    .health-row-clickable {
+        cursor: pointer;
+    }
+
+    .health-row-clickable:hover td {
+        background: rgba(220, 252, 231, 0.58);
+    }
+
+    .health-row-clickable td {
+        transition: background 0.16s ease;
+    }
+
     .health-highlight-row td {
         background: transparent;
     }
@@ -591,6 +614,10 @@
         box-shadow: inset 4px 0 0 #a855f7;
     }
 
+    html[data-theme="dark"] .health-row-clickable:hover td {
+        background: rgba(20, 83, 45, 0.34);
+    }
+
     @media (max-width: 980px) {
         .health-records-toolbar {
             flex-direction: column;
@@ -678,7 +705,12 @@
                 <tr
                     data-health-row
                     data-health-id="{{ $record->id }}"
-                    class="{{ $highlightHealthId !== '' && $highlightHealthId === (string) $record->id ? 'health-highlight-row' : '' }}"
+                    data-view-url="{{ $record->clearance_status == 'Issued' ? route('admin.show_health', $record->id) : '' }}"
+                    title="{{ $record->clearance_status == 'Issued' ? 'Click to view' : '' }}"
+                    class="{{ implode(' ', array_filter([
+                        $highlightHealthId !== '' && $highlightHealthId === (string) $record->id ? 'health-highlight-row' : '',
+                        $record->clearance_status == 'Issued' ? 'health-row-clickable' : '',
+                    ])) }}"
                 >
                     <td class="fw-bold">{{ $record->user->student_number ?: $record->user->student_id }}</td>
                     <td>
@@ -715,7 +747,7 @@
                     <td style="text-align: center;">
                         @if($record->clearance_status == 'Issued')
                             <div class="d-flex justify-content-center">
-                                <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-signed-icon" aria-label="Signed record, click to view" title="Click to view"></a>
+                                <span class="btn-action btn-signed-icon" aria-hidden="true"></span>
                             </div>
                         @else
                             <div class="d-flex justify-content-center gap-2">
@@ -850,6 +882,23 @@
             }
         });
     }
+
+    window.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[data-health-row][data-view-url]').forEach(function (row) {
+            const viewUrl = row.getAttribute('data-view-url') || '';
+            if (viewUrl.trim() === '') {
+                return;
+            }
+
+            row.addEventListener('click', function (event) {
+                if (event.target.closest('a, button, input, select, textarea, label')) {
+                    return;
+                }
+
+                window.location.href = viewUrl;
+            });
+        });
+    });
 
 </script>
 @endpush

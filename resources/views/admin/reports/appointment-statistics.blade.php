@@ -278,12 +278,12 @@
 
     <div class="appt-stats-grid">
         <div class="appt-stat-card"><span>Total Appointments</span><strong>{{ $totalAppointments }}</strong></div>
-        <div class="appt-stat-card"><span>Pending Requests</span><strong>{{ $pendingCount }}</strong></div>
         <div class="appt-stat-card"><span>Approved / Scheduled</span><strong>{{ $approvedCount }}</strong></div>
         <div class="appt-stat-card"><span>Completed</span><strong>{{ $completedCount }}</strong></div>
         <div class="appt-stat-card"><span>Cancelled</span><strong>{{ $cancelledCount }}</strong></div>
         <div class="appt-stat-card"><span>Online</span><strong>{{ $onlineCount }}</strong></div>
         <div class="appt-stat-card"><span>Walk-in</span><strong>{{ $walkInCount }}</strong></div>
+        <div class="appt-stat-card"><span>Month</span><strong>{{ \Carbon\Carbon::parse($monthFilter . '-01')->format('F Y') }}</strong></div>
         <div class="appt-stat-card"><span>Most Common Illness</span><strong>{{ $topDisease->condition ?? 'No data yet' }}</strong></div>
     </div>
 

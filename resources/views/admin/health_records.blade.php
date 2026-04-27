@@ -45,6 +45,13 @@
     .status.review { background: #fee2e2; color: #b91c1c; }
     .status.submitted { background: #e0f2fe; color: #0369a1; }
 
+    html[data-theme="dark"] .status.pending,
+    html[data-theme="dark"] .status.issued,
+    html[data-theme="dark"] .status.review,
+    html[data-theme="dark"] .status.submitted {
+        color: #ffffff !important;
+    }
+
     /* Buttons */
     .btn-action {
         padding: 8px 16px;

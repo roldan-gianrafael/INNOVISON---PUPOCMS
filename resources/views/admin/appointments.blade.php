@@ -300,19 +300,23 @@
     }
 
     .appointments-search-toggle {
-        width: 48px;
-        height: 48px;
-        flex: 0 0 48px;
-        padding: 0;
-        gap: 0;
-        border-radius: 999px;
+        width: 56px !important;
+        height: 56px !important;
+        min-width: 56px !important;
+        min-height: 56px !important;
+        flex: 0 0 56px !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        border-radius: 999px !important;
     }
 
     .appointments-search-toggle svg {
-        width: 30px;
-        height: 30px;
+        width: 36px !important;
+        height: 36px !important;
+        stroke-width: 2.2 !important;
         position: relative;
         z-index: 1;
+        display: block;
     }
 
     .btn-add-walkin {

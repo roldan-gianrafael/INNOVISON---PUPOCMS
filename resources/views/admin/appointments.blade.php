@@ -41,7 +41,7 @@
     
     h2,
     .card,
-    .card *:not(.status):not(.type-badge):not(.btn-action):not(.dialog-btn):not(.btn-add-walkin) {
+    .card *:not(.status):not(.type-badge):not(.btn-action):not(.dialog-btn):not(.btn-add-walkin):not(.appointment-action-menu-item):not(.appointment-action-menu-state):not(.appointment-action-menu-item *):not(.appointment-action-menu-state *) {
         color: #111827;
     }
 
@@ -187,7 +187,7 @@
     }
     .appointment-action-menu-item.is-view {
         background: #fff3f5;
-        color: #70131B;
+        color: #70131B !important;
         border-color: #f0d7dc;
     }
     .appointment-action-menu-item.is-view:hover {
@@ -196,7 +196,7 @@
     }
     .appointment-action-menu-item.is-approve {
         background: #ecfdf5;
-        color: #166534;
+        color: #166534 !important;
         border-color: #bbf7d0;
     }
     .appointment-action-menu-item.is-approve:hover {
@@ -205,7 +205,7 @@
     }
     .appointment-action-menu-item.is-reschedule {
         background: #fffbeb;
-        color: #92400e;
+        color: #92400e !important;
         border-color: #fde68a;
     }
     .appointment-action-menu-item.is-reschedule:hover {
@@ -214,7 +214,7 @@
     }
     .appointment-action-menu-item.is-consult {
         background: #eff6ff;
-        color: #1d4ed8;
+        color: #1d4ed8 !important;
         border-color: #bfdbfe;
     }
     .appointment-action-menu-item.is-consult:hover {
@@ -223,7 +223,7 @@
     }
     .appointment-action-menu-item.is-missed {
         background: #fff7ed;
-        color: #9a3412;
+        color: #9a3412 !important;
         border-color: #fed7aa;
     }
     .appointment-action-menu-item.is-missed:hover {
@@ -232,7 +232,7 @@
     }
     .appointment-action-menu-item.is-reject {
         background: #fff1f2;
-        color: #b91c1c;
+        color: #b91c1c !important;
         border-color: #fecdd3;
     }
     .appointment-action-menu-item.is-reject:hover {
@@ -241,7 +241,7 @@
     }
     .appointment-action-menu-state {
         background: #e2e8f0;
-        color: #64748b;
+        color: #64748b !important;
         border-color: #cbd5e1;
         cursor: not-allowed;
     }
@@ -988,16 +988,6 @@
                                                     <x-outline-icon name="clipboard-document-list" />
                                                     Consult
                                                 </a>
-                                                @if($showMissedAction)
-                                                    <a
-                                                        href="{{ url($basePrefix . '/appointments/' . $appt->id . '/' . rawurlencode('Missed Scheduled')) }}"
-                                                        class="appointment-action-menu-item is-missed btn-missed"
-                                                        title="Mark as Missed Scheduled"
-                                                        data-status-target="Missed Scheduled">
-                                                        <x-outline-icon name="clock" />
-                                                        Missed Scheduled
-                                                    </a>
-                                                @endif
                                             @endif
                                         @endif
                                     </div>

@@ -143,69 +143,32 @@
         font-weight: 900;
     }
 
-    .btn-signed-icon {
-        position: relative;
-        min-width: 40px;
-        width: 40px;
-        min-height: 40px;
-        padding: 0;
+    .health-issued-badge {
+        min-width: 118px;
+        min-height: 38px;
+        padding: 8px 14px;
         border-radius: 999px;
-        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-        border-color: #86efac;
-        color: #166534;
-        box-shadow:
-            0 0 0 3px rgba(34, 197, 94, 0.12),
-            0 10px 20px rgba(22, 101, 52, 0.14);
-        font-size: 16px;
-        font-weight: 900;
-    }
-
-    .btn-signed-icon::before {
-        content: "\2713";
-        line-height: 1;
-    }
-
-    .signed-action-wrap {
-        position: relative;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 54px;
-        min-height: 48px;
-        border-radius: 999px;
-        text-decoration: none;
-    }
-
-    .signed-action-wrap::after {
-        content: "Click to view";
-        position: absolute;
-        left: 50%;
-        bottom: calc(100% + 10px);
-        transform: translateX(-50%) translateY(4px);
-        white-space: nowrap;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(17, 24, 39, 0.94);
-        color: #ffffff;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.02em;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.16s ease, transform 0.16s ease;
-    }
-
-    .btn-signed-icon:hover {
+        gap: 8px;
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
         color: #166534;
-        border-color: #4ade80;
+        border: 1px solid #86efac;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
         box-shadow:
-            0 0 0 3px rgba(74, 222, 128, 0.16),
-            0 14px 24px rgba(22, 101, 52, 0.18);
+            0 0 0 3px rgba(34, 197, 94, 0.10),
+            0 10px 20px rgba(22, 101, 52, 0.10);
     }
 
-    .signed-action-wrap:hover::after {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
+    .health-issued-badge svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 auto;
+        stroke-width: 2;
+        margin-right: 0;
     }
 
     /* Custom Flex Grid para sa Summary Cards */
@@ -728,10 +691,13 @@
         color: #e2e8f0;
     }
 
-    html[data-theme="dark"] .btn-signed-icon {
-        background: linear-gradient(135deg, rgba(20, 83, 45, 0.92), rgba(21, 128, 61, 0.78));
-        border-color: rgba(74, 222, 128, 0.34);
+    html[data-theme="dark"] .health-issued-badge {
+        background: linear-gradient(135deg, rgba(20, 83, 45, 0.96), rgba(21, 128, 61, 0.84));
+        border-color: rgba(74, 222, 128, 0.30);
         color: #ecfdf5;
+        box-shadow:
+            0 0 0 3px rgba(34, 197, 94, 0.10),
+            0 12px 22px rgba(0, 0, 0, 0.24);
     }
 
     html[data-theme="dark"] .health-filter-modal-card {
@@ -931,7 +897,10 @@
                     <td style="text-align: center;">
                         @if($record->clearance_status == 'Issued')
                             <div class="d-flex justify-content-center">
-                                <span class="btn-action btn-signed-icon" aria-hidden="true"></span>
+                                <span class="health-issued-badge" aria-hidden="true">
+                                    <x-outline-icon name="check" />
+                                    Issued
+                                </span>
                             </div>
                         @else
                             <div class="d-flex justify-content-center gap-2">

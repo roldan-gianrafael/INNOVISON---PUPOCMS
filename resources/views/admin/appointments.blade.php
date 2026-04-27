@@ -271,7 +271,7 @@
         width: 100%;
     }
 
-    .appointments-search-input {
+    .main .appointments-search-shell .appointments-search-input {
         width: 100%;
         min-height: 48px;
         padding: 12px 20px;
@@ -290,12 +290,12 @@
         -webkit-appearance: none;
     }
 
-    .appointments-search-input::placeholder {
+    .main .appointments-search-shell .appointments-search-input::placeholder {
         color: #7f1d2d;
         font-weight: 700;
     }
 
-    .appointments-search-input:focus {
+    .main .appointments-search-shell .appointments-search-input:focus {
         outline: none;
         border-color: #70131B;
         box-shadow:
@@ -446,7 +446,7 @@
         color: #ffffff !important;
     }
 
-    html[data-theme="dark"] .appointments-search-input {
+    html[data-theme="dark"] .main .appointments-search-shell .appointments-search-input {
         background: rgba(18, 8, 12, 0.86);
         color: #ffffff;
         border-color: rgba(143, 34, 48, 0.92);
@@ -455,7 +455,7 @@
             0 12px 22px rgba(0, 0, 0, 0.22);
     }
 
-    html[data-theme="dark"] .appointments-search-input::placeholder {
+    html[data-theme="dark"] .main .appointments-search-shell .appointments-search-input::placeholder {
         color: #fecdd3;
     }
 

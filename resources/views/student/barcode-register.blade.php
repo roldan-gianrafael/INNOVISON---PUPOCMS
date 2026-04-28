@@ -291,7 +291,7 @@
         <section class="scan-section" style="opacity: 0.8;">
     <h3>Barcode (Deprecated)</h3>
     <p class="scan-section-note" style="font-size: 0.9em; color: #666;">
-        <em>Note: Barcode scanning is being phased out. Please use the new OCR system for ID validation.</em>
+        <em>Note: Barcode scanning is being phased out. We will be transitioning to the new OCR system for ID validation.</em>
     </p>
 
     <form method="POST" action="{{ route('barcode.store') }}">

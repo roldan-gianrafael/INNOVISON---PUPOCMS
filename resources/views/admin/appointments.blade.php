@@ -455,7 +455,7 @@
         font-weight: 700;
         cursor: pointer;
         transition: 0.2s;
-        border: 2px solid yellow;
+        border-bottom: 1px solid yellow;
     }
     .dialog-btn-neutral {
         background: #eee;

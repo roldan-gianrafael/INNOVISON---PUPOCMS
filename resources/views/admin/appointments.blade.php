@@ -322,8 +322,8 @@
         top: 0; left: 0;
         width: 100%; height: 100%;
         background: rgba(0,0,0,0.5);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(58px);
+        -webkit-backdrop-filter: blur(58px);
         z-index: 1000;
         justify-content: center;
         align-items: center;
@@ -331,8 +331,8 @@
     }
     .modal-box {
         background: rgb(255, 255, 255);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(50px);
+        -webkit-backdrop-filter: blur(50px);
         padding: 24px;
         border-radius: 18px;
         width: 560px;
@@ -353,8 +353,8 @@
         border-top: 4px solid #70131B !important;
         border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
+        backdrop-filter: blur(50px) !important;
+        -webkit-backdrop-filter: blur(50px) !important;
     }
     .modal-header {
         display: flex;

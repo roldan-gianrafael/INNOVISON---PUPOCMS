@@ -414,7 +414,7 @@
         border-bottom: 0;
         padding-bottom: 0;
         margin-bottom: 4px;
-        color: #ffffff;
+        color: #ffffff !important;
         display: inline-flex;
         align-items: center;
         padding: 0;

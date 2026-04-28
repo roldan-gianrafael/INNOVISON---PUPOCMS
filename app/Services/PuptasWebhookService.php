@@ -272,6 +272,7 @@ class PuptasWebhookService
                 'student_number' => $studentNumber,
                 'medical_status' => $isCleared ? 'cleared' : 'failed',
                 'is_health_profile_completed' => $isCleared ? 1 : 0,
+                'timestamp' => now()->toIso8601String(), // API requires this
             ], JSON_UNESCAPED_SLASHES);
 
             if ($payload === false) {

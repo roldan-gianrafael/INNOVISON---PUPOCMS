@@ -456,7 +456,7 @@
         cursor: pointer;
         transition: 0.2s;
         border-bottom: 2px solid yellow;
-        border-radius: 6px;
+        border-bottom-radius: 6px;
     }
     .dialog-btn-neutral {
         background: #eee;

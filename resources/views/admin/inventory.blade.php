@@ -315,7 +315,7 @@
         align-items: center; 
     }
     .modal-box { 
-       background: rgba(255, 255, 255, 0.4) !important;
+       background: rgba(0, 0, 0, 0.4) !important;
         padding: 24px; 
         width: 760px;
         max-width: 94vw;

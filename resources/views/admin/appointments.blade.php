@@ -449,9 +449,9 @@
         justify-content: center;
         text-decoration: none;
         border: none;
-        border-radius: 8px;
-        padding: 14px 20px;
-        font-size: 13px;
+        border-radius: 14px;
+        padding: 14px 25px;
+        font-size: 16px;
         font-weight: 700;
         cursor: pointer;
         transition: 0.2s;

@@ -302,7 +302,13 @@
 
     /* Modal */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 760px; max-width: 94vw; }
+    .modal-box { 
+       background: rgba(255, 255, 255, 0.4) !important;
+        padding: 24px; 
+        border-radius: 12px; 
+        width: 760px;
+        max-width: 94vw;
+     }
     .modal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .modal-form-panel {
         border: 1px solid #e5e7eb;

@@ -450,7 +450,7 @@
         text-decoration: none;
         border: none;
         border-radius: 8px;
-        padding: 10px 16px;
+        padding: 14px 20px;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;

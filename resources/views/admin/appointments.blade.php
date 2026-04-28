@@ -1198,7 +1198,7 @@
         <div class="modal-box">
             <div class="modal-header">
                 <div class="modal-header-main">
-                    <h3 class="modal-title" style="color:#8B0000;">Appointment Details</h3>
+                    <h3 class="modal-title">Appointment Details</h3>
                 </div>
                 <span class="modal-status-badge" id="mStatus">-</span>
             </div>

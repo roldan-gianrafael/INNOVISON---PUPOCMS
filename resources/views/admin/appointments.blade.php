@@ -322,6 +322,8 @@
         top: 0; left: 0;
         width: 100%; height: 100%;
         background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         z-index: 1000;
         justify-content: center;
         align-items: center;

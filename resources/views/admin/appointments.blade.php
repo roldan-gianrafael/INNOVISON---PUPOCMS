@@ -330,7 +330,7 @@
         animation: fadeIn 0.2s;
     }
     .modal-box {
-        background: rgb(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
         padding: 24px;
@@ -347,14 +347,14 @@
     .main #infoModal .modal-box,
     .main #statusActionModal .modal-box,
     .main #rescheduleModal .modal-box {
-        background: rgba(255, 255, 255, 0.7) !important;
+        background: rgba(255, 255, 255, 0.2) !important;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-top: 4px solid #70131B !important;
         border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
     }
     .modal-header {
         display: flex;

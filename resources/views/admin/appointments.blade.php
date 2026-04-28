@@ -330,7 +330,7 @@
         animation: fadeIn 0.2s;
     }
     .modal-box {
-        background: rgb(255, 255, 255, 0.7);
+        background: rgb(255, 255, 255, 0.2);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding: 24px;

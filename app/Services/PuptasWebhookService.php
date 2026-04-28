@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +15,7 @@ class PuptasWebhookService
     private string $webhookSecret;
     private string $signatureHeader;
     private string $timestampHeader;
+    private string $nonceHeader;
     private string $hmacSignatureHeader;
     private int $timeout;
     private string $scope;
@@ -27,13 +29,14 @@ class PuptasWebhookService
         $this->webhookSecret = (string) config('services.puptas.webhook_secret', '');
         $this->signatureHeader = (string) config('services.puptas.signature_header', 'X-Medical-Signature');
         $this->timestampHeader = (string) config('services.puptas.timestamp_header', 'X-HMAC-Timestamp');
+        $this->nonceHeader = (string) config('services.puptas.nonce_header', 'X-HMAC-Nonce');
         $this->hmacSignatureHeader = (string) config('services.puptas.hmac_signature_header', 'X-HMAC-Signature');
         $this->timeout = (int) config('services.puptas.timeout', 20);
         $this->scope = (string) config('services.puptas.scope', 'medical-read medical-write');
         $this->tokenUrl = $this->resolveTokenUrl((string) config('services.puptas.token_url', ''));
     }
 
-    private function buildTimestampedSignature(string $method, string $url, string $payload, string $timestamp, string $nonce = ''): string
+    private function buildHmacSignature(string $method, string $url, string $payload, string $timestamp, string $nonce): string
     {
         $message = implode('|', [
             strtoupper(trim($method)),
@@ -302,15 +305,17 @@ class PuptasWebhookService
             }
 
             $timestamp = (string) now()->timestamp;
+            $nonce = (string) Str::uuid();
 
             // PUPTAS production currently validates `is_health_profile_completed`
             // in addition to the documented `medical_status` field, so we send both.
-            // We also include a timestamp so the receiving system can verify freshness.
+            // We also include timestamp and nonce values so the receiving system can verify freshness.
             $payload = json_encode([
                 'student_number' => $studentNumber,
                 'medical_status' => $isCleared ? 'cleared' : 'failed',
                 'is_health_profile_completed' => $isCleared ? 1 : 0,
                 'timestamp' => $timestamp,
+                'nonce' => $nonce,
             ], JSON_UNESCAPED_SLASHES);
 
             if ($payload === false) {
@@ -318,14 +323,16 @@ class PuptasWebhookService
             }
 
             $legacySignature = hash_hmac('sha256', $payload, $this->webhookSecret);
-            $timestampedSignature = $this->buildTimestampedSignature('POST', $this->apiUrl, $payload, $timestamp);
+            $timestampedSignature = $this->buildHmacSignature('POST', $this->apiUrl, $payload, $timestamp, $nonce);
             $accessToken = $this->getAccessToken();
 
             $headers = [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 $this->timestampHeader => $timestamp,
+                $this->nonceHeader => $nonce,
                 'X-Medical-Timestamp' => $timestamp,
+                'X-Medical-Nonce' => $nonce,
                 $this->hmacSignatureHeader => $timestampedSignature,
                 $this->signatureHeader => $this->signatureHeader === $this->hmacSignatureHeader
                     ? $timestampedSignature
@@ -334,6 +341,10 @@ class PuptasWebhookService
 
             if ($this->timestampHeader !== 'X-HMAC-Timestamp') {
                 $headers['X-HMAC-Timestamp'] = $timestamp;
+            }
+
+            if ($this->nonceHeader !== 'X-HMAC-Nonce') {
+                $headers['X-HMAC-Nonce'] = $nonce;
             }
 
             if ($this->signatureHeader !== 'X-Medical-Signature') {
@@ -350,6 +361,7 @@ class PuptasWebhookService
                 Log::info('PUPTAS webhook sent successfully', [
                     'student_number' => $studentNumber,
                     'timestamp' => $timestamp,
+                    'nonce' => $nonce,
                 ]);
                 return ['success' => true, 'message' => 'Synced successfully'];
             }
@@ -359,6 +371,7 @@ class PuptasWebhookService
                 'status' => $response->status(),
                 'student_number' => $studentNumber,
                 'timestamp' => $timestamp,
+                'nonce' => $nonce,
                 'error' => $response->body(),
             ]);
             return ['success' => false, 'message' => $errorMessage];

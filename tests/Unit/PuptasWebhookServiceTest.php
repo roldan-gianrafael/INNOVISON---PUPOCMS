@@ -30,6 +30,7 @@ class PuptasWebhookServiceTest extends TestCase
         Config::set('services.puptas.webhook_secret', 'webhook-secret');
         Config::set('services.puptas.signature_header', 'X-Medical-Signature');
         Config::set('services.puptas.timestamp_header', 'X-HMAC-Timestamp');
+        Config::set('services.puptas.nonce_header', 'X-HMAC-Nonce');
         Config::set('services.puptas.hmac_signature_header', 'X-HMAC-Signature');
         Config::set('services.puptas.token_url', 'https://puptas.example/oauth/token');
         Config::set('services.puptas.timeout', 20);
@@ -62,8 +63,11 @@ class PuptasWebhookServiceTest extends TestCase
             $this->assertSame('cleared', $payload['medical_status'] ?? null);
             $this->assertSame(1, $payload['is_health_profile_completed'] ?? null);
             $this->assertSame($timestamp, $payload['timestamp'] ?? null);
+            $this->assertNotEmpty($payload['nonce'] ?? null);
             $this->assertSame([$timestamp], $request->header('X-HMAC-Timestamp'));
             $this->assertSame([$timestamp], $request->header('X-Medical-Timestamp'));
+            $this->assertSame([$payload['nonce']], $request->header('X-HMAC-Nonce'));
+            $this->assertSame([$payload['nonce']], $request->header('X-Medical-Nonce'));
 
             $legacySignature = hash_hmac('sha256', $request->body(), 'webhook-secret');
             $timestampedSignature = hash_hmac(
@@ -73,7 +77,7 @@ class PuptasWebhookServiceTest extends TestCase
                     'https://puptas.example/api/v1/medical/webhook',
                     $request->body(),
                     $timestamp,
-                    '',
+                    $payload['nonce'],
                 ]),
                 'webhook-secret'
             );
@@ -93,6 +97,7 @@ class PuptasWebhookServiceTest extends TestCase
         Config::set('services.puptas.webhook_secret', 'webhook-secret');
         Config::set('services.puptas.signature_header', 'X-Medical-Signature');
         Config::set('services.puptas.timestamp_header', 'X-HMAC-Timestamp');
+        Config::set('services.puptas.nonce_header', 'X-HMAC-Nonce');
         Config::set('services.puptas.hmac_signature_header', 'X-HMAC-Signature');
         Config::set('services.puptas.token_url', 'https://puptas.example/oauth/token');
         Cache::forget('puptas.oauth_token');

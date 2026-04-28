@@ -288,47 +288,37 @@
     @enderror
 
     <div class="scan-bio-grid">
-        <section class="scan-section">
-            <h3>Barcode</h3>
-            <p class="scan-section-note">Use your school ID barcode for clinic walk-ins and quick identity checks.</p>
+        <section class="scan-section" style="opacity: 0.8;">
+    <h3>Barcode (Deprecated)</h3>
+    <p class="scan-section-note" style="font-size: 0.9em; color: #666;">
+        <em>Note: Barcode scanning is being phased out. Please use the new OCR system for ID validation.</em>
+    </p>
 
-            <form method="POST" action="{{ route('barcode.store') }}">
-                @csrf
-                <input type="text" name="barcode" id="barcode" 
-                       class="barcode-input {{ $user->barcode ? 'input-success' : '' }}"
-                       readonly placeholder="Scan result will appear here..."
-                       value="{{ $user->barcode ?? '' }}">
+    <form method="POST" action="{{ route('barcode.store') }}">
+        @csrf
+        {{-- The input is now disabled so users cannot edit it --}}
+        <input type="text" name="barcode" id="barcode" 
+               class="barcode-input {{ $user->barcode ? 'input-success' : '' }}"
+               readonly disabled 
+               placeholder="No barcode found."
+               value="{{ $user->barcode ?? '' }}">
 
-                @if(!$user->barcode)
-                    <button type="button" class="btn-scan" id="start-scan">
-                        Start Camera Scan
-                    </button>
+        {{-- Interactive buttons are hidden because we only want a Read-Only view --}}
+        @if(!$user->barcode)
+            <p style="color: #999;">Barcode entry is currently disabled.</p>
+        @endif
+    </form>
 
-                    <p class="scan-helper">Or upload a clear photo of your ID barcode for instant validation.</p>
-                    <label for="barcode-image-input" class="btn-scan btn-upload">
-                        Upload Scan Image
-                    </label>
-                    <input type="file" id="barcode-image-input" class="upload-input" accept="image/png,image/jpeg,image/jpg,image/webp">
-
-                    <div id="scan-status" class="scan-status" aria-live="polite"></div>
-
-                    <button type="submit" class="btn-submit">
-                        Submit Barcode
-                    </button>
-                @endif
-            </form>
-
-            @if($user->barcode)
-                <form method="POST" action="{{ route('barcode.reset') }}" onsubmit="return confirm('Are you sure you want to unlink this barcode?')">
-                    @csrf
-                    <button type="submit" class="btn-reset">
-                        Unlink Barcode
-                    </button>
-                </form>
-            @endif
-
-            <div id="reader"></div>
-        </section>
+    @if($user->barcode)
+        {{-- Keep the Unlink option if you still want them to be able to clear their old data --}}
+        <form method="POST" action="{{ route('barcode.reset') }}" onsubmit="return confirm('Are you sure you want to unlink this old barcode?')">
+            @csrf
+            <button type="submit" class="btn-reset">
+                Unlink Barcode
+            </button>
+        </form>
+    @endif
+</section>
 
         <section class="scan-section biosync-card">
             <h3>BioSync</h3>

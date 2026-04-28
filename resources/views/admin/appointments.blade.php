@@ -332,7 +332,7 @@
     .modal-box {
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(10px);
         padding: 24px;
         border-radius: 18px;
         width: 560px;
@@ -341,8 +341,8 @@
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         border-left: 1px solid rgba(112, 19, 27, 0.12);
         border-right: 1px solid rgba(112, 19, 27, 0.12);
-        border-top: 4px solid #70131B;
-        border-bottom: 4px solid #70131B;
+        border-top: 4px solid #66ff00;
+        border-bottom: 4px solid #66ff00;
     }
     .main #infoModal .modal-box,
     .main #statusActionModal .modal-box,
@@ -350,8 +350,8 @@
         background: rgba(255, 255, 255, 0.7) !important;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-top: 4px solid #66ff00 !important;
-        border-bottom: 4px solid #66ff00  !important;
+        border-top: 4px solid #70131B !important;
+        border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;

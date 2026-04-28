@@ -329,8 +329,8 @@
     }
     .modal-box {
         background: rgba(255, 248, 220, 0.42);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         padding: 24px;
         border-radius: 18px;
         width: 560px;
@@ -351,8 +351,8 @@
         border-top: 4px solid #70131B !important;
         border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(14px) !important;
-        -webkit-backdrop-filter: blur(14px) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
     }
     .modal-header {
         display: flex;

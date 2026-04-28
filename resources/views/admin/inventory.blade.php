@@ -331,14 +331,7 @@
     .modal-form-panel {
         border: 1px solid #e5e7eb;
         padding: 16px;
-        background: rgba(255, 255, 255, 0.4) !important;
-        border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-top: 4px solid #66ff00 !important;
-        border-bottom: 4px solid #70131B !important;
-        border-radius: 18px !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
+       
     }
     .modal-panel-title {
         margin: 0 0 14px;

@@ -13,6 +13,8 @@ class PuptasWebhookService
     private string $clientSecret;
     private string $webhookSecret;
     private string $signatureHeader;
+    private string $timestampHeader;
+    private string $hmacSignatureHeader;
     private int $timeout;
     private string $scope;
     private string $tokenUrl;
@@ -24,9 +26,42 @@ class PuptasWebhookService
         $this->clientSecret = (string) config('services.puptas.client_secret', '');
         $this->webhookSecret = (string) config('services.puptas.webhook_secret', '');
         $this->signatureHeader = (string) config('services.puptas.signature_header', 'X-Medical-Signature');
+        $this->timestampHeader = (string) config('services.puptas.timestamp_header', 'X-HMAC-Timestamp');
+        $this->hmacSignatureHeader = (string) config('services.puptas.hmac_signature_header', 'X-HMAC-Signature');
         $this->timeout = (int) config('services.puptas.timeout', 20);
         $this->scope = (string) config('services.puptas.scope', 'medical-read medical-write');
         $this->tokenUrl = $this->resolveTokenUrl((string) config('services.puptas.token_url', ''));
+    }
+
+    private function buildTimestampedSignature(string $method, string $url, string $payload, string $timestamp, string $nonce = ''): string
+    {
+        $message = implode('|', [
+            strtoupper(trim($method)),
+            trim($url),
+            $payload,
+            $timestamp,
+            $nonce,
+        ]);
+
+        return hash_hmac('sha256', $message, $this->webhookSecret);
+    }
+
+    private function extractWebhookFailureMessage(string $responseBody): string
+    {
+        $responseBody = trim($responseBody);
+        if ($responseBody === '') {
+            return 'PUPTAS rejected the webhook request.';
+        }
+
+        $decoded = json_decode($responseBody, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $message = trim((string) ($decoded['message'] ?? ''));
+            if ($message !== '') {
+                return $message;
+            }
+        }
+
+        return $responseBody;
     }
 
     private function resolveTokenUrl(string $configuredTokenUrl): string
@@ -266,42 +301,67 @@ class PuptasWebhookService
                 throw new \RuntimeException('PUPTAS webhook configuration is incomplete.');
             }
 
+            $timestamp = (string) now()->timestamp;
+
             // PUPTAS production currently validates `is_health_profile_completed`
             // in addition to the documented `medical_status` field, so we send both.
+            // We also include a timestamp so the receiving system can verify freshness.
             $payload = json_encode([
                 'student_number' => $studentNumber,
                 'medical_status' => $isCleared ? 'cleared' : 'failed',
                 'is_health_profile_completed' => $isCleared ? 1 : 0,
+                'timestamp' => $timestamp,
             ], JSON_UNESCAPED_SLASHES);
 
             if ($payload === false) {
                 throw new \RuntimeException('Failed to encode PUPTAS payload.');
             }
 
-            $signature = hash_hmac('sha256', $payload, $this->webhookSecret);
+            $legacySignature = hash_hmac('sha256', $payload, $this->webhookSecret);
+            $timestampedSignature = $this->buildTimestampedSignature('POST', $this->apiUrl, $payload, $timestamp);
             $accessToken = $this->getAccessToken();
+
+            $headers = [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                $this->timestampHeader => $timestamp,
+                'X-Medical-Timestamp' => $timestamp,
+                $this->hmacSignatureHeader => $timestampedSignature,
+                $this->signatureHeader => $this->signatureHeader === $this->hmacSignatureHeader
+                    ? $timestampedSignature
+                    : $legacySignature,
+            ];
+
+            if ($this->timestampHeader !== 'X-HMAC-Timestamp') {
+                $headers['X-HMAC-Timestamp'] = $timestamp;
+            }
+
+            if ($this->signatureHeader !== 'X-Medical-Signature') {
+                $headers['X-Medical-Signature'] = $legacySignature;
+            }
 
             $response = Http::timeout($this->timeout)
                 ->withToken($accessToken)
-                ->withHeaders([
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                    $this->signatureHeader => $signature,
-                ])
+                ->withHeaders($headers)
                 ->withBody($payload, 'application/json')
                 ->post($this->apiUrl);
 
             if ($response->successful()) {
-                Log::info('PUPTAS webhook sent successfully', ['student_number' => $studentNumber]);
+                Log::info('PUPTAS webhook sent successfully', [
+                    'student_number' => $studentNumber,
+                    'timestamp' => $timestamp,
+                ]);
                 return ['success' => true, 'message' => 'Synced successfully'];
             }
 
+            $errorMessage = $this->extractWebhookFailureMessage($response->body());
             Log::error('PUPTAS webhook failed', [
                 'status' => $response->status(),
                 'student_number' => $studentNumber,
+                'timestamp' => $timestamp,
                 'error' => $response->body(),
             ]);
-            return ['success' => false, 'message' => $response->body()];
+            return ['success' => false, 'message' => $errorMessage];
         } catch (\Exception $e) {
             Log::error('PUPTAS webhook exception', ['error' => $e->getMessage()]);
             return ['success' => false, 'message' => $e->getMessage()];

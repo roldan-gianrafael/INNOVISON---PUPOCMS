@@ -331,8 +331,8 @@
     }
     .modal-box {
         background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
         padding: 24px;
         border-radius: 18px;
         width: 560px;

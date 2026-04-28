@@ -353,8 +353,8 @@
         border-top: 4px solid #70131B !important;
         border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(50px) !important;
-        -webkit-backdrop-filter: blur(50px) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
     }
     .modal-header {
         display: flex;

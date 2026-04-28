@@ -330,7 +330,7 @@
         animation: fadeIn 0.2s;
     }
     .modal-box {
-        background: rgba(255, 248, 220, 0.42);
+        background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding: 24px;
@@ -347,7 +347,7 @@
     .main #infoModal .modal-box,
     .main #statusActionModal .modal-box,
     .main #rescheduleModal .modal-box {
-        background: rgba(255, 248, 220, 0.42) !important;
+        background: rgba(255, 255, 255, 0.7) !important;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-top: 4px solid #70131B !important;
@@ -362,7 +362,10 @@
         justify-content: space-between;
         gap: 16px;
         margin-bottom: 16px;
-        padding-bottom: 12px;
+        padding: 16px 20px;
+        margin: -24px -24px 16px -24px;
+        border-radius: 14px 14px 0 0;
+        background: #70131B;
         border-bottom: 1px solid #eee;
     }
     .modal-header-main {
@@ -398,8 +401,8 @@
         align-items: start;
         padding: 12px 14px;
         border-radius: 16px;
-        border: 1px solid rgba(112, 19, 27, 0.34);
-        background: #fff8dc;
+        border: 1px solid rgba(112, 19, 27, 0.15);
+        background: rgba(255, 255, 255, 0.6);
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.82),
             0 8px 18px rgba(112, 19, 27, 0.05);
@@ -411,13 +414,12 @@
         border-bottom: 0;
         padding-bottom: 0;
         margin-bottom: 4px;
-        color: #111827;
+        color: #ffffff;
         display: inline-flex;
         align-items: center;
-        padding: 10px 18px;
-        border-radius: 0 0 14px 14px;
+        padding: 0;
+        border-radius: 0;
         border: 0;
-        border-bottom: 2px solid rgba(112, 19, 27, 0.72);
         background: transparent;
         box-shadow: none;
     }

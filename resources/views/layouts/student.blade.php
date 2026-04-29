@@ -1566,38 +1566,54 @@
 
     @if($showHealthFormModal)
     <div id="healthFormModal" class="modal-overlay" style="display: flex;">
-        <div class="modal-content" style="background: #fff; border-radius: 16px; padding: 32px; max-width: 480px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <div class="modal-icon" style="width: 80px; height: 80px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="modal-content" style="background: #fff; border-radius: 20px; padding: 40px; max-width: 520px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.4); margin: auto;">
+            <div class="modal-icon" style="width: 90px; height: 90px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
                     <line x1="19" y1="8" x2="19" y2="14"></line>
                     <line x1="22" y1="11" x2="16" y2="11"></line>
                 </svg>
             </div>
-            <h2 style="color: #1f2937; font-size: 22px; font-weight: 700; margin: 0 0 12px;">Health Information Required</h2>
-            <p style="color: #6b7280; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+            <h2 style="color: #1f2937; font-size: 24px; font-weight: 800; margin: 0 0 16px;">Health Information Required</h2>
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.7; margin: 0 0 28px;">
                 You have not yet submitted your <strong>Health Information Form</strong>. 
                 Please fill it up to access clinic services and book appointments.
             </p>
-            <a href="{{ route('health.form') }}" class="modal-btn" style="display: inline-block; background: #8b0000; color: #fff; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+            <a href="{{ route('health.form') }}" class="modal-btn" style="display: inline-block; background: #8b0000; color: #fff; padding: 16px 40px; border-radius: 12px; font-size: 17px; font-weight: 700; text-decoration: none; transition: all 0.2s; box-shadow: 0 8px 24px rgba(139,0,0,0.3);">
                 Proceed to Fill Up Form
             </a>
-            <p style="color: #9ca3af; font-size: 12px; margin: 16px 0 0;">This is a mandatory requirement for all students.</p>
+            <p style="color: #9ca3af; font-size: 13px; margin: 20px 0 0; font-weight: 500;">This is a mandatory requirement for all students.</p>
         </div>
     </div>
     <style>
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 9999;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 99999;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+        }
+        .modal-content {
+            animation: modalSlideIn 0.4s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         .modal-btn:hover {
             background: #6b0000 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(139,0,0,0.4) !important;
         }
     </style>
     @endif

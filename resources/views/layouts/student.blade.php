@@ -74,6 +74,12 @@
             box-shadow: 0 10px 24px rgba(128, 0, 0, 0.28) !important;
         }
 
+        :where(.asw-menu-btn) {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            z-index: -1 !important;
+        }
+
         :where(.asw-menu-btn)::after {
             content: "";
             position: absolute;
@@ -253,35 +259,117 @@
             position: relative;
         }
 
-        .student-quick-actions-toggle {
-            width: 44px;
-            height: 44px;
+        .student-quick-actions-fab-wrap {
+            position: fixed;
+            right: 24px;
+            bottom: 18px;
+            display: flex;
+            align-items: center;
+            z-index: 499997;
+        }
+
+        .student-quick-actions-toggle,
+        .student-quick-action-btn,
+        .student-quick-action-logo {
+            width: 66px;
+            height: 66px;
             border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.24);
-            background: rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.94);
+            border: 2px solid #facc15;
+            background: linear-gradient(145deg, #9b111e, #6e1220 55%, #4f0b15);
+            color: #ffffff !important;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            flex: 0 0 auto;
+            padding: 0;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.12),
+                0 0 18px rgba(250, 204, 21, 0.26),
+                0 10px 22px rgba(95, 0, 18, 0.28);
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .student-quick-actions-toggle,
+        .student-quick-action-btn {
             cursor: pointer;
-            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
-            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+        }
+
+        .student-quick-actions-toggle {
+            animation: quickActionsGlow 2.2s ease-in-out infinite;
             position: relative;
         }
 
         .student-quick-actions-toggle:hover,
-        .student-quick-actions-wrap.is-open .student-quick-actions-toggle {
-            transform: translateY(-1px);
-            background: rgba(255, 255, 255, 0.18);
-            color: #ffc107;
-            border-color: rgba(255, 193, 7, 0.34);
-            box-shadow: 0 16px 28px rgba(15, 23, 42, 0.2);
+        .student-quick-action-btn:hover {
+            background: linear-gradient(145deg, #b01826, #7f1d2d 55%, #5a0f16);
+            border-color: #fde047;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 22px rgba(250, 204, 21, 0.34),
+                0 14px 28px rgba(95, 0, 18, 0.36);
         }
 
-        .student-quick-actions-toggle svg {
+        .student-quick-action-item:hover .student-quick-action-btn,
+        .student-quick-action-item:hover .student-quick-action-logo {
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.18),
+                0 0 10px rgba(255, 0, 102, 0.34),
+                0 0 18px rgba(0, 200, 255, 0.32),
+                0 0 26px rgba(255, 221, 0, 0.3),
+                0 14px 28px rgba(95, 0, 18, 0.36) !important;
+        }
+
+        .student-quick-action-item:hover .student-quick-action-btn svg,
+        .student-quick-action-item:hover .student-quick-action-logo img {
+            animation: quickActionShake 0.42s ease-in-out;
+            filter:
+                drop-shadow(0 0 6px rgba(255, 0, 102, 0.45))
+                drop-shadow(0 0 10px rgba(0, 200, 255, 0.38))
+                drop-shadow(0 0 14px rgba(255, 221, 0, 0.42));
+        }
+
+        .student-quick-action-item:hover .student-accessibility-launch svg {
+            animation: quickActionShakeAccessibility 0.42s ease-in-out;
+        }
+
+        .student-quick-actions-toggle:focus-visible,
+        .student-quick-action-btn:focus-visible,
+        .student-quick-action-link:focus-visible {
+            outline: 2px solid #facc15;
+            outline-offset: 2px;
+        }
+
+        .student-quick-actions-toggle svg,
+        .student-quick-action-btn svg,
+        .student-quick-action-link svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: block;
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .student-quick-action-bell svg {
             width: 20px;
             height: 20px;
-            stroke-width: 2;
+        }
+
+        .student-accessibility-launch svg {
+            width: 45px;
+            height: 45px;
+            stroke-width: 2.4;
+            transform: translateY(-1px) scale(1.18);
+            transform-origin: center;
+            overflow: visible;
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-actions-toggle svg {
+            transform: rotate(135deg) scale(1.04);
         }
 
         .student-quick-actions-badge {
@@ -292,100 +380,285 @@
             height: 18px;
             padding: 0 5px;
             border-radius: 999px;
-            background: #ffc107;
-            color: #70131B;
+            background: #ffb81c;
+            color: #5a0f16;
+            border: 2px solid rgba(44, 14, 21, 0.96);
             font-size: 10px;
-            font-weight: 800;
+            font-weight: 900;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+            line-height: 1;
+        }
+
+        .student-quick-actions-toggle > .student-quick-actions-badge {
+            top: 1px;
+            right: 1px;
+            border-color: #7f1d2d;
         }
 
         .student-quick-actions-panel {
             position: absolute;
-            top: calc(100% + 12px);
-            right: 0;
-            width: 232px;
-            padding: 12px;
-            border-radius: 18px;
-            background: linear-gradient(180deg, rgba(127, 29, 45, 0.98) 0%, rgba(75, 85, 99, 0.98) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            box-shadow: 0 22px 44px rgba(15, 23, 42, 0.28);
-            display: none;
-            z-index: 60;
+            left: 50%;
+            bottom: calc(100% + 16px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 0;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-50%) translateY(6px) scale(0.96);
+            transform-origin: bottom center;
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            z-index: 1002;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-actions-panel {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
         }
 
-        .student-quick-actions-logo {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 10px;
+        .student-quick-actions-panel::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 2px;
+            width: 54px;
+            height: 16px;
+            border-bottom: 3px solid #70131B;
+            border-radius: 0 0 999px 999px;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.68));
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
         }
 
-        .student-quick-actions-logo img {
-            width: 42px;
-            height: 42px;
-            object-fit: cover;
+        .student-quick-actions-panel::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -6px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid #70131B;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.68));
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-actions-panel::before,
+        .student-quick-actions-wrap.is-open .student-quick-actions-panel::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .student-quick-action-item {
+            position: relative;
+            display: inline-flex;
+            opacity: 0;
+            transform: translateY(18px) scale(0.86);
+            transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-action-item {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(1) {
+            transition-delay: 0.19s;
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(3) {
+            transition-delay: 0.14s;
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(4) {
+            transition-delay: 0.09s;
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(5) {
+            transition-delay: 0.04s;
+        }
+
+        .student-quick-action-logo {
+            overflow: hidden;
             border-radius: 999px;
-            border: 2px solid rgba(255, 255, 255, 0.18);
+            background: #ffffff !important;
+            border: 2px solid #7f1d2d;
+            box-shadow:
+                0 0 0 3px #ffffff,
+                0 0 0 5px #facc15,
+                0 10px 22px rgba(95, 0, 18, 0.28);
+        }
+
+        .student-quick-action-logo img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            border-radius: 999px;
             background: #ffffff;
         }
 
         .student-quick-actions-divider {
             width: 100%;
             height: 1px;
-            background: rgba(255, 255, 255, 0.14);
-            margin: 0 0 10px;
+            background: rgba(255, 255, 255, 0.12);
+            margin: 2px 0;
         }
 
-        .student-quick-action-item {
-            position: relative;
-        }
-
-        .student-quick-action-btn,
-        .student-quick-action-link {
-            width: 100%;
-            min-height: 44px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.1);
-            color: #f8fafc !important;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 10px 12px;
+        .student-quick-action-link,
+        .student-quick-action-btn {
             text-decoration: none;
+        }
+
+        .student-quick-action-tooltip {
+            position: absolute;
+            top: 50%;
+            right: calc(100% + 14px);
+            transform: translateY(-50%) translateX(6px);
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(44, 14, 21, 0.96);
+            border: 1px solid #facc15;
+            color: #ffffff;
+            font-size: 12px;
             font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
-            margin-bottom: 8px;
+            line-height: 1;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            box-shadow: 0 10px 22px rgba(44, 14, 21, 0.24);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
         }
 
-        .student-quick-action-btn:hover,
-        .student-quick-action-link:hover {
-            background: rgba(255, 255, 255, 0.16);
-            border-color: rgba(255, 193, 7, 0.26);
-            transform: translateY(-1px);
+        .student-quick-action-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: -6px;
+            width: 10px;
+            height: 10px;
+            background: rgba(44, 14, 21, 0.96);
+            border-right: 1px solid #facc15;
+            border-top: 1px solid #facc15;
+            transform: translateY(-50%) rotate(45deg);
         }
 
-        .student-quick-action-btn svg,
-        .student-quick-action-link svg {
-            width: 18px;
-            height: 18px;
-            flex: 0 0 auto;
-            stroke-width: 1.9;
+        .student-quick-action-item:hover .student-quick-action-tooltip,
+        .student-quick-action-item:focus-within .student-quick-action-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) translateX(0);
         }
 
-        .student-quick-action-link .student-quick-actions-badge {
-            position: static;
-            margin-left: auto;
-            box-shadow: none;
+        html[data-theme="light"] .student-quick-actions-toggle,
+        html[data-theme="light"] .student-quick-action-btn,
+        html[data-theme="light"] .student-quick-action-link {
+            background: linear-gradient(145deg, #9b111e, #6e1220 55%, #4f0b15);
+            border-color: #facc15;
+            color: #ffffff !important;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.12),
+                0 0 18px rgba(250, 204, 21, 0.32),
+                0 12px 26px rgba(95, 0, 18, 0.34);
+        }
+
+        html[data-theme="light"] .student-quick-actions-toggle:hover,
+        html[data-theme="light"] .student-quick-action-btn:hover,
+        html[data-theme="light"] .student-quick-action-link:hover {
+            background: linear-gradient(145deg, rgba(176, 24, 38, 0.82), rgba(127, 29, 45, 0.7) 55%, rgba(90, 15, 22, 0.8));
+            border-color: #fde047;
+            color: #ffffff !important;
+        }
+
+        html[data-theme="light"] .student-quick-actions-divider {
+            background: rgba(128, 0, 0, 0.12);
+        }
+
+        html[data-theme="light"] .student-quick-actions-badge {
+            border-color: rgba(255, 255, 255, 0.98);
+        }
+
+        html[data-theme="dark"] .student-quick-actions-toggle,
+        html[data-theme="dark"] .student-quick-action-btn,
+        html[data-theme="dark"] .student-quick-action-link {
+            background: linear-gradient(145deg, #d1d5db, #9ca3af);
+            border-color: #6b7280;
+            color: #5f0012 !important;
+            box-shadow:
+                0 0 0 3px rgba(148, 163, 184, 0.18),
+                0 0 18px rgba(148, 163, 184, 0.28),
+                0 10px 22px rgba(15, 23, 42, 0.26);
+        }
+
+        html[data-theme="dark"] .student-quick-actions-toggle:hover,
+        html[data-theme="dark"] .student-quick-action-btn:hover,
+        html[data-theme="dark"] .student-quick-action-link:hover {
+            background: linear-gradient(145deg, #e5e7eb, #cbd5e1);
+            border-color: #facc15;
+            color: #5f0012 !important;
+            box-shadow:
+                0 0 0 3px rgba(250, 204, 21, 0.14),
+                0 0 20px rgba(250, 204, 21, 0.24),
+                0 14px 26px rgba(15, 23, 42, 0.3);
+        }
+
+        html[data-theme="dark"] .student-quick-actions-panel::after {
+            border-bottom-color: #facc15;
+        }
+
+        html[data-theme="dark"] .student-quick-actions-panel::before {
+            border-top-color: #facc15;
+        }
+
+        html[data-theme="dark"] .student-quick-action-tooltip {
+            background: rgba(17, 24, 39, 0.96);
+            border-color: rgba(250, 204, 21, 0.72);
+            color: #f8fafc;
+            box-shadow: 0 14px 28px rgba(2, 6, 23, 0.34);
+        }
+
+        html[data-theme="dark"] .student-quick-action-tooltip::after {
+            background: rgba(17, 24, 39, 0.96);
+            border-right-color: rgba(250, 204, 21, 0.72);
+            border-top-color: rgba(250, 204, 21, 0.72);
+        }
+
+        @media (max-width: 768px) {
+            .student-quick-actions-fab-wrap {
+                right: 18px;
+                bottom: 16px;
+            }
+
+            .student-quick-actions-toggle,
+            .student-quick-action-btn,
+            .student-quick-action-logo {
+                width: 60px;
+                height: 60px;
+            }
+
+            .student-accessibility-launch svg {
+                width: 40px;
+                height: 40px;
+            }
+
+            .student-quick-action-tooltip {
+                display: none;
+            }
         }
 
         .nav-dropdown-toggle:focus-visible {
@@ -1338,50 +1611,6 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="student-quick-actions-wrap nav-dropdown" data-nav-dropdown>
-                        <button
-                            type="button"
-                            class="student-quick-actions-toggle nav-dropdown-toggle"
-                            aria-expanded="false"
-                            aria-haspopup="true"
-                            aria-label="Open quick actions"
-                            title="Quick actions"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5.25v13.5M5.25 12h13.5" />
-                            </svg>
-                            @if($notificationCount > 0)
-                                <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
-                            @endif
-                        </button>
-                        <div class="student-quick-actions-panel">
-                            <div class="student-quick-actions-logo">
-                                <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo">
-                            </div>
-                            <div class="student-quick-actions-divider" aria-hidden="true"></div>
-                            <div class="student-quick-action-item">
-                                <a href="{{ url('/student/account?view=notifications') }}" class="student-quick-action-link">
-                                    <x-outline-icon name="bell" />
-                                    <span>Notifications</span>
-                                    @if($notificationCount > 0)
-                                        <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
-                                    @endif
-                                </a>
-                            </div>
-                            <div class="student-quick-action-item">
-                                <button type="button" id="themeToggleBtn" class="student-quick-action-btn" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
-                                    <x-outline-icon name="sun" />
-                                    <span>Theme Mode</span>
-                                </button>
-                            </div>
-                            <div class="student-quick-action-item">
-                                <button type="button" id="studentAccessibilityLaunch" class="student-quick-action-btn" aria-label="Accessibility menu" title="Accessibility">
-                                    <x-outline-icon name="accessibility-person" />
-                                    <span>Accessibility</span>
-                                </button>
-                            </div>
-                        </div>
-                    </li>
                     <li>
                         <a href="#" class="logout-btn" 
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -1406,19 +1635,52 @@
 
     @include('partials.post_login_terms_gate')
 
-    @if($notificationCount > 0)
-        <div class="notif-fab-wrap">
-            <a
-                href="{{ url('/student/account?view=notifications') }}"
-                class="notif-fab"
-                aria-label="Notifications"
-                title="Notifications"
-            >
-                <x-outline-icon name="bell" />
-                <span class="notif-badge">{{ $notificationCount }}</span>
-            </a>
+    <div class="student-quick-actions-wrap student-quick-actions-fab-wrap nav-dropdown" data-nav-dropdown>
+        <button
+            type="button"
+            class="student-quick-actions-toggle nav-dropdown-toggle"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-label="Open quick actions"
+            title="Quick actions"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5.25v13.5M5.25 12h13.5" />
+            </svg>
+            @if($notificationCount > 0)
+                <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
+            @endif
+        </button>
+        <div class="student-quick-actions-panel">
+            <div class="student-quick-action-item is-logo">
+                <span class="student-quick-action-logo" aria-hidden="true">
+                    <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo">
+                </span>
+            </div>
+            <div class="student-quick-actions-divider" aria-hidden="true"></div>
+            <div class="student-quick-action-item">
+                <a href="{{ url('/student/account?view=notifications') }}" class="student-quick-action-link student-quick-action-btn student-quick-action-bell" aria-label="Notifications">
+                    <x-outline-icon name="bell" />
+                    @if($notificationCount > 0)
+                        <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
+                    @endif
+                </a>
+                <span class="student-quick-action-tooltip">Notifications</span>
+            </div>
+            <div class="student-quick-action-item">
+                <button type="button" id="themeToggleBtn" class="student-quick-action-btn" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
+                    <x-outline-icon name="sun" />
+                </button>
+                <span class="student-quick-action-tooltip">Theme Mode</span>
+            </div>
+            <div class="student-quick-action-item is-accessibility">
+                <button type="button" id="studentAccessibilityLaunch" class="student-quick-action-btn student-accessibility-launch" aria-label="Accessibility menu" title="Accessibility">
+                    <x-outline-icon name="accessibility-person" />
+                </button>
+                <span class="student-quick-action-tooltip">Accessibility</span>
+            </div>
         </div>
-    @endif
+    </div>
 
     @if(
         Request::is('student/account') ||
@@ -1436,6 +1698,7 @@
             const navToggle = document.querySelector('.nav-toggle');
             const navList = document.querySelector('.nav-list');
             const navDropdowns = document.querySelectorAll('[data-nav-dropdown]');
+            const studentQuickActionsWrap = document.querySelector('.student-quick-actions-fab-wrap');
             const themeToggleBtn = document.getElementById('themeToggleBtn');
             const studentAccessibilityLaunch = document.getElementById('studentAccessibilityLaunch');
             const storageKey = 'student_theme';
@@ -1512,7 +1775,7 @@
                 });
 
                 document.addEventListener('click', (event) => {
-                    const clickedInsideMenu = navList.contains(event.target);
+                    const clickedInsideMenu = navList.contains(event.target) || (studentQuickActionsWrap && studentQuickActionsWrap.contains(event.target));
                     const clickedToggle = navToggle.contains(event.target);
                     if (!clickedInsideMenu && !clickedToggle) {
                         closeDropdowns();

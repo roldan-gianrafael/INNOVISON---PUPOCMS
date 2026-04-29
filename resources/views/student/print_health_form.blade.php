@@ -342,7 +342,7 @@ for the improvement of healthcare services.
         
    
         <div class="sig-line">{{ strtoupper($profile->user->name) }}</div>
-        <div style="font-size: 8px;">Student Digital Signature</div>
+        <div style="font-size: 8px;">Student Signature</div>
     </div>
 
     {{-- Date Signed Block --}}

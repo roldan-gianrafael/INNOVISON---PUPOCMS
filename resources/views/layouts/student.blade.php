@@ -1565,9 +1565,9 @@
     @endphp
 
     @if($showHealthFormModal)
-    <div id="healthFormModal" class="modal-overlay" style="display: flex;">
-        <div class="modal-content" style="background: #fff; border-radius: 20px; padding: 40px; max-width: 520px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.4); margin: auto;">
-            <div class="modal-icon" style="width: 90px; height: 90px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+    <div id="healthFormModal" style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; height: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 999999 !important;">
+        <div style="background: #fff; border-radius: 20px; padding: 40px; max-width: 520px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.4); margin: auto; position: relative;">
+            <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
@@ -1580,37 +1580,18 @@
                 You have not yet submitted your <strong>Health Information Form</strong>. 
                 Please fill it up to access clinic services and book appointments.
             </p>
-            <a href="{{ route('health.form') }}" class="modal-btn" style="display: inline-block; background: #8b0000; color: #fff; padding: 16px 40px; border-radius: 12px; font-size: 17px; font-weight: 700; text-decoration: none; transition: all 0.2s; box-shadow: 0 8px 24px rgba(139,0,0,0.3);">
+            <a href="{{ route('health.form') }}" style="display: inline-block; background: #8b0000; color: #fff; padding: 16px 40px; border-radius: 12px; font-size: 17px; font-weight: 700; text-decoration: none; transition: all 0.2s; box-shadow: 0 8px 24px rgba(139,0,0,0.3);">
                 Proceed to Fill Up Form
             </a>
             <p style="color: #9ca3af; font-size: 13px; margin: 20px 0 0; font-weight: 500;">This is a mandatory requirement for all students.</p>
         </div>
     </div>
     <style>
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
+        #healthFormModal {
+            background: rgba(0, 0, 0, 0.75) !important;
             backdrop-filter: blur(8px);
-            padding: 20px;
         }
-        .modal-content {
-            animation: modalSlideIn 0.4s ease-out;
-        }
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        .modal-btn:hover {
+        #healthFormModal a:hover {
             background: #6b0000 !important;
             transform: translateY(-2px);
             box-shadow: 0 12px 32px rgba(139,0,0,0.4) !important;

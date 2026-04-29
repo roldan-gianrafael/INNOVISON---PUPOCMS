@@ -405,6 +405,8 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
+            width: 78px;
+            min-width: 78px;
             padding: 6px 0;
             border-radius: 16px;
             border: none;
@@ -466,7 +468,9 @@
 
         .student-quick-action-item {
             position: relative;
-            display: inline-flex;
+            display: flex;
+            width: 100%;
+            justify-content: center;
             opacity: 0;
             transform: translateY(18px) scale(0.86);
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);

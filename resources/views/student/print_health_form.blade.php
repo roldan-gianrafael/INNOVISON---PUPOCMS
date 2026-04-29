@@ -101,7 +101,7 @@
     .cert-text { font-style: italic; font-size: 11px; text-align: justify; margin-top: 15px; line-height: 1.3; } /* From 9px */
     .signature-row { display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-end; }
     .sig-block { width: 35%; text-align: center; }
-    .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
+    .sig-image { width: 120px; height: auto; margin-bottom: -6px; }
     /* --- I-update ang sig-line sa <style> section --- */
 .sig-line { 
     border-bottom: 1px solid #000; /* Ginawang bottom border para sa ibabaw ang text */

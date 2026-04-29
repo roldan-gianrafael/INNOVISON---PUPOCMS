@@ -397,7 +397,7 @@ for the improvement of healthcare services.
             <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 10;">
                 <img src="{{ asset('storage/' . $profile->effective_clearance_signature_path) }}" 
                      alt="Nurse Signature" 
-                     style="height: 40px; width: auto; pointer-events: none;">
+                     style="height: 45px; width: auto; pointer-events: none;">
             </div>
         @endif
 

@@ -1568,8 +1568,8 @@
     <div id="healthFormModal" style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; height: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 999999 !important;">
         <div style="background: #fff; border-radius: 24px; padding: 40px; max-width: 520px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.4); margin: auto; position: relative; border-top: 2px solid #ffc107; border-bottom: 2px solid #ffc107;">
             <div style="position: relative; width: 90px; height: 90px; margin: 0 auto 24px;">
-                <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: floatIcon 3s ease-in-out infinite; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #8b0000 0%, #6b0000 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: floatIcon 3s ease-in-out infinite; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
                         <line x1="19" y1="8" x2="19" y2="14"></line>
@@ -1580,6 +1580,7 @@
             </div>
             <h2 style="color: #1f2937; font-size: 24px; font-weight: 800; margin: 0 0 16px;">Health Information Required</h2>
             <p style="color: #4b5563; font-size: 16px; line-height: 1.7; margin: 0 0 28px;">
+                Hello <strong>{{ Auth::user()->first_name ?? 'Student' }}</strong>! Good day!<br>
                 You have not yet submitted your <strong>Health Information Form</strong>. 
                 Please fill it up to access clinic services and book appointments.
             </p>

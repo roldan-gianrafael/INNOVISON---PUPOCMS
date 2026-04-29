@@ -363,7 +363,7 @@
             width: 32px;
             height: 32px;
             stroke-width: 2.1;
-            transform: translateY(-1px);
+            transform: none;
             transform-origin: center;
             overflow: visible;
         }
@@ -474,6 +474,23 @@
             opacity: 0;
             transform: translateY(18px) scale(0.86);
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .student-quick-action-item.is-logo {
+            order: 1;
+        }
+
+        .student-quick-action-item.is-notifications {
+            order: 2;
+        }
+
+        .student-quick-action-item.is-theme {
+            order: 3;
+        }
+
+        .student-quick-action-item.is-accessibility {
+            order: 4;
+            margin-top: 4px;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-action-item {
@@ -1662,7 +1679,7 @@
                 </span>
             </div>
             <div class="student-quick-actions-divider" aria-hidden="true"></div>
-            <div class="student-quick-action-item">
+            <div class="student-quick-action-item is-notifications">
                 <a href="{{ url('/student/account?view=notifications') }}" class="student-quick-action-link student-quick-action-btn student-quick-action-bell" aria-label="Notifications">
                     <x-outline-icon name="bell" />
                     @if($notificationCount > 0)
@@ -1671,7 +1688,7 @@
                 </a>
                 <span class="student-quick-action-tooltip">Notifications</span>
             </div>
-            <div class="student-quick-action-item">
+            <div class="student-quick-action-item is-theme">
                 <button type="button" id="themeToggleBtn" class="student-quick-action-btn" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
                     <x-outline-icon name="sun" />
                 </button>

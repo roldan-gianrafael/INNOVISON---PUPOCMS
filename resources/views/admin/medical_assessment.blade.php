@@ -130,6 +130,9 @@ body { background-color: #e2e8f0; }
     <a href="{{ route('admin.show_health', $profile->id) }}" class="btn" style="background: #800000; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
         HEALTH FORM
     </a>
+    <a href="#" class="btn" style="background: #533a0d; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
+        UPLOADED DOCUMENTS
+    </a>
     <button onclick="window.print()" class="btn" style="background: #f59e0b; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer;">
         PRINT ASSESSMENT
     </button>

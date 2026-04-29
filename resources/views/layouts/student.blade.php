@@ -399,7 +399,8 @@
 
         .student-quick-actions-panel {
             position: absolute;
-            left: 50%;
+            left: 0;
+            right: 0;
             bottom: calc(100% + 16px);
             display: grid;
             grid-template-columns: 1fr;
@@ -414,9 +415,10 @@
             background: transparent;
             box-shadow: none;
             backdrop-filter: none;
+            margin: 0 auto;
             opacity: 0;
             visibility: hidden;
-            transform: translateX(-50%) translateY(6px) scale(0.96);
+            transform: translateY(6px) scale(0.96);
             transform-origin: bottom center;
             transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
             z-index: 1002;
@@ -425,7 +427,7 @@
         .student-quick-actions-wrap.is-open .student-quick-actions-panel {
             opacity: 1;
             visibility: visible;
-            transform: translateX(-50%) translateY(0) scale(1);
+            transform: translateY(0) scale(1);
         }
 
         .student-quick-actions-panel::after {
@@ -1615,10 +1617,10 @@
 
     @include('partials.post_login_terms_gate')
 
-    <div class="student-quick-actions-wrap student-quick-actions-fab-wrap nav-dropdown" data-nav-dropdown>
+    <div class="student-quick-actions-wrap student-quick-actions-fab-wrap" data-nav-dropdown>
         <button
             type="button"
-            class="student-quick-actions-toggle nav-dropdown-toggle"
+            class="student-quick-actions-toggle"
             aria-expanded="false"
             aria-haspopup="true"
             aria-label="Open quick actions"
@@ -1693,7 +1695,7 @@
                         }
 
                         dropdown.classList.remove('is-open');
-                        const toggle = dropdown.querySelector('.nav-dropdown-toggle, .notif-toggle-btn');
+                        const toggle = dropdown.querySelector('.student-quick-actions-toggle, .nav-dropdown-toggle, .notif-toggle-btn');
                         if (toggle) {
                             toggle.setAttribute('aria-expanded', 'false');
                         }
@@ -1705,7 +1707,7 @@
                 });
 
                 navDropdowns.forEach((dropdown) => {
-                    const toggle = dropdown.querySelector('.nav-dropdown-toggle, .notif-toggle-btn');
+                    const toggle = dropdown.querySelector('.student-quick-actions-toggle, .nav-dropdown-toggle, .notif-toggle-btn');
                     if (!toggle) {
                         return;
                     }
@@ -1725,7 +1727,7 @@
                         return;
                     }
 
-                    if (target.classList.contains('nav-dropdown-toggle') || target.classList.contains('notif-toggle-btn')) {
+                    if (target.classList.contains('student-quick-actions-toggle') || target.classList.contains('nav-dropdown-toggle') || target.classList.contains('notif-toggle-btn')) {
                         return;
                     }
 

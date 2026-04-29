@@ -138,7 +138,7 @@
     }
     .feedback-btn.secondary {
         background-color: #ebe5e5;
-        color: #ffffff;
+        color: #000000;
         border-color: #8f2230;
         box-shadow:
             0 0 0 3px rgba(112, 19, 27, 0.12),

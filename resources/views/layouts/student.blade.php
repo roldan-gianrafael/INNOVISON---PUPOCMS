@@ -74,6 +74,12 @@
             box-shadow: 0 10px 24px rgba(128, 0, 0, 0.28) !important;
         }
 
+        :where(.asw-menu-btn) {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            z-index: -1 !important;
+        }
+
         :where(.asw-menu-btn)::after {
             content: "";
             position: absolute;

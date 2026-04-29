@@ -406,8 +406,8 @@
             justify-items: center;
             align-items: center;
             gap: 0;
-            width: 78px;
-            min-width: 78px;
+            width: 66px;
+            min-width: 66px;
             padding: 0 0 6px;
             border-radius: 16px;
             border: none;
@@ -469,9 +469,9 @@
 
         .student-quick-action-item {
             position: relative;
-            display: block;
+            display: flex;
             width: 100%;
-            text-align: center;
+            justify-content: center;
             opacity: 0;
             transform: translateY(18px) scale(0.86);
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
@@ -501,6 +501,7 @@
         .student-quick-action-link,
         .student-quick-action-btn {
             text-decoration: none;
+            margin: 0 auto;
         }
 
         .student-quick-action-tooltip {

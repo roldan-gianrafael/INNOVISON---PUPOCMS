@@ -137,7 +137,7 @@
             0 10px 22px rgba(112, 19, 27, 0.20);
     }
     .feedback-btn.secondary {
-        background: linear-gradient(135deg, #e7d5d7, #8f2230);
+        background-color: #ebe5e5;
         color: #ffffff;
         border-color: #8f2230;
         box-shadow:

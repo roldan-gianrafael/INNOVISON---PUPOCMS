@@ -1581,8 +1581,8 @@
             <h2 style="color: #1f2937; font-size: 24px; font-weight: 800; margin: 0 0 16px;">Health Information Required</h2>
             <p style="color: #4b5563; font-size: 16px; line-height: 1.7; margin: 0 0 28px;">
                 Hello <strong>{{ Auth::user()->first_name ?? 'Student' }}</strong>! Good day!<br>
-                You have not yet submitted your <strong>Health Information Form</strong>. 
-                Please fill it up to access clinic services and book appointments.
+                Please fill up the <strong>Health Information Form</strong> to access clinic services and book appointments.<br>
+                <span style="color: #6b7280; font-size: 14px;">Please prepare your soft copy requirements (2x2 ID photo, medical certificate, etc.) as needed.</span>
             </p>
             <a href="{{ route('health.form') }}" style="display: inline-block; background: #8b0000; color: #fff; padding: 16px 40px; border-radius: 12px; font-size: 17px; font-weight: 700; text-decoration: none; transition: all 0.2s; box-shadow: 0 8px 24px rgba(139,0,0,0.3);">
                 Proceed to Fill Up Form

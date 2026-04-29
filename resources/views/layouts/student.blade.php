@@ -1620,27 +1620,13 @@
     <div class="student-quick-actions-wrap student-quick-actions-fab-wrap" data-nav-dropdown>
         <button
             type="button"
-            class="student-quick-actions-toggle"
-            aria-expanded="false"
-            aria-haspopup="true"
-            aria-label="Open quick actions"
-            title="Quick actions"
+            id="studentAccessibilityLaunch"
+            class="student-quick-action-btn student-accessibility-launch"
+            aria-label="Accessibility menu"
+            title="Accessibility"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5.25v13.5M5.25 12h13.5" />
-            </svg>
-            @if($notificationCount > 0)
-                <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
-            @endif
+            <x-outline-icon name="accessibility-person" />
         </button>
-        <div class="student-quick-actions-panel">
-            <div class="student-quick-action-item is-accessibility">
-                <button type="button" id="studentAccessibilityLaunch" class="student-quick-action-btn student-accessibility-launch" aria-label="Accessibility menu" title="Accessibility">
-                    <x-outline-icon name="accessibility-person" />
-                </button>
-                <span class="student-quick-action-tooltip">Accessibility</span>
-            </div>
-        </div>
     </div>
 
     @if(

@@ -195,7 +195,7 @@
         <span class="label">Student No.:</span> <div class="field">{{ $profile->user->student_number }}</div>
     </div>
     <div class="row">
-        <span class="label">Home Address:</span> <div class="field">{{ $printAddress !== '' ? $printAddress : 'N/A' }}</div>
+        <span class="label">Home Address:</span> <div class="field">{{ $profile->user->home_address ?? '' }}</div>
         <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
     </div>
     <div class="row">

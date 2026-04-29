@@ -399,10 +399,14 @@
 
         .student-quick-actions-panel {
             position: absolute;
-            left: 50%;
-            right: auto;
+            left: 0;
+            right: 0;
             bottom: calc(100% + 16px);
-            display: block;
+            display: grid;
+            grid-template-columns: 1fr;
+            justify-items: center;
+            align-items: center;
+            gap: 0;
             width: 66px;
             min-width: 66px;
             padding: 0 0 6px;
@@ -411,9 +415,10 @@
             background: transparent;
             box-shadow: none;
             backdrop-filter: none;
+            margin: 0 auto;
             opacity: 0;
             visibility: hidden;
-            transform: translateX(-50%) translateY(6px) scale(0.96);
+            transform: translateY(6px) scale(0.96);
             transform-origin: bottom center;
             transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
             z-index: 1002;
@@ -422,7 +427,7 @@
         .student-quick-actions-wrap.is-open .student-quick-actions-panel {
             opacity: 1;
             visibility: visible;
-            transform: translateX(-50%) translateY(0) scale(1);
+            transform: translateY(0) scale(1);
         }
 
         .student-quick-actions-panel::after {
@@ -466,15 +471,16 @@
 
         .student-quick-action-item {
             position: relative;
-            display: block;
-            width: 66px;
-            margin: 0 auto;
+            display: flex;
+            width: 100%;
+            justify-content: center;
             opacity: 0;
             transform: translateY(18px) scale(0.86);
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .student-quick-action-item.is-accessibility {
+            grid-row: 1;
             margin-top: 0;
         }
 

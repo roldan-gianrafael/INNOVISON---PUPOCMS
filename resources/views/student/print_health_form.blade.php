@@ -348,7 +348,7 @@ for the improvement of healthcare services.
     {{-- Date Signed Block --}}
     <div class="sig-block">
         <div style="padding-bottom: 5px; font-weight: bold; height: 60px; display: flex; align-items: flex-end; justify-content: center;">
-            {{-- FIX: Gamitin ang created_at date ng profile record --}}
+           
             {{ $profile->created_at ? $profile->created_at->format('m/d/Y') : date('m/d/Y') }}
         </div>
         <div class="sig-line">Date Signed</div>

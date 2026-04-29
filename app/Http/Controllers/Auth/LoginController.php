@@ -259,6 +259,13 @@ class LoginController extends Controller
         $linkedAdmin->save();
     }
 
+    private function isStudentAssistantAccount(User $user): bool
+    {
+        $userType = strtolower(trim((string) ($user->user_type ?? '')));
+
+        return in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true);
+    }
+
     private function resolveLocalRoleFromAdminHub(string $email): ?string
     {
         if (!Schema::hasTable('admins')) {
@@ -343,6 +350,10 @@ class LoginController extends Controller
         }
 
         if ($normalizedRole === User::ROLE_ADMIN) {
+            if ($this->isStudentAssistantAccount($user)) {
+                return '/assistant/dashboard';
+            }
+
             $linkedAdmin = $this->findLinkedAdminProfile($user);
             $accessLevel = strtolower(trim((string) ($linkedAdmin?->access_level ?? '')));
 

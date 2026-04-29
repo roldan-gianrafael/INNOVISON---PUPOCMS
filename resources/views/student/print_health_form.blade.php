@@ -340,7 +340,7 @@ for the improvement of healthcare services.
             <div style="height: 60px;"></div>
         @endif
         
-        {{-- FIX: Gamitin ang name ng student mula sa profile, hindi Auth::user() --}}
+   
         <div class="sig-line">{{ strtoupper($profile->user->name) }}</div>
         <div style="font-size: 8px;">Student Digital Signature</div>
     </div>
@@ -397,7 +397,7 @@ for the improvement of healthcare services.
             <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 10;">
                 <img src="{{ asset('storage/' . $profile->effective_clearance_signature_path) }}" 
                      alt="Nurse Signature" 
-                     style="height: 85px; width: auto; pointer-events: none;">
+                     style="height: 60px; width: auto; pointer-events: none;">
             </div>
         @endif
 

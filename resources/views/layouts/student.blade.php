@@ -401,8 +401,9 @@
             position: absolute;
             left: 50%;
             bottom: calc(100% + 16px);
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr;
+            justify-items: center;
             align-items: center;
             gap: 4px;
             width: 78px;
@@ -468,29 +469,33 @@
 
         .student-quick-action-item {
             position: relative;
-            display: flex;
+            display: block;
             width: 100%;
-            justify-content: center;
+            text-align: center;
             opacity: 0;
             transform: translateY(18px) scale(0.86);
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .student-quick-action-item.is-logo {
-            order: 1;
+            grid-row: 1;
         }
 
         .student-quick-action-item.is-notifications {
-            order: 2;
+            grid-row: 3;
         }
 
         .student-quick-action-item.is-theme {
-            order: 3;
+            grid-row: 4;
         }
 
         .student-quick-action-item.is-accessibility {
-            order: 4;
+            grid-row: 5;
             margin-top: 4px;
+        }
+
+        .student-quick-actions-divider {
+            grid-row: 2;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-action-item {

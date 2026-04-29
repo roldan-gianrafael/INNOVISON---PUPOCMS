@@ -841,7 +841,7 @@
     <table id="healthTable">
         <thead>
             <tr>
-                <th>Student ID</th>
+                <th>ID Number</th>
                 <th>Full Name</th>
                 <th>Course / Yr / Sec</th>
                 <th>Medical Condition</th> {{-- Dating Medical Status --}}

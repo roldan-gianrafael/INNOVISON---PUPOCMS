@@ -1050,7 +1050,7 @@
         <table id="apptTable">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Full Name</th>
                     <th>ID Number</th>
                     <th>Appointment Type</th> <th>Service</th>
                     <th>Date & Time</th>

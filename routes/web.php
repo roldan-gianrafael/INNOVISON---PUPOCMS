@@ -185,7 +185,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::get('/reports/feedbacks', [ReportsController::class, 'feedbackReport'])->name('reports.feedbacks');
         Route::get('/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
-        Route::post('/notifications/mark-all-read', [AdminController::class, 'markAllAdminNotificationsRead'])->name('assistant.notifications.read_all');
+        Route::post('/notifications/mark-all-read', [AdminController::class, 'markAllAdminNotificationsRead'])->name('notifications.read_all');
         Route::get('/api-testing', [AdminController::class, 'apiTesting'])->name('api-testing');
     });
 });

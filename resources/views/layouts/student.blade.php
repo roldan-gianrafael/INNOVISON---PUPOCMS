@@ -360,10 +360,10 @@
         }
 
         .student-accessibility-launch svg {
-            width: 45px;
-            height: 45px;
-            stroke-width: 2.4;
-            transform: translateY(-1px) scale(1.18);
+            width: 32px;
+            height: 32px;
+            stroke-width: 2.1;
+            transform: translateY(-1px);
             transform-origin: center;
             overflow: visible;
         }
@@ -652,8 +652,8 @@
             }
 
             .student-accessibility-launch svg {
-                width: 40px;
-                height: 40px;
+                width: 28px;
+                height: 28px;
             }
 
             .student-quick-action-tooltip {

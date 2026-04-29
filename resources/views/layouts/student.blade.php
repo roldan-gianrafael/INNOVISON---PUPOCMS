@@ -1553,5 +1553,53 @@
             }
         })();
     </script>
+
+    {{-- MANDATORY HEALTH FORM MODAL --}}
+    @php
+        $showHealthFormModal = false;
+        if (Auth::check()) {
+            $user = Auth::user();
+            $user->loadMissing('healthProfile');
+            $showHealthFormModal = is_null($user->healthProfile) || empty($user->healthProfile);
+        }
+    @endphp
+
+    @if($showHealthFormModal)
+    <div id="healthFormModal" class="modal-overlay" style="display: flex;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; padding: 32px; max-width: 480px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div class="modal-icon" style="width: 80px; height: 80px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <line x1="19" y1="8" x2="19" y2="14"></line>
+                    <line x1="22" y1="11" x2="16" y2="11"></line>
+                </svg>
+            </div>
+            <h2 style="color: #1f2937; font-size: 22px; font-weight: 700; margin: 0 0 12px;">Health Information Required</h2>
+            <p style="color: #6b7280; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+                You have not yet submitted your <strong>Health Information Form</strong>. 
+                Please fill it up to access clinic services and book appointments.
+            </p>
+            <a href="{{ route('health.form') }}" class="modal-btn" style="display: inline-block; background: #8b0000; color: #fff; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+                Proceed to Fill Up Form
+            </a>
+            <p style="color: #9ca3af; font-size: 12px; margin: 16px 0 0;">This is a mandatory requirement for all students.</p>
+        </div>
+    </div>
+    <style>
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-btn:hover {
+            background: #6b0000 !important;
+        }
+    </style>
+    @endif
 </body>
 </html>

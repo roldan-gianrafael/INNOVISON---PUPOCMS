@@ -405,10 +405,10 @@
             grid-template-columns: 1fr;
             justify-items: center;
             align-items: center;
-            gap: 4px;
+            gap: 0;
             width: 78px;
             min-width: 78px;
-            padding: 6px 0;
+            padding: 0 0 6px;
             border-radius: 16px;
             border: none;
             background: transparent;
@@ -477,17 +477,9 @@
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .student-quick-action-item.is-logo {
-            grid-row: 1;
-        }
-
         .student-quick-action-item.is-accessibility {
-            grid-row: 3;
-            margin-top: 4px;
-        }
-
-        .student-quick-actions-divider {
-            grid-row: 2;
+            grid-row: 1;
+            margin-top: 0;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-action-item {
@@ -496,38 +488,7 @@
         }
 
         .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(1) {
-            transition-delay: 0.19s;
-        }
-
-        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(3) {
-            transition-delay: 0.14s;
-        }
-
-        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(4) {
-            transition-delay: 0.09s;
-        }
-
-        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(5) {
-            transition-delay: 0.04s;
-        }
-
-        .student-quick-action-logo {
-            overflow: hidden;
-            border-radius: 999px;
-            background: #ffffff !important;
-            border: 2px solid #7f1d2d;
-            box-shadow:
-                0 0 0 3px #ffffff,
-                0 0 0 5px #facc15,
-                0 10px 22px rgba(95, 0, 18, 0.28);
-        }
-
-        .student-quick-action-logo img {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-            border-radius: 999px;
-            background: #ffffff;
+            transition-delay: 0.1s;
         }
 
         .student-quick-actions-divider {
@@ -1670,12 +1631,6 @@
             @endif
         </button>
         <div class="student-quick-actions-panel">
-            <div class="student-quick-action-item is-logo">
-                <span class="student-quick-action-logo" aria-hidden="true">
-                    <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo">
-                </span>
-            </div>
-            <div class="student-quick-actions-divider" aria-hidden="true"></div>
             <div class="student-quick-action-item is-accessibility">
                 <button type="button" id="studentAccessibilityLaunch" class="student-quick-action-btn student-accessibility-launch" aria-label="Accessibility menu" title="Accessibility">
                     <x-outline-icon name="accessibility-person" />

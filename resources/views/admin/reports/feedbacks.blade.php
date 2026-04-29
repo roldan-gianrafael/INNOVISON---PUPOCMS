@@ -186,7 +186,7 @@
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
-        color: #ffffff;
+        color: #000000;
     }
     .feedback-btn:hover::after {
         transform: translateX(135%);

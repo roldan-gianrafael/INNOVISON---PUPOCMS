@@ -92,6 +92,9 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
     Route::get('/health-profile/{id}/medical-assessment', [AdminController::class, 'showMedicalAssessment'])
         ->middleware('role:superadmin,admin')
         ->name('admin.medical_assessment');
+    Route::put('/health-profile/{id}/medical-assessment', [AdminController::class, 'updateMedicalAssessment'])
+        ->middleware('role:superadmin,admin')
+        ->name('admin.medical_assessment.update');
     Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage'])
         ->middleware('role:superadmin')
         ->name('admin.sign_page');

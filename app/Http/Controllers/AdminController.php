@@ -1204,6 +1204,33 @@ class AdminController extends Controller
         return view('admin.medical_assessment', compact('profile', 'calculatedAge'));
     }
 
+    public function updateMedicalAssessment(Request $request, $id)
+    {
+        $profile = HealthProfile::with('user')->findOrFail($id);
+
+        $validated = $request->validate([
+            'assessment_date' => ['required', 'date'],
+            'height' => ['nullable', 'string', 'max:30'],
+            'weight' => ['nullable', 'string', 'max:30'],
+            'blood_pressure' => ['nullable', 'string', 'max:30'],
+            'respiratory_rate' => ['nullable', 'string', 'max:30'],
+            'temperature' => ['nullable', 'string', 'max:30'],
+            'covid_positive' => ['nullable', Rule::in(['Yes', 'No'])],
+            'medical_certificate_issued_by' => ['nullable', 'string', 'max:120'],
+            'medical_certificate_issued_at' => ['nullable', 'date'],
+            'chest_xray_result_text' => ['nullable', 'string', 'max:200'],
+            'chest_xray_date' => ['nullable', 'date'],
+            'assessment_remarks' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $profile->fill($validated);
+        $profile->save();
+
+        return redirect()
+            ->route('admin.medical_assessment', $profile->id)
+            ->with('success', 'Medical assessment saved successfully.');
+    }
+
     public function exportHealthPdf($id)
     {
         $profile = HealthProfile::with('user')->findOrFail($id);

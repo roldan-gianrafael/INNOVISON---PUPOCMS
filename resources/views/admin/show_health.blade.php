@@ -10,6 +10,9 @@
     .profile-title { margin: 0; font-size: 20px; font-weight: 800; color: #0f172a; }
     .profile-sub { margin: 6px 0 0; font-size: 13px; color: #64748b; }
     .profile-back { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #1e293b; background: #e2e8f0; border: 1px solid #cbd5e1; text-decoration: none; }
+    .profile-assessment { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #ffffff; background: #70131B; border: 1px solid #8f2230; text-decoration: none; }
+    .profile-assessment:hover { color: #ffffff; text-decoration: none; }
+    .profile-head-actions { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .profile-switch { display: flex; gap: 10px; flex-wrap: wrap; }
     .profile-tab {
         border: 1px solid #cbd5e1;
@@ -54,6 +57,7 @@
     [data-theme="dark"] .doc-missing { color: #cbd5e1; }
     [data-theme="dark"] .profile-meta { background: #111827; border-color: #334155; }
     [data-theme="dark"] .profile-back { background: #1e293b; color: #f8fafc; border-color: #475569; }
+    [data-theme="dark"] .profile-assessment { background: #8f2230; border-color: #facc15; color: #ffffff; }
     [data-theme="dark"] .profile-tab { background: #111827; border-color: #475569; color: #f8fafc; }
     [data-theme="dark"] .profile-tab.is-active { background: #70131B; border-color: #8f2230; color: #fff; }
     [data-theme="dark"] .doc-link { background: #111827; border-color: #475569; color: #f8fafc; }
@@ -76,10 +80,16 @@
                 <h1 class="profile-title">Student Health Profile</h1>
                 <p class="profile-sub">Issued health profile details and submitted documents.</p>
             </div>
-            <a href="{{ route('admin.health_records') }}" class="profile-back">
-                <x-outline-icon name="arrow-left-on-rectangle" />
-                Back to Health Records
-            </a>
+            <div class="profile-head-actions">
+                <a href="{{ route('admin.medical_assessment', $profile->id) }}" class="profile-assessment">
+                    <x-outline-icon name="clipboard-document-list" />
+                    Medical Assessment
+                </a>
+                <a href="{{ route('admin.health_records') }}" class="profile-back">
+                    <x-outline-icon name="arrow-left-on-rectangle" />
+                    Back to Health Records
+                </a>
+            </div>
         </div>
     </div>
 

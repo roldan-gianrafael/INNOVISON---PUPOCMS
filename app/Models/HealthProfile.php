@@ -17,6 +17,16 @@ class HealthProfile extends Model
         'has_disability', 'disability_type',
         'pwd_id_proof',
         'medical_certificate', 'health_form_upload', 'clearance_status',
+        'assessment_date',
+        'blood_pressure',
+        'respiratory_rate',
+        'temperature',
+        'covid_positive',
+        'medical_certificate_issued_by',
+        'medical_certificate_issued_at',
+        'chest_xray_result_text',
+        'chest_xray_date',
+        'assessment_remarks',
         'clearance_signature_snapshot_path',
         'pending_reason',
         'verified_at',
@@ -28,6 +38,9 @@ class HealthProfile extends Model
 
     protected $casts = [
         'puptas_synced_at' => 'datetime',
+        'assessment_date' => 'date',
+        'medical_certificate_issued_at' => 'date',
+        'chest_xray_date' => 'date',
 
     ];
 

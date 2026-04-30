@@ -354,6 +354,10 @@
             transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
+        .student-quick-action-bell {
+            position: relative;
+        }
+
         .student-quick-action-bell svg {
             width: 20px;
             height: 20px;
@@ -399,8 +403,8 @@
 
         .student-quick-actions-panel {
             position: absolute;
-            left: 0;
-            right: 0;
+            left: 50%;
+            right: auto;
             bottom: calc(100% + 16px);
             display: grid;
             grid-template-columns: 1fr;
@@ -415,10 +419,9 @@
             background: transparent;
             box-shadow: none;
             backdrop-filter: none;
-            margin: 0 auto;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(6px) scale(0.96);
+            transform: translateX(-50%) translateY(6px) scale(0.96);
             transform-origin: bottom center;
             transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
             z-index: 1002;
@@ -427,7 +430,7 @@
         .student-quick-actions-wrap.is-open .student-quick-actions-panel {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0) scale(1);
+            transform: translateX(-50%) translateY(0) scale(1);
         }
 
         .student-quick-actions-panel::after {
@@ -479,9 +482,19 @@
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .student-quick-action-item.is-accessibility {
+        .student-quick-action-item.is-notifications {
             grid-row: 1;
             margin-top: 0;
+        }
+
+        .student-quick-action-item.is-theme {
+            grid-row: 2;
+            margin-top: 4px;
+        }
+
+        .student-quick-action-item.is-accessibility {
+            grid-row: 3;
+            margin-top: 4px;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-action-item {
@@ -491,6 +504,14 @@
 
         .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(1) {
             transition-delay: 0.1s;
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(2) {
+            transition-delay: 0.07s;
+        }
+
+        .student-quick-actions-wrap.is-open .student-quick-action-item:nth-child(3) {
+            transition-delay: 0.04s;
         }
 
         .student-quick-actions-divider {
@@ -1620,13 +1641,45 @@
     <div class="student-quick-actions-wrap student-quick-actions-fab-wrap" data-nav-dropdown>
         <button
             type="button"
-            id="studentAccessibilityLaunch"
-            class="student-quick-action-btn student-accessibility-launch"
-            aria-label="Accessibility menu"
-            title="Accessibility"
+            class="student-quick-actions-toggle"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-label="Open quick actions"
+            title="Quick actions"
         >
-            <x-outline-icon name="accessibility-person" />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5.25v13.5M5.25 12h13.5" />
+            </svg>
+            @if($notificationCount > 0)
+                <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
+            @endif
         </button>
+
+        <div class="student-quick-actions-panel">
+            <div class="student-quick-action-item is-notifications">
+                <a href="{{ url('/student/account?view=notifications') }}" class="student-quick-action-btn student-quick-action-link student-quick-action-bell" aria-label="Notifications">
+                    <x-outline-icon name="bell" />
+                    @if($notificationCount > 0)
+                        <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
+                    @endif
+                </a>
+                <span class="student-quick-action-tooltip">Notifications</span>
+            </div>
+
+            <div class="student-quick-action-item is-theme">
+                <button type="button" id="themeToggleBtn" class="student-quick-action-btn" aria-pressed="false" aria-label="Theme mode" title="Theme mode">
+                    <x-outline-icon name="sun" />
+                </button>
+                <span class="student-quick-action-tooltip">Theme Mode</span>
+            </div>
+
+            <div class="student-quick-action-item is-accessibility">
+                <button type="button" id="studentAccessibilityLaunch" class="student-quick-action-btn student-accessibility-launch" aria-label="Accessibility menu" title="Accessibility">
+                    <x-outline-icon name="accessibility-person" />
+                </button>
+                <span class="student-quick-action-tooltip">Accessibility</span>
+            </div>
+        </div>
     </div>
 
     @if(

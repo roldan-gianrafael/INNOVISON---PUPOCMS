@@ -4,7 +4,15 @@
 
 @push('styles')
 <style>
-    .profile-wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 16px; }
+    .profile-wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        display: grid;
+        gap: 16px;
+        padding-right: 92px;
+        padding-bottom: 96px;
+        box-sizing: border-box;
+    }
     .profile-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); padding: 18px; }
     .profile-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
     .profile-title { margin: 0; font-size: 21px; font-weight: 800; color: #0f172a; }
@@ -63,11 +71,22 @@
     .profile-top-btn svg {
         color: #ffffff !important;
     }
+    .profile-top-btn svg,
+    .profile-top-btn svg * {
+        stroke: #ffffff !important;
+    }
     .profile-top-btn:hover::after {
         transform: translateX(135%);
     }
     .profile-head-actions { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .profile-switch { display: flex; gap: 10px; flex-wrap: wrap; }
+    .profile-switch-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
     .profile-tab {
         border: 1px solid #cbd5e1;
         background: #ffffff;
@@ -83,6 +102,46 @@
         background: #70131B;
         border-color: #8f2230;
         color: #ffffff;
+    }
+    .profile-status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 36px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+        letter-spacing: 0.02em;
+    }
+    .profile-status-badge svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 6px;
+        stroke-width: 2.2;
+        flex: 0 0 auto;
+    }
+    .profile-status-issued {
+        background: #dcfce7;
+        color: #166534;
+        border-color: #86efac;
+    }
+    .profile-status-pending {
+        background: #ffedd5;
+        color: #9a3412;
+        border-color: #fdba74;
+    }
+    .profile-status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+        border-color: #fca5a5;
+    }
+    .profile-status-default {
+        background: #e2e8f0;
+        color: #334155;
+        border-color: #cbd5e1;
     }
     .profile-panel { display: none; }
     .profile-panel.is-active { display: block; }
@@ -120,11 +179,35 @@
     [data-theme="dark"] .profile-tab { background: #111827; border-color: #475569; color: #f8fafc; }
     [data-theme="dark"] .profile-tab.is-active { background: #70131B; border-color: #8f2230; color: #fff; }
     [data-theme="dark"] .doc-link { background: #111827; border-color: #475569; color: #f8fafc; }
+    [data-theme="dark"] .profile-status-issued {
+        background: rgba(21, 128, 61, 0.25);
+        color: #bbf7d0;
+        border-color: rgba(74, 222, 128, 0.55);
+    }
+    [data-theme="dark"] .profile-status-pending {
+        background: rgba(154, 52, 18, 0.25);
+        color: #fed7aa;
+        border-color: rgba(251, 146, 60, 0.55);
+    }
+    [data-theme="dark"] .profile-status-rejected {
+        background: rgba(153, 27, 27, 0.25);
+        color: #fecaca;
+        border-color: rgba(248, 113, 113, 0.55);
+    }
+    [data-theme="dark"] .profile-status-default {
+        background: rgba(51, 65, 85, 0.6);
+        color: #e2e8f0;
+        border-color: rgba(148, 163, 184, 0.35);
+    }
 
     @media (max-width: 1024px) {
         .profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 768px) {
+        .profile-wrap {
+            padding-right: 0;
+            padding-bottom: 126px;
+        }
         .profile-grid,
         .doc-grid { grid-template-columns: 1fr; }
     }
@@ -132,6 +215,17 @@
 @endpush
 
 @section('content')
+@php
+    $profileStatusRaw = trim((string) ($profile->clearance_status ?? ''));
+    $profileStatusNormalized = in_array($profileStatusRaw, ['Pending', 'For Verification'], true) ? 'Pending' : $profileStatusRaw;
+    $profileStatusClass = match ($profileStatusNormalized) {
+        'Issued' => 'profile-status-issued',
+        'Pending' => 'profile-status-pending',
+        'Rejected' => 'profile-status-rejected',
+        default => 'profile-status-default',
+    };
+    $profileStatusLabel = $profileStatusNormalized !== '' ? $profileStatusNormalized : 'Not Processed';
+@endphp
 <div class="profile-wrap">
     <div class="profile-card">
         <div class="profile-head">
@@ -153,9 +247,23 @@
     </div>
 
     <div class="profile-card">
-        <div class="profile-switch" role="tablist" aria-label="Health profile sections">
-            <button type="button" class="profile-tab is-active" data-profile-tab-target="summaryPanel">Medical Summary</button>
-            <button type="button" class="profile-tab" data-profile-tab-target="docsPanel">Uploaded Documents</button>
+        <div class="profile-switch-head">
+            <div class="profile-switch" role="tablist" aria-label="Health profile sections">
+                <button type="button" class="profile-tab is-active" data-profile-tab-target="summaryPanel">Medical Summary</button>
+                <button type="button" class="profile-tab" data-profile-tab-target="docsPanel">Uploaded Documents</button>
+            </div>
+            <span class="profile-status-badge {{ $profileStatusClass }}">
+                @if($profileStatusNormalized === 'Issued')
+                    <x-outline-icon name="check" />
+                @elseif($profileStatusNormalized === 'Pending')
+                    <x-outline-icon name="clock" />
+                @elseif($profileStatusNormalized === 'Rejected')
+                    <x-outline-icon name="exclamation-triangle" />
+                @else
+                    <x-outline-icon name="information-circle" />
+                @endif
+                Status: {{ $profileStatusLabel }}
+            </span>
         </div>
     </div>
 

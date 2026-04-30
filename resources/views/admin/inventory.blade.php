@@ -319,8 +319,8 @@
             linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12)) !important;
         width: 760px;
         max-width: 94vw;
-        border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.72) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.72) !important;
         border-top: 2px solid #facc15 !important;
         border-bottom: 2px solid #facc15 !important;
         border-radius: 18px !important;
@@ -337,7 +337,7 @@
         gap: 12px;
         padding: 16px 20px;
         background: #70131B;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.45);
     }
     .inventory-modal-head-main {
         min-width: 0;
@@ -426,6 +426,8 @@
     html[data-theme="light"] .modal-box {
         background:
             linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)) !important;
+        border-left-color: rgba(255, 255, 255, 0.78) !important;
+        border-right-color: rgba(255, 255, 255, 0.78) !important;
     }
 
     html[data-theme="light"] .modal-form-panel {

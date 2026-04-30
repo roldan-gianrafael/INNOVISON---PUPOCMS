@@ -125,7 +125,7 @@ class AppointmentController extends Controller
                 'message' => $healthProfileStatus === 'Issued'
                     ? 'Your health profile has been approved by the clinic.'
                     : 'Your health profile was submitted and is awaiting medical review.',
-                'time' => 'Health form status',
+                'time' => 'Health profile status',
                 'link' => url('/student/account?view=health-record'),
             ];
 
@@ -1245,7 +1245,6 @@ public function showHealthForm()
 
 public function storeHealthForm(Request $request)
 {
-    // 1. VALIDATION: Siguraduhin na lahat ng fields ay tama ang format
     $request->validate([
         'student_id'        => 'nullable|string|max:255',
         'student_number'    => 'required|string|max:255',
@@ -1254,8 +1253,8 @@ public function storeHealthForm(Request $request)
         'zipcode'           => 'required|string|max:20',
         'birthday'          => 'required|date',
         'student_photo'     => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        'height'            => 'required|string|max:50',
-        'weight'            => 'required|string|max:50',
+        'height'            => 'required|numeric|min:0',
+        'weight'            => 'required|numeric|min:0',
         'age'               => 'required|numeric|min:15|max:100',
         'sex'               => 'required|string',
         'civil_status'      => 'required|string',
@@ -1264,41 +1263,18 @@ public function storeHealthForm(Request $request)
         'contact_no'        => 'required|string|max:20',
         'guardian_name'     => 'required|string|max:255',
         'cellphone'         => 'required|string|max:20',
-        
-        // Medical History
-        'medical_history'   => 'nullable|array', 
-        'has_illness'       => 'required|string',
-        'chest_xray_result' => 'required|file|mimes:jpeg,jpg,png,pdf|max:4096',
+
+        'chest_xray_result' => 'required|file|mimes:pdf|max:4096',
         'has_disability'    => 'required|string',
         'disability_type'   => 'required_if:has_disability,Yes|nullable|string|max:255',
-        'pwd_id_proof'      => 'required_if:has_disability,Yes|file|mimes:jpeg,jpg,png,pdf|max:4096',
-        
-        // Allergies
-        'food_allergies' => 'required_without:no_allergies|nullable|string|max:255',
-        'medicine_allergies' => 'required_without:no_allergies|nullable|array|min:1',
-        'medical_certificate' => 'required|file|mimes:jpeg,jpg,png,pdf|max:4096',
-        'medical_certificate_issued_by' => 'required|string|max:255',
-
-        // Vaccination
-        'vax_date_1' => 'required|date',
-        'vax_brand_1' => 'required|string|max:255',
-        'vax_date_2' => 'required|date',
-        'vax_brand_2' => 'required|string|max:255',
-        'booster_date_1' => 'required|date',
-        'booster_brand_1' => 'required|string|max:255',
-        'booster_date_2' => 'required|date',
-        'booster_brand_2' => 'required|string|max:255',
-        
-        // Signature
-        'digital_signature' => 'required_without:digital_signature_drawn|nullable|image|mimes:jpeg,png,jpg|max:2048',
-        'digital_signature_drawn' => 'required_without:digital_signature|nullable|string',
+        'pwd_id_proof'      => 'required_if:has_disability,Yes|file|mimes:pdf|max:4096',
+        'medical_certificate' => 'required|file|mimes:pdf|max:4096',
     ]);
 
     /** @var \App\Models\User $user */
     $user = Auth::user();
     $normalizedHeight = $this->normalizeMeasurement($request->input('height'), 'cm');
     $normalizedWeight = $this->normalizeMeasurement($request->input('weight'), 'kg');
-    $normalizedDoctorName = $this->normalizeDoctorName($request->input('medical_certificate_issued_by'));
     $user->DOB = $request->input('birthday');
     $user->contact_no = $request->input('contact_no');
     $resolvedStudentNumber = trim((string) $request->input('student_number'));
@@ -1316,27 +1292,7 @@ public function storeHealthForm(Request $request)
     $user->save();
 
     try {
-        // 2. FILE HANDLING: I-save ang Photo at Signature sa storage
-        // Gagamit ng 'public' disk para ma-access ng 'storage:link'
         $photoPath = $request->file('student_photo')->store('health_profiles/photos', 'public');
-        $sigPath = null;
-        if ($request->hasFile('digital_signature')) {
-            $sigPath = $request->file('digital_signature')->store('health_profiles/signatures', 'public');
-        } else {
-            $drawnSignature = (string) $request->input('digital_signature_drawn', '');
-            if (!preg_match('/^data:image\/png;base64,/', $drawnSignature)) {
-                throw new \RuntimeException('The drawn signature format is invalid.');
-            }
-
-            $binarySignature = base64_decode(substr($drawnSignature, strpos($drawnSignature, ',') + 1), true);
-            if ($binarySignature === false) {
-                throw new \RuntimeException('The drawn signature could not be processed.');
-            }
-
-            $signatureFileName = 'health_profiles/signatures/' . uniqid('drawn-signature-', true) . '.png';
-            Storage::disk('public')->put($signatureFileName, $binarySignature);
-            $sigPath = $signatureFileName;
-        }
         $chestXrayPath = $request->hasFile('chest_xray_result')
             ? $request->file('chest_xray_result')->store('health_profiles/chest_xray_results', 'public')
             : null;
@@ -1347,7 +1303,6 @@ public function storeHealthForm(Request $request)
             ? $request->file('medical_certificate')->store('health_profiles/medical_certificates', 'public')
             : null;
 
-        // 3. LOGIC: I-save ang data sa health_profiles table
         \App\Models\HealthProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -1368,47 +1323,34 @@ public function storeHealthForm(Request $request)
                 'guardian_name'      => $request->guardian_name,
                 'landline'           => $request->landline,
                 'cellphone'          => $request->cellphone,
-
-                // Part II
-                'has_illness'        => $request->has_illness,
-                'medical_history'    => $request->medical_history, 
-                'other_illness'      => $request->other_illness,
+                'has_illness'        => null,
+                'medical_history'    => null,
+                'other_illness'      => null,
                 'chest_xray_result'  => $chestXrayPath,
                 'has_disability'     => $request->has_disability,
                 'disability_type'    => $request->disability_type,
                 'pwd_id_proof'       => $pwdIdProofPath,
-
-                // Section 3
-                'food_allergies'      => $request->food_allergies,
-                'no_allergies'        => $request->has('no_allergies'),
-                'medicine_allergies'  => $request->medicine_allergies,
-                'other_med_allergies' => $request->other_med_allergies,
+                'food_allergies'      => null,
+                'no_allergies'        => null,
+                'medicine_allergies'  => null,
+                'other_med_allergies' => null,
                 'medical_certificate' => $medicalCertificatePath,
-                'medical_certificate_issued_by' => $normalizedDoctorName,
-
-                // Part III: COVID Vax
-                'vaccine_history' => [
-                    'dose1'    => ['date' => $request->vax_date_1, 'brand' => $request->vax_brand_1],
-                    'dose2'    => ['date' => $request->vax_date_2, 'brand' => $request->vax_brand_2],
-                    'booster1' => ['date' => $request->booster_date_1, 'brand' => $request->booster_brand_1],
-                    'booster2' => ['date' => $request->booster_date_2, 'brand' => $request->booster_brand_2],
-                ],
-
-                'digital_signature'  => $sigPath,
-                'is_smoker'          => $request->smoking ?? 'No',
-                'is_drinker'         => $request->alcohol ?? 'No',
+                'medical_certificate_issued_by' => null,
+                'vaccine_history' => null,
+                'digital_signature'  => null,
+                'is_smoker'          => null,
+                'is_drinker'         => null,
             ]
         );
 
         $user->is_health_profile_completed = 0;
         $user->save();
 
-        // 5. ACTIVITY LOG
         \App\Models\ActivityLog::create([
             'user_id'     => $user->id,
             'user_name'   => $user->name,
             'action'      => 'Health Profile Completed',
-            'description' => "Student completed the detailed Health Information Form (HIF).",
+            'description' => 'Student completed the Health Profile requirements.',
             'ip_address'  => $request->ip(),
             'user_agent'  => $request->userAgent(),
         ]);
@@ -1431,7 +1373,7 @@ public function printHealthForm()
     $profile = \App\Models\HealthProfile::where('user_id', $user->id)->first();
 
     if (!$profile) {
-        return redirect()->route('health.form')->with('error', 'Please fill up the form first.');
+        return redirect()->route('health.form')->with('error', 'Please fill up your health profile first.');
     }
 
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);

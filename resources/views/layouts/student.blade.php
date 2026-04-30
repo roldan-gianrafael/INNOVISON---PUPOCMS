@@ -2588,10 +2588,10 @@
         })();
     </script>
 
-    {{-- MANDATORY HEALTH FORM MODAL --}}
+    {{-- HEALTH PROFILE PROMPT MODAL --}}
     @php
         $showHealthFormModal = false;
-        if (Auth::check()) {
+        if (Auth::check() && session('show_health_profile_prompt')) {
             $user = Auth::user();
             $user->loadMissing('healthProfile');
             $showHealthFormModal = is_null($user->healthProfile) || empty($user->healthProfile);
@@ -2612,16 +2612,20 @@
                 </div>
                 <div style="width: 70px; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, transparent 70%); margin: 8px auto 0; border-radius: 50%;"></div>
             </div>
-            <h2 style="color: #1f2937; font-size: 24px; font-weight: 800; margin: 0 0 16px;">Health Information Required</h2>
+            <h2 style="color: #1f2937; font-size: 24px; font-weight: 800; margin: 0 0 16px;">Complete Your Health Profile</h2>
             <p style="color: #4b5563; font-size: 16px; line-height: 1.7; margin: 0 0 28px;">
                 Hello <strong>{{ Auth::user()->first_name ?? 'Student' }}</strong>! Good day!<br>
-                Please fill up the <strong>Health Information Form</strong> to access clinic services and book appointments.<br>
-                <span style="color: #6b7280; font-size: 14px;">Please prepare your soft copy requirements (2x2 ID photo, medical certificate, etc.) as needed.</span>
+                Please fill up your <strong>Health Profile</strong> to complete your clinic record.<br>
+                <span style="color: #6b7280; font-size: 14px;">You can skip this for now, but this prompt will show again on your next login until submitted.</span>
             </p>
-            <a href="{{ route('health.form') }}" style="display: inline-block; background: #8b0000; color: #fff; padding: 16px 40px; border-radius: 12px; font-size: 17px; font-weight: 700; text-decoration: none; transition: all 0.2s; box-shadow: 0 8px 24px rgba(139,0,0,0.3);">
-                Proceed to Fill Up Form
-            </a>
-            <p style="color: #9ca3af; font-size: 13px; margin: 20px 0 0; font-weight: 500;">This is a mandatory requirement for all students.</p>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ route('health.form') }}" style="display: inline-block; background: #8b0000; color: #fff; padding: 14px 30px; border-radius: 12px; font-size: 16px; font-weight: 700; text-decoration: none; transition: all 0.2s; box-shadow: 0 8px 24px rgba(139,0,0,0.3);">
+                    Open Health Profile
+                </a>
+                <button type="button" onclick="document.getElementById('healthFormModal').style.display='none'" style="display: inline-block; background: #e5e7eb; color: #1f2937; border: none; padding: 14px 30px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;">
+                    Skip for Now
+                </button>
+            </div>
         </div>
     </div>
     <style>

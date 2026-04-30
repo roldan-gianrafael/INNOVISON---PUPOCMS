@@ -491,7 +491,7 @@
     @if(session('health_profile_submitted'))
         <div class="health-submit-overlay" id="healthSubmitOverlay">
             <div class="health-submit-overlay-card">
-                <h2 class="health-submit-title">Health Form Submitted</h2>
+                <h2 class="health-submit-title">Health Profile Submitted</h2>
                 <div class="health-submit-circle" aria-hidden="true">
                     <svg class="health-submit-ring" viewBox="0 0 120 120" aria-hidden="true">
                         <circle cx="60" cy="60" r="54"></circle>
@@ -766,7 +766,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @endphp
     <div class="page-intro">
         <h1 class="page-intro-title">Health Record</h1>
-        <p class="page-intro-text">Check the status of your submitted health form, review clinic approval, and open your printable record.</p>
+        <p class="page-intro-text">Check the status of your submitted health profile, review clinic approval, and open your printable record.</p>
     </div>
     <div class="health-status-card">
         <span class="health-status-title">Health Information Record</span>

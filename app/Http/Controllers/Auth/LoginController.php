@@ -171,6 +171,17 @@ class LoginController extends Controller
         return '/student/home';
     }
 
+    private function queueHealthProfilePrompt(Request $request, User $user, string $redirectPath): void
+    {
+        if (!str_starts_with($redirectPath, '/student/')) {
+            return;
+        }
+
+        if (!$user->healthProfile()->exists()) {
+            $request->session()->flash('show_health_profile_prompt', true);
+        }
+    }
+
     private function findLinkedAdminProfile(User $user): ?Admin
     {
         if (!Schema::hasTable('admins')) {
@@ -1165,7 +1176,10 @@ class LoginController extends Controller
 
             $this->recordAuthEvent($request, 'Login', 'User logged in successfully.', $authenticatedUser);
 
-            return redirect($this->resolveRedirectPathForUser($authenticatedUser));
+            $redirectPath = $this->resolveRedirectPathForUser($authenticatedUser);
+            $this->queueHealthProfilePrompt($request, $authenticatedUser, $redirectPath);
+
+            return redirect($redirectPath);
         }
 
         $this->recordAuthEvent(
@@ -1278,7 +1292,9 @@ class LoginController extends Controller
         $request->session()->flash('show_terms_modal', true);
         $this->recordAuthEvent($request, 'Login', 'User logged in successfully via IDP authorization code flow.', $user);
 
-        $redirectResponse = redirect($this->resolveRedirectPathForUser($user));
+        $redirectPath = $this->resolveRedirectPathForUser($user);
+        $this->queueHealthProfilePrompt($request, $user, $redirectPath);
+        $redirectResponse = redirect($redirectPath);
         return $this->attachIdpCookies($redirectResponse, $accessToken, $refreshToken);
     }
 

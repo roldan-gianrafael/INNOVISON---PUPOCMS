@@ -1,6 +1,6 @@
 @extends('layouts.student')
 
-@section('title', 'Health Information Form - Print')
+@section('title', 'Health Profile - Print')
 
 @push('styles')
 <style>

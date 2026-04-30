@@ -561,6 +561,277 @@
             transform: translateY(-50%) translateX(0);
         }
 
+        .student-notif-panel {
+            position: absolute;
+            right: calc(100% + 14px);
+            bottom: -10px;
+            width: min(340px, calc(100vw - 32px));
+            border-radius: 18px;
+            background: rgba(255, 248, 249, 0.74);
+            border: 1px solid rgba(250, 204, 21, 0.48);
+            box-shadow: 0 22px 48px rgba(15, 23, 42, 0.2);
+            backdrop-filter: blur(16px) saturate(145%);
+            -webkit-backdrop-filter: blur(16px) saturate(145%);
+            padding: 14px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px) scale(0.96);
+            transform-origin: bottom right;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.24s ease, visibility 0.2s ease;
+            z-index: 1005;
+        }
+
+        .student-notif-panel.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        .student-notif-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .student-notif-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #70131B;
+            line-height: 1.2;
+        }
+
+        .student-notif-subtitle {
+            margin: 4px 0 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #7c2d36;
+        }
+
+        .student-notif-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .student-notif-back-btn,
+        .student-notif-actions-toggle,
+        .student-notif-close {
+            border: 1px solid rgba(112, 19, 27, 0.2);
+            background: rgba(255, 255, 255, 0.86);
+            color: #70131B;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transition: all 0.18s ease;
+        }
+
+        .student-notif-actions-toggle,
+        .student-notif-close {
+            width: 34px;
+            height: 34px;
+            padding: 0;
+        }
+
+        .student-notif-back-btn {
+            height: 34px;
+            padding: 0 10px;
+            gap: 4px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .student-notif-back-btn.is-visible {
+            display: inline-flex;
+        }
+
+        .student-notif-back-btn svg,
+        .student-notif-actions-toggle svg,
+        .student-notif-close svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2;
+        }
+
+        .student-notif-back-btn:hover,
+        .student-notif-actions-toggle:hover,
+        .student-notif-close:hover {
+            background: #fff;
+            border-color: rgba(250, 204, 21, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .student-notif-actions-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 188px;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(112, 19, 27, 0.2);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(4px) scale(0.98);
+            transform-origin: top right;
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            z-index: 6;
+        }
+
+        .student-notif-actions-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .student-notif-actions-menu form {
+            margin: 0 0 6px;
+        }
+
+        .student-notif-actions-submit {
+            width: 100%;
+            border: 1px solid rgba(112, 19, 27, 0.18);
+            background: #fff;
+            border-radius: 10px;
+            padding: 8px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #70131B;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .student-notif-actions-submit:hover {
+            border-color: rgba(250, 204, 21, 0.84);
+            background: #fffdf3;
+        }
+
+        .student-notif-actions-submit:disabled {
+            opacity: 0.58;
+            cursor: not-allowed;
+        }
+
+        .student-notif-actions-submit svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2;
+        }
+
+        .student-notif-section {
+            display: block;
+        }
+
+        .student-notif-section.is-hidden {
+            display: none;
+        }
+
+        .student-notif-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .student-notif-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+        }
+
+        .student-notif-item.is-unread {
+            border-color: #f5d0d0;
+            background: #fff7f7;
+        }
+
+        .student-notif-item-link {
+            display: flex;
+            gap: 10px;
+            text-decoration: none;
+            padding: 11px 12px;
+            color: inherit;
+        }
+
+        .student-notif-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #8B0000;
+            margin-top: 6px;
+            flex: 0 0 auto;
+        }
+
+        .student-notif-dot.is-read {
+            background: #cbd5e1;
+        }
+
+        .student-notif-content {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .student-notif-item-title {
+            display: block;
+            font-size: 13px;
+            line-height: 1.45;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .student-notif-item-time {
+            display: block;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .student-notif-chip {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 8px;
+            padding: 2px 6px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .student-notif-empty {
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            background: #ffffff;
+        }
+
+        .student-notif-empty-title {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 800;
+            color: #475569;
+        }
+
+        .student-notif-empty-copy {
+            margin: 6px 0 0;
+            font-size: 11px;
+            color: #64748b;
+        }
+
         html[data-theme="light"] .student-quick-actions-toggle,
         html[data-theme="light"] .student-quick-action-btn,
         html[data-theme="light"] .student-quick-action-link {
@@ -634,6 +905,87 @@
             border-top-color: rgba(250, 204, 21, 0.72);
         }
 
+        html[data-theme="dark"] .student-notif-panel {
+            background: rgba(12, 18, 29, 0.8);
+            border-color: rgba(250, 204, 21, 0.38);
+            box-shadow: 0 22px 48px rgba(2, 6, 23, 0.44);
+        }
+
+        html[data-theme="dark"] .student-notif-title {
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .student-notif-subtitle {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .student-notif-back-btn,
+        html[data-theme="dark"] .student-notif-actions-toggle,
+        html[data-theme="dark"] .student-notif-close {
+            background: rgba(17, 24, 39, 0.92);
+            color: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.35);
+        }
+
+        html[data-theme="dark"] .student-notif-back-btn:hover,
+        html[data-theme="dark"] .student-notif-actions-toggle:hover,
+        html[data-theme="dark"] .student-notif-close:hover {
+            border-color: rgba(250, 204, 21, 0.85);
+            background: rgba(30, 41, 59, 0.96);
+        }
+
+        html[data-theme="dark"] .student-notif-actions-menu {
+            background: rgba(2, 6, 23, 0.98);
+            border-color: rgba(148, 163, 184, 0.36);
+        }
+
+        html[data-theme="dark"] .student-notif-actions-submit {
+            background: rgba(15, 23, 42, 0.9);
+            color: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.36);
+        }
+
+        html[data-theme="dark"] .student-notif-actions-submit:hover {
+            border-color: rgba(250, 204, 21, 0.85);
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        html[data-theme="dark"] .student-notif-item {
+            background: #111a24;
+            border-color: #3b4657;
+        }
+
+        html[data-theme="dark"] .student-notif-item.is-unread {
+            background: rgba(139, 0, 0, 0.2);
+            border-color: #7f1d2d;
+        }
+
+        html[data-theme="dark"] .student-notif-item-title {
+            color: #e5ecf7;
+        }
+
+        html[data-theme="dark"] .student-notif-item-time {
+            color: #9fb0c8;
+        }
+
+        html[data-theme="dark"] .student-notif-chip {
+            background: rgba(148, 163, 184, 0.2);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="dark"] .student-notif-empty {
+            background: #111a24;
+            border-color: #3b4657;
+        }
+
+        html[data-theme="dark"] .student-notif-empty-title {
+            color: #e5ecf7;
+        }
+
+        html[data-theme="dark"] .student-notif-empty-copy {
+            color: #9fb0c8;
+        }
+
         @media (max-width: 768px) {
             .student-quick-actions-fab-wrap {
                 right: 18px;
@@ -654,6 +1006,18 @@
 
             .student-quick-action-tooltip {
                 display: none;
+            }
+
+            .student-notif-panel {
+                right: 0;
+                left: auto;
+                bottom: calc(100% + 12px);
+                width: min(320px, calc(100vw - 22px));
+                transform-origin: bottom right;
+            }
+
+            .student-notif-panel.is-open {
+                transform: translateY(0) scale(1);
             }
         }
 
@@ -1511,8 +1875,12 @@
             <nav id="main-menu" class="main-nav">
                 @php
                     $isMyAccountSection = Request::is('student/account') || Request::is('student/history') || Request::is('student/barcode-register') || Request::is('student/print-health-form');
-                    $layoutNotifications = collect($notifications ?? [])->take(5);
-                    $notificationCount = $layoutNotifications->where('is_unread', true)->count();
+                    $studentAllNotifications = collect($notifications ?? [])->values();
+                    $studentUnreadNotifications = $studentAllNotifications
+                        ->filter(fn ($notification) => !empty($notification['is_unread']))
+                        ->values();
+                    $notificationCount = $studentUnreadNotifications->count();
+                    $studentNotificationHistory = $studentAllNotifications->take(20)->values();
                 @endphp
                 <ul class="nav-list">
                     <li>
@@ -1664,15 +2032,96 @@
             </div>
 
             <div class="student-quick-action-item is-notifications">
-                <a href="{{ url('/student/account?view=notifications') }}" class="student-quick-action-btn student-quick-action-link student-quick-action-bell" aria-label="Notifications">
+                <button type="button" id="studentNotifToggleBtn" class="student-quick-action-btn student-quick-action-bell" aria-label="Notifications" aria-expanded="false">
                     <x-outline-icon name="bell" />
                     @if($notificationCount > 0)
                         <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
                     @endif
-                </a>
+                </button>
                 <span class="student-quick-action-tooltip">Notifications</span>
             </div>
         </div>
+
+        <section class="student-notif-panel" id="studentNotifPanel" aria-live="polite">
+            <div class="student-notif-head">
+                <div>
+                    <p class="student-notif-title">Notifications</p>
+                    <p class="student-notif-subtitle">Appointment and health updates.</p>
+                </div>
+                <div class="student-notif-actions">
+                    <button type="button" class="student-notif-back-btn" id="studentNotifBackBtn" aria-label="Back to new notifications">
+                        <x-outline-icon name="chevron-right" style="transform: rotate(180deg);" />
+                        Back
+                    </button>
+                    <button type="button" class="student-notif-actions-toggle" id="studentNotifActionsToggle" aria-label="Notification actions" aria-expanded="false">
+                        <x-outline-icon name="bars-3" />
+                    </button>
+                    <div class="student-notif-actions-menu" id="studentNotifActionsMenu">
+                        <form method="POST" action="{{ route('student.notifications.read_all') }}">
+                            @csrf
+                            <button type="submit" class="student-notif-actions-submit" {{ $studentUnreadNotifications->isEmpty() ? 'disabled' : '' }}>
+                                <x-outline-icon name="check" />
+                                Mark all as read
+                            </button>
+                        </form>
+                        <button type="button" class="student-notif-actions-submit" id="studentNotifHistoryBtn">
+                            <x-outline-icon name="clock" />
+                            Notification history
+                        </button>
+                    </div>
+                    <button type="button" class="student-notif-close" id="studentNotifCloseBtn" aria-label="Close notifications">
+                        <x-outline-icon name="x-mark" />
+                    </button>
+                </div>
+            </div>
+
+            <div class="student-notif-section" id="studentNotifUnreadSection">
+                <div class="student-notif-list">
+                    @forelse($studentUnreadNotifications as $notification)
+                        <article class="student-notif-item is-unread">
+                            <a href="{{ route('student.notifications.open', ['notificationId' => $notification['id']]) }}" class="student-notif-item-link">
+                                <span class="student-notif-dot" aria-hidden="true"></span>
+                                <span class="student-notif-content">
+                                    <span class="student-notif-item-title">{{ $notification['message'] ?? 'Notification available.' }}</span>
+                                    <span class="student-notif-item-time">{{ $notification['time'] ?? 'Just now' }}</span>
+                                </span>
+                            </a>
+                        </article>
+                    @empty
+                        <div class="student-notif-empty">
+                            <p class="student-notif-empty-title">No new notifications</p>
+                            <p class="student-notif-empty-copy">You're all caught up for now.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="student-notif-section is-hidden" id="studentNotifHistorySection">
+                <div class="student-notif-list">
+                    @forelse($studentNotificationHistory as $notification)
+                        <article class="student-notif-item {{ !empty($notification['is_unread']) ? 'is-unread' : '' }}">
+                            <a href="{{ route('student.notifications.open', ['notificationId' => $notification['id']]) }}" class="student-notif-item-link">
+                                <span class="student-notif-dot {{ !empty($notification['is_unread']) ? '' : 'is-read' }}" aria-hidden="true"></span>
+                                <span class="student-notif-content">
+                                    <span class="student-notif-item-title">
+                                        {{ $notification['message'] ?? 'Notification available.' }}
+                                        @if(empty($notification['is_unread']))
+                                            <span class="student-notif-chip">Read</span>
+                                        @endif
+                                    </span>
+                                    <span class="student-notif-item-time">{{ $notification['time'] ?? 'Just now' }}</span>
+                                </span>
+                            </a>
+                        </article>
+                    @empty
+                        <div class="student-notif-empty">
+                            <p class="student-notif-empty-title">No notification history yet</p>
+                            <p class="student-notif-empty-copy">As notifications come in, they will appear here.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </section>
     </div>
 
     @if(
@@ -1694,6 +2143,15 @@
             const studentQuickActionsWrap = document.querySelector('.student-quick-actions-fab-wrap');
             const themeToggleBtn = document.getElementById('themeToggleBtn');
             const studentAccessibilityLaunch = document.getElementById('studentAccessibilityLaunch');
+            const studentNotifPanel = document.getElementById('studentNotifPanel');
+            const studentNotifToggleBtn = document.getElementById('studentNotifToggleBtn');
+            const studentNotifCloseBtn = document.getElementById('studentNotifCloseBtn');
+            const studentNotifActionsToggle = document.getElementById('studentNotifActionsToggle');
+            const studentNotifActionsMenu = document.getElementById('studentNotifActionsMenu');
+            const studentNotifHistoryBtn = document.getElementById('studentNotifHistoryBtn');
+            const studentNotifBackBtn = document.getElementById('studentNotifBackBtn');
+            const studentNotifUnreadSection = document.getElementById('studentNotifUnreadSection');
+            const studentNotifHistorySection = document.getElementById('studentNotifHistorySection');
             const storageKey = 'student_theme';
 
             function forceAccessibilityButtonTheme() {
@@ -1718,6 +2176,57 @@
                 });
             }
 
+            function closeStudentNotifActionsMenu() {
+                if (!studentNotifActionsToggle || !studentNotifActionsMenu) {
+                    return;
+                }
+
+                studentNotifActionsToggle.setAttribute('aria-expanded', 'false');
+                studentNotifActionsMenu.classList.remove('is-open');
+            }
+
+            function showStudentUnreadNotifications() {
+                if (!studentNotifUnreadSection || !studentNotifHistorySection || !studentNotifBackBtn) {
+                    return;
+                }
+
+                studentNotifUnreadSection.classList.remove('is-hidden');
+                studentNotifHistorySection.classList.add('is-hidden');
+                studentNotifBackBtn.classList.remove('is-visible');
+            }
+
+            function showStudentNotificationHistory() {
+                if (!studentNotifUnreadSection || !studentNotifHistorySection || !studentNotifBackBtn) {
+                    return;
+                }
+
+                studentNotifUnreadSection.classList.add('is-hidden');
+                studentNotifHistorySection.classList.remove('is-hidden');
+                studentNotifBackBtn.classList.add('is-visible');
+            }
+
+            function closeStudentNotifPanel() {
+                if (!studentNotifPanel || !studentNotifToggleBtn) {
+                    return;
+                }
+
+                studentNotifPanel.classList.remove('is-open');
+                studentNotifToggleBtn.setAttribute('aria-expanded', 'false');
+                closeStudentNotifActionsMenu();
+                showStudentUnreadNotifications();
+            }
+
+            function openStudentNotifPanel() {
+                if (!studentNotifPanel || !studentNotifToggleBtn) {
+                    return;
+                }
+
+                studentNotifPanel.classList.add('is-open');
+                studentNotifToggleBtn.setAttribute('aria-expanded', 'true');
+                closeStudentNotifActionsMenu();
+                showStudentUnreadNotifications();
+            }
+
             if (navToggle && navList) {
                 const closeMobileMenu = () => navList.classList.remove('show');
                 const closeDropdowns = (exceptDropdown = null) => {
@@ -1732,6 +2241,10 @@
                             toggle.setAttribute('aria-expanded', 'false');
                         }
                     });
+
+                    if (!exceptDropdown || exceptDropdown !== studentQuickActionsWrap) {
+                        closeStudentNotifPanel();
+                    }
                 };
 
                 navToggle.addEventListener('click', () => {
@@ -1750,6 +2263,9 @@
                         closeDropdowns(isOpen ? null : dropdown);
                         dropdown.classList.toggle('is-open', !isOpen);
                         toggle.setAttribute('aria-expanded', (!isOpen).toString());
+                        if (isOpen) {
+                            closeStudentNotifPanel();
+                        }
                     });
                 });
 
@@ -1789,6 +2305,67 @@
                     }
                 });
             }
+
+            if (studentNotifToggleBtn) {
+                studentNotifToggleBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    if (studentQuickActionsWrap) {
+                        studentQuickActionsWrap.classList.add('is-open');
+                    }
+
+                    if (studentNotifPanel && studentNotifPanel.classList.contains('is-open')) {
+                        closeStudentNotifPanel();
+                        return;
+                    }
+
+                    openStudentNotifPanel();
+                });
+            }
+
+            if (studentNotifCloseBtn) {
+                studentNotifCloseBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    closeStudentNotifPanel();
+                });
+            }
+
+            if (studentNotifActionsToggle && studentNotifActionsMenu) {
+                studentNotifActionsToggle.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const willOpen = !studentNotifActionsMenu.classList.contains('is-open');
+                    studentNotifActionsMenu.classList.toggle('is-open', willOpen);
+                    studentNotifActionsToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+                });
+            }
+
+            if (studentNotifHistoryBtn) {
+                studentNotifHistoryBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    showStudentNotificationHistory();
+                    closeStudentNotifActionsMenu();
+                });
+            }
+
+            if (studentNotifBackBtn) {
+                studentNotifBackBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    showStudentUnreadNotifications();
+                });
+            }
+
+            document.addEventListener('click', (event) => {
+                if (!studentNotifPanel || !studentNotifActionsMenu || !studentNotifActionsToggle) {
+                    return;
+                }
+
+                const clickedInsideActions = studentNotifActionsMenu.contains(event.target) || studentNotifActionsToggle.contains(event.target);
+                if (!clickedInsideActions) {
+                    closeStudentNotifActionsMenu();
+                }
+            });
 
             function setTheme(theme) {
                 const normalizedTheme = theme === 'dark' ? 'dark' : 'light';

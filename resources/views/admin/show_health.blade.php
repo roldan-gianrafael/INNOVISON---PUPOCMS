@@ -16,9 +16,9 @@
         align-items: center;
         gap: 8px;
         border-radius: 999px;
-        min-height: 42px;
-        padding: 10px 16px;
-        font-size: 13px;
+        min-height: 38px;
+        padding: 0 14px;
+        font-size: 12px;
         font-weight: 800;
         color: #ffffff;
         background: linear-gradient(135deg, #70131B, #8f2230);
@@ -133,11 +133,11 @@
             <div class="profile-head-actions">
                 <a href="{{ route('admin.medical_assessment', $profile->id) }}" class="profile-top-btn">
                     <x-outline-icon name="clipboard-document-list" />
-                    Medical Assessment
+                    Assess
                 </a>
                 <a href="{{ route('admin.health_records') }}" class="profile-top-btn">
                     <x-outline-icon name="arrow-left-on-rectangle" />
-                    Back to Health Records
+                    Back
                 </a>
             </div>
         </div>

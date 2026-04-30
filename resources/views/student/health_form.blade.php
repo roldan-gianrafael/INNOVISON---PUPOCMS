@@ -369,20 +369,24 @@
                             <strong>{{ old('full_name', $prefill['full_name'] ?? $user->name) }}</strong>
                         </div>
                         <div class="readonly-item">
-                            <small>Email</small>
-                            <strong>{{ old('email', $prefill['email'] ?? $user->email) }}</strong>
+                            <small>Course</small>
+                            <input
+                                type="text"
+                                name="course_college"
+                                class="form-control"
+                                readonly
+                                required
+                                value="{{ old('course_college', $prefill['course_college'] ?? $user->course) }}"
+                                style="margin-top: 2px;"
+                            >
                         </div>
                         <div class="readonly-item">
-                            <small>Course</small>
-                            <strong>{{ old('course_college', $prefill['course_college'] ?? $user->course) }}</strong>
+                            <small>Email</small>
+                            <strong>{{ old('email', $prefill['email'] ?? $user->email) }}</strong>
                         </div>
                     </div>
 
                     <div class="step-one-grid">
-                        <div class="form-field">
-                            <label class="form-label">Course / College <span class="required">*</span></label>
-                            <input type="text" name="course_college" class="form-control" readonly required value="{{ old('course_college', $prefill['course_college'] ?? '') }}">
-                        </div>
                         <div class="form-field">
                             <label class="form-label">Student Number <span class="required">*</span></label>
                             <input type="text" name="student_number" class="form-control" readonly required value="{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}">

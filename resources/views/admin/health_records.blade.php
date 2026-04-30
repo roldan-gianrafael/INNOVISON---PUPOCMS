@@ -186,7 +186,7 @@
         display: flex;
         align-items: center;
         width: 100%;
-        height: 40px;
+        height: 60px;
         box-sizing: border-box;
         padding: 15px 24px !important;
         border-radius: 12px;

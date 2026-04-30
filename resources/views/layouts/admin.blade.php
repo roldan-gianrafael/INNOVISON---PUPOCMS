@@ -3592,7 +3592,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
       </a>
       <a href="{{ route('admin.health_records') }}" class="nav-health {{ (request()->routeIs('admin.health_records') || Request::is('health-records') || Request::is('health-profile/*')) ? 'active' : '' }}">
     <span class="sidebar-short"><x-outline-icon name="document-text" /></span>
-    <span class="sidebar-label">Student Health Form</span>
+    <span class="sidebar-label">Health Records</span>
     </a>
       @if($isAdminLike)
           <a href="{{ $userManagementUrl }}" class="nav-users {{ (request()->routeIs('admin.user-management*') || Request::is('admin/user-management*')) ? 'active' : '' }}">

@@ -21,7 +21,7 @@
         margin-bottom: 16px;
         border-left: 4px solid #8B0000;
     }
-    .patient-header-name { margin: 0 0 6px; font-size: 20px; font-weight: 800; color: #ffffff; }
+    .patient-header-name { margin: 0 0 6px; font-size: 20px; font-weight: 800; text-color: #ffffff; }
     .badge-chip {
         display: inline-flex;
         align-items: center;
@@ -41,6 +41,7 @@
     }
     .patient-date-right {
         text-align: right;
+        color: #86efac
     }
     .patient-date-label {
         display: block;

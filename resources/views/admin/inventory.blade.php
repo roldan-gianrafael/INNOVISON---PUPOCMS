@@ -314,29 +314,55 @@
         justify-content: center; 
         align-items: center; 
     }
-    .modal-box { 
-       background: rgba(0, 0, 0, 0.4) !important;
-        padding: 24px; 
+    .modal-box {
+        background: rgba(255, 255, 255, 0.48) !important;
         width: 760px;
         max-width: 94vw;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-top: 4px solid #66ff00 !important;
+        border-top: 4px solid #70131B !important;
         border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
         backdrop-filter: blur(8px) !important;
         -webkit-backdrop-filter: blur(8px) !important;
-     }
+        box-shadow: 0 24px 46px rgba(15, 23, 42, 0.24);
+        overflow: hidden;
+        padding: 0;
+    }
+    .inventory-modal-head {
+        padding: 16px 20px;
+        background: #70131B;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    .inventory-modal-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+    .inventory-modal-copy {
+        margin: 4px 0 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .inventory-modal-body {
+        padding: 18px 20px 20px;
+    }
     .modal-form-grid { 
         display: grid; 
         grid-template-columns: 1fr 1fr; 
         gap: 18px; 
-        
     }
     .modal-form-panel {
-        border: 1px solid #e5e7eb;
+        border: 1px solid rgba(112, 19, 27, 0.16);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.72);
         padding: 16px;
-       
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.84),
+            0 8px 18px rgba(112, 19, 27, 0.06);
     }
     .modal-panel-title {
         margin: 0 0 14px;
@@ -345,8 +371,42 @@
         color: #70131B;
     }
     .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600; color: #111827; }
-    .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; color: #111827; }
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .form-control,
+    .form-select {
+        width: 100%;
+        min-height: 46px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid #d1d5db;
+        color: #111827;
+        background: #f8fafc;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: rgba(127, 29, 45, 0.5);
+        box-shadow: 0 0 0 0.18rem rgba(127, 29, 45, 0.12);
+    }
+    .inventory-subgroup {
+        display: none;
+        border-left: 3px solid #8B0000;
+        padding-left: 15px;
+        margin-bottom: 15px;
+    }
+    .modal-actions-row {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
 
     @media (max-width: 760px) {
         .modal-form-grid {
@@ -424,19 +484,31 @@
     }
 
     html[data-theme="dark"] .modal-box {
-        background: linear-gradient(180deg, rgba(31, 12, 18, 0.98), rgba(20, 8, 12, 0.98));
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, rgba(31, 12, 18, 0.94), rgba(20, 8, 12, 0.94));
+        border-left: 1px solid rgba(250, 204, 21, 0.2) !important;
+        border-right: 1px solid rgba(250, 204, 21, 0.2) !important;
+        border-top: 4px solid #facc15 !important;
+        border-bottom: 4px solid #facc15 !important;
         box-shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
     }
 
-    html[data-theme="dark"] #modalTitle,
+    html[data-theme="dark"] .inventory-modal-head {
+        background: #4d0d17;
+        border-bottom-color: rgba(250, 204, 21, 0.2);
+    }
+
+    html[data-theme="dark"] .inventory-modal-title,
     html[data-theme="dark"] .modal-panel-title {
         color: #ffffff !important;
     }
 
+    html[data-theme="dark"] .inventory-modal-copy {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
     html[data-theme="dark"] .modal-form-panel {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.10);
+        background: rgba(15, 23, 42, 0.42);
+        border-color: rgba(148, 163, 184, 0.24);
     }
 
     html[data-theme="dark"] .form-group label {
@@ -444,14 +516,21 @@
     }
 
     html[data-theme="dark"] .form-control,
+    html[data-theme="dark"] .form-select,
     html[data-theme="dark"] .form-control option {
-        background: rgba(18, 8, 12, 0.94);
+        background: rgba(18, 8, 12, 0.82);
         color: #ffffff !important;
-        border-color: rgba(255, 255, 255, 0.14);
+        border-color: rgba(148, 163, 184, 0.34);
     }
 
     html[data-theme="dark"] .form-control::placeholder {
         color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .form-control:focus,
+    html[data-theme="dark"] .form-select:focus {
+        border-color: rgba(250, 204, 21, 0.58);
+        box-shadow: 0 0 0 0.18rem rgba(250, 204, 21, 0.18);
     }
 
     html[data-theme="dark"] #medicineFields,
@@ -611,93 +690,98 @@
     @if($canManageInventory)
         <div id="itemModal" class="modal-overlay">
             <div class="modal-box">
-                <h3 id="modalTitle" style="margin-top:0; color:#8B0000;">Add New Item</h3>
-                
+                <div class="inventory-modal-head">
+                    <h3 id="modalTitle" class="inventory-modal-title">Add New Item</h3>
+                    <p class="inventory-modal-copy">Provide inventory details and save to update clinic stock records.</p>
+                </div>
+
                 <form id="itemForm" method="POST" action="{{ url('/admin/inventory/store') }}">
-                    @csrf
-                    <div id="methodField"></div> 
+                    <div class="inventory-modal-body">
+                        @csrf
+                        <div id="methodField"></div>
 
-                    <div class="modal-form-grid">
-                        <div class="modal-form-panel">
-                            <h4 class="modal-panel-title">Item Information</h4>
+                        <div class="modal-form-grid">
+                            <div class="modal-form-panel">
+                                <h4 class="modal-panel-title">Item Information</h4>
 
-                            <div class="form-group">
-                                <label>Item Name</label>
-                                <input name="name" id="iName" class="form-control" required placeholder="e.g. Paracetamol">
-                            </div>
-
-                            <div class="form-group">
-                                <label>Category</label>
-                                <select name="category" id="iCategory" class="form-control" onchange="toggleMedicineFields()">
-                                    <option value="Medicine">Medicine</option>
-                                    <option value="Equipment">Equipment</option>
-                                    <option value="Supplies">Supplies</option>
-                                </select>
-                            </div>
-
-                            <div id="medicineFields" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">
                                 <div class="form-group">
-                                    <label>Medicine Type</label>
-                                    <select name="medicine_type" id="iMedicineType" class="form-control">
-                                        <option value="">-- Select Type --</option>
-                                        <option value="Antibiotic">Antibiotic</option>
-                                        <option value="Asthma">For Asthma</option>
-                                        <option value="Analgesic">Analgesic</option>
-                                        <option value="Antipyretic">Antipyretic</option>
-                                        <option value="Others">Others</option>
+                                    <label>Item Name</label>
+                                    <input name="name" id="iName" class="form-control" required placeholder="e.g. Paracetamol">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select name="category" id="iCategory" class="form-control" onchange="toggleMedicineFields()">
+                                        <option value="Medicine">Medicine</option>
+                                        <option value="Equipment">Equipment</option>
+                                        <option value="Supplies">Supplies</option>
                                     </select>
                                 </div>
+
+                                <div id="medicineFields" class="inventory-subgroup">
+                                    <div class="form-group">
+                                        <label>Medicine Type</label>
+                                        <select name="medicine_type" id="iMedicineType" class="form-control">
+                                            <option value="">-- Select Type --</option>
+                                            <option value="Antibiotic">Antibiotic</option>
+                                            <option value="Asthma">For Asthma</option>
+                                            <option value="Analgesic">Analgesic</option>
+                                            <option value="Antipyretic">Antipyretic</option>
+                                            <option value="Others">Others</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                             </div>
 
-                        </div>
+                            <div class="modal-form-panel">
+                                <h4 class="modal-panel-title">Stock Details</h4>
 
-                        <div class="modal-form-panel">
-                            <h4 class="modal-panel-title">Stock Details</h4>
-
-                            <div class="form-group">
-                                <label>Quantity</label>
-                                <input type="number" name="quantity" id="iQty" class="form-control" required min="0">
-                            </div>
-
-                            <div class="form-group">
-                                <label>Unit</label>
-                                <input type="text" name="unit" id="iUnit" class="form-control" list="inventoryUnitSuggestions" required placeholder="e.g. pcs, box, bottle, vial">
-                                <datalist id="inventoryUnitSuggestions">
-                                    <option value="pcs">
-                                    <option value="box">
-                                    <option value="bottle">
-                                    <option value="vial">
-                                    <option value="ampule">
-                                    <option value="tablet">
-                                    <option value="capsule">
-                                    <option value="pack">
-                                    <option value="set">
-                                    <option value="tube">
-                                    <option value="sachet">
-                                    <option value="roll">
-                                    <option value="pair">
-                                    <option value="ml">
-                                    <option value="mg">
-                                </datalist>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Date Added</label>
-                                <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
-                            </div>
-
-                            <div id="medicineExpiryField" style="display: none; border-left: 3px solid #8B0000; padding-left: 15px; margin-bottom: 15px;">
                                 <div class="form-group">
-                                    <label>Expiration Date</label>
-                                    <input type="date" name="expiration_date" id="iExpDate" class="form-control">
+                                    <label>Quantity</label>
+                                    <input type="number" name="quantity" id="iQty" class="form-control" required min="0">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Unit</label>
+                                    <input type="text" name="unit" id="iUnit" class="form-control" list="inventoryUnitSuggestions" required placeholder="e.g. pcs, box, bottle, vial">
+                                    <datalist id="inventoryUnitSuggestions">
+                                        <option value="pcs">
+                                        <option value="box">
+                                        <option value="bottle">
+                                        <option value="vial">
+                                        <option value="ampule">
+                                        <option value="tablet">
+                                        <option value="capsule">
+                                        <option value="pack">
+                                        <option value="set">
+                                        <option value="tube">
+                                        <option value="sachet">
+                                        <option value="roll">
+                                        <option value="pair">
+                                        <option value="ml">
+                                        <option value="mg">
+                                    </datalist>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Date Added</label>
+                                    <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
+                                </div>
+
+                                <div id="medicineExpiryField" class="inventory-subgroup">
+                                    <div class="form-group">
+                                        <label>Expiration Date</label>
+                                        <input type="date" name="expiration_date" id="iExpDate" class="form-control">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                        <button type="button" class="inventory-btn-cancel" onclick="closeModal()">Cancel</button>
-                        <button type="submit" class="btn-add">Save Item</button>
+                        <div class="modal-actions-row">
+                            <button type="button" class="inventory-btn-cancel" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn-add">Save Item</button>
+                        </div>
                     </div>
                 </form>
             </div>

@@ -495,7 +495,7 @@
                                     <option value="{{ $bloodType }}" {{ $selectedBloodType === $bloodType ? 'selected' : '' }}>{{ $bloodType }}</option>
                                 @endforeach
                             </select>
-                            <p class="field-helper">Type NONE if nothing to add.</p>
+                            <p class="field-helper">Select Unknownif nothing to add.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Contact Number <span class="required">*</span></label>

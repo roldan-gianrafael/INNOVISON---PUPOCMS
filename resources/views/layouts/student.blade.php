@@ -1513,6 +1513,21 @@
                 margin-left: 0;
                 width: 100%;
                 justify-content: center;
+                background: #7f1d2d;
+                border-color: #6b1324;
+                color: #ffffff;
+            }
+
+            .nav-list li .logout-btn:hover,
+            .nav-list li .logout-btn:focus-visible {
+                background: #6b1324;
+                border-color: #5a0f1d;
+                color: #ffffff;
+            }
+
+            .nav-list li .logout-btn svg {
+                color: #ffffff;
+                stroke: currentColor;
             }
 
             main table {

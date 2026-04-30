@@ -822,7 +822,7 @@
             <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #dc3545;">
                 <div class="health-summary-row">
                     <small class="text-muted fw-bold text-uppercase health-summary-label"><span>With Medical</span><span>Conditions</span></small>
-                    <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_illness', 'Yes')->count() }}</h3>
+                    <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_disability', 'Yes')->count() }}</h3>
                 </div>
             </div>
         </div>
@@ -870,7 +870,7 @@
                     
                     {{-- Column 1: Medical Condition Status --}}
                     <td>
-                        @if($record->has_illness == 'Yes')
+                        @if($record->has_disability == 'Yes')
                             <span class="status review">With Condition</span>
                         @else
                             <span class="status submitted">No Condition</span>

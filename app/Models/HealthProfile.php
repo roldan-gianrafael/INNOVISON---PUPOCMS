@@ -13,13 +13,10 @@ class HealthProfile extends Model
         'height', 'weight',
         'age', 'sex', 'civil_status', 'course_college', 
         'blood_type', 'guardian_name', 'landline', 'cellphone',
-        'has_illness', 'medical_history', 'other_illness', 
         'chest_xray_result',
         'has_disability', 'disability_type',
         'pwd_id_proof',
-        'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies',
-        'medical_certificate', 'medical_certificate_issued_by',
-        'is_smoker', 'is_drinker', 'vaccine_history', 'digital_signature', 'clearance_status',
+        'medical_certificate', 'clearance_status',
         'clearance_signature_snapshot_path',
         'pending_reason',
         'verified_at',
@@ -29,12 +26,7 @@ class HealthProfile extends Model
         
     ];
 
-    // NAPAKA-IMPORTANTE: Para kusa nang maging array ang JSON columns mo
     protected $casts = [
-        'medical_history' => 'array',
-        'medicine_allergies' => 'array',
-        'vaccine_history' => 'array',
-        'no_allergies' => 'boolean',
         'puptas_synced_at' => 'datetime',
 
     ];

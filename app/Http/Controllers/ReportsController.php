@@ -376,7 +376,7 @@ class ReportsController extends Controller
                     return $form->verified_at ?? $form->created_at;
                 })->values();
 
-                $withConditionCount = $forms->where('has_illness', 'Yes')->count();
+                $withConditionCount = $forms->where('has_disability', 'Yes')->count();
                 $issuedCount = $forms->count();
 
                 return (object) [
@@ -421,7 +421,7 @@ class ReportsController extends Controller
 
         $totalIssued = (clone $summaryQuery)->count();
         $totalCourses = $issuedFormsCollection->count();
-        $issuedWithConditions = (clone $summaryQuery)->where('has_illness', 'Yes')->count();
+        $issuedWithConditions = (clone $summaryQuery)->where('has_disability', 'Yes')->count();
         $topCourse = optional($issuedFormsCollection->first())->course ?? 'No course data yet';
 
         return view('admin.reports.health-forms', compact(
@@ -685,7 +685,7 @@ public function printReport(Request $request)
                     return $form->verified_at ?? $form->created_at;
                 })->values();
 
-                $withConditionCount = $forms->where('has_illness', 'Yes')->count();
+                $withConditionCount = $forms->where('has_disability', 'Yes')->count();
                 $issuedCount = $forms->count();
 
                 return (object) [

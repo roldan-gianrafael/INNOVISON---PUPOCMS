@@ -37,8 +37,8 @@
             <h3>Sign Student Health Clearance</h3>
             <p style="font-size: 13px; color: #64748b;">Review medical profile and finalize clearance.</p>
         </div>
-        <span class="status-badge {{ $record->has_illness == 'Yes' ? 'bg-danger text-white' : 'bg-success text-white' }}">
-            {{ $record->has_illness == 'Yes' ? 'With Condition' : 'No Condition' }}
+        <span class="status-badge {{ $record->has_disability == 'Yes' ? 'bg-danger text-white' : 'bg-success text-white' }}">
+            {{ $record->has_disability == 'Yes' ? 'With Condition' : 'No Condition' }}
         </span>
     </div>
 
@@ -64,26 +64,13 @@
         </div>
     </div>
 
-    @if($record->has_illness == 'Yes')
+    @if($record->has_disability == 'Yes')
     <div class="medical-alert" style="background-color: #fef2f2; border-left: 4px solid #b91c1c; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
         <h6 style="color: #b91c1c; font-weight: 800; font-size: 13px; margin-bottom: 5px;">
-            <i class="fas fa-exclamation-triangle me-1"></i> DECLARED MEDICAL CONDITION/S:
+            <i class="fas fa-exclamation-triangle me-1"></i> DECLARED CONDITION:
         </h6>
         <p style="margin: 0; font-size: 14px; color: #334155; font-weight: 600;">
-            @php
-  
-                $history = is_array($record->medical_history) 
-                           ? $record->medical_history 
-                           : json_decode($record->medical_history ?? '[]', true);
-            @endphp
-
-            @if(!empty($history))
-                {{ implode(', ', $history) }}
-            @endif
-
-            @if($record->other_illness)
-                {{ !empty($history) ? ', ' : '' }} {{ $record->other_illness }}
-            @endif
+            {{ $record->disability_type ?: 'PWD' }}
         </p>
     </div>
 @endif

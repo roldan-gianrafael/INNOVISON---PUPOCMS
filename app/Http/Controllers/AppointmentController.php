@@ -10,7 +10,6 @@ use App\Models\HealthProfile;
 use App\Models\User;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class AppointmentController extends Controller
@@ -1323,23 +1322,11 @@ public function storeHealthForm(Request $request)
                 'guardian_name'      => $request->guardian_name,
                 'landline'           => $request->landline,
                 'cellphone'          => $request->cellphone,
-                'has_illness'        => null,
-                'medical_history'    => null,
-                'other_illness'      => null,
                 'chest_xray_result'  => $chestXrayPath,
                 'has_disability'     => $request->has_disability,
                 'disability_type'    => $request->disability_type,
                 'pwd_id_proof'       => $pwdIdProofPath,
-                'food_allergies'      => null,
-                'no_allergies'        => null,
-                'medicine_allergies'  => null,
-                'other_med_allergies' => null,
                 'medical_certificate' => $medicalCertificatePath,
-                'medical_certificate_issued_by' => null,
-                'vaccine_history' => null,
-                'digital_signature'  => null,
-                'is_smoker'          => null,
-                'is_drinker'         => null,
             ]
         );
 

@@ -109,18 +109,7 @@
     $studentRole = \App\Models\Appointment::normalizeUserType($profile->user->user_role ?? $profile->user->user_type ?? 'Student');
 @endphp
 <div class="assessment-wrap">
-    <div class="assessment-card">
-        <div class="assessment-head">
-            <div>
-                <h1 class="assessment-title">Medical Assessment</h1>
-                <p class="assessment-sub">Enter on-site clinic assessment details for this student.</p>
-            </div>
-            <a href="{{ route('admin.show_health', $profile->id) }}" class="assessment-back">
-                <x-outline-icon name="arrow-left-on-rectangle" />
-                Back to Health Profile
-            </a>
-        </div>
-    </div>
+    
 
     <div class="assessment-card">
         <div class="patient-header">

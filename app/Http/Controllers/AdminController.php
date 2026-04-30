@@ -1235,7 +1235,7 @@ public function showSignPage($id)
 {
     if (!$this->canSignHealthClearance()) {
         return redirect()->route('admin.health_records')
-            ->with('error', 'Only Nurse Joyce or Super Admin can e-sign health records.');
+            ->with('error', 'Only authorized clinic officers can verify and approve health records.');
     }
 
     // Ginaya ko ang variable name na $record para tugma sa blade na binigay ko kanina
@@ -1248,7 +1248,7 @@ public function updateClearance(Request $request, $id)
 {
     if (!$this->canSignHealthClearance()) {
         return redirect()->route('admin.health_records')
-            ->with('error', 'Only Nurse Joyce or Super Admin can e-sign health records.');
+            ->with('error', 'Only authorized clinic officers can verify and approve health records.');
     }
 
     $request->validate([
@@ -1265,11 +1265,8 @@ public function updateClearance(Request $request, $id)
     $record->pending_reason   = ($request->clearance_status === 'Issued') ? null : $request->pending_reason;
     $record->verified_at      = ($request->clearance_status === 'Issued') ? ($request->verified_at ?? now()) : null;
 
-    if ($request->clearance_status === 'Issued' && ($previousStatus !== 'Issued' || empty($record->clearance_signature_snapshot_path))) {
-        $currentSignaturePath = trim((string) Setting::query()->value('clearance_signature_path'));
-        $record->clearance_signature_snapshot_path = $currentSignaturePath !== ''
-            ? $currentSignaturePath
-            : 'health_profiles/signatures/nurse-sign.png';
+    if ($request->clearance_status !== 'Issued') {
+        $record->clearance_signature_snapshot_path = null;
     }
 
     if ($record->save()) {

@@ -912,7 +912,7 @@
                                 @if($canSignHealth)
                                     <a href="{{ route('admin.sign_page', $record->id) }}" class="btn-action btn-sign">
                                         <x-outline-icon name="pencil-square" />
-                                        Sign
+                                        Verify
                                     </a>
                                 @else
                                     <button class="btn-action btn-readonly" disabled>

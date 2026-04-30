@@ -1,399 +1,184 @@
 @extends('layouts.admin')
 
-@section('title', 'Health Information Form - Print')
+@section('title', 'Student Health Profile Review')
 
 @push('styles')
 <style>
-    /* --- PRINT SETTINGS --- */
-@media print {
-    header, footer, nav, .sidebar, .navbar, .no-print,
-    .admin-header, .sidebar-toggle, .sidebar-scroll-indicator,
-    .medicine-alert-fab, .medicine-alert-panel, .medicine-hover-hint,
-    .accessibility-launch-admin, .asw-menu-btn, .asw-widget, .asw-menu,
-    .asw-overlay, .profile-dropdown, .logout-link, aside,
-    .admin-layout > .sidebar {
-        display: none !important;
+    .doc-review-wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .doc-review-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); padding: 18px; }
+    .doc-review-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .doc-review-title { font-size: 20px; font-weight: 800; color: #0f172a; margin: 0; }
+    .doc-review-sub { font-size: 13px; color: #64748b; margin: 6px 0 0; }
+    .doc-btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 10px 14px; font-weight: 700; font-size: 13px; text-decoration: none; border: 1px solid transparent; }
+    .doc-btn-back { background: #e2e8f0; color: #1e293b; }
+    .doc-btn-verify { background: #70131b; color: #ffffff; }
+    .doc-meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .doc-meta-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; }
+    .doc-meta-k { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 4px; }
+    .doc-meta-v { font-size: 14px; color: #0f172a; font-weight: 700; word-break: break-word; }
+    .doc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .doc-file { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; background: #fff; }
+    .doc-file h4 { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: #1e293b; }
+    .doc-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .doc-link { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 10px; color: #1e293b; font-size: 12px; font-weight: 700; text-decoration: none; background: #fff; }
+    .doc-preview { width: 100%; height: 300px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; }
+    .doc-preview iframe, .doc-preview img { width: 100%; height: 100%; border: 0; object-fit: contain; background: #fff; }
+    .doc-missing { border: 1px dashed #cbd5e1; color: #64748b; border-radius: 8px; padding: 14px; font-size: 13px; font-weight: 600; background: #f8fafc; }
+
+    [data-theme="dark"] .doc-review-card,
+    [data-theme="dark"] .doc-file { background: #0f172a; border-color: #334155; box-shadow: none; }
+    [data-theme="dark"] .doc-review-title,
+    [data-theme="dark"] .doc-meta-v,
+    [data-theme="dark"] .doc-file h4 { color: #f8fafc; }
+    [data-theme="dark"] .doc-review-sub,
+    [data-theme="dark"] .doc-meta-k,
+    [data-theme="dark"] .doc-missing { color: #cbd5e1; }
+    [data-theme="dark"] .doc-meta-item { background: #111827; border-color: #334155; }
+    [data-theme="dark"] .doc-link { background: #111827; border-color: #475569; color: #f8fafc; }
+    [data-theme="dark"] .doc-btn-back { background: #1e293b; color: #f8fafc; }
+
+    @media (max-width: 1024px) { .doc-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 768px) {
+        .doc-grid { grid-template-columns: 1fr; }
+        .doc-meta { grid-template-columns: 1fr; }
     }
-
-    html, body {
-        background: white !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: visible !important;
-    }
-
-    body {
-        visibility: hidden !important;
-    }
-
-    .admin-layout,
-    .main {
-        display: block !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .print-container, .print-container * {
-        visibility: visible !important;
-    }
-
-    .print-container {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0.2in 0.5in !important;
-        box-shadow: none !important;
-        line-height: 1.2;
-        border: none !important;
-        max-width: none !important;
-        min-height: auto !important;
-        background: white !important;
-    }
-
-    .print-page {
-        display: block !important;
-        break-after: page;
-        page-break-after: always;
-        break-inside: avoid;
-    }
-
-    .print-page:last-child {
-        break-after: auto;
-        page-break-after: auto;
-    }
-
-    .screen-page-separator {
-        display: none !important;
-    }
-
-    /* 5. Force the page size and REMOVE default browser margins */
-    @page { 
-        size: 8.5in 13in; 
-        margin: 0 !important;
-    }
-}
-
-    .row { margin-bottom: 4px !important; }
-    .section-header { margin-top: 12px !important; }
-
-    /* --- SCREEN VIEW --- */
-    body { background-color: #e2e8f0; }
-
-    .print-container {
-        font-family: Arial, sans-serif;
-        color: #000;
-        background: #fff;
-        max-width: 8.5in; 
-        min-height: 13in; 
-        margin: 20px auto;
-        padding: 0.4in 0.5in;
-        box-shadow: 0 0 15px rgba(0,0,0,0.3);
-        position: relative;
-        box-sizing: border-box;
-    }
-
-    .header-section { display: flex; align-items: center; position: relative; margin-bottom: 8px; }
-    .logo { width: 80px; height: 80px; margin-right: 15px; margin-left: 50px;} /* Pinalaki rin ang logo konti */
-    .header-text p { margin: 0; line-height: 1.3; }
-    
-    /* Font Size Updates (+2) */
-    .univ-name { font-size: 15px; font-weight: bold; } /* From 13px */
-    .dept-name { font-size: 17px; font-weight: bold; } /* From 15px */
-
-    .photo-box {
-        position: absolute; right: 0; top: 0;
-        width: 150px; height: 130px;
-        border: 1px solid #000;
-        text-align: center; display: flex; align-items: center; justify-content: center;
-        overflow: hidden;
-    }
-    .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-
-    .form-title { text-align: center; font-weight: bold; font-style: italic; font-size: 16px; margin: 18px 0;  } /* From 14px */
-    .section-header { font-weight: bold; font-style: italic; margin-top: 12px; text-transform: uppercase; font-size: 13px; padding-left: 5px; } /* From 11px */
-
-    .row { display: flex; margin-bottom: 6px; gap: 10px; align-items: baseline; }
-    .field { border-bottom: 1px solid #000; flex: 1; padding-left: 5px; min-height: 18px; font-size: 14px; font-weight: bold; color: #000; } /* From 12px */
-    .label { font-weight: bold; white-space: nowrap; font-size: 13px; } /* From 11px */
-    .labels {  white-space: nowrap; font-size: 13px; } /* From 11px */
-
-    .checkbox-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 8px 0 8px 20px; }
-    .check-item { display: flex; align-items: center; gap: 6px; font-size: 12px; } /* From 10px */
-    .box-ui { width: 13px; height: 13px; border: 1px solid #000; display: inline-block; text-align: center; line-height: 12px; font-weight: bold; }
-
-    .vax-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    .vax-table th, .vax-table td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 12px; } /* From 10px */
-    
-    .cert-text { font-style: italic; font-size: 11px; text-align: justify; margin-top: 15px; line-height: 1.3; } /* From 9px */
-    .signature-row { display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-end; gap: 16px; }
-    .sig-block { flex: 1; width: auto; text-align: center; }
-    .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
-    /* --- I-update ang sig-line sa <style> section --- */
-.sig-line { 
-    border-bottom: 1px solid #000; /* Ginawang bottom border para sa ibabaw ang text */
-    font-size: 11px; 
-    font-weight: bold; 
-    text-transform: uppercase;
-    min-height: 15px;
-    margin-bottom: 2px;
-}
-    .sig-label {
-    font-size: 9px;
-    font-weight: bold;
-    color: #000;
-}
-
 </style>
 @endpush
 
 @section('content')
-<div class="no-print" style="text-align: right; padding: 10px; max-width: 8.5in; margin: auto;">
-    <a href="{{ route('admin.health_records') }}" class="btn" style="background: #64748b; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
-        BACK TO RECORDS
-    </a>
-    <a href="{{ route('admin.medical_assessment', $profile->id) }}" class="btn" style="background: #f59e0b; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
-        MEDICAL ASSESSMENT
-    </a>
-    <a href="#" class="btn" style="background: #533a0d; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-right: 10px;">
-        UPLOADED DOCUMENTS
-    </a>
-    <a href="{{ route('admin.show_health_plain', $profile->id) }}" target="_blank" rel="noopener" class="btn" style="display: inline-block; background: #800000; border: none; padding: 10px 25px; font-weight: bold; color: white; border-radius: 5px; cursor: pointer; text-decoration: none;">
-        OPEN FORM ONLY
-    </a>
+@php
+    $adminUser = auth('admin')->user();
+    $isSuperAdmin = strtolower((string) ($adminUser->user_role ?? '')) === 'superadmin';
+@endphp
 
-</div>
-
-<div class="print-container">
-    <div class="print-page">
-    <div class="header-section">
-        <img src="{{ asset('images/pup_logo.png') }}" class="logo">
-        <div class="header-text">
-            <p style="font-size: 9px;">Republic of the Philippines</p>
-            <p class="univ-name">POLYTECHNIC UNIVERSITY OF THE PHILIPPINES</p>
-            <p style="font-size: 10px;">Office of the Vice President for Administration</p>
-            <p class="dept-name">MEDICAL SERVICES DEPARTMENT</p>
-        </div>
-        <div class="photo-box">
-            @if($profile->student_photo)
-               <img src="{{ asset('storage/' . $profile->student_photo) }}" alt="Student Photo">
-            @else
-                <span style="font-size: 8px;">2x2 ID PHOTO</span>
-            @endif
-        </div>
-    </div>
-
-    <hr style="border: 0.5px solid #000;">
-
-    <div class="form-title">HEALTH INFORMATION FORM</div>
-
-    <div class="section-header">PART I. STUDENT INFORMATION</div>
-    <div class="row">
-        <span class="label">Name:</span> <div class="field">{{ $profile->user->name }}</div>
-        <span class="label">Student No.:</span> <div class="field">{{ $profile->user->student_number }}</div>
-    </div>
-    <div class="row">
-        <span class="label">Home Address:</span> <div class="field">{{ $profile->user->home_address ?? '' }}</div>
-        <span class="label">School Year:</span> <div class="field">{{ $profile->school_year ?? '2025-2026' }}</div>
-    </div>
-    <div class="row">
-        <span class="label">Height:</span> <div class="field">{{ $profile->height ?? 'N/A' }}</div>
-        <span class="label">Weight:</span> <div class="field">{{ $profile->weight ?? 'N/A' }}</div>
-    </div>
-    <div class="row">
-        <span class="label">Age:</span> <div class="field">{{ $profile->age ?? '' }}</div>
-        <span class="label">Sex:</span> <div class="field">{{ $profile->sex ?? '' }}</div>
-        <span class="label">Civil Status:</span> <div class="field">{{ $profile->civil_status ?? '' }}</div>
-        <span class="label">Course:</span> <div class="field">{{ $profile->course_college ?? '' }}</div>
-    </div>
-    <div class="row">
-        <span class="label">Blood Type:</span> <div class="field">{{ $profile->blood_type ?? 'N/A' }}</div>
-        <span class="label">Email:</span> <div class="field">{{ $profile->user->email }}</div>
-    </div>
-    <div class="row">
-        <span class="label">Parent/Guardian:</span> <div class="field">{{ $profile->guardian_name ?? '' }}</div>
-        <span class="label">Landline:</span> <div class="field">{{ $profile->landline ?? 'N/A' }}</div>
-        <span class="label">Cellphone:</span> <div class="field">{{ $profile->cellphone ?? '' }}</div>
-    </div>
-
-    <div class="section-header">PART II. MEDICAL HISTORY</div>
-    <div class="row" style="margin-left: 5px;">
-        <span>1. Known medical illness?</span>
-        <div class="check-item"><div class="box-ui">{{ $profile->has_illness == 'No' ? '/' : '' }}</div> No</div>
-        <div class="check-item"><div class="box-ui">{{ $profile->has_illness == 'Yes' ? '/' : '' }}</div> Yes</div>
-    </div>
-    
-    <div class="checkbox-grid">
-        @php
-            $illnesses = ['Asthma', 'Loss of Consciousness', 'Eye Disease/ Defect', 'Accident Injuries', 'Diabetes', 'Heart Disease', 'Kidney Disease', 'Tuberculosis', 'Convulsion/ Epilepsy', 'Hyperventilation', 'High Blood Pressure', 'Migraine'];
-            $saved_history = is_array($profile->medical_history) ? $profile->medical_history : json_decode($profile->medical_history ?? '[]', true);
-        @endphp
-        @foreach($illnesses as $illness)
-        <div class="check-item">
-            <div class="box-ui">{{ in_array($illness, $saved_history) ? '/' : '' }}</div> {{ $illness }}
-        </div>
-        @endforeach
-        <div class="check-item" style="grid-column: span 2;">Others: <div class="field">{{ $profile->other_illness ?? '' }}</div></div>
-    </div>
-
-    <div class="row">
-        <span>2. Do you have disability?</span>
-        <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'None' ? '/' : '' }}</div> None</div>
-        <div class="check-item"><div class="box-ui">{{ $profile->has_disability == 'Yes' ? '/' : '' }}</div> Yes:</div>
-        <div class="field">{{ $profile->disability_type ?? '' }}</div>
-    </div>
-
-    <div class="section-header">3. ALLERGIES & MEDICAL CONDITIONS</div>
-    <div class="row">
-        <span class="label">Food:</span> <div class="field">{{ $profile->food_allergies ?? 'None' }}</div>
-        <span class="label">No Known Allergies:</span> <div class="box-ui">{{ $profile->no_allergies ? '/' : '' }}</div>
-    </div>
-    <div class="row px-4">
-        <span class="label">Medicines:</span>
-        @php
-            $meds_list = ['Aspirin', 'Ibuprofen', 'Amoxicillin', 'Mefenamic Acid', 'Penicillin'];
-            $saved_meds = is_array($profile->medicine_allergies) ? $profile->medicine_allergies : json_decode($profile->medicine_allergies ?? '[]', true);
-        @endphp
-        @foreach($meds_list as $med)
-            <div class="check-item">
-                <div class="box-ui">{{ in_array($med, $saved_meds) ? '/' : '' }}</div> {{ $med }}
+<div class="doc-review-wrap">
+    <div class="doc-review-card">
+        <div class="doc-review-head">
+            <div>
+                <h1 class="doc-review-title">Student Health Upload Review</h1>
+                <p class="doc-review-sub">Review uploaded files before verification/approval.</p>
             </div>
-        @endforeach
-    </div>
-
-    <div class="section-header">PART III. PERSONAL SOCIAL HISTORY</div>
-    <div class="row" style="margin-top: 5px;">
-    <span class="labels">Cigarette Smoking :</span>
-    <div class="check-item" style="margin-left: 10px;">
-        <div class="box-ui">{{ ($profile->is_smoker ?? '') == 'Yes' ? '/' : '' }}</div> Yes
-    </div>
-    <div class="check-item">
-        <div class="box-ui">{{ ($profile->is_smoker ?? '') == 'No' ? '/' : '' }}</div> No
-    </div>
-</div>
-
-<div class="row">
-    <span class="labels">Alcohol Drinking:</span>
-    <div class="check-item" style="margin-left: 24px;">
-        <div class="box-ui">{{ ($profile->is_drinker ?? '') == 'Yes' ? '/' : '' }}</div> Yes
-    </div>
-    <div class="check-item">
-        <div class="box-ui">{{ ($profile->is_drinker ?? '') == 'No' ? '/' : '' }}</div> No
-    </div>
-</div>
-
-    <div class="row">
-        <div style="flex: 1;">
-            <span class="label">COVID-19 Vaccination History:</span><br>
-            <small>.</small>
-        </div>
-        <table class="vax-table" style="width: 65%;">
-            @php $vax = is_array($profile->vaccine_history) ? $profile->vaccine_history : json_decode($profile->vaccine_history ?? '[]', true); @endphp
-            <thead><tr><th>Dose</th><th>Date Received</th><th>Brand</th></tr></thead>
-            <tbody>
-                <tr><td>1st Dose</td><td>{{ $vax['dose1']['date'] ?? '' }}</td><td>{{ $vax['dose1']['brand'] ?? '' }}</td></tr>
-                <tr><td>2nd Dose</td><td>{{ $vax['dose2']['date'] ?? '' }}</td><td>{{ $vax['dose2']['brand'] ?? '' }}</td></tr>
-                <tr><td>Booster 1</td><td>{{ $vax['booster1']['date'] ?? '' }}</td><td>{{ $vax['booster1']['brand'] ?? '' }}</td></tr>
-                <tr><td>Booster 2</td><td>{{ $vax['booster2']['date'] ?? '' }}</td><td>{{ $vax['booster2']['brand'] ?? '' }}</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="cert-text">
-        I hereby certify that the medical health information given to PUP Medical Services are true, correct and fully disclosed to the best of
-my knowledge and all the medical condition that may affect in the assessment for purpose of consultation/ issuance of medical
-clearance/ certificate as a student of PUP.
-    </div>
-<div class="cert-text">
-        I also understand that the PUP MSD and university will not be liable for any untoward incident that may arise due to any failure to
-disclose accurate information or intentionally providing false and deceptive information.
-    </div>
-    <div class="cert-text">
-        In compliance with the Data Privacy Act of 2012 and its IRR, I voluntarily consent to the collection, processing and storage of my
-personal and health information for the purpose/s of health assessment/ treatment/ or research following research ethics guidelines
-for the improvement of healthcare services.
-    </div>
-
-
-
-    <div class="signature-row">
-    {{-- Parent Signature Block --}}
-    <div class="sig-block">
-        <div style="height: 60px;"></div>
-        <div class="sig-line">Parent/Guardian Signature</div>
-    </div>
-
-    {{-- Student Signature Block --}}
-    <div class="sig-block">
-        @if($profile->digital_signature)
-            <img src="{{ asset('storage/' . $profile->digital_signature) }}" class="sig-image" style="height: 60px; width: auto;">
-        @else
-            <div style="height: 60px;"></div>
-        @endif
-        
-        <div class="sig-line">{{ strtoupper($profile->user->name ?? '') }}</div>
-        <div style="font-size: 8px;">Student Digital Signature</div>
-    </div>
-
-    {{-- Date Signed Block --}}
-    <div class="sig-block">
-        <div style="padding-bottom: 5px; font-weight: bold; height: 60px; display: flex; align-items: flex-end; justify-content: center;">
-            {{ $profile->created_at ? $profile->created_at->format('m/d/Y') : date('m/d/Y') }}
-        </div>
-        <div class="sig-line">Date Signed</div>
-    </div>
-</div>
-
-    <div style="display: block; width: 100%; clear: both; border: 2px solid #000; margin-top: 28px; padding: 15px; position: relative;">
-        <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
-        
-        <div class="row" style="display: flex; align-items: center; gap: 15px;">
-            <span style="font-weight: bold;">Medical Clearance:</span>
-            
-            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
-                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
-                    {{ $profile->clearance_status == 'Issued' ? '✔' : '' }}
-                </div> 
-                Issued
-            </div>
-
-            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
-                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
-                    {{ in_array($profile->clearance_status, ['Pending', 'For Verification'], true) ? '✔' : '' }}
-                </div> 
-                For Verification, Reason: 
-                <div class="field" style="border-bottom: 1px solid #000; min-width: 150px; padding-left: 5px; font-size: 12px; font-style: italic;">
-                    {{ in_array($profile->clearance_status, ['Pending', 'For Verification'], true) ? $profile->pending_reason : '' }}
-                </div>
-            </div>
-        </div>
-
-        <div class="row" style="margin-top: 25px; display: flex; align-items: flex-end; justify-content: space-between; gap: 28px;">
-            <div style="flex: 0 0 220px; max-width: 220px;">
-                <div class="field" style="border-bottom: 1px solid #000; text-align: center; font-weight: bold; min-height: 20px;">
-                    {{ $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : date('m/d/Y') }}
-                </div>
-                <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
-            </div>
-
-            <div style="flex: 1; text-align: center; position: relative; min-height: 80px;">
-                @if($profile->clearance_status == 'Issued')
-                    <div style="position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                        <img src="{{ asset('storage/' . $profile->effective_clearance_signature_path) }}" 
-                             alt="Nurse Signature" 
-                             style="height: 44px; width: auto; pointer-events: none;">
-                    </div>
+            <div class="doc-actions">
+                <a href="{{ route('admin.health_records') }}" class="doc-btn doc-btn-back">
+                    <x-outline-icon name="arrow-left-on-rectangle" />
+                    Back
+                </a>
+                @if($isSuperAdmin)
+                    <a href="{{ route('admin.sign_page', $profile->id) }}" class="doc-btn doc-btn-verify">
+                        <x-outline-icon name="check" />
+                        Verify / Approve
+                    </a>
                 @endif
+            </div>
+        </div>
 
-                <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
-                    MS. NURSE NAME, RN
-                </div>
-                <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
+        <div class="doc-meta">
+            <div class="doc-meta-item">
+                <div class="doc-meta-k">Student</div>
+                <div class="doc-meta-v">{{ $profile->user->name ?? 'N/A' }}</div>
+            </div>
+            <div class="doc-meta-item">
+                <div class="doc-meta-k">Student Number</div>
+                <div class="doc-meta-v">{{ $profile->user->student_number ?: ($profile->user->student_id ?? 'N/A') }}</div>
+            </div>
+            <div class="doc-meta-item">
+                <div class="doc-meta-k">Course</div>
+                <div class="doc-meta-v">{{ $profile->course_college ?: ($profile->user->course ?? 'N/A') }}</div>
+            </div>
+            <div class="doc-meta-item">
+                <div class="doc-meta-k">Status</div>
+                <div class="doc-meta-v">{{ in_array($profile->clearance_status, ['Pending', 'For Verification'], true) ? 'For Verification' : ($profile->clearance_status ?: 'Not Processed') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="doc-review-card">
+        <div class="doc-grid">
+            <div class="doc-file">
+                <h4>Health Form Upload (PDF)</h4>
+                @if(!empty($profile->health_form_upload))
+                    <div class="doc-actions">
+                        <a class="doc-link" href="{{ asset('storage/' . $profile->health_form_upload) }}" target="_blank" rel="noopener">
+                            <x-outline-icon name="document-text" />
+                            Open
+                        </a>
+                    </div>
+                    <div class="doc-preview">
+                        <iframe src="{{ asset('storage/' . $profile->health_form_upload) }}"></iframe>
+                    </div>
+                @else
+                    <div class="doc-missing">No health form upload found.</div>
+                @endif
+            </div>
+
+            <div class="doc-file">
+                <h4>Medical Certificate (PDF)</h4>
+                @if(!empty($profile->medical_certificate))
+                    <div class="doc-actions">
+                        <a class="doc-link" href="{{ asset('storage/' . $profile->medical_certificate) }}" target="_blank" rel="noopener">
+                            <x-outline-icon name="document-text" />
+                            Open
+                        </a>
+                    </div>
+                    <div class="doc-preview">
+                        <iframe src="{{ asset('storage/' . $profile->medical_certificate) }}"></iframe>
+                    </div>
+                @else
+                    <div class="doc-missing">No medical certificate uploaded.</div>
+                @endif
+            </div>
+
+            <div class="doc-file">
+                <h4>Chest X-ray Result (PDF)</h4>
+                @if(!empty($profile->chest_xray_result))
+                    <div class="doc-actions">
+                        <a class="doc-link" href="{{ asset('storage/' . $profile->chest_xray_result) }}" target="_blank" rel="noopener">
+                            <x-outline-icon name="document-text" />
+                            Open
+                        </a>
+                    </div>
+                    <div class="doc-preview">
+                        <iframe src="{{ asset('storage/' . $profile->chest_xray_result) }}"></iframe>
+                    </div>
+                @else
+                    <div class="doc-missing">No chest X-ray result uploaded.</div>
+                @endif
+            </div>
+
+            <div class="doc-file">
+                <h4>PWD ID Proof (PDF)</h4>
+                @if(($profile->has_disability ?? 'No') !== 'Yes')
+                    <div class="doc-missing">Not required (PWD is set to No).</div>
+                @elseif(!empty($profile->pwd_id_proof))
+                    <div class="doc-actions">
+                        <a class="doc-link" href="{{ asset('storage/' . $profile->pwd_id_proof) }}" target="_blank" rel="noopener">
+                            <x-outline-icon name="document-text" />
+                            Open
+                        </a>
+                    </div>
+                    <div class="doc-preview">
+                        <iframe src="{{ asset('storage/' . $profile->pwd_id_proof) }}"></iframe>
+                    </div>
+                @else
+                    <div class="doc-missing">PWD is Yes but no proof uploaded.</div>
+                @endif
+            </div>
+
+            <div class="doc-file">
+                <h4>2x2 Student Photo</h4>
+                @if(!empty($profile->student_photo))
+                    <div class="doc-actions">
+                        <a class="doc-link" href="{{ asset('storage/' . $profile->student_photo) }}" target="_blank" rel="noopener">
+                            <x-outline-icon name="eye" />
+                            Open
+                        </a>
+                    </div>
+                    <div class="doc-preview">
+                        <img src="{{ asset('storage/' . $profile->student_photo) }}" alt="2x2 Student Photo">
+                    </div>
+                @else
+                    <div class="doc-missing">No 2x2 student photo uploaded.</div>
+                @endif
             </div>
         </div>
     </div>

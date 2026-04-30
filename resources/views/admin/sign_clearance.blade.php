@@ -1,137 +1,194 @@
 @extends('layouts.admin')
 
-@section('title', 'Sign Health Clearance')
+@section('title', 'Verify Health Uploads')
 
 @push('styles')
 <style>
-    .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; margin-bottom: 24px; }
-    .manage-section { background: #fdfdfd; border: 1px dashed #cbd5e1; padding: 30px; border-radius: 10px; max-width: 900px; margin: 0 auto; }
-    
-    h3 { color: #334155; font-size: 18px; margin-top: 0; font-weight: 700; }
+    .verify-wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 18px; }
+    .verify-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); }
+    .verify-head h2 { margin: 0; font-size: 20px; color: #0f172a; font-weight: 800; }
+    .verify-head p { margin: 6px 0 0; font-size: 13px; color: #64748b; }
+    .verify-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+    .verify-badge { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+    .verify-badge-ok { background: #ecfdf3; color: #047857; }
+    .verify-badge-alert { background: #fef2f2; color: #b91c1c; }
+    .verify-meta { margin-top: 14px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .verify-meta-item { border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; padding: 10px 12px; }
+    .verify-meta-k { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 4px; }
+    .verify-meta-v { font-size: 14px; color: #0f172a; font-weight: 700; word-break: break-word; }
+    .verify-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .verify-doc { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #fff; }
+    .verify-doc h4 { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: #1e293b; }
+    .verify-doc-preview { width: 100%; height: 250px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; overflow: hidden; }
+    .verify-doc-preview iframe, .verify-doc-preview img { width: 100%; height: 100%; border: 0; object-fit: contain; background: #fff; }
+    .verify-missing { border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; font-size: 13px; color: #64748b; font-weight: 600; background: #f8fafc; }
+    .verify-link { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 10px; }
+    .verify-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .verify-label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; color: #334155; }
+    .verify-control { width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; font-size: 14px; background: #fff; color: #0f172a; }
+    .verify-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+    .verify-btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 15px; font-weight: 700; font-size: 13px; text-decoration: none; cursor: pointer; }
+    .verify-btn-cancel { background: #e2e8f0; color: #1e293b; }
+    .verify-btn-save { background: #70131b; color: #fff; }
 
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-    .info-box { background: #f8fafc; padding: 12px 15px; border-radius: 8px; border: 1px solid #edf2f7; }
-    .info-label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 3px; }
-    .info-value { font-size: 15px; font-weight: 600; color: #1e293b; }
+    [data-theme="dark"] .verify-card, [data-theme="dark"] .verify-doc { background: #0f172a; border-color: #334155; box-shadow: none; }
+    [data-theme="dark"] .verify-head h2, [data-theme="dark"] .verify-meta-v, [data-theme="dark"] .verify-doc h4, [data-theme="dark"] .verify-label { color: #f8fafc; }
+    [data-theme="dark"] .verify-head p, [data-theme="dark"] .verify-meta-k, [data-theme="dark"] .verify-missing { color: #cbd5e1; }
+    [data-theme="dark"] .verify-meta-item { background: #111827; border-color: #334155; }
+    [data-theme="dark"] .verify-link { background: #111827; border-color: #475569; color: #f8fafc; }
+    [data-theme="dark"] .verify-control { background: #111827; border-color: #475569; color: #f8fafc; }
+    [data-theme="dark"] .verify-btn-cancel { background: #1e293b; color: #f8fafc; }
 
-    .medical-alert { background: #fff5f5; border-left: 4px solid #ef4444; padding: 15px; border-radius: 6px; margin-bottom: 25px; }
-    .form-control { padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px; }
-    .form-label { display: block; font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 8px; }
-
-    .btn-save { background: #70131B; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-    .btn-save:hover { background: #8B0000; transform: translateY(-1px); }
-    .btn-cancel { background: #e2e8f0; color: #475569; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 600; display: inline-block; }
-    
-    .status-badge { font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 700; }
+    @media (max-width: 1024px) { .verify-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 768px) {
+        .verify-grid, .verify-form-grid, .verify-meta { grid-template-columns: 1fr; }
+    }
 </style>
 @endpush
 
 @section('content')
-<div style="margin-bottom: 20px;">
+<div style="margin-bottom: 14px;">
     <a href="{{ route('admin.health_records') }}" style="text-decoration: none; color: #64748b; font-size: 14px;">&larr; Back to Health Records</a>
 </div>
 
-<div class="card manage-section">
-    <div class="d-flex justify-content-between align-items-start mb-3">
-        <div>
-            <h3>Sign Student Health Clearance</h3>
-            <p style="font-size: 13px; color: #64748b;">Review medical profile and finalize clearance.</p>
+<div class="verify-wrap">
+    <div class="verify-card">
+        <div class="verify-top">
+            <div class="verify-head">
+                <h2>Verify Student Health Uploads</h2>
+                <p>Review the uploaded files and set the final verification status. Nurse digital e-sign is not required in this workflow.</p>
+            </div>
+            <span class="verify-badge {{ ($record->has_disability ?? 'No') === 'Yes' ? 'verify-badge-alert' : 'verify-badge-ok' }}">
+                {{ ($record->has_disability ?? 'No') === 'Yes' ? 'With Condition' : 'No Condition' }}
+            </span>
         </div>
-        <span class="status-badge {{ $record->has_disability == 'Yes' ? 'bg-danger text-white' : 'bg-success text-white' }}">
-            {{ $record->has_disability == 'Yes' ? 'With Condition' : 'No Condition' }}
-        </span>
+
+        <div class="verify-meta">
+            <div class="verify-meta-item">
+                <div class="verify-meta-k">Student Name</div>
+                <div class="verify-meta-v">{{ $record->user->name ?? 'N/A' }}</div>
+            </div>
+            <div class="verify-meta-item">
+                <div class="verify-meta-k">Student Number</div>
+                <div class="verify-meta-v">{{ $record->user->student_number ?: ($record->user->student_id ?? 'N/A') }}</div>
+            </div>
+            <div class="verify-meta-item">
+                <div class="verify-meta-k">Course</div>
+                <div class="verify-meta-v">{{ $record->course_college ?: ($record->user->course ?? 'N/A') }}</div>
+            </div>
+            <div class="verify-meta-item">
+                <div class="verify-meta-k">Submitted</div>
+                <div class="verify-meta-v">{{ optional($record->created_at)->format('M d, Y h:i A') }}</div>
+            </div>
+        </div>
     </div>
 
-    {{-- Student Information Summary --}}
-    <div class="info-grid">
-        <div class="info-box">
-            <div class="info-label">Student Name</div>
-            <div class="info-value">{{ $record->user->name }}</div>
-        </div>
-        <div class="info-box">
-            <div class="info-label">Student ID</div>
-            <div class="info-value">{{ $record->user->student_number }}</div>
-        </div>
-        <div class="info-box">
-            <div class="info-label">Course & Section</div>
-            <div class="info-value">{{ $record->user->course }} {{ $record->user->year }}-{{ $record->user->section }}</div>
-        </div>
-        <div class="info-box">
-            <div class="info-label">Contact Number</div>
-            <div class="info-value" style="font-size: 15px; color: #1e293b; font-weight: 700;">
-        {{ $record->contact_no ?? ($record->cellphone ?? 'NOT PROVIDED') }}
-    </div>
-        </div>
-    </div>
-
-    @if($record->has_disability == 'Yes')
-    <div class="medical-alert" style="background-color: #fef2f2; border-left: 4px solid #b91c1c; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
-        <h6 style="color: #b91c1c; font-weight: 800; font-size: 13px; margin-bottom: 5px;">
-            <i class="fas fa-exclamation-triangle me-1"></i> DECLARED CONDITION:
-        </h6>
-        <p style="margin: 0; font-size: 14px; color: #334155; font-weight: 600;">
-            {{ $record->disability_type ?: 'PWD' }}
-        </p>
-    </div>
-@endif
-
-    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;">
-
-    <form action="{{ route('admin.update_clearance', $record->id) }}" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div style="margin-bottom: 20px;">
-            <label class="form-label">Remarks / Pending Reason</label>
-            <textarea name="pending_reason" class="form-control" rows="3" placeholder="Enter reason or additional instructions here...">{{ $record->pending_reason }}</textarea>
-        </div>
-
-        {{-- AUTO-SIGNATURE PREVIEW SECTION --}}
-        <div style="margin-bottom: 25px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #edf2f7; text-align: center;">
-            <label class="form-label" style="color: #70131B; display: block; text-align: left;">Medical Officer Signature Preview</label>
-            
-            <div style="position: relative; display: inline-block; min-height: 110px; width: 280px; border-bottom: 2px solid #334155; margin-top: 15px;">
-                
-                @if($record->clearance_status == 'Issued')
-                    <div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                        <img src="{{ asset('storage/' . $record->effective_clearance_signature_path) }}" 
-                             alt="Nurse Signature" 
-                             style="height: 90px; width: auto; pointer-events: none;">
+    <div class="verify-card">
+        <div class="verify-grid">
+            <div class="verify-doc">
+                <h4>Health Form Upload (PDF)</h4>
+                @if(!empty($record->health_form_upload))
+                    <a class="verify-link" href="{{ asset('storage/' . $record->health_form_upload) }}" target="_blank" rel="noopener">
+                        <x-outline-icon name="document-text" /> Open
+                    </a>
+                    <div class="verify-doc-preview">
+                        <iframe src="{{ asset('storage/' . $record->health_form_upload) }}"></iframe>
                     </div>
                 @else
-                    <div style="padding-top: 40px; color: #000000; font-style: italic; font-size: 12px;">
-                        Signature will be applied upon "Issued" status
-                    </div>
+                    <div class="verify-missing">No health form PDF uploaded.</div>
                 @endif
+            </div>
 
-                <div style="position: relative; z-index: 5; font-weight: bold; text-transform: uppercase; margin-top: 55px; color: #1e293b;">
-                    MS. NURSE NAME, RN
+            <div class="verify-doc">
+                <h4>Medical Certificate (PDF)</h4>
+                @if(!empty($record->medical_certificate))
+                    <a class="verify-link" href="{{ asset('storage/' . $record->medical_certificate) }}" target="_blank" rel="noopener">
+                        <x-outline-icon name="document-text" /> Open
+                    </a>
+                    <div class="verify-doc-preview">
+                        <iframe src="{{ asset('storage/' . $record->medical_certificate) }}"></iframe>
+                    </div>
+                @else
+                    <div class="verify-missing">No medical certificate uploaded.</div>
+                @endif
+            </div>
+
+            <div class="verify-doc">
+                <h4>Chest X-ray Result (PDF)</h4>
+                @if(!empty($record->chest_xray_result))
+                    <a class="verify-link" href="{{ asset('storage/' . $record->chest_xray_result) }}" target="_blank" rel="noopener">
+                        <x-outline-icon name="document-text" /> Open
+                    </a>
+                    <div class="verify-doc-preview">
+                        <iframe src="{{ asset('storage/' . $record->chest_xray_result) }}"></iframe>
+                    </div>
+                @else
+                    <div class="verify-missing">No chest X-ray result uploaded.</div>
+                @endif
+            </div>
+
+            <div class="verify-doc">
+                <h4>PWD ID Proof (PDF)</h4>
+                @if(($record->has_disability ?? 'No') !== 'Yes')
+                    <div class="verify-missing">Not required (PWD is set to No).</div>
+                @elseif(!empty($record->pwd_id_proof))
+                    <a class="verify-link" href="{{ asset('storage/' . $record->pwd_id_proof) }}" target="_blank" rel="noopener">
+                        <x-outline-icon name="document-text" /> Open
+                    </a>
+                    <div class="verify-doc-preview">
+                        <iframe src="{{ asset('storage/' . $record->pwd_id_proof) }}"></iframe>
+                    </div>
+                @else
+                    <div class="verify-missing">PWD is Yes but no proof uploaded.</div>
+                @endif
+            </div>
+
+            <div class="verify-doc">
+                <h4>2x2 Student Photo</h4>
+                @if(!empty($record->student_photo))
+                    <a class="verify-link" href="{{ asset('storage/' . $record->student_photo) }}" target="_blank" rel="noopener">
+                        <x-outline-icon name="eye" /> Open
+                    </a>
+                    <div class="verify-doc-preview">
+                        <img src="{{ asset('storage/' . $record->student_photo) }}" alt="2x2 Student Photo">
+                    </div>
+                @else
+                    <div class="verify-missing">No 2x2 photo uploaded.</div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="verify-card">
+        <form action="{{ route('admin.update_clearance', $record->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div style="margin-bottom: 14px;">
+                <label class="verify-label" for="pending_reason">Verification Notes / Reason</label>
+                <textarea id="pending_reason" name="pending_reason" class="verify-control" rows="3" placeholder="Add notes if still for verification or rejected...">{{ $record->pending_reason }}</textarea>
+            </div>
+
+            <div class="verify-form-grid">
+                <div>
+                    <label class="verify-label" for="clearance_status">Verification Status</label>
+                    <select id="clearance_status" name="clearance_status" class="verify-control" required>
+                        <option value="Issued" {{ $record->clearance_status == 'Issued' ? 'selected' : '' }}>Approved (Webhook Ready)</option>
+                        <option value="For Verification" {{ in_array($record->clearance_status, ['Pending', 'For Verification'], true) ? 'selected' : '' }}>For Verification</option>
+                        <option value="Rejected" {{ $record->clearance_status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="verify-label" for="verified_at">Date Verified</label>
+                    <input id="verified_at" type="date" name="verified_at" class="verify-control" value="{{ $record->verified_at ?? date('Y-m-d') }}" readonly>
                 </div>
             </div>
-            <div style="font-size: 11px; color: #64748b; margin-top: 5px;">Nurse/Doctor/Physician</div>
-        </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-            <div>
-                <label class="form-label">Clearance Action</label>
-                <select name="clearance_status" class="form-control" required>
-                    <option value="Issued" {{ $record->clearance_status == 'Issued' ? 'selected' : '' }}>Issue Clearance</option>
-                    <option value="For Verification" {{ in_array($record->clearance_status, ['Pending', 'For Verification'], true) ? 'selected' : '' }}>For Verification</option>
-                    <option value="Rejected" {{ $record->clearance_status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
-                </select>
+            <div class="verify-actions">
+                <a href="{{ route('admin.health_records') }}" class="verify-btn verify-btn-cancel">Cancel</a>
+                <button type="submit" class="verify-btn verify-btn-save">Save Verification</button>
             </div>
-            <div>
-                <label class="form-label">Date Verified</label>
-                <input type="date" name="verified_at" class="form-control" value="{{ $record->verified_at ?? date('Y-m-d') }}" readonly>
-                <small class="text-muted" style="font-size: 11px;">Current Date</small>
-            </div>
-        </div>
-
-        <div style="text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
-            <a href="{{ route('admin.health_records') }}" class="btn-cancel">Cancel</a>
-            <button type="submit" class="btn-save">Update & Save</button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
-
 @endsection

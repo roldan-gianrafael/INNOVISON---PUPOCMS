@@ -383,10 +383,11 @@
         margin-bottom: 12px;
         display: flex;
         flex-direction: column;
-        border: 0;
-        background: transparent;
-        border-radius: 0;
-        padding: 0;
+        border: 1px solid rgba(127, 29, 45, 0.14);
+        background: rgba(255, 248, 220, 0.9);
+        border-radius: 12px;
+        padding: 10px 12px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
     .form-group label {
         display: block;
@@ -401,21 +402,19 @@
     .form-select {
         width: 100%;
         min-height: 24px;
-        padding: 8px 0 4px;
-        border-radius: 0 0 6px 6px;
+        padding: 0;
+        border-radius: 0;
         border: 0;
-        border-bottom: 2px solid #8f2230;
         color: #111827;
-        background: #fff8dc;
+        background: transparent;
         box-shadow: none;
         font-weight: 700;
-        transition: color .18s ease, box-shadow .18s ease, border-color .18s ease;
+        transition: color .18s ease, box-shadow .18s ease;
     }
     .form-control:focus,
     .form-select:focus {
         outline: none;
         border: 0;
-        border-bottom: 2px solid #70131B;
         background: transparent;
         box-shadow: none;
     }
@@ -434,7 +433,7 @@
     }
 
     html[data-theme="light"] .form-group {
-        background: transparent;
+        background: rgba(255, 248, 220, 0.9);
     }
     .inventory-subgroup {
         display: none;
@@ -568,8 +567,9 @@
     }
 
     html[data-theme="dark"] .form-group {
-        background: transparent;
-        border-color: transparent;
+        background: rgba(31, 41, 55, 0.9);
+        border-color: rgba(148, 163, 184, 0.34);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
     html[data-theme="dark"] .form-group label {
@@ -579,10 +579,9 @@
     html[data-theme="dark"] .form-control,
     html[data-theme="dark"] .form-select,
     html[data-theme="dark"] .form-control option {
-        background: #1f2937;
+        background: transparent;
         color: #ffffff !important;
         border-color: transparent;
-        border-bottom: 2px solid #8f2230;
     }
 
     html[data-theme="dark"] .form-control::placeholder {

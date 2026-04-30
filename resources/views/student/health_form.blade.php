@@ -552,6 +552,13 @@
 
                     <h2 class="section-title mt-4">Required Uploads</h2>
                     <div class="row g-3">
+                        <div class="col-md-6" id="pwdUploadWrap">
+                            <div class="upload-card">
+                                <strong>PWD ID (PDF, if PWD is Yes)</strong>
+                                <input id="pwd_id_proof" type="file" name="pwd_id_proof" class="form-control" accept=".pdf,application/pdf">
+                                <small>Required only when PWD = Yes.</small>
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <div class="upload-card">
                                 <strong>Medical Certificate (PDF) <span class="required">*</span></strong>
@@ -564,13 +571,6 @@
                                 <strong>Chest X-ray Result (PDF) <span class="required">*</span></strong>
                                 <input type="file" name="chest_xray_result" class="form-control" accept=".pdf,application/pdf" required>
                                 <small>Allowed: PDF only, max 4MB.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6" id="pwdUploadWrap">
-                            <div class="upload-card">
-                                <strong>PWD ID (PDF, if PWD is Yes)</strong>
-                                <input id="pwd_id_proof" type="file" name="pwd_id_proof" class="form-control" accept=".pdf,application/pdf">
-                                <small>Required only when PWD = Yes.</small>
                             </div>
                         </div>
                         <div class="col-md-6">

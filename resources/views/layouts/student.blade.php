@@ -297,6 +297,7 @@
         .student-quick-actions-toggle {
             animation: quickActionsGlow 2.2s ease-in-out infinite;
             position: relative;
+            margin-left: -4px;
         }
 
         .student-quick-actions-toggle:hover,
@@ -487,6 +488,11 @@
         .student-quick-action-item.is-notifications {
             grid-row: 3;
             margin-top: 4px;
+        }
+
+        .student-quick-action-item.is-theme .student-quick-action-btn,
+        .student-quick-action-item.is-notifications .student-quick-action-btn {
+            margin-left: -4px;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-action-item {

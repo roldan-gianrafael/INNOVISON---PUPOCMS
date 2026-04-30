@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Student Health Records')
+@section('title', 'Health Records')
 
 @push('styles')
 <style>
@@ -1073,7 +1073,7 @@
 
     {{-- Header with Search / Filters --}}
     <div class="health-records-toolbar">
-        <h2 class="health-records-title"><x-outline-icon name="document-text" />Student Health Records</h2>
+        <h2 class="health-records-title"><x-outline-icon name="document-text" />Health Records</h2>
         <div class="health-records-toolbar-actions">
             <div class="health-records-search-shell" id="healthRecordsSearchShell">
                 <div class="health-records-search-wrap">

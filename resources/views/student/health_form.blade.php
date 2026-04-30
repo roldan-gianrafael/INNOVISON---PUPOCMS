@@ -86,7 +86,7 @@
             left: 50%;
             top: 14px;
             transform: translateX(-50%);
-            width: min(924px, calc(100vw - 26px));
+            width: min(928px, calc(100vw - 22px));
             box-sizing: border-box;
             z-index: 70;
             background: rgba(255, 255, 255, 0.92);

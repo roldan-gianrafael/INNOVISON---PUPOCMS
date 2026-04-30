@@ -332,6 +332,13 @@
             background: transparent;
         }
 
+        .step-fill-note {
+            margin: 0 0 12px;
+            color: #7f1d2d;
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
         @media (max-width: 768px) {
             .stepper-shell,
             .profile-readonly-grid,
@@ -389,6 +396,8 @@
 
             <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" name="course_college" value="{{ old('course_college', $prefill['course_college'] ?? $user->course) }}">
+                <input type="hidden" name="student_number" value="{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}">
 
                 <div class="step-panel {{ $startStep === 2 ? 'is-hidden' : '' }}" id="stepPanel1">
                     <h2 class="section-title">Step 1: Information</h2>
@@ -403,27 +412,20 @@
                         </div>
                         <div class="readonly-item">
                             <small>Course</small>
-                            <input
-                                type="text"
-                                name="course_college"
-                                class="form-control"
-                                readonly
-                                required
-                                value="{{ old('course_college', $prefill['course_college'] ?? $user->course) }}"
-                                style="margin-top: 2px;"
-                            >
+                            <strong>{{ old('course_college', $prefill['course_college'] ?? $user->course) }}</strong>
                         </div>
                         <div class="readonly-item">
                             <small>Email</small>
                             <strong>{{ old('email', $prefill['email'] ?? $user->email) }}</strong>
                         </div>
+                        <div class="readonly-item">
+                            <small>Student Number</small>
+                            <strong>{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}</strong>
+                        </div>
                     </div>
 
+                    <p class="step-fill-note">Please fill in the editable fields below.</p>
                     <div class="step-one-grid">
-                        <div class="form-field">
-                            <label class="form-label">Student Number <span class="required">*</span></label>
-                            <input type="text" name="student_number" class="form-control" readonly required value="{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}">
-                        </div>
                         <div class="form-field">
                             <label class="form-label">School Year <span class="required">*</span></label>
                             <input type="text" name="school_year" class="form-control" required value="{{ old('school_year', $prefill['school_year'] ?? '') }}">

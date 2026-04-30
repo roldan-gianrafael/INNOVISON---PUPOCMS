@@ -316,16 +316,16 @@
     }
     .modal-box {
         background:
-            linear-gradient(145deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.24)) !important;
+            linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12)) !important;
         width: 760px;
         max-width: 94vw;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-top: 4px solid #70131B !important;
-        border-bottom: 4px solid #70131B !important;
+        border-top: 2px solid #facc15 !important;
+        border-bottom: 2px solid #facc15 !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(14px) saturate(140%) !important;
-        -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+        backdrop-filter: blur(18px) saturate(150%) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
         box-shadow: 0 24px 46px rgba(15, 23, 42, 0.24);
         overflow: hidden;
         padding: 0;
@@ -359,10 +359,10 @@
     .modal-form-panel {
         border: 1px solid rgba(112, 19, 27, 0.16);
         border-radius: 16px;
-        background: rgba(255, 255, 255, 0.42);
+        background: rgba(255, 255, 255, 0.26);
         padding: 16px;
         box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.54),
+            inset 0 1px 0 rgba(255, 255, 255, 0.38),
             0 8px 18px rgba(112, 19, 27, 0.06);
     }
     .modal-panel-title {
@@ -376,7 +376,7 @@
         display: flex;
         flex-direction: column;
         border: 1px solid rgba(127, 29, 45, 0.12);
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.4);
         border-radius: 12px;
         padding: 10px 12px;
     }
@@ -393,25 +393,40 @@
     .form-select {
         width: 100%;
         min-height: 24px;
-        padding: 0;
-        border-radius: 0;
+        padding: 0 0 2px;
+        border-radius: 0 0 6px 6px;
         border: 0;
+        border-bottom: 2px solid #8f2230;
         color: #111827;
         background: transparent;
         box-shadow: none;
         font-weight: 700;
-        transition: color .18s ease, box-shadow .18s ease;
+        transition: color .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
     .form-control:focus,
     .form-select:focus {
         outline: none;
         border: 0;
+        border-bottom: 2px solid #70131B;
         background: transparent;
         box-shadow: none;
     }
     .form-control::placeholder {
         color: #9ca3af;
         font-weight: 600;
+    }
+
+    html[data-theme="light"] .modal-box {
+        background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)) !important;
+    }
+
+    html[data-theme="light"] .modal-form-panel {
+        background: rgba(255, 255, 255, 0.22);
+    }
+
+    html[data-theme="light"] .form-group {
+        background: rgba(255, 255, 255, 0.34);
     }
     .inventory-subgroup {
         display: none;
@@ -505,8 +520,8 @@
         background: linear-gradient(180deg, rgba(31, 12, 18, 0.94), rgba(20, 8, 12, 0.94));
         border-left: 1px solid rgba(250, 204, 21, 0.2) !important;
         border-right: 1px solid rgba(250, 204, 21, 0.2) !important;
-        border-top: 4px solid #facc15 !important;
-        border-bottom: 4px solid #facc15 !important;
+        border-top: 2px solid #facc15 !important;
+        border-bottom: 2px solid #facc15 !important;
         box-shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
     }
 
@@ -544,6 +559,7 @@
         background: transparent;
         color: #ffffff !important;
         border-color: transparent;
+        border-bottom: 2px solid #8f2230;
     }
 
     html[data-theme="dark"] .form-control::placeholder {

@@ -81,11 +81,13 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
+            min-height: 77px;
             position: fixed;
             left: 50%;
             top: 14px;
             transform: translateX(-50%);
-            width: min(920px, calc(100vw - 26px));
+            width: min(924px, calc(100vw - 26px));
+            box-sizing: border-box;
             z-index: 70;
             background: rgba(255, 255, 255, 0.92);
             padding: 10px;
@@ -95,7 +97,7 @@
         }
 
         .stepper-spacer {
-            height: 92px;
+            height: 95px;
         }
 
         .step-chip {
@@ -314,7 +316,7 @@
             }
 
             .stepper-spacer {
-                height: 102px;
+                height: 105px;
             }
         }
     </style>

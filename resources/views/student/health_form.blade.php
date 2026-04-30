@@ -380,16 +380,16 @@
 
                     <div class="step-one-grid">
                         <div class="form-field">
+                            <label class="form-label">Course / College <span class="required">*</span></label>
+                            <input type="text" name="course_college" class="form-control" readonly required value="{{ old('course_college', $prefill['course_college'] ?? '') }}">
+                        </div>
+                        <div class="form-field">
                             <label class="form-label">Student Number <span class="required">*</span></label>
                             <input type="text" name="student_number" class="form-control" readonly required value="{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}">
                         </div>
                         <div class="form-field">
                             <label class="form-label">School Year <span class="required">*</span></label>
                             <input type="text" name="school_year" class="form-control" required value="{{ old('school_year', $prefill['school_year'] ?? '') }}">
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Course / College <span class="required">*</span></label>
-                            <input type="text" name="course_college" class="form-control" readonly required value="{{ old('course_college', $prefill['course_college'] ?? '') }}">
                         </div>
 
                         <div class="form-field span-2">

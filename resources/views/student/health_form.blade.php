@@ -293,10 +293,43 @@
         .form-field {
             display: flex;
             flex-direction: column;
+            border: 1px solid rgba(127, 29, 45, 0.12);
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px 12px;
         }
 
         .form-field.span-2 {
             grid-column: span 2;
+        }
+
+        .form-field .form-label {
+            display: block;
+            color: #6b7280;
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .form-field .form-control,
+        .form-field .form-select {
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+            min-height: 24px;
+            padding: 0;
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .form-field .form-control:focus,
+        .form-field .form-select:focus {
+            border: 0;
+            box-shadow: none;
+            background: transparent;
         }
 
         @media (max-width: 768px) {
@@ -472,17 +505,21 @@
                     <h2 class="section-title">Step 2: Uploading Documents</h2>
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label">Are you a PWD? <span class="required">*</span></label>
-                            <div class="pwd-toggle" id="pwdToggle">
-                                <input class="pwd-radio" type="radio" name="has_disability" id="pwd_no" value="No" required {{ $selectedPwd !== 'Yes' ? 'checked' : '' }}>
-                                <label class="pwd-option" for="pwd_no">No</label>
-                                <input class="pwd-radio" type="radio" name="has_disability" id="pwd_yes" value="Yes" {{ $selectedPwd === 'Yes' ? 'checked' : '' }}>
-                                <label class="pwd-option" for="pwd_yes">Yes</label>
+                            <div class="form-field">
+                                <label class="form-label">Are you a PWD? <span class="required">*</span></label>
+                                <div class="pwd-toggle" id="pwdToggle">
+                                    <input class="pwd-radio" type="radio" name="has_disability" id="pwd_no" value="No" required {{ $selectedPwd !== 'Yes' ? 'checked' : '' }}>
+                                    <label class="pwd-option" for="pwd_no">No</label>
+                                    <input class="pwd-radio" type="radio" name="has_disability" id="pwd_yes" value="Yes" {{ $selectedPwd === 'Yes' ? 'checked' : '' }}>
+                                    <label class="pwd-option" for="pwd_yes">Yes</label>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-8">
-                            <label class="form-label">Disability Type <span class="required">*</span></label>
-                            <input id="disability_type" type="text" name="disability_type" class="form-control" value="{{ old('disability_type', $prefill['disability_type'] ?? '') }}">
+                            <div class="form-field">
+                                <label class="form-label">Disability Type <span class="required">*</span></label>
+                                <input id="disability_type" type="text" name="disability_type" class="form-control" value="{{ old('disability_type', $prefill['disability_type'] ?? '') }}">
+                            </div>
                         </div>
                     </div>
 

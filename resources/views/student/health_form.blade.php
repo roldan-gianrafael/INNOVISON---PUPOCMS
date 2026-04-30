@@ -96,7 +96,16 @@
             backdrop-filter: blur(8px);
         }
 
-        :where(.asw-menu-btn) {
+        :where(.asw-menu-btn),
+        :where(#studentQuickActionsFab),
+        :where(.student-quick-actions-fab-wrap),
+        :where(.student-quick-actions-toggle),
+        :where(.student-quick-action-btn),
+        :where(#studentAccessibilityLaunch),
+        :where(#sienna-accessibility-button),
+        :where(.sienna-accessibility-button),
+        :where(.sienna-accessibility-trigger),
+        :where([data-sienna-accessibility-trigger]) {
             position: fixed !important;
             right: 22px !important;
             bottom: 14px !important;
@@ -104,7 +113,21 @@
         }
 
         :where(.asw-menu-btn),
-        :where(.asw-menu-btn *) {
+        :where(.asw-menu-btn *),
+        :where(#studentQuickActionsFab),
+        :where(#studentQuickActionsFab *),
+        :where(.student-quick-actions-fab-wrap),
+        :where(.student-quick-actions-fab-wrap *),
+        :where(#studentAccessibilityLaunch),
+        :where(#studentAccessibilityLaunch *),
+        :where(#sienna-accessibility-button),
+        :where(#sienna-accessibility-button *),
+        :where(.sienna-accessibility-button),
+        :where(.sienna-accessibility-button *),
+        :where(.sienna-accessibility-trigger),
+        :where(.sienna-accessibility-trigger *),
+        :where([data-sienna-accessibility-trigger]),
+        :where([data-sienna-accessibility-trigger] *) {
             pointer-events: auto !important;
         }
 

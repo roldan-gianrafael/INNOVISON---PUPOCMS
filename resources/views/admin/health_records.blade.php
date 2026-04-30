@@ -883,8 +883,8 @@
                             <span class="status issued"><i class="fas fa-check-circle me-1"></i> Issued</span>
                         @elseif($record->clearance_status == 'Rejected')
                             <span class="status review">Rejected</span>
-                        @elseif($record->clearance_status == 'Pending')
-                            <span class="status pending">Pending</span>
+                        @elseif(in_array($record->clearance_status, ['Pending', 'For Verification'], true))
+                            <span class="status pending">For Verification</span>
                         @else
                             <span class="status submitted">Not Processed</span>
                         @endif

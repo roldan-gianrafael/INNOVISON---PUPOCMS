@@ -190,11 +190,11 @@ for the improvement of healthcare services.
 
             <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
                 <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
-                    {{ $profile->clearance_status == 'Pending' ? 'âœ”' : '' }}
+                    {{ in_array($profile->clearance_status, ['Pending', 'For Verification'], true) ? 'âœ”' : '' }}
                 </div> 
-                Pending, Reason: 
+                For Verification, Reason: 
                 <div class="field" style="border-bottom: 1px solid #000; min-width: 150px; padding-left: 5px; font-size: 12px; font-style: italic;">
-                    {{ $profile->clearance_status == 'Pending' ? $profile->pending_reason : '' }}
+                    {{ in_array($profile->clearance_status, ['Pending', 'For Verification'], true) ? $profile->pending_reason : '' }}
                 </div>
             </div>
         </div>

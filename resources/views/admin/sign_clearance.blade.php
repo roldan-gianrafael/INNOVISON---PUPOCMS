@@ -116,7 +116,7 @@
                 <label class="form-label">Clearance Action</label>
                 <select name="clearance_status" class="form-control" required>
                     <option value="Issued" {{ $record->clearance_status == 'Issued' ? 'selected' : '' }}>Issue Clearance</option>
-                    <option value="Pending" {{ $record->clearance_status == 'Pending' ? 'selected' : '' }}>Hold / Pending</option>
+                    <option value="For Verification" {{ in_array($record->clearance_status, ['Pending', 'For Verification'], true) ? 'selected' : '' }}>For Verification</option>
                     <option value="Rejected" {{ $record->clearance_status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
                 </select>
             </div>

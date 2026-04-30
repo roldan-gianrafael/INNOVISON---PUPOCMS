@@ -1332,6 +1332,9 @@ public function storeHealthForm(Request $request)
                 'pwd_id_proof'       => $pwdIdProofPath,
                 'medical_certificate' => $medicalCertificatePath,
                 'health_form_upload' => $healthFormUploadPath,
+                'clearance_status'   => 'For Verification',
+                'pending_reason'     => null,
+                'verified_at'        => null,
             ]
         );
 

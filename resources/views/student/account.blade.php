@@ -759,7 +759,7 @@ document.addEventListener('DOMContentLoaded', function () {
 @elseif($accountView === 'health-record')
     @php
         $healthFormSubmitted = $hasSubmittedHealthProfile ?? ($user->healthProfile !== null);
-        $status = $user->healthProfile->clearance_status ?? 'Pending';
+        $status = $user->healthProfile->clearance_status ?? 'For Verification';
         $puptasSyncStatus = optional($user->healthProfile)->puptas_sync_status;
         $puptasSyncMessage = trim((string) optional($user->healthProfile)->puptas_sync_message);
         $puptasSyncedAt = optional(optional($user->healthProfile)->puptas_synced_at)->format('M d, Y g:i A');
@@ -809,13 +809,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 <span class="health-status-note">Valid for Academic Year 2025-2026</span>
             @else
                 <div class="health-status-summary">
-                    <span class="health-status-state pending">Pending Review</span>
+                    <span class="health-status-state pending">For Verification</span>
                     <p class="health-status-message">Your profile has been submitted and is currently <strong>awaiting medical review</strong>.</p>
                 </div>
 
                 <div class="health-status-actions">
                     <a href="{{ route('print.health.form') }}" class="btn-print-form pending">View Submitted Form</a>
-                    <button class="btn-print-form disabled" disabled>Printing Disabled (Pending)</button>
+                    <button class="btn-print-form disabled" disabled>Printing Disabled (For Verification)</button>
                 </div>
                 <span class="health-status-note">Physician signature is required to print.</span>
             @endif

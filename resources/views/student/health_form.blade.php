@@ -81,7 +81,7 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
-            min-height: 81px;
+            min-height: 91px;
             position: fixed;
             left: 50%;
             top: 14px;
@@ -97,7 +97,7 @@
         }
 
         .stepper-spacer {
-            height: 99px;
+            height: 109px;
         }
 
         .step-chip {
@@ -316,7 +316,7 @@
             }
 
             .stepper-spacer {
-                height: 109px;
+                height: 119px;
             }
         }
     </style>

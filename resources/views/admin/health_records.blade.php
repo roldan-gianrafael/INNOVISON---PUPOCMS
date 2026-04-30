@@ -738,6 +738,234 @@
         background: rgba(20, 83, 45, 0.34);
     }
 
+    .verify-approval-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(6px);
+        z-index: 1300;
+    }
+
+    .verify-approval-modal.is-open {
+        display: flex;
+    }
+
+    .verify-approval-modal-card {
+        width: min(760px, 100%);
+        border-radius: 18px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+        overflow: hidden;
+    }
+
+    .verify-approval-modal-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .verify-approval-modal-title {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 900;
+        color: #70131B;
+    }
+
+    .verify-approval-modal-copy {
+        margin: 4px 0 0;
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .verify-approval-modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #111827;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .verify-approval-modal-close svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .verify-approval-body {
+        padding: 16px 18px 18px;
+        display: grid;
+        gap: 14px;
+    }
+
+    .verify-approval-student {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .verify-approval-meta {
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 10px 12px;
+    }
+
+    .verify-approval-meta-k {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .verify-approval-meta-v {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        word-break: break-word;
+    }
+
+    .verify-approval-doc-wrap {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        background: #ffffff;
+    }
+
+    .verify-approval-doc-title {
+        margin: 0 0 8px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #1e293b;
+    }
+
+    .verify-approval-doc-frame {
+        height: 340px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #f8fafc;
+    }
+
+    .verify-approval-doc-frame iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: #ffffff;
+    }
+
+    .verify-approval-doc-missing {
+        border: 1px dashed #cbd5e1;
+        background: #f8fafc;
+        color: #64748b;
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .verify-approval-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .verify-approval-btn {
+        border-radius: 999px;
+        padding: 9px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .verify-approval-btn-cancel {
+        background: #e2e8f0;
+        color: #334155;
+        border-color: #cbd5e1;
+    }
+
+    .verify-approval-btn-approve {
+        background: #70131B;
+        color: #ffffff;
+        border-color: #8f2230;
+    }
+
+    .verify-approval-btn-approve:disabled {
+        background: #cbd5e1;
+        color: #64748b;
+        border-color: #cbd5e1;
+        cursor: not-allowed;
+    }
+
+    html[data-theme="dark"] .verify-approval-modal-card {
+        background: #0f172a;
+        border-color: #334155;
+    }
+
+    html[data-theme="dark"] .verify-approval-modal-head {
+        background: #111827;
+        border-color: #334155;
+    }
+
+    html[data-theme="dark"] .verify-approval-modal-title,
+    html[data-theme="dark"] .verify-approval-meta-v,
+    html[data-theme="dark"] .verify-approval-doc-title {
+        color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .verify-approval-modal-copy,
+    html[data-theme="dark"] .verify-approval-meta-k,
+    html[data-theme="dark"] .verify-approval-doc-missing {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .verify-approval-modal-close {
+        background: #1e293b;
+        border-color: #475569;
+        color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .verify-approval-meta {
+        background: #111827;
+        border-color: #334155;
+    }
+
+    html[data-theme="dark"] .verify-approval-doc-wrap {
+        background: #0f172a;
+        border-color: #334155;
+    }
+
+    html[data-theme="dark"] .verify-approval-doc-frame {
+        border-color: #334155;
+        background: #111827;
+    }
+
+    html[data-theme="dark"] .verify-approval-doc-missing {
+        border-color: #475569;
+        background: #111827;
+    }
+
+    html[data-theme="dark"] .verify-approval-btn-cancel {
+        background: #1e293b;
+        border-color: #475569;
+        color: #f8fafc;
+    }
+
     @media (max-width: 980px) {
         .health-records-toolbar {
             flex-direction: column;
@@ -773,6 +1001,10 @@
 
         .health-records-search {
             width: 100%;
+        }
+
+        .verify-approval-student {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -910,10 +1142,18 @@
                                 </a>
                                 
                                 @if($canSignHealth)
-                                    <a href="{{ route('admin.sign_page', $record->id) }}" class="btn-action btn-sign">
+                                    <button
+                                        type="button"
+                                        class="btn-action btn-sign js-open-verify-modal"
+                                        data-student-name="{{ e($record->user->name ?? 'N/A') }}"
+                                        data-student-number="{{ e($record->user->student_number ?: ($record->user->student_id ?? 'N/A')) }}"
+                                        data-student-course="{{ e(trim(($record->course_college ?: ($record->user->course ?? 'N/A')) . ' ' . ($record->user->year ?? '') . '-' . ($record->user->section ?? ''))) }}"
+                                        data-health-form-url="{{ !empty($record->health_form_upload) ? asset('storage/' . $record->health_form_upload) : '' }}"
+                                        data-approve-url="{{ route('admin.update_clearance', $record->id) }}"
+                                    >
                                         <x-outline-icon name="pencil-square" />
                                         Verify
-                                    </a>
+                                    </button>
                                 @else
                                     <button class="btn-action btn-readonly" disabled>
                                         View Only
@@ -930,6 +1170,57 @@
             @endforelse
         </tbody>
     </table>
+</div>
+
+<div class="verify-approval-modal" id="verifyApprovalModal" aria-hidden="true">
+    <div class="verify-approval-modal-card">
+        <div class="verify-approval-modal-head">
+            <div>
+                <h3 class="verify-approval-modal-title">Verify Health Form Upload</h3>
+                <p class="verify-approval-modal-copy">Review the uploaded Health Form PDF, then approve to sync to student side and Admission webhook.</p>
+            </div>
+            <button type="button" class="verify-approval-modal-close" id="verifyApprovalCloseBtn" aria-label="Close verification popup">
+                <x-outline-icon name="x-mark" />
+            </button>
+        </div>
+        <div class="verify-approval-body">
+            <div class="verify-approval-student">
+                <div class="verify-approval-meta">
+                    <div class="verify-approval-meta-k">Student Name</div>
+                    <div class="verify-approval-meta-v" id="verifyApprovalStudentName">-</div>
+                </div>
+                <div class="verify-approval-meta">
+                    <div class="verify-approval-meta-k">Student Number</div>
+                    <div class="verify-approval-meta-v" id="verifyApprovalStudentNumber">-</div>
+                </div>
+                <div class="verify-approval-meta">
+                    <div class="verify-approval-meta-k">Course</div>
+                    <div class="verify-approval-meta-v" id="verifyApprovalStudentCourse">-</div>
+                </div>
+            </div>
+
+            <div class="verify-approval-doc-wrap">
+                <p class="verify-approval-doc-title">Uploaded Health Form (PDF)</p>
+                <div id="verifyApprovalDocMissing" class="verify-approval-doc-missing" style="display:none;">
+                    No uploaded Health Form PDF found.
+                </div>
+                <div id="verifyApprovalDocFrame" class="verify-approval-doc-frame" style="display:none;">
+                    <iframe id="verifyApprovalDocViewer" src=""></iframe>
+                </div>
+            </div>
+
+            <form id="verifyApprovalForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="clearance_status" value="Issued">
+                <input type="hidden" name="pending_reason" value="">
+                <div class="verify-approval-actions">
+                    <button type="button" class="verify-approval-btn verify-approval-btn-cancel" id="verifyApprovalCancelBtn">Cancel</button>
+                    <button type="submit" class="verify-approval-btn verify-approval-btn-approve" id="verifyApprovalApproveBtn">Approve</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="health-filter-modal" id="healthFilterModal" aria-hidden="true">
@@ -993,6 +1284,17 @@
     const healthRecordsSearchShell = document.getElementById('healthRecordsSearchShell');
     const healthRecordsSearchToggle = document.getElementById('healthRecordsSearchToggle');
     const healthRows = Array.from(document.querySelectorAll('#healthTable tbody tr[data-health-row]'));
+    const verifyApprovalModal = document.getElementById('verifyApprovalModal');
+    const verifyApprovalCloseBtn = document.getElementById('verifyApprovalCloseBtn');
+    const verifyApprovalCancelBtn = document.getElementById('verifyApprovalCancelBtn');
+    const verifyApprovalStudentName = document.getElementById('verifyApprovalStudentName');
+    const verifyApprovalStudentNumber = document.getElementById('verifyApprovalStudentNumber');
+    const verifyApprovalStudentCourse = document.getElementById('verifyApprovalStudentCourse');
+    const verifyApprovalDocViewer = document.getElementById('verifyApprovalDocViewer');
+    const verifyApprovalDocFrame = document.getElementById('verifyApprovalDocFrame');
+    const verifyApprovalDocMissing = document.getElementById('verifyApprovalDocMissing');
+    const verifyApprovalForm = document.getElementById('verifyApprovalForm');
+    const verifyApprovalApproveBtn = document.getElementById('verifyApprovalApproveBtn');
 
     function setHealthFilterOpenState(isOpen) {
         if (!healthFilterToggle || !healthFilterModal) {
@@ -1085,6 +1387,88 @@
 
                 window.location.href = viewUrl;
             });
+        });
+    });
+
+    const setVerifyApprovalModalOpenState = function (isOpen) {
+        if (!verifyApprovalModal) {
+            return;
+        }
+
+        verifyApprovalModal.classList.toggle('is-open', isOpen);
+        verifyApprovalModal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    };
+
+    if (verifyApprovalCloseBtn) {
+        verifyApprovalCloseBtn.addEventListener('click', function () {
+            setVerifyApprovalModalOpenState(false);
+        });
+    }
+
+    if (verifyApprovalCancelBtn) {
+        verifyApprovalCancelBtn.addEventListener('click', function () {
+            setVerifyApprovalModalOpenState(false);
+        });
+    }
+
+    if (verifyApprovalModal) {
+        verifyApprovalModal.addEventListener('click', function (event) {
+            if (event.target === verifyApprovalModal) {
+                setVerifyApprovalModalOpenState(false);
+            }
+        });
+    }
+
+    document.querySelectorAll('.js-open-verify-modal').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const studentName = button.getAttribute('data-student-name') || '-';
+            const studentNumber = button.getAttribute('data-student-number') || '-';
+            const studentCourse = button.getAttribute('data-student-course') || '-';
+            const healthFormUrl = button.getAttribute('data-health-form-url') || '';
+            const approveUrl = button.getAttribute('data-approve-url') || '';
+
+            if (verifyApprovalStudentName) {
+                verifyApprovalStudentName.textContent = studentName;
+            }
+            if (verifyApprovalStudentNumber) {
+                verifyApprovalStudentNumber.textContent = studentNumber;
+            }
+            if (verifyApprovalStudentCourse) {
+                verifyApprovalStudentCourse.textContent = studentCourse;
+            }
+            if (verifyApprovalForm) {
+                verifyApprovalForm.setAttribute('action', approveUrl);
+            }
+
+            if (healthFormUrl.trim() !== '') {
+                if (verifyApprovalDocViewer) {
+                    verifyApprovalDocViewer.setAttribute('src', healthFormUrl);
+                }
+                if (verifyApprovalDocFrame) {
+                    verifyApprovalDocFrame.style.display = '';
+                }
+                if (verifyApprovalDocMissing) {
+                    verifyApprovalDocMissing.style.display = 'none';
+                }
+                if (verifyApprovalApproveBtn) {
+                    verifyApprovalApproveBtn.disabled = false;
+                }
+            } else {
+                if (verifyApprovalDocViewer) {
+                    verifyApprovalDocViewer.setAttribute('src', '');
+                }
+                if (verifyApprovalDocFrame) {
+                    verifyApprovalDocFrame.style.display = 'none';
+                }
+                if (verifyApprovalDocMissing) {
+                    verifyApprovalDocMissing.style.display = '';
+                }
+                if (verifyApprovalApproveBtn) {
+                    verifyApprovalApproveBtn.disabled = true;
+                }
+            }
+
+            setVerifyApprovalModalOpenState(true);
         });
     });
 

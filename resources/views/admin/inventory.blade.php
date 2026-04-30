@@ -315,7 +315,8 @@
         align-items: center; 
     }
     .modal-box {
-        background: rgba(255, 255, 255, 0.48) !important;
+        background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.24)) !important;
         width: 760px;
         max-width: 94vw;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
@@ -323,8 +324,8 @@
         border-top: 4px solid #70131B !important;
         border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
+        backdrop-filter: blur(14px) saturate(140%) !important;
+        -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
         box-shadow: 0 24px 46px rgba(15, 23, 42, 0.24);
         overflow: hidden;
         padding: 0;
@@ -336,16 +337,16 @@
     }
     .inventory-modal-title {
         margin: 0;
-        color: #ffffff;
+        color: #ffffff !important;
         font-size: 18px;
         font-weight: 800;
         line-height: 1.2;
     }
     .inventory-modal-copy {
         margin: 4px 0 0;
-        color: rgba(255, 255, 255, 0.88);
+        color: #ffffff !important;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
     }
     .inventory-modal-body {
         padding: 18px 20px 20px;
@@ -358,10 +359,10 @@
     .modal-form-panel {
         border: 1px solid rgba(112, 19, 27, 0.16);
         border-radius: 16px;
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.42);
         padding: 16px;
         box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.84),
+            inset 0 1px 0 rgba(255, 255, 255, 0.54),
             0 8px 18px rgba(112, 19, 27, 0.06);
     }
     .modal-panel-title {
@@ -370,30 +371,47 @@
         font-weight: 800;
         color: #70131B;
     }
-    .form-group { margin-bottom: 15px; }
+    .form-group {
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(127, 29, 45, 0.12);
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
     .form-group label {
         display: block;
-        margin-bottom: 6px;
-        font-size: 13px;
+        margin-bottom: 4px;
+        font-size: 0.74rem;
         font-weight: 700;
-        color: #111827;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
     }
     .form-control,
     .form-select {
         width: 100%;
-        min-height: 46px;
-        padding: 10px 12px;
-        border-radius: 12px;
-        border: 1px solid #d1d5db;
+        min-height: 24px;
+        padding: 0;
+        border-radius: 0;
+        border: 0;
         color: #111827;
-        background: #f8fafc;
-        transition: border-color .18s ease, box-shadow .18s ease;
+        background: transparent;
+        box-shadow: none;
+        font-weight: 700;
+        transition: color .18s ease, box-shadow .18s ease;
     }
     .form-control:focus,
     .form-select:focus {
         outline: none;
-        border-color: rgba(127, 29, 45, 0.5);
-        box-shadow: 0 0 0 0.18rem rgba(127, 29, 45, 0.12);
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+    .form-control::placeholder {
+        color: #9ca3af;
+        font-weight: 600;
     }
     .inventory-subgroup {
         display: none;
@@ -507,30 +525,29 @@
     }
 
     html[data-theme="dark"] .modal-form-panel {
-        background: rgba(15, 23, 42, 0.42);
+        background: rgba(15, 23, 42, 0.34);
         border-color: rgba(148, 163, 184, 0.24);
     }
 
+    html[data-theme="dark"] .form-group {
+        background: rgba(15, 23, 42, 0.5);
+        border-color: rgba(148, 163, 184, 0.28);
+    }
+
     html[data-theme="dark"] .form-group label {
-        color: #ffffff !important;
+        color: #cbd5e1 !important;
     }
 
     html[data-theme="dark"] .form-control,
     html[data-theme="dark"] .form-select,
     html[data-theme="dark"] .form-control option {
-        background: rgba(18, 8, 12, 0.82);
+        background: transparent;
         color: #ffffff !important;
-        border-color: rgba(148, 163, 184, 0.34);
+        border-color: transparent;
     }
 
     html[data-theme="dark"] .form-control::placeholder {
-        color: #cbd5e1;
-    }
-
-    html[data-theme="dark"] .form-control:focus,
-    html[data-theme="dark"] .form-select:focus {
-        border-color: rgba(250, 204, 21, 0.58);
-        box-shadow: 0 0 0 0.18rem rgba(250, 204, 21, 0.18);
+        color: #94a3b8;
     }
 
     html[data-theme="dark"] #medicineFields,

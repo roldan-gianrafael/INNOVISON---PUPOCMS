@@ -297,7 +297,7 @@
         .student-quick-actions-toggle {
             animation: quickActionsGlow 2.2s ease-in-out infinite;
             position: relative;
-            margin-left: -4px;
+            margin-left: 0;
         }
 
         .student-quick-actions-toggle:hover,
@@ -488,11 +488,6 @@
         .student-quick-action-item.is-notifications {
             grid-row: 3;
             margin-top: 4px;
-        }
-
-        .student-quick-action-item.is-theme .student-quick-action-btn,
-        .student-quick-action-item.is-notifications .student-quick-action-btn {
-            margin-left: -4px;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-action-item {
@@ -1814,20 +1809,25 @@
             setTheme(currentTheme);
 
             function initAccessibilityLaunch() {
+                function isStudentAccessibilityLauncher(element) {
+                    return !!element && (element.id === 'studentAccessibilityLaunch' || element.classList.contains('student-accessibility-launch'));
+                }
+
                 function findSiennaTrigger() {
                     const selectorMatches = [
+                        '.asw-menu-btn',
                         '#sienna-accessibility-button',
                         '.sienna-accessibility-button',
                         '.sienna-accessibility-trigger',
                         '[data-sienna-accessibility-trigger]',
-                        'button[aria-label*="accessibility" i]',
-                        'button[title*="accessibility" i]',
-                        '[role="button"][aria-label*="accessibility" i]'
+                        'button[aria-label*="accessibility" i]:not(#studentAccessibilityLaunch)',
+                        'button[title*="accessibility" i]:not(#studentAccessibilityLaunch)',
+                        '[role="button"][aria-label*="accessibility" i]:not(#studentAccessibilityLaunch)'
                     ];
 
                     for (const selector of selectorMatches) {
                         const candidate = document.querySelector(selector);
-                        if (candidate) {
+                        if (candidate && !isStudentAccessibilityLauncher(candidate)) {
                             return candidate;
                         }
                     }
@@ -1843,7 +1843,7 @@
                             const style = window.getComputedStyle(element);
                             const looksFloating = style.position === 'fixed' || style.position === 'sticky';
 
-                            return looksFloating && label.includes('access');
+                            return looksFloating && label.includes('access') && !isStudentAccessibilityLauncher(element);
                         });
 
                     return fallbackCandidates[0] || null;

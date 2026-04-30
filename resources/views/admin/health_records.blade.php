@@ -183,11 +183,15 @@
         flex: 1; /* Hahatiin ang space sa dalawa (50/50) */
     }
     .summary-medical-assessment-btn {
-        display: block;
+        display: flex;
+        align-items: center;
+        width: 100%;
         height: 100%;
+        box-sizing: border-box;
         padding: 15px 24px !important;
         border-radius: 12px;
-        border: 2px solid #facc15;
+        border: 1px solid #facc15;
+        border-left: 5px solid #facc15;
         background: linear-gradient(135deg, #70131B, #8f2230);
         color: #ffffff;
         text-decoration: none;
@@ -214,6 +218,9 @@
     .summary-medical-assessment-btn .health-summary-label,
     .summary-medical-assessment-btn .health-summary-value {
         color: #ffffff !important;
+    }
+    .summary-medical-assessment-btn .health-summary-row {
+        width: 100%;
     }
 
     .health-records-title {
@@ -1105,7 +1112,7 @@
             </div>
         </div>
         <div class="summary-item">
-            <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="summary-medical-assessment-btn">
+            <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="summary-medical-assessment-btn card p-3">
                 <div class="health-summary-row">
                     <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Medical</span><span>Assessment</span></small>
                     <h3 class="fw-bold mb-0 health-summary-value"><x-outline-icon name="qr-code" /></h3>

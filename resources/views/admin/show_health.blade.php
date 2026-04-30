@@ -9,9 +9,54 @@
     .profile-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
     .profile-title { margin: 0; font-size: 20px; font-weight: 800; color: #0f172a; }
     .profile-sub { margin: 6px 0 0; font-size: 13px; color: #64748b; }
-    .profile-back { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #1e293b; background: #e2e8f0; border: 1px solid #cbd5e1; text-decoration: none; }
-    .profile-assessment { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #ffffff; background: #70131B; border: 1px solid #8f2230; text-decoration: none; }
-    .profile-assessment:hover { color: #ffffff; text-decoration: none; }
+    .profile-top-btn {
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        min-height: 42px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #ffffff;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        border: 1px solid #8f2230;
+        text-decoration: none;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+    .profile-top-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+    .profile-top-btn:hover {
+        color: #ffffff;
+        text-decoration: none;
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+    .profile-top-btn:hover::after {
+        transform: translateX(135%);
+    }
     .profile-head-actions { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .profile-switch { display: flex; gap: 10px; flex-wrap: wrap; }
     .profile-tab {
@@ -56,8 +101,13 @@
     [data-theme="dark"] .profile-meta-k,
     [data-theme="dark"] .doc-missing { color: #cbd5e1; }
     [data-theme="dark"] .profile-meta { background: #111827; border-color: #334155; }
-    [data-theme="dark"] .profile-back { background: #1e293b; color: #f8fafc; border-color: #475569; }
-    [data-theme="dark"] .profile-assessment { background: #8f2230; border-color: #facc15; color: #ffffff; }
+    [data-theme="dark"] .profile-top-btn {
+        color: #ffffff;
+        border-color: rgba(250, 204, 21, 0.30);
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.16),
+            0 12px 22px rgba(0, 0, 0, 0.24);
+    }
     [data-theme="dark"] .profile-tab { background: #111827; border-color: #475569; color: #f8fafc; }
     [data-theme="dark"] .profile-tab.is-active { background: #70131B; border-color: #8f2230; color: #fff; }
     [data-theme="dark"] .doc-link { background: #111827; border-color: #475569; color: #f8fafc; }
@@ -81,11 +131,11 @@
                 <p class="profile-sub">Issued health profile details and submitted documents.</p>
             </div>
             <div class="profile-head-actions">
-                <a href="{{ route('admin.medical_assessment', $profile->id) }}" class="profile-assessment">
+                <a href="{{ route('admin.medical_assessment', $profile->id) }}" class="profile-top-btn">
                     <x-outline-icon name="clipboard-document-list" />
                     Medical Assessment
                 </a>
-                <a href="{{ route('admin.health_records') }}" class="profile-back">
+                <a href="{{ route('admin.health_records') }}" class="profile-top-btn">
                     <x-outline-icon name="arrow-left-on-rectangle" />
                     Back to Health Records
                 </a>

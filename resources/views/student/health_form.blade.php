@@ -28,7 +28,7 @@
             background:
                 linear-gradient(rgba(39, 14, 17, 0.82), rgba(22, 8, 8, 0.84)),
                 url('{{ asset('images/PUPBG.jpg') }}') center center / cover no-repeat fixed;
-            padding: 28px 12px;
+            padding: 28px 12px 120px;
         }
 
         .health-shell {
@@ -88,12 +88,24 @@
             transform: translateX(-50%);
             width: min(972px, calc(100vw - 10px));
             box-sizing: border-box;
-            z-index: 70;
+            z-index: 50;
             background: rgba(255, 255, 255, 0.92);
             padding: 10px;
             border-radius: 16px;
             border: 1px solid rgba(127, 29, 45, 0.12);
             backdrop-filter: blur(8px);
+        }
+
+        :where(.asw-menu-btn) {
+            position: fixed !important;
+            right: 22px !important;
+            bottom: 14px !important;
+            z-index: 2147483000 !important;
+        }
+
+        :where(.asw-menu-btn),
+        :where(.asw-menu-btn *) {
+            pointer-events: auto !important;
         }
 
         .stepper-spacer {
@@ -411,6 +423,10 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding-bottom: 132px;
+            }
+
             .stepper-shell,
             .profile-readonly-grid,
             .step-one-grid {

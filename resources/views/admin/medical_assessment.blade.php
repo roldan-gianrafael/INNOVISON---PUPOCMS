@@ -10,6 +10,46 @@
     .assessment-title { margin: 0; font-size: 20px; font-weight: 800; color: #0f172a; }
     .assessment-sub { margin: 6px 0 0; font-size: 13px; color: #64748b; }
     .assessment-back { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #1e293b; background: #e2e8f0; border: 1px solid #cbd5e1; text-decoration: none; }
+    .patient-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8fafc;
+        padding: 15px 18px;
+        border-radius: 10px;
+        margin-bottom: 16px;
+        border-left: 4px solid #8B0000;
+    }
+    .patient-header-name { margin: 0 0 6px; font-size: 20px; font-weight: 800; color: #0f172a; }
+    .badge-chip {
+        display: inline-flex;
+        align-items: center;
+        background: #e2e8f0;
+        color: #334155;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 800;
+        margin-right: 8px;
+        margin-bottom: 4px;
+    }
+    .badge-chip-applicant {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    .patient-date-right {
+        text-align: right;
+    }
+    .patient-date-label {
+        display: block;
+        font-size: 12px;
+        color: #94a3b8;
+    }
+    .patient-date-value {
+        font-weight: 700;
+        color: #334155;
+    }
     .assessment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .assessment-field { display: grid; gap: 6px; }
     .assessment-label { font-size: 12px; font-weight: 700; color: #334155; }
@@ -51,6 +91,12 @@
     [data-theme="dark"] .assessment-control[readonly] { background: #1e293b; }
     [data-theme="dark"] .assessment-radios label { color: #f8fafc; }
     [data-theme="dark"] .assessment-btn-cancel { background: #1e293b; color: #f8fafc; border-color: #475569; }
+    [data-theme="dark"] .patient-header { background: #111827; border-left-color: #facc15; }
+    [data-theme="dark"] .patient-header-name { color: #f8fafc; }
+    [data-theme="dark"] .badge-chip { background: #1f2937; color: #e2e8f0; }
+    [data-theme="dark"] .badge-chip-applicant { background: #3f2a00; color: #facc15; }
+    [data-theme="dark"] .patient-date-label { color: #cbd5e1; }
+    [data-theme="dark"] .patient-date-value { color: #f8fafc; }
 
     @media (max-width: 768px) {
         .assessment-grid { grid-template-columns: 1fr; }
@@ -59,6 +105,9 @@
 @endpush
 
 @section('content')
+@php
+    $studentRole = \App\Models\Appointment::normalizeUserType($profile->user->user_role ?? $profile->user->user_type ?? 'Student');
+@endphp
 <div class="assessment-wrap">
     <div class="assessment-card">
         <div class="assessment-head">
@@ -74,6 +123,19 @@
     </div>
 
     <div class="assessment-card">
+        <div class="patient-header">
+            <div>
+                <h3 class="patient-header-name">{{ $profile->user->name ?? 'N/A' }}</h3>
+                <span class="badge-chip">{{ $studentRole }}</span>
+                <span class="badge-chip">{{ $profile->user->student_number ?: ($profile->user->student_id ?? 'N/A') }}</span>
+                <span class="badge-chip badge-chip-applicant">Applicant</span>
+            </div>
+            <div class="patient-date-right">
+                <span class="patient-date-label">Date Today</span>
+                <span class="patient-date-value">{{ now()->format('F d, Y') }}</span>
+            </div>
+        </div>
+
         @if(session('success'))
             <div class="assessment-success">{{ session('success') }}</div>
         @endif

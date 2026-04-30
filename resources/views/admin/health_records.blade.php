@@ -177,9 +177,43 @@
         gap: 20px;
         width: 100%;
         margin-bottom: 25px;
+        align-items: stretch;
     }
     .summary-item {
         flex: 1; /* Hahatiin ang space sa dalawa (50/50) */
+    }
+    .summary-medical-assessment-btn {
+        display: block;
+        height: 100%;
+        padding: 15px 24px !important;
+        border-radius: 12px;
+        border: 2px solid #facc15;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        text-decoration: none;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .summary-medical-assessment-btn:hover {
+        color: #ffffff;
+        text-decoration: none;
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+    .summary-medical-assessment-btn svg {
+        width: 19px;
+        height: 19px;
+        flex: 0 0 auto;
+        stroke-width: 2;
+    }
+    .summary-medical-assessment-btn .health-summary-label,
+    .summary-medical-assessment-btn .health-summary-value {
+        color: #ffffff !important;
     }
 
     .health-records-title {
@@ -737,6 +771,13 @@
     html[data-theme="dark"] .health-row-clickable:hover td {
         background: rgba(20, 83, 45, 0.34);
     }
+    html[data-theme="dark"] .summary-medical-assessment-btn {
+        color: #ffffff;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.16),
+            0 12px 22px rgba(0, 0, 0, 0.24);
+    }
 
     .verify-approval-modal {
         position: fixed;
@@ -1006,6 +1047,11 @@
         .verify-approval-student {
             grid-template-columns: 1fr;
         }
+
+        .summary-container {
+            flex-direction: column;
+        }
+
     }
 </style>
 @endpush
@@ -1057,6 +1103,14 @@
                     <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_disability', 'Yes')->count() }}</h3>
                 </div>
             </div>
+        </div>
+        <div class="summary-item">
+            <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="summary-medical-assessment-btn">
+                <div class="health-summary-row">
+                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Medical</span><span>Assessment</span></small>
+                    <h3 class="fw-bold mb-0 health-summary-value"><x-outline-icon name="qr-code" /></h3>
+                </div>
+            </a>
         </div>
     </div>
 

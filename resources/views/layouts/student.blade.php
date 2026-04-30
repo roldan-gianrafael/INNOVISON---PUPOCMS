@@ -418,6 +418,7 @@
             transform-origin: bottom center;
             transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
             z-index: 1002;
+            overflow: visible;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-actions-panel {
@@ -440,6 +441,7 @@
             pointer-events: none;
             opacity: 0;
             visibility: hidden;
+            z-index: 1;
         }
 
         .student-quick-actions-panel::before {
@@ -457,6 +459,7 @@
             pointer-events: none;
             opacity: 0;
             visibility: hidden;
+            z-index: 1;
         }
 
         .student-quick-actions-wrap.is-open .student-quick-actions-panel::before,
@@ -473,6 +476,7 @@
             opacity: 0;
             transform: translateY(18px) scale(0.86);
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 2;
         }
 
         .student-quick-action-item.is-accessibility {
@@ -854,6 +858,16 @@
 
         html[data-theme="light"] .student-quick-actions-divider {
             background: rgba(128, 0, 0, 0.12);
+        }
+
+        html[data-theme="light"] .student-quick-actions-panel::after {
+            border-bottom-color: #facc15;
+            filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.75));
+        }
+
+        html[data-theme="light"] .student-quick-actions-panel::before {
+            border-top-color: #facc15;
+            filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.75));
         }
 
         html[data-theme="light"] .student-quick-actions-badge {

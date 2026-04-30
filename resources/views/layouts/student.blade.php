@@ -863,21 +863,21 @@
         html[data-theme="dark"] .student-quick-actions-toggle,
         html[data-theme="dark"] .student-quick-action-btn,
         html[data-theme="dark"] .student-quick-action-link {
-            background: linear-gradient(145deg, #d1d5db, #9ca3af);
-            border-color: #6b7280;
-            color: #5f0012 !important;
+            background: linear-gradient(145deg, #9b111e, #6e1220 55%, #4f0b15);
+            border-color: #facc15;
+            color: #ffffff !important;
             box-shadow:
-                0 0 0 3px rgba(148, 163, 184, 0.18),
-                0 0 18px rgba(148, 163, 184, 0.28),
-                0 10px 22px rgba(15, 23, 42, 0.26);
+                0 0 0 3px rgba(250, 204, 21, 0.12),
+                0 0 18px rgba(250, 204, 21, 0.32),
+                0 12px 26px rgba(95, 0, 18, 0.34);
         }
 
         html[data-theme="dark"] .student-quick-actions-toggle:hover,
         html[data-theme="dark"] .student-quick-action-btn:hover,
         html[data-theme="dark"] .student-quick-action-link:hover {
-            background: linear-gradient(145deg, #e5e7eb, #cbd5e1);
-            border-color: #facc15;
-            color: #5f0012 !important;
+            background: linear-gradient(145deg, rgba(176, 24, 38, 0.82), rgba(127, 29, 45, 0.7) 55%, rgba(90, 15, 22, 0.8));
+            border-color: #fde047;
+            color: #ffffff !important;
             box-shadow:
                 0 0 0 3px rgba(250, 204, 21, 0.14),
                 0 0 20px rgba(250, 204, 21, 0.24),

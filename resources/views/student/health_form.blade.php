@@ -42,22 +42,26 @@
         }
 
         .health-header {
-            padding: 24px 28px;
+            height: 12px;
             background: linear-gradient(135deg, var(--clinic-maroon) 0%, var(--clinic-maroon-dark) 100%);
-            color: #fff;
             border-bottom: 2px solid var(--clinic-yellow);
         }
 
-        .health-header h1 {
+        .form-intro {
+            margin-bottom: 18px;
+        }
+
+        .form-intro h1 {
             margin: 0;
             font-size: 1.6rem;
             font-weight: 800;
+            color: #70131b;
         }
 
-        .health-header p {
+        .form-intro p {
             margin: 8px 0 0;
             font-size: 0.95rem;
-            opacity: 0.95;
+            color: #4b5563;
         }
 
         .section-body {
@@ -77,7 +81,21 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
-            margin-bottom: 18px;
+            position: fixed;
+            left: 50%;
+            top: 14px;
+            transform: translateX(-50%);
+            width: min(920px, calc(100vw - 26px));
+            z-index: 70;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(127, 29, 45, 0.12);
+            backdrop-filter: blur(8px);
+        }
+
+        .stepper-spacer {
+            height: 92px;
         }
 
         .step-chip {
@@ -264,10 +282,39 @@
             display: none;
         }
 
+        .step-one-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field.span-2 {
+            grid-column: span 2;
+        }
+
         @media (max-width: 768px) {
             .stepper-shell,
-            .profile-readonly-grid {
+            .profile-readonly-grid,
+            .step-one-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .form-field.span-2 {
+                grid-column: span 1;
+            }
+
+            .stepper-shell {
+                top: 8px;
+                width: calc(100vw - 16px);
+            }
+
+            .stepper-spacer {
+                height: 102px;
             }
         }
     </style>
@@ -278,10 +325,7 @@
     @endphp
 
     <div class="health-shell">
-        <div class="health-header">
-            <h1>Student Health Profile</h1>
-            <p>Complete personal information and upload required clinic documents.</p>
-        </div>
+        <div class="health-header"></div>
 
         <div class="section-body">
             @if(session('error'))
@@ -290,122 +334,123 @@
             @if($errors->any())
                 <div class="alert alert-danger">{{ $errors->first() }}</div>
             @endif
+            @php
+                $selectedPwd = old('has_disability', $prefill['has_disability'] ?? 'No');
+                $stepTwoErrorFields = ['has_disability', 'disability_type', 'medical_certificate', 'chest_xray_result', 'pwd_id_proof', 'student_photo'];
+                $startStep = collect($stepTwoErrorFields)->contains(fn ($field) => $errors->has($field)) ? 2 : 1;
+            @endphp
+
+            <div class="stepper-shell">
+                <div class="step-chip {{ $startStep === 1 ? 'is-active' : '' }}" id="chipStep1">
+                    <small>Step 1</small>
+                    <strong>Information</strong>
+                </div>
+                <div class="step-chip {{ $startStep === 2 ? 'is-active' : '' }}" id="chipStep2">
+                    <small>Step 2</small>
+                    <strong>Upload Requirements</strong>
+                </div>
+            </div>
+            <div class="stepper-spacer"></div>
 
             <form action="{{ route('store.health.form') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" name="student_id" value="{{ old('student_id', $prefill['student_id'] ?? $user->student_id) }}">
-                @php
-                    $selectedPwd = old('has_disability', $prefill['has_disability'] ?? 'No');
-                    $stepTwoErrorFields = ['has_disability', 'disability_type', 'medical_certificate', 'chest_xray_result', 'pwd_id_proof', 'student_photo'];
-                    $startStep = collect($stepTwoErrorFields)->contains(fn ($field) => $errors->has($field)) ? 2 : 1;
-                @endphp
-
-                <div class="stepper-shell">
-                    <div class="step-chip {{ $startStep === 1 ? 'is-active' : '' }}" id="chipStep1">
-                        <small>Step 1</small>
-                        <strong>Information</strong>
-                    </div>
-                    <div class="step-chip {{ $startStep === 2 ? 'is-active' : '' }}" id="chipStep2">
-                        <small>Step 2</small>
-                        <strong>Upload Requirements</strong>
-                    </div>
-                </div>
 
                 <div class="step-panel {{ $startStep === 2 ? 'is-hidden' : '' }}" id="stepPanel1">
                     <h2 class="section-title">Step 1: Information</h2>
+                    <div class="form-intro">
+                        <h1>Student Health Profile</h1>
+                        <p>Complete personal information and upload required clinic documents.</p>
+                    </div>
                     <div class="profile-readonly-grid">
                         <div class="readonly-item">
-                            <small>Student Name (Admission API)</small>
+                            <small>Student Name</small>
                             <strong>{{ old('full_name', $prefill['full_name'] ?? $user->name) }}</strong>
                         </div>
                         <div class="readonly-item">
-                            <small>Email (Admission API)</small>
+                            <small>Email</small>
                             <strong>{{ old('email', $prefill['email'] ?? $user->email) }}</strong>
                         </div>
                         <div class="readonly-item">
-                            <small>Student ID</small>
-                            <strong>{{ old('student_id', $prefill['student_id'] ?? $user->student_id) }}</strong>
-                        </div>
-                        <div class="readonly-item">
-                            <small>Course (Admission API)</small>
+                            <small>Course</small>
                             <strong>{{ old('course_college', $prefill['course_college'] ?? $user->course) }}</strong>
                         </div>
                     </div>
 
-                    <div class="row g-3">
-                        <div class="col-md-4">
+                    <div class="step-one-grid">
+                        <div class="form-field">
                             <label class="form-label">Student Number <span class="required">*</span></label>
-                            <input type="text" name="student_number" class="form-control" required value="{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}">
+                            <input type="text" name="student_number" class="form-control" readonly required value="{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="form-field">
                             <label class="form-label">School Year <span class="required">*</span></label>
                             <input type="text" name="school_year" class="form-control" required value="{{ old('school_year', $prefill['school_year'] ?? '') }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="form-field">
                             <label class="form-label">Course / College <span class="required">*</span></label>
-                            <input type="text" name="course_college" class="form-control" required value="{{ old('course_college', $prefill['course_college'] ?? '') }}">
+                            <input type="text" name="course_college" class="form-control" readonly required value="{{ old('course_college', $prefill['course_college'] ?? '') }}">
                         </div>
 
-                        <div class="col-md-8">
+                        <div class="form-field span-2">
                             <label class="form-label">Home Address <span class="required">*</span></label>
-                            <input type="text" name="home_address" class="form-control" required value="{{ old('home_address', $prefill['home_address'] ?? '') }}">
+                            <input type="text" name="home_address" class="form-control" readonly required value="{{ old('home_address', $prefill['home_address'] ?? '') }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="form-field">
                             <label class="form-label">Zip Code <span class="required">*</span></label>
-                            <input type="text" name="zipcode" class="form-control" required value="{{ old('zipcode', $prefill['zipcode'] ?? '') }}">
+                            <input type="text" name="zipcode" class="form-control" readonly required value="{{ old('zipcode', $prefill['zipcode'] ?? '') }}">
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="form-field">
                             <label class="form-label">Birthday <span class="required">*</span></label>
-                            <input type="date" name="birthday" id="birthday" class="form-control" required value="{{ old('birthday', $prefill['birthday'] ?? '') }}">
+                            <input type="date" name="birthday" id="birthday" class="form-control" readonly required value="{{ old('birthday', $prefill['birthday'] ?? '') }}">
                         </div>
-                        <div class="col-md-2">
+                        <div class="form-field">
                             <label class="form-label">Age <span class="required">*</span></label>
-                            <input type="number" name="age" id="age" class="form-control" min="15" max="100" required value="{{ old('age', $prefill['age'] ?? '') }}">
+                            <input type="number" name="age" id="age" class="form-control" min="15" max="100" readonly required value="{{ old('age', $prefill['age'] ?? '') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Sex <span class="required">*</span></label>
-                            <select name="sex" class="form-select" required>
-                                <option value="">Select</option>
-                                <option value="Male" {{ old('sex', $prefill['sex'] ?? '') === 'Male' ? 'selected' : '' }}>Male</option>
-                                <option value="Female" {{ old('sex', $prefill['sex'] ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
-                            </select>
+                        <div class="form-field">
+                            <label class="form-label">Gender <span class="required">*</span></label>
+                            <input type="text" name="sex" class="form-control" readonly required value="{{ old('sex', $prefill['sex'] ?? '') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="form-field">
                             <label class="form-label">Civil Status <span class="required">*</span></label>
-                            <select name="civil_status" class="form-select" required>
-                                <option value="">Select</option>
-                                <option value="Single" {{ old('civil_status', $prefill['civil_status'] ?? '') === 'Single' ? 'selected' : '' }}>Single</option>
-                                <option value="Married" {{ old('civil_status', $prefill['civil_status'] ?? '') === 'Married' ? 'selected' : '' }}>Married</option>
-                            </select>
+                            <input type="text" name="civil_status" class="form-control" readonly required value="{{ old('civil_status', $prefill['civil_status'] ?? '') }}">
                         </div>
 
-                        <div class="col-md-2">
+                        <div class="form-field">
                             <label class="form-label">Height (cm) <span class="required">*</span></label>
                             <input type="number" step="0.01" min="0" name="height" class="form-control" required value="{{ old('height', $prefill['height'] ?? '') }}">
                         </div>
-                        <div class="col-md-2">
+                        <div class="form-field">
                             <label class="form-label">Weight (kg) <span class="required">*</span></label>
                             <input type="number" step="0.01" min="0" name="weight" class="form-control" required value="{{ old('weight', $prefill['weight'] ?? '') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="form-field">
                             <label class="form-label">Blood Type <span class="required">*</span></label>
-                            <input type="text" name="blood_type" class="form-control" required value="{{ old('blood_type', $prefill['blood_type'] ?? '') }}">
+                            <select name="blood_type" class="form-select" required>
+                                @php
+                                    $selectedBloodType = old('blood_type', $prefill['blood_type'] ?? '');
+                                    $bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Unknown'];
+                                @endphp
+                                <option value="">Select Blood Type</option>
+                                @foreach ($bloodTypes as $bloodType)
+                                    <option value="{{ $bloodType }}" {{ $selectedBloodType === $bloodType ? 'selected' : '' }}>{{ $bloodType }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="col-md-5">
+                        <div class="form-field">
                             <label class="form-label">Contact Number <span class="required">*</span></label>
-                            <input type="text" name="contact_no" class="form-control" required value="{{ old('contact_no', $prefill['contact_number'] ?? $user->contact_no) }}">
+                            <input type="text" name="contact_no" class="form-control" readonly required value="{{ old('contact_no', $prefill['contact_number'] ?? $user->contact_no) }}">
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="form-field">
                             <label class="form-label">Guardian Name <span class="required">*</span></label>
                             <input type="text" name="guardian_name" class="form-control" required value="{{ old('guardian_name', $prefill['guardian_name'] ?? '') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="form-field">
                             <label class="form-label">Guardian Contact <span class="required">*</span></label>
                             <input type="text" name="cellphone" class="form-control" required value="{{ old('cellphone', $prefill['cellphone'] ?? '') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="form-field">
                             <label class="form-label">Landline (Optional)</label>
                             <input type="text" name="landline" class="form-control" value="{{ old('landline', $prefill['landline'] ?? '') }}">
                         </div>

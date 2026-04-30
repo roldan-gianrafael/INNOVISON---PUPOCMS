@@ -1347,8 +1347,7 @@ public function storeHealthForm(Request $request)
             'user_agent'  => $request->userAgent(),
         ]);
 
-        return redirect('/student/account')
-            ->with('health_profile_submitted', true)
+        return redirect('/student/home')
             ->with('success', 'Health Profile saved successfully.');
 
     } catch (\Exception $e) {

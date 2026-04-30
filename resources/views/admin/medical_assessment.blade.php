@@ -14,7 +14,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #f8fafc;
+        background: #8b0000;
+        color: #ffffff;
         padding: 15px 18px;
         border-radius: 10px;
         margin-bottom: 16px;

@@ -331,9 +331,17 @@
         padding: 0;
     }
     .inventory-modal-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
         padding: 16px 20px;
         background: #70131B;
         border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    .inventory-modal-head-main {
+        min-width: 0;
+        flex: 1 1 auto;
     }
     .inventory-modal-title {
         margin: 0;
@@ -375,10 +383,10 @@
         margin-bottom: 12px;
         display: flex;
         flex-direction: column;
-        border: 1px solid rgba(127, 29, 45, 0.12);
-        background: rgba(255, 255, 255, 0.4);
-        border-radius: 12px;
-        padding: 10px 12px;
+        border: 0;
+        background: transparent;
+        border-radius: 0;
+        padding: 0;
     }
     .form-group label {
         display: block;
@@ -393,12 +401,12 @@
     .form-select {
         width: 100%;
         min-height: 24px;
-        padding: 0 0 2px;
+        padding: 8px 0 4px;
         border-radius: 0 0 6px 6px;
         border: 0;
         border-bottom: 2px solid #8f2230;
         color: #111827;
-        background: transparent;
+        background: #fff8dc;
         box-shadow: none;
         font-weight: 700;
         transition: color .18s ease, box-shadow .18s ease, border-color .18s ease;
@@ -412,7 +420,7 @@
         box-shadow: none;
     }
     .form-control::placeholder {
-        color: #9ca3af;
+        color: #6b7280;
         font-weight: 600;
     }
 
@@ -426,7 +434,7 @@
     }
 
     html[data-theme="light"] .form-group {
-        background: rgba(255, 255, 255, 0.34);
+        background: transparent;
     }
     .inventory-subgroup {
         display: none;
@@ -439,6 +447,21 @@
         gap: 10px;
         justify-content: flex-end;
         margin-top: 20px;
+    }
+    .inventory-modal-close {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        padding: 0;
+        border-radius: 999px;
+        flex: 0 0 40px;
+        margin-left: auto;
+    }
+    .inventory-modal-close svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2.2;
     }
 
     @media (max-width: 760px) {
@@ -545,8 +568,8 @@
     }
 
     html[data-theme="dark"] .form-group {
-        background: rgba(15, 23, 42, 0.5);
-        border-color: rgba(148, 163, 184, 0.28);
+        background: transparent;
+        border-color: transparent;
     }
 
     html[data-theme="dark"] .form-group label {
@@ -556,7 +579,7 @@
     html[data-theme="dark"] .form-control,
     html[data-theme="dark"] .form-select,
     html[data-theme="dark"] .form-control option {
-        background: transparent;
+        background: #1f2937;
         color: #ffffff !important;
         border-color: transparent;
         border-bottom: 2px solid #8f2230;
@@ -724,8 +747,13 @@
         <div id="itemModal" class="modal-overlay">
             <div class="modal-box">
                 <div class="inventory-modal-head">
-                    <h3 id="modalTitle" class="inventory-modal-title">Add New Item</h3>
-                    <p class="inventory-modal-copy">Provide inventory details and save to update clinic stock records.</p>
+                    <div class="inventory-modal-head-main">
+                        <h3 id="modalTitle" class="inventory-modal-title">Add New Item</h3>
+                        <p class="inventory-modal-copy">Provide inventory details and save to update clinic stock records.</p>
+                    </div>
+                    <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeModal()" aria-label="Close modal">
+                        <x-outline-icon name="x-mark" />
+                    </button>
                 </div>
 
                 <form id="itemForm" method="POST" action="{{ url('/admin/inventory/store') }}">
@@ -772,7 +800,7 @@
 
                                 <div class="form-group">
                                     <label>Quantity</label>
-                                    <input type="number" name="quantity" id="iQty" class="form-control" required min="0">
+                                    <input type="number" name="quantity" id="iQty" class="form-control" required min="0" placeholder="e.g. 100">
                                 </div>
 
                                 <div class="form-group">
@@ -799,20 +827,19 @@
 
                                 <div class="form-group">
                                     <label>Date Added</label>
-                                    <input type="date" name="date_added" id="iDateAdded" class="form-control" required>
+                                    <input type="date" name="date_added" id="iDateAdded" class="form-control" required placeholder="mm/dd/yyyy">
                                 </div>
 
                                 <div id="medicineExpiryField" class="inventory-subgroup">
                                     <div class="form-group">
                                         <label>Expiration Date</label>
-                                        <input type="date" name="expiration_date" id="iExpDate" class="form-control">
+                                        <input type="date" name="expiration_date" id="iExpDate" class="form-control" placeholder="mm/dd/yyyy">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="modal-actions-row">
-                            <button type="button" class="inventory-btn-cancel" onclick="closeModal()">Cancel</button>
                             <button type="submit" class="btn-add">Save Item</button>
                         </div>
                     </div>

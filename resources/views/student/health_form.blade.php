@@ -354,6 +354,62 @@
             line-height: 1.5;
         }
 
+        .submit-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        .submit-overlay.is-open {
+            display: flex;
+        }
+
+        .submit-card {
+            width: min(360px, calc(100vw - 26px));
+            border-radius: 18px;
+            background: #ffffff;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.28);
+            padding: 26px 20px;
+            text-align: center;
+        }
+
+        .submit-check {
+            width: 72px;
+            height: 72px;
+            border-radius: 999px;
+            margin: 0 auto 12px;
+            background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: popIn 0.35s ease;
+        }
+
+        .submit-check svg {
+            width: 36px;
+            height: 36px;
+            stroke: #fff;
+            stroke-width: 2.6;
+            fill: none;
+        }
+
+        .submit-card strong {
+            display: block;
+            color: #111827;
+            font-size: 1rem;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         @media (max-width: 768px) {
             .stepper-shell,
             .profile-readonly-grid,
@@ -394,7 +450,7 @@
             @php
                 $selectedPwd = old('has_disability', $prefill['has_disability'] ?? 'No');
                 $stepTwoErrorFields = ['has_disability', 'disability_type', 'medical_certificate', 'chest_xray_result', 'pwd_id_proof', 'student_photo'];
-                $startStep = collect($stepTwoErrorFields)->contains(fn ($field) => $errors->has($field)) ? 2 : 1;
+                $startStep = $errors->any() ? 2 : (collect($stepTwoErrorFields)->contains(fn ($field) => $errors->has($field)) ? 2 : 1);
             @endphp
 
             <div class="stepper-shell">
@@ -591,6 +647,17 @@
         </div>
     </div>
 
+    <div class="submit-overlay" id="submitOverlay" aria-hidden="true">
+        <div class="submit-card">
+            <div class="submit-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+            </div>
+            <strong>Thank you for submission.</strong>
+        </div>
+    </div>
+
     <script>
         (function () {
             const form = document.querySelector('form[action="{{ route('store.health.form') }}"]');
@@ -606,7 +673,9 @@
             const disabilityTypeInput = document.getElementById('disability_type');
             const pwdProofInput = document.getElementById('pwd_id_proof');
             const pwdUploadWrap = document.getElementById('pwdUploadWrap');
+            const submitOverlay = document.getElementById('submitOverlay');
             let currentStep = {{ $startStep }};
+            let isSubmitting = false;
 
             function setStep(step) {
                 currentStep = step;
@@ -691,6 +760,10 @@
                 stepPanel1?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             form?.addEventListener('submit', (event) => {
+                if (isSubmitting) {
+                    return;
+                }
+
                 if (currentStep === 1) {
                     event.preventDefault();
                     if (!validateStepOne()) {
@@ -699,6 +772,24 @@
                     setStep(2);
                     return;
                 }
+
+                if (!form.checkValidity()) {
+                    return;
+                }
+
+                event.preventDefault();
+                isSubmitting = true;
+                submitOverlay?.classList.add('is-open');
+                const submitButtons = form.querySelectorAll('button[type="submit"], button[type="button"], a.btn');
+                submitButtons.forEach((btn) => {
+                    btn.setAttribute('aria-disabled', 'true');
+                    btn.style.pointerEvents = 'none';
+                    btn.style.opacity = '0.72';
+                });
+
+                window.setTimeout(() => {
+                    form.submit();
+                }, 850);
             });
 
             updateAgeFromBirthday();

@@ -4,14 +4,22 @@
 
 @push('styles')
 <style>
-    .profile-wrap {
+    .health-profile-wrap {
         max-width: 1120px;
         margin: 0 auto;
         display: grid;
         gap: 16px;
-        padding-right: 92px;
-        padding-bottom: 96px;
+        padding-right: 116px;
+        padding-bottom: 124px;
         box-sizing: border-box;
+    }
+    #headerQuickActions,
+    .quick-actions-wrap,
+    .quick-actions-toggle,
+    .quick-actions-panel,
+    .medicine-alert-fab,
+    .medicine-alert-panel {
+        z-index: 2147483000 !important;
     }
     .profile-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); padding: 18px; }
     .profile-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -204,9 +212,9 @@
         .profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 768px) {
-        .profile-wrap {
+        .health-profile-wrap {
             padding-right: 0;
-            padding-bottom: 126px;
+            padding-bottom: 152px;
         }
         .profile-grid,
         .doc-grid { grid-template-columns: 1fr; }
@@ -226,7 +234,7 @@
     };
     $profileStatusLabel = $profileStatusNormalized !== '' ? $profileStatusNormalized : 'Not Processed';
 @endphp
-<div class="profile-wrap">
+<div class="health-profile-wrap">
     <div class="profile-card">
         <div class="profile-head">
             <div>

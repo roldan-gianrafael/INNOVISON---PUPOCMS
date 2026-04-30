@@ -339,6 +339,21 @@
             font-weight: 700;
         }
 
+        .field-helper {
+            margin-top: 6px;
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .privacy-note {
+            margin: 14px 0 0;
+            text-align: center;
+            font-size: 0.78rem;
+            color: #5b6470;
+            line-height: 1.5;
+        }
+
         @media (max-width: 768px) {
             .stepper-shell,
             .profile-readonly-grid,
@@ -424,11 +439,12 @@
                         </div>
                     </div>
 
-                    <p class="step-fill-note">Please fill in the editable fields below.</p>
+                    <p class="step-fill-note">Please fill in this fields.</p>
                     <div class="step-one-grid">
                         <div class="form-field">
                             <label class="form-label">School Year <span class="required">*</span></label>
                             <input type="text" name="school_year" class="form-control" required value="{{ old('school_year', $prefill['school_year'] ?? '') }}">
+                            <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
 
                         <div class="form-field span-2">
@@ -460,10 +476,12 @@
                         <div class="form-field">
                             <label class="form-label">Height (cm) <span class="required">*</span></label>
                             <input type="number" step="0.01" min="0" name="height" class="form-control" required value="{{ old('height', $prefill['height'] ?? '') }}">
+                            <p class="field-helper">Enter a numeric value.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Weight (kg) <span class="required">*</span></label>
                             <input type="number" step="0.01" min="0" name="weight" class="form-control" required value="{{ old('weight', $prefill['weight'] ?? '') }}">
+                            <p class="field-helper">Enter a numeric value.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Blood Type <span class="required">*</span></label>
@@ -477,6 +495,7 @@
                                     <option value="{{ $bloodType }}" {{ $selectedBloodType === $bloodType ? 'selected' : '' }}>{{ $bloodType }}</option>
                                 @endforeach
                             </select>
+                            <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Contact Number <span class="required">*</span></label>
@@ -486,14 +505,17 @@
                         <div class="form-field">
                             <label class="form-label">Guardian Name <span class="required">*</span></label>
                             <input type="text" name="guardian_name" class="form-control" required value="{{ old('guardian_name', $prefill['guardian_name'] ?? '') }}">
+                            <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Guardian Contact <span class="required">*</span></label>
                             <input type="text" name="cellphone" class="form-control" required value="{{ old('cellphone', $prefill['cellphone'] ?? '') }}">
+                            <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Landline (Optional)</label>
                             <input type="text" name="landline" class="form-control" value="{{ old('landline', $prefill['landline'] ?? '') }}">
+                            <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
                     </div>
 
@@ -501,6 +523,9 @@
                         <a href="{{ url('/student/account') }}" class="btn btn-health btn-health-back">Back</a>
                         <button type="button" class="btn btn-health btn-health-next" id="nextToStep2">Next</button>
                     </div>
+                    <p class="privacy-note">
+                        Data Privacy Notice: The information you provide is collected for school clinic documentation and health clearance processing only, in compliance with school data privacy requirements.
+                    </p>
                 </div>
 
                 <div class="step-panel {{ $startStep === 1 ? 'is-hidden' : '' }}" id="stepPanel2">

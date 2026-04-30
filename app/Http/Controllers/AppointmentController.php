@@ -1268,6 +1268,7 @@ public function storeHealthForm(Request $request)
         'disability_type'   => 'required_if:has_disability,Yes|nullable|string|max:255',
         'pwd_id_proof'      => 'required_if:has_disability,Yes|file|mimes:pdf|max:4096',
         'medical_certificate' => 'required|file|mimes:pdf|max:4096',
+        'health_form_upload' => 'required|file|mimes:pdf|max:4096',
     ]);
 
     /** @var \App\Models\User $user */
@@ -1301,6 +1302,9 @@ public function storeHealthForm(Request $request)
         $medicalCertificatePath = $request->hasFile('medical_certificate')
             ? $request->file('medical_certificate')->store('health_profiles/medical_certificates', 'public')
             : null;
+        $healthFormUploadPath = $request->hasFile('health_form_upload')
+            ? $request->file('health_form_upload')->store('health_profiles/health_form_uploads', 'public')
+            : null;
 
         \App\Models\HealthProfile::updateOrCreate(
             ['user_id' => $user->id],
@@ -1327,6 +1331,7 @@ public function storeHealthForm(Request $request)
                 'disability_type'    => $request->disability_type,
                 'pwd_id_proof'       => $pwdIdProofPath,
                 'medical_certificate' => $medicalCertificatePath,
+                'health_form_upload' => $healthFormUploadPath,
             ]
         );
 

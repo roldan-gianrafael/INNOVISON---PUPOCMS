@@ -449,7 +449,7 @@
             @endif
             @php
                 $selectedPwd = old('has_disability', $prefill['has_disability'] ?? 'No');
-                $stepTwoErrorFields = ['has_disability', 'disability_type', 'medical_certificate', 'chest_xray_result', 'pwd_id_proof', 'student_photo'];
+                $stepTwoErrorFields = ['has_disability', 'disability_type', 'medical_certificate', 'chest_xray_result', 'pwd_id_proof', 'health_form_upload', 'student_photo'];
                 $startStep = $errors->any() ? 2 : (collect($stepTwoErrorFields)->contains(fn ($field) => $errors->has($field)) ? 2 : 1);
             @endphp
 
@@ -626,6 +626,13 @@
                             <div class="upload-card">
                                 <strong>Chest X-ray Result (PDF) <span class="required">*</span></strong>
                                 <input type="file" name="chest_xray_result" class="form-control" accept=".pdf,application/pdf" required>
+                                <small>Allowed: PDF only, max 4MB.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="upload-card">
+                                <strong>Health Form Upload (PDF) <span class="required">*</span></strong>
+                                <input type="file" name="health_form_upload" class="form-control" accept=".pdf,application/pdf" required>
                                 <small>Allowed: PDF only, max 4MB.</small>
                             </div>
                         </div>

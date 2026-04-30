@@ -358,15 +358,7 @@
             position: relative;
         }
 
-        .student-quick-action-bell svg {
-            width: 20px;
-            height: 20px;
-        }
-
         .student-accessibility-launch svg {
-            width: 32px;
-            height: 32px;
-            stroke-width: 2.1;
             transform: none;
             transform-origin: center;
             overflow: visible;
@@ -482,7 +474,7 @@
             transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .student-quick-action-item.is-notifications {
+        .student-quick-action-item.is-accessibility {
             grid-row: 1;
             margin-top: 0;
         }
@@ -492,7 +484,7 @@
             margin-top: 4px;
         }
 
-        .student-quick-action-item.is-accessibility {
+        .student-quick-action-item.is-notifications {
             grid-row: 3;
             margin-top: 4px;
         }
@@ -1656,14 +1648,11 @@
         </button>
 
         <div class="student-quick-actions-panel">
-            <div class="student-quick-action-item is-notifications">
-                <a href="{{ url('/student/account?view=notifications') }}" class="student-quick-action-btn student-quick-action-link student-quick-action-bell" aria-label="Notifications">
-                    <x-outline-icon name="bell" />
-                    @if($notificationCount > 0)
-                        <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
-                    @endif
-                </a>
-                <span class="student-quick-action-tooltip">Notifications</span>
+            <div class="student-quick-action-item is-accessibility">
+                <button type="button" id="studentAccessibilityLaunch" class="student-quick-action-btn student-accessibility-launch" aria-label="Accessibility menu" title="Accessibility">
+                    <x-outline-icon name="accessibility-person" />
+                </button>
+                <span class="student-quick-action-tooltip">Accessibility</span>
             </div>
 
             <div class="student-quick-action-item is-theme">
@@ -1673,11 +1662,14 @@
                 <span class="student-quick-action-tooltip">Theme Mode</span>
             </div>
 
-            <div class="student-quick-action-item is-accessibility">
-                <button type="button" id="studentAccessibilityLaunch" class="student-quick-action-btn student-accessibility-launch" aria-label="Accessibility menu" title="Accessibility">
-                    <x-outline-icon name="accessibility-person" />
-                </button>
-                <span class="student-quick-action-tooltip">Accessibility</span>
+            <div class="student-quick-action-item is-notifications">
+                <a href="{{ url('/student/account?view=notifications') }}" class="student-quick-action-btn student-quick-action-link student-quick-action-bell" aria-label="Notifications">
+                    <x-outline-icon name="bell" />
+                    @if($notificationCount > 0)
+                        <span class="student-quick-actions-badge">{{ $notificationCount }}</span>
+                    @endif
+                </a>
+                <span class="student-quick-action-tooltip">Notifications</span>
             </div>
         </div>
     </div>

@@ -514,7 +514,7 @@
     }
     .metric-field .metric-suffix {
         position: absolute;
-        right: 5px;
+        right: 20px;
         top: 50%;
         transform: translateY(-50%);
         font-size: 12px;

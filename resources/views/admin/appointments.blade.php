@@ -741,7 +741,7 @@
         position: relative;
         background: linear-gradient(180deg, rgba(255, 248, 208, 0.98), rgba(255, 243, 191, 0.98));
         box-shadow: inset 4px 0 0 #f59e0b;
-        animation: appointmentHighlightPulse 2.2s ease-in-out 2;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
     }
 
     .appointment-highlight-row td {
@@ -1456,10 +1456,23 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+        const clearHighlightQueryParam = function(paramName) {
+            const url = new URL(window.location.href);
+            if (!url.searchParams.has(paramName)) {
+                return;
+            }
+            url.searchParams.delete(paramName);
+            window.history.replaceState({}, document.title, url.toString());
+        };
+
         if (highlightedAppointmentId) {
             const highlightedRow = document.querySelector('[data-appointment-row][data-appointment-id="' + highlightedAppointmentId + '"]');
             if (highlightedRow) {
                 highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                window.setTimeout(function() {
+                    highlightedRow.classList.remove('appointment-highlight-row');
+                    clearHighlightQueryParam('highlight_appointment');
+                }, 5000);
             }
         }
 

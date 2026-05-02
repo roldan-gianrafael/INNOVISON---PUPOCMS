@@ -364,6 +364,25 @@ class AppointmentController extends Controller
         return $normalizedValue;
     }
 
+    private function extractMeasurementNumber($value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        if (!preg_match('/\d+(?:\.\d+)?/', $value, $matches)) {
+            return null;
+        }
+
+        $number = $matches[0];
+        if (str_contains($number, '.')) {
+            $number = rtrim(rtrim($number, '0'), '.');
+        }
+
+        return $number === '' ? null : $number;
+    }
+
     private function normalizeDoctorName(?string $value): string
     {
         $value = trim((string) $value);
@@ -1003,17 +1022,20 @@ public function updateContact(Request $request)
     }
 
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
+    $normalizedContactNo = preg_replace('/\D+/', '', (string) $request->input('contact_no', ''));
     $request->merge([
-        'contact_no' => preg_replace('/\D+/', '', (string) $request->input('contact_no', '')),
+        'contact_no' => $normalizedContactNo === '' ? null : $normalizedContactNo,
     ]);
 
     // 2. I-validate ang lahat ng fields (Contact, Year, Section, etc.)
     $validated = $request->validate([
-        'contact_no' => ['required', 'regex:/^[0-9]{10,13}$/'],
-        'year'       => empty($linkedAdminProfile) ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
-        'section'    => empty($linkedAdminProfile) ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
-        'height'     => ['nullable', 'numeric'],
-        'weight'     => ['nullable', 'numeric'],
+        'contact_no' => ['nullable', 'regex:/^[0-9]{10,13}$/'],
+        'year'       => ['nullable', 'string', 'max:10'],
+        'section'    => ['nullable', 'string', 'max:10'],
+        'height'     => ['nullable', 'string', 'max:20', 'regex:/^\s*\d+(\.\d+)?(\s*cm)?\s*$/i'],
+        'weight'     => ['nullable', 'string', 'max:20', 'regex:/^\s*\d+(\.\d+)?(\s*kg)?\s*$/i'],
+        'guardian_name' => ['nullable', 'string', 'max:255'],
+        'cellphone' => ['nullable', 'string', 'max:25'],
         'admin_profile_id' => ['nullable', 'integer', 'exists:admins,admin_id'],
         'first_name' => ['nullable', 'string', 'max:255'],
         'middle_name' => ['nullable', 'string', 'max:255'],
@@ -1030,18 +1052,27 @@ public function updateContact(Request $request)
         'office' => ['nullable', 'string', 'max:255'],
     ], [
         'contact_no.regex' => 'Please enter a valid contact number using 10 to 13 digits.',
+        'height.regex' => 'Height must be a valid number (optional unit: cm).',
+        'weight.regex' => 'Weight must be a valid number (optional unit: kg).',
     ]);
+
+    $heightNumeric = $this->extractMeasurementNumber($validated['height'] ?? null);
+    $weightNumeric = $this->extractMeasurementNumber($validated['weight'] ?? null);
+    $normalizedHeight = $heightNumeric !== null ? $this->normalizeMeasurement($heightNumeric, 'cm') : null;
+    $normalizedWeight = $weightNumeric !== null ? $this->normalizeMeasurement($weightNumeric, 'kg') : null;
 
     // 3. I-track ang changes para sa Log (Optional: Para alam ng Admin kung ano ang binago)
     $oldYear = $user->year;
     $newYear = $validated['year'] ?? $user->year;
 
     // 4. I-save ang mga bagong data
-    $user->contact_no = $validated['contact_no'];
+    if (array_key_exists('contact_no', $validated) && $validated['contact_no'] !== null) {
+        $user->contact_no = $validated['contact_no'];
+    }
     $user->year = $validated['year'] ?? $user->year;
     $user->section = $validated['section'] ?? $user->section;
-    $user->height = $validated['height'] ?? $user->height;
-    $user->weight = $validated['weight'] ?? $user->weight;
+    $user->height = $heightNumeric ?? $user->height;
+    $user->weight = $weightNumeric ?? $user->weight;
     if ($linkedAdminProfile && isset($validated['admin_profile_id']) && (int) $validated['admin_profile_id'] === (int) $linkedAdminProfile->admin_id) {
         $linkedAdminProfile->first_name = $validated['first_name'] ?? $linkedAdminProfile->first_name;
         $linkedAdminProfile->middle_name = $validated['middle_name'] ?? $linkedAdminProfile->middle_name;
@@ -1065,6 +1096,23 @@ public function updateContact(Request $request)
     }
 
     $user->save();
+
+    $healthProfile = $user->healthProfile()->first();
+    if ($healthProfile) {
+        if ($normalizedHeight !== null) {
+            $healthProfile->height = $normalizedHeight;
+        }
+        if ($normalizedWeight !== null) {
+            $healthProfile->weight = $normalizedWeight;
+        }
+        if (array_key_exists('guardian_name', $validated) && $validated['guardian_name'] !== null) {
+            $healthProfile->guardian_name = $validated['guardian_name'];
+        }
+        if (array_key_exists('cellphone', $validated) && $validated['cellphone'] !== null) {
+            $healthProfile->cellphone = $validated['cellphone'];
+        }
+        $healthProfile->save();
+    }
 
     // 5. SYSTEM LOG ---
     \App\Models\ActivityLog::create([

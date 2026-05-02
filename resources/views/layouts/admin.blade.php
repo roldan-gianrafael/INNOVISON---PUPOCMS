@@ -2372,6 +2372,164 @@
             border-color: rgba(255, 255, 255, 0.38) !important;
         }
 
+        .admin-live-alert {
+            position: fixed;
+            right: 20px;
+            top: 86px;
+            width: min(420px, calc(100vw - 28px));
+            z-index: 500001;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.98);
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.24s ease;
+        }
+
+        .admin-live-alert.is-open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .admin-live-alert-card {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 10px;
+            align-items: start;
+            border-radius: 14px;
+            border: 1px solid rgba(112, 19, 27, 0.22);
+            background: rgba(255, 250, 244, 0.96);
+            box-shadow: 0 18px 34px rgba(15, 23, 42, 0.2);
+            padding: 12px 12px 10px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .admin-live-alert-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: #fff3c4;
+            color: #7f1d2d;
+            border: 1px solid rgba(250, 204, 21, 0.45);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .admin-live-alert-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+        }
+
+        .admin-live-alert-icon.is-health {
+            background: #dcfce7;
+            color: #166534;
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .admin-live-alert-title {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 800;
+            color: #70131B;
+            line-height: 1.3;
+        }
+
+        .admin-live-alert-copy {
+            margin: 4px 0 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .admin-live-alert-open {
+            align-self: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 32px;
+            padding: 0 12px;
+            border-radius: 9px;
+            border: 1px solid rgba(250, 204, 21, 0.52);
+            background: #fff7d6;
+            color: #70131B;
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .admin-live-alert-close {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(112, 19, 27, 0.22);
+            background: #ffffff;
+            color: #70131B;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .admin-live-alert-close:hover {
+            background: #fff4f4;
+            border-color: rgba(112, 19, 27, 0.42);
+        }
+
+        .admin-live-alert-close svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2.2;
+        }
+
+        .admin-live-alert-progress {
+            margin-top: 8px;
+            width: 100%;
+            height: 3px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(148, 163, 184, 0.28);
+        }
+
+        .admin-live-alert-progress-bar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #facc15, #70131B);
+            transform-origin: left center;
+            transform: scaleX(1);
+        }
+
+        html[data-theme="dark"] .admin-live-alert-card {
+            border-color: rgba(148, 163, 184, 0.32);
+            background: rgba(17, 24, 39, 0.94);
+            box-shadow: 0 18px 34px rgba(2, 6, 23, 0.44);
+        }
+
+        html[data-theme="dark"] .admin-live-alert-title {
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .admin-live-alert-copy {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .admin-live-alert-open {
+            border-color: rgba(250, 204, 21, 0.5);
+            background: rgba(146, 64, 14, 0.22);
+            color: #fde68a;
+        }
+
+        html[data-theme="dark"] .admin-live-alert-close {
+            border-color: rgba(148, 163, 184, 0.34);
+            background: rgba(30, 41, 59, 0.9);
+            color: #f8fafc;
+        }
+
         .assistant-launch {
             border: 1px solid rgba(255, 255, 255, 0.28);
             background: rgba(255, 255, 255, 0.12);
@@ -3294,7 +3452,10 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
     $inventoryUrl = $isStudentAssistant ? url('/assistant/inventory') : url('/admin/inventory');
     $reportsUrl = $isStudentAssistant ? url('/assistant/reports') : url('/admin/reports');
-    $healthRecordsUrl = url('/admin/health-records');
+    $healthRecordsUrl = route('admin.health_records');
+    $adminNotificationsFeedUrl = $isStudentAssistant
+        ? route('assistant.notifications.feed')
+        : route('admin.notifications.feed');
     $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
     $settingsUrl = url('/admin/settings');
     $userManagementUrl = url('/admin/user-management?entry=menu');
@@ -3469,6 +3630,26 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $adminNotificationPreview = $adminNotifications->take(4);
     $adminNotificationOverflow = $adminNotifications->slice(4)->values();
     $adminNotificationHistory = $allAdminNotifications->take(20)->values();
+    $adminLiveAlertItems = $adminNotifications
+        ->filter(function (array $notification) {
+            $id = (string) ($notification['id'] ?? '');
+            return str_starts_with($id, 'appointment-pending:') || str_starts_with($id, 'health-form:');
+        })
+        ->take(2)
+        ->map(function (array $notification) {
+            $id = (string) ($notification['id'] ?? '');
+            $isHealth = str_starts_with($id, 'health-form:');
+            return [
+                'id' => $id,
+                'kind' => $isHealth ? 'health' : 'appointment',
+                'title' => (string) ($notification['title'] ?? ($isHealth ? 'New health form submission' : 'New appointment request')),
+                'message' => $isHealth
+                    ? 'A student submitted a health record for verification.'
+                    : 'A new appointment request is waiting for review.',
+                'link' => (string) ($notification['link'] ?? ''),
+            ];
+        })
+        ->values();
 @endphp
 
 <header class="admin-header">
@@ -3785,6 +3966,27 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 </form>
 
 <div id="medicineHoverHint" class="medicine-hover-hint" aria-hidden="true">Press to enter</div>
+
+<div id="adminLiveAlertModal" class="admin-live-alert" aria-live="assertive" aria-atomic="true">
+    <div class="admin-live-alert-card">
+        <div id="adminLiveAlertIcon" class="admin-live-alert-icon" aria-hidden="true">
+            <x-outline-icon name="calendar-days" />
+        </div>
+        <div>
+            <p id="adminLiveAlertTitle" class="admin-live-alert-title">New notification</p>
+            <p id="adminLiveAlertCopy" class="admin-live-alert-copy">A new clinic activity requires your attention.</p>
+        </div>
+        <a id="adminLiveAlertOpen" class="admin-live-alert-open" href="{{ $appointmentsUrl }}">Open</a>
+        <button type="button" class="admin-live-alert-close" id="adminLiveAlertClose" aria-label="Close alert">
+            <x-outline-icon name="x-mark" />
+        </button>
+    </div>
+    <div class="admin-live-alert-progress" aria-hidden="true">
+        <div id="adminLiveAlertProgressBar" class="admin-live-alert-progress-bar"></div>
+    </div>
+</div>
+<script id="adminLiveAlertData" type="application/json">@json($adminLiveAlertItems)</script>
+<script id="adminLiveAlertFeedUrl" type="application/json">@json($adminNotificationsFeedUrl)</script>
 
 <section id="assistantPanel" class="assistant-panel" aria-live="polite">
     <div class="assistant-head">
@@ -4144,6 +4346,222 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
     }
 
+    function initAdminLiveAlerts() {
+        const modal = document.getElementById('adminLiveAlertModal');
+        const dataNode = document.getElementById('adminLiveAlertData');
+        const feedUrlNode = document.getElementById('adminLiveAlertFeedUrl');
+        const titleNode = document.getElementById('adminLiveAlertTitle');
+        const copyNode = document.getElementById('adminLiveAlertCopy');
+        const iconNode = document.getElementById('adminLiveAlertIcon');
+        const openNode = document.getElementById('adminLiveAlertOpen');
+        const closeNode = document.getElementById('adminLiveAlertClose');
+        const progressNode = document.getElementById('adminLiveAlertProgressBar');
+        const badgeNodes = Array.from(document.querySelectorAll('.quick-action-badge, .medicine-alert-badge'));
+
+        if (!modal || !dataNode || !titleNode || !copyNode || !iconNode || !openNode || !closeNode || !progressNode || !feedUrlNode) {
+            return;
+        }
+
+        let alerts = [];
+        try {
+            alerts = JSON.parse(dataNode.textContent || '[]');
+        } catch (error) {
+            alerts = [];
+        }
+
+        const feedUrl = (() => {
+            try {
+                return JSON.parse(feedUrlNode.textContent || '""') || '';
+            } catch (error) {
+                return '';
+            }
+        })();
+
+        const storageKey = 'admin_live_alert_seen_' + String({{ (int) (optional(auth()->user())->id ?? 0) }});
+        let seenMap = {};
+        try {
+            const rawSeen = localStorage.getItem(storageKey);
+            seenMap = rawSeen ? JSON.parse(rawSeen) : {};
+        } catch (error) {
+            seenMap = {};
+        }
+
+        const queue = [];
+        const queuedIds = new Set();
+
+        const appointmentIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>';
+        const healthIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75h.008v.008H12V6.75Zm0 3.75h.008v.008H12V10.5Zm0 3.75h.008v.008H12v-.008Zm-6 6h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"/></svg>';
+
+        let currentIndex = -1;
+        let hideTimer = null;
+        let isShowing = false;
+        let pollTimer = null;
+        let currentAlert = null;
+
+        const persistSeen = function () {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(seenMap));
+            } catch (error) {
+                // no-op
+            }
+        };
+
+        const markSeen = function (notificationId) {
+            if (!notificationId) {
+                return;
+            }
+            seenMap[notificationId] = new Date().toISOString();
+            persistSeen();
+        };
+
+        const updateBadgeCount = function (count) {
+            badgeNodes.forEach(function (badge) {
+                if (!badge) {
+                    return;
+                }
+
+                if (count > 0) {
+                    badge.textContent = String(count);
+                    badge.style.display = 'inline-flex';
+                } else {
+                    badge.textContent = '';
+                    badge.style.display = 'none';
+                }
+            });
+        };
+
+        const closeCurrent = function () {
+            modal.classList.remove('is-open');
+            if (hideTimer) {
+                window.clearTimeout(hideTimer);
+                hideTimer = null;
+            }
+            isShowing = false;
+            currentAlert = null;
+            window.setTimeout(function () {
+                if (queue.length > 0) {
+                    showNext();
+                }
+            }, 180);
+        };
+
+        const resetProgress = function () {
+            progressNode.style.transition = 'none';
+            progressNode.style.transform = 'scaleX(1)';
+            window.requestAnimationFrame(function () {
+                window.requestAnimationFrame(function () {
+                    progressNode.style.transition = 'transform 5s linear';
+                    progressNode.style.transform = 'scaleX(0)';
+                });
+            });
+        };
+
+        const showNext = function () {
+            if (isShowing || queue.length === 0) {
+                return;
+            }
+
+            const item = queue.shift();
+            if (!item) {
+                return;
+            }
+
+            currentIndex += 1;
+            isShowing = true;
+            currentAlert = item;
+            titleNode.textContent = item.title || 'New notification';
+            copyNode.textContent = item.message || 'A new clinic activity requires your attention.';
+            openNode.setAttribute('href', item.link || '{{ $appointmentsUrl }}');
+            iconNode.classList.toggle('is-health', item.kind === 'health');
+            iconNode.innerHTML = item.kind === 'health' ? healthIconSvg : appointmentIconSvg;
+
+            modal.classList.add('is-open');
+            resetProgress();
+
+            hideTimer = window.setTimeout(function () {
+                markSeen(item.id);
+                closeCurrent();
+            }, 5000);
+        };
+
+        closeNode.addEventListener('click', function () {
+            if (isShowing && currentAlert && currentAlert.id) {
+                markSeen(currentAlert.id);
+            }
+            closeCurrent();
+        });
+
+        openNode.addEventListener('click', function () {
+            if (isShowing && currentAlert && currentAlert.id) {
+                markSeen(currentAlert.id);
+            }
+        });
+
+        const enqueueAlerts = function (items) {
+            if (!Array.isArray(items)) {
+                return;
+            }
+
+            items.forEach(function (alertItem) {
+                if (!alertItem || !alertItem.id || seenMap[alertItem.id] || queuedIds.has(alertItem.id)) {
+                    return;
+                }
+
+                queuedIds.add(alertItem.id);
+                queue.push(alertItem);
+            });
+
+            showNext();
+        };
+
+        const pullFeed = function () {
+            if (!feedUrl) {
+                return;
+            }
+
+            fetch(feedUrl, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin',
+                cache: 'no-store',
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('Notifications feed request failed');
+                    }
+                    return response.json();
+                })
+                .then(function (payload) {
+                    const items = Array.isArray(payload.notifications) ? payload.notifications : [];
+                    updateBadgeCount(Number(payload.count || items.length || 0));
+
+                    const filtered = items
+                        .filter(function (item) {
+                            return item && item.id && (item.kind === 'appointment' || item.kind === 'health');
+                        })
+                        .slice(0, 3);
+
+                    alerts = filtered;
+                    enqueueAlerts(filtered);
+                })
+                .catch(function () {
+                    // keep silent to avoid noisy UX
+                });
+        };
+
+        enqueueAlerts(Array.isArray(alerts) ? alerts : []);
+        pullFeed();
+        pollTimer = window.setInterval(pullFeed, 10000);
+        window.addEventListener('beforeunload', function () {
+            if (pollTimer) {
+                window.clearInterval(pollTimer);
+            }
+        });
+    }
+
     function initAccessibilityLaunch() {
         const launchButton = document.getElementById('adminAccessibilityLaunch');
         forceAccessibilityButtonTheme();
@@ -4494,6 +4912,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         initThemeToggle();
         initSidebarScrollIndicator();
         initMedicineAlerts();
+        initAdminLiveAlerts();
         initAccessibilityLaunch();
     });
 </script>

@@ -1392,6 +1392,72 @@ public function updateClearance(Request $request, $id)
         return view('admin.settings', compact('admin', 'settings', 'cmsProfile'));
     }
 
+    public function notificationsFeed(Request $request)
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json([
+                'count' => 0,
+                'notifications' => [],
+            ], 401);
+        }
+
+        $currentRole = User::normalizeRole((string) ($user->user_role ?? ''));
+        $isStudentAssistant = $currentRole === User::ROLE_ADMIN;
+
+        $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
+        $healthRecordsUrl = route('admin.health_records');
+        $readMap = is_array($user->notification_read_map) ? $user->notification_read_map : [];
+
+        $recentPendingAppointments = Appointment::query()
+            ->where('status', 'Pending')
+            ->orderByDesc('created_at')
+            ->limit(4)
+            ->get();
+
+        $recentHealthFormSubmissions = $isStudentAssistant
+            ? collect()
+            : HealthProfile::query()
+                ->with('user')
+                ->latest('created_at')
+                ->limit(3)
+                ->get();
+
+        $notifications = collect();
+
+        foreach ($recentPendingAppointments as $appointment) {
+            $notifications->push([
+                'id' => 'appointment-pending:' . $appointment->id . ':' . optional($appointment->updated_at)->timestamp,
+                'kind' => 'appointment',
+                'title' => 'New appointment request',
+                'message' => 'A new appointment request is waiting for review.',
+                'link' => $appointmentsUrl . '?highlight_appointment=' . $appointment->id,
+            ]);
+        }
+
+        foreach ($recentHealthFormSubmissions as $healthProfile) {
+            $notifications->push([
+                'id' => 'health-form:' . $healthProfile->id . ':' . optional($healthProfile->updated_at)->timestamp,
+                'kind' => 'health',
+                'title' => 'New health form submission',
+                'message' => 'A student submitted a health record for verification.',
+                'link' => $healthRecordsUrl . '?highlight_health=' . $healthProfile->id,
+            ]);
+        }
+
+        $unread = $notifications
+            ->filter(function (array $notification) use ($readMap) {
+                return !isset($readMap[$notification['id']]);
+            })
+            ->values();
+
+        return response()->json([
+            'count' => $unread->count(),
+            'notifications' => $unread,
+        ]);
+    }
+
     public function markAllAdminNotificationsRead(Request $request)
     {
         $user = Auth::user();

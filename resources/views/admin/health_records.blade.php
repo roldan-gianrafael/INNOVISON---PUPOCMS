@@ -626,7 +626,7 @@
         position: relative;
         background: linear-gradient(180deg, rgba(243, 232, 255, 0.98), rgba(237, 233, 254, 0.98));
         box-shadow: inset 4px 0 0 #7c3aed;
-        animation: healthHighlightPulse 2.2s ease-in-out 2;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
     }
 
     .health-row-clickable {
@@ -1399,6 +1399,15 @@
             const highlightedRow = document.querySelector('[data-health-row][data-health-id="' + highlightedHealthId + '"]');
             if (highlightedRow) {
                 highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                window.setTimeout(function () {
+                    highlightedRow.classList.remove('health-highlight-row');
+
+                    const url = new URL(window.location.href);
+                    if (url.searchParams.has('highlight_health')) {
+                        url.searchParams.delete('highlight_health');
+                        window.history.replaceState({}, document.title, url.toString());
+                    }
+                }, 5000);
             }
         });
     }

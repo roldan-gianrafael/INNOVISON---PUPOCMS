@@ -125,6 +125,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::get('/admin/reports/feedbacks', [ReportsController::class, 'feedbackReport'])->name('reports.feedbacks');
         Route::get('/admin/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/admin/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
+        Route::get('/admin/notifications/feed', [AdminController::class, 'notificationsFeed'])->name('admin.notifications.feed');
         Route::post('/admin/notifications/mark-all-read', [AdminController::class, 'markAllAdminNotificationsRead'])->name('admin.notifications.read_all');
         Route::get('/admin/user-management', [AdminUserController::class, 'index'])->name('admin.user-management');
         Route::post('/admin/user-management/from-lookup', [AdminUserController::class, 'storeFromLookup'])->name('admin.user-management.store-from-lookup');
@@ -185,6 +186,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::get('/reports/feedbacks', [ReportsController::class, 'feedbackReport'])->name('reports.feedbacks');
         Route::get('/reports/export-hub', [ReportsController::class, 'exportHub'])->name('reports.exportHub');
         Route::get('/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
+        Route::get('/notifications/feed', [AdminController::class, 'notificationsFeed'])->name('notifications.feed');
         Route::post('/notifications/mark-all-read', [AdminController::class, 'markAllAdminNotificationsRead'])->name('notifications.read_all');
         Route::get('/api-testing', [AdminController::class, 'apiTesting'])->name('api-testing');
     });

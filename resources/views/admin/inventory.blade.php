@@ -283,13 +283,13 @@
         background: #fff7cc;
         outline: 2px solid #f59e0b;
         box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.25);
-        animation: inventoryHighlightPulse 1.4s ease-in-out 3;
+        transition: background 0.3s ease, outline-color 0.3s ease, box-shadow 0.3s ease;
     }
     .inventory-row-highlight-expired {
         background: #fee2e2;
         outline: 2px solid #dc2626;
         box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.25);
-        animation: inventoryHighlightPulseExpired 1.4s ease-in-out 3;
+        transition: background 0.3s ease, outline-color 0.3s ease, box-shadow 0.3s ease;
     }
     @keyframes inventoryHighlightPulse {
         0%, 100% { background: #fff7cc; }
@@ -925,6 +925,15 @@
         itemModal.style.display = 'none';
     }
 
+    const clearHighlightQueryParam = function (paramName) {
+        const url = new URL(window.location.href);
+        if (!url.searchParams.has(paramName)) {
+            return;
+        }
+        url.searchParams.delete(paramName);
+        window.history.replaceState({}, document.title, url.toString());
+    };
+
     window.onclick = function(event) {
         if (itemModal && event.target == itemModal) {
             closeModal();
@@ -935,12 +944,20 @@
         setTimeout(function () {
             highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 180);
+        setTimeout(function () {
+            highlightedRow.classList.remove('inventory-row-highlight');
+            clearHighlightQueryParam('highlight_item');
+        }, 5000);
     }
 
     if (highlightedExpiredRow) {
         setTimeout(function () {
             highlightedExpiredRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 180);
+        setTimeout(function () {
+            highlightedExpiredRow.classList.remove('inventory-row-highlight-expired');
+            clearHighlightQueryParam('highlight_item');
+        }, 5000);
     }
 
     if (inventorySearchInput) {

@@ -1597,7 +1597,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="health-status-actions">
                     <a href="https://puptas.undraftedbsit2027.com/applicant-dashboard" class="btn-print-form approved">
                         <x-outline-icon name="eye" />
-                        View Record <Details></Details>
+                        View Record Details
                     </a>
                     <a href="https://puptas.undraftedbsit2027.com/applicant-dashboard" class="health-status-link">
                         <x-outline-icon name="document-text" />

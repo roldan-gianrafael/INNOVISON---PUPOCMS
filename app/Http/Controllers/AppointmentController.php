@@ -1227,7 +1227,7 @@ public function showHealthForm()
     $user = Auth::user();
     
     if ($this->hasSubmittedHealthProfile($user)) {
-        return redirect()->route('print.health.form')
+        return redirect('/student/account?view=health-record')
             ->with('info', 'You have already submitted your health profile.');
     }
 
@@ -1244,6 +1244,13 @@ public function showHealthForm()
 
 public function storeHealthForm(Request $request)
 {
+    /** @var \App\Models\User|null $user */
+    $user = Auth::user();
+    if ($this->hasSubmittedHealthProfile($user)) {
+        return redirect('/student/account?view=health-record')
+            ->with('info', 'Your health profile is already submitted.');
+    }
+
     $request->validate([
         'student_id'        => 'nullable|string|max:255',
         'student_number'    => 'required|string|max:255',
@@ -1357,23 +1364,6 @@ public function storeHealthForm(Request $request)
    
         return back()->withInput()->with('error', 'Something went wrong: ' . $e->getMessage());
     }
-}
-
-public function printHealthForm()
-{
-    /** @var \App\Models\User $user */
-    $user = Auth::user();
-    // Kunin ang profile record
-    $profile = \App\Models\HealthProfile::where('user_id', $user->id)->first();
-
-    if (!$profile) {
-        return redirect()->route('health.form')->with('error', 'Please fill up your health profile first.');
-    }
-
-    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
-    $printProfileData = $this->buildHealthFormPrefill($user, $linkedAdminProfile, $profile);
-
-    return view('student.print_health_form', compact('profile', 'printProfileData'));
 }
 
 

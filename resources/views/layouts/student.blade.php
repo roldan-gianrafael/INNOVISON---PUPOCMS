@@ -1903,7 +1903,7 @@
 
             <nav id="main-menu" class="main-nav">
                 @php
-                    $isMyAccountSection = Request::is('student/account') || Request::is('student/history') || Request::is('student/barcode-register') || Request::is('student/print-health-form');
+                    $isMyAccountSection = Request::is('student/account') || Request::is('student/history') || Request::is('student/barcode-register');
                     $studentAllNotifications = collect($notifications ?? [])->values();
                     $studentUnreadNotifications = $studentAllNotifications
                         ->filter(fn ($notification) => !empty($notification['is_unread']))

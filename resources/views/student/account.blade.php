@@ -766,7 +766,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @endphp
     <div class="page-intro">
         <h1 class="page-intro-title">Health Record</h1>
-        <p class="page-intro-text">Check the status of your submitted health profile, review clinic approval, and open your printable record.</p>
+        <p class="page-intro-text">Check the status of your submitted health profile, review clinic approval, and view your uploaded documents.</p>
     </div>
     <div class="health-status-card">
         <span class="health-status-title">Health Information Record</span>
@@ -803,8 +803,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 @endif
 
                 <div class="health-status-actions">
-                    <a href="{{ route('print.health.form') }}" class="btn-print-form approved">Print Approved Form</a>
-                    <a href="{{ route('print.health.form') }}" class="health-status-link">View Record Details</a>
+                    <a href="{{ url('/student/account?view=health-record') }}" class="btn-print-form approved">View Approved Record</a>
+                    <a href="{{ url('/student/account?view=health-record') }}" class="health-status-link">View Record Details</a>
                 </div>
                 <span class="health-status-note">Valid for Academic Year 2025-2026</span>
             @else
@@ -814,10 +814,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
 
                 <div class="health-status-actions">
-                    <a href="{{ route('print.health.form') }}" class="btn-print-form pending">View Submitted Form</a>
-                    <button class="btn-print-form disabled" disabled>Printing Disabled (For Verification)</button>
+                    <a href="{{ url('/student/account?view=health-record') }}" class="btn-print-form pending">View Submitted Record</a>
+                    <button class="btn-print-form disabled" disabled>Approval Required (For Verification)</button>
                 </div>
-                <span class="health-status-note">Physician signature is required to print.</span>
+                <span class="health-status-note">Clinic approval is required before your record can be marked as issued.</span>
             @endif
         @else
             <div class="health-status-summary">

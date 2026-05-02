@@ -45,9 +45,6 @@ Route::middleware(['auth:student', 'audit'])->group(function () {
         // 2. Route para i-save ang data (Dito galing ang form submit)
         Route::post('/student/store-health-form', [AppointmentController::class, 'storeHealthForm'])->name('store.health.form');
 
-        // 3. Route para sa Printable View (Dito tayo pupunta pagkatapos mag-save)
-        Route::get('/student/print-health-form', [AppointmentController::class, 'printHealthForm'])->name('print.health.form');
-
         Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
         Route::get('/student/account', [AppointmentController::class, 'account']);
         Route::get('/student/faq', [AppointmentController::class, 'faq']);

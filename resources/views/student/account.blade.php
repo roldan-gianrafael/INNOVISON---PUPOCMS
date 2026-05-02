@@ -758,6 +758,142 @@
     .notif-icon { font-size: 16px; }
     .notif-text { font-size: 13px; color: #334155; line-height: 1.4; }
     .notif-time { display: block; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .notif-panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+    .notif-panel-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 800;
+        color: #600000;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .notif-panel-title svg {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+    }
+    .notif-mark-btn {
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        border-radius: 999px;
+        padding: 9px 14px;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 20px rgba(112, 19, 27, 0.18);
+    }
+    .notif-mark-btn:hover {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 12px 22px rgba(112, 19, 27, 0.16);
+    }
+    .notif-mark-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+    }
+    .notif-list {
+        display: grid;
+        gap: 10px;
+    }
+    .notif-record {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #ffffff;
+        text-decoration: none;
+        transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+    .notif-record:hover {
+        transform: translateY(-1px);
+        border-color: #f5d0d0;
+        box-shadow: 0 10px 20px rgba(112, 19, 27, 0.08);
+    }
+    .notif-record.is-unread {
+        border-color: #f5d0d0;
+        background: #fff7f7;
+    }
+    .notif-record-dot {
+        width: 10px;
+        height: 10px;
+        margin-top: 6px;
+        border-radius: 999px;
+        background: #cbd5e1;
+        flex: 0 0 auto;
+    }
+    .notif-record.is-unread .notif-record-dot {
+        background: #8B0000;
+    }
+    .notif-record-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .notif-record-message {
+        display: block;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #1f2937;
+        font-weight: 600;
+    }
+    .notif-record.is-unread .notif-record-message {
+        font-weight: 800;
+    }
+    .notif-record-time {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #64748b;
+    }
+    .notif-empty {
+        padding: 18px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        color: #64748b;
+        text-align: center;
+        background: #ffffff;
+    }
+    html[data-theme="dark"] .notif-panel-title {
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .notif-mark-btn {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        border-color: #8f2230;
+    }
+    html[data-theme="dark"] .notif-record {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="dark"] .notif-record.is-unread {
+        background: rgba(127, 29, 45, 0.20);
+        border-color: rgba(248, 113, 113, 0.35);
+    }
+    html[data-theme="dark"] .notif-record-message {
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .notif-record-time,
+    html[data-theme="dark"] .notif-empty {
+        color: #cbd5e1;
+    }
+    html[data-theme="dark"] .notif-empty {
+        border-color: rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.72);
+    }
 
     /* --- BARCODE WIDGET --- */
     .barcode-status-card {
@@ -1505,40 +1641,41 @@ document.addEventListener('DOMContentLoaded', function () {
         <p class="page-intro-text">Stay updated with appointment changes, health record progress, and important clinic activity.</p>
     </div>
     <div class="widget-card">
-        <div class="section-title" style="font-size: 16px; margin-bottom: 15px;"> Notifications</div>
-        <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+        <div class="notif-panel-head">
+            <h2 class="notif-panel-title">
+                <x-outline-icon name="bell" />
+                Notifications
+            </h2>
             @if(collect($notifications ?? [])->isNotEmpty())
                 <form action="{{ route('student.notifications.read_all') }}" method="POST">
                     @csrf
-                    <button type="submit" style="padding:10px 14px; background:#8B0000; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
+                    <button type="submit" class="notif-mark-btn">
                         Mark all as read
                     </button>
                 </form>
             @endif
         </div>
 
-        @forelse(collect($notifications ?? []) as $notif)
-            <a href="{{ route('student.notifications.open', ['notificationId' => $notif['id']]) }}"
-               style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; margin-bottom:12px; border:1px solid {{ !empty($notif['is_unread']) ? '#f5d0d0' : '#e2e8f0' }}; background:{{ !empty($notif['is_unread']) ? '#fff7f7' : '#ffffff' }}; border-radius:12px; text-decoration:none;">
-                @if(!empty($notif['is_unread']))
-                    <span style="width:10px; height:10px; margin-top:6px; border-radius:999px; background:#8B0000; flex:0 0 auto;"></span>
-                @else
-                    <span style="width:10px; height:10px; margin-top:6px; border-radius:999px; background:#cbd5e1; flex:0 0 auto;"></span>
-                @endif
-                <span style="flex:1; min-width:0;">
-                    <span style="display:block; font-size:14px; line-height:1.5; color:#1f2937; font-weight:{{ !empty($notif['is_unread']) ? '800' : '600' }};">
-                        {{ $notif['message'] ?? 'Notification available.' }}
+        <div class="notif-list">
+            @forelse(collect($notifications ?? []) as $notif)
+                <a href="{{ route('student.notifications.open', ['notificationId' => $notif['id']]) }}"
+                   class="notif-record {{ !empty($notif['is_unread']) ? 'is-unread' : '' }}">
+                    <span class="notif-record-dot"></span>
+                    <span class="notif-record-content">
+                        <span class="notif-record-message">
+                            {{ $notif['message'] ?? 'Notification available.' }}
+                        </span>
+                        <span class="notif-record-time">
+                            {{ $notif['time'] ?? 'Just now' }}
+                        </span>
                     </span>
-                    <span style="display:block; margin-top:5px; font-size:12px; color:#64748b;">
-                        {{ $notif['time'] ?? 'Just now' }}
-                    </span>
-                </span>
-            </a>
-        @empty
-            <div style="padding:18px; border:1px dashed #cbd5e1; border-radius:12px; color:#64748b; text-align:center;">
-                No notifications available right now.
-            </div>
-        @endforelse
+                </a>
+            @empty
+                <div class="notif-empty">
+                    No notifications available right now.
+                </div>
+            @endforelse
+        </div>
     </div>
 @endif
         </div>

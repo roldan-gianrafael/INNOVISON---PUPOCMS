@@ -1595,7 +1595,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 @endif
 
                 <div class="health-status-actions">
-                    <a href="https://puptas.undraftedbsit2027.com/applicant-dashboard" class="btn-print-form approved">
+                    <a href="" class="btn-print-form approved">
                         <x-outline-icon name="eye" />
                         View Record Details
                     </a>

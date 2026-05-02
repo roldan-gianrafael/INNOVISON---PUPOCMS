@@ -503,7 +503,7 @@
         align-items: center;
     }
     .metric-field .form-control {
-        padding-right: 58px;
+        padding-right: 96px;
         text-align: right !important;
         border-bottom-color: var(--field-bottom) !important;
     }

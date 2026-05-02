@@ -1084,6 +1084,12 @@
     $showOfficeField = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin', 'faculty'], true) || str_contains($linkedAccessLevel, 'faculty');
     $displayStudentNumber = trim((string) ($accountProfileData['student_number'] ?? $user->student_number ?? ''));
     $displayCourse = trim((string) ($accountProfileData['course_college'] ?? $user->course ?? ''));
+    $heightRaw = old('height', $accountProfileData['height'] ?? $user->height ?? '');
+    $weightRaw = old('weight', $accountProfileData['weight'] ?? $user->weight ?? '');
+    preg_match('/\d+(?:\.\d+)?/', (string) $heightRaw, $heightMatch);
+    preg_match('/\d+(?:\.\d+)?/', (string) $weightRaw, $weightMatch);
+    $heightDisplay = $heightMatch[0] ?? trim((string) $heightRaw);
+    $weightDisplay = $weightMatch[0] ?? trim((string) $weightRaw);
 @endphp
 <div class="container" style="padding: 0 20px 40px;">
 
@@ -1232,14 +1238,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div>
                                 <label class="input-label">Height (cm)</label>
                                 <div class="metric-field">
-                                    <input type="text" name="height" class="form-control editable-input" inputmode="decimal" value="{{ old('height', $accountProfileData['height'] ?? $user->height) }}" disabled>
+                                    <input type="text" name="height" class="form-control editable-input" inputmode="decimal" value="{{ $heightDisplay }}" disabled>
                                     <span class="metric-suffix">cm</span>
                                 </div>
                             </div>
                             <div>
                                 <label class="input-label">Weight (kg)</label>
                                 <div class="metric-field">
-                                    <input type="text" name="weight" class="form-control editable-input" inputmode="decimal" value="{{ old('weight', $accountProfileData['weight'] ?? $user->weight) }}" disabled>
+                                    <input type="text" name="weight" class="form-control editable-input" inputmode="decimal" value="{{ $weightDisplay }}" disabled>
                                     <span class="metric-suffix">kg</span>
                                 </div>
                             </div>
@@ -1256,7 +1262,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <div class="profile-info-row">
                             <label class="input-label">Address</label>
-                            <input type="text" class="form-control" value="{{ old('home_address', $accountProfileData['home_address'] ?? '') }}" disabled>
+                            <textarea class="form-control" rows="2" disabled>{{ old('home_address', $accountProfileData['home_address'] ?? '') }}</textarea>
                         </div>
                     </section>
 
@@ -1340,7 +1346,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="profile-info-row">
                     <label class="input-label">Address</label>
-                    <input type="text" name="address" class="form-control editable-input" value="{{ old('address', $accountProfileData['home_address'] ?? $linkedAdminProfile->address) }}" disabled>
+                    <textarea name="address" class="form-control editable-input" rows="2" disabled>{{ old('address', $accountProfileData['home_address'] ?? $linkedAdminProfile->address) }}</textarea>
                 </div>
 
                 <div class="profile-grid-2">

@@ -1292,10 +1292,6 @@ public function updateClearance(Request $request, $id)
     $record->pending_reason   = ($request->clearance_status === 'Issued') ? null : $request->pending_reason;
     $record->verified_at      = ($request->clearance_status === 'Issued') ? ($request->verified_at ?? now()) : null;
 
-    if ($request->clearance_status !== 'Issued') {
-        $record->clearance_signature_snapshot_path = null;
-    }
-
     if ($record->save()) {
         if ($record->user) {
             $record->user->is_health_profile_completed = $record->clearance_status === 'Issued' ? 1 : 0;
@@ -1392,12 +1388,8 @@ public function updateClearance(Request $request, $id)
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
         $cmsProfile = $admin ? $this->buildCmsAdminProfile($admin) : [];
-        $canManageClearanceSignature = $admin ? $this->isSuperadminAccount($admin) : false;
-        $clearanceSignatureUrl = !empty($settings->clearance_signature_path)
-            ? Storage::disk('public')->url($settings->clearance_signature_path)
-            : null;
 
-        return view('admin.settings', compact('admin', 'settings', 'cmsProfile', 'canManageClearanceSignature', 'clearanceSignatureUrl'));
+        return view('admin.settings', compact('admin', 'settings', 'cmsProfile'));
     }
 
     public function markAllAdminNotificationsRead(Request $request)
@@ -1596,10 +1588,6 @@ public function deleteItem($id)
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
 
-        $request->validate([
-            'clearance_signature' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
-        ]);
-
         $settings->clinic_name = $request->input('clinic_name', $settings->clinic_name ?: 'PUP Taguig Clinic');
         $settings->clinic_location = $request->input('clinic_location', $settings->clinic_location ?: 'Santos Ave, Lower Bicutan, Taguig');
         $settings->open_time = $request->input('open_time', $settings->open_time ?: '08:00');
@@ -1617,20 +1605,6 @@ public function deleteItem($id)
             $settings->auto_approve = false;
         }
 
-        $signatureUpdated = false;
-        if ($request->hasFile('clearance_signature')) {
-            if (!$this->canSignHealthClearance()) {
-                abort(403, 'Only superadmin accounts can update the clearance signature.');
-            }
-
-            if (!empty($settings->clearance_signature_path)) {
-                Storage::disk('public')->delete($settings->clearance_signature_path);
-            }
-
-            $settings->clearance_signature_path = $request->file('clearance_signature')->store('settings/clearance-signatures', 'public');
-            $signatureUpdated = true;
-        }
-
         $settings->save();
 
         $logParts = [];
@@ -1639,9 +1613,6 @@ public function deleteItem($id)
         }
         if ($request->boolean('preferences_form')) {
             $logParts[] = 'system preferences';
-        }
-        if ($signatureUpdated) {
-            $logParts[] = 'clearance digital signature';
         }
         $logDescription = $logParts !== []
             ? 'Modified ' . implode(', ', $logParts)
@@ -1657,7 +1628,7 @@ public function deleteItem($id)
         'user_agent'  => request()->userAgent(),
     ]);
 
-        return redirect()->back()->with('success', $signatureUpdated ? 'System settings saved and digital signature updated.' : 'System settings saved.');
+        return redirect()->back()->with('success', 'System settings saved.');
     }
 
     public function updateProfile(Request $request)

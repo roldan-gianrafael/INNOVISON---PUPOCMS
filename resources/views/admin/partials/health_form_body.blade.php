@@ -208,18 +208,10 @@ for the improvement of healthcare services.
             </div>
 
             <div style="flex: 1; text-align: center; position: relative; min-height: 80px;">
-                @if($profile->clearance_status == 'Issued')
-                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                        <img src="{{ asset('storage/' . $profile->effective_clearance_signature_path) }}" 
-                             alt="Nurse Signature" 
-                             style="height: 44px; width: auto; pointer-events: none;">
-                    </div>
-                @endif
-
                 <div class="field" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;">
-                    MS. NURSE NAME, RN
+                    CLINIC VERIFIER
                 </div>
-                <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
+                <div style="font-size: 10px; font-weight: bold;">Clinic Verification / Approval</div>
             </div>
         </div>
     </div>

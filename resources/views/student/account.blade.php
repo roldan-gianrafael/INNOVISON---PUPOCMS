@@ -504,7 +504,7 @@
     }
     .metric-field .form-control {
         padding-right: 58px;
-        text-align: left !important;
+        text-align: right !important;
         border-bottom-color: var(--field-bottom) !important;
     }
     .metric-field .form-control:focus {
@@ -514,7 +514,7 @@
     }
     .metric-field .metric-suffix {
         position: absolute;
-        right: 10px;
+        right: 5px;
         top: 50%;
         transform: translateY(-50%);
         font-size: 12px;

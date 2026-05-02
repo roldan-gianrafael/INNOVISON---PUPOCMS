@@ -1595,9 +1595,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 @endif
 
                 <div class="health-status-actions">
-                    <a href="{{ url('/student/account?view=health-record') }}" class="btn-print-form approved">
+                    <a href="https://puptas.undraftedbsit2027.com/applicant-dashboard" class="btn-print-form approved">
                         <x-outline-icon name="eye" />
-                        View Approved Record
+                        View Admission System
                     </a>
                     <a href="{{ url('/student/account?view=health-record') }}" class="health-status-link">
                         <x-outline-icon name="document-text" />

@@ -1597,11 +1597,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="health-status-actions">
                     <a href="https://puptas.undraftedbsit2027.com/applicant-dashboard" class="btn-print-form approved">
                         <x-outline-icon name="eye" />
-                        View Admission System
+                        View Record <Details></Details>
                     </a>
-                    <a href="{{ url('/student/account?view=health-record') }}" class="health-status-link">
+                    <a href="https://puptas.undraftedbsit2027.com/applicant-dashboard" class="health-status-link">
                         <x-outline-icon name="document-text" />
-                        View Record Details
+                        Proceed to Admission System
                     </a>
                 </div>
                 <span class="health-status-note">Valid for Academic Year 2025-2026</span>

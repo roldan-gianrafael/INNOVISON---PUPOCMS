@@ -503,7 +503,8 @@
         align-items: center;
     }
     .metric-field .form-control {
-        padding-right: 46px;
+        padding-right: 58px;
+        text-align: left !important;
         border-bottom-color: var(--field-bottom) !important;
     }
     .metric-field .form-control:focus {
@@ -513,7 +514,7 @@
     }
     .metric-field .metric-suffix {
         position: absolute;
-        right: 12px;
+        right: 10px;
         top: 50%;
         transform: translateY(-50%);
         font-size: 12px;
@@ -522,6 +523,9 @@
         text-transform: uppercase;
         color: #64748b;
         pointer-events: none;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 1px 6px;
+        border-radius: 999px;
     }
     .profile-is-editing .metric-field .metric-suffix {
         display: none;
@@ -640,6 +644,7 @@
     }
     html[data-theme="dark"] .metric-field .metric-suffix {
         color: #e2e8f0;
+        background: rgba(15, 23, 42, 0.9);
     }
 
     /* --- NOTIFICATIONS --- */

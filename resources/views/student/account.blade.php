@@ -503,7 +503,7 @@
         align-items: center;
     }
     .metric-field .form-control {
-        padding-right: 96px;
+        padding-right: 16px;
         text-align: right !important;
         border-bottom-color: var(--field-bottom) !important;
     }
@@ -512,27 +512,6 @@
         background: rgba(255, 251, 235, 0.85);
         transform: translateY(-1px);
     }
-    .metric-field .metric-suffix {
-        position: absolute;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: #64748b;
-        pointer-events: none;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 1px 6px;
-        border-radius: 999px;
-    }
-    .profile-is-editing .metric-field .metric-suffix {
-        display: none;
-    }
-    .profile-is-editing .metric-field .form-control {
-        padding-right: 16px;
-    }
     .soft-field .form-control {
         border-bottom-color: var(--field-bottom) !important;
     }
@@ -540,6 +519,20 @@
         border-bottom-color: var(--field-bottom-focus) !important;
         background: rgba(255, 251, 235, 0.85);
         transform: translateY(-1px);
+    }
+    .widget-card .voice-field-wrap input[type="text"],
+    .widget-card .voice-field-wrap input[type="email"],
+    .widget-card .voice-field-wrap input[type="tel"],
+    .widget-card .voice-field-wrap input[type="number"],
+    .widget-card .voice-field-wrap input[type="search"],
+    .widget-card .voice-field-wrap input:not([type]),
+    .widget-card .voice-field-wrap textarea {
+        padding-right: 16px !important;
+        padding-left: 44px !important;
+    }
+    .widget-card .voice-field-inline-mic {
+        left: 10px !important;
+        right: auto !important;
     }
     .profile-info-row textarea.form-control {
         text-align: left;
@@ -641,10 +634,6 @@
     html[data-theme="dark"] .profile-info-row .form-control:focus {
         background: rgba(51, 65, 85, 0.78);
         border-bottom-color: var(--field-bottom-focus) !important;
-    }
-    html[data-theme="dark"] .metric-field .metric-suffix {
-        color: #e2e8f0;
-        background: rgba(15, 23, 42, 0.9);
     }
 
     /* --- NOTIFICATIONS --- */
@@ -1244,14 +1233,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <label class="input-label">Height (cm)</label>
                                 <div class="metric-field">
                                     <input type="text" name="height" class="form-control editable-input" inputmode="decimal" value="{{ $heightDisplay }}" disabled>
-                                    <span class="metric-suffix">cm</span>
                                 </div>
                             </div>
                             <div>
                                 <label class="input-label">Weight (kg)</label>
                                 <div class="metric-field">
                                     <input type="text" name="weight" class="form-control editable-input" inputmode="decimal" value="{{ $weightDisplay }}" disabled>
-                                    <span class="metric-suffix">kg</span>
                                 </div>
                             </div>
                         </div>

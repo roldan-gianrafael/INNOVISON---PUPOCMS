@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Appointment;
+use App\Models\HealthProfile;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -347,6 +348,7 @@ class WalkInController extends Controller
         $lookup = trim((string) $request->student_id);
         $lookupName = trim((string) $request->student_name);
         $previewOnly = $request->boolean('preview_only');
+        $intakeTarget = strtolower(trim((string) $request->query('intake_target', 'consultation')));
 
         $student = $this->findUserByIdentifier($lookup);
         $lookupMessage = 'No patient matched that student number in local records or PUPTAS.';
@@ -397,10 +399,39 @@ class WalkInController extends Controller
 
             return response()->json([
                 'status' => 'found',
-                'redirect_url' => route($this->walkinRouteName($request, 'form'), [
-                    'student_id' => $student->student_number ?: $student->student_id,
-                    'source' => 'walkin'
-                ])
+                'redirect_url' => $intakeTarget === 'assessment'
+                    ? (function () use ($student) {
+                        $profile = HealthProfile::firstOrCreate(
+                            ['user_id' => $student->id],
+                            [
+                                'student_id' => (string) ($student->student_id ?? ''),
+                                'student_number' => (string) ($student->student_number ?? ''),
+                                'course_college' => (string) ($student->course ?? ''),
+                                'birthday' => (string) ($student->DOB ?? ''),
+                                'sex' => (string) ($student->gender ?? ''),
+                                'clearance_status' => 'Pending',
+                            ]
+                        );
+
+                        $profileNeedsSave = false;
+                        if (empty($profile->student_number) && !empty($student->student_number)) {
+                            $profile->student_number = (string) $student->student_number;
+                            $profileNeedsSave = true;
+                        }
+                        if (empty($profile->student_id) && !empty($student->student_id)) {
+                            $profile->student_id = (string) $student->student_id;
+                            $profileNeedsSave = true;
+                        }
+                        if ($profileNeedsSave) {
+                            $profile->save();
+                        }
+
+                        return route('admin.medical_assessment', $profile->id);
+                    })()
+                    : route($this->walkinRouteName($request, 'form'), [
+                        'student_id' => $student->student_number ?: $student->student_id,
+                        'source' => 'walkin'
+                    ])
             ]);
         }
 

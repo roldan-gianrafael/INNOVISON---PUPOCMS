@@ -248,7 +248,7 @@
 
     .intake-heading-kicker {
         margin: 0 0 8px;
-        font-size: 12px;
+        font-size: 16px;
         font-weight: 800;
         letter-spacing: 1px;
         color: #8b0000;
@@ -257,7 +257,7 @@
 
     .intake-heading-title {
         margin: 0;
-        font-size: 28px;
+        font-size: 22px;
         font-weight: 800;
         color: #0f172a;
     }
@@ -266,6 +266,215 @@
         margin: 10px 0 0;
         color: #475569;
         max-width: 680px;
+    }
+
+    .intake-options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+    }
+
+    .intake-option-link {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .intake-option-card {
+        position: relative;
+        height: 100%;
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(112, 19, 27, 0.42);
+        box-shadow:
+            inset 0 -3px 0 rgba(112, 19, 27, 0.82),
+            0 10px 24px rgba(15, 23, 42, 0.05);
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    .intake-option-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .intake-option-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0) 38%);
+    }
+
+    .intake-option-card::after {
+        content: "";
+        position: absolute;
+        top: -42%;
+        left: -130%;
+        width: 120%;
+        height: 185%;
+        background: linear-gradient(115deg, rgba(250, 204, 21, 0) 0%, rgba(250, 204, 21, 0.46) 45%, rgba(250, 204, 21, 0) 100%);
+        transform: skewX(-20deg);
+        opacity: 0;
+        transition: left .8s ease, opacity .18s ease;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .intake-option-card:hover::after {
+        opacity: 1;
+        left: 125%;
+    }
+
+    .intake-option-chip {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        box-shadow: 0 8px 14px rgba(15, 23, 42, 0.14);
+    }
+
+    .intake-option-chip svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        stroke-width: 2.2;
+        fill: none;
+    }
+
+    .intake-option-icon-wrap {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+        position: relative;
+        z-index: 1;
+        animation: intakeFloat 3.8s ease-in-out infinite;
+    }
+
+    .intake-option-icon-wrap::after {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        bottom: -10px;
+        height: 14px;
+        border-radius: 999px;
+        filter: blur(8px);
+        opacity: .6;
+        z-index: -1;
+        background: radial-gradient(circle, rgba(0, 0, 0, 0.44) 0%, rgba(0, 0, 0, 0.22) 48%, transparent 86%);
+    }
+
+    .intake-option-icon-wrap svg {
+        width: 24px;
+        height: 24px;
+        stroke: currentColor;
+        stroke-width: 2.1;
+        fill: none;
+    }
+
+    .intake-option-title {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 800;
+        color: #111827;
+        position: relative;
+        z-index: 1;
+    }
+
+    .intake-option-copy {
+        margin: 0;
+        color: #475569;
+        line-height: 1.55;
+        position: relative;
+        z-index: 1;
+    }
+
+    .intake-option-registration {
+        background: linear-gradient(135deg, #fff8f1, #ffffff);
+    }
+
+    .intake-option-registration.is-active {
+        border: 2px solid #8B0000;
+        background: linear-gradient(135deg, #fff5f5, #ffffff);
+    }
+
+    .intake-option-registration .intake-option-icon-wrap {
+        background: #8B0000;
+        color: #ffffff;
+    }
+
+    .intake-option-registration .intake-option-chip {
+        background: #8B0000;
+        color: #ffffff;
+    }
+
+    .intake-option-scan {
+        background: linear-gradient(135deg, #f8fafc, #ffffff);
+    }
+
+    .intake-option-scan.is-active {
+        border: 2px solid #8B0000;
+        background: linear-gradient(135deg, #fff5f5, #ffffff);
+    }
+
+    .intake-option-scan .intake-option-icon-wrap {
+        background: #0f172a;
+        color: #ffffff;
+    }
+
+    .intake-option-scan .intake-option-chip {
+        background: #0f172a;
+        color: #ffffff;
+    }
+
+    .intake-option-assisted {
+        background: linear-gradient(135deg, #f8fafc, #ffffff);
+    }
+
+    .intake-option-assisted.is-active {
+        border: 2px solid #8B0000;
+        background: linear-gradient(135deg, #eef2ff, #ffffff);
+    }
+
+    .intake-option-assisted .intake-option-icon-wrap {
+        background: #334155;
+        color: #ffffff;
+    }
+
+    .intake-option-assisted .intake-option-chip {
+        background: #334155;
+        color: #ffffff;
+    }
+
+    .intake-option-applicant {
+        background: linear-gradient(135deg, #fffdf3, #ffffff);
+    }
+
+    .intake-option-applicant.is-active {
+        border: 2px solid #8B0000;
+        background: linear-gradient(135deg, #fff7cc, #ffffff);
+    }
+
+    .intake-option-applicant .intake-option-icon-wrap {
+        background: #70131B;
+        color: #ffffff;
+    }
+
+    .intake-option-applicant .intake-option-chip {
+        background: #70131B;
+        color: #ffffff;
     }
 
     html[data-theme="dark"] .intake-heading-title,
@@ -280,6 +489,48 @@
     html[data-theme="dark"] .scan-method-title,
     html[data-theme="dark"] .scan-method-note {
         color: #ffffff;
+    }
+
+    html[data-theme="dark"] .intake-option-card {
+        border-color: rgba(250, 204, 21, 0.62);
+        box-shadow:
+            inset 0 -3px 0 rgba(250, 204, 21, 0.92),
+            0 14px 26px rgba(0, 0, 0, 0.22);
+        background: #70131B;
+    }
+
+    html[data-theme="dark"] .intake-option-card::after {
+        background: linear-gradient(115deg, rgba(163, 53, 72, 0) 0%, rgba(163, 53, 72, 0.62) 45%, rgba(163, 53, 72, 0) 100%);
+    }
+
+    html[data-theme="dark"] .intake-option-card::before {
+        background: none;
+    }
+
+    html[data-theme="dark"] .intake-option-title,
+    html[data-theme="dark"] .intake-option-copy {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .intake-option-registration,
+    html[data-theme="dark"] .intake-option-scan,
+    html[data-theme="dark"] .intake-option-assisted,
+    html[data-theme="dark"] .intake-option-applicant {
+        background: #70131B;
+    }
+
+    html[data-theme="dark"] .intake-option-registration.is-active,
+    html[data-theme="dark"] .intake-option-scan.is-active,
+    html[data-theme="dark"] .intake-option-assisted.is-active,
+    html[data-theme="dark"] .intake-option-applicant.is-active {
+        background: #70131B;
+    }
+
+    html[data-theme="dark"] .intake-option-registration.is-active,
+    html[data-theme="dark"] .intake-option-scan.is-active,
+    html[data-theme="dark"] .intake-option-assisted.is-active,
+    html[data-theme="dark"] .intake-option-applicant.is-active {
+        border-color: #facc15;
     }
 
     .scan-surface {
@@ -516,7 +767,452 @@
         box-shadow: 0 8px 18px rgba(127, 29, 29, 0.22);
     }
 
+    .registration-hub {
+        max-width: 980px;
+    }
+
+    .registration-head {
+        margin-bottom: 10px;
+    }
+
+    .registration-head-main {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .registration-head-copy {
+        flex: 1 1 420px;
+        min-width: 280px;
+    }
+
+    .registration-kicker {
+        margin: 0 0 8px;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #8b0000;
+    }
+
+    .registration-head h3 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 900;
+        color: #111827;
+    }
+
+    .registration-head p {
+        margin: 8px 0 0;
+        color: #475569;
+    }
+
+    .registration-mode-picker {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        margin: 18px 0 20px;
+        flex-wrap: wrap;
+    }
+
+    .registration-mode-btn {
+        width: min(360px, 100%);
+        min-height: 280px;
+        border: 1px solid rgba(234, 179, 8, 0.42);
+        border-radius: 28px;
+        padding: 26px 24px 30px;
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 48%, #e5e7eb 100%);
+        box-shadow:
+            0 0 0 1px rgba(250, 204, 21, 0.12),
+            0 22px 36px rgba(234, 179, 8, 0.18),
+            0 48px 60px -36px rgba(202, 138, 4, 0.36);
+        text-align: center;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+
+    .registration-mode-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.10));
+        pointer-events: none;
+    }
+
+    .registration-mode-btn::after {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        bottom: -22px;
+        height: 36px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(148, 163, 184, 0.34) 0%, rgba(148, 163, 184, 0.14) 42%, transparent 78%);
+        filter: blur(12px);
+        pointer-events: none;
+    }
+
+    .registration-mode-btn:hover {
+        transform: translateY(-4px);
+        border-color: rgba(234, 179, 8, 0.62);
+        box-shadow:
+            0 0 0 1px rgba(250, 204, 21, 0.22),
+            0 26px 42px rgba(234, 179, 8, 0.22),
+            0 54px 76px -38px rgba(202, 138, 4, 0.42);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .registration-mode-btn .um-mode-icon {
+        width: 68px;
+        height: 68px;
+        margin: 12px auto 10px;
+        border-radius: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, rgba(254, 240, 138, 0.98), rgba(250, 204, 21, 0.9));
+        border: 1px solid rgba(234, 179, 8, 0.34);
+        color: #111827;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.96), 0 18px 28px rgba(234, 179, 8, 0.18);
+        position: relative;
+        z-index: 1;
+        animation: umModeFloat 3.8s ease-in-out infinite;
+    }
+
+    .registration-mode-btn .um-mode-icon::after {
+        content: "";
+        position: absolute;
+        left: 12%;
+        right: 12%;
+        bottom: -13px;
+        height: 14px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.2) 48%, transparent 86%);
+        filter: blur(7px);
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    .registration-mode-btn .um-mode-icon svg {
+        width: 30px;
+        height: 30px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+    }
+
+    .registration-mode-btn .um-mode-icon img {
+        width: 46px;
+        height: 46px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .registration-mode-btn h3 {
+        margin: 14px 0 8px;
+        font-size: 1.24rem;
+        font-weight: 900;
+        color: #0f172a;
+        position: relative;
+        z-index: 1;
+    }
+
+    .registration-mode-btn p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.6;
+        font-size: .95rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .registration-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        margin-top: 8px;
+    }
+
+    .registration-actions .btn {
+        min-width: 132px;
+        width: auto !important;
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border-radius: 999px;
+        border: 1px solid rgba(112, 19, 27, 0.3);
+        background: rgba(255, 255, 255, 0.96);
+        color: #70131B;
+        font-weight: 800;
+        padding: 10px 16px;
+        white-space: nowrap;
+        box-shadow: 0 0 0 2px rgba(112, 19, 27, 0.09), 0 10px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .registration-actions .btn::after {
+        content: "";
+        position: absolute;
+        top: -40%;
+        left: -130%;
+        width: 120%;
+        height: 180%;
+        background: linear-gradient(115deg, rgba(250, 204, 21, 0) 0%, rgba(250, 204, 21, 0.46) 45%, rgba(250, 204, 21, 0) 100%);
+        transform: skewX(-20deg);
+        transition: left 1.5s ease;
+        pointer-events: none;
+    }
+
+    .registration-actions .btn:hover::after {
+        left: 125%;
+    }
+
+    .registration-actions .btn:hover,
+    .registration-actions .btn:focus {
+        color: #70131B;
+        border-color: rgba(112, 19, 27, 0.48);
+        background: #ffffff;
+    }
+
+    .fingerprint-hub {
+        max-width: 980px;
+    }
+
+    .fingerprint-hero {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 16px;
+    }
+
+    .fingerprint-orbit {
+        width: 94px;
+        height: 94px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(250, 204, 21, 0.35) 0%, rgba(112, 19, 27, 0.12) 56%, transparent 100%);
+        display: grid;
+        place-items: center;
+        animation: fingerPulse 2.8s ease-in-out infinite;
+    }
+
+    .fingerprint-core {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        background: linear-gradient(145deg, #70131B, #8f2230);
+        color: #ffffff;
+        border: 1px solid rgba(250, 204, 21, 0.4);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 14px 28px rgba(112, 19, 27, 0.3);
+    }
+
+    .fingerprint-core i {
+        font-size: 30px;
+    }
+
+    .fingerprint-core svg {
+        width: 34px;
+        height: 34px;
+        stroke: #ffffff;
+        stroke-width: 2;
+        fill: none;
+    }
+
+    .fingerprint-kicker {
+        margin: 0 0 8px;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 900;
+        color: #8b0000;
+    }
+
+    .fingerprint-copy h3 {
+        margin: 0;
+        font-size: 1.55rem;
+        font-weight: 900;
+        color: #111827;
+    }
+
+    .fingerprint-copy p {
+        margin: 8px 0 0;
+        color: #475569;
+        line-height: 1.6;
+    }
+
+    .fingerprint-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .fingerprint-step {
+        border: 1px solid rgba(148, 163, 184, 0.26);
+        background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92));
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.05);
+    }
+
+    .fingerprint-step span {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 900;
+        color: #7c2d12;
+    }
+
+    .fingerprint-step strong {
+        display: block;
+        margin-top: 8px;
+        color: #0f172a;
+    }
+
+    .fingerprint-step p {
+        margin: 6px 0 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .fingerprint-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 4px;
+    }
+
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .status-chip.pending {
+        background: #fff7ed;
+        border: 1px solid #fdba74;
+        color: #9a3412;
+    }
+
+    .status-note {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    html[data-theme="dark"] .registration-kicker,
+    html[data-theme="dark"] .fingerprint-kicker {
+        color: #fde68a;
+    }
+
+    html[data-theme="dark"] .registration-head h3,
+    html[data-theme="dark"] .registration-head p,
+    html[data-theme="dark"] .fingerprint-copy h3,
+    html[data-theme="dark"] .fingerprint-copy p,
+    html[data-theme="dark"] .status-note {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .registration-mode-btn {
+        background: #70131B;
+        border-color: rgba(255, 214, 102, 0.5);
+        box-shadow: 0 0 0 1px rgba(255, 214, 102, 0.16), 0 24px 38px rgba(95, 0, 18, 0.34), 0 52px 72px -38px rgba(193, 138, 16, 0.56);
+    }
+
+    html[data-theme="dark"] .registration-mode-btn::before {
+        background: none;
+    }
+
+    html[data-theme="dark"] .registration-mode-btn .eyebrow {
+        background: rgba(193, 138, 16, 0.22);
+        color: #ffd86b;
+    }
+
+    html[data-theme="dark"] .registration-mode-btn h3,
+    html[data-theme="dark"] .registration-mode-btn p {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .fingerprint-step {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(17, 24, 39, 0.92));
+        border-color: rgba(148, 163, 184, 0.22);
+    }
+
+    html[data-theme="dark"] .fingerprint-step strong,
+    html[data-theme="dark"] .fingerprint-step p {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .status-chip.pending {
+        background: rgba(234, 179, 8, 0.16);
+        border-color: rgba(250, 204, 21, 0.5);
+        color: #fde68a;
+    }
+
+    html[data-theme="dark"] .registration-actions .btn {
+        background: rgba(255, 255, 255, 0.96);
+        color: #70131B;
+        border-color: rgba(250, 204, 21, 0.42);
+    }
+
+    @media (max-width: 860px) {
+        .fingerprint-hero {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .fingerprint-orbit {
+            margin: 0 auto;
+        }
+
+        .fingerprint-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .registration-actions {
+            justify-content: flex-start;
+        }
+
+        .registration-head-main {
+            flex-direction: column;
+        }
+    }
+
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes umModeFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+    }
+    @keyframes intakeFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    @keyframes fingerPulse {
+        0%, 100% { transform: scale(1); opacity: 0.95; }
+        50% { transform: scale(1.05); opacity: 1; }
+    }
     @keyframes scan-animation {
         0% { top: 16%; opacity: 0.9; }
         50% { top: 78%; opacity: 1; }
@@ -530,12 +1226,13 @@
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
-    $currentMode = in_array($mode ?? '', ['scan', 'assisted'], true) ? $mode : '';
+    $currentMode = in_array($mode ?? '', ['scan', 'assisted', 'applicant', 'registration', 'fingerprint'], true) ? $mode : '';
     $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
     $idpClientId = trim((string) config('services.idp.client_id', ''));
     $portalRegisterUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
         ? $idpBaseUrl . '/login?' . http_build_query(['client_id' => $idpClientId])
         : route('login');
+    $idpRegistrationLink = 'https://identity-provider.isaxbsit2027.com/register?client_id=7112646b-c785-4306-b00f-87d29ad54fb2';
 @endphp
 
 @if(session('consultation_done'))
@@ -557,55 +1254,181 @@
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;">
             <div>
                 <p class="intake-heading-kicker">Patient Intake</p>
-                <h2 class="intake-heading-title">Choose how you want to begin the consultation flow</h2>
-                <p class="intake-heading-copy">
-                    Use the identity portal for official account registration, scan an existing school user through barcode or BioSync, or let clinic staff complete an assisted intake when the patient cannot register alone.
-                </p>
+                <h2 class="intake-heading-title">Choose how you want to begin the clinic intake flow</h2>
             </div>
             <a href="{{ url($basePrefix . '/appointments') }}" class="btn" style="background:#f8fafc; border:1px solid #cbd5e1; color:#334155; font-weight:700; border-radius:12px; white-space:nowrap;">
                 BACK TO APPOINTMENTS
             </a>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-top:24px;">
-            <a href="{{ $portalRegisterUrl }}" target="_blank" rel="noopener noreferrer" style="text-decoration:none; color:inherit;">
-                <div style="height:100%; padding:20px; border-radius:16px; border:1px solid #e2e8f0; background:linear-gradient(135deg, #fff7ed, #ffffff); box-shadow:0 10px 24px rgba(15, 23, 42, 0.05);">
-                    <div style="width:48px; height:48px; border-radius:14px; background:#8B0000; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:14px;">IDP</div>
-                    <h3 style="margin:0 0 8px; font-size:18px; font-weight:800; color:#111827;">Register via IDP</h3>
-                    <p style="margin:0; color:#475569; line-height:1.55;">Open the centralized identity portal in a new tab so the patient can create or complete their official account first.</p>
+        <div class="intake-options-grid">
+            <a href="{{ url()->current() }}?mode=registration" class="intake-option-link">
+                <div class="intake-option-card intake-option-registration {{ $currentMode === 'registration' ? 'is-active' : '' }}">
+                    <span class="intake-option-chip" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                    </span>
+                    <span class="intake-option-icon-wrap" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6m0 0v6m0-6-7.5 7.5M9 6H6.75A2.25 2.25 0 0 0 4.5 8.25v9A2.25 2.25 0 0 0 6.75 19.5h9A2.25 2.25 0 0 0 18 17.25V15" />
+                        </svg>
+                    </span>
+                    <h3 class="intake-option-title">Registration</h3>
+                    <p class="intake-option-copy">Open registration options for IDP account creation or fingerprint enrollment through BioSync.</p>
                 </div>
             </a>
 
-            <a href="{{ url()->current() }}?mode=scan" style="text-decoration:none; color:inherit;">
-                <div style="height:100%; padding:20px; border-radius:16px; border:{{ $currentMode === 'scan' ? '2px solid #8B0000' : '1px solid #e2e8f0' }}; background:{{ $currentMode === 'scan' ? 'linear-gradient(135deg, #fff5f5, #ffffff)' : 'linear-gradient(135deg, #f8fafc, #ffffff)' }}; box-shadow:0 10px 24px rgba(15, 23, 42, 0.05);">
-                    <div style="width:48px; height:48px; border-radius:14px; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:14px;">SB</div>
-                    <h3 style="margin:0 0 8px; font-size:18px; font-weight:800; color:#111827;">Scan / Bio</h3>
-                    <p style="margin:0; color:#475569; line-height:1.55;">Use OCR ID scanning, BioSync, or manual student number entry to identify an existing school user and continue directly to consultation.</p>
+            <a href="{{ url()->current() }}?mode=scan" class="intake-option-link">
+                <div class="intake-option-card intake-option-scan {{ $currentMode === 'scan' ? 'is-active' : '' }}">
+                    <span class="intake-option-chip" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 7.5V6A1.5 1.5 0 0 1 6 4.5h1.5m10.5 3V6A1.5 1.5 0 0 0 16.5 4.5H15m3 12V18a1.5 1.5 0 0 1-1.5 1.5H15m-9-3V18A1.5 1.5 0 0 0 7.5 19.5H9" />
+                        </svg>
+                    </span>
+                    <span class="intake-option-icon-wrap" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5v9A1.5 1.5 0 0 1 19.5 18h-15A1.5 1.5 0 0 1 3 16.5v-9Zm3 3h12m-12 3h7.5" />
+                        </svg>
+                    </span>
+                    <h3 class="intake-option-title">Scan / Bio</h3>
+                    <p class="intake-option-copy">Use OCR ID scanning, BioSync, or manual student number entry to identify an existing school user and continue directly to consultation.</p>
                 </div>
             </a>
 
-            <a href="{{ url()->current() }}?mode=assisted" style="text-decoration:none; color:inherit;">
-                <div style="height:100%; padding:20px; border-radius:16px; border:{{ $currentMode === 'assisted' ? '2px solid #334155' : '1px solid #e2e8f0' }}; background:{{ $currentMode === 'assisted' ? 'linear-gradient(135deg, #eef2ff, #ffffff)' : 'linear-gradient(135deg, #f8fafc, #ffffff)' }}; box-shadow:0 10px 24px rgba(15, 23, 42, 0.05);">
-                    <div style="width:48px; height:48px; border-radius:14px; background:#334155; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:14px;">AI</div>
-                    <h3 style="margin:0 0 8px; font-size:18px; font-weight:800; color:#111827;">Assisted Intake</h3>
-                    <p style="margin:0; color:#475569; line-height:1.55;">Let clinic staff capture the patient record on their behalf when illness or urgency makes self-registration impractical.</p>
+            <a href="{{ url()->current() }}?mode=assisted" class="intake-option-link">
+                <div class="intake-option-card intake-option-assisted {{ $currentMode === 'assisted' ? 'is-active' : '' }}">
+                    <span class="intake-option-chip" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </span>
+                    <span class="intake-option-icon-wrap" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.983 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.072M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.552-.645-6.46-1.766l-.084-.049a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                        </svg>
+                    </span>
+                    <h3 class="intake-option-title">Assisted Intake</h3>
+                    <p class="intake-option-copy">Let clinic staff capture the patient record on their behalf when illness or urgency makes self-registration impractical.</p>
+                </div>
+            </a>
+
+            <a href="{{ url()->current() }}?mode=applicant" class="intake-option-link">
+                <div class="intake-option-card intake-option-applicant {{ $currentMode === 'applicant' ? 'is-active' : '' }}">
+                    <span class="intake-option-chip" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+                        </svg>
+                    </span>
+                    <span class="intake-option-icon-wrap" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a6 6 0 0 0-6 6v1.5m12-1.5A6 6 0 0 0 12 3m6 6v4.5m-12-4.5v3m3-5.25A3.75 3.75 0 0 1 12 5.25m0 0A3.75 3.75 0 0 1 15 6.75m-3 12.75v-4.5m-3 4.5c0-1.95 1.05-3.75 3-4.5m3 4.5c0-1.95-1.05-3.75-3-4.5" />
+                        </svg>
+                    </span>
+                    <h3 class="intake-option-title">Applicants</h3>
+                    <p class="intake-option-copy">Use OCR ID scanning, BioSync, or manual student number entry, then proceed directly to Medical Assessment.</p>
                 </div>
             </a>
         </div>
     </div>
     @endif
 
-@if($currentMode !== '')
+@if($currentMode === 'registration')
+<div class="card p-4 shadow-sm walkin-strip-card registration-hub" style="border-radius: 16px; border: none; margin: 20px auto;">
+    <div class="registration-head">
+        <div class="registration-head-main">
+            <div class="registration-head-copy">
+                <p class="registration-kicker">Patient Intake</p>
+                <h3>Registration Options</h3>
+                <p>Choose an onboarding path for applicant registration and identity setup.</p>
+            </div>
+            <div class="registration-actions">
+                <a href="{{ url($basePrefix . '/walkin') }}" class="btn">Back to Intake Options</a>
+                <a href="{{ url($basePrefix . '/appointments') }}" class="btn">Back to Appointments</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="um-mode-picker registration-mode-picker">
+        <a href="{{ $idpRegistrationLink }}" target="_blank" rel="noopener noreferrer" class="um-mode-btn registration-mode-btn">
+            <span class="um-mode-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6m0 0v6m0-6-7.5 7.5M9 6H6.75A2.25 2.25 0 0 0 4.5 8.25v9A2.25 2.25 0 0 0 6.75 19.5h9A2.25 2.25 0 0 0 18 17.25V15" />
+                </svg>
+            </span>
+            <h3>Register via IDP</h3>
+            <p>Open the official Identity Provider registration form and complete applicant account enrollment.</p>
+        </a>
+
+        <a href="{{ url()->current() }}?mode=fingerprint" class="um-mode-btn registration-mode-btn">
+            <span class="um-mode-icon" aria-hidden="true">
+                <img width="100" height="100" src="https://img.icons8.com/bubbles/100/fingerprint.png" alt="fingerprint" />
+            </span>
+            <h3>Register Fingerprint</h3>
+            <p>Proceed to the BioSync enrollment interface to capture and bind fingerprint data for clinic use.</p>
+        </a>
+    </div>
+</div>
+@endif
+
+@if($currentMode === 'fingerprint')
+<div class="card p-4 shadow-sm walkin-strip-card fingerprint-hub" style="border-radius: 16px; border: none; margin: 20px auto;">
+    <div class="fingerprint-hero">
+        <div class="fingerprint-orbit">
+            <span class="fingerprint-core">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33" />
+                </svg>
+            </span>
+        </div>
+        <div class="fingerprint-copy">
+            <p class="fingerprint-kicker">BioSync Enrollment</p>
+            <h3>Register Fingerprint</h3>
+            <p>Capture applicant biometrics for identity matching and secure clinic verification. This interface is ready for the BioSync device integration flow.</p>
+        </div>
+    </div>
+
+    <div class="fingerprint-grid">
+        <div class="fingerprint-step">
+            <span><i class="fa-solid fa-plug-circle-bolt"></i> Step 1</span>
+            <strong>Connect Reader</strong>
+            <p>Ensure the BioSync fingerprint scanner is connected and recognized by this workstation.</p>
+        </div>
+        <div class="fingerprint-step">
+            <span><i class="fa-solid fa-hand-pointer"></i> Step 2</span>
+            <strong>Capture Fingerprint</strong>
+            <p>Ask the applicant to press their finger until the enrollment quality meets the required threshold.</p>
+        </div>
+        <div class="fingerprint-step">
+            <span><i class="fa-solid fa-shield-heart"></i> Step 3</span>
+            <strong>Save Template</strong>
+            <p>Bind the biometric template to the applicant profile and confirm enrollment success.</p>
+        </div>
+    </div>
+
+    <div class="fingerprint-status">
+        <span class="status-chip pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Waiting for scanner handshake</span>
+        <span class="status-note">Device bridge can be connected here once BioSync runtime service is available.</span>
+    </div>
+
+    <div class="registration-actions">
+        <a href="{{ url()->current() }}?mode=registration" class="btn">Back</a>
+        <button type="button" class="btn" disabled>Start Enrollment</button>
+    </div>
+</div>
+@endif
+
+@if(in_array($currentMode, ['scan', 'assisted', 'applicant'], true))
 <div class="card p-4 shadow-sm walkin-strip-card" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
     
     <div id="dynamicHeader" class="mode-header {{ $currentMode === 'assisted' ? 'bg-register' : 'bg-scan' }}">
-        <div id="headerIcon" class="mode-header-badge">{{ $currentMode === 'assisted' ? 'AI' : 'SB' }}</div>
+        <div id="headerIcon" class="mode-header-badge">{{ $currentMode === 'assisted' ? 'AI' : ($currentMode === 'applicant' ? 'AP' : 'SB') }}</div>
         <div class="mode-header-copy">
             <h3 id="headerTitle" style="margin: 0; font-weight: 800; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
-                {{ $currentMode === 'assisted' ? 'Assisted Intake Ready' : 'Scan / Bio Ready' }}
+                {{ $currentMode === 'assisted' ? 'Assisted Intake Ready' : ($currentMode === 'applicant' ? 'Applicant Scan Ready' : 'Scan / Bio Ready') }}
             </h3>
             <p id="headerSubtitle">
-                {{ $currentMode === 'assisted' ? 'Capture the patient basics first, then continue to consultation.' : 'Choose barcode scanning or BioSync mode to identify the patient.' }}
+                {{ $currentMode === 'assisted' ? 'Capture the patient basics first, then continue to consultation.' : ($currentMode === 'applicant' ? 'Choose OCR scanning or BioSync to identify the applicant and continue to Medical Assessment.' : 'Choose barcode scanning or BioSync mode to identify the patient.') }}
             </p>
         </div>
     </div>
@@ -793,6 +1616,8 @@
     let autoProceedInFlight = false;
     let lastAutoProceedKey = '';
     const initialMode = @json($currentMode);
+    const intakeTarget = initialMode === 'applicant' ? 'assessment' : 'consultation';
+    const destinationLabel = intakeTarget === 'assessment' ? 'medical assessment form' : 'consultation form';
     let scanMethod = 'ocr';
     const liveOcrIntervalMs = 900;
     const ocrCanvasScale = 1;
@@ -830,7 +1655,7 @@
     $(document).ready(function() {
         updateScanModeUI();
 
-        if (initialMode === 'scan') {
+        if (initialMode === 'scan' || initialMode === 'applicant') {
             startMainScanner();
         }
 
@@ -1034,7 +1859,8 @@
             $.get("{{ url($basePrefix . '/walkin/get-student') }}", {
                 student_id: normalizedStudentNumber,
                 student_name: extractedName,
-                preview_only: 1
+                preview_only: 1,
+                intake_target: intakeTarget
             }, function(res) {
                 if (res.status !== 'preview' || !res.student_name) {
                     return;
@@ -1061,7 +1887,7 @@
 
             autoProceedInFlight = true;
             lastAutoProceedKey = autoProceedKey;
-            buildStatus('Student number and name matched. Opening the consultation form now.', 'success', 'Auto proceed');
+            buildStatus(`Student number and name matched. Opening the ${destinationLabel} now.`, 'success', 'Auto proceed');
             verifyUser(normalizedStudentNumber, normalizedStudentName, true);
         }
 
@@ -1076,7 +1902,8 @@
             $.get("{{ url($basePrefix . '/walkin/get-student') }}", {
                 student_id: '',
                 student_name: normalizedStudentName,
-                preview_only: 1
+                preview_only: 1,
+                intake_target: intakeTarget
             }, function(res) {
                 if (res.status !== 'preview' || !res.student_number) {
                     return;
@@ -1374,7 +2201,7 @@
         function verifyUser(id, studentName = '', autoProceed = false) {
             $('#scan-loading').css('display', 'flex');
             $('#notification').html('');
-            $.get("{{ url($basePrefix . '/walkin/get-student') }}", { student_id: id, student_name: studentName }, function(res) {
+            $.get("{{ url($basePrefix . '/walkin/get-student') }}", { student_id: id, student_name: studentName, intake_target: intakeTarget }, function(res) {
                 $('#scan-loading').hide();
                 autoProceedInFlight = false;
                 if (res.status === 'found') {
@@ -1428,25 +2255,32 @@
 
         function updateScanModeUI() {
             const isBioSync = scanMethod === 'biosync';
+            const isApplicantFlow = intakeTarget === 'assessment';
             $('#scanMethodTitle').text(isBioSync ? 'BioSync' : 'OCR ID Scan');
             $('#scanMethodNote').text(
                 isBioSync
                     ? 'BioSync mode uses the same patient lookup path for now, while presenting the intake flow as biometric identification.'
-                    : 'Use the live camera feed to extract the printed student number from the physical ID card, then fill the saved name from records.'
+                    : isApplicantFlow
+                        ? 'Use the live camera feed to extract the applicant student number from the ID card, then proceed to Medical Assessment.'
+                        : 'Use the live camera feed to extract the printed student number from the physical ID card, then fill the saved name from records.'
             );
             $('#scanMethodBadge').text(isBioSync ? 'BioSync Active' : 'OCR Active');
             $('#btnSwitchScanMode').text(isBioSync ? 'Switch to OCR Scan' : 'Switch to BioSync');
-            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : 'Scan / Bio Ready');
+            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : (isApplicantFlow ? 'Applicant Scan Ready' : 'Scan / Bio Ready'));
             $('#headerSubtitle').text(
                 isBioSync
                     ? 'BioSync is selected. The biometric integration panel is reserved for the next implementation step.'
-                    : 'Choose OCR ID scanning or BioSync mode to identify the patient.'
+                    : isApplicantFlow
+                        ? 'Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.'
+                        : 'Choose OCR ID scanning or BioSync mode to identify the patient.'
             );
-            $('#headerIcon').text(isBioSync ? 'BIO' : 'SB');
+            $('#headerIcon').text(isBioSync ? 'BIO' : (isApplicantFlow ? 'AP' : 'SB'));
             $('#scanInlineNote').text(
                 isBioSync
                     ? 'BioSync mode is selected. This section is currently in pending state while we complete the biometric workflow.'
-                    : 'OCR mode is active. Align the physical ID inside the frame and the system will keep reading the student number live, then match the saved name automatically.'
+                    : isApplicantFlow
+                        ? 'OCR mode is active. Align the physical ID inside the frame and continue once student number and name are matched for Medical Assessment.'
+                        : 'OCR mode is active. Align the physical ID inside the frame and the system will keep reading the student number live, then match the saved name automatically.'
             );
             $('#barcodeScanPanel').toggle(!isBioSync);
             $('#bioSyncPendingPanel').toggle(isBioSync);

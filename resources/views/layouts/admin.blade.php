@@ -2374,25 +2374,25 @@
 
         .admin-live-alert {
             position: fixed;
-            right: 20px;
-            top: 86px;
+            left: 50%;
+            top: 50%;
             width: min(420px, calc(100vw - 28px));
             z-index: 500001;
             opacity: 0;
-            transform: translateY(-10px) scale(0.98);
+            transform: translate(-50%, -56%) scale(0.98);
             pointer-events: none;
             transition: opacity 0.22s ease, transform 0.24s ease;
         }
 
         .admin-live-alert.is-open {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            transform: translate(-50%, -50%) scale(1);
             pointer-events: auto;
         }
 
         .admin-live-alert-card {
             display: grid;
-            grid-template-columns: auto 1fr auto auto;
+            grid-template-columns: auto 1fr auto auto auto;
             gap: 10px;
             align-items: start;
             border-radius: 14px;
@@ -2462,6 +2462,27 @@
             white-space: nowrap;
         }
 
+        .admin-live-alert-more {
+            align-self: center;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            min-height: 32px;
+            padding: 0 12px;
+            border-radius: 9px;
+            border: 1px solid rgba(112, 19, 27, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            color: #70131B;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .admin-live-alert-more.is-visible {
+            display: inline-flex;
+        }
+
         .admin-live-alert-close {
             width: 30px;
             height: 30px;
@@ -2521,6 +2542,12 @@
         html[data-theme="dark"] .admin-live-alert-open {
             border-color: rgba(250, 204, 21, 0.5);
             background: rgba(146, 64, 14, 0.22);
+            color: #fde68a;
+        }
+
+        html[data-theme="dark"] .admin-live-alert-more {
+            border-color: rgba(250, 204, 21, 0.46);
+            background: rgba(30, 41, 59, 0.92);
             color: #fde68a;
         }
 
@@ -3977,6 +4004,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             <p id="adminLiveAlertCopy" class="admin-live-alert-copy">A new clinic activity requires your attention.</p>
         </div>
         <a id="adminLiveAlertOpen" class="admin-live-alert-open" href="{{ $appointmentsUrl }}">Open</a>
+        <button type="button" id="adminLiveAlertMore" class="admin-live-alert-more" aria-label="See more notifications">
+            See more
+        </button>
         <button type="button" class="admin-live-alert-close" id="adminLiveAlertClose" aria-label="Close alert">
             <x-outline-icon name="x-mark" />
         </button>
@@ -4354,11 +4384,14 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const copyNode = document.getElementById('adminLiveAlertCopy');
         const iconNode = document.getElementById('adminLiveAlertIcon');
         const openNode = document.getElementById('adminLiveAlertOpen');
+        const moreNode = document.getElementById('adminLiveAlertMore');
         const closeNode = document.getElementById('adminLiveAlertClose');
         const progressNode = document.getElementById('adminLiveAlertProgressBar');
         const badgeNodes = Array.from(document.querySelectorAll('.quick-action-badge, .medicine-alert-badge'));
+        const alertPanel = document.getElementById('medicineAlertPanel');
+        const notificationToggle = document.querySelector('[data-medicine-alert-toggle]');
 
-        if (!modal || !dataNode || !titleNode || !copyNode || !iconNode || !openNode || !closeNode || !progressNode || !feedUrlNode) {
+        if (!modal || !dataNode || !titleNode || !copyNode || !iconNode || !openNode || !moreNode || !closeNode || !progressNode || !feedUrlNode) {
             return;
         }
 
@@ -4368,6 +4401,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         } catch (error) {
             alerts = [];
         }
+        let unreadCount = {{ (int) $adminNotificationCount }};
 
         const feedUrl = (() => {
             try {
@@ -4414,6 +4448,10 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             persistSeen();
         };
 
+        const syncSeeMore = function () {
+            moreNode.classList.toggle('is-visible', unreadCount > 3);
+        };
+
         const updateBadgeCount = function (count) {
             badgeNodes.forEach(function (badge) {
                 if (!badge) {
@@ -4450,7 +4488,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             progressNode.style.transform = 'scaleX(1)';
             window.requestAnimationFrame(function () {
                 window.requestAnimationFrame(function () {
-                    progressNode.style.transition = 'transform 5s linear';
+                    progressNode.style.transition = 'transform 10s linear';
                     progressNode.style.transform = 'scaleX(0)';
                 });
             });
@@ -4481,7 +4519,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             hideTimer = window.setTimeout(function () {
                 markSeen(item.id);
                 closeCurrent();
-            }, 5000);
+            }, 10000);
         };
 
         closeNode.addEventListener('click', function () {
@@ -4495,6 +4533,16 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             if (isShowing && currentAlert && currentAlert.id) {
                 markSeen(currentAlert.id);
             }
+        });
+
+        moreNode.addEventListener('click', function () {
+            if (alertPanel && !alertPanel.classList.contains('is-open') && notificationToggle) {
+                notificationToggle.click();
+            }
+            if (isShowing && currentAlert && currentAlert.id) {
+                markSeen(currentAlert.id);
+            }
+            closeCurrent();
         });
 
         const enqueueAlerts = function (items) {
@@ -4536,7 +4584,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 })
                 .then(function (payload) {
                     const items = Array.isArray(payload.notifications) ? payload.notifications : [];
-                    updateBadgeCount(Number(payload.count || items.length || 0));
+                    unreadCount = Number(payload.count || items.length || 0);
+                    updateBadgeCount(unreadCount);
+                    syncSeeMore();
 
                     const filtered = items
                         .filter(function (item) {
@@ -4553,6 +4603,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         };
 
         enqueueAlerts(Array.isArray(alerts) ? alerts : []);
+        syncSeeMore();
         pullFeed();
         pollTimer = window.setInterval(pullFeed, 10000);
         window.addEventListener('beforeunload', function () {

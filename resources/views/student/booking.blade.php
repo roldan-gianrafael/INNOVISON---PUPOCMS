@@ -5,9 +5,78 @@
 @push('styles')
 <style>
     /* --- PAGE LAYOUT --- */
-    .page-header { margin-bottom: 30px; }
-    .page-title { color: #8B0000; font-weight: 800; font-size: 32px; margin: 0 0 10px 0; }
-    .page-subtitle { color: #64748b; font-size: 15px; }
+    .page-header {
+        position: relative;
+        margin-bottom: 22px;
+        margin-top: -12px;
+        padding: 18px 22px;
+        border-radius: 24px;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        background:
+            radial-gradient(circle at top right, rgba(255, 244, 194, 0.68), transparent 30%),
+            linear-gradient(135deg, #fffef4 0%, #fff8fb 36%, #ffffff 100%);
+        box-shadow:
+            0 20px 40px rgba(15, 23, 42, 0.09),
+            0 0 0 1px rgba(255,255,255,0.78) inset;
+        overflow: hidden;
+    }
+    .page-header::before {
+        content: "";
+        position: absolute;
+        inset: auto -60px -80px auto;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(139, 0, 0, 0.10) 0%, rgba(139, 0, 0, 0) 70%);
+        pointer-events: none;
+    }
+    .page-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(139, 0, 0, 0.08);
+        color: #8B0000;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .page-title { color: #8B0000; font-weight: 800; font-size: 28px; margin: 0 0 8px 0; letter-spacing: -0.03em; }
+    .page-subtitle { color: #64748b; font-size: 14px; margin: 0; max-width: 620px; line-height: 1.6; }
+    .page-steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+    .page-step {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+    .page-step-index {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: #8B0000;
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+        flex: 0 0 auto;
+    }
 
     /* --- ALERTS --- */
     .alert { padding: 15px; border-radius: 8px; margin-bottom: 24px; border: 1px solid transparent; font-size: 14px; }
@@ -17,17 +86,63 @@
 
     /* --- MAIN CARD --- */
     .booking-card {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        overflow: hidden;
-        border-top: 5px solid #8B0000;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
+        border-top: 0;
         display: flex;
         flex-wrap: wrap;
+        gap: 22px;
+        padding: 0;
     }
 
-    .booking-form-section { flex: 2; padding: 40px; border-right: 1px solid #f1f5f9; min-width: 0; }
-    .booking-info-section { flex: 1; padding: 40px; background: #fcfcfc; min-width: 0; }
+    .booking-form-section {
+        flex: 2;
+        padding: 32px;
+        min-width: 0;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        border-radius: 22px;
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,250,249,0.98) 100%);
+        box-shadow:
+            0 18px 38px rgba(15, 23, 42, 0.08),
+            0 0 0 1px rgba(139, 0, 0, 0.04);
+        position: relative;
+        overflow: hidden;
+    }
+    .booking-form-section,
+    .booking-form-section .form-section-title,
+    .booking-form-section .input-label,
+    .booking-form-section .form-control,
+    .booking-form-section .form-control::placeholder,
+    .booking-form-section .time-slot-hint,
+    .booking-form-section .date-picker-month,
+    .booking-form-section .date-picker-weekdays span,
+    .booking-form-section .calendar-day,
+    .booking-form-section .date-picker-toggle {
+        color: #111111;
+    }
+    .booking-form-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 22px;
+        right: 22px;
+        height: 5px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #8B0000 0%, #c9872d 55%, #facc15 100%);
+        pointer-events: none;
+    }
+    .booking-info-section {
+        flex: 1;
+        padding: 0;
+        background: transparent;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
     .booking-grid-2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -35,7 +150,30 @@
     }
 
     /* --- FORM STYLING --- */
-    .form-section-title { color: #20343a; font-size: 20px; font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+    .form-section-title {
+        color: #20343a;
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        letter-spacing: -0.01em;
+    }
+    .section-title-badge {
+        background: linear-gradient(135deg, #fee2e2, #fff1f2);
+        color: #8B0000;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        border: 1px solid rgba(139, 0, 0, 0.10);
+        box-shadow: 0 8px 18px rgba(139, 0, 0, 0.10);
+        flex: 0 0 auto;
+    }
     
     .input-group { position: relative; margin-bottom: 24px; }
     .input-label { display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -43,28 +181,58 @@
     
     .form-control {
         width: 100%;
-        padding: 12px 16px; 
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
+        min-height: 50px;
+        padding: 12px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.20);
+        border-radius: 18px;
         font-size: 15px;
-        color: #334155;
+        color: #111111;
         transition: all 0.2s ease;
-        background: #fff;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        box-shadow:
+            0 10px 18px rgba(15, 23, 42, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.86);
+        font-weight: 400;
     }
-    .form-control:focus { border-color: #8B0000; box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.05); outline: none; }
+    .form-control,
+    .form-control option,
+    textarea.form-control,
+    input.form-control,
+    select.form-control {
+        color: #111111 !important;
+    }
+    .form-control:focus {
+        border-color: #8B0000;
+        box-shadow:
+            0 0 0 4px rgba(139, 0, 0, 0.06),
+            0 14px 24px rgba(139, 0, 0, 0.10),
+            inset 0 1px 0 rgba(255,255,255,0.88);
+        outline: none;
+    }
     
     /* READONLY STYLE */
     .form-control[readonly] {
-        background: #f8fafc;
-        color: #64748b;
-        cursor: not-allowed;
-        border-color: #e2e8f0;
+        background: linear-gradient(180deg, #fffaf8 0%, #f8fafc 100%);
+        color: #111111;
+        cursor: default;
+        border-color: rgba(148, 163, 184, 0.16);
     }
 
-    textarea.form-control { resize: vertical; min-height: 100px; }
+    textarea.form-control {
+        resize: vertical;
+        min-height: 118px;
+        padding-top: 14px;
+        line-height: 1.6;
+        border-radius: 20px;
+    }
     .time-display-input {
-        background: #f8fafc;
-        cursor: default;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        cursor: pointer;
+    }
+    .time-display-input.is-disabled {
+        background: linear-gradient(180deg, #fffaf8 0%, #f8fafc 100%);
+        color: #94a3b8 !important;
+        cursor: not-allowed;
     }
     .time-slots {
         display: grid;
@@ -74,23 +242,26 @@
     }
     .time-slot-btn {
         border: 1px solid #e2e8f0;
-        background: #ffffff;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
         color: #334155;
-        border-radius: 8px;
+        border-radius: 12px;
         padding: 10px 8px;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.2s ease;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
     }
     .time-slot-btn:hover {
         border-color: #8B0000;
         color: #8B0000;
+        transform: translateY(-1px);
     }
     .time-slot-btn.selected {
-        background: #8B0000;
+        background: linear-gradient(135deg, #8B0000, #70131B);
         border-color: #8B0000;
         color: #ffffff;
+        box-shadow: 0 14px 22px rgba(139, 0, 0, 0.20);
     }
     .time-slot-btn:disabled {
         background: #f8fafc;
@@ -100,15 +271,30 @@
     }
     .time-slot-hint {
         display: block;
-        margin-top: 8px;
+        margin-top: 10px;
+        padding-left: 16px;
         font-size: 12px;
+        font-weight: 600;
         color: #64748b;
+        line-height: 1.55;
+        position: relative;
+    }
+    .time-slot-hint::before {
+        content: "*";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        color: #8B0000;
+        font-size: 13px;
+        font-weight: 900;
+        line-height: 1;
     }
     .date-picker-wrapper {
         position: relative;
     }
     .date-display-input {
-        background: #fff;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
         cursor: pointer;
     }
     .date-picker-toggle {
@@ -116,18 +302,162 @@
         top: 50%;
         right: 10px;
         transform: translateY(-50%);
-        border: 1px solid #cbd5e1;
-        background: #f8fafc;
-        color: #334155;
-        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: #8B0000;
+        border-radius: 999px;
         font-size: 12px;
-        font-weight: 700;
-        padding: 6px 10px;
+        font-weight: 800;
+        padding: 7px 12px;
         cursor: pointer;
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
     }
     .date-picker-toggle:hover {
         border-color: #8B0000;
         color: #8B0000;
+        transform: translateY(calc(-50% - 1px));
+    }
+    .service-select-wrap {
+        position: relative;
+    }
+    .service-select {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        padding: 0;
+        border: 0;
+        margin: 0;
+    }
+    .service-select-display {
+        width: 100%;
+        min-height: 50px;
+        padding: 12px 52px 12px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.20);
+        border-radius: 18px;
+        font-size: 15px;
+        color: #111111;
+        background:
+            linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        box-shadow:
+            0 10px 18px rgba(15, 23, 42, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.86);
+        cursor: pointer;
+        font-weight: 400;
+        text-align: left;
+        transition: all 0.2s ease;
+    }
+    .service-select-display:hover {
+        border-color: rgba(139, 0, 0, 0.28);
+        box-shadow:
+            0 10px 18px rgba(139, 0, 0, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.86);
+    }
+    .service-select-display.is-open,
+    .service-select-display:focus {
+        outline: none;
+        border-color: #8B0000;
+        box-shadow:
+            0 0 0 4px rgba(139, 0, 0, 0.06),
+            0 10px 18px rgba(139, 0, 0, 0.08);
+    }
+    .service-select option {
+        color: #111111;
+        background: #ffffff;
+        font-weight: 700;
+        padding: 10px 12px;
+    }
+    .service-select option[disabled] {
+        color: #64748b;
+        font-weight: 600;
+    }
+    .service-select:hover {
+        border-color: rgba(139, 0, 0, 0.28);
+        box-shadow:
+            0 10px 18px rgba(139, 0, 0, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.86);
+    }
+    .service-select-wrap::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 18px;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #8B0000;
+        border-bottom: 2px solid #8B0000;
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+        transition: transform 0.18s ease;
+    }
+    .service-select-wrap::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 42px;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 24px;
+        background: rgba(148, 163, 184, 0.24);
+        pointer-events: none;
+    }
+    .service-select-focus {
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.06);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease;
+    }
+    .service-select-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        right: 0;
+        display: none;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+        z-index: 80;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+    .service-select-wrap.is-open .service-select-menu {
+        display: grid;
+    }
+    .service-select-option {
+        position: relative;
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: #1e293b;
+        border-radius: 999px;
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+    }
+    .service-select-option:hover {
+        transform: translateY(-1px);
+        border-color: #8B0000;
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15;
+        box-shadow: 0 12px 20px rgba(139, 0, 0, 0.16);
+    }
+    .service-select-option.is-selected {
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #ffffff;
+        border-color: #8B0000;
+        box-shadow: 0 14px 24px rgba(139, 0, 0, 0.18);
     }
     .date-picker-panel {
         position: absolute;
@@ -219,33 +549,157 @@
     }
 
     .btn-submit {
-        background: #8B0000;
+        background: linear-gradient(135deg, #8B0000, #70131B);
         color: white;
         border: none;
         padding: 14px 28px;
-        border-radius: 10px;
+        border-radius: 14px;
         font-weight: 700;
         font-size: 16px;
         cursor: pointer;
         width: 100%;
         transition: transform 0.2s, box-shadow 0.2s;
         display: flex; align-items: center; justify-content: center; gap: 10px;
+        box-shadow:
+            0 0 0 3px rgba(139, 0, 0, 0.10),
+            0 16px 28px rgba(112, 19, 27, 0.20);
     }
-    .btn-submit:hover { background: #70131B; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139, 0, 0, 0.2); }
+    .btn-submit:hover {
+        background: #facc15;
+        color: #8B0000;
+        transform: translateY(-2px);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.12),
+            0 18px 30px rgba(139, 0, 0, 0.22);
+    }
 
     /* --- WIDGETS --- */
-    .info-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-    .info-title { font-size: 16px; font-weight: 700; color: #20343a; margin: 0 0 15px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+    .info-card {
+        background:
+            linear-gradient(180deg, #ffffff 0%, #fcfcfe 100%);
+        border: 1px solid rgba(30, 41, 59, 0.10);
+        border-radius: 22px;
+        padding: 22px;
+        margin-bottom: 0;
+        box-shadow:
+            0 16px 32px rgba(15, 23, 42, 0.08),
+            0 0 0 1px rgba(255,255,255,0.75) inset;
+        position: relative;
+        overflow: hidden;
+    }
+    .info-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 18px;
+        right: 18px;
+        height: 4px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #8B0000 0%, #facc15 100%);
+    }
+    .info-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #20343a;
+        margin: 0 0 16px 0;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 12px;
+    }
     .empty-state { text-align: center; padding: 20px 0; color: #94a3b8; }
     .empty-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; display: block; }
     
-    .appt-item { padding: 12px; border: 1px solid #eee; border-radius: 8px; background: #fff; margin-bottom: 10px; }
-    .appt-service { font-weight: 700; color: #8B0000; font-size: 14px; }
-    .appt-time { font-size: 13px; color: #555; margin-top: 4px; }
-    .appt-status { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .app-list {
+        display: grid;
+        gap: 12px;
+    }
+    .appt-item {
+        padding: 14px 14px 14px 16px;
+        border: 1px solid rgba(226, 232, 240, 0.92);
+        border-left: 4px solid #8B0000;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+        margin-bottom: 0;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+    }
+    .appt-service { font-weight: 800; color: #8B0000; font-size: 14px; letter-spacing: 0.01em; }
+    .appt-time { font-size: 13px; color: #555; margin-top: 6px; line-height: 1.6; }
+    .appt-status { display: inline-block; margin-top: 8px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .appt-overflow-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+    .appt-overflow-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(139, 0, 0, 0.18);
+        background: #ffffff;
+        color: #8B0000;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+    }
+    .appt-overflow-btn:hover {
+        transform: translateY(-1px);
+        background: #8B0000;
+        color: #facc15;
+        border-color: #8B0000;
+        box-shadow: 0 14px 24px rgba(139, 0, 0, 0.16);
+    }
+    .appt-hidden-list {
+        display: none;
+        gap: 12px;
+        margin-top: 12px;
+    }
+    .appt-hidden-list.is-open {
+        display: grid;
+    }
     
-    .note-widget { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 8px; color: #92400e; font-size: 14px; line-height: 1.6; }
-    .note-header { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 8px; color: #b45309; }
+    .note-widget {
+        background: linear-gradient(180deg, #fffdf5 0%, #fffbeb 100%);
+        border: 1px solid rgba(245, 158, 11, 0.22);
+        border-left: 5px solid #f59e0b;
+        padding: 22px;
+        border-radius: 16px;
+        color: #92400e;
+        font-size: 14px;
+        line-height: 1.7;
+        box-shadow:
+            0 16px 32px rgba(146, 64, 14, 0.10),
+            0 0 0 1px rgba(255,255,255,0.7) inset;
+        position: relative;
+        overflow: hidden;
+    }
+    .note-widget::before {
+        content: "";
+        position: absolute;
+        top: -22px;
+        right: -22px;
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0) 72%);
+        pointer-events: none;
+    }
+    .note-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: #b45309;
+        font-size: 16px;
+    }
 
     .confirmation-overlay {
         position: fixed;
@@ -355,16 +809,195 @@
         background: #fff5f5;
     }
 
+    html[data-theme="dark"] .page-header,
+    html[data-theme="dark"] .booking-form-section,
+    html[data-theme="dark"] .info-card,
+    html[data-theme="dark"] .note-widget,
+    html[data-theme="dark"] .confirmation-modal {
+        background: linear-gradient(180deg, #0f0f10 0%, #161618 100%) !important;
+        border-color: rgba(250, 204, 21, 0.16) !important;
+        box-shadow:
+            0 18px 36px rgba(0, 0, 0, 0.42),
+            0 0 0 1px rgba(250, 204, 21, 0.05) inset !important;
+    }
+
+    html[data-theme="dark"] .page-kicker,
+    html[data-theme="dark"] .page-step,
+    html[data-theme="dark"] .appt-item {
+        background: linear-gradient(180deg, #17171a 0%, #1d1d21 100%) !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .page-title,
+    html[data-theme="dark"] .form-section-title,
+    html[data-theme="dark"] .info-title,
+    html[data-theme="dark"] .appt-service,
+    html[data-theme="dark"] .note-header,
+    html[data-theme="dark"] .confirmation-title {
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .page-subtitle,
+    html[data-theme="dark"] .page-step,
+    html[data-theme="dark"] .input-label,
+    html[data-theme="dark"] .appt-time,
+    html[data-theme="dark"] .note-widget p,
+    html[data-theme="dark"] .confirmation-subtitle,
+    html[data-theme="dark"] .confirmation-label,
+    html[data-theme="dark"] .confirmation-value,
+    html[data-theme="dark"] .confirmation-status {
+        color: #e5e7eb !important;
+    }
+    html[data-theme="dark"] .time-slot-hint {
+        color: #e5e7eb !important;
+    }
+    html[data-theme="dark"] .time-slot-hint::before {
+        color: #facc15 !important;
+    }
+
+    html[data-theme="dark"] .form-control,
+    html[data-theme="dark"] .form-control option,
+    html[data-theme="dark"] textarea.form-control,
+    html[data-theme="dark"] input.form-control,
+    html[data-theme="dark"] select.form-control,
+    html[data-theme="dark"] .time-display-input,
+    html[data-theme="dark"] .date-display-input,
+    html[data-theme="dark"] .date-picker-month,
+    html[data-theme="dark"] .date-picker-weekdays span,
+    html[data-theme="dark"] .calendar-day,
+    html[data-theme="dark"] .date-picker-toggle {
+        background: #111214 !important;
+        color: #ffffff !important;
+        border-color: rgba(250, 204, 21, 0.16) !important;
+        box-shadow: none !important;
+    }
+    html[data-theme="dark"] .time-display-input.is-disabled {
+        background: #1a1c20 !important;
+        color: #6b7280 !important;
+    }
+    html[data-theme="dark"] .service-select {
+        background: linear-gradient(180deg, #111214 0%, #17171a 100%) !important;
+    }
+    html[data-theme="dark"] .service-select-display {
+        background: linear-gradient(180deg, #111214 0%, #17171a 100%) !important;
+        color: #ffffff !important;
+        border-color: rgba(250, 204, 21, 0.16) !important;
+        box-shadow: none !important;
+    }
+    html[data-theme="dark"] .service-select option {
+        background: #111214 !important;
+        color: #ffffff !important;
+    }
+    html[data-theme="dark"] .service-select option[disabled] {
+        color: #94a3b8 !important;
+    }
+    html[data-theme="dark"] .service-select-menu {
+        background: rgba(15, 18, 20, 0.98) !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        box-shadow: 0 20px 36px rgba(0, 0, 0, 0.34) !important;
+    }
+    html[data-theme="dark"] .service-select-option {
+        background: linear-gradient(180deg, #17171a 0%, #1d1d21 100%) !important;
+        color: #f8fafc !important;
+        border-color: rgba(250, 204, 21, 0.12) !important;
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22) !important;
+    }
+    html[data-theme="dark"] .service-select-option:hover {
+        background: linear-gradient(135deg, #8B0000, #70131B) !important;
+        color: #facc15 !important;
+        border-color: #8B0000 !important;
+    }
+    html[data-theme="dark"] .service-select-option.is-selected {
+        background: linear-gradient(135deg, #8B0000, #70131B) !important;
+        color: #ffffff !important;
+        border-color: #8B0000 !important;
+    }
+    html[data-theme="dark"] .service-select-wrap::after {
+        border-right-color: #facc15;
+        border-bottom-color: #facc15;
+    }
+    html[data-theme="dark"] .service-select-wrap::before {
+        background: rgba(250, 204, 21, 0.16);
+    }
+
+    html[data-theme="dark"] .form-control::placeholder,
+    html[data-theme="dark"] .time-display-input::placeholder,
+    html[data-theme="dark"] .date-display-input::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    html[data-theme="dark"] .calendar-day:disabled {
+        background: #1a1c20 !important;
+        color: #6b7280 !important;
+        border-color: rgba(148, 163, 184, 0.12) !important;
+    }
+
+    html[data-theme="dark"] .calendar-day.selected,
+    html[data-theme="dark"] .time-slot-btn.selected,
+    html[data-theme="dark"] .btn-submit,
+    html[data-theme="dark"] .confirmation-btn-primary {
+        background: linear-gradient(135deg, #8B0000, #70131B) !important;
+        color: #ffffff !important;
+        border-color: #8B0000 !important;
+    }
+    html[data-theme="dark"] .btn-submit:hover {
+        background: #facc15 !important;
+        color: #8B0000 !important;
+        border-color: #facc15 !important;
+    }
+
+    html[data-theme="dark"] .time-slot-btn,
+    html[data-theme="dark"] .date-picker-panel,
+    html[data-theme="dark"] .confirmation-item {
+        background: #111214 !important;
+        color: #ffffff !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24) !important;
+    }
+
+    html[data-theme="dark"] .confirmation-btn-secondary {
+        background: #17171a !important;
+        color: #ffffff !important;
+        border-color: rgba(250, 204, 21, 0.18) !important;
+    }
+    html[data-theme="dark"] .appt-overflow-btn {
+        background: #17171a !important;
+        color: #ffffff !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        box-shadow: 0 12px 22px rgba(0, 0, 0, 0.22) !important;
+    }
+    html[data-theme="dark"] .appt-overflow-btn:hover {
+        background: #8B0000 !important;
+        color: #facc15 !important;
+        border-color: #8B0000 !important;
+    }
+
     @media (max-width: 900px) {
         .booking-card { flex-direction: column; }
-        .booking-form-section { border-right: none; border-bottom: 1px solid #f1f5f9; }
+        .booking-form-section { border-right: none; }
     }
 
     @media (max-width: 680px) {
         .page-title { font-size: 26px; }
+        .page-header {
+            padding: 16px 16px;
+            margin-bottom: 18px;
+            margin-top: -8px;
+        }
+        .page-steps {
+            gap: 10px;
+        }
+        .page-step {
+            width: 100%;
+            justify-content: flex-start;
+        }
+        .booking-card {
+            gap: 16px;
+        }
         .booking-form-section,
         .booking-info-section {
-            padding: 24px 16px;
+            padding: 22px 16px;
         }
         .booking-grid-2 {
             grid-template-columns: 1fr;
@@ -385,11 +1018,26 @@
 @endpush
 
 @section('content')
-<div class="container" style="padding: 40px 20px;">
+<div class="container" style="padding: 8px 20px 40px;">
     
     <div class="page-header">
+        <div class="page-kicker">Student Clinic Booking</div>
         <h1 class="page-title">Book an Appointment</h1>
         <p class="page-subtitle">Fill out the form below to request a consultation with the school nurse.</p>
+        <div class="page-steps">
+            <div class="page-step">
+                <span class="page-step-index">1</span>
+                <span>Enter appointment details</span>
+            </div>
+            <div class="page-step">
+                <span class="page-step-index">2</span>
+                <span>Choose an available schedule</span>
+            </div>
+            <div class="page-step">
+                <span class="page-step-index">3</span>
+                <span>Submit and wait for approval</span>
+            </div>
+        </div>
     </div>
 
     @if(session('success'))
@@ -413,7 +1061,7 @@
         
         <div class="booking-form-section">
             <div class="form-section-title">
-                <span style="background:#fee2e2; color:#8B0000; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">1</span>
+                <span class="section-title-badge">1</span>
                 Appointment Details
             </div>
 
@@ -446,6 +1094,8 @@
                     </div>
                 </div>
 
+                
+
                 <div class="booking-grid-2">
                     <div class="input-group">
                         <label class="input-label">Preferred Date</label>
@@ -471,7 +1121,7 @@
                                 <div class="date-picker-days" id="calendarDays"></div>
                             </div>
                         </div>
-                        <small class="time-slot-hint" id="dateHint">Choose a date to load available schedules.</small>
+                        <small class="time-slot-hint" id="dateHint">Weekends and past dates are unavailable.</small>
                     </div>
 
                     <div class="input-group">
@@ -480,22 +1130,30 @@
                             <input id="preferredTimeDisplay" type="text" class="form-control time-display-input" readonly placeholder="Select a date first">
                             <input id="preferredTimeInput" type="hidden" name="time" value="{{ old('time') }}" required>
                         </div>
+                        <div id="timeSlots" class="time-slots-container"></div>
+                    <small class="time-slot-hint" id="timeSlotsHint">
+                        Select a date to view available time slots.
+                    </small>
+
+                    
                     </div>
                 </div>
-
-                <div class="input-group">
-                    <div id="timeSlots" class="time-slots" aria-live="polite"></div>
-                    <small class="time-slot-hint" id="timeSlotsHint">Select a date to view available time slots.</small>
-                </div>
-                 
+                
                 <div class="input-group">
                     <label class="input-label">Service Type</label>
-                    <div class="input-wrapper">
-                        <select name="service" class="form-control" required>
+                    <div class="input-wrapper service-select-wrap">
+                        <select name="service" class="form-control service-select" id="serviceTypeSelect" required>
                             <option value="" disabled selected>Select a Service...</option>
                             <option value="General Consultation">General Consultation</option>
                             <option value="Blood Pressure Monitoring">Blood Pressure Monitoring</option>
                         </select>
+                        <button type="button" class="service-select-display" id="serviceTypeDisplay" aria-haspopup="listbox" aria-expanded="false">
+                            Select a Service...
+                        </button>
+                        <div class="service-select-menu" id="serviceTypeMenu" role="listbox" aria-label="Service Type options">
+                            <button type="button" class="service-select-option" data-service-value="General Consultation">General Consultation</button>
+                            <button type="button" class="service-select-option" data-service-value="Blood Pressure Monitoring">Blood Pressure Monitoring</button>
+                        </div>
                     </div>
                 </div>
 
@@ -516,7 +1174,12 @@
                 <h4 class="info-title">Upcoming Schedule</h4>
                 
                 <div class="app-list">
-                    @forelse($appointments as $appt)
+                    @php
+                        $visibleAppointments = $appointments->take(4);
+                        $overflowAppointments = $appointments->slice(4);
+                    @endphp
+
+                    @forelse($visibleAppointments as $appt)
                         <div class="appt-item">
                             <div class="appt-service">{{ $appt->service }}</div>
                             <div class="appt-time">
@@ -544,6 +1207,39 @@
                             <div>No appointments scheduled.</div>
                         </div>
                     @endforelse
+
+                    @if($overflowAppointments->isNotEmpty())
+                        <div id="moreAppointmentsList" class="appt-hidden-list">
+                            @foreach($overflowAppointments as $appt)
+                                <div class="appt-item">
+                                    <div class="appt-service">{{ $appt->service }}</div>
+                                    <div class="appt-time">
+                                        {{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }} <br>
+                                        <span style="font-weight:normal; font-size:12px; color:#777;">
+                                            {{ \Carbon\Carbon::parse($appt->time)->format('g:i A') }}
+                                        </span>
+                                    </div>
+
+                                    <div style="margin-top: 5px;">
+                                        @if($appt->status == 'Approved')
+                                            <span class="appt-status" style="background: #dcfce7; color: #15803d;">
+                                                ● Approved
+                                            </span>
+                                        @else
+                                            <span class="appt-status" style="background: #fff3cd; color: #b45309;">
+                                                ● Pending
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="appt-overflow-actions">
+                            <button type="button" class="appt-overflow-btn" id="seeMoreAppointmentsBtn">See more</button>
+                            <a href="{{ url('/student/history') }}" class="appt-overflow-btn">View another schedule</a>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -615,6 +1311,11 @@
         const timeSlots = document.getElementById('timeSlots');
         const slotsHint = document.getElementById('timeSlotsHint');
         const dateHint = document.getElementById('dateHint');
+        const serviceTypeSelect = document.getElementById('serviceTypeSelect');
+        const serviceTypeDisplay = document.getElementById('serviceTypeDisplay');
+        const serviceTypeMenu = document.getElementById('serviceTypeMenu');
+        const serviceTypeOptions = Array.from(document.querySelectorAll('.service-select-option'));
+        const serviceTypeWrap = serviceTypeDisplay ? serviceTypeDisplay.closest('.service-select-wrap') : null;
         const availabilityUrl = @json(url('/student/appointments/availability'));
 
         if (!dateInput || !dateDisplayInput || !dateToggle || !datePickerPanel || !calendarMonthLabel || !calendarDays || !calendarPrev || !calendarNext || !timeInput || !timeDisplay || !timeSlots || !slotsHint) {
@@ -681,6 +1382,29 @@
             return text.length >= 5 ? text.slice(0, 5) : text;
         }
 
+        function syncServiceTypeDisplay() {
+            if (!serviceTypeSelect || !serviceTypeDisplay) return;
+
+            const selectedValue = serviceTypeSelect.value || '';
+            const selectedText = selectedValue
+                ? (serviceTypeSelect.options[serviceTypeSelect.selectedIndex]?.text || selectedValue)
+                : 'Select a Service...';
+
+            serviceTypeDisplay.textContent = selectedText;
+
+            serviceTypeOptions.forEach(function (option) {
+                option.classList.toggle('is-selected', option.dataset.serviceValue === selectedValue);
+            });
+        }
+
+        function setServiceTypeOpenState(isOpen) {
+            if (!serviceTypeWrap || !serviceTypeDisplay) return;
+
+            serviceTypeWrap.classList.toggle('is-open', isOpen);
+            serviceTypeDisplay.classList.toggle('is-open', isOpen);
+            serviceTypeDisplay.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
         function formatTimeLabel(value) {
             if (!value) return '';
             const parts = value.split(':');
@@ -689,6 +1413,16 @@
             const dt = new Date();
             dt.setHours(hour, minute, 0, 0);
             return dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        }
+
+        function setTimeSlotsOpenState(isOpen) {
+            timeSlots.style.display = isOpen ? 'grid' : 'none';
+        }
+
+        function syncTimeFieldState() {
+            const hasDate = Boolean(dateInput.value);
+            timeDisplay.classList.toggle('is-disabled', !hasDate);
+            timeDisplay.setAttribute('aria-disabled', hasDate ? 'false' : 'true');
         }
 
         function setSelectedTime(value) {
@@ -702,10 +1436,41 @@
             timeSlots.querySelectorAll('.time-slot-btn').forEach(function (btn) {
                 btn.classList.toggle('selected', btn.dataset.value === normalized);
             });
+
+            if (normalized) {
+                setTimeSlotsOpenState(false);
+                slotsHint.textContent = 'Time selected. Click the Preferred Time field to change it.';
+            }
+
+            syncTimeFieldState();
         }
 
         function closeDatePanel() {
             datePickerPanel.hidden = true;
+        }
+
+        if (serviceTypeSelect && serviceTypeDisplay && serviceTypeWrap) {
+            syncServiceTypeDisplay();
+
+            serviceTypeDisplay.addEventListener('click', function () {
+                const shouldOpen = !serviceTypeWrap.classList.contains('is-open');
+                setServiceTypeOpenState(shouldOpen);
+            });
+
+            serviceTypeOptions.forEach(function (option) {
+                option.addEventListener('click', function () {
+                    const value = option.dataset.serviceValue || '';
+                    serviceTypeSelect.value = value;
+                    syncServiceTypeDisplay();
+                    setServiceTypeOpenState(false);
+                });
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!serviceTypeWrap.contains(event.target)) {
+                    setServiceTypeOpenState(false);
+                }
+            });
         }
 
         function renderCalendar() {
@@ -744,10 +1509,8 @@
                     dayButton.addEventListener('click', function () {
                         dateInput.value = dateValue;
                         dateDisplayInput.value = formatDateDisplay(dateValue);
-                        if (dateHint) {
-                            dateHint.textContent = 'Date selected. Now choose an available time slot.';
-                        }
                         loadAvailability(dateValue, '');
+                        syncTimeFieldState();
                         renderCalendar();
                         closeDatePanel();
                     });
@@ -780,12 +1543,14 @@
 
         function renderMessage(message) {
             timeSlots.innerHTML = '';
+            setTimeSlotsOpenState(false);
             slotsHint.textContent = message;
             setSelectedTime('');
         }
 
         function renderSlots(slots, preselectedTime) {
             timeSlots.innerHTML = '';
+            setTimeSlotsOpenState(true);
             const selected = normalizeTime(preselectedTime);
             let availableCount = 0;
 
@@ -888,6 +1653,29 @@
             }
         });
 
+        timeDisplay.addEventListener('click', function () {
+            if (!dateInput.value) {
+                slotsHint.textContent = 'Select a date first to view available time slots.';
+                syncTimeFieldState();
+                return;
+            }
+
+            if (timeSlots.children.length === 0) {
+                loadAvailability(dateInput.value, timeInput.value);
+                return;
+            }
+
+            setTimeSlotsOpenState(true);
+            slotsHint.textContent = 'Select one available time slot.';
+        });
+
+        timeDisplay.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                timeDisplay.click();
+            }
+        });
+
         calendarPrev.addEventListener('click', function () {
             if (calendarPrev.disabled) {
                 return;
@@ -924,10 +1712,9 @@
             dateInput.value = '';
             dateDisplayInput.value = '';
             renderMessage('Select a date to view available time slots.');
-            if (dateHint) {
-                dateHint.textContent = 'Weekends and past dates are unavailable.';
-            }
         }
+
+        syncTimeFieldState();
 
         if (bookingForm) {
             bookingForm.addEventListener('submit', function (event) {
@@ -935,9 +1722,6 @@
 
                 if (!dateInput.value) {
                     isValid = false;
-                    if (dateHint) {
-                        dateHint.textContent = 'Please choose an available weekday date.';
-                    }
                     openDatePanel();
                 }
 
@@ -954,10 +1738,20 @@
         }
 
         renderCalendar();
+        setTimeSlotsOpenState(false);
 
         const confirmationOverlay = document.getElementById('appointmentConfirmationOverlay');
         const confirmationClose = document.getElementById('appointmentConfirmationClose');
         const confirmationDone = document.getElementById('appointmentConfirmationDone');
+        const seeMoreAppointmentsBtn = document.getElementById('seeMoreAppointmentsBtn');
+        const moreAppointmentsList = document.getElementById('moreAppointmentsList');
+
+        if (seeMoreAppointmentsBtn && moreAppointmentsList) {
+            seeMoreAppointmentsBtn.addEventListener('click', function () {
+                const isOpen = moreAppointmentsList.classList.toggle('is-open');
+                seeMoreAppointmentsBtn.textContent = isOpen ? 'Show less' : 'See more';
+            });
+        }
 
         if (confirmationOverlay) {
             const closeConfirmation = function () {

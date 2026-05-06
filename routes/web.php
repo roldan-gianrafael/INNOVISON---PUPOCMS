@@ -7,6 +7,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\MedicalConditionController;
+use App\Http\Controllers\MedicineTypeController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\StudentAssistantController;
 use App\Http\Controllers\WalkInController;
@@ -153,9 +154,12 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::delete('/admin/inventory/{id}', [AdminController::class, 'deleteItem'])->name('admin.inventory.delete');
 
         Route::get('/admin/reports/manage-mar', [ReportsController::class, 'manageMar'])->name('admin.reports.manage-mar');
+        Route::get('/admin/reports/manage-medicine-types', [MedicineTypeController::class, 'index'])->name('admin.reports.manage-medicine-types');
         Route::put('/admin/conditions/{id}', [ReportsController::class, 'update'])->name('conditions.update');
         Route::post('/admin/medical-conditions', [MedicalConditionController::class, 'store'])->name('conditions.store');
         Route::delete('/admin/medical-conditions/{id}', [MedicalConditionController::class, 'destroy'])->name('conditions.destroy');
+        Route::post('/admin/medicine-types', [MedicineTypeController::class, 'store'])->name('medicine-types.store');
+        Route::delete('/admin/medicine-types/{id}', [MedicineTypeController::class, 'destroy'])->name('medicine-types.destroy');
 
         Route::get('/admin/student-assistants', [StudentAssistantController::class, 'index'])->name('admin.student-assistants.index');
         Route::post('/admin/student-assistants', [StudentAssistantController::class, 'store'])->name('admin.student-assistants.store');

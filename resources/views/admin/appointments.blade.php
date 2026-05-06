@@ -17,7 +17,7 @@
 
     .appointments-summary-card {
         position: relative;
-        overflow: hidden;
+        overflow: visible;
     }
 
     .appointments-summary-card::before {
@@ -102,6 +102,10 @@
         position: relative;
         display: inline-flex;
         justify-content: center;
+        z-index: 5;
+    }
+    .appointment-action-menu-wrap.is-open {
+        z-index: 60;
     }
     .appointment-action-menu-toggle {
         min-width: 108px;
@@ -156,6 +160,12 @@
         box-shadow: 0 18px 32px rgba(15, 23, 42, 0.14);
         display: none;
         z-index: 30;
+    }
+    #apptTable,
+    #apptTable tbody,
+    #apptTable tr,
+    #apptTable td {
+        overflow: visible;
     }
     .appointment-action-menu-wrap.is-open .appointment-action-menu {
         display: grid;
@@ -423,11 +433,44 @@
         background: transparent;
         box-shadow: none;
     }
+    .modal-header .modal-subtitle {
+        margin: 6px 0 0;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 13px;
+        line-height: 1.5;
+    }
     .modal-subtitle {
         font-size: 14px;
         color: #111827;
         margin-bottom: 16px;
     }
+    .modal-header-close {
+        width: 38px;
+        height: 38px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s ease;
+    }
+    .modal-header-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.34);
+        transform: translateY(-1px);
+    }
+    .modal-header-close svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2.2;
+    }
+    .modal-status-badge.action-approve { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .modal-status-badge.action-reject { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+    .modal-status-badge.action-missed { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
+    .modal-status-badge.action-reschedule { background: #fef3c7; color: #92400e; border-color: #fde68a; }
     .modal-notes {
         background: #fff4c7;
         padding: 10px;
@@ -473,18 +516,18 @@
         background: #5a0f16;
     }
     .dialog-btn-approve {
-        background: #166534;
+        background: #70131B;
         color: #fff;
     }
     .dialog-btn-approve:hover {
-        background: #14532d;
+        background: #5a0f16;
     }
     .dialog-btn-reject {
-        background: #b91c1c;
+        background: #70131B;
         color: #fff;
     }
     .dialog-btn-reject:hover {
-        background: #991b1b;
+        background: #5a0f16;
     }
     .dialog-btn-warning {
         background: #b45309;
@@ -497,10 +540,24 @@
     /* Form Inputs for Reschedule */
     .form-input {
         width: 100%;
-        padding: 10px;
+        min-height: 42px;
+        padding: 10px 12px;
         border: 1px solid #cbd5e1;
-        border-radius: 6px;
+        border-radius: 12px;
         margin-top: 4px;
+        background: rgba(255, 255, 255, 0.96);
+        color: #111827;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #8f2230;
+        box-shadow:
+            0 0 0 3px rgba(143, 34, 48, 0.12),
+            inset 0 1px 0 rgba(255,255,255,0.82);
+    }
+    .modal-row.is-form {
+        align-items: center;
     }
 
     .action-header { margin-bottom: 20px; }
@@ -938,6 +995,18 @@
     html[data-theme="dark"] .modal-header {
         border-bottom-color: rgba(255, 255, 255, 0.12);
     }
+    html[data-theme="dark"] .modal-header .modal-subtitle {
+        color: rgba(255, 255, 255, 0.76);
+    }
+    html[data-theme="dark"] .modal-header-close {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(250, 204, 21, 0.22);
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .modal-header-close:hover {
+        background: rgba(255, 255, 255, 0.14);
+        border-color: rgba(250, 204, 21, 0.34);
+    }
 
     html[data-theme="dark"] .modal-row {
         background: rgba(25, 25, 28, 0.96);
@@ -959,11 +1028,21 @@
     html[data-theme="dark"] .modal-status-badge.cancelled { background: rgba(127, 29, 29, 0.24); color: #fecaca; border-color: rgba(248, 113, 113, 0.28); }
     html[data-theme="dark"] .modal-status-badge.expired { background: rgba(71, 85, 105, 0.26); color: #e5e7eb; border-color: rgba(148, 163, 184, 0.30); }
     html[data-theme="dark"] .modal-status-badge.missed { background: rgba(154, 52, 18, 0.24); color: #fdba74; border-color: rgba(251, 146, 60, 0.28); }
+    html[data-theme="dark"] .modal-status-badge.action-approve { background: rgba(21, 128, 61, 0.24); color: #bbf7d0; border-color: rgba(74, 222, 128, 0.28); }
+    html[data-theme="dark"] .modal-status-badge.action-reject { background: rgba(127, 29, 29, 0.24); color: #fecaca; border-color: rgba(248, 113, 113, 0.28); }
+    html[data-theme="dark"] .modal-status-badge.action-missed { background: rgba(154, 52, 18, 0.24); color: #fdba74; border-color: rgba(251, 146, 60, 0.28); }
+    html[data-theme="dark"] .modal-status-badge.action-reschedule { background: rgba(146, 64, 14, 0.24); color: #fde68a; border-color: rgba(250, 204, 21, 0.3); }
 
     html[data-theme="dark"] .form-input {
         background: rgba(255, 255, 255, 0.06);
         color: #ffffff;
         border-color: rgba(250, 204, 21, 0.18);
+    }
+    html[data-theme="dark"] .form-input:focus {
+        border-color: rgba(250, 204, 21, 0.36);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.10),
+            inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
     html[data-theme="dark"] .form-input::placeholder {
@@ -1217,8 +1296,16 @@
 
     <div id="statusActionModal" class="modal-overlay">
         <div class="modal-box">
-            <h3 id="statusActionTitle" class="modal-title" style="color:#70131B;">Appointment Action</h3>
-            <p id="statusActionSubtitle" class="modal-subtitle">Confirm this appointment update.</p>
+            <div class="modal-header">
+                <div class="modal-header-main">
+                    <h3 id="statusActionTitle" class="modal-title">Appointment Action</h3>
+                    <p id="statusActionSubtitle" class="modal-subtitle">Confirm this appointment update.</p>
+                </div>
+                <span class="modal-status-badge action-approve" id="statusActionBadge">Action</span>
+                <button type="button" class="modal-header-close" onclick="closeStatusActionModal()" aria-label="Close action modal">
+                    <x-outline-icon name="x-mark" />
+                </button>
+            </div>
             <div class="modal-row"><div class="modal-label">Student Name</div><div class="modal-val" id="sName"></div></div>
             <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="sService"></div></div>
             <div class="modal-row"><div class="modal-label">Schedule</div><div class="modal-val" id="sDateTime"></div></div>
@@ -1231,15 +1318,23 @@
 
     <div id="rescheduleModal" class="modal-overlay">
         <div class="modal-box">
-            <h3 class="modal-title" style="color:#b45309;">Reschedule Appointment</h3>
             <form id="rescheduleForm" method="POST" action="">
                 @csrf
-                <p class="modal-subtitle">Select a new date and time for this appointment.</p>
+                <div class="modal-header">
+                    <div class="modal-header-main">
+                        <h3 class="modal-title">Reschedule Appointment</h3>
+                        <p class="modal-subtitle">Select a new date and time for this appointment.</p>
+                    </div>
+                    <span class="modal-status-badge action-reschedule">Reschedule</span>
+                    <button type="button" class="modal-header-close" onclick="closeRescheduleModal()" aria-label="Close reschedule modal">
+                        <x-outline-icon name="x-mark" />
+                    </button>
+                </div>
                 <div class="modal-row"><div class="modal-label">Student Name</div><div class="modal-val" id="rName"></div></div>
                 <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="rService"></div></div>
                 <div class="modal-row"><div class="modal-label">Current Schedule</div><div class="modal-val" id="rCurrentSchedule"></div></div>
-                <div class="modal-row"><label class="modal-label">New Date</label><input type="date" name="date" id="rDate" class="form-input" required></div>
-                <div class="modal-row"><label class="modal-label">New Time</label><input type="time" name="time" id="rTime" class="form-input" required></div>
+                <div class="modal-row is-form"><label class="modal-label">New Date</label><input type="date" name="date" id="rDate" class="form-input" required></div>
+                <div class="modal-row is-form"><label class="modal-label">New Time</label><input type="time" name="time" id="rTime" class="form-input" required></div>
                 <div class="dialog-actions">
                     <button type="button" class="dialog-btn dialog-btn-neutral" onclick="closeRescheduleModal()">Cancel</button>
                     <button type="submit" class="dialog-btn dialog-btn-primary">Confirm New Schedule</button>
@@ -1351,6 +1446,7 @@
         const isApprove = statusTarget === 'Approved';
         const isReject = statusTarget === 'Cancelled';
         const isMissed = statusTarget === 'Missed Scheduled';
+        const statusBadge = document.getElementById('statusActionBadge');
         document.getElementById('statusActionTitle').innerText = isApprove
             ? 'Approve Appointment'
             : (isMissed ? 'Mark Appointment as Missed' : 'Reject Appointment');
@@ -1362,6 +1458,10 @@
         document.getElementById('sName').innerText = safeText(name);
         document.getElementById('sService').innerText = safeText(service);
         document.getElementById('sDateTime').innerText = formatSchedule(date, time);
+        if (statusBadge) {
+            statusBadge.innerText = isApprove ? 'Approve' : (isMissed ? 'Missed' : 'Reject');
+            statusBadge.className = 'modal-status-badge ' + (isApprove ? 'action-approve' : (isMissed ? 'action-missed' : 'action-reject'));
+        }
 
         const confirmBtn = document.getElementById('statusActionConfirm');
         confirmBtn.href = actionUrl;
@@ -1456,6 +1556,110 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+        const liveFeedNode = document.getElementById('adminLiveAlertFeedUrl');
+        let appointmentsLivePollTimer = null;
+
+        const initAppointmentsSummaryLiveSync = function () {
+            if (!liveFeedNode) {
+                return;
+            }
+
+            let feedUrl = '';
+            try {
+                feedUrl = JSON.parse(liveFeedNode.textContent || '""') || '';
+            } catch (error) {
+                feedUrl = '';
+            }
+
+            if (!feedUrl) {
+                return;
+            }
+
+            let knownNotificationIds = new Set();
+
+            const isAppointmentNotification = function (notification) {
+                const id = (notification && notification.id ? String(notification.id) : '').trim();
+                return id.startsWith('appointment-pending:');
+            };
+
+            const hydrateKnownIds = function (payload) {
+                const notifications = Array.isArray(payload && payload.notifications) ? payload.notifications : [];
+                knownNotificationIds = new Set(
+                    notifications
+                        .filter(isAppointmentNotification)
+                        .map(function (notification) {
+                            return String(notification.id);
+                        })
+                );
+            };
+
+            const pullFeed = function () {
+                if (document.hidden) {
+                    return;
+                }
+
+                fetch(feedUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch live appointment updates.');
+                        }
+                        return response.json();
+                    })
+                    .then(function (payload) {
+                        const notifications = Array.isArray(payload && payload.notifications) ? payload.notifications : [];
+                        const appointmentNotifications = notifications.filter(isAppointmentNotification);
+                        const hasNewAppointment = appointmentNotifications.some(function (notification) {
+                            return !knownNotificationIds.has(String(notification.id));
+                        });
+
+                        if (hasNewAppointment) {
+                            window.location.reload();
+                            return;
+                        }
+
+                        hydrateKnownIds(payload);
+                    })
+                    .catch(function () {
+                        // Keep the page usable even if polling fails.
+                    });
+            };
+
+            fetch(feedUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('Failed to initialize live appointment updates.');
+                    }
+                    return response.json();
+                })
+                .then(function (payload) {
+                    hydrateKnownIds(payload);
+                })
+                .catch(function () {
+                    knownNotificationIds = new Set();
+                });
+
+            appointmentsLivePollTimer = window.setInterval(pullFeed, 10000);
+            window.addEventListener('beforeunload', function () {
+                if (appointmentsLivePollTimer) {
+                    window.clearInterval(appointmentsLivePollTimer);
+                }
+            }, { once: true });
+        };
+
+        initAppointmentsSummaryLiveSync();
+
         const clearHighlightQueryParam = function(paramName) {
             const url = new URL(window.location.href);
             if (!url.searchParams.has(paramName)) {

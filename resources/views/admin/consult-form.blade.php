@@ -237,18 +237,38 @@
                 <h3>Medicine Dispensing</h3>
                 <div class="form-group">
                     <label>Select Medicine (Inventory)</label>
-                    <select name="item_id" class="form-control">
+                    <select name="item_id" id="consultMedicineSelect" class="form-control">
                         <option value="">-- No Medicine Issued --</option>
                         @foreach($items as $item)
-                            <option value="{{ $item->id }}" {{ $item->quantity <= 0 ? 'disabled' : '' }} {{ (string) old('item_id') === (string) $item->id ? 'selected' : '' }}>
-                                {{ $item->name }} (Available: {{ $item->quantity }})
+                            @php
+                                $availableDispensingQuantity = $item->hasDispensingConversion()
+                                    ? $item->availableDispensingQuantity()
+                                    : (float) $item->quantity;
+                                $issueUnit = $item->hasDispensingConversion()
+                                    ? ($item->dispensing_unit ?: $item->unit)
+                                    : ($item->unit ?: 'pcs');
+                                $stockDisplay = rtrim(rtrim(number_format((float) $item->quantity, 2, '.', ''), '0'), '.');
+                                $availableDisplay = rtrim(rtrim(number_format($availableDispensingQuantity, 2, '.', ''), '0'), '.');
+                            @endphp
+                            <option
+                                value="{{ $item->id }}"
+                                data-stock-unit="{{ $item->unit ?: 'pcs' }}"
+                                data-dispensing-unit="{{ $issueUnit }}"
+                                data-has-conversion="{{ $item->hasDispensingConversion() ? '1' : '0' }}"
+                                data-units-per-stock="{{ $item->units_per_stock_unit ?: 1 }}"
+                                data-available-dispensing="{{ $availableDispensingQuantity }}"
+                                {{ (float) $item->quantity <= 0 ? 'disabled' : '' }}
+                                {{ (string) old('item_id') === (string) $item->id ? 'selected' : '' }}
+                            >
+                                {{ $item->name }} (Available: {{ $availableDisplay }} {{ $issueUnit }}@if($item->hasDispensingConversion()) | {{ $stockDisplay }} {{ $item->unit }}@endif)
                             </option>
                         @endforeach
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Quantity to Issue</label>
-                    <input type="number" name="issued_quantity" class="form-control" min="0" placeholder="Enter amount" value="{{ old('issued_quantity') }}">
+                    <label id="consultIssuedQuantityLabel">Quantity to Issue</label>
+                    <input type="number" name="issued_quantity" id="consultIssuedQuantityInput" class="form-control" min="0" step="0.01" placeholder="Enter amount" value="{{ old('issued_quantity') }}">
+                    <div class="form-help" id="consultIssuedQuantityHelp">Select a medicine to see the dispensing unit and available stock.</div>
                 </div>
             </div>
         </div>
@@ -267,5 +287,52 @@
         </div>
     </div>
 </form>
+
+<script>
+    (function () {
+        const medicineSelect = document.getElementById('consultMedicineSelect');
+        const quantityLabel = document.getElementById('consultIssuedQuantityLabel');
+        const quantityHelp = document.getElementById('consultIssuedQuantityHelp');
+        const quantityInput = document.getElementById('consultIssuedQuantityInput');
+
+        if (!medicineSelect || !quantityLabel || !quantityHelp || !quantityInput) {
+            return;
+        }
+
+        const formatQty = function (value) {
+            const numeric = Number(value || 0);
+            if (Number.isNaN(numeric)) {
+                return '0';
+            }
+
+            return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(2).replace(/\.?0+$/, '');
+        };
+
+        const updateMedicineHint = function () {
+            const selected = medicineSelect.options[medicineSelect.selectedIndex];
+            if (!selected || !selected.value) {
+                quantityLabel.textContent = 'Quantity to Issue';
+                quantityHelp.textContent = 'Select a medicine to see the dispensing unit and available stock.';
+                quantityInput.placeholder = 'Enter amount';
+                return;
+            }
+
+            const dispensingUnit = selected.dataset.dispensingUnit || selected.dataset.stockUnit || 'unit';
+            const stockUnit = selected.dataset.stockUnit || 'pcs';
+            const available = formatQty(selected.dataset.availableDispensing || 0);
+            const hasConversion = selected.dataset.hasConversion === '1';
+            const unitsPerStock = formatQty(selected.dataset.unitsPerStock || 1);
+
+            quantityLabel.textContent = 'Quantity to Issue (' + dispensingUnit + ')';
+            quantityInput.placeholder = 'Enter ' + dispensingUnit + ' quantity';
+            quantityHelp.textContent = hasConversion
+                ? 'Available: ' + available + ' ' + dispensingUnit + ' (' + unitsPerStock + ' ' + dispensingUnit + ' per ' + stockUnit + ').'
+                : 'Available: ' + available + ' ' + stockUnit + '.';
+        };
+
+        medicineSelect.addEventListener('change', updateMedicineHint);
+        updateMedicineHint();
+    })();
+</script>
 
 @endsection

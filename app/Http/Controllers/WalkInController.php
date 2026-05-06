@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Appointment;
 use App\Models\HealthProfile;
+use App\Models\Item;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -222,6 +223,16 @@ class WalkInController extends Controller
     private function adminBasePrefix(Request $request): string
     {
         return $this->inAssistantWorkspace($request) ? '/assistant' : '/admin';
+    }
+
+    private function formatQuantityNumber(float $value): string
+    {
+        $rounded = round($value, 2);
+        if (abs($rounded - round($rounded)) < 0.00001) {
+            return (string) (int) round($rounded);
+        }
+
+        return rtrim(rtrim(number_format($rounded, 2, '.', ''), '0'), '.');
     }
 
     private function extractOpenAiOutputText(array $payload): string
@@ -631,6 +642,8 @@ PROMPT;
             'covid_status' => 'required|in:Yes,No',
             'reason_for_visit' => 'nullable|string|max:255',
             'certificate_type' => 'nullable|in:none,excused_letter,coc_ijt,coc_ladderized',
+            'item_id' => 'nullable|exists:items,id',
+            'issued_quantity' => 'nullable|numeric|min:0.01',
         ]);
 
         $student = $this->findUserByIdentifier((string) $request->student_number);
@@ -669,7 +682,43 @@ PROMPT;
             $student->healthProfile->save();
         }
 
-        DB::transaction(function () use ($request, $student) {
+        $issuedQuantity = (float) $request->input('issued_quantity', 0);
+        $dispensedItem = null;
+
+        if ($request->filled('item_id')) {
+            $dispensedItem = Item::find($request->input('item_id'));
+
+            if (!$dispensedItem) {
+                return redirect()->back()->withInput()->with('error', 'Selected medicine was not found in inventory.');
+            }
+
+            if ($issuedQuantity <= 0) {
+                return redirect()->back()->withInput()->with('error', 'Enter the quantity to issue for the selected medicine.');
+            }
+
+            if ($dispensedItem->requiresDispensingConversion() && !$dispensedItem->hasDispensingConversion()) {
+                return redirect()->back()->withInput()->with(
+                    'error',
+                    'This medicine uses a stock unit like box or bottle. Please edit the inventory item first and set the dispensing unit plus units per stock unit.'
+                );
+            }
+
+            $availableDispensingQuantity = $dispensedItem->availableDispensingQuantity();
+            if ($issuedQuantity - $availableDispensingQuantity > 0.00001) {
+                $availableUnitLabel = $dispensedItem->hasDispensingConversion()
+                    ? ($dispensedItem->dispensing_unit ?: $dispensedItem->unit)
+                    : $dispensedItem->unit;
+
+                return redirect()->back()->withInput()->with(
+                    'error',
+                    'Only ' . $this->formatQuantityNumber($availableDispensingQuantity) . ' ' . $availableUnitLabel . ' of ' . $dispensedItem->name . ' are currently available.'
+                );
+            }
+        } elseif ($issuedQuantity > 0) {
+            return redirect()->back()->withInput()->with('error', 'Select a medicine before entering a quantity to issue.');
+        }
+
+        DB::transaction(function () use ($request, $student, $dispensedItem, $issuedQuantity) {
             $requestedSource = trim((string) $request->input('user_type', 'walkin'));
             $isOnlineSource = $requestedSource === 'online';
             $finalSource = 'walkin';
@@ -715,13 +764,21 @@ PROMPT;
 
             // --- MEDICINE LOGIC ---
             $medicineName = 'None';
-            if ($request->filled('item_id')) {
-                $item = \App\Models\Item::find($request->item_id);
+            if ($dispensedItem) {
+                $item = Item::query()->lockForUpdate()->find($dispensedItem->id);
                 $medicineName = $item ? $item->name : 'None';
 
-                // Bawasan ang inventory kung may quantity na binigay
-                if ($item && $request->issued_quantity > 0) {
-                    $item->decrement('quantity', $request->issued_quantity);
+                if ($item && $issuedQuantity > 0) {
+                    $availableDispensingQuantity = $item->availableDispensingQuantity();
+                    if ($issuedQuantity - $availableDispensingQuantity > 0.00001) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'issued_quantity' => ['The selected medicine no longer has enough stock for that quantity.'],
+                        ]);
+                    }
+
+                    $stockDeduction = $item->convertDispensingQuantityToStockQuantity($issuedQuantity);
+                    $item->quantity = max(0, round((float) $item->quantity - $stockDeduction, 2));
+                    $item->save();
                 }
             }
 
@@ -743,7 +800,7 @@ PROMPT;
                 'reason_for_visit'     => $request->input('reason_for_visit'),
                 'certificate_type'     => $request->input('certificate_type') ?: 'none',
                 'medicine'             => $medicineName,
-                'medicine_quantity'    => $request->input('issued_quantity') ?? 0, // Fallback to 0 to avoid SQL error
+                'medicine_quantity'    => $issuedQuantity > 0 ? $issuedQuantity : 0,
                 'comments'             => $request->remarks,
             ]);
         });

@@ -1542,5 +1542,106 @@
         });
     });
 
+    (function initHealthSummaryLiveSync() {
+        const liveFeedNode = document.getElementById('adminLiveAlertFeedUrl');
+        if (!liveFeedNode) {
+            return;
+        }
+
+        let feedUrl = '';
+        try {
+            feedUrl = JSON.parse(liveFeedNode.textContent || '""') || '';
+        } catch (error) {
+            feedUrl = '';
+        }
+
+        if (!feedUrl) {
+            return;
+        }
+
+        let knownNotificationIds = new Set();
+        let healthLivePollTimer = null;
+
+        const isHealthNotification = function (notification) {
+            const id = (notification && notification.id ? String(notification.id) : '').trim();
+            return id.startsWith('health-form:');
+        };
+
+        const hydrateKnownIds = function (payload) {
+            const notifications = Array.isArray(payload && payload.notifications) ? payload.notifications : [];
+            knownNotificationIds = new Set(
+                notifications
+                    .filter(isHealthNotification)
+                    .map(function (notification) {
+                        return String(notification.id);
+                    })
+            );
+        };
+
+        const pullFeed = function () {
+            if (document.hidden) {
+                return;
+            }
+
+            fetch(feedUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch live health updates.');
+                    }
+                    return response.json();
+                })
+                .then(function (payload) {
+                    const notifications = Array.isArray(payload && payload.notifications) ? payload.notifications : [];
+                    const healthNotifications = notifications.filter(isHealthNotification);
+                    const hasNewHealthSubmission = healthNotifications.some(function (notification) {
+                        return !knownNotificationIds.has(String(notification.id));
+                    });
+
+                    if (hasNewHealthSubmission) {
+                        window.location.reload();
+                        return;
+                    }
+
+                    hydrateKnownIds(payload);
+                })
+                .catch(function () {
+                    // Ignore transient polling failures.
+                });
+        };
+
+        fetch(feedUrl, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('Failed to initialize live health updates.');
+                }
+                return response.json();
+            })
+            .then(function (payload) {
+                hydrateKnownIds(payload);
+            })
+            .catch(function () {
+                knownNotificationIds = new Set();
+            });
+
+        healthLivePollTimer = window.setInterval(pullFeed, 10000);
+        window.addEventListener('beforeunload', function () {
+            if (healthLivePollTimer) {
+                window.clearInterval(healthLivePollTimer);
+            }
+        }, { once: true });
+    })();
+
 </script>
 @endpush

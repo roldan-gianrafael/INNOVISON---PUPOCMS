@@ -732,30 +732,31 @@
     <table>
         <thead>
             <tr>
-                    <th>ID</th>
                 <th>ITEM DESCRIPTION</th>
                 <th>CATEGORY</th>
                 <th>UNIT</th>
                 <th>STARTING STOCK</th>
                 <th>CONSUMED</th>
                 <th>CURRENT BALANCE</th>
-                <th>DATE ADDED</th>
             </tr>
         </thead>
         <tbody>
             @forelse($data as $item)
-            <tr>
-                <td>{{ $item->id }}</td>
-                <td class="text-left">{{ $item->name }}</td>
-                <td>{{ $item->report_category }}</td>
-                <td>{{ $item->unit }}</td>
-                <td>{{ $item->starting_stock }}</td>
-                <td>{{ $item->consumed }}</td>
-                <td style="font-weight: bold;">{{ $item->current_balance }}</td>
-                <td>{{ optional($item->date_added)->format('M d, Y') ?? optional($item->created_at)->format('M d, Y') }}</td>
-            </tr>
+                <tr>
+                    <td class="text-left">{{ $item->name }}</td>
+                    <td>{{ $item->report_category }}</td>
+                    <td>
+                        {{ $item->unit }}
+                        @if($item->hasDispensingConversion())
+                            <div style="font-size: 11px;">{{ $item->dispensing_unit }} ({{ $item->units_per_stock_unit }} per {{ $item->unit }})</div>
+                        @endif
+                    </td>
+                    <td>{{ rtrim(rtrim(number_format((float) $item->starting_stock, 2, '.', ''), '0'), '.') }}</td>
+                    <td>{{ rtrim(rtrim(number_format((float) $item->consumed, 2, '.', ''), '0'), '.') }}</td>
+                    <td style="font-weight: bold;">{{ rtrim(rtrim(number_format((float) $item->current_balance, 2, '.', ''), '0'), '.') }}</td>
+                </tr>
             @empty
-            <tr><td colspan="8">No items found in the inventory.</td></tr>
+            <tr><td colspan="6">No items found in the inventory.</td></tr>
             @endforelse
         </tbody>
     </table>

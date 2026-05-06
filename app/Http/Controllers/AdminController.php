@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Appointment;
 use App\Models\ActivityLog;
 use App\Models\Item;
+use App\Models\MedicineType;
 use App\Models\Setting;
 use App\Models\Admin;
 use App\Services\FacultySyncService;
@@ -25,6 +26,32 @@ use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
+    private function formatInventoryQuantity(float $value): string
+    {
+        $rounded = round($value, 2);
+        if (abs($rounded - round($rounded)) < 0.00001) {
+            return (string) (int) round($rounded);
+        }
+
+        return rtrim(rtrim(number_format($rounded, 2, '.', ''), '0'), '.');
+    }
+
+    private function consumedStockQuantityForItem(Item $item, float $consumedTotal): float
+    {
+        return $item->convertDispensingQuantityToStockQuantity($consumedTotal);
+    }
+
+    private function inventoryReportCategoryLabel(Item $item): string
+    {
+        if ($item->category === 'Medicine') {
+            if (!empty($item->medicine_type)) {
+                return 'Medicine (' . $item->medicine_type . ')';
+            }
+        }
+
+        return (string) $item->category;
+    }
+
     private function isStudentAssistantAccount(User $user): bool
     {
         $userType = strtolower(trim((string) ($user->user_type ?? '')));
@@ -1347,8 +1374,16 @@ public function updateClearance(Request $request, $id)
 
     public function inventory()
     {
-        $items = Item::all();
-        return view('admin.inventory', compact('items'));
+        $items = Item::query()
+            ->with('medicineType')
+            ->orderBy('name')
+            ->get();
+        $medicineTypes = MedicineType::query()
+            ->orderBy('name')
+            ->get();
+        $reportMonth = now()->format('Y-m');
+
+        return view('admin.inventory', compact('items', 'medicineTypes', 'reportMonth'));
     }
 
     public function reports()
@@ -1550,18 +1585,36 @@ public function storeItem(Request $request)
     $request->validate([
         'name' => ['required', 'string', 'max:255'],
         'category' => ['required', 'string', 'max:255'],
-        'quantity' => ['required', 'integer', 'min:0'],
+        'quantity' => ['required', 'numeric', 'min:0'],
         'unit' => ['required', 'string', 'max:50'],
+        'dispensing_unit' => ['nullable', 'string', 'max:50'],
+        'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
         'date_added' => ['required', 'date'],
-        'medicine_type' => ['nullable', 'string', 'max:255'],
+        'medicine_type_id' => ['nullable', 'integer', 'exists:medicine_types,id'],
         'expiration_date' => ['nullable', 'date'],
     ]);
 
     // 1. Prepare data and sanitize medicine-specific fields
     $data = $request->all();
+    $data['unit'] = trim((string) $request->input('unit', 'pcs')) ?: 'pcs';
+    $data['dispensing_unit'] = trim((string) $request->input('dispensing_unit', '')) ?: null;
+    $data['units_per_stock_unit'] = $request->filled('units_per_stock_unit')
+        ? max(1, (int) $request->input('units_per_stock_unit'))
+        : null;
+    $selectedMedicineType = $request->filled('medicine_type_id')
+        ? MedicineType::find($request->input('medicine_type_id'))
+        : null;
+    $data['medicine_type_id'] = $selectedMedicineType?->id;
+    $data['medicine_type'] = $selectedMedicineType?->name;
     if ($request->category !== 'Medicine') {
+        $data['medicine_type_id'] = null;
         $data['medicine_type'] = null;
         $data['expiration_date'] = null;
+        $data['dispensing_unit'] = null;
+        $data['units_per_stock_unit'] = null;
+    } elseif ($data['dispensing_unit'] === null || ($data['units_per_stock_unit'] ?? null) === null || (int) $data['units_per_stock_unit'] <= 1) {
+        $data['dispensing_unit'] = null;
+        $data['units_per_stock_unit'] = null;
     }
 
     $item = Item::create($data);
@@ -1569,12 +1622,15 @@ public function storeItem(Request $request)
     // 2. LOGS CODES
     $typeInfo = $item->medicine_type ? " ({$item->medicine_type})" : "";
     $expInfo = $item->expiration_date ? " | Exp: " . $item->expiration_date->format('M d, Y') : "";
+    $conversionInfo = $item->hasDispensingConversion()
+        ? " | Dispense as: {$item->dispensing_unit} ({$item->units_per_stock_unit} per {$item->unit})"
+        : "";
 
     \App\Models\ActivityLog::create([
         'user_id'     => auth()->id(),
         'user_name'   => auth()->user()->name,
         'action'      => 'Inventory Update', 
-        'description' => "Added new item: " . $item->name . $typeInfo . " (Qty: " . $item->quantity . ")" . $expInfo, 
+        'description' => "Added new item: " . $item->name . $typeInfo . " (Qty: " . $this->formatInventoryQuantity((float) $item->quantity) . " {$item->unit})" . $conversionInfo . $expInfo,
         'ip_address'  => request()->ip(),
         'user_agent'  => request()->userAgent(),
     ]);
@@ -1590,10 +1646,12 @@ public function updateItem($id, Request $request)
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
-            'quantity' => ['required', 'integer', 'min:0'],
+            'quantity' => ['required', 'numeric', 'min:0'],
             'unit' => ['required', 'string', 'max:50'],
+            'dispensing_unit' => ['nullable', 'string', 'max:50'],
+            'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
             'date_added' => ['required', 'date'],
-            'medicine_type' => ['nullable', 'string', 'max:255'],
+            'medicine_type_id' => ['nullable', 'integer', 'exists:medicine_types,id'],
             'expiration_date' => ['nullable', 'date'],
         ]);
 
@@ -1601,19 +1659,38 @@ public function updateItem($id, Request $request)
         
         // 1. Prepare and sanitize data for update
         $data = $request->all();
+        $data['unit'] = trim((string) $request->input('unit', 'pcs')) ?: 'pcs';
+        $data['dispensing_unit'] = trim((string) $request->input('dispensing_unit', '')) ?: null;
+        $data['units_per_stock_unit'] = $request->filled('units_per_stock_unit')
+            ? max(1, (int) $request->input('units_per_stock_unit'))
+            : null;
+        $selectedMedicineType = $request->filled('medicine_type_id')
+            ? MedicineType::find($request->input('medicine_type_id'))
+            : null;
+        $data['medicine_type_id'] = $selectedMedicineType?->id;
+        $data['medicine_type'] = $selectedMedicineType?->name;
         if ($request->category !== 'Medicine') {
+            $data['medicine_type_id'] = null;
             $data['medicine_type'] = null;
             $data['expiration_date'] = null;
+            $data['dispensing_unit'] = null;
+            $data['units_per_stock_unit'] = null;
+        } elseif ($data['dispensing_unit'] === null || ($data['units_per_stock_unit'] ?? null) === null || (int) $data['units_per_stock_unit'] <= 1) {
+            $data['dispensing_unit'] = null;
+            $data['units_per_stock_unit'] = null;
         }
 
         $item->update($data);
+        $conversionInfo = $item->hasDispensingConversion()
+            ? " | Dispense as: {$item->dispensing_unit} ({$item->units_per_stock_unit} per {$item->unit})"
+            : "";
 
         // 2. LOGS CODES
         \App\Models\ActivityLog::create([
             'user_id'     => auth()->id(),
             'user_name'   => auth()->user()->name,
             'action'      => 'Inventory Edited', 
-            'description' => "Updated Item: $oldName (ID: #$id). New Qty: " . $item->quantity . ($item->expiration_date ? " | New Exp: " . $item->expiration_date->format('M d, Y') : ""),
+            'description' => "Updated Item: $oldName (ID: #$id). New Qty: " . $this->formatInventoryQuantity((float) $item->quantity) . " {$item->unit}" . $conversionInfo . ($item->expiration_date ? " | New Exp: " . $item->expiration_date->format('M d, Y') : ""),
             'ip_address'  => request()->ip(),
             'user_agent'  => request()->userAgent(),
         ]);
@@ -1928,21 +2005,24 @@ public function exportInventory()
         ->groupBy('medicine')
         ->pluck('consumed_total', 'medicine');
 
-    $items = Item::query()
-        ->orderBy('name')
-        ->get()
-        ->map(function ($item) use ($consumedByMedicine) {
-            $consumed = (int) ($consumedByMedicine[$item->name] ?? 0);
-            $item->unit = $item->unit ?: 'pcs';
-            $item->starting_stock = (int) $item->quantity + $consumed;
-            $item->consumed = $consumed;
-            $item->current_balance = (int) $item->quantity;
-            return $item;
-        });
+      $items = Item::query()
+          ->orderBy('name')
+          ->get()
+          ->map(function ($item) use ($consumedByMedicine) {
+              $consumed = (float) ($consumedByMedicine[$item->name] ?? 0);
+              $consumedInStockUnit = $this->consumedStockQuantityForItem($item, $consumed);
+              $item->unit = $item->unit ?: 'pcs';
+              $item->starting_stock = (float) $item->quantity + $consumedInStockUnit;
+              $item->consumed = $consumedInStockUnit;
+              $item->consumed_display = $consumed;
+              $item->current_balance = (float) $item->quantity;
+              $item->report_category = $this->inventoryReportCategoryLabel($item);
+              return $item;
+          });
 
-    $filename = "inventory_" . date('Y-m-d_H-i-s') . ".csv";
-    $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
-    $columns = ['ID','Name','Category','Unit','Starting Stock','Consumed','Current Balance'];
+      $filename = "inventory_" . date('Y-m-d_H-i-s') . ".csv";
+      $headers = ["Content-Type" => "text/csv", "Content-Disposition" => "attachment; filename={$filename}"];
+      $columns = ['Medicine Name','Category','Unit','Starting Stock','Consumed','Current Balance'];
 
     // --- LOGS CODES ---
     \App\Models\ActivityLog::create([
@@ -1957,17 +2037,16 @@ public function exportInventory()
     $callback = function() use ($items, $columns) {
         $file = fopen('php://output', 'w');
         fputcsv($file, $columns);
-        foreach ($items as $item) {
-            fputcsv($file, [
-                $item->id,
-                $item->name,
-                $item->category,
-                $item->unit,
-                $item->starting_stock,
-                $item->consumed,
-                $item->current_balance
-            ]);
-        }
+          foreach ($items as $item) {
+              fputcsv($file, [
+                  $item->name,
+                  $item->report_category,
+                  $item->unit,
+                  $this->formatInventoryQuantity((float) $item->starting_stock),
+                  $this->formatInventoryQuantity((float) $item->consumed),
+                  $this->formatInventoryQuantity((float) $item->current_balance)
+              ]);
+          }
         fclose($file);
     };
 
@@ -1985,14 +2064,14 @@ public function exportInventory()
 
     $logDescription = "Completed Appointment #$id for {$appointment->name}.";
 
-    if ($request->filled('item_id')) {
+      if ($request->filled('item_id')) {
         $item = Item::find($request->item_id);
-        if ($item && $item->quantity > 0) {
+        if ($item && (float) $item->quantity > 0) {
             $item->decrement('quantity', 1);
-            $logDescription .= " Deducted 1 unit of {$item->name} from inventory."; 
+            $logDescription .= " Deducted 1 {$item->unit} of {$item->name} from inventory."; 
             
             $this->logActivity('Appointment & Inventory', $logDescription); 
-            return redirect()->back()->with('success', "Appointment completed and 1 {$item->name} deducted.");
+            return redirect()->back()->with('success', "Appointment completed and 1 {$item->unit} of {$item->name} deducted.");
         } 
     }
 
@@ -2019,11 +2098,14 @@ public function exportInventory()
         ->orderBy('name')
         ->get()
         ->map(function ($item) use ($consumedByMedicine) {
-            $consumed = (int) ($consumedByMedicine[$item->name] ?? 0);
+            $consumed = (float) ($consumedByMedicine[$item->name] ?? 0);
+            $consumedInStockUnit = $this->consumedStockQuantityForItem($item, $consumed);
             $item->unit = $item->unit ?: 'pcs';
-            $item->consumed = $consumed;
-            $item->current_balance = (int) $item->quantity;
-            $item->starting_stock = $item->current_balance + $consumed;
+            $item->consumed = $consumedInStockUnit;
+            $item->consumed_display = $consumed;
+            $item->current_balance = (float) $item->quantity;
+            $item->starting_stock = $item->current_balance + $consumedInStockUnit;
+            $item->report_category = $this->inventoryReportCategoryLabel($item);
             return $item;
         });
 
@@ -2037,7 +2119,7 @@ public function exportInventory()
     $lowStockCount = $lowStockItems->count();
     
     $categorySummary = $itemPerformance
-        ->groupBy('category')
+        ->groupBy('report_category')
         ->map(function ($items, $category) {
             return (object) [
                 'category' => $category,

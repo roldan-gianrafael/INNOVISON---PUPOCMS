@@ -209,6 +209,71 @@
     .summary-back:hover {
         color: #5a0f16;
     }
+    .summary-top-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 14px;
+    }
+    .mar-manage-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        padding: 11px 18px;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 800;
+        border: 1px solid #8f2230;
+        box-shadow: 0 0 0 3px rgba(112, 19, 27, 0.12), 0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, background .18s ease;
+        z-index: 0;
+    }
+    .mar-manage-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(255, 248, 196, 0) 0%, rgba(255, 239, 181, 0.14) 22%, rgba(255, 239, 181, 0.52) 48%, rgba(255, 239, 181, 0.14) 72%, rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+    .mar-manage-btn::before {
+        content: "MT";
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: #ffefb5;
+        color: #70131B;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+    .mar-manage-btn-label {
+        position: relative;
+        z-index: 1;
+        color: #ffffff;
+    }
+    .mar-manage-btn:hover {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.18), 0 14px 24px rgba(112, 19, 27, 0.16);
+        color: #ffffff;
+    }
+    .mar-manage-btn:hover::after {
+        transform: translateX(135%);
+    }
 
     @media (max-width: 1100px) {
         .summary-grid {
@@ -234,8 +299,17 @@
     $reportsHomeUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports') : url('/admin/reports');
     $summaryUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/inventory-summary') : url('/admin/reports/inventory-summary');
     $reportMonthLabel = \Carbon\Carbon::parse($monthFilter . '-01')->format('F Y');
+    $canManageInventory = $role === \App\Models\User::ROLE_SUPERADMIN;
+    $manageMedicineTypesUrl = route('admin.reports.manage-medicine-types', ['month' => $monthFilter]);
 @endphp
 <div class="summary-container">
+    @if($canManageInventory)
+    <div class="summary-top-actions">
+        <a href="{{ $manageMedicineTypesUrl }}" class="mar-manage-btn">
+            <span class="mar-manage-btn-label">Manage Medicine Type</span>
+        </a>
+    </div>
+    @endif
     <div class="summary-header">
         <div>
             <h2 class="summary-title">Inventory Summary Report</h2>
@@ -293,12 +367,22 @@
                         <tr>
                             <td>
                                 <div style="font-weight: 700;">{{ $item->name }}</div>
-                                <div style="font-size: 12px; color: #6b7280;">{{ $item->category }}</div>
+                                <div style="font-size: 12px; color: #6b7280;">{{ $item->report_category }}</div>
                             </td>
-                            <td>{{ $item->unit }}</td>
-                            <td>{{ $item->starting_stock }}</td>
-                            <td>{{ $item->consumed }}</td>
-                            <td style="font-weight: 800;">{{ $item->current_balance }}</td>
+                            <td>
+                                {{ $item->unit }}
+                                @if($item->hasDispensingConversion())
+                                    <div style="font-size: 12px; color: #6b7280;">{{ $item->dispensing_unit }} ({{ $item->units_per_stock_unit }} per {{ $item->unit }})</div>
+                                @endif
+                            </td>
+                            <td>{{ rtrim(rtrim(number_format((float) $item->starting_stock, 2, '.', ''), '0'), '.') }}</td>
+                            <td>
+                                {{ rtrim(rtrim(number_format((float) $item->consumed, 2, '.', ''), '0'), '.') }}
+                                @if($item->hasDispensingConversion())
+                                    <div style="font-size: 12px; color: #6b7280;">{{ rtrim(rtrim(number_format((float) $item->consumed_display, 2, '.', ''), '0'), '.') }} {{ $item->dispensing_unit }} dispensed</div>
+                                @endif
+                            </td>
+                            <td style="font-weight: 800;">{{ rtrim(rtrim(number_format((float) $item->current_balance, 2, '.', ''), '0'), '.') }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -330,7 +414,7 @@
                         @foreach($lowStockItems as $item)
                             <tr>
                                 <td style="font-weight: 700;">{{ $item->name }}</td>
-                                <td>{{ $item->current_balance }} {{ $item->unit }}</td>
+                                <td>{{ rtrim(rtrim(number_format((float) $item->current_balance, 2, '.', ''), '0'), '.') }} {{ $item->unit }}</td>
                                 <td><span class="summary-chip low">Low Stock</span></td>
                             </tr>
                         @endforeach
@@ -359,7 +443,7 @@
                     <td style="font-weight: 700;">{{ $cat->category }}</td>
                     <td>{{ $cat->count }}</td>
                     <td>{{ $cat->starting_qty }}</td>
-                    <td>{{ $cat->consumed_qty }}</td>
+                    <td>{{ rtrim(rtrim(number_format((float) $cat->consumed_qty, 2, '.', ''), '0'), '.') }}</td>
                     <td>{{ $cat->total_qty }}</td>
                 </tr>
                 @empty

@@ -167,6 +167,7 @@
         outline: none !important;
     }
     .btn-add,
+    .inventory-manage-btn,
     .inventory-btn-cancel {
         display: inline-flex;
         align-items: center;
@@ -186,7 +187,15 @@
         transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
         z-index: 0;
     }
+    .modal-actions-row .btn-add {
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20),
+            0 18px 32px rgba(112, 19, 27, 0.18),
+            0 30px 24px -18px rgba(250, 204, 21, 0.38);
+    }
     .btn-add::after,
+    .inventory-manage-btn::after,
     .inventory-btn-cancel::after {
         content: "";
         position: absolute;
@@ -203,6 +212,7 @@
         z-index: -1;
     }
     .btn-add:hover,
+    .inventory-manage-btn:hover,
     .inventory-btn-cancel:hover {
         transform: translateY(-1px);
         border-color: #facc15;
@@ -210,9 +220,38 @@
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
     }
+    .modal-actions-row .btn-add:hover {
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16),
+            0 22px 34px rgba(112, 19, 27, 0.20),
+            0 34px 28px -20px rgba(250, 204, 21, 0.42);
+    }
     .btn-add:hover::after,
+    .inventory-manage-btn:hover::after,
     .inventory-btn-cancel:hover::after {
         transform: translateX(135%);
+    }
+    .inventory-manage-btn {
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .inventory-manage-btn::before {
+        content: "IC";
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: #ffefb5;
+        color: #70131B;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 1;
     }
 
     /* Status Badges */
@@ -307,37 +346,41 @@
         top: 0; left: 0; 
         width: 100%; 
         height: 100%; 
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
         z-index: 1000; 
         justify-content: center; 
         align-items: center; 
     }
-    .modal-box {
-        background:
-            linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12)) !important;
-        width: 760px;
-        max-width: 94vw;
-        border-left: 1px solid rgba(255, 255, 255, 0.72) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.72) !important;
-        border-top: 2px solid #facc15 !important;
-        border-bottom: 2px solid #facc15 !important;
+    #itemModal .modal-box {
+        background: rgba(255, 255, 255, 0.4) !important;
+        width: 820px;
+        max-width: min(94vw, 820px);
+        max-height: min(88vh, 920px);
+        border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
+        border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
+        border-top: 4px solid #66ff00 !important;
+        border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(18px) saturate(150%) !important;
-        -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
-        box-shadow: 0 24px 46px rgba(15, 23, 42, 0.24);
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         overflow: hidden;
         padding: 0;
-    }
-    .inventory-modal-head {
         display: flex;
-        align-items: flex-start;
+        flex-direction: column;
+        position: relative;
+    }
+    #itemModal .inventory-modal-head {
+        display: flex;
+        align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 16px;
         padding: 16px 20px;
         background: #70131B;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+        border-bottom: 1px solid #eee;
+        flex: 0 0 auto;
     }
     .inventory-modal-head-main {
         min-width: 0;
@@ -351,43 +394,50 @@
         line-height: 1.2;
     }
     .inventory-modal-copy {
-        margin: 4px 0 0;
+        margin: 6px 0 0;
         color: #ffffff !important;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 700;
+        line-height: 1.45;
     }
-    .inventory-modal-body {
-        padding: 18px 20px 20px;
+    #itemModal .inventory-modal-body {
+        padding: 24px;
+        overflow-y: auto;
+        background: transparent;
     }
     .modal-form-grid { 
         display: grid; 
         grid-template-columns: 1fr 1fr; 
-        gap: 18px; 
+        gap: 20px;
+        align-items: start;
     }
-    .modal-form-panel {
-        border: 1px solid rgba(112, 19, 27, 0.16);
+    #itemModal .modal-form-panel {
+        border: 1px solid rgba(112, 19, 27, 0.15);
         border-radius: 16px;
-        background: rgba(255, 255, 255, 0.26);
-        padding: 16px;
+        background: #ffffff;
+        padding: 18px;
         box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.38),
-            0 8px 18px rgba(112, 19, 27, 0.06);
+            inset 0 1px 0 rgba(255,255,255,0.82),
+            0 8px 18px rgba(112, 19, 27, 0.05);
     }
     .modal-panel-title {
-        margin: 0 0 14px;
+        margin: 0 0 16px;
         font-size: 15px;
         font-weight: 800;
         color: #70131B;
+        line-height: 1.3;
     }
-    .form-group {
-        margin-bottom: 12px;
+    #itemModal .form-group {
+        margin-bottom: 14px;
         display: flex;
         flex-direction: column;
-        border: 1px solid rgba(127, 29, 45, 0.14);
-        background: rgba(255, 248, 220, 0.9);
+        border: 1px solid rgba(112, 19, 27, 0.15);
+        background: rgba(255, 255, 255, 0.46);
         border-radius: 12px;
-        padding: 10px 12px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        padding: 11px 12px;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.82),
+            0 8px 18px rgba(112, 19, 27, 0.05);
     }
     .form-group label {
         display: block;
@@ -398,56 +448,70 @@
         text-transform: uppercase;
         letter-spacing: 0.06em;
     }
-    .form-control,
-    .form-select {
+    #itemModal .form-control,
+    #itemModal .form-select {
         width: 100%;
-        min-height: 24px;
-        padding: 0;
+        min-height: 38px;
+        padding: 8px 0 4px;
         border-radius: 0;
         border: 0;
+        border-bottom: 1px solid #d9c8cd;
         color: #111827;
         background: transparent;
         box-shadow: none;
         font-weight: 700;
-        transition: color .18s ease, box-shadow .18s ease;
+        transition: color .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
-    .form-control:focus,
-    .form-select:focus {
+    #itemModal .form-control:focus,
+    #itemModal .form-select:focus {
         outline: none;
         border: 0;
+        border-bottom: 1px solid #8f2230;
         background: transparent;
         box-shadow: none;
+    }
+    #itemModal .form-control[type="date"],
+    #itemModal .form-control[type="number"],
+    #itemModal .form-control[type="text"],
+    #itemModal .form-select,
+    #itemModal select.form-control {
+        appearance: auto;
+        -webkit-appearance: auto;
     }
     .form-control::placeholder {
         color: #6b7280;
         font-weight: 600;
     }
 
-    html[data-theme="light"] .modal-box {
-        background:
-            linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)) !important;
-        border-left-color: rgba(255, 255, 255, 0.78) !important;
-        border-right-color: rgba(255, 255, 255, 0.78) !important;
-    }
-
-    html[data-theme="light"] .modal-form-panel {
-        background: rgba(255, 255, 255, 0.22);
-    }
-
-    html[data-theme="light"] .form-group {
-        background: rgba(255, 248, 220, 0.9);
-    }
     .inventory-subgroup {
         display: none;
         border-left: 3px solid #8B0000;
         padding-left: 15px;
-        margin-bottom: 15px;
+        margin-top: 8px;
+        margin-bottom: 4px;
+    }
+    #itemModal .inventory-subgroup .form-group {
+        background: rgba(255, 255, 255, 0.52);
+    }
+    .inventory-inline-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .inventory-date-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        align-items: start;
+    }
+    #medicineExpiryField {
+        display: none;
     }
     .modal-actions-row {
         display: flex;
         gap: 10px;
         justify-content: flex-end;
-        margin-top: 20px;
+        margin-top: 22px;
     }
     .inventory-modal-close {
         width: 40px;
@@ -466,8 +530,24 @@
     }
 
     @media (max-width: 760px) {
+        #itemModal .modal-box {
+            max-width: 96vw;
+            max-height: 90vh;
+        }
+        .inventory-modal-head {
+            align-items: flex-start;
+        }
         .modal-form-grid {
             grid-template-columns: 1fr;
+        }
+        .inventory-inline-grid {
+            grid-template-columns: 1fr;
+        }
+        .inventory-date-grid {
+            grid-template-columns: 1fr;
+        }
+        .inventory-modal-body {
+            padding: 18px;
         }
     }
 
@@ -540,16 +620,18 @@
         }
     }
 
-    html[data-theme="dark"] .modal-box {
-        background: linear-gradient(180deg, rgba(31, 12, 18, 0.94), rgba(20, 8, 12, 0.94));
-        border-left: 1px solid rgba(250, 204, 21, 0.2) !important;
-        border-right: 1px solid rgba(250, 204, 21, 0.2) !important;
-        border-top: 2px solid #facc15 !important;
-        border-bottom: 2px solid #facc15 !important;
-        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
+    html[data-theme="dark"] #itemModal .modal-box {
+        background: rgba(28, 20, 22, 0.34) !important;
+        border-left: 1px solid rgba(143, 34, 48, 0.36) !important;
+        border-right: 1px solid rgba(143, 34, 48, 0.36) !important;
+        border-top: 4px solid #facc15 !important;
+        border-bottom: 4px solid #facc15 !important;
+        box-shadow:
+            0 22px 38px rgba(0, 0, 0, 0.42),
+            0 0 0 1px rgba(250, 204, 21, 0.06);
     }
 
-    html[data-theme="dark"] .inventory-modal-head {
+    html[data-theme="dark"] #itemModal .inventory-modal-head {
         background: #4d0d17;
         border-bottom-color: rgba(250, 204, 21, 0.2);
     }
@@ -563,30 +645,35 @@
         color: rgba(255, 255, 255, 0.8);
     }
 
-    html[data-theme="dark"] .modal-form-panel {
-        background: rgba(15, 23, 42, 0.34);
-        border-color: rgba(148, 163, 184, 0.24);
+    html[data-theme="dark"] #itemModal .modal-form-panel {
+        background: rgba(15, 23, 42, 0.78);
+        border-color: rgba(250, 204, 21, 0.16);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.04),
+            0 10px 22px rgba(0, 0, 0, 0.24);
     }
 
-    html[data-theme="dark"] .form-group {
+    html[data-theme="dark"] #itemModal .form-group {
         background: rgba(31, 41, 55, 0.9);
-        border-color: rgba(148, 163, 184, 0.34);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-color: rgba(148, 163, 184, 0.26);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.04),
+            0 8px 18px rgba(0, 0, 0, 0.18);
     }
 
-    html[data-theme="dark"] .form-group label {
-        color: #cbd5e1 !important;
+    html[data-theme="dark"] #itemModal .form-group label {
+        color: #ffffff !important;
     }
 
-    html[data-theme="dark"] .form-control,
-    html[data-theme="dark"] .form-select,
-    html[data-theme="dark"] .form-control option {
+    html[data-theme="dark"] #itemModal .form-control,
+    html[data-theme="dark"] #itemModal .form-select,
+    html[data-theme="dark"] #itemModal .form-control option {
         background: transparent;
         color: #ffffff !important;
-        border-color: transparent;
+        border-color: rgba(148, 163, 184, 0.36);
     }
 
-    html[data-theme="dark"] .form-control::placeholder {
+    html[data-theme="dark"] #itemModal .form-control::placeholder {
         color: #94a3b8;
     }
 
@@ -694,9 +781,27 @@
                                 <small style="display:block; color:#64748b; font-style: italic;">({{ $item->medicine_type }})</small>
                             @endif
                         </td>
-                        <td>{{ $item->unit ?: 'pcs' }}</td>
                         <td>
-                            <div style="font-weight: 700;">{{ $item->quantity }} {{ $item->unit ?: 'pcs' }}</div>
+                            <div style="font-weight: 700;">{{ $item->unit ?: 'pcs' }}</div>
+                            @if($item->category == 'Medicine' && $item->hasDispensingConversion())
+                                <small style="display:block; color:#64748b; margin-top:4px;">
+                                    Dispense as: {{ $item->dispensing_unit }} ({{ $item->units_per_stock_unit }} per {{ $item->unit }})
+                                </small>
+                            @endif
+                        </td>
+                        <td>
+                            @php
+                                $stockDisplay = rtrim(rtrim(number_format((float) $item->quantity, 2, '.', ''), '0'), '.');
+                                $availableDispensing = $item->hasDispensingConversion()
+                                    ? rtrim(rtrim(number_format($item->availableDispensingQuantity(), 2, '.', ''), '0'), '.')
+                                    : null;
+                            @endphp
+                            <div style="font-weight: 700;">{{ $stockDisplay }} {{ $item->unit ?: 'pcs' }}</div>
+                            @if($item->category == 'Medicine' && $item->hasDispensingConversion())
+                                <small style="display:block; color:#64748b; margin-top:4px;">
+                                    Available to dispense: {{ $availableDispensing }} {{ $item->dispensing_unit }}
+                                </small>
+                            @endif
                             <small style="display:block; color:#64748b; margin-top:4px;">
                                 📅 Added: {{ $item->date_added ? \Carbon\Carbon::parse($item->date_added)->format('M d, Y') : 'N/A' }}
                             </small>
@@ -717,9 +822,24 @@
                         </td>
                         <td>
                             @if($canManageInventory)
+                                @php
+                                    $editItemPayload = [
+                                        'id' => $item->id,
+                                        'name' => $item->name,
+                                        'category' => $item->category,
+                                        'quantity' => $item->quantity,
+                                        'unit' => $item->unit,
+                                        'medicine_type_id' => $item->medicine_type_id,
+                                        'dispensing_unit' => $item->dispensing_unit,
+                                        'units_per_stock_unit' => $item->units_per_stock_unit,
+                                        'medicine_type' => $item->medicine_type,
+                                        'date_added' => optional($item->date_added)->format('Y-m-d'),
+                                        'expiration_date' => optional($item->expiration_date)->format('Y-m-d'),
+                                    ];
+                                @endphp
                                 <div class="inventory-actions">
                                     <button class="btn-icon btn-edit" 
-                                        onclick="editItem('{{ $item->id }}', '{{ $item->name }}', '{{ $item->category }}', '{{ $item->quantity }}', '{{ $item->unit }}', '{{ $item->medicine_type }}', '{{ $item->date_added }}', '{{ $item->expiration_date }}')">
+                                        onclick='editItem(@json($editItemPayload))'>
                                         <x-outline-icon name="pencil-square" />
                                         <span>Edit</span>
                                     </button>
@@ -783,13 +903,11 @@
                                 <div id="medicineFields" class="inventory-subgroup">
                                     <div class="form-group">
                                         <label>Medicine Type</label>
-                                        <select name="medicine_type" id="iMedicineType" class="form-control">
+                                        <select name="medicine_type_id" id="iMedicineType" class="form-control">
                                             <option value="">-- Select Type --</option>
-                                            <option value="Antibiotic">Antibiotic</option>
-                                            <option value="Asthma">For Asthma</option>
-                                            <option value="Analgesic">Analgesic</option>
-                                            <option value="Antipyretic">Antipyretic</option>
-                                            <option value="Others">Others</option>
+                                            @foreach($medicineTypes as $medicineType)
+                                                <option value="{{ $medicineType->id }}">{{ $medicineType->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -799,40 +917,65 @@
                             <div class="modal-form-panel">
                                 <h4 class="modal-panel-title">Stock Details</h4>
 
-                                <div class="form-group">
-                                    <label>Quantity</label>
-                                    <input type="number" name="quantity" id="iQty" class="form-control" required min="0" placeholder="e.g. 100">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Unit</label>
-                                    <input type="text" name="unit" id="iUnit" class="form-control" list="inventoryUnitSuggestions" required placeholder="e.g. pcs, box, bottle, vial">
-                                    <datalist id="inventoryUnitSuggestions">
-                                        <option value="pcs">
-                                        <option value="box">
-                                        <option value="bottle">
-                                        <option value="vial">
-                                        <option value="ampule">
-                                        <option value="tablet">
-                                        <option value="capsule">
-                                        <option value="pack">
-                                        <option value="set">
-                                        <option value="tube">
-                                        <option value="sachet">
-                                        <option value="roll">
-                                        <option value="pair">
-                                        <option value="ml">
-                                        <option value="mg">
-                                    </datalist>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Date Added</label>
-                                    <input type="date" name="date_added" id="iDateAdded" class="form-control" required placeholder="mm/dd/yyyy">
-                                </div>
-
-                                <div id="medicineExpiryField" class="inventory-subgroup">
+                                <div class="inventory-inline-grid">
                                     <div class="form-group">
+                                        <label>Quantity</label>
+                                        <input type="number" name="quantity" id="iQty" class="form-control" required min="0" step="0.01" placeholder="e.g. 100">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Unit</label>
+                                        <input type="text" name="unit" id="iUnit" class="form-control" list="inventoryUnitSuggestions" required placeholder="e.g. pcs, box, bottle, vial">
+                                        <datalist id="inventoryUnitSuggestions">
+                                            <option value="pcs">
+                                            <option value="box">
+                                            <option value="bottle">
+                                            <option value="vial">
+                                            <option value="ampule">
+                                            <option value="tablet">
+                                            <option value="capsule">
+                                            <option value="pack">
+                                            <option value="set">
+                                            <option value="tube">
+                                            <option value="sachet">
+                                            <option value="roll">
+                                            <option value="pair">
+                                            <option value="ml">
+                                            <option value="mg">
+                                        </datalist>
+                                    </div>
+                                </div>
+
+                                <div id="medicineDispensingFields" class="inventory-subgroup">
+                                    <div class="inventory-inline-grid">
+                                        <div class="form-group">
+                                            <label>Dispensing Unit</label>
+                                            <input type="text" name="dispensing_unit" id="iDispensingUnit" class="form-control" list="dispensingUnitSuggestions" placeholder="e.g. tablet, capsule, ml">
+                                            <datalist id="dispensingUnitSuggestions">
+                                                <option value="tablet">
+                                                <option value="capsule">
+                                                <option value="ml">
+                                                <option value="dose">
+                                                <option value="drop">
+                                                <option value="puff">
+                                                <option value="sachet">
+                                            </datalist>
+                                        </div>
+
+                                        <div id="itemsPerUnitField" class="form-group" style="display:none;">
+                                            <label>Items Per Unit</label>
+                                            <input type="number" name="units_per_stock_unit" id="iUnitsPerStockUnit" class="form-control" min="1" step="1" placeholder="e.g. 10 tablets in 1 box">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="inventory-date-grid">
+                                    <div class="form-group">
+                                        <label>Date Added</label>
+                                        <input type="date" name="date_added" id="iDateAdded" class="form-control" required placeholder="mm/dd/yyyy">
+                                    </div>
+
+                                    <div id="medicineExpiryField" class="form-group">
                                         <label>Expiration Date</label>
                                         <input type="date" name="expiration_date" id="iExpDate" class="form-control" placeholder="mm/dd/yyyy">
                                     </div>
@@ -854,8 +997,12 @@
 <script>
     const itemModal = document.getElementById('itemModal');
     const medicineFields = document.getElementById('medicineFields');
+    const medicineDispensingFields = document.getElementById('medicineDispensingFields');
     const medicineExpiryField = document.getElementById('medicineExpiryField');
     const medicineSelect = document.getElementById('iMedicineType');
+    const dispensingUnitInput = document.getElementById('iDispensingUnit');
+    const itemsPerUnitField = document.getElementById('itemsPerUnitField');
+    const unitsPerStockUnitInput = document.getElementById('iUnitsPerStockUnit');
     const expDateInput = document.getElementById('iExpDate');
     const highlightedRow = document.querySelector('.inventory-row-highlight');
     const highlightedExpiredRow = document.querySelector('.inventory-row-highlight-expired');
@@ -864,6 +1011,33 @@
     const inventorySearchToggle = document.getElementById('inventorySearchToggle');
     const inventoryRows = Array.from(document.querySelectorAll('#inventoryTable tbody tr[data-inventory-row]'));
 
+    function toggleDispensingFields() {
+        if (!medicineDispensingFields) return;
+
+        const unitValue = String(document.getElementById('iUnit').value || '').trim().toLowerCase();
+        const shouldHideDispensing = unitValue === 'pcs';
+
+        if (shouldHideDispensing) {
+            medicineDispensingFields.style.display = 'none';
+            if (itemsPerUnitField) {
+                itemsPerUnitField.style.display = 'none';
+            }
+            if (dispensingUnitInput) {
+                dispensingUnitInput.value = '';
+            }
+            if (unitsPerStockUnitInput) {
+                unitsPerStockUnitInput.value = '';
+            }
+            return;
+        }
+
+        const category = document.getElementById('iCategory').value;
+        medicineDispensingFields.style.display = category === 'Medicine' ? 'block' : 'none';
+        if (itemsPerUnitField) {
+            itemsPerUnitField.style.display = category === 'Medicine' ? 'flex' : 'none';
+        }
+    }
+
     function toggleMedicineFields() {
         const category = document.getElementById('iCategory').value;
         if (category === 'Medicine') {
@@ -871,12 +1045,25 @@
             medicineExpiryField.style.display = 'block';
             medicineSelect.setAttribute('required', 'required');
             expDateInput.setAttribute('required', 'required');
+            toggleDispensingFields();
         } else {
             medicineFields.style.display = 'none';
+            if (medicineDispensingFields) {
+                medicineDispensingFields.style.display = 'none';
+            }
+            if (itemsPerUnitField) {
+                itemsPerUnitField.style.display = 'none';
+            }
             medicineExpiryField.style.display = 'none';
             medicineSelect.removeAttribute('required');
             expDateInput.removeAttribute('required');
             medicineSelect.value = ''; 
+            if (dispensingUnitInput) {
+                dispensingUnitInput.value = '';
+            }
+            if (unitsPerStockUnitInput) {
+                unitsPerStockUnitInput.value = '';
+            }
             expDateInput.value = '';
         }
     }
@@ -893,31 +1080,44 @@
         document.getElementById('iCategory').value = 'Medicine';
         document.getElementById('iQty').value = '';
         document.getElementById('iUnit').value = 'pcs';
+        if (dispensingUnitInput) {
+            dispensingUnitInput.value = '';
+        }
+        if (unitsPerStockUnitInput) {
+            unitsPerStockUnitInput.value = '';
+        }
         document.getElementById('iDateAdded').value = new Date().toISOString().split('T')[0]; // Set today as default
         document.getElementById('iExpDate').value = '';
         
         toggleMedicineFields();
     }
 
-    function editItem(id, name, category, qty, unit, medicineType, dateAdded, expDate) {
+    function editItem(item) {
         if (!itemModal) return;
         itemModal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Edit Item';
-        document.getElementById('itemForm').action = "/admin/inventory/" + id;
+        document.getElementById('itemForm').action = "/admin/inventory/" + item.id;
         
         document.getElementById('methodField').innerHTML = '<input type="hidden" name="_method" value="PUT">';
 
-        document.getElementById('iName').value = name;
-        document.getElementById('iCategory').value = category;
-        document.getElementById('iQty').value = qty;
-        document.getElementById('iUnit').value = unit || 'pcs';
-        document.getElementById('iDateAdded').value = dateAdded;
+        document.getElementById('iName').value = item.name || '';
+        document.getElementById('iCategory').value = item.category || 'Medicine';
+        document.getElementById('iQty').value = item.quantity ?? '';
+        document.getElementById('iUnit').value = item.unit || 'pcs';
+        if (dispensingUnitInput) {
+            dispensingUnitInput.value = item.dispensing_unit || '';
+        }
+        if (unitsPerStockUnitInput) {
+            unitsPerStockUnitInput.value = item.units_per_stock_unit || '';
+        }
+        document.getElementById('iDateAdded').value = item.date_added || '';
         
         toggleMedicineFields();
-        if(category === 'Medicine') {
-            document.getElementById('iMedicineType').value = medicineType;
-            document.getElementById('iExpDate').value = expDate;
+        if((item.category || '') === 'Medicine') {
+            document.getElementById('iMedicineType').value = item.medicine_type_id || '';
+            document.getElementById('iExpDate').value = item.expiration_date || '';
         }
+        toggleDispensingFields();
     }
 
     function closeModal() {
@@ -989,6 +1189,12 @@
                 });
             }
         });
+    }
+
+    const unitInput = document.getElementById('iUnit');
+    if (unitInput) {
+        unitInput.addEventListener('input', toggleDispensingFields);
+        unitInput.addEventListener('change', toggleDispensingFields);
     }
 </script>
 @endpush

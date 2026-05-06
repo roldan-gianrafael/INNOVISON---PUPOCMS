@@ -18,6 +18,22 @@ use Illuminate\Support\Collection;
 
 class ReportsController extends Controller
 {
+    private function inventoryReportCategoryLabel(Item $item): string
+    {
+        if ($item->category === 'Medicine') {
+            if (!empty($item->medicine_type)) {
+                return 'Medicine (' . $item->medicine_type . ')';
+            }
+        }
+
+        return (string) $item->category;
+    }
+
+    private function consumedStockQuantityForItem(Item $item, float $consumedTotal): float
+    {
+        return $item->convertDispensingQuantityToStockQuantity($consumedTotal);
+    }
+
     public function appointmentStatistics(Request $request)
     {
         Appointment::expireOverduePending();
@@ -548,21 +564,20 @@ class ReportsController extends Controller
             ->groupBy('medicine')
             ->pluck('consumed_total', 'medicine');
 
-        return Item::query()
-            ->orderBy('name')
-            ->get()
-            ->map(function ($item) use ($consumedByMedicine) {
-                $consumed = (int) ($consumedByMedicine[$item->name] ?? 0);
-                $item->unit = $item->unit ?: 'pcs';
-                $item->consumed = $consumed;
-                $item->current_balance = (int) $item->quantity;
-                $item->starting_stock = $item->current_balance + $consumed;
-                $item->report_category = $item->category === 'Medicine' && $item->medicine_type
-                    ? $item->category . ' (' . $item->medicine_type . ')'
-                    : $item->category;
-
-                return $item;
-            });
+          return Item::query()
+              ->orderBy('name')
+              ->get()
+              ->map(function ($item) use ($consumedByMedicine) {
+                  $consumed = (float) ($consumedByMedicine[$item->name] ?? 0);
+                  $consumedInStockUnit = $this->consumedStockQuantityForItem($item, $consumed);
+                  $item->unit = $item->unit ?: 'pcs';
+                  $item->consumed = $consumedInStockUnit;
+                  $item->consumed_display = $consumed;
+                  $item->current_balance = (float) $item->quantity;
+                  $item->starting_stock = $item->current_balance + $consumedInStockUnit;
+                  $item->report_category = $this->inventoryReportCategoryLabel($item);
+                  return $item;
+              });
     }
 
     public function marReport(Request $request)

@@ -2376,7 +2376,7 @@
             position: fixed;
             left: 50%;
             top: 50%;
-            width: min(420px, calc(100vw - 28px));
+            width: min(620px, calc(100vw - 36px));
             z-index: 500001;
             opacity: 0;
             transform: translate(-50%, -56%) scale(0.98);
@@ -2392,21 +2392,33 @@
 
         .admin-live-alert-card {
             display: grid;
-            grid-template-columns: auto 1fr auto auto auto;
-            gap: 10px;
-            align-items: start;
+            grid-template-columns: auto minmax(0, 1fr) auto auto;
+            gap: 12px;
+            align-items: center;
             border-radius: 14px;
             border: 1px solid rgba(112, 19, 27, 0.22);
             background: rgba(255, 250, 244, 0.96);
             box-shadow: 0 18px 34px rgba(15, 23, 42, 0.2);
-            padding: 12px 12px 10px;
+            padding: 16px 16px 14px;
+            min-height: 176px;
+            height: 176px;
+            overflow: hidden;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
 
+        .admin-live-alert-content {
+            min-width: 0;
+            align-self: center;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
         .admin-live-alert-icon {
-            width: 34px;
-            height: 34px;
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
             background: #fff3c4;
             color: #7f1d2d;
@@ -2418,8 +2430,8 @@
         }
 
         .admin-live-alert-icon svg {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             stroke-width: 2;
         }
 
@@ -2431,18 +2443,25 @@
 
         .admin-live-alert-title {
             margin: 0;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 800;
             color: #70131B;
             line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .admin-live-alert-copy {
-            margin: 4px 0 0;
-            font-size: 12px;
+            margin: 5px 0 0;
+            font-size: 13px;
             font-weight: 600;
             color: #334155;
-            line-height: 1.45;
+            line-height: 1.5;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
         }
 
         .admin-live-alert-open {
@@ -2450,13 +2469,13 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 32px;
-            padding: 0 12px;
-            border-radius: 9px;
+            min-height: 38px;
+            padding: 0 16px;
+            border-radius: 10px;
             border: 1px solid rgba(250, 204, 21, 0.52);
             background: #fff7d6;
             color: #70131B;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 800;
             text-decoration: none;
             white-space: nowrap;
@@ -2467,16 +2486,19 @@
             display: none;
             align-items: center;
             justify-content: center;
-            min-height: 32px;
-            padding: 0 12px;
-            border-radius: 9px;
+            min-height: 38px;
+            padding: 0 16px;
+            border-radius: 10px;
             border: 1px solid rgba(112, 19, 27, 0.3);
             background: rgba(255, 255, 255, 0.9);
             color: #70131B;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 800;
             white-space: nowrap;
             cursor: pointer;
+            grid-column: 1 / -1;
+            justify-self: center;
+            margin-top: 2px;
         }
 
         .admin-live-alert-more.is-visible {
@@ -2484,12 +2506,12 @@
         }
 
         .admin-live-alert-close {
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             border: 1px solid rgba(112, 19, 27, 0.22);
             background: #ffffff;
             color: #70131B;
-            border-radius: 8px;
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -2503,8 +2525,8 @@
         }
 
         .admin-live-alert-close svg {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             stroke-width: 2.2;
         }
 
@@ -2523,6 +2545,33 @@
             background: linear-gradient(90deg, #facc15, #70131B);
             transform-origin: left center;
             transform: scaleX(1);
+        }
+
+        @media (max-width: 640px) {
+            .admin-live-alert {
+                width: min(100vw - 24px, 540px);
+            }
+
+            .admin-live-alert-card {
+                grid-template-columns: auto minmax(0, 1fr) auto;
+                min-height: 188px;
+                height: 188px;
+            }
+
+            .admin-live-alert-open {
+                grid-column: 2 / 3;
+                justify-self: start;
+            }
+
+            .admin-live-alert-more {
+                grid-column: 1 / -1;
+                justify-self: center;
+            }
+
+            .admin-live-alert-close {
+                grid-column: 3 / 4;
+                grid-row: 1;
+            }
         }
 
         html[data-theme="dark"] .admin-live-alert-card {
@@ -3999,7 +4048,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         <div id="adminLiveAlertIcon" class="admin-live-alert-icon" aria-hidden="true">
             <x-outline-icon name="calendar-days" />
         </div>
-        <div>
+        <div class="admin-live-alert-content">
             <p id="adminLiveAlertTitle" class="admin-live-alert-title">New notification</p>
             <p id="adminLiveAlertCopy" class="admin-live-alert-copy">A new clinic activity requires your attention.</p>
         </div>
@@ -4449,7 +4498,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         };
 
         const syncSeeMore = function () {
-            moreNode.classList.toggle('is-visible', unreadCount > 3);
+            moreNode.classList.toggle('is-visible', unreadCount >= 4);
         };
 
         const updateBadgeCount = function (count) {

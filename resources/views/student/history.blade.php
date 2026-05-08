@@ -102,18 +102,14 @@
           font-weight: 700;
           box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
       }
-      .history-hero-step-index {
-          width: 22px;
-          height: 22px;
+      .history-hero-step::before {
+          content: "";
+          width: 8px;
+          height: 8px;
           border-radius: 999px;
           background: #8B0000;
-          color: #ffffff;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 11px;
-          font-weight: 800;
           flex: 0 0 auto;
+          box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.08);
       }
       
       .card-history {
@@ -733,21 +729,18 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m5-2a9 9 0 1 1-3.13-6.838M21 3v6h-6" />
           </svg>
         </div>
-        <div class="history-hero-kicker">Student Clinic Timeline</div>
+        <div class="history-hero-kicker">Clinic Timeline</div>
         <h1 class="history-hero-title">Appointment History</h1>
         <p class="history-hero-text">View and manage your past and upcoming consultations.</p>
         <div class="history-hero-steps">
           <div class="history-hero-step">
-            <span class="history-hero-step-index">1</span>
-            <span>Review recent appointments</span>
+            <span>Recent Appointments</span>
           </div>
           <div class="history-hero-step">
-            <span class="history-hero-step-index">2</span>
-            <span>Track current status</span>
+            <span>Current Status</span>
           </div>
           <div class="history-hero-step">
-            <span class="history-hero-step-index">3</span>
-            <span>Manage upcoming bookings</span>
+            <span>Upcoming Bookings</span>
           </div>
         </div>
       </div>

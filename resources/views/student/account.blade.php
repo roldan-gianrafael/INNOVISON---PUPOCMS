@@ -187,18 +187,14 @@
         font-weight: 700;
         box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
     }
-    .page-hero-step-index {
-        width: 22px;
-        height: 22px;
+    .page-hero-step::before {
+        content: "";
+        width: 8px;
+        height: 8px;
         border-radius: 999px;
         background: #8B0000;
-        color: #ffffff;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: 800;
         flex: 0 0 auto;
+        box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.08);
     }
 
     /* --- APPOINTMENT CARDS --- */
@@ -1216,8 +1212,11 @@
         border-radius: 10px;
         background: #f8fafc;
         padding: 10px;
-        text-align: center;
+        text-align: left;
         color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     .health-step.is-complete {
         border-color: #bbf7d0;
@@ -1229,11 +1228,33 @@
         background: #fffbeb;
         color: #92400e;
     }
-    .health-step svg {
-        width: 16px;
-        height: 16px;
-        display: block;
-        margin: 0 auto 5px;
+    .health-step-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+        color: #b91c1c;
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+    }
+    .health-step-icon svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2.5;
+    }
+    .health-step.is-complete .health-step-icon {
+        background: #16a34a;
+        border-color: #16a34a;
+        color: #ffffff;
+    }
+    .health-step.is-active .health-step-icon {
+        background: #fff3cd;
+        border-color: #f59e0b;
+        color: #92400e;
     }
     .health-step-label {
         font-size: 12px;
@@ -1357,6 +1378,22 @@
     }
     html[data-theme="dark"] .health-step.is-active {
         background: rgba(146, 64, 14, 0.24);
+        border-color: rgba(250, 204, 21, 0.42);
+        color: #fde68a;
+    }
+    html[data-theme="dark"] .health-step-icon {
+        background: rgba(127, 29, 45, 0.34);
+        border-color: rgba(248, 113, 113, 0.24);
+        color: #fca5a5;
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
+    }
+    html[data-theme="dark"] .health-step.is-complete .health-step-icon {
+        background: #16a34a;
+        border-color: #16a34a;
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .health-step.is-active .health-step-icon {
+        background: rgba(146, 64, 14, 0.46);
         border-color: rgba(250, 204, 21, 0.42);
         color: #fde68a;
     }
@@ -1699,21 +1736,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
             </svg>
         </div>
-        <div class="page-hero-kicker">Student Clinic Record</div>
+        <div class="page-hero-kicker">Clinic Record</div>
         <h1 class="page-hero-title">Health Record</h1>
         <p class="page-hero-text">Check the status of your submitted health profile, review clinic approval, and view your uploaded documents.</p>
         <div class="page-hero-steps">
             <div class="page-hero-step">
-                <span class="page-hero-step-index">1</span>
-                <span>Review your submission</span>
+                <span>Submission Review</span>
             </div>
             <div class="page-hero-step">
-                <span class="page-hero-step-index">2</span>
-                <span>Track clinic verification</span>
+                <span>Clinic Verification</span>
             </div>
             <div class="page-hero-step">
-                <span class="page-hero-step-index">3</span>
-                <span>View approval status</span>
+                <span>Record Approval</span>
             </div>
         </div>
     </div>
@@ -1727,15 +1761,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
         <div class="health-status-steps">
             <div class="health-step {{ $healthFormSubmitted ? 'is-complete' : '' }}">
-                <x-outline-icon name="document-text" />
+                <span class="health-step-icon">
+                    @if($healthFormSubmitted)
+                        <x-outline-icon name="check" />
+                    @else
+                        <x-outline-icon name="x-mark" />
+                    @endif
+                </span>
                 <div class="health-step-label">Submitted</div>
             </div>
             <div class="health-step {{ $healthFormSubmitted ? ($isIssuedStatus ? 'is-complete' : 'is-active') : '' }}">
-                <x-outline-icon name="clock" />
+                <span class="health-step-icon">
+                    @if($isIssuedStatus)
+                        <x-outline-icon name="check" />
+                    @elseif($healthFormSubmitted)
+                        <x-outline-icon name="clock" />
+                    @else
+                        <x-outline-icon name="x-mark" />
+                    @endif
+                </span>
                 <div class="health-step-label">Verification</div>
             </div>
             <div class="health-step {{ $isIssuedStatus ? 'is-complete' : '' }}">
-                <x-outline-icon name="check" />
+                <span class="health-step-icon">
+                    @if($isIssuedStatus)
+                        <x-outline-icon name="check" />
+                    @else
+                        <x-outline-icon name="x-mark" />
+                    @endif
+                </span>
                 <div class="health-step-label">Issued</div>
             </div>
         </div>
@@ -1831,21 +1885,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
             </svg>
         </div>
-        <div class="page-hero-kicker">Student Clinic Updates</div>
+        <div class="page-hero-kicker">Clinic Updates</div>
         <h1 class="page-hero-title">Notifications</h1>
         <p class="page-hero-text">Stay updated with appointment changes, health record progress, and important clinic activity.</p>
         <div class="page-hero-steps">
             <div class="page-hero-step">
-                <span class="page-hero-step-index">1</span>
-                <span>Check new clinic updates</span>
+                <span>Clinic Updates</span>
             </div>
             <div class="page-hero-step">
-                <span class="page-hero-step-index">2</span>
-                <span>Open important alerts</span>
+                <span>Important Alerts</span>
             </div>
             <div class="page-hero-step">
-                <span class="page-hero-step-index">3</span>
-                <span>Stay on top of changes</span>
+                <span>Status Changes</span>
             </div>
         </div>
     </div>

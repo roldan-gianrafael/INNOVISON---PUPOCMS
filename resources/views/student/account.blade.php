@@ -549,6 +549,12 @@
         line-height: 1.45;
         overflow: hidden;
     }
+    .profile-static-field {
+        display: flex;
+        align-items: center;
+        white-space: normal;
+        word-break: break-word;
+    }
     .profile-grid-3 > div .form-control:disabled,
     .profile-grid-2 > div .form-control:disabled,
     .profile-info-row .form-control:disabled {
@@ -1355,7 +1361,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="profile-grid-3">
                             <div>
                                 <label class="input-label">Course</label>
-                                <textarea class="form-control profile-course-field" rows="2" readonly disabled>{{ $accountProfileData['course_college'] ?? $user->course }}</textarea>
+                                <div class="form-control profile-course-field profile-static-field">{{ $accountProfileData['course_college'] ?? $user->course }}</div>
                             </div>
                             <div>
                                 <label class="input-label">Year</label>
@@ -1727,4 +1733,3 @@ function enableEditing() {
 }
 </script>
 @endsection
-

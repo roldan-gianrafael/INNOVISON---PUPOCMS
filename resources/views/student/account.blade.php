@@ -90,6 +90,116 @@
         color: #6b7b7d;
         line-height: 1.5;
     }
+    .page-hero {
+        position: relative;
+        margin-bottom: 22px;
+        margin-top: -12px;
+        padding: 18px 22px;
+        border-radius: 24px;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        background:
+            radial-gradient(circle at top right, rgba(255, 244, 194, 0.68), transparent 30%),
+            linear-gradient(135deg, #fffef4 0%, #fff8fb 36%, #ffffff 100%);
+        box-shadow:
+            0 20px 40px rgba(15, 23, 42, 0.09),
+            0 0 0 1px rgba(255,255,255,0.78) inset;
+        overflow: hidden;
+    }
+    .page-hero::before {
+        content: "";
+        position: absolute;
+        inset: auto -60px -80px auto;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(139, 0, 0, 0.10) 0%, rgba(139, 0, 0, 0) 70%);
+        pointer-events: none;
+    }
+    .page-hero-icon {
+        position: absolute;
+        top: -12px;
+        right: -8px;
+        width: 180px;
+        height: 180px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(112, 19, 27, 0.10);
+        transform: rotate(-12deg);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .page-hero-icon svg {
+        width: 100%;
+        height: 100%;
+        stroke-width: 1.7;
+    }
+    .page-hero-kicker,
+    .page-hero-title,
+    .page-hero-text,
+    .page-hero-steps {
+        position: relative;
+        z-index: 1;
+    }
+    .page-hero-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(139, 0, 0, 0.08);
+        color: #8B0000;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .page-hero-title {
+        color: #8B0000;
+        font-weight: 800;
+        font-size: 28px;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.03em;
+    }
+    .page-hero-text {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0;
+        max-width: 620px;
+        line-height: 1.6;
+    }
+    .page-hero-steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+    .page-hero-step {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+    .page-hero-step-index {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: #8B0000;
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+        flex: 0 0 auto;
+    }
 
     /* --- APPOINTMENT CARDS --- */
     .section-title {
@@ -615,6 +725,28 @@
     html[data-theme="dark"] .profile-card-description {
         color: #cbd5e1;
     }
+    html[data-theme="dark"] .page-hero {
+        background: linear-gradient(180deg, #0f0f10 0%, #161618 100%) !important;
+        border-color: rgba(250, 204, 21, 0.16) !important;
+        box-shadow:
+            0 18px 36px rgba(0, 0, 0, 0.42),
+            0 0 0 1px rgba(250, 204, 21, 0.05) inset !important;
+    }
+    html[data-theme="dark"] .page-hero-kicker,
+    html[data-theme="dark"] .page-hero-step {
+        background: linear-gradient(180deg, #17171a 0%, #1d1d21 100%) !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        color: #f8fafc !important;
+    }
+    html[data-theme="dark"] .page-hero-title {
+        color: #ffffff !important;
+    }
+    html[data-theme="dark"] .page-hero-text {
+        color: #e5e7eb !important;
+    }
+    html[data-theme="dark"] .page-hero-icon {
+        color: rgba(250, 204, 21, 0.08) !important;
+    }
     html[data-theme="dark"] .profile-edit-btn {
         background: linear-gradient(135deg, #70131B, #8f2230);
         border-color: #8f2230;
@@ -948,6 +1080,21 @@
     }
 
     @media (max-width: 760px) {
+        .page-hero {
+            padding: 16px 16px;
+            margin-bottom: 18px;
+            margin-top: -8px;
+        }
+        .page-hero-icon {
+            top: 4px;
+            right: -10px;
+            width: 118px;
+            height: 118px;
+        }
+        .page-hero-step {
+            width: 100%;
+            justify-content: flex-start;
+        }
         .profile-hero {
             padding: 24px 18px;
             gap: 18px;
@@ -1546,9 +1693,29 @@ document.addEventListener('DOMContentLoaded', function () {
         $puptasSyncMessage = trim((string) optional($user->healthProfile)->puptas_sync_message);
         $puptasSyncedAt = optional(optional($user->healthProfile)->puptas_synced_at)->format('M d, Y g:i A');
     @endphp
-    <div class="page-intro">
-        <h1 class="page-intro-title">Health Record</h1>
-        <p class="page-intro-text">Check the status of your submitted health profile, review clinic approval, and view your uploaded documents.</p>
+    <div class="page-hero">
+        <div class="page-hero-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+            </svg>
+        </div>
+        <div class="page-hero-kicker">Student Clinic Record</div>
+        <h1 class="page-hero-title">Health Record</h1>
+        <p class="page-hero-text">Check the status of your submitted health profile, review clinic approval, and view your uploaded documents.</p>
+        <div class="page-hero-steps">
+            <div class="page-hero-step">
+                <span class="page-hero-step-index">1</span>
+                <span>Review your submission</span>
+            </div>
+            <div class="page-hero-step">
+                <span class="page-hero-step-index">2</span>
+                <span>Track clinic verification</span>
+            </div>
+            <div class="page-hero-step">
+                <span class="page-hero-step-index">3</span>
+                <span>View approval status</span>
+            </div>
+        </div>
     </div>
     <div class="health-status-card">
         <div class="health-status-head">
@@ -1658,9 +1825,29 @@ document.addEventListener('DOMContentLoaded', function () {
         @endif
     </div>
 @else
-    <div class="page-intro">
-        <h1 class="page-intro-title">Notifications</h1>
-        <p class="page-intro-text">Stay updated with appointment changes, health record progress, and important clinic activity.</p>
+    <div class="page-hero">
+        <div class="page-hero-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+            </svg>
+        </div>
+        <div class="page-hero-kicker">Student Clinic Updates</div>
+        <h1 class="page-hero-title">Notifications</h1>
+        <p class="page-hero-text">Stay updated with appointment changes, health record progress, and important clinic activity.</p>
+        <div class="page-hero-steps">
+            <div class="page-hero-step">
+                <span class="page-hero-step-index">1</span>
+                <span>Check new clinic updates</span>
+            </div>
+            <div class="page-hero-step">
+                <span class="page-hero-step-index">2</span>
+                <span>Open important alerts</span>
+            </div>
+            <div class="page-hero-step">
+                <span class="page-hero-step-index">3</span>
+                <span>Stay on top of changes</span>
+            </div>
+        </div>
     </div>
     <div class="widget-card">
         <div class="notif-panel-head">

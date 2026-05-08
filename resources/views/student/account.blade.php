@@ -485,17 +485,18 @@
     .profile-info-row .form-control {
         font-size: 15px;
         color: #111827;
-        text-align: right;
-        font-weight: 700;
-        letter-spacing: 0.01em;
-        min-height: 44px;
-        padding: 10px 16px;
-        border: none !important;
-        border-bottom: 2px solid var(--field-bottom) !important;
-        border-radius: 12px 12px 10px 10px;
-        background: rgba(255, 255, 255, 0.55);
-        box-shadow: none !important;
-        transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+        text-align: left;
+        font-weight: 400;
+        letter-spacing: 0;
+        min-height: 50px;
+        padding: 12px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.20) !important;
+        border-radius: 18px !important;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%) !important;
+        box-shadow:
+            0 10px 18px rgba(15, 23, 42, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.86) !important;
+        transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
     }
     .metric-field {
         position: relative;
@@ -504,20 +505,24 @@
     }
     .metric-field .form-control {
         padding-right: 16px;
-        text-align: right !important;
-        border-bottom-color: var(--field-bottom) !important;
+        text-align: left !important;
     }
     .metric-field .form-control:focus {
-        border-bottom-color: var(--field-bottom-focus) !important;
-        background: rgba(255, 251, 235, 0.85);
+        border-color: #8B0000 !important;
+        box-shadow:
+            0 0 0 4px rgba(139, 0, 0, 0.06),
+            0 14px 24px rgba(139, 0, 0, 0.10),
+            inset 0 1px 0 rgba(255,255,255,0.88) !important;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%) !important;
         transform: translateY(-1px);
     }
-    .soft-field .form-control {
-        border-bottom-color: var(--field-bottom) !important;
-    }
     .soft-field .form-control:focus {
-        border-bottom-color: var(--field-bottom-focus) !important;
-        background: rgba(255, 251, 235, 0.85);
+        border-color: #8B0000 !important;
+        box-shadow:
+            0 0 0 4px rgba(139, 0, 0, 0.06),
+            0 14px 24px rgba(139, 0, 0, 0.10),
+            inset 0 1px 0 rgba(255,255,255,0.88) !important;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%) !important;
         transform: translateY(-1px);
     }
     .widget-card .voice-field-wrap input[type="text"],
@@ -536,22 +541,25 @@
     }
     .profile-info-row textarea.form-control {
         text-align: left;
-        min-height: 44px;
+        min-height: 76px;
         resize: none;
     }
     .profile-grid-3 > div .form-control:disabled,
     .profile-grid-2 > div .form-control:disabled,
     .profile-info-row .form-control:disabled {
         color: #111827;
-        background: #fffef7;
-        border-bottom-color: var(--field-bottom) !important;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%) !important;
         opacity: 1;
     }
     .profile-grid-3 > div .form-control:focus,
     .profile-grid-2 > div .form-control:focus,
     .profile-info-row .form-control:focus {
-        border-bottom-color: var(--field-bottom-focus) !important;
-        background: rgba(255, 251, 235, 0.85);
+        border-color: #8B0000 !important;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%) !important;
+        box-shadow:
+            0 0 0 4px rgba(139, 0, 0, 0.06),
+            0 14px 24px rgba(139, 0, 0, 0.10),
+            inset 0 1px 0 rgba(255,255,255,0.88) !important;
         transform: translateY(-1px);
     }
     .form-control:focus { border-color: #8B0000; box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.05); outline: none; }
@@ -625,15 +633,18 @@
     html[data-theme="dark"] .profile-grid-3 > div .form-control:disabled,
     html[data-theme="dark"] .profile-grid-2 > div .form-control:disabled,
     html[data-theme="dark"] .profile-info-row .form-control:disabled {
-        background: rgba(30, 41, 59, 0.92);
-        border-bottom-color: var(--field-bottom) !important;
+        background: linear-gradient(180deg, #111214 0%, #17171a 100%) !important;
+        border-color: rgba(250, 204, 21, 0.16) !important;
         color: #f8fafc;
     }
     html[data-theme="dark"] .profile-grid-3 > div .form-control:focus,
     html[data-theme="dark"] .profile-grid-2 > div .form-control:focus,
     html[data-theme="dark"] .profile-info-row .form-control:focus {
-        background: rgba(51, 65, 85, 0.78);
-        border-bottom-color: var(--field-bottom-focus) !important;
+        background: linear-gradient(180deg, #111214 0%, #17171a 100%) !important;
+        border-color: rgba(250, 204, 21, 0.28) !important;
+        box-shadow:
+            0 0 0 4px rgba(250, 204, 21, 0.08),
+            0 14px 24px rgba(0, 0, 0, 0.24) !important;
     }
 
     /* --- NOTIFICATIONS --- */
@@ -1711,7 +1722,6 @@ function enableEditing() {
 }
 </script>
 @endsection
-
 
 
 

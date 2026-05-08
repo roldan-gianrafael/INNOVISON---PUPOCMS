@@ -234,28 +234,52 @@
         color: #94a3b8 !important;
         cursor: not-allowed;
     }
-    .time-slots {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-        gap: 10px;
-        margin-top: 4px;
+    .time-slots-container {
+        display: none;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+        align-items: stretch;
+        padding: 14px;
+        border: 1px solid rgba(139, 0, 0, 0.22);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255, 251, 249, 0.92) 0%, rgba(255, 255, 255, 0.96) 100%);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.8),
+            0 16px 30px rgba(15, 23, 42, 0.08),
+            0 6px 14px rgba(139, 0, 0, 0.06);
     }
     .time-slot-btn {
-        border: 1px solid #e2e8f0;
+        position: relative;
+        width: 100%;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(148, 163, 184, 0.22);
         background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-        color: #334155;
-        border-radius: 12px;
-        padding: 10px 8px;
-        font-size: 13px;
-        font-weight: 700;
+        color: #1e293b;
+        border-radius: 999px;
+        padding: 7px 8px;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: 0;
+        text-align: center;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+        transition: all 0.18s ease;
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.08),
+            0 1px 0 rgba(255,255,255,0.85) inset;
     }
     .time-slot-btn:hover {
-        border-color: #8B0000;
-        color: #8B0000;
         transform: translateY(-1px);
+        border-color: #8B0000;
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15;
+        box-shadow: 0 12px 20px rgba(139, 0, 0, 0.16);
     }
     .time-slot-btn.selected {
         background: linear-gradient(135deg, #8B0000, #70131B);
@@ -264,10 +288,18 @@
         box-shadow: 0 14px 22px rgba(139, 0, 0, 0.20);
     }
     .time-slot-btn:disabled {
-        background: #f8fafc;
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
         color: #94a3b8;
-        border-color: #e2e8f0;
+        border-color: rgba(226, 232, 240, 0.9);
         cursor: not-allowed;
+        box-shadow: none;
+    }
+    .time-slot-btn:disabled:hover {
+        transform: none;
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+        color: #94a3b8;
+        border-color: rgba(226, 232, 240, 0.9);
+        box-shadow: none;
     }
     .time-slot-hint {
         display: block;
@@ -310,7 +342,9 @@
         font-weight: 800;
         padding: 7px 12px;
         cursor: pointer;
-        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.08),
+            0 1px 0 rgba(255,255,255,0.82) inset;
     }
     .date-picker-toggle:hover {
         border-color: #8B0000;
@@ -341,7 +375,7 @@
         background:
             linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
         box-shadow:
-            0 10px 18px rgba(15, 23, 42, 0.05),
+            0 12px 22px rgba(15, 23, 42, 0.08),
             inset 0 1px 0 rgba(255,255,255,0.86);
         cursor: pointer;
         font-weight: 400;
@@ -444,7 +478,9 @@
         text-align: left;
         cursor: pointer;
         transition: all 0.18s ease;
-        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.08),
+            0 1px 0 rgba(255,255,255,0.82) inset;
     }
     .service-select-option:hover {
         transform: translateY(-1px);
@@ -792,6 +828,10 @@
         border: 1px solid transparent;
         cursor: pointer;
         font-size: 14px;
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.08),
+            0 1px 0 rgba(255,255,255,0.75) inset;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
     }
     .confirmation-btn-primary {
         background: #8B0000;
@@ -799,6 +839,8 @@
     }
     .confirmation-btn-primary:hover {
         background: #70131B;
+        transform: translateY(-1px);
+        box-shadow: 0 16px 26px rgba(112, 19, 27, 0.20);
     }
     .confirmation-btn-secondary {
         background: #fff;
@@ -807,6 +849,8 @@
     }
     .confirmation-btn-secondary:hover {
         background: #fff5f5;
+        transform: translateY(-1px);
+        box-shadow: 0 16px 26px rgba(139, 0, 0, 0.14);
     }
 
     html[data-theme="dark"] .page-header,
@@ -955,6 +999,27 @@
         border-color: rgba(250, 204, 21, 0.14) !important;
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24) !important;
     }
+    html[data-theme="dark"] .time-slots-container {
+        background: linear-gradient(180deg, #121315 0%, #17171a 100%) !important;
+        border-color: rgba(139, 0, 0, 0.5) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.03),
+            0 18px 34px rgba(0, 0, 0, 0.30),
+            0 6px 16px rgba(139, 0, 0, 0.12) !important;
+    }
+    html[data-theme="dark"] .time-slot-btn:hover {
+        background: linear-gradient(135deg, #8B0000, #70131B) !important;
+        color: #facc15 !important;
+        border-color: #8B0000 !important;
+    }
+    html[data-theme="dark"] .time-slot-btn:disabled,
+    html[data-theme="dark"] .time-slot-btn:disabled:hover {
+        background: #1a1c20 !important;
+        color: #6b7280 !important;
+        border-color: rgba(148, 163, 184, 0.12) !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
 
     html[data-theme="dark"] .confirmation-btn-secondary {
         background: #17171a !important;
@@ -1002,6 +1067,9 @@
         .booking-grid-2 {
             grid-template-columns: 1fr;
             gap: 12px;
+        }
+        .time-slots-container {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         .confirmation-modal {
             padding: 18px;

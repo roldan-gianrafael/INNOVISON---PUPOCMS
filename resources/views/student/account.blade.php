@@ -544,6 +544,11 @@
         min-height: 76px;
         resize: none;
     }
+    .profile-course-field {
+        min-height: 58px !important;
+        line-height: 1.45;
+        overflow: hidden;
+    }
     .profile-grid-3 > div .form-control:disabled,
     .profile-grid-2 > div .form-control:disabled,
     .profile-info-row .form-control:disabled {
@@ -1350,7 +1355,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="profile-grid-3">
                             <div>
                                 <label class="input-label">Course</label>
-                                <input type="text" class="form-control" value="{{ $accountProfileData['course_college'] ?? $user->course }}" readonly style="background-color: #f8fafc;">
+                                <textarea class="form-control profile-course-field" rows="2" readonly disabled>{{ $accountProfileData['course_college'] ?? $user->course }}</textarea>
                             </div>
                             <div>
                                 <label class="input-label">Year</label>
@@ -1722,6 +1727,4 @@ function enableEditing() {
 }
 </script>
 @endsection
-
-
 

@@ -1424,7 +1424,6 @@
     .record-modal {
         width: min(860px, 100%);
         max-height: min(88vh, 900px);
-        overflow: auto;
         background: rgba(255, 255, 255, 0.42);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
@@ -1481,6 +1480,53 @@
     }
     .record-modal-body {
         padding: 20px 24px 24px;
+        position: relative;
+    }
+    .record-modal-body.is-collapsed {
+        max-height: 470px;
+        overflow: hidden;
+    }
+    .record-modal-body-fade {
+        display: none;
+    }
+    .record-modal-body.is-collapsed .record-modal-body-fade {
+        display: block;
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        bottom: 72px;
+        height: 94px;
+        pointer-events: none;
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.72) 42%, rgba(255, 255, 255, 0.96) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.24);
+    }
+    .record-modal-expand {
+        display: flex;
+        justify-content: center;
+        margin-top: 4px;
+        position: relative;
+        z-index: 2;
+    }
+    .record-modal-expand-btn {
+        min-height: 40px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(139, 0, 0, 0.16);
+        background: rgba(255, 255, 255, 0.86);
+        color: #8B0000;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+        transition: all 0.18s ease;
+    }
+    .record-modal-expand-btn:hover {
+        transform: translateY(-1px);
+        background: #8B0000;
+        color: #facc15;
+        border-color: #8B0000;
+        box-shadow: 0 14px 24px rgba(139, 0, 0, 0.16);
     }
     .record-modal-grid {
         display: grid;
@@ -1574,6 +1620,15 @@
         height: 18px;
         flex: 0 0 auto;
     }
+    .record-modal-photo-thumb {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        object-fit: cover;
+        display: block;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+    }
     .record-modal-link-body {
         display: flex;
         flex-direction: column;
@@ -1633,8 +1688,25 @@
         color: #facc15 !important;
         border-color: #8B0000 !important;
     }
+    html[data-theme="dark"] .record-modal-body.is-collapsed .record-modal-body-fade {
+        background: linear-gradient(180deg, rgba(15, 15, 16, 0) 0%, rgba(15, 15, 16, 0.74) 42%, rgba(15, 15, 16, 0.96) 100%) !important;
+        border-color: rgba(250, 204, 21, 0.08) !important;
+    }
+    html[data-theme="dark"] .record-modal-expand-btn {
+        background: #17171a !important;
+        color: #ffffff !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+    }
+    html[data-theme="dark"] .record-modal-expand-btn:hover {
+        background: #8B0000 !important;
+        color: #facc15 !important;
+        border-color: #8B0000 !important;
+    }
     html[data-theme="dark"] .record-modal-link-top {
         background: rgba(250, 204, 21, 0.10) !important;
+    }
+    html[data-theme="dark"] .record-modal-photo-thumb {
+        border-color: rgba(250, 204, 21, 0.16) !important;
     }
     @media (max-width: 760px) {
         .record-modal-grid {
@@ -2131,7 +2203,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <h2 class="record-modal-title" id="healthRecordModalTitle">Health Record Details</h2>
                     <p class="record-modal-subtitle">Review your submitted health profile, clinic status, and uploaded record documents in one place.</p>
                 </div>
-                <div class="record-modal-body">
+                <div class="record-modal-body is-collapsed" id="healthRecordModalBody">
                     <div class="record-modal-grid">
                         <div class="record-modal-card">
                             <span class="record-modal-label">Current Status</span>
@@ -2222,7 +2294,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="record-modal-links">
                                 @if(optional($healthProfileRecord)->student_photo)
                                     <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->student_photo) }}" target="_blank" rel="noopener noreferrer">
-                                        <span class="record-modal-link-top"><x-outline-icon name="photo" /></span>
+                                        <img class="record-modal-photo-thumb" src="{{ asset('storage/' . $healthProfileRecord->student_photo) }}" alt="Uploaded student photo">
                                         <span class="record-modal-link-body">
                                             <span class="record-modal-link-title">Student Photo</span>
                                             <span class="record-modal-link-meta">Image Upload</span>
@@ -2255,6 +2327,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 @endif
                             </div>
                         </div>
+                    </div>
+                    <div class="record-modal-body-fade" aria-hidden="true"></div>
+                    <div class="record-modal-expand">
+                        <button type="button" class="record-modal-expand-btn" id="healthRecordModalToggle" onclick="toggleHealthRecordModalBody()">See more</button>
                     </div>
                 </div>
             </div>
@@ -2327,11 +2403,19 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 function openHealthRecordModal() {
     const modal = document.getElementById('healthRecordModal');
+    const modalBody = document.getElementById('healthRecordModalBody');
+    const toggleBtn = document.getElementById('healthRecordModalToggle');
     if (!modal) {
         return;
     }
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
+    if (modalBody) {
+        modalBody.classList.add('is-collapsed');
+    }
+    if (toggleBtn) {
+        toggleBtn.textContent = 'See more';
+    }
     document.body.style.overflow = 'hidden';
 }
 
@@ -2343,6 +2427,17 @@ function closeHealthRecordModal() {
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+}
+
+function toggleHealthRecordModalBody() {
+    const modalBody = document.getElementById('healthRecordModalBody');
+    const toggleBtn = document.getElementById('healthRecordModalToggle');
+    if (!modalBody || !toggleBtn) {
+        return;
+    }
+
+    const isCollapsed = modalBody.classList.toggle('is-collapsed');
+    toggleBtn.textContent = isCollapsed ? 'See more' : 'Show less';
 }
 
 function enableEditing() {

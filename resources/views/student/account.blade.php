@@ -1495,12 +1495,38 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        overflow: hidden;
         transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+    }
+    .record-modal-close svg {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+    .record-modal-close::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.16) 22%,
+                rgba(255, 239, 181, 0.48) 48%,
+                rgba(255, 239, 181, 0.16) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 0.5s ease;
+        pointer-events: none;
     }
     .record-modal-close:hover {
         background: rgba(143, 34, 48, 0.30);
         border-color: #facc15;
         transform: translateY(-1px);
+    }
+    .record-modal-close:hover::after {
+        transform: translateX(135%);
     }
     .record-modal-body {
         padding: 20px 24px 24px;
@@ -2203,7 +2229,11 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="record-modal-overlay" id="healthRecordModal" aria-hidden="true">
             <div class="record-modal" role="dialog" aria-modal="true" aria-labelledby="healthRecordModalTitle">
                 <div class="record-modal-head">
-                    <button type="button" class="record-modal-close" aria-label="Close record details" onclick="closeHealthRecordModal()">x</button>
+                    <button type="button" class="record-modal-close" aria-label="Close record details" onclick="closeHealthRecordModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                    </button>
                     <h2 class="record-modal-title" id="healthRecordModalTitle">Health Record Details</h2>
                     <p class="record-modal-subtitle">Review your submitted health profile, clinic status, and uploaded record documents in one place.</p>
                 </div>

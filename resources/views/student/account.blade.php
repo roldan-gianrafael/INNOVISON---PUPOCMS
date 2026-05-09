@@ -1434,10 +1434,19 @@
         border-bottom: 4px solid #facc15;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         position: relative;
+        overflow: auto;
         overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .record-modal::-webkit-scrollbar {
+        width: 0;
+        height: 0;
     }
     .record-modal-head {
-        position: relative;
+        position: sticky;
+        top: 0;
+        z-index: 3;
         padding: 24px 24px 18px;
         background: linear-gradient(135deg, #70131B, #8f2230);
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -1482,51 +1491,45 @@
         padding: 20px 24px 24px;
         position: relative;
     }
-    .record-modal-body.is-collapsed {
-        max-height: 470px;
-        overflow: hidden;
-    }
     .record-modal-body-fade {
-        display: none;
-    }
-    .record-modal-body.is-collapsed .record-modal-body-fade {
         display: block;
         position: absolute;
         left: 24px;
         right: 24px;
-        bottom: 72px;
+        bottom: 0;
         height: 94px;
         pointer-events: none;
         border-radius: 18px;
         background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.72) 42%, rgba(255, 255, 255, 0.96) 100%);
         border: 1px solid rgba(255, 255, 255, 0.24);
     }
-    .record-modal-expand {
+    .record-modal-footer {
+        padding: 0 24px 24px;
         display: flex;
         justify-content: center;
-        margin-top: 4px;
         position: relative;
         z-index: 2;
     }
-    .record-modal-expand-btn {
+    .record-modal-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         min-height: 40px;
         padding: 0 18px;
         border-radius: 999px;
-        border: 1px solid rgba(139, 0, 0, 0.16);
+        border: 1px solid rgba(139, 0, 0, 0.14);
         background: rgba(255, 255, 255, 0.86);
         color: #8B0000;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 800;
-        cursor: pointer;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
         box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
-        transition: all 0.18s ease;
     }
-    .record-modal-expand-btn:hover {
-        transform: translateY(-1px);
-        background: #8B0000;
-        color: #facc15;
-        border-color: #8B0000;
-        box-shadow: 0 14px 24px rgba(139, 0, 0, 0.16);
+    .record-modal-indicator svg {
+        width: 14px;
+        height: 14px;
+        flex: 0 0 auto;
     }
     .record-modal-grid {
         display: grid;
@@ -1688,19 +1691,14 @@
         color: #facc15 !important;
         border-color: #8B0000 !important;
     }
-    html[data-theme="dark"] .record-modal-body.is-collapsed .record-modal-body-fade {
+    html[data-theme="dark"] .record-modal-body-fade {
         background: linear-gradient(180deg, rgba(15, 15, 16, 0) 0%, rgba(15, 15, 16, 0.74) 42%, rgba(15, 15, 16, 0.96) 100%) !important;
         border-color: rgba(250, 204, 21, 0.08) !important;
     }
-    html[data-theme="dark"] .record-modal-expand-btn {
+    html[data-theme="dark"] .record-modal-indicator {
         background: #17171a !important;
         color: #ffffff !important;
         border-color: rgba(250, 204, 21, 0.14) !important;
-    }
-    html[data-theme="dark"] .record-modal-expand-btn:hover {
-        background: #8B0000 !important;
-        color: #facc15 !important;
-        border-color: #8B0000 !important;
     }
     html[data-theme="dark"] .record-modal-link-top {
         background: rgba(250, 204, 21, 0.10) !important;
@@ -2203,7 +2201,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <h2 class="record-modal-title" id="healthRecordModalTitle">Health Record Details</h2>
                     <p class="record-modal-subtitle">Review your submitted health profile, clinic status, and uploaded record documents in one place.</p>
                 </div>
-                <div class="record-modal-body is-collapsed" id="healthRecordModalBody">
+                <div class="record-modal-body" id="healthRecordModalBody">
                     <div class="record-modal-grid">
                         <div class="record-modal-card">
                             <span class="record-modal-label">Current Status</span>
@@ -2329,8 +2327,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     </div>
                     <div class="record-modal-body-fade" aria-hidden="true"></div>
-                    <div class="record-modal-expand">
-                        <button type="button" class="record-modal-expand-btn" id="healthRecordModalToggle" onclick="toggleHealthRecordModalBody()">See more</button>
+                </div>
+                <div class="record-modal-footer">
+                    <div class="record-modal-indicator">
+                        <span>More data below</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25 12 15.75 4.5 8.25" />
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -2403,19 +2406,11 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 function openHealthRecordModal() {
     const modal = document.getElementById('healthRecordModal');
-    const modalBody = document.getElementById('healthRecordModalBody');
-    const toggleBtn = document.getElementById('healthRecordModalToggle');
     if (!modal) {
         return;
     }
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
-    if (modalBody) {
-        modalBody.classList.add('is-collapsed');
-    }
-    if (toggleBtn) {
-        toggleBtn.textContent = 'See more';
-    }
     document.body.style.overflow = 'hidden';
 }
 
@@ -2427,17 +2422,6 @@ function closeHealthRecordModal() {
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-}
-
-function toggleHealthRecordModalBody() {
-    const modalBody = document.getElementById('healthRecordModalBody');
-    const toggleBtn = document.getElementById('healthRecordModalToggle');
-    if (!modalBody || !toggleBtn) {
-        return;
-    }
-
-    const isCollapsed = modalBody.classList.toggle('is-collapsed');
-    toggleBtn.textContent = isCollapsed ? 'See more' : 'Show less';
 }
 
 function enableEditing() {

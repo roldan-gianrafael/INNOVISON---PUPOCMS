@@ -1351,6 +1351,10 @@
         color: #70131B;
     }
     .btn-print-form.approved { background: #70131B; }
+    .btn-print-form.approved:hover {
+        background: #facc15;
+        color: #70131B;
+    }
     .btn-print-form.pending { background: #8f2724; }
     .btn-print-form.incomplete { background: #800000; }
     .btn-print-form.disabled {
@@ -1607,9 +1611,7 @@
         align-items: flex-start;
         justify-content: space-between;
         gap: 12px;
-        box-shadow:
-            0 12px 22px rgba(15, 23, 42, 0.05),
-            inset 0 1px 0 rgba(255,255,255,0.82);
+        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.05);
         transition: all 0.18s ease;
     }
     .record-modal-link:hover {

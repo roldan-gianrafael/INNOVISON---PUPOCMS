@@ -1528,33 +1528,76 @@
         border: 1px solid rgba(245, 158, 11, 0.18);
     }
     .record-modal-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
     }
     .record-modal-link {
-        min-height: 38px;
-        padding: 0 14px;
-        border-radius: 999px;
-        border: 1px solid rgba(139, 0, 0, 0.16);
-        background: #ffffff;
+        min-height: 108px;
+        padding: 14px 14px 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(139, 0, 0, 0.14);
+        background: linear-gradient(180deg, #ffffff 0%, #fff9f7 100%);
         color: #8B0000;
-        font-size: 13px;
-        font-weight: 800;
         text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.82);
         transition: all 0.18s ease;
     }
     .record-modal-link:hover {
-        transform: translateY(-1px);
-        background: #8B0000;
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #8B0000, #70131B);
         color: #facc15;
         border-color: #8B0000;
-        box-shadow: 0 14px 24px rgba(139, 0, 0, 0.16);
+        box-shadow: 0 16px 28px rgba(139, 0, 0, 0.16);
         text-decoration: none;
+    }
+    .record-modal-link-top {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(139, 0, 0, 0.08);
+        color: inherit;
+        flex: 0 0 auto;
+    }
+    .record-modal-link-top svg {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+    }
+    .record-modal-link-body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .record-modal-link-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: inherit;
+        line-height: 1.35;
+    }
+    .record-modal-link-meta {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.72;
+        color: inherit;
+    }
+    .record-modal-link-arrow {
+        font-size: 12px;
+        font-weight: 800;
+        color: inherit;
+        opacity: 0.88;
     }
     html[data-theme="dark"] .record-modal {
         background: linear-gradient(180deg, #0f0f10 0%, #161618 100%) !important;
@@ -1590,8 +1633,14 @@
         color: #facc15 !important;
         border-color: #8B0000 !important;
     }
+    html[data-theme="dark"] .record-modal-link-top {
+        background: rgba(250, 204, 21, 0.10) !important;
+    }
     @media (max-width: 760px) {
         .record-modal-grid {
+            grid-template-columns: 1fr;
+        }
+        .record-modal-links {
             grid-template-columns: 1fr;
         }
     }
@@ -2173,29 +2222,35 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="record-modal-links">
                                 @if(optional($healthProfileRecord)->student_photo)
                                     <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->student_photo) }}" target="_blank" rel="noopener noreferrer">
-                                        <x-outline-icon name="photo" />
-                                        Student Photo
+                                        <span class="record-modal-link-top"><x-outline-icon name="photo" /></span>
+                                        <span class="record-modal-link-body">
+                                            <span class="record-modal-link-title">Student Photo</span>
+                                            <span class="record-modal-link-meta">Image Upload</span>
+                                        </span>
+                                        <span class="record-modal-link-arrow">Open File</span>
                                     </a>
                                 @endif
                                 @if(optional($healthProfileRecord)->medical_certificate)
                                     <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->medical_certificate) }}" target="_blank" rel="noopener noreferrer">
-                                        <x-outline-icon name="document-text" />
-                                        Medical Certificate
+                                        <span class="record-modal-link-top"><x-outline-icon name="document-text" /></span>
+                                        <span class="record-modal-link-body">
+                                            <span class="record-modal-link-title">Medical Certificate</span>
+                                            <span class="record-modal-link-meta">PDF Upload</span>
+                                        </span>
+                                        <span class="record-modal-link-arrow">Open File</span>
                                     </a>
                                 @endif
                                 @if(optional($healthProfileRecord)->health_form_upload)
                                     <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->health_form_upload) }}" target="_blank" rel="noopener noreferrer">
-                                        <x-outline-icon name="document-text" />
-                                        Health Form Upload
+                                        <span class="record-modal-link-top"><x-outline-icon name="document-text" /></span>
+                                        <span class="record-modal-link-body">
+                                            <span class="record-modal-link-title">Health Form Upload</span>
+                                            <span class="record-modal-link-meta">PDF Upload</span>
+                                        </span>
+                                        <span class="record-modal-link-arrow">Open File</span>
                                     </a>
                                 @endif
-                                @if(optional($healthProfileRecord)->pwd_id_proof)
-                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->pwd_id_proof) }}" target="_blank" rel="noopener noreferrer">
-                                        <x-outline-icon name="identification" />
-                                        PWD ID Proof
-                                    </a>
-                                @endif
-                                @if(!optional($healthProfileRecord)->student_photo && !optional($healthProfileRecord)->medical_certificate && !optional($healthProfileRecord)->health_form_upload && !optional($healthProfileRecord)->pwd_id_proof)
+                                @if(!optional($healthProfileRecord)->student_photo && !optional($healthProfileRecord)->medical_certificate && !optional($healthProfileRecord)->health_form_upload)
                                     <div class="record-modal-value">No uploaded files available.</div>
                                 @endif
                             </div>

@@ -1406,6 +1406,195 @@
     html[data-theme="dark"] .health-status-note {
         color: var(--text-light, #a9b4c4);
     }
+    .record-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 1200;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .record-modal-overlay.is-open {
+        display: flex;
+    }
+    .record-modal {
+        width: min(860px, 100%);
+        max-height: min(88vh, 900px);
+        overflow: auto;
+        background: rgba(255, 255, 255, 0.42);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 18px;
+        border-left: 1px solid rgba(112, 19, 27, 0.12);
+        border-right: 1px solid rgba(112, 19, 27, 0.12);
+        border-top: 4px solid #facc15;
+        border-bottom: 4px solid #facc15;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow-x: hidden;
+    }
+    .record-modal-head {
+        position: relative;
+        padding: 24px 24px 18px;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .record-modal-title {
+        margin: 0 0 8px;
+        color: #ffffff;
+        font-size: 24px;
+        font-weight: 800;
+    }
+    .record-modal-subtitle {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 14px;
+        line-height: 1.6;
+        max-width: 640px;
+    }
+    .record-modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.16);
+        color: #ffffff;
+        font-size: 22px;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+    }
+    .record-modal-close:hover {
+        background: rgba(143, 34, 48, 0.30);
+        border-color: #facc15;
+        transform: translateY(-1px);
+    }
+    .record-modal-body {
+        padding: 20px 24px 24px;
+    }
+    .record-modal-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .record-modal-card {
+        border: 1px solid rgba(112, 19, 27, 0.10);
+        border-radius: 14px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.78);
+        box-shadow:
+            0 10px 18px rgba(15, 23, 42, 0.06),
+            inset 0 1px 0 rgba(255,255,255,0.82);
+    }
+    .record-modal-card.is-full {
+        grid-column: 1 / -1;
+    }
+    .record-modal-label {
+        display: block;
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 800;
+    }
+    .record-modal-value {
+        color: #111827;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.55;
+        word-break: break-word;
+    }
+    .record-modal-status {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 800;
+        background: #fff3cd;
+        color: #b45309;
+        border: 1px solid rgba(245, 158, 11, 0.18);
+    }
+    .record-modal-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .record-modal-link {
+        min-height: 38px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(139, 0, 0, 0.16);
+        background: #ffffff;
+        color: #8B0000;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+        transition: all 0.18s ease;
+    }
+    .record-modal-link:hover {
+        transform: translateY(-1px);
+        background: #8B0000;
+        color: #facc15;
+        border-color: #8B0000;
+        box-shadow: 0 14px 24px rgba(139, 0, 0, 0.16);
+        text-decoration: none;
+    }
+    html[data-theme="dark"] .record-modal {
+        background: linear-gradient(180deg, #0f0f10 0%, #161618 100%) !important;
+        border-color: rgba(250, 204, 21, 0.16) !important;
+        box-shadow:
+            0 18px 36px rgba(0, 0, 0, 0.42),
+            0 0 0 1px rgba(250, 204, 21, 0.05) inset !important;
+    }
+    html[data-theme="dark"] .record-modal-card {
+        background: #111214 !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24) !important;
+    }
+    html[data-theme="dark"] .record-modal-label,
+    html[data-theme="dark"] .record-modal-value {
+        color: #f8fafc !important;
+    }
+    html[data-theme="dark"] .record-modal-close {
+        color: #f8fafc !important;
+    }
+    html[data-theme="dark"] .record-modal-status {
+        background: rgba(250, 204, 21, 0.16) !important;
+        color: #fef3c7 !important;
+        border-color: rgba(250, 204, 21, 0.24) !important;
+    }
+    html[data-theme="dark"] .record-modal-link {
+        background: #17171a !important;
+        color: #ffffff !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+    }
+    html[data-theme="dark"] .record-modal-link:hover {
+        background: #8B0000 !important;
+        color: #facc15 !important;
+        border-color: #8B0000 !important;
+    }
+    @media (max-width: 760px) {
+        .record-modal-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 @endpush
 
@@ -1720,6 +1909,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 @elseif($accountView === 'health-record')
     @php
+        $healthProfileRecord = $user->healthProfile;
         $healthFormSubmitted = $hasSubmittedHealthProfile ?? ($user->healthProfile !== null);
         $status = $user->healthProfile->clearance_status ?? 'For Verification';
         $statusNormalized = strtolower(trim((string) $status));
@@ -1729,6 +1919,12 @@ document.addEventListener('DOMContentLoaded', function () {
         $puptasSyncStatus = optional($user->healthProfile)->puptas_sync_status;
         $puptasSyncMessage = trim((string) optional($user->healthProfile)->puptas_sync_message);
         $puptasSyncedAt = optional(optional($user->healthProfile)->puptas_synced_at)->format('M d, Y g:i A');
+        $recordVerifiedAt = optional(optional($user->healthProfile)->verified_at)->format('M d, Y g:i A');
+        $recordBirthday = trim((string) optional($healthProfileRecord)->birthday);
+        $recordBirthday = $recordBirthday !== '' ? optional(\Carbon\Carbon::parse($recordBirthday))->format('M d, Y') : '-';
+        $recordAssessmentDate = optional(optional($healthProfileRecord)->assessment_date)->format('M d, Y');
+        $recordChestXrayDate = optional(optional($healthProfileRecord)->chest_xray_date)->format('M d, Y');
+        $recordMedicalIssuedAt = optional(optional($healthProfileRecord)->medical_certificate_issued_at)->format('M d, Y');
     @endphp
     <div class="page-hero">
         <div class="page-hero-icon" aria-hidden="true">
@@ -1838,10 +2034,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 @endif
 
                 <div class="health-status-actions">
-                    <a href="" class="btn-print-form approved">
+                    <button type="button" class="btn-print-form approved" onclick="openHealthRecordModal()">
                         <x-outline-icon name="eye" />
                         View Record Details
-                    </a>
+                    </button>
                     <a href="https://puptas.undraftedbsit2027.com/applicant-dashboard" class="health-status-link">
                         <x-outline-icon name="document-text" />
                         Proceed to Admission System
@@ -1855,10 +2051,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
 
                 <div class="health-status-actions">
-                    <a href="{{ url('/student/account?view=health-record') }}" class="btn-print-form pending">
+                    <button type="button" class="btn-print-form pending" onclick="openHealthRecordModal()">
                         <x-outline-icon name="eye" />
                         View Submitted Record
-                    </a>
+                    </button>
                     <button class="btn-print-form disabled" disabled>
                         <x-outline-icon name="clock" />
                         Approval Required
@@ -1878,6 +2074,137 @@ document.addEventListener('DOMContentLoaded', function () {
             <span class="health-status-note">Required for clinic consultations.</span>
         @endif
     </div>
+    @if($healthFormSubmitted && $healthProfileRecord)
+        <div class="record-modal-overlay" id="healthRecordModal" aria-hidden="true">
+            <div class="record-modal" role="dialog" aria-modal="true" aria-labelledby="healthRecordModalTitle">
+                <div class="record-modal-head">
+                    <button type="button" class="record-modal-close" aria-label="Close record details" onclick="closeHealthRecordModal()">x</button>
+                    <h2 class="record-modal-title" id="healthRecordModalTitle">Health Record Details</h2>
+                    <p class="record-modal-subtitle">Review your submitted health profile, clinic status, and uploaded record documents in one place.</p>
+                </div>
+                <div class="record-modal-body">
+                    <div class="record-modal-grid">
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Current Status</span>
+                            <span class="record-modal-status">{{ $status }}</span>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Student Number</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->student_number ?: ($accountProfileData['student_number'] ?? $user->student_number ?? '-') }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Course</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->course_college ?: ($accountProfileData['course_college'] ?? $user->course ?? '-') }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">School Year</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->school_year ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Birthday</span>
+                            <div class="record-modal-value">{{ $recordBirthday }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Sex</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->sex ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Height</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->height ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Weight</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->weight ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Blood Type</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->blood_type ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Blood Pressure</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->blood_pressure ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Temperature</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->temperature ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Respiratory Rate</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->respiratory_rate ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Guardian Name</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->guardian_name ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Contact Number</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->cellphone ?: optional($healthProfileRecord)->landline ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card is-full">
+                            <span class="record-modal-label">Home Address</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->home_address ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Assessment Date</span>
+                            <div class="record-modal-value">{{ $recordAssessmentDate ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Verified At</span>
+                            <div class="record-modal-value">{{ $recordVerifiedAt ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Chest X-Ray Date</span>
+                            <div class="record-modal-value">{{ $recordChestXrayDate ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Medical Certificate Issued</span>
+                            <div class="record-modal-value">{{ $recordMedicalIssuedAt ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card is-full">
+                            <span class="record-modal-label">Assessment Remarks</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->assessment_remarks ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card is-full">
+                            <span class="record-modal-label">Pending Reason</span>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->pending_reason ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card is-full">
+                            <span class="record-modal-label">Uploaded Documents</span>
+                            <div class="record-modal-links">
+                                @if(optional($healthProfileRecord)->student_photo)
+                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->student_photo) }}" target="_blank" rel="noopener noreferrer">
+                                        <x-outline-icon name="photo" />
+                                        Student Photo
+                                    </a>
+                                @endif
+                                @if(optional($healthProfileRecord)->medical_certificate)
+                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->medical_certificate) }}" target="_blank" rel="noopener noreferrer">
+                                        <x-outline-icon name="document-text" />
+                                        Medical Certificate
+                                    </a>
+                                @endif
+                                @if(optional($healthProfileRecord)->health_form_upload)
+                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->health_form_upload) }}" target="_blank" rel="noopener noreferrer">
+                                        <x-outline-icon name="document-text" />
+                                        Health Form Upload
+                                    </a>
+                                @endif
+                                @if(optional($healthProfileRecord)->pwd_id_proof)
+                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->pwd_id_proof) }}" target="_blank" rel="noopener noreferrer">
+                                        <x-outline-icon name="identification" />
+                                        PWD ID Proof
+                                    </a>
+                                @endif
+                                @if(!optional($healthProfileRecord)->student_photo && !optional($healthProfileRecord)->medical_certificate && !optional($healthProfileRecord)->health_form_upload && !optional($healthProfileRecord)->pwd_id_proof)
+                                    <div class="record-modal-value">No uploaded files available.</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @else
     <div class="page-hero">
         <div class="page-hero-icon" aria-hidden="true">
@@ -1943,6 +2270,26 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <script>
+function openHealthRecordModal() {
+    const modal = document.getElementById('healthRecordModal');
+    if (!modal) {
+        return;
+    }
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeHealthRecordModal() {
+    const modal = document.getElementById('healthRecordModal');
+    if (!modal) {
+        return;
+    }
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+}
+
 function enableEditing() {
     const form = document.querySelector('form[action="{{ route('student.updateContact') }}"]');
     if (form) {
@@ -1969,5 +2316,24 @@ function enableEditing() {
     document.getElementById('editBtn').style.display = 'none';
     document.getElementById('saveAction').style.display = 'flex';
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('healthRecordModal');
+    if (!modal) {
+        return;
+    }
+
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            closeHealthRecordModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeHealthRecordModal();
+        }
+    });
+});
 </script>
 @endsection

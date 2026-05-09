@@ -311,6 +311,7 @@
             transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
+        #disabilityTypeWrap.is-hidden,
         #pwdUploadWrap.is-hidden {
             display: none;
         }
@@ -359,12 +360,60 @@
             color: #111827;
             font-weight: 700;
         }
+        .form-field .form-control.field-maroon,
+        .form-field .form-select.field-maroon {
+            border: 1.5px solid rgba(127, 29, 45, 0.52);
+            background: linear-gradient(180deg, #fffafb 0%, #fff6f7 100%);
+            box-shadow:
+                0 8px 18px rgba(127, 29, 45, 0.06),
+                inset 0 1px 0 rgba(255,255,255,0.82);
+            border-radius: 12px;
+            min-height: 46px;
+            padding: 10px 12px;
+        }
+        .form-field .form-control.field-maroon.is-filled,
+        .form-field .form-select.field-maroon.is-filled {
+            border: 1px solid rgba(209, 213, 219, 0.9);
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            box-shadow:
+                0 6px 14px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 rgba(255,255,255,0.82);
+            border-radius: 12px;
+            min-height: 46px;
+            padding: 10px 12px;
+        }
+        .form-field .form-control.field-maroon.is-filled:focus,
+        .form-field .form-select.field-maroon.is-filled:focus {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+        }
+        .form-field input[type="number"].field-maroon,
+        .form-field input[type="number"].field-maroon.is-filled {
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
+        .form-field input[type="number"].field-maroon::-webkit-outer-spin-button,
+        .form-field input[type="number"].field-maroon::-webkit-inner-spin-button,
+        .form-field input[type="number"].field-maroon.is-filled::-webkit-outer-spin-button,
+        .form-field input[type="number"].field-maroon.is-filled::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
 
         .form-field .form-control:focus,
         .form-field .form-select:focus {
             border: 0;
             box-shadow: none;
             background: transparent;
+        }
+        .form-field .form-control.field-maroon:focus,
+        .form-field .form-select.field-maroon:focus {
+            border: 1.5px solid var(--clinic-maroon);
+            background: linear-gradient(180deg, #fffafb 0%, #fff6f7 100%);
+            box-shadow:
+                0 0 0 0.18rem rgba(127, 29, 45, 0.12),
+                0 10px 22px rgba(127, 29, 45, 0.10);
         }
 
         .step-fill-note {
@@ -542,7 +591,7 @@
                             <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
 
-                        <div class="form-field span-2">
+                        <div class="form-field">
                             <label class="form-label">Home Address <span class="required">*</span></label>
                             <input type="text" name="home_address" class="form-control" readonly required value="{{ old('home_address', $prefill['home_address'] ?? '') }}">
                         </div>
@@ -570,17 +619,17 @@
 
                         <div class="form-field">
                             <label class="form-label">Height (cm) <span class="required">*</span></label>
-                            <input type="number" step="0.01" min="0" name="height" class="form-control" required value="{{ old('height', $prefill['height'] ?? '') }}">
+                            <input type="number" step="0.01" min="0" name="height" class="form-control field-maroon" required value="{{ old('height', $prefill['height'] ?? '') }}">
                             <p class="field-helper">Enter a numeric value.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Weight (kg) <span class="required">*</span></label>
-                            <input type="number" step="0.01" min="0" name="weight" class="form-control" required value="{{ old('weight', $prefill['weight'] ?? '') }}">
+                            <input type="number" step="0.01" min="0" name="weight" class="form-control field-maroon" required value="{{ old('weight', $prefill['weight'] ?? '') }}">
                             <p class="field-helper">Enter a numeric value.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Blood Type <span class="required">*</span></label>
-                            <select name="blood_type" class="form-select" required>
+                            <select name="blood_type" class="form-select field-maroon" required>
                                 @php
                                     $selectedBloodType = old('blood_type', $prefill['blood_type'] ?? '');
                                     $bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Unknown'];
@@ -599,17 +648,17 @@
 
                         <div class="form-field">
                             <label class="form-label">Guardian Name <span class="required">*</span></label>
-                            <input type="text" name="guardian_name" class="form-control" required value="{{ old('guardian_name', $prefill['guardian_name'] ?? '') }}">
+                            <input type="text" name="guardian_name" class="form-control field-maroon" required value="{{ old('guardian_name', $prefill['guardian_name'] ?? '') }}">
                             <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Guardian Contact <span class="required">*</span></label>
-                            <input type="text" name="cellphone" class="form-control" required value="{{ old('cellphone', $prefill['cellphone'] ?? '') }}">
+                            <input type="text" name="cellphone" class="form-control field-maroon" required value="{{ old('cellphone', $prefill['cellphone'] ?? '') }}">
                             <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
                         <div class="form-field">
                             <label class="form-label">Landline (Optional)</label>
-                            <input type="text" name="landline" class="form-control" value="{{ old('landline', $prefill['landline'] ?? '') }}">
+                            <input type="text" name="landline" class="form-control field-maroon" value="{{ old('landline', $prefill['landline'] ?? '') }}">
                             <p class="field-helper">Type NONE if nothing to add.</p>
                         </div>
                     </div>
@@ -637,7 +686,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-8" id="disabilityTypeWrap">
                             <div class="form-field">
                                 <label class="form-label">Disability Type <span class="required">*</span></label>
                                 <input id="disability_type" type="text" name="disability_type" class="form-control" value="{{ old('disability_type', $prefill['disability_type'] ?? '') }}">
@@ -717,6 +766,7 @@
             const ageInput = document.getElementById('age');
             const disabilityRadios = document.querySelectorAll('input[name="has_disability"]');
             const disabilityTypeInput = document.getElementById('disability_type');
+            const disabilityTypeWrap = document.getElementById('disabilityTypeWrap');
             const pwdProofInput = document.getElementById('pwd_id_proof');
             const pwdUploadWrap = document.getElementById('pwdUploadWrap');
             const submitOverlay = document.getElementById('submitOverlay');
@@ -782,6 +832,7 @@
                 disabilityTypeInput.disabled = !isPwd;
                 pwdProofInput.required = isPwd;
                 pwdProofInput.disabled = !isPwd;
+                disabilityTypeWrap?.classList.toggle('is-hidden', !isPwd);
                 pwdUploadWrap?.classList.toggle('is-hidden', !isPwd);
 
                 if (!isPwd) {
@@ -794,6 +845,22 @@
             disabilityRadios.forEach((radio) => {
                 radio.addEventListener('change', togglePwdRequirements);
             });
+            togglePwdRequirements();
+
+            const maroonFields = Array.from(document.querySelectorAll('.field-maroon'));
+
+            function syncMaroonFieldState(field) {
+                if (!field) return;
+                const value = typeof field.value === 'string' ? field.value.trim() : '';
+                field.classList.toggle('is-filled', value !== '');
+            }
+
+            maroonFields.forEach((field) => {
+                syncMaroonFieldState(field);
+                field.addEventListener('input', () => syncMaroonFieldState(field));
+                field.addEventListener('change', () => syncMaroonFieldState(field));
+            });
+
             nextToStep2Btn?.addEventListener('click', () => {
                 if (!validateStepOne()) {
                     return;

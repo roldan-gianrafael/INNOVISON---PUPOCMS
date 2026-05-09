@@ -2144,9 +2144,8 @@ document.addEventListener('DOMContentLoaded', function () {
         @if($healthFormSubmitted)
             @if($isIssuedStatus)
                 <div class="health-status-summary">
-                    <p class="health-status-message">Your health profile is approved and already available in your health record.</p>
                     <span class="health-status-state issued"><x-outline-icon name="check" /> Approved</span>
-                    
+                    <p class="health-status-message">Your health profile is approved and already available in your health record.</p>
                 </div>
 
                 @if($puptasSyncStatus === 'synced')

@@ -1192,7 +1192,7 @@
         height: 14px;
         flex: 0 0 auto;
     }
-    .health-status-state.issued { background: #dcfce7; color: #166534; }
+    .health-status-state.issued { background: #fbecef; color: #70131B; }
     .health-status-state.pending { background: #fffbeb; color: #92400e; }
     .health-status-state.incomplete { background: #fef2f2; color: #991b1b; }
     .health-status-message {
@@ -1219,9 +1219,9 @@
         gap: 10px;
     }
     .health-step.is-complete {
-        border-color: #bbf7d0;
-        background: #ecfdf5;
-        color: #166534;
+        border-color: rgba(139, 0, 0, 0.18);
+        background: #fff3f5;
+        color: #70131B;
     }
     .health-step.is-active {
         border-color: #fde68a;
@@ -1247,8 +1247,8 @@
         stroke-width: 2.5;
     }
     .health-step.is-complete .health-step-icon {
-        background: #16a34a;
-        border-color: #16a34a;
+        background: #70131B;
+        border-color: #70131B;
         color: #ffffff;
     }
     .health-step.is-active .health-step-icon {
@@ -1284,8 +1284,8 @@
         color: #1d4ed8;
     }
     .health-status-sync.synced {
-        background: #ecfdf5;
-        color: #166534;
+        background: #fff3f5;
+        color: #70131B;
     }
     .health-status-sync.failed,
     .health-status-sync.missing {
@@ -1350,7 +1350,7 @@
         box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
         color: white;
     }
-    .btn-print-form.approved { background: #059669; }
+    .btn-print-form.approved { background: #70131B; }
     .btn-print-form.pending { background: #8f2724; }
     .btn-print-form.incomplete { background: #800000; }
     .btn-print-form.disabled {
@@ -1364,7 +1364,7 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
     }
     html[data-theme="dark"] .health-status-title {
-        color: #fca5a5;
+        color: #facc15;
     }
     html[data-theme="dark"] .health-step {
         background: rgba(17, 24, 39, 0.72);
@@ -1372,9 +1372,9 @@
         color: #cbd5e1;
     }
     html[data-theme="dark"] .health-step.is-complete {
-        background: rgba(22, 101, 52, 0.2);
-        border-color: rgba(34, 197, 94, 0.35);
-        color: #bbf7d0;
+        background: rgba(250, 204, 21, 0.12);
+        border-color: rgba(250, 204, 21, 0.30);
+        color: #fde68a;
     }
     html[data-theme="dark"] .health-step.is-active {
         background: rgba(146, 64, 14, 0.24);
@@ -1388,9 +1388,21 @@
         box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
     }
     html[data-theme="dark"] .health-step.is-complete .health-step-icon {
-        background: #16a34a;
-        border-color: #16a34a;
-        color: #ffffff;
+        background: #facc15;
+        border-color: #facc15;
+        color: #111827;
+    }
+    html[data-theme="dark"] .health-status-state.issued {
+        background: rgba(250, 204, 21, 0.16) !important;
+        color: #fde68a !important;
+    }
+    html[data-theme="dark"] .health-status-sync.synced {
+        background: rgba(250, 204, 21, 0.12) !important;
+        color: #fde68a !important;
+    }
+    html[data-theme="dark"] .btn-print-form.approved {
+        background: #facc15 !important;
+        color: #111827 !important;
     }
     html[data-theme="dark"] .health-step.is-active .health-step-icon {
         background: rgba(146, 64, 14, 0.46);
@@ -1449,7 +1461,6 @@
         z-index: 3;
         padding: 24px 24px 18px;
         background: linear-gradient(135deg, #70131B, #8f2230);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     }
     .record-modal-title {
         margin: 0 0 8px;
@@ -1504,11 +1515,13 @@
         border: 1px solid rgba(255, 255, 255, 0.24);
     }
     .record-modal-footer {
-        padding: 0 24px 24px;
+        position: sticky;
+        bottom: 0;
+        padding: 12px 24px 18px;
         display: flex;
         justify-content: center;
-        position: relative;
-        z-index: 2;
+        z-index: 3;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.86) 38%, rgba(255, 255, 255, 0.98) 100%);
     }
     .record-modal-indicator {
         display: inline-flex;
@@ -1694,6 +1707,9 @@
     html[data-theme="dark"] .record-modal-body-fade {
         background: linear-gradient(180deg, rgba(15, 15, 16, 0) 0%, rgba(15, 15, 16, 0.74) 42%, rgba(15, 15, 16, 0.96) 100%) !important;
         border-color: rgba(250, 204, 21, 0.08) !important;
+    }
+    html[data-theme="dark"] .record-modal-footer {
+        background: linear-gradient(180deg, rgba(15, 15, 16, 0) 0%, rgba(15, 15, 16, 0.82) 38%, rgba(15, 15, 16, 0.98) 100%) !important;
     }
     html[data-theme="dark"] .record-modal-indicator {
         background: #17171a !important;

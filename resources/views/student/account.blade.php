@@ -1247,9 +1247,9 @@
         stroke-width: 2.5;
     }
     .health-step.is-complete .health-step-icon {
-        background: #70131B;
-        border-color: #70131B;
-        color: #ffffff;
+        background: #facc15;
+        border-color: #facc15;
+        color: #70131B;
     }
     .health-step.is-active .health-step-icon {
         background: #fff3cd;
@@ -1346,9 +1346,9 @@
         flex: 0 0 auto;
     }
     .btn-print-form:hover {
-        background: #5a0f15;
+        background: #facc15;
         box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
-        color: white;
+        color: #70131B;
     }
     .btn-print-form.approved { background: #70131B; }
     .btn-print-form.pending { background: #8f2724; }

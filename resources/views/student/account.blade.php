@@ -1507,16 +1507,7 @@
         position: relative;
     }
     .record-modal-body-fade {
-        display: block;
-        position: absolute;
-        left: 24px;
-        right: 24px;
-        bottom: 0;
-        height: 94px;
-        pointer-events: none;
-        border-radius: 18px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.72) 42%, rgba(255, 255, 255, 0.96) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.24);
+        display: none;
     }
     .record-modal-footer {
         position: sticky;
@@ -1525,7 +1516,7 @@
         display: flex;
         justify-content: center;
         z-index: 3;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.86) 38%, rgba(255, 255, 255, 0.98) 100%);
+        background: transparent;
     }
     .record-modal-indicator {
         display: inline-flex;
@@ -1705,13 +1696,6 @@
         background: #8B0000 !important;
         color: #facc15 !important;
         border-color: #8B0000 !important;
-    }
-    html[data-theme="dark"] .record-modal-body-fade {
-        background: linear-gradient(180deg, rgba(15, 15, 16, 0) 0%, rgba(15, 15, 16, 0.74) 42%, rgba(15, 15, 16, 0.96) 100%) !important;
-        border-color: rgba(250, 204, 21, 0.08) !important;
-    }
-    html[data-theme="dark"] .record-modal-footer {
-        background: linear-gradient(180deg, rgba(15, 15, 16, 0) 0%, rgba(15, 15, 16, 0.82) 38%, rgba(15, 15, 16, 0.98) 100%) !important;
     }
     html[data-theme="dark"] .record-modal-indicator {
         background: #17171a !important;

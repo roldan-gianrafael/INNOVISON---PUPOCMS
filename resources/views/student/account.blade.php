@@ -1538,6 +1538,10 @@
         width: 14px;
         height: 14px;
         flex: 0 0 auto;
+        transition: transform 0.18s ease;
+    }
+    .record-modal-indicator.is-top svg {
+        transform: rotate(180deg);
     }
     .record-modal-grid {
         display: grid;
@@ -2331,8 +2335,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="record-modal-body-fade" aria-hidden="true"></div>
                 </div>
                 <div class="record-modal-footer">
-                    <div class="record-modal-indicator">
-                        <span>More data below</span>
+                    <div class="record-modal-indicator" id="healthRecordModalIndicator">
+                        <span id="healthRecordModalIndicatorText">More data below</span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25 12 15.75 4.5 8.25" />
                         </svg>
@@ -2414,6 +2418,7 @@ function openHealthRecordModal() {
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    updateHealthRecordModalIndicator();
 }
 
 function closeHealthRecordModal() {
@@ -2424,6 +2429,21 @@ function closeHealthRecordModal() {
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+}
+
+function updateHealthRecordModalIndicator() {
+    const modal = document.querySelector('#healthRecordModal .record-modal');
+    const indicator = document.getElementById('healthRecordModalIndicator');
+    const indicatorText = document.getElementById('healthRecordModalIndicatorText');
+
+    if (!modal || !indicator || !indicatorText) {
+        return;
+    }
+
+    const reachedBottom = modal.scrollTop + modal.clientHeight >= modal.scrollHeight - 4;
+
+    indicator.classList.toggle('is-top', reachedBottom);
+    indicatorText.textContent = reachedBottom ? 'More data above' : 'More data below';
 }
 
 function enableEditing() {
@@ -2458,6 +2478,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!modal) {
         return;
     }
+    const modalCard = modal.querySelector('.record-modal');
+
+    modalCard?.addEventListener('scroll', updateHealthRecordModalIndicator);
 
     modal.addEventListener('click', function (event) {
         if (event.target === modal) {

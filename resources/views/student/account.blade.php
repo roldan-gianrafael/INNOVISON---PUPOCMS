@@ -1499,8 +1499,8 @@
         transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
     }
     .record-modal-close svg {
-        width: 20px;
-        height: 20px;
+        width: 30px;
+        height: 30px;
         flex: 0 0 auto;
         position: relative;
         z-index: 1;

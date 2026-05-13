@@ -1488,63 +1488,8 @@
                         <input type="hidden" name="last_name" id="detailLastName" value="">
                         <input type="hidden" name="full_name" id="detailFullName" value="">
                         <input type="hidden" name="external_identifier" id="detailExternalIdentifier" value="">
-                        <div class="um-section-block account-access" id="accountAccessSection">
-                            <div class="um-section-kicker">Users Table</div>
-                            <h4 class="um-section-title">Account Access</h4>
-                            <p class="um-section-copy">This controls the clinic login role, the student-side email, and whether the account can enter the clinic system.</p>
-                            <div class="um-field">
-                                <label>Clinic Role</label>
-                                <select name="user_role" id="detailRole">
-                                    <option value="student">Student</option>
-                                    <option value="student_assistant">Student Assistant</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="super_admin">Super Admin</option>
-                                </select>
-                            </div>
-                            <div class="um-field">
-                                <label id="detailEmailLabel">Student Email</label>
-                                <input type="email" name="email" id="detailEditEmail" placeholder="Enter Gmail account">
-                                <div class="um-note" id="emailRoleNote" style="margin-top: 6px;">
-                                    Keep this email for the student side.
-                                </div>
-                            </div>
-                            <div class="um-field">
-                                <label>Status</label>
-                                <select name="status" id="detailStatus">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="um-section-block admin-hub" id="adminHubSection">
-                            <div class="um-section-kicker">Admins Table</div>
-                            <h4 class="um-section-title">Admin Hub Profile</h4>
-                            <p class="um-section-copy">This is clinic-only data for admin-side access. It can stay separate from the student login profile while still being managed here.</p>
-                            <div class="um-profile-list">
-                                <div class="um-profile-row">
-                                    <div class="label">Hub Record</div>
-                                    <div class="value" id="detailAdminProfileStatus">No linked admin hub record yet</div>
-                                </div>
-                            </div>
-                            <div class="um-field" id="accessLevelWrap" style="display:none; margin-top: 14px;">
-                                <label id="detailAccessLevelLabel">Admin Type</label>
-                                <select name="access_level" id="detailAccessLevel">
-                                    <option value="clinic_staff">Clinic Staff</option>
-                                    <option value="designee">Designee</option>
-                                </select>
-                            </div>
-                            <div class="um-field" id="adminEmailWrap" style="display:none;">
-                                <label id="detailAdminEmailLabel">Admin Login Email</label>
-                                <input type="email" name="admin_email" id="detailAdminEmail" placeholder="Enter separate admin login email">
-                                <div class="um-note" id="adminEmailNote" style="margin-top: 6px;">
-                                    This email is used for the admin side only.
-                                </div>
-                            </div>
-                            <div class="um-field" id="adminOfficeWrap" style="display:none;">
-                                <label>Office</label>
-                                <input type="text" name="office" id="detailOffice" placeholder="Office or Department">
-                            </div>
-                        </div>
+                        @include('admin.user_management.account-access-section')
+                        @include('admin.user_management.admin-hub-profile-section')
                         <div class="um-note" id="externalNote" style="display:none; margin-top: 6px;">
                             This faculty profile comes from the external source. Saving here will add a clinic-side user and admin hub record without changing the source system.
                         </div>
@@ -1700,18 +1645,18 @@
         if (isStudent) {
             detailEmailLabel.textContent = 'Student Email';
             emailRoleNote.textContent = 'This email stays with the student account.';
-            accessLevelWrap.style.display = 'none';
-            detailAccessLevel.disabled = true;
-            adminEmailWrap.style.display = 'none';
-            adminOfficeWrap.style.display = 'none';
+            if (accessLevelWrap) accessLevelWrap.style.display = 'none';
+            if (detailAccessLevel) detailAccessLevel.disabled = true;
+            if (adminEmailWrap) adminEmailWrap.style.display = 'none';
+            if (adminOfficeWrap) adminOfficeWrap.style.display = 'none';
         } else {
             detailEmailLabel.textContent = 'Student Email';
             emailRoleNote.textContent = 'Keep this email for the student side.';
-            accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
-            detailAccessLevel.disabled = !isAdmin || !(canEdit || canOnboard);
-            adminEmailWrap.style.display = usesSeparateAdminEmail ? 'block' : 'none';
-            adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
-            detailAccessLevelLabel.textContent = 'Admin Type';
+            if (accessLevelWrap) accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
+            if (detailAccessLevel) detailAccessLevel.disabled = !isAdmin || !(canEdit || canOnboard);
+            if (adminEmailWrap) adminEmailWrap.style.display = usesSeparateAdminEmail ? 'block' : 'none';
+            if (adminOfficeWrap) adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
+            if (detailAccessLevelLabel) detailAccessLevelLabel.textContent = 'Admin Type';
         }
 
         if (adminEmailNote) {
@@ -1837,7 +1782,9 @@
         if (deleteAdminProfileId) {
             deleteAdminProfileId.value = adminProfileId;
         }
-        detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
+        if (detailAccessLevel) {
+            detailAccessLevel.value = ['clinic_staff', 'designee'].includes(accessLevel) ? accessLevel : 'clinic_staff';
+        }
         applySettingsSectionMode(managementView, canEdit, canOnboard);
 
         detailEditEmail.value = row.dataset.email || '';
@@ -1914,7 +1861,9 @@
         }
         if (!canEdit && canOnboard) {
             detailRole.value = 'admin';
-            detailAccessLevel.value = 'designee';
+            if (detailAccessLevel) {
+                detailAccessLevel.value = 'designee';
+            }
             detailStatus.value = row.dataset.status || 'active';
         }
         syncRoleUi({ canEdit, canOnboard });

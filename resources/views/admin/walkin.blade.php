@@ -826,9 +826,10 @@
         min-width: 0;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         gap: 10px;
         align-self: center;
+        margin-left: 10px;
     }
 
     .applicant-modal-head-badge {
@@ -880,6 +881,9 @@
         color: #70131B;
         border-color: rgba(255, 255, 255, 0.86);
         box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+        min-height: 44px;
+        padding: 11px 18px;
+        font-size: 13px;
     }
 
     .applicant-modal-head-actions .scan-method-badge {
@@ -1957,7 +1961,7 @@
         <div id="headerIcon" class="mode-header-badge">{{ $currentMode === 'assisted' ? 'AI' : ($currentMode === 'applicant' ? 'AP' : 'SB') }}</div>
         <div class="mode-header-copy">
             <h3 id="headerTitle" style="margin: 0; font-weight: 800; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
-                {{ $currentMode === 'assisted' ? 'Assisted Intake Ready' : ($currentMode === 'applicant' ? 'Applicant Scan Ready' : 'Scan / Bio Ready') }}
+                {{ $currentMode === 'assisted' ? 'Assisted Intake Ready' : ($currentMode === 'applicant' ? 'Applicant Scan Ready' : 'OCR Ready') }}
             </h3>
             <p id="headerSubtitle">
                 {{ $currentMode === 'assisted' ? 'Capture the patient basics first, then continue to consultation.' : ($currentMode === 'applicant' ? 'Choose OCR scanning or BioSync to identify the applicant and continue to Medical Assessment.' : 'Choose barcode scanning or BioSync mode to identify the patient.') }}
@@ -2813,13 +2817,13 @@
             );
             $('#scanMethodBadge').text(isBioSync ? 'BioSync Active' : 'OCR Active');
             $('#btnSwitchScanMode').text(isBioSync ? 'Switch to OCR Scan' : 'Switch to BioSync');
-            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : (isApplicantFlow ? 'Applicant Scan Ready' : 'Scan / Bio Ready'));
+            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : (isApplicantFlow ? 'Applicant Scan Ready' : 'OCR Ready'));
             $('#headerSubtitle').text(
                 isBioSync
-                    ? 'BioSync is selected. The biometric integration panel is reserved for the next implementation step.'
+                    ? ''
                     : isApplicantFlow
                         ? 'Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.'
-                        : 'Choose OCR ID scanning or BioSync mode to identify the patient.'
+                        : ''
             );
             $('#headerIcon').text(isBioSync ? 'BIO' : (isApplicantFlow ? 'AP' : 'SB'));
             $('#scanInlineNote').text(

@@ -11,6 +11,7 @@ use App\Models\MedicineType;
 use App\Models\Setting;
 use App\Models\Admin;
 use App\Services\FacultySyncService;
+use App\Services\GuisisApiService;
 use App\Services\PuptasWebhookService;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Auth;
@@ -357,7 +358,7 @@ class AdminController extends Controller
         ));
     }
 
-    public function apiTesting(Request $request, FacultySyncService $facultySyncService)
+    public function apiTesting(Request $request, FacultySyncService $facultySyncService, GuisisApiService $guisisApiService)
     {
         $search = trim((string) $request->query('search', ''));
         $source = trim((string) $request->query('source', 'faculty'));
@@ -370,13 +371,14 @@ class AdminController extends Controller
         $errorMessage = null;
         $errorDetails = null;
 
-        $canRunWithoutSearch = in_array($source, ['admin_api', 'admin_options', 'database_info'], true);
+        $canRunWithoutSearch = in_array($source, ['admin_api', 'admin_options', 'database_info', 'guisis_profiles'], true);
 
         if ($search !== '' || $canRunWithoutSearch) {
             $facultyEndpoint = trim((string) config('services.pupt_flss.faculty_profiles_url', ''));
             $internalAdminEndpoint = url('/api/external/admins');
             $internalAdminOptionsEndpoint = url('/api/external/admins/options');
             $configuredTempEndpoint = trim((string) config('services.temp_api_testing.url', ''));
+            $guisisBaseUrl = $guisisApiService->configuredBaseUrl();
 
             if ($source === 'database_info') {
                 $endpoint = 'local-database://' . $dbTable;
@@ -384,6 +386,16 @@ class AdminController extends Controller
                 $endpoint = $internalAdminEndpoint;
             } elseif ($source === 'admin_options') {
                 $endpoint = $internalAdminOptionsEndpoint;
+            } elseif ($source === 'guisis_profile') {
+                $endpoint = $guisisBaseUrl . '/integrations/students/profile?email={email}';
+            } elseif ($source === 'guisis_profiles') {
+                $endpoint = $guisisBaseUrl . '/integrations/students/profiles';
+            } elseif ($source === 'guisis_student') {
+                $endpoint = $guisisBaseUrl . '/integrations/students/{studentNumber}';
+            } elseif ($source === 'guisis_addresses') {
+                $endpoint = $guisisBaseUrl . '/integrations/students/{studentNumber}/addresses';
+            } elseif ($source === 'guisis_personal_info') {
+                $endpoint = $guisisBaseUrl . '/integrations/students/{studentNumber}/personalInfo';
             } elseif ($source === 'puptas_applicant') {
                 $endpoint = 'PUPTAS /api/v1/medical/applicants/{studentNumber}';
             } elseif ($source === 'puptas_applicant_idp') {
@@ -486,6 +498,112 @@ class AdminController extends Controller
 
                         if (empty($results)) {
                             $errorMessage = 'No matching records were found for the current search.';
+                        }
+                    } elseif ($source === 'guisis_profile') {
+                        $lookupResult = $guisisApiService->getStudentByEmailDetailed($search);
+                        $payload = $lookupResult['data'] ?? null;
+                        $results = $payload ? $this->normalizeApiTestingResults($payload, $search) : [];
+                        $apiResponseMeta = [
+                            'status' => $lookupResult['status'] ?? ($results ? 200 : 404),
+                            'ok' => !empty($results),
+                            'endpoint' => $endpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'guisis-m2m-bearer',
+                            'source' => $source,
+                            'auth_status' => data_get($lookupResult, 'auth.status'),
+                            'auth_token_source' => data_get($lookupResult, 'auth.source'),
+                            'auth_endpoint' => data_get($lookupResult, 'auth.endpoint'),
+                        ];
+
+                        if (empty($results)) {
+                            $errorMessage = trim((string) ($lookupResult['message'] ?? '')) ?: 'No GuiSIS student record matched the provided email.';
+                            $errorDetails = trim((string) ($lookupResult['body'] ?? ''));
+                        }
+                    } elseif ($source === 'guisis_profiles') {
+                        $lookupResult = $guisisApiService->listStudentsDetailed([
+                            'search' => $search !== '' ? $search : null,
+                            'page' => 1,
+                            'page_size' => 10,
+                        ]);
+                        $payload = $lookupResult['data'] ?? null;
+                        $results = $this->normalizeGuisisStudentResults($payload, $search);
+                        $apiResponseMeta = [
+                            'status' => $lookupResult['status'] ?? 200,
+                            'ok' => ($lookupResult['ok'] ?? false) && !empty($results),
+                            'endpoint' => $endpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'guisis-m2m-bearer',
+                            'source' => $source,
+                            'auth_status' => data_get($lookupResult, 'auth.status'),
+                            'auth_token_source' => data_get($lookupResult, 'auth.source'),
+                            'auth_endpoint' => data_get($lookupResult, 'auth.endpoint'),
+                        ];
+
+                        if (!$lookupResult['ok']) {
+                            $errorMessage = trim((string) ($lookupResult['message'] ?? '')) ?: 'GuiSIS list-students request failed.';
+                            $errorDetails = trim((string) ($lookupResult['body'] ?? ''));
+                        } elseif (empty($results)) {
+                            $errorMessage = 'No GuiSIS student records matched the current search.';
+                        }
+                    } elseif ($source === 'guisis_student') {
+                        $lookupResult = $guisisApiService->getStudentByStudentNumberDetailed($search);
+                        $payload = $lookupResult['data'] ?? null;
+                        $results = $payload ? $this->normalizeApiTestingResults($payload, $search) : [];
+                        $apiResponseMeta = [
+                            'status' => $lookupResult['status'] ?? ($results ? 200 : 404),
+                            'ok' => !empty($results),
+                            'endpoint' => $endpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'guisis-m2m-bearer',
+                            'source' => $source,
+                            'auth_status' => data_get($lookupResult, 'auth.status'),
+                            'auth_token_source' => data_get($lookupResult, 'auth.source'),
+                            'auth_endpoint' => data_get($lookupResult, 'auth.endpoint'),
+                        ];
+
+                        if (empty($results)) {
+                            $errorMessage = trim((string) ($lookupResult['message'] ?? '')) ?: 'No GuiSIS student record matched the provided student number.';
+                            $errorDetails = trim((string) ($lookupResult['body'] ?? ''));
+                        }
+                    } elseif ($source === 'guisis_addresses') {
+                        $lookupResult = $guisisApiService->getStudentAddressesDetailed($search);
+                        $payload = $lookupResult['data'] ?? null;
+                        $results = is_array($payload) ? [$payload] : [];
+                        $apiResponseMeta = [
+                            'status' => $lookupResult['status'] ?? ($results ? 200 : 404),
+                            'ok' => !empty($results),
+                            'endpoint' => $endpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'guisis-m2m-bearer',
+                            'source' => $source,
+                            'auth_status' => data_get($lookupResult, 'auth.status'),
+                            'auth_token_source' => data_get($lookupResult, 'auth.source'),
+                            'auth_endpoint' => data_get($lookupResult, 'auth.endpoint'),
+                        ];
+
+                        if (empty($results)) {
+                            $errorMessage = trim((string) ($lookupResult['message'] ?? '')) ?: 'No GuiSIS address record matched the provided student number.';
+                            $errorDetails = trim((string) ($lookupResult['body'] ?? ''));
+                        }
+                    } elseif ($source === 'guisis_personal_info') {
+                        $lookupResult = $guisisApiService->getStudentPersonalInfoDetailed($search);
+                        $payload = $lookupResult['data'] ?? null;
+                        $results = is_array($payload) ? [$payload] : [];
+                        $apiResponseMeta = [
+                            'status' => $lookupResult['status'] ?? ($results ? 200 : 404),
+                            'ok' => !empty($results),
+                            'endpoint' => $endpoint,
+                            'result_count' => count($results),
+                            'auth_mode' => 'guisis-m2m-bearer',
+                            'source' => $source,
+                            'auth_status' => data_get($lookupResult, 'auth.status'),
+                            'auth_token_source' => data_get($lookupResult, 'auth.source'),
+                            'auth_endpoint' => data_get($lookupResult, 'auth.endpoint'),
+                        ];
+
+                        if (empty($results)) {
+                            $errorMessage = trim((string) ($lookupResult['message'] ?? '')) ?: 'No GuiSIS personal-info record matched the provided student number.';
+                            $errorDetails = trim((string) ($lookupResult['body'] ?? ''));
                         }
                     } elseif ($source === 'puptas_applicant') {
                         $lookupResult = app(PuptasWebhookService::class)->fetchApplicantByStudentNumberDetailed($search);
@@ -1035,7 +1153,7 @@ class AdminController extends Controller
                 : [];
             $name = trim((string) ($item['name'] ?? trim(($item['first_name'] ?? '') . ' ' . ($item['middle_name'] ?? '') . ' ' . ($item['last_name'] ?? '') . ' ' . ($item['suffix_name'] ?? ''))));
             $email = trim((string) ($item['email'] ?? $item['email_address'] ?? ''));
-            $identifier = trim((string) ($item['faculty_code'] ?? $item['faculty_id'] ?? $item['id'] ?? $item['admin_id'] ?? $item['student_id'] ?? $item['employee_id'] ?? ''));
+            $identifier = trim((string) ($item['faculty_code'] ?? $item['faculty_id'] ?? $item['id'] ?? $item['admin_id'] ?? $item['student_number'] ?? $item['student_id'] ?? $item['employee_id'] ?? ''));
             $birthday = trim((string) ($item['birthday'] ?? $profile['birthday'] ?? $item['dob'] ?? $item['date_of_birth'] ?? ''));
             $role = trim((string) ($item['faculty_type'] ?? $item['role'] ?? $item['access_level'] ?? $item['designation'] ?? ''));
             $office = trim((string) ($item['office'] ?? $item['offices'] ?? $item['department'] ?? ''));
@@ -1081,6 +1199,24 @@ class AdminController extends Controller
         }
 
         return array_slice($normalized, 0, 20);
+    }
+
+    private function normalizeGuisisStudentResults($payload, string $search): array
+    {
+        if (!is_array($payload)) {
+            return [];
+        }
+
+        $students = $payload['students'] ?? $payload['data']['students'] ?? $payload['data'] ?? [];
+        if (!is_array($students)) {
+            return [];
+        }
+
+        if (!array_is_list($students)) {
+            $students = [$students];
+        }
+
+        return $this->normalizeApiTestingResults($students, $search);
     }
 
     private function formatApiTestingAddress(array $address): string

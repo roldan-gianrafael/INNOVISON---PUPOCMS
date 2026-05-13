@@ -89,6 +89,13 @@ return [
         'timeout' => (int) env('PUPT_FLSS_TIMEOUT', 30),
     ],
 
+    'guisis' => [
+        'base_url' => env('GUISIS_API_BASE_URL', 'https://api.guisis.dllbsit2027.com/api/v1'),
+        'client_id' => env('GUISIS_M2M_CLIENT_ID'),
+        'client_secret' => env('GUISIS_M2M_CLIENT_SECRET'),
+        'timeout' => (int) env('GUISIS_TIMEOUT', 20),
+    ],
+
     'puptas' => [
         'api_url' => env('PUPTAS_API_URL'),
         'client_id' => env('PUPTAS_CLIENT_ID'),

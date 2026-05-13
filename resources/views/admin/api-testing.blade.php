@@ -618,11 +618,29 @@
             </div>
         @endif
 
+        @if(str_starts_with(($source ?? ''), 'guisis_'))
+            <div class="api-connection-note">
+                <strong>GuiSIS Connection Check</strong>
+                <code>{{ config('services.guisis.base_url') }}</code>
+                <small>
+                    This test source uses the GuiSIS M2M flow:
+                    <code>POST /auth/m2m/token</code> then
+                    <code>Authorization: Bearer &lt;accessToken&gt;</code>.
+                    Make sure <code>GUISIS_M2M_CLIENT_ID</code> and <code>GUISIS_M2M_CLIENT_SECRET</code> are configured.
+                </small>
+            </div>
+        @endif
+
         <form method="GET" class="api-search-form" id="apiTestingForm">
             <div>
                 <label for="source">API Source</label>
                 <select id="source" name="source">
                     <option value="faculty" {{ ($source ?? 'faculty') === 'faculty' ? 'selected' : '' }}>Faculty API (Test FLSS)</option>
+                    <option value="guisis_profile" {{ ($source ?? 'faculty') === 'guisis_profile' ? 'selected' : '' }}>GuiSIS Student by Email</option>
+                    <option value="guisis_profiles" {{ ($source ?? 'faculty') === 'guisis_profiles' ? 'selected' : '' }}>GuiSIS List Students</option>
+                    <option value="guisis_student" {{ ($source ?? 'faculty') === 'guisis_student' ? 'selected' : '' }}>GuiSIS Student by Student Number</option>
+                    <option value="guisis_addresses" {{ ($source ?? 'faculty') === 'guisis_addresses' ? 'selected' : '' }}>GuiSIS Student Addresses</option>
+                    <option value="guisis_personal_info" {{ ($source ?? 'faculty') === 'guisis_personal_info' ? 'selected' : '' }}>GuiSIS Student Personal Info</option>
                     <option value="puptas_applicant" {{ ($source ?? 'faculty') === 'puptas_applicant' ? 'selected' : '' }}>PUPTAS Applicant API</option>
                     <option value="puptas_applicant_idp" {{ ($source ?? 'faculty') === 'puptas_applicant_idp' ? 'selected' : '' }}>PUPTAS Applicant API by IDP User ID</option>
                     <option value="admin_api" {{ ($source ?? 'faculty') === 'admin_api' ? 'selected' : '' }}>Our Admin API</option>
@@ -643,13 +661,13 @@
                 </select>
             </div>
             <div>
-                <label for="search">{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Search by Student Number' : (($source ?? 'faculty') === 'puptas_applicant_idp' ? 'Search by IDP User ID' : 'Search by name, email, or ID') }}</label>
+                <label for="search">{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Search by Student Number' : (($source ?? 'faculty') === 'puptas_applicant_idp' ? 'Search by IDP User ID' : (($source ?? 'faculty') === 'guisis_profile' ? 'Search by Student Email' : (in_array(($source ?? 'faculty'), ['guisis_student', 'guisis_addresses', 'guisis_personal_info'], true) ? 'Search by Student Number' : 'Search by name, email, or ID')))) }}</label>
                 <input
                     type="text"
                     id="search"
                     name="search"
                     value="{{ $search }}"
-                    placeholder="{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Try a student number' : (($source ?? 'faculty') === 'puptas_applicant_idp' ? 'Try an IDP user ID' : 'Try a name, email address, or identifier') }}"
+                    placeholder="{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Try a student number' : (($source ?? 'faculty') === 'puptas_applicant_idp' ? 'Try an IDP user ID' : (($source ?? 'faculty') === 'guisis_profile' ? 'Try a student email address' : (in_array(($source ?? 'faculty'), ['guisis_student', 'guisis_addresses', 'guisis_personal_info'], true) ? 'Try a student number' : 'Try a name, email address, or identifier')))) }}"
                 >
             </div>
             <button type="submit">Search API's</button>
@@ -684,6 +702,19 @@
                     @endif
                     @if(!empty($apiResponseMeta['header_name']))
                     | {{ $apiResponseMeta['header_name'] }}: <strong>{{ $apiResponseMeta['api_key_preview'] ?? 'configured' }}</strong>
+                    @endif
+                </p>
+            @endif
+            @if(!empty($apiResponseMeta['auth_status']) || !empty($apiResponseMeta['auth_token_source']) || !empty($apiResponseMeta['auth_endpoint']))
+                <p class="api-testing-meta" style="margin-top: 8px;">
+                    @if(!empty($apiResponseMeta['auth_status']))
+                    Token Status: <strong>{{ $apiResponseMeta['auth_status'] }}</strong>
+                    @endif
+                    @if(!empty($apiResponseMeta['auth_token_source']))
+                    | Token Source: <strong>{{ $apiResponseMeta['auth_token_source'] }}</strong>
+                    @endif
+                    @if(!empty($apiResponseMeta['auth_endpoint']))
+                    | Token Endpoint: <strong>{{ $apiResponseMeta['auth_endpoint'] }}</strong>
                     @endif
                 </p>
             @endif
@@ -797,6 +828,70 @@
             <div class="faculty-autofill-field"><label>Department/Office</label><input type="text" id="selectedFacultyOffice" readonly></div>
         </div>
     </div>
+        @elseif(in_array(($source ?? ''), ['guisis_profile', 'guisis_profiles', 'guisis_student'], true))
+            <div class="api-results">
+                @foreach($results as $result)
+                    @php
+                        $guisisFields = $result['fields'] ?? [];
+                    @endphp
+                    <article class="api-result-card">
+                        <h3 style="margin: 0; color: #7f1d2d;">{{ $result['name'] ?? 'GuiSIS Student' }}</h3>
+                        <div class="api-result-grid">
+                            <div class="api-field">
+                                <small>Student Number</small>
+                                <strong>{{ $result['identifier'] ?? data_get($guisisFields, 'student_number', 'N/A') }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Email</small>
+                                <strong>{{ $result['email'] ?? data_get($guisisFields, 'email', 'N/A') }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>First Name</small>
+                                <strong>{{ $result['first_name'] ?? data_get($guisisFields, 'first_name', 'N/A') }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Last Name</small>
+                                <strong>{{ $result['last_name'] ?? data_get($guisisFields, 'last_name', 'N/A') }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Course</small>
+                                <strong>{{ data_get($guisisFields, 'course.name', data_get($guisisFields, 'course', 'N/A')) }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Year Level</small>
+                                <strong>{{ data_get($guisisFields, 'year_level', 'N/A') }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Gender</small>
+                                <strong>{{ data_get($guisisFields, 'gender.name', data_get($guisisFields, 'gender', 'N/A')) }}</strong>
+                            </div>
+                            <div class="api-field">
+                                <small>Status</small>
+                                <strong>{{ $result['status'] ?? data_get($guisisFields, 'status', 'N/A') }}</strong>
+                            </div>
+                        </div>
+
+                        <details class="api-raw-toggle">
+                            <summary>Show raw response</summary>
+                            <div class="api-json">{{ json_encode($guisisFields, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                        </details>
+                    </article>
+                @endforeach
+            </div>
+        @elseif(in_array(($source ?? ''), ['guisis_addresses', 'guisis_personal_info'], true))
+            <div class="api-results">
+                @foreach($results as $result)
+                    <article class="api-result-card">
+                        <h3 style="margin: 0; color: #7f1d2d;">
+                            {{ ($source ?? '') === 'guisis_addresses' ? 'GuiSIS Address Response' : 'GuiSIS Personal Info Response' }}
+                        </h3>
+                        <details class="api-raw-toggle" open>
+                            <summary>Show raw response</summary>
+                            <div class="api-json">{{ json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                        </details>
+                    </article>
+                @endforeach
+            </div>
         @elseif(in_array(($source ?? ''), ['puptas_applicant', 'puptas_applicant_idp'], true))
             <div class="api-results">
                 @foreach($results as $result)
@@ -1001,14 +1096,20 @@
             const searchLabel = document.querySelector('label[for="search"]');
             const isPuptasApplicant = sourceField.value === 'puptas_applicant';
             const isPuptasApplicantIdp = sourceField.value === 'puptas_applicant_idp';
+            const isGuisisProfile = sourceField.value === 'guisis_profile';
+            const isGuisisStudentNumber = ['guisis_student', 'guisis_addresses', 'guisis_personal_info'].includes(sourceField.value);
             if (searchLabel) {
                 searchLabel.textContent = isPuptasApplicant
                     ? 'Search by Student Number'
-                    : (isPuptasApplicantIdp ? 'Search by IDP User ID' : 'Search by name, email, or ID');
+                    : (isPuptasApplicantIdp
+                        ? 'Search by IDP User ID'
+                        : (isGuisisProfile ? 'Search by Student Email' : (isGuisisStudentNumber ? 'Search by Student Number' : 'Search by name, email, or ID')));
             }
             searchField.placeholder = isPuptasApplicant
                 ? 'Try a student number'
-                : (isPuptasApplicantIdp ? 'Try an IDP user ID' : 'Try a name, email address, or identifier');
+                : (isPuptasApplicantIdp
+                    ? 'Try an IDP user ID'
+                    : (isGuisisProfile ? 'Try a student email address' : (isGuisisStudentNumber ? 'Try a student number' : 'Try a name, email address, or identifier')));
         });
 
         syncSystemVisibility();

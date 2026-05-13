@@ -847,14 +847,21 @@
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.08em;
+        color: #ffffff !important;
     }
 
     .applicant-modal-head p {
         margin: 6px 0 0;
-        color: rgba(255, 255, 255, 0.92);
+        color: rgba(255, 255, 255, 0.92) !important;
         font-size: 12px;
         line-height: 1.55;
         max-width: 760px;
+    }
+
+    .applicant-modal-head-copy,
+    .applicant-modal-head-copy h3,
+    .applicant-modal-head-copy p {
+        color: #ffffff !important;
     }
 
     .applicant-modal-close {
@@ -936,6 +943,88 @@
         color: #7f1d1d;
     }
 
+    .applicant-biosync-visual {
+        position: relative;
+        min-height: 360px;
+        border-radius: 18px;
+        overflow: hidden;
+        background: radial-gradient(circle at top, #eff6ff 0%, #dbeafe 38%, #eef2ff 100%);
+        border: 1px dashed #93c5fd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 28px 24px;
+        text-align: center;
+    }
+
+    .applicant-biosync-ring {
+        position: relative;
+        width: 190px;
+        height: 190px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(219,234,254,0.9) 52%, rgba(191,219,254,0.72) 100%);
+        box-shadow:
+            inset 0 0 0 1px rgba(59, 130, 246, 0.16),
+            0 22px 42px rgba(59, 130, 246, 0.14);
+    }
+
+    .applicant-biosync-ring::before,
+    .applicant-biosync-ring::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        inset: -14px;
+        border: 1px solid rgba(59, 130, 246, 0.18);
+        animation: biosyncPulse 2.6s ease-in-out infinite;
+    }
+
+    .applicant-biosync-ring::after {
+        inset: -28px;
+        animation-delay: 1.2s;
+    }
+
+    .applicant-biosync-fingerprint {
+        width: 104px;
+        height: 104px;
+        color: #2563eb;
+        display: block;
+    }
+
+    .applicant-biosync-scanline {
+        position: absolute;
+        left: 20%;
+        right: 20%;
+        top: 50%;
+        height: 4px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(37,99,235,0) 0%, rgba(37,99,235,0.95) 50%, rgba(37,99,235,0) 100%);
+        box-shadow: 0 0 14px rgba(37,99,235,0.34);
+        animation: biosyncScan 2s ease-in-out infinite;
+    }
+
+    .applicant-biosync-copy {
+        margin-top: 28px;
+        max-width: 320px;
+    }
+
+    .applicant-biosync-copy h4 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .applicant-biosync-copy p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.65;
+        color: #475569;
+    }
+
     html[data-theme="dark"] .applicant-modal-shell {
         background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.96));
         border-color: rgba(148, 163, 184, 0.16);
@@ -953,6 +1042,41 @@
 
     html[data-theme="dark"] .applicant-modal-panel .manual-toggle-label {
         color: #facc15;
+    }
+
+    html[data-theme="dark"] .applicant-biosync-visual {
+        background: radial-gradient(circle at top, rgba(30,41,59,0.98) 0%, rgba(15,23,42,0.94) 38%, rgba(17,24,39,0.96) 100%);
+        border-color: rgba(96, 165, 250, 0.22);
+    }
+
+    html[data-theme="dark"] .applicant-biosync-ring {
+        background: radial-gradient(circle, rgba(30,41,59,0.98) 0%, rgba(30,64,175,0.18) 52%, rgba(30,41,59,0.92) 100%);
+        box-shadow:
+            inset 0 0 0 1px rgba(96, 165, 250, 0.18),
+            0 22px 42px rgba(0, 0, 0, 0.26);
+    }
+
+    html[data-theme="dark"] .applicant-biosync-fingerprint {
+        color: #93c5fd;
+    }
+
+    html[data-theme="dark"] .applicant-biosync-copy h4 {
+        color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .applicant-biosync-copy p {
+        color: #cbd5e1;
+    }
+
+    @keyframes biosyncPulse {
+        0%, 100% { transform: scale(1); opacity: 0.45; }
+        50% { transform: scale(1.04); opacity: 0.9; }
+    }
+
+    @keyframes biosyncScan {
+        0% { top: 28%; opacity: 0.72; }
+        50% { top: 72%; opacity: 1; }
+        100% { top: 28%; opacity: 0.72; }
     }
 
     .registration-hub {
@@ -1414,7 +1538,7 @@
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
-    $currentMode = in_array($mode ?? '', ['scan', 'assisted', 'applicant', 'registration', 'fingerprint'], true) ? $mode : '';
+    $currentMode = in_array($mode ?? '', ['assisted', 'registration', 'fingerprint'], true) ? $mode : '';
     $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
     $idpClientId = trim((string) config('services.idp.client_id', ''));
     $portalRegisterUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
@@ -1467,7 +1591,7 @@
                 </div>
             </a>
 
-            <a href="{{ url()->current() }}?mode=scan" class="intake-option-link">
+            <a href="#" class="intake-option-link" id="openScanLookupModal">
                 <div class="intake-option-card intake-option-scan {{ $currentMode === 'scan' ? 'is-active' : '' }}">
                     <span class="intake-option-chip" aria-hidden="true">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -1576,37 +1700,52 @@
                     </div>
 
                     <div class="applicant-modal-panel">
-                        <div id="ocrResultPanel" class="ocr-result-panel">
-                            <p class="ocr-result-help">Review the extracted values below. Staff can correct them before confirming the patient record.</p>
+                        <div id="applicantOcrReviewPanel">
+                            <div id="ocrResultPanel" class="ocr-result-panel">
+                                <p class="ocr-result-help">Review the extracted values below. Staff can correct them before confirming the patient record.</p>
 
-                            <div class="ocr-result-grid">
-                                <div>
-                                    <p class="ocr-result-label">Detected Student Number</p>
-                                    <input type="text" id="ocr_student_number" class="form-control" placeholder="Student number from ID card" style="margin-bottom:0;">
+                                <div class="ocr-result-grid">
+                                    <div>
+                                        <p class="ocr-result-label">Detected Student Number</p>
+                                        <input type="text" id="ocr_student_number" class="form-control" placeholder="Student number from ID card" style="margin-bottom:0;">
+                                    </div>
+                                    <div>
+                                        <p class="ocr-result-label">Detected Student Name</p>
+                                        <input type="text" id="ocr_student_name" class="form-control" placeholder="Full name from ID card" style="margin-bottom:0;">
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="ocr-result-label">Detected Student Name</p>
-                                    <input type="text" id="ocr_student_name" class="form-control" placeholder="Full name from ID card" style="margin-bottom:0;">
+
+                                <div id="ocrStatus" class="ocr-status info" style="display:block;">AI verification could not finish right now.</div>
+                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    <div id="ocrConfidenceText" class="ocr-meta">Student no. confidence: 10%</div>
+                                    <div id="ocrLockBadge" class="ocr-lock-badge" style="display:none;">Locked on ID</div>
+                                </div>
+
+                                <div class="ocr-actions" style="margin-top:14px;">
+                                    <button type="button" id="btnConfirmOcr" class="btn-ocr btn-ocr-secondary" disabled>Confirm & Continue</button>
                                 </div>
                             </div>
 
-                            <div id="ocrStatus" class="ocr-status info" style="display:block;">AI verification could not finish right now.</div>
-                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                <div id="ocrConfidenceText" class="ocr-meta">Student no. confidence: 10%</div>
-                                <div id="ocrLockBadge" class="ocr-lock-badge" style="display:none;">Locked on ID</div>
-                            </div>
-
-                            <div class="ocr-actions" style="margin-top:14px;">
-                                <button type="button" id="btnConfirmOcr" class="btn-ocr btn-ocr-secondary" disabled>Confirm & Continue</button>
+                            <div class="manual-input-stack">
+                                <p class="manual-toggle-label">Type Student Number Manually</p>
+                                <form id="walkinFormManual">
+                                    <input type="text" id="student_id_manual" placeholder="Enter student number" class="form-control" style="margin-bottom:10px;" required>
+                                    <button type="submit" class="manual-find-btn">Find</button>
+                                </form>
                             </div>
                         </div>
 
-                        <div class="manual-input-stack">
-                            <p class="manual-toggle-label">Type Student Number Manually</p>
-                            <form id="walkinFormManual">
-                                <input type="text" id="student_id_manual" placeholder="Enter student number" class="form-control" style="margin-bottom:10px;" required>
-                                <button type="submit" class="manual-find-btn">Find</button>
-                            </form>
+                        <div id="applicantBioSyncInfoPanel" class="applicant-biosync-visual" style="display:none;">
+                            <div class="applicant-biosync-ring">
+                                <svg class="applicant-biosync-fingerprint" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33" />
+                                </svg>
+                                <div class="applicant-biosync-scanline"></div>
+                            </div>
+                            <div class="applicant-biosync-copy">
+                                <h4>BioSync Scanner Active</h4>
+                                <p>The applicant biometric verification panel is now active. Keep the scanner ready while we prepare the fingerprint capture workflow.</p>
+                            </div>
                         </div>
 
                         <canvas id="ocrCanvas" style="display:none;"></canvas>
@@ -1900,7 +2039,7 @@
     let autoProceedInFlight = false;
     let lastAutoProceedKey = '';
     const initialMode = @json($currentMode);
-    let intakeTarget = initialMode === 'applicant' ? 'assessment' : 'consultation';
+    let intakeTarget = 'consultation';
     let scanMethod = 'ocr';
     const liveOcrIntervalMs = 900;
     const ocrCanvasScale = 1;
@@ -1937,14 +2076,11 @@
 
     $(document).ready(function() {
         const applicantScanModal = document.getElementById('applicantScanModal');
+        const openScanLookupModalBtn = document.getElementById('openScanLookupModal');
         const openApplicantScanModalBtn = document.getElementById('openApplicantScanModal');
         const closeApplicantScanModalBtn = document.getElementById('closeApplicantScanModal');
 
         updateScanModeUI();
-
-        if (initialMode === 'scan' || initialMode === 'applicant') {
-            startMainScanner();
-        }
 
         function getDestinationLabel() {
             return intakeTarget === 'assessment' ? 'medical assessment form' : 'consultation form';
@@ -2590,6 +2726,8 @@
             $('#manualInputArea').toggle(!isBioSync && $('#manualInputArea').is(':visible'));
             const keepResultPanelVisible = intakeTarget === 'assessment';
             $('#ocrResultPanel').toggle(!isBioSync && ($('#ocrResultPanel').is(':visible') || keepResultPanelVisible));
+            $('#applicantOcrReviewPanel').toggle(!isBioSync);
+            $('#applicantBioSyncInfoPanel').toggle(isBioSync);
 
             if (isBioSync) {
                 stopLiveOcr();
@@ -2598,8 +2736,8 @@
             }
         }
 
-        function openApplicantScanModal() {
-            intakeTarget = 'assessment';
+        function openIntakeScanModal(target = 'consultation') {
+            intakeTarget = target;
             scanMethod = 'ocr';
             manualStudentNumberEdited = false;
             manualStudentNameEdited = false;
@@ -2625,10 +2763,17 @@
             stopMainScanner();
         }
 
+        if (openScanLookupModalBtn) {
+            openScanLookupModalBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                openIntakeScanModal('consultation');
+            });
+        }
+
         if (openApplicantScanModalBtn) {
             openApplicantScanModalBtn.addEventListener('click', function (event) {
                 event.preventDefault();
-                openApplicantScanModal();
+                openIntakeScanModal('assessment');
             });
         }
 

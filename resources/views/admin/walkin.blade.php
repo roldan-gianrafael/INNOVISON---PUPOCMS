@@ -1693,9 +1693,7 @@
                     </div>
                 </div>
                 <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
+                    <x-outline-icon name="x-mark" />
                 </button>
             </div>
             <div class="applicant-modal-body">
@@ -1785,8 +1783,8 @@
                                 <div class="applicant-biosync-scanline"></div>
                             </div>
                             <div class="applicant-biosync-copy">
-                                <h4>BioSync Scanner Active</h4>
-                                <p>The applicant biometric verification panel is now active. Keep the scanner ready while we prepare the fingerprint capture workflow.</p>
+                                <h4>BioSync Scanner Pending</h4>
+                                <p>The applicant biometric verification panel is not yet active. Keep the scanner ready while we prepare the fingerprint capture workflow.</p>
                             </div>
                         </div>
 

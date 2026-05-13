@@ -801,6 +801,7 @@
         background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.98));
         box-shadow: 0 26px 60px rgba(15, 23, 42, 0.24);
         border: 1px solid rgba(255,255,255,0.62);
+        border-bottom: 4px solid #70131B;
     }
 
     .applicant-modal-head {

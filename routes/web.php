@@ -75,6 +75,12 @@ Route::middleware(['auth:student', 'audit'])->group(function () {
 });
 
 Route::middleware(['auth:admin', 'audit'])->group(function () {
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/assistant/choose-portal', [LoginController::class, 'showStudentAssistantPortalChooser'])->name('assistant.choose-portal');
+        Route::get('/assistant/enter-student', [LoginController::class, 'enterStudentPortal'])->name('assistant.enter-student');
+        Route::get('/assistant/enter-admin', [LoginController::class, 'enterAdminPortal'])->name('assistant.enter-admin');
+    });
+
     Route::get('/health-records', [AdminController::class, 'viewHealth'])
         ->middleware('role:superadmin,admin')
         ->name('admin.health_records');

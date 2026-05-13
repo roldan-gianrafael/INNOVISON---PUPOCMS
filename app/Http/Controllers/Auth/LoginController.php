@@ -362,7 +362,7 @@ class LoginController extends Controller
 
         if ($normalizedRole === User::ROLE_ADMIN) {
             if ($this->isStudentAssistantAccount($user)) {
-                return '/assistant/dashboard';
+                return '/assistant/choose-portal';
             }
 
             $linkedAdmin = $this->findLinkedAdminProfile($user);
@@ -376,6 +376,39 @@ class LoginController extends Controller
         }
 
         return '/student/home';
+    }
+
+    public function showStudentAssistantPortalChooser()
+    {
+        $user = $this->authenticatedUser();
+        abort_unless($user instanceof User && $this->isStudentAssistantAccount($user), 403);
+
+        return view('auth.student-assistant-portal', [
+            'user' => $user,
+        ]);
+    }
+
+    public function enterStudentPortal(Request $request)
+    {
+        $user = $this->authenticatedUser();
+        abort_unless($user instanceof User && $this->isStudentAssistantAccount($user), 403);
+
+        Auth::guard($this->studentGuardName())->login($user);
+        Auth::shouldUse($this->studentGuardName());
+        $this->queueHealthProfilePrompt($request, $user, '/student/home');
+
+        return redirect('/student/home');
+    }
+
+    public function enterAdminPortal()
+    {
+        $user = $this->authenticatedUser();
+        abort_unless($user instanceof User && $this->isStudentAssistantAccount($user), 403);
+
+        Auth::guard($this->adminGuardName())->login($user);
+        Auth::shouldUse($this->adminGuardName());
+
+        return redirect('/assistant/dashboard');
     }
 
     private function idpUrl(string $path): ?string

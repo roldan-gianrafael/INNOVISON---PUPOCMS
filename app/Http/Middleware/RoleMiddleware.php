@@ -44,6 +44,10 @@ class RoleMiddleware
             return true;
         }
 
+        if (in_array(User::ROLE_STUDENT, $allowedRoles, true) && $this->isStudentAssistantPortalUser($user)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -69,6 +73,17 @@ class RoleMiddleware
         $accessLevel = strtolower(trim((string) ($linkedAdmin?->access_level ?? '')));
 
         return in_array($accessLevel, ['clinic_staff', 'clinic staff', 'staff'], true);
+    }
+
+    private function isStudentAssistantPortalUser($user): bool
+    {
+        if (!$user || User::normalizeRole((string) ($user->user_role ?? '')) !== User::ROLE_ADMIN) {
+            return false;
+        }
+
+        $userType = strtolower(trim((string) ($user->user_type ?? '')));
+
+        return in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true);
     }
 
     private function findLinkedAdminProfile($user): ?Admin

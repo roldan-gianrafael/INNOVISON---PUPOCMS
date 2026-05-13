@@ -1053,7 +1053,7 @@
         </div>
         <div class="um-modal-body">
             <form class="um-search" method="GET" action="{{ route('admin.user-management.admin-hub') }}">
-                <input type="hidden" name="management_view" value="{{ $managementView ?: 'account-access' }}" id="lookupManagementViewField">
+                <input type="hidden" name="management_view" value="{{ $managementView ?: 'admin-hub' }}" id="lookupManagementViewField">
                 <input type="search" name="lookup_search" value="{{ $lookupSearch }}" placeholder="Search users by email, name, or ID" id="lookupSearchField">
                 <button class="um-btn um-btn-primary" type="submit">Search</button>
             </form>
@@ -1168,7 +1168,7 @@
                     <form method="POST" id="settingsForm">
                         @csrf
                         <input type="hidden" name="_method" id="settingsMethod" value="PUT">
-                        <input type="hidden" name="management_view" id="detailManagementView" value="account-access">
+                        <input type="hidden" name="management_view" id="detailManagementView" value="admin-hub">
                         <input type="hidden" name="lookup_source" id="detailLookupSource" value="">
                         <input type="hidden" name="first_name" id="detailFirstName" value="">
                         <input type="hidden" name="last_name" id="detailLastName" value="">
@@ -1207,14 +1207,14 @@
                     <form method="POST" id="deleteForm" style="margin-top: 10px;">
                         @csrf
                         @method('DELETE')
-                        <input type="hidden" name="management_view" id="deleteManagementView" value="account-access">
+                        <input type="hidden" name="management_view" id="deleteManagementView" value="admin-hub">
                         <input type="hidden" name="admin_profile_id" id="deleteAdminProfileId">
                     </form>
 
                     <form method="POST" id="deleteAdminHubForm" style="display:none;">
                         @csrf
                         @method('DELETE')
-                        <input type="hidden" name="management_view" id="deleteAdminHubManagementView" value="account-access">
+                        <input type="hidden" name="management_view" id="deleteAdminHubManagementView" value="admin-hub">
                     </form>
                 </div>
             </div>

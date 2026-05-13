@@ -448,7 +448,7 @@ class AdminUserController extends Controller
         return $this->redirectToManagementView($request, 'success', 'Admin Hub profile updated successfully.');
     }
 
-    public function destroyAdminHub(Admin $admin)
+    public function destroyAdminHub(Request $request, Admin $admin)
     {
         $this->ensureCanManageUsers();
 

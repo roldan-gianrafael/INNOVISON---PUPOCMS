@@ -153,12 +153,28 @@ class GuisisApiService
         }
 
         $payload = $response->json();
-        $token = trim((string) ($payload['accessToken'] ?? $payload['access_token'] ?? ''));
+        $token = trim((string) (
+            data_get($payload, 'accessToken')
+            ?? data_get($payload, 'access_token')
+            ?? data_get($payload, 'token')
+            ?? data_get($payload, 'data.accessToken')
+            ?? data_get($payload, 'data.access_token')
+            ?? data_get($payload, 'data.token')
+            ?? ''
+        ));
         if ($token === '') {
-            throw new \RuntimeException('GuiSIS access token response did not include accessToken.');
+            throw new \RuntimeException(
+                'GuiSIS access token response did not include accessToken. Raw token response: ' . $response->body()
+            );
         }
 
-        $expiresIn = (int) ($payload['expiresIn'] ?? $payload['expires_in'] ?? 3600);
+        $expiresIn = (int) (
+            data_get($payload, 'expiresIn')
+            ?? data_get($payload, 'expires_in')
+            ?? data_get($payload, 'data.expiresIn')
+            ?? data_get($payload, 'data.expires_in')
+            ?? 3600
+        );
         Cache::put($cacheKey, $token, now()->addSeconds(max(60, $expiresIn - 60)));
 
         return [

@@ -805,6 +805,7 @@
     }
 
     .applicant-modal-head {
+        position: relative;
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
@@ -822,14 +823,16 @@
     }
 
     .applicant-modal-head-actions {
-        flex: 1 1 auto;
-        min-width: 0;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         display: flex;
         align-items: center;
-        justify-content: flex-end;
+        justify-content: center;
         gap: 10px;
-        align-self: center;
-        margin-left: 10px;
+        min-width: max-content;
+        z-index: 1;
     }
 
     .applicant-modal-head-badge {
@@ -1787,7 +1790,7 @@
                 <div class="applicant-modal-head-actions">
                     <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12m-4.5 4.5h13.5a4.5 4.5 0 0 0 0-9H9m0 0L13.5 3M9 7.5 4.5 12" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                         </svg>
                         <span>Switch to BioSync</span>
                     </button>

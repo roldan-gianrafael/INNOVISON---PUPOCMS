@@ -472,7 +472,7 @@ class AdminUserController extends Controller
         return $this->redirectToManagementView($request, 'success', 'Admin Hub access removed successfully.');
     }
 
-    public function deleteAdminHubRecord(Admin $admin)
+    public function deleteAdminHubRecord(Request $request, Admin $admin)
     {
         $this->ensureCanManageUsers();
 
@@ -493,7 +493,7 @@ class AdminUserController extends Controller
         return $this->redirectToManagementView($request, 'success', 'Admin Hub record deleted successfully.');
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
         $this->ensureCanManageUsers();
 

@@ -1052,7 +1052,7 @@
             <button type="button" class="um-btn um-btn-soft" data-close-lookup>Close</button>
         </div>
         <div class="um-modal-body">
-            <form class="um-search" method="GET" action="{{ route('admin.user-management') }}">
+            <form class="um-search" method="GET" action="{{ route('admin.user-management.admin-hub') }}">
                 <input type="hidden" name="management_view" value="{{ $managementView ?: 'account-access' }}" id="lookupManagementViewField">
                 <input type="search" name="lookup_search" value="{{ $lookupSearch }}" placeholder="Search users by email, name, or ID" id="lookupSearchField">
                 <button class="um-btn um-btn-primary" type="submit">Search</button>

@@ -26,14 +26,20 @@
 
     .um-hero h1 {
         margin: 0;
-        font-size: 1.85rem;
+        font-size: 1.55rem;
         font-weight: 800;
         color: #111827;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 18px;
+        gap: 8px;
+        padding: 8px 14px;
         border-bottom: 2px solid rgba(112, 19, 27, 0.72);
+    }
+
+    .um-hero h1 svg {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
     }
 
     .um-hero p {
@@ -54,12 +60,12 @@
         overflow: hidden;
         padding: 28px 24px 30px;
         border-radius: 28px;
-        border: 1px solid rgba(234, 179, 8, 0.42);
+        border: 1px solid rgba(128, 0, 0, 0.14);
         background: linear-gradient(145deg, #ffffff 0%, #f8fafc 48%, #e5e7eb 100%);
         box-shadow:
-            0 0 0 1px rgba(250, 204, 21, 0.12),
-            0 24px 38px rgba(234, 179, 8, 0.18),
-            0 52px 72px -38px rgba(202, 138, 4, 0.36);
+            0 0 0 1px rgba(112, 19, 27, 0.06),
+            0 24px 38px rgba(112, 19, 27, 0.10),
+            0 52px 72px -38px rgba(15, 23, 42, 0.24);
         color: inherit;
         transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
     }
@@ -87,27 +93,11 @@
 
     .um-entry-card:hover {
         transform: translateY(-4px);
-        border-color: rgba(234, 179, 8, 0.62);
+        border-color: rgba(112, 19, 27, 0.26);
         box-shadow:
-            0 0 0 1px rgba(250, 204, 21, 0.22),
-            0 28px 44px rgba(234, 179, 8, 0.22),
-            0 58px 78px -38px rgba(202, 138, 4, 0.42);
-    }
-
-    .um-entry-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 12px;
-        border-radius: 999px;
-        background: rgba(241, 245, 249, 0.94);
-        color: #64748b;
-        font-size: .76rem;
-        font-weight: 900;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        position: relative;
-        z-index: 1;
+            0 0 0 1px rgba(112, 19, 27, 0.12),
+            0 28px 44px rgba(112, 19, 27, 0.14),
+            0 58px 78px -38px rgba(15, 23, 42, 0.28);
     }
 
     .um-entry-icon {
@@ -118,12 +108,12 @@
         justify-content: center;
         border-radius: 22px;
         margin: 18px 0 12px;
-        color: #111827;
-        background: linear-gradient(145deg, rgba(254, 240, 138, 0.98), rgba(250, 204, 21, 0.9));
-        border: 1px solid rgba(234, 179, 8, 0.34);
+        color: #ffffff;
+        background: linear-gradient(145deg, rgba(128, 0, 0, 0.96), rgba(112, 19, 27, 0.92));
+        border: 1px solid rgba(112, 19, 27, 0.30);
         box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.96),
-            0 18px 28px rgba(234, 179, 8, 0.18);
+            inset 0 1px 0 rgba(255,255,255,0.18),
+            0 18px 28px rgba(112, 19, 27, 0.22);
         position: relative;
         z-index: 1;
         animation: umEntryFloat 3.8s ease-in-out infinite;
@@ -199,11 +189,11 @@
 
     html[data-theme="dark"] .um-entry-card {
         background: linear-gradient(145deg, #5f0012 0%, #7d0b17 45%, #5a0010 100%);
-        border-color: rgba(255, 214, 102, 0.5);
+        border-color: rgba(148, 163, 184, 0.14);
         box-shadow:
-            0 0 0 1px rgba(255, 214, 102, 0.16),
+            0 0 0 1px rgba(148, 163, 184, 0.08),
             0 24px 38px rgba(95, 0, 18, 0.34),
-            0 52px 72px -38px rgba(193, 138, 16, 0.56);
+            0 52px 72px -38px rgba(0, 0, 0, 0.52);
     }
 
     html[data-theme="dark"] .um-entry-card::before {
@@ -219,25 +209,20 @@
     }
 
     html[data-theme="dark"] .um-entry-card:hover {
-        border-color: rgba(255, 214, 102, 0.68);
+        border-color: rgba(240, 209, 90, 0.24);
         background: linear-gradient(145deg, #6d0014 0%, #8a0d19 42%, #670012 100%);
         box-shadow:
-            0 0 0 1px rgba(255, 214, 102, 0.22),
+            0 0 0 1px rgba(240, 209, 90, 0.10),
             0 26px 40px rgba(95, 0, 18, 0.38),
             0 56px 76px -38px rgba(193, 138, 16, 0.52);
     }
 
-    html[data-theme="dark"] .um-entry-chip {
-        background: rgba(193, 138, 16, 0.22);
-        color: #ffd86b;
-    }
-
     html[data-theme="dark"] .um-entry-icon {
-        background: linear-gradient(145deg, rgba(255, 214, 102, 0.26), rgba(193, 138, 16, 0.52));
-        border-color: rgba(255, 214, 102, 0.34);
-        color: #111827;
+        background: linear-gradient(145deg, rgba(128, 0, 0, 0.92), rgba(95, 0, 18, 0.88));
+        border-color: rgba(240, 209, 90, 0.22);
+        color: #f8fafc;
         box-shadow:
-            inset 0 1px 0 rgba(255, 210, 90, 0.12),
+            inset 0 1px 0 rgba(255,255,255,0.12),
             0 18px 28px rgba(95, 0, 18, 0.28);
     }
 
@@ -273,7 +258,6 @@
 
     <div class="um-entry-grid">
         <a href="{{ route('admin.user-management.account-access') }}" class="um-entry-card">
-            <span class="um-entry-chip" aria-hidden="true">Users Table</span>
             <span class="um-entry-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -288,7 +272,6 @@
         </a>
 
         <a href="{{ route('admin.user-management.admin-hub') }}" class="um-entry-card">
-            <span class="um-entry-chip" aria-hidden="true">Admins Table</span>
             <span class="um-entry-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/>

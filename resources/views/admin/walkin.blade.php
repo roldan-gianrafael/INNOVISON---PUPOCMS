@@ -865,27 +865,65 @@
     }
 
     .applicant-modal-close {
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        padding: 0;
+        flex: 0 0 40px;
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.34);
-        background: rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
         color: #ffffff;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        font-weight: 700;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
         cursor: pointer;
-        transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
+    }
+
+    .applicant-modal-close::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+
+    .applicant-modal-close svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2.2;
+        flex: 0 0 auto;
     }
 
     .applicant-modal-close:hover,
     .applicant-modal-close:focus {
         transform: translateY(-1px);
-        background: rgba(255, 255, 255, 0.18);
-        border-color: rgba(255, 255, 255, 0.56);
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
         outline: none;
+    }
+
+    .applicant-modal-close:hover::after,
+    .applicant-modal-close:focus::after {
+        transform: translateX(135%);
     }
 
     .applicant-modal-body {
@@ -1654,7 +1692,11 @@
                         <p id="headerSubtitle">Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
                     </div>
                 </div>
-                <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">×</button>
+                <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                </button>
             </div>
             <div class="applicant-modal-body">
                 <div class="applicant-modal-grid">

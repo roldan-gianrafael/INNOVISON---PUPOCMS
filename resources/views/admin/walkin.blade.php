@@ -1079,6 +1079,37 @@
         box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24);
     }
 
+    html[data-theme="dark"] .applicant-modal-panel .scan-method-bar,
+    html[data-theme="dark"] .applicant-modal-panel .scan-surface {
+        background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(15, 23, 42, 0.94));
+        border-color: rgba(148, 163, 184, 0.18);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 12px 30px rgba(0, 0, 0, 0.20);
+    }
+
+    html[data-theme="dark"] .applicant-modal-panel .scan-method-title,
+    html[data-theme="dark"] .applicant-modal-panel .scan-method-note,
+    html[data-theme="dark"] .applicant-modal-panel .scan-inline-note {
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .applicant-modal-panel .scan-inline-note {
+        background: rgba(112, 19, 27, 0.32);
+        border-color: rgba(250, 204, 21, 0.22);
+    }
+
+    html[data-theme="dark"] .applicant-modal-panel .btn-scan-switch {
+        background: rgba(15, 23, 42, 0.86);
+        color: #f8fafc;
+        border-color: rgba(250, 204, 21, 0.28);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-theme="dark"] .applicant-modal-panel .scan-method-badge {
+        background: rgba(250, 204, 21, 0.16);
+        border-color: rgba(250, 204, 21, 0.28);
+        color: #fde68a;
+    }
+
     html[data-theme="dark"] .applicant-modal-panel .manual-input-stack {
         border-top-color: rgba(148, 163, 184, 0.18);
     }

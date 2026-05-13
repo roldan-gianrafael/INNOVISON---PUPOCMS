@@ -826,7 +826,7 @@
         min-width: 0;
         display: flex;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: flex-end;
         gap: 10px;
         align-self: center;
         margin-left: 10px;
@@ -876,6 +876,11 @@
         color: #ffffff !important;
     }
 
+    .applicant-modal-head-copy .scan-method-badge {
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+
     .applicant-modal-head-actions .btn-scan-switch {
         background: rgba(255, 255, 255, 0.96);
         color: #70131B;
@@ -884,6 +889,14 @@
         min-height: 44px;
         padding: 11px 18px;
         font-size: 13px;
+        gap: 8px;
+    }
+
+    .applicant-modal-head-actions .btn-scan-switch svg {
+        width: 15px;
+        height: 15px;
+        flex: 0 0 auto;
+        stroke-width: 2.2;
     }
 
     .applicant-modal-head-actions .scan-method-badge {
@@ -1766,13 +1779,18 @@
                 <div class="applicant-modal-head-main">
                     <div id="headerIcon" class="applicant-modal-head-badge">AP</div>
                     <div class="applicant-modal-head-copy">
-                        <h3 id="headerTitle">Applicant Scan Ready</h3>
+                        <h3 id="headerTitle">OCR Ready</h3>
+                        <span id="scanMethodBadge" class="scan-method-badge">OCR Active</span>
                         <p id="headerSubtitle">Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
                     </div>
                 </div>
                 <div class="applicant-modal-head-actions">
-                    <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">Switch to BioSync</button>
-                    <span id="scanMethodBadge" class="scan-method-badge">OCR Active</span>
+                    <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12m-4.5 4.5h13.5a4.5 4.5 0 0 0 0-9H9m0 0L13.5 3M9 7.5 4.5 12" />
+                        </svg>
+                        <span>Switch to BioSync</span>
+                    </button>
                 </div>
                 <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">
                     <x-outline-icon name="x-mark" />
@@ -2816,8 +2834,8 @@
                         : 'Use the live camera feed to extract the printed student number from the physical ID card, then fill the saved name from records.'
             );
             $('#scanMethodBadge').text(isBioSync ? 'BioSync Active' : 'OCR Active');
-            $('#btnSwitchScanMode').text(isBioSync ? 'Switch to OCR Scan' : 'Switch to BioSync');
-            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : (isApplicantFlow ? 'Applicant Scan Ready' : 'OCR Ready'));
+            $('#btnSwitchScanMode span').text(isBioSync ? 'Switch to OCR Scan' : 'Switch to BioSync');
+            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : 'OCR Ready');
             $('#headerSubtitle').text(
                 isBioSync
                     ? ''

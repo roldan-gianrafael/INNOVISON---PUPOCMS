@@ -238,7 +238,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding: 18px 20px 0;
+        padding: 18px 20px 12px;
     }
 
     .um-panel-header h2 {

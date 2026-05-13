@@ -71,7 +71,12 @@ class AdminUserController extends Controller
             ->values()
             ->all();
 
-        $adminHubRecords = $this->collectAdminHubProfiles($lookupSearch);
+        $facultyDirectory = collect($allFacultyUsers)
+            ->filter(fn (array $record) => ($record['source'] ?? '') === 'faculty')
+            ->values()
+            ->all();
+
+        $adminHubRecords = $this->collectAdminHubProfiles($lookupSearch, $facultyDirectory);
 
         $lookupRecords = $lookupSearch !== ''
             ? collect($this->collectLocalUsers($lookupSearch))
@@ -699,11 +704,21 @@ class AdminUserController extends Controller
             ->all();
     }
 
-    private function collectAdminHubProfiles(string $search = ''): array
+    private function collectAdminHubProfiles(string $search = '', array $facultyDirectory = []): array
     {
         if (!Schema::hasTable('admins')) {
             return [];
         }
+
+        $facultyByEmail = collect($facultyDirectory)
+            ->filter(fn (array $record) => trim(strtolower((string) ($record['email'] ?? ''))) !== '')
+            ->keyBy(fn (array $record) => trim(strtolower((string) ($record['email'] ?? ''))))
+            ->all();
+
+        $facultyByName = collect($facultyDirectory)
+            ->filter(fn (array $record) => trim(strtolower((string) ($record['name'] ?? ''))) !== '')
+            ->keyBy(fn (array $record) => trim(strtolower((string) ($record['name'] ?? ''))))
+            ->all();
 
         $query = Admin::query();
 
@@ -724,7 +739,7 @@ class AdminUserController extends Controller
         return $query->orderBy('name')
             ->limit(100)
             ->get()
-            ->map(function (Admin $admin) {
+            ->map(function (Admin $admin) use ($facultyByEmail, $facultyByName) {
                 $linkedUser = Admin::hasColumn('user_id') && $admin->user_id ? User::find($admin->user_id) : null;
                 $externalIdentifier = trim((string) ($admin->external_identifier ?? ''));
                 $displayName = trim((string) ($admin->name ?? ''));
@@ -735,10 +750,20 @@ class AdminUserController extends Controller
                     ])));
                 }
                 $email = trim((string) ($admin->email_address ?? $admin->email ?? ''));
+                $normalizedEmail = trim(strtolower($email));
+                $normalizedName = trim(strtolower($displayName));
+                $matchedFaculty = $normalizedEmail !== '' && isset($facultyByEmail[$normalizedEmail])
+                    ? $facultyByEmail[$normalizedEmail]
+                    : ($normalizedName !== '' && isset($facultyByName[$normalizedName]) ? $facultyByName[$normalizedName] : null);
+                $facultyIdentifier = trim((string) ($matchedFaculty['student_id'] ?? ''));
                 $status = strtolower(trim((string) ($admin->status ?? 'active')));
                 if ($status === '') {
                     $status = 'active';
                 }
+
+                $resolvedIdentifier = $externalIdentifier !== ''
+                    ? $externalIdentifier
+                    : ($facultyIdentifier !== '' ? $facultyIdentifier : (string) ($linkedUser?->student_id ?? ''));
 
                 return [
                     'id' => (string) $admin->admin_id,
@@ -748,7 +773,7 @@ class AdminUserController extends Controller
                     'name' => $displayName !== '' ? $displayName : ($email !== '' ? $email : 'Admin Hub Record'),
                     'first_name' => (string) ($admin->first_name ?? ''),
                     'last_name' => (string) ($admin->last_name ?? ''),
-                    'student_id' => $externalIdentifier !== '' ? $externalIdentifier : (string) ($linkedUser?->student_id ?? ''),
+                    'student_id' => $resolvedIdentifier,
                     'email' => $email,
                     'role' => 'Admin - Designee',
                     'raw_role' => 'admin',
@@ -767,7 +792,8 @@ class AdminUserController extends Controller
                         'admin_login_email' => $email,
                         'admin_profile_id' => $admin->admin_id,
                         'admin_profile_name' => $displayName,
-                        'external_identifier' => $externalIdentifier,
+                        'external_identifier' => $resolvedIdentifier,
+                        'faculty_identifier' => $facultyIdentifier,
                         'office' => (string) ($admin->office ?? ''),
                         'lookup_source' => 'admin-hub',
                         'updated_at' => optional($admin->updated_at)->toIso8601String(),

@@ -584,6 +584,7 @@ class AdminUserController extends Controller
                 $linkedAdmin = $this->findLinkedAdminProfile($user);
                 $rawRole = strtolower(trim((string) ($user->user_role ?? 'student')));
                 $role = User::normalizeRole($rawRole);
+                $source = $this->resolveUserSource($user);
                 $status = strtolower(trim((string) ($user->status ?? 'active')));
                 if ($status === '') {
                     $status = 'active';
@@ -598,16 +599,21 @@ class AdminUserController extends Controller
                 }
 
                 $studentPhoto = $user->healthProfile?->student_photo;
+                $studentNumber = trim((string) ($user->student_number ?? ''));
+                $studentId = trim((string) ($user->student_id ?? ''));
+                $resolvedIdentifier = $source === 'student_assistant' && $studentNumber !== ''
+                    ? $studentNumber
+                    : $studentId;
 
                 return [
                     'id' => (string) $user->id,
                     'record_id' => (string) $user->id,
-                    'source' => $this->resolveUserSource($user),
+                    'source' => $source,
                     'source_label' => $this->resolveUserSourceLabel($user),
                     'name' => $displayName !== '' ? $displayName : ($user->email ?? 'Unknown User'),
                     'first_name' => (string) ($user->first_name ?? ''),
                     'last_name' => (string) ($user->last_name ?? ''),
-                    'student_id' => (string) ($user->student_id ?? ''),
+                    'student_id' => $resolvedIdentifier,
                     'email' => (string) ($user->email ?? ''),
                     'role' => $this->resolveRoleLabel($rawRole, $linkedAdmin),
                     'raw_role' => $rawRole,
@@ -622,6 +628,7 @@ class AdminUserController extends Controller
                         'course' => (string) ($user->course ?? ''),
                         'year' => (string) ($user->year ?? ''),
                         'section' => (string) ($user->section ?? ''),
+                        'student_number' => $studentNumber,
                         'DOB' => (string) ($user->DOB ?? ''),
                         'gender' => (string) ($user->gender ?? ''),
                         'contact_no' => (string) ($user->contact_no ?? ''),

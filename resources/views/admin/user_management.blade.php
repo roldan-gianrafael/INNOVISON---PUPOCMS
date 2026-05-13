@@ -49,7 +49,8 @@
 
     .um-entry-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(280px, 360px));
+        justify-content: center;
         gap: 22px;
     }
 
@@ -58,6 +59,8 @@
         text-decoration: none;
         position: relative;
         overflow: hidden;
+        width: min(360px, 100%);
+        min-height: 360px;
         padding: 28px 24px 30px;
         border-radius: 28px;
         border: 1px solid rgba(128, 0, 0, 0.14);
@@ -68,6 +71,7 @@
             0 52px 72px -38px rgba(15, 23, 42, 0.24);
         color: inherit;
         transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
+        justify-self: center;
     }
 
     .um-entry-card::before {

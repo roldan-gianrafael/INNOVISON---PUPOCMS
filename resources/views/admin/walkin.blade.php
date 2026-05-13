@@ -821,6 +821,16 @@
         min-width: 0;
     }
 
+    .applicant-modal-head-actions {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        align-self: center;
+    }
+
     .applicant-modal-head-badge {
         width: 46px;
         height: 46px;
@@ -863,6 +873,20 @@
     .applicant-modal-head-copy h3,
     .applicant-modal-head-copy p {
         color: #ffffff !important;
+    }
+
+    .applicant-modal-head-actions .btn-scan-switch {
+        background: rgba(255, 255, 255, 0.96);
+        color: #70131B;
+        border-color: rgba(255, 255, 255, 0.86);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+    }
+
+    .applicant-modal-head-actions .scan-method-badge {
+        margin-top: 0;
+        background: rgba(255, 244, 214, 0.96);
+        border-color: rgba(254, 215, 170, 0.94);
+        color: #9a3412;
     }
 
     .applicant-modal-close {
@@ -1106,6 +1130,19 @@
     }
 
     html[data-theme="dark"] .applicant-modal-panel .scan-method-badge {
+        background: rgba(250, 204, 21, 0.16);
+        border-color: rgba(250, 204, 21, 0.28);
+        color: #fde68a;
+    }
+
+    html[data-theme="dark"] .applicant-modal-head-actions .btn-scan-switch {
+        background: rgba(15, 23, 42, 0.86);
+        color: #f8fafc;
+        border-color: rgba(250, 204, 21, 0.28);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-theme="dark"] .applicant-modal-head-actions .scan-method-badge {
         background: rgba(250, 204, 21, 0.16);
         border-color: rgba(250, 204, 21, 0.28);
         color: #fde68a;
@@ -1729,6 +1766,10 @@
                         <p id="headerSubtitle">Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
                     </div>
                 </div>
+                <div class="applicant-modal-head-actions">
+                    <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">Switch to BioSync</button>
+                    <span id="scanMethodBadge" class="scan-method-badge">OCR Active</span>
+                </div>
                 <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">
                     <x-outline-icon name="x-mark" />
                 </button>
@@ -1738,15 +1779,6 @@
                     <div class="applicant-modal-panel">
                         <div id="scanForm">
                             <div id="scanStage" class="scan-stage">
-                                <div class="scan-method-bar">
-                                    <div>
-                                        <p id="scanMethodTitle" class="scan-method-title">OCR ID Scan</p>
-                                        <p id="scanMethodNote" class="scan-method-note">Use the live camera feed to extract the applicant student number from the ID card, then proceed to Medical Assessment.</p>
-                                        <span id="scanMethodBadge" class="scan-method-badge">OCR Active</span>
-                                    </div>
-                                    <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">Switch to BioSync</button>
-                                </div>
-
                                 <div id="scanner-container-scan" class="scan-surface" style="position: relative;">
                                     <p id="scanInlineNote" class="scan-inline-note">OCR mode is active. Align the physical ID inside the frame and continue once student number and name are matched for Medical Assessment.</p>
                                     <div id="barcodeScanPanel">

@@ -320,7 +320,7 @@
         <section class="chooser-card">
             <div class="chooser-hero-mark" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a8.97 8.97 0 0 0 3.74-.8 4.5 4.5 0 0 0-7.48-2.33m3.74 3.13a9.06 9.06 0 0 1-6 0m6 0a8.96 8.96 0 0 1-6 0m0 0a8.97 8.97 0 0 1-3.74-.8 4.5 4.5 0 0 1 7.48-2.33M12 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                 </svg>
             </div>
             <div class="chooser-kicker">Student Assistant Portal</div>
@@ -339,7 +339,7 @@
                         <span class="chooser-chip">Portal Choice</span>
                         <div class="chooser-icon" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a8.97 8.97 0 0 0 3.74-.8 4.5 4.5 0 0 0-7.48-2.33m3.74 3.13a9.06 9.06 0 0 1-6 0m6 0a8.96 8.96 0 0 1-6 0m0 0a8.97 8.97 0 0 1-3.74-.8 4.5 4.5 0 0 1 7.48-2.33M12 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                             </svg>
                         </div>
                         <div>

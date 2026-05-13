@@ -813,6 +813,34 @@
         color: #ffffff;
     }
 
+    .applicant-modal-head-main {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        min-width: 0;
+    }
+
+    .applicant-modal-head-badge {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 auto;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+    }
+
+    .applicant-modal-head-copy {
+        min-width: 0;
+    }
+
     .applicant-modal-head h3 {
         margin: 0;
         font-size: 1rem;
@@ -1495,21 +1523,16 @@
     <div class="applicant-modal-backdrop" id="applicantScanModal">
         <div class="applicant-modal-shell">
             <div class="applicant-modal-head">
-                <div>
-                    <h3>Applicant Scan Ready</h3>
-                    <p>Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
+                <div class="applicant-modal-head-main">
+                    <div id="headerIcon" class="applicant-modal-head-badge">AP</div>
+                    <div class="applicant-modal-head-copy">
+                        <h3 id="headerTitle">Applicant Scan Ready</h3>
+                        <p id="headerSubtitle">Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
+                    </div>
                 </div>
                 <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">×</button>
             </div>
             <div class="applicant-modal-body">
-                <div id="dynamicHeader" class="mode-header bg-scan" style="margin-bottom:18px;">
-                    <div id="headerIcon" class="mode-header-badge">AP</div>
-                    <div class="mode-header-copy">
-                        <h3 id="headerTitle" style="margin: 0; font-weight: 800; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">Applicant Scan Ready</h3>
-                        <p id="headerSubtitle">Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
-                    </div>
-                </div>
-
                 <div class="applicant-modal-grid">
                     <div class="applicant-modal-panel">
                         <div id="scanForm">
@@ -2524,7 +2547,6 @@
         function showRegisterUI(scannedId = '') {
             $('#scanForm').hide();
             $('#registerForm').show();
-            $('#dynamicHeader').removeClass('bg-scan').addClass('bg-register');
             $('#headerTitle').text('Assisted Intake Ready');
             $('#headerIcon').text('ASSIST');
             if(scannedId) {

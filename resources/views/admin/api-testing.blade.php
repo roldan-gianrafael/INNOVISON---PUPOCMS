@@ -631,6 +631,26 @@
             </div>
         @endif
 
+        @php
+            $apiTestingCurrentSource = $source ?? 'faculty';
+            $apiTestingSearchLabel = 'Search by name, email, or ID';
+            $apiTestingSearchPlaceholder = 'Try a name, email address, or identifier';
+
+            if ($apiTestingCurrentSource === 'puptas_applicant') {
+                $apiTestingSearchLabel = 'Search by Student Number';
+                $apiTestingSearchPlaceholder = 'Try a student number';
+            } elseif ($apiTestingCurrentSource === 'puptas_applicant_idp') {
+                $apiTestingSearchLabel = 'Search by IDP User ID';
+                $apiTestingSearchPlaceholder = 'Try an IDP user ID';
+            } elseif ($apiTestingCurrentSource === 'guisis_profile') {
+                $apiTestingSearchLabel = 'Search by Student Email';
+                $apiTestingSearchPlaceholder = 'Try a student email address';
+            } elseif (in_array($apiTestingCurrentSource, ['guisis_student', 'guisis_addresses', 'guisis_personal_info'], true)) {
+                $apiTestingSearchLabel = 'Search by Student Number';
+                $apiTestingSearchPlaceholder = 'Try a student number';
+            }
+        @endphp
+
         <form method="GET" class="api-search-form" id="apiTestingForm">
             <div>
                 <label for="source">API Source</label>
@@ -661,13 +681,13 @@
                 </select>
             </div>
             <div>
-                <label for="search">{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Search by Student Number' : (($source ?? 'faculty') === 'puptas_applicant_idp' ? 'Search by IDP User ID' : (($source ?? 'faculty') === 'guisis_profile' ? 'Search by Student Email' : (in_array(($source ?? 'faculty'), ['guisis_student', 'guisis_addresses', 'guisis_personal_info'], true) ? 'Search by Student Number' : 'Search by name, email, or ID')))) }}</label>
+                <label for="search">{{ $apiTestingSearchLabel }}</label>
                 <input
                     type="text"
                     id="search"
                     name="search"
                     value="{{ $search }}"
-                    placeholder="{{ ($source ?? 'faculty') === 'puptas_applicant' ? 'Try a student number' : (($source ?? 'faculty') === 'puptas_applicant_idp' ? 'Try an IDP user ID' : (($source ?? 'faculty') === 'guisis_profile' ? 'Try a student email address' : (in_array(($source ?? 'faculty'), ['guisis_student', 'guisis_addresses', 'guisis_personal_info'], true) ? 'Try a student number' : 'Try a name, email address, or identifier')))) }}"
+                    placeholder="{{ $apiTestingSearchPlaceholder }}"
                 >
             </div>
             <button type="submit">Search API's</button>

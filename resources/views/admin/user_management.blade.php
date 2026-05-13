@@ -60,8 +60,8 @@
         position: relative;
         overflow: hidden;
         width: min(360px, 100%);
-        min-height: 360px;
-        padding: 28px 24px 30px;
+        min-height: 300px;
+        padding: 24px 22px 24px;
         border-radius: 28px;
         border: 1px solid rgba(128, 0, 0, 0.14);
         background: linear-gradient(145deg, #ffffff 0%, #f8fafc 48%, #e5e7eb 100%);
@@ -111,7 +111,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 22px;
-        margin: 18px 0 12px;
+        margin: 14px 0 10px;
         color: #ffffff;
         background: linear-gradient(145deg, rgba(128, 0, 0, 0.96), rgba(112, 19, 27, 0.92));
         border: 1px solid rgba(112, 19, 27, 0.30);
@@ -163,7 +163,7 @@
     }
 
     .um-entry-meta {
-        margin-top: 18px;
+        margin-top: 14px;
         font-size: 0.92rem;
         font-weight: 700;
         color: #70131b;

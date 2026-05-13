@@ -96,6 +96,11 @@
         letter-spacing: 0.01em;
     }
 
+    #dynamicHeader #headerTitle,
+    #dynamicHeader #headerSubtitle {
+        color: #ffffff;
+    }
+
     .scanner-box {
         width: 100% !important; max-width: 480px; aspect-ratio: 16 / 9;
         margin: 0 auto; background: radial-gradient(circle at top, #1f2937 0%, #0f172a 58%, #020617 100%);
@@ -742,13 +747,18 @@
     }
 
     .manual-find-btn {
-        min-width: 128px;
-        padding: 0 20px;
+        min-width: 180px;
+        min-height: 48px;
+        padding: 0 26px;
         border: none;
         border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c);
         color: #ffffff;
         font-weight: 800;
+        font-size: 0.92rem;
         letter-spacing: 0.03em;
         box-shadow: 0 12px 24px rgba(127, 29, 29, 0.24);
         transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
@@ -765,6 +775,156 @@
     .manual-find-btn:active {
         transform: translateY(0);
         box-shadow: 0 8px 18px rgba(127, 29, 29, 0.22);
+    }
+
+    .applicant-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1300;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 26px 18px;
+        background: rgba(15, 23, 42, 0.52);
+        backdrop-filter: blur(10px);
+    }
+
+    .applicant-modal-backdrop.show {
+        display: flex;
+    }
+
+    .applicant-modal-shell {
+        width: min(1180px, 100%);
+        max-height: calc(100vh - 40px);
+        overflow: hidden;
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.98));
+        box-shadow: 0 26px 60px rgba(15, 23, 42, 0.24);
+        border: 1px solid rgba(255,255,255,0.62);
+    }
+
+    .applicant-modal-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 20px 14px;
+        background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c);
+        color: #ffffff;
+    }
+
+    .applicant-modal-head h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .applicant-modal-head p {
+        margin: 6px 0 0;
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 12px;
+        line-height: 1.55;
+        max-width: 760px;
+    }
+
+    .applicant-modal-close {
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.34);
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .applicant-modal-close:hover,
+    .applicant-modal-close:focus {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.56);
+        outline: none;
+    }
+
+    .applicant-modal-body {
+        padding: 18px;
+        overflow: auto;
+        max-height: calc(100vh - 158px);
+    }
+
+    .applicant-modal-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+        gap: 18px;
+        align-items: start;
+    }
+
+    .applicant-modal-panel {
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        background: rgba(255,255,255,0.88);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.06);
+        padding: 16px;
+    }
+
+    .applicant-modal-panel .scan-method-bar {
+        margin-bottom: 14px;
+    }
+
+    .applicant-modal-panel .ocr-actions {
+        margin-top: 14px;
+    }
+
+    .applicant-modal-panel .ocr-result-panel {
+        display: block;
+        margin-top: 0;
+        background: transparent;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    .applicant-modal-panel .manual-input-stack {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px dashed #cbd5e1;
+    }
+
+    .applicant-modal-panel .manual-input-stack .manual-find-btn {
+        width: 100%;
+    }
+
+    .applicant-modal-panel .manual-toggle-label {
+        margin: 0 0 10px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #7f1d1d;
+    }
+
+    html[data-theme="dark"] .applicant-modal-shell {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.96));
+        border-color: rgba(148, 163, 184, 0.16);
+    }
+
+    html[data-theme="dark"] .applicant-modal-panel {
+        background: rgba(15, 23, 42, 0.88);
+        border-color: rgba(148, 163, 184, 0.16);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24);
+    }
+
+    html[data-theme="dark"] .applicant-modal-panel .manual-input-stack {
+        border-top-color: rgba(148, 163, 184, 0.18);
+    }
+
+    html[data-theme="dark"] .applicant-modal-panel .manual-toggle-label {
+        color: #facc15;
     }
 
     .registration-hub {
@@ -1313,7 +1473,7 @@
                 </div>
             </a>
 
-            <a href="{{ url()->current() }}?mode=applicant" class="intake-option-link">
+            <a href="#" class="intake-option-link" id="openApplicantScanModal">
                 <div class="intake-option-card intake-option-applicant {{ $currentMode === 'applicant' ? 'is-active' : '' }}">
                     <span class="intake-option-chip" aria-hidden="true">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -1329,6 +1489,107 @@
                     <p class="intake-option-copy">Use OCR ID scanning, BioSync, or manual student number entry, then proceed directly to Medical Assessment.</p>
                 </div>
             </a>
+        </div>
+    </div>
+
+    <div class="applicant-modal-backdrop" id="applicantScanModal">
+        <div class="applicant-modal-shell">
+            <div class="applicant-modal-head">
+                <div>
+                    <h3>Applicant Scan Ready</h3>
+                    <p>Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
+                </div>
+                <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">×</button>
+            </div>
+            <div class="applicant-modal-body">
+                <div id="dynamicHeader" class="mode-header bg-scan" style="margin-bottom:18px;">
+                    <div id="headerIcon" class="mode-header-badge">AP</div>
+                    <div class="mode-header-copy">
+                        <h3 id="headerTitle" style="margin: 0; font-weight: 800; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">Applicant Scan Ready</h3>
+                        <p id="headerSubtitle">Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
+                    </div>
+                </div>
+
+                <div class="applicant-modal-grid">
+                    <div class="applicant-modal-panel">
+                        <div id="scanForm">
+                            <div id="scanStage" class="scan-stage">
+                                <div class="scan-method-bar">
+                                    <div>
+                                        <p id="scanMethodTitle" class="scan-method-title">OCR ID Scan</p>
+                                        <p id="scanMethodNote" class="scan-method-note">Use the live camera feed to extract the applicant student number from the ID card, then proceed to Medical Assessment.</p>
+                                        <span id="scanMethodBadge" class="scan-method-badge">OCR Active</span>
+                                    </div>
+                                    <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">Switch to BioSync</button>
+                                </div>
+
+                                <div id="scanner-container-scan" class="scan-surface" style="position: relative;">
+                                    <p id="scanInlineNote" class="scan-inline-note">OCR mode is active. Align the physical ID inside the frame and continue once student number and name are matched for Medical Assessment.</p>
+                                    <div id="barcodeScanPanel">
+                                        <div id="scan-loading">
+                                            <div class="spinner"></div>
+                                            <p style="margin-top:10px; color:#8B0000; font-weight:bold; font-size: 12px;">Verifying...</p>
+                                        </div>
+                                        <div id="readerScan" class="scanner-box">
+                                            <div class="scan-line-overlay"></div>
+                                            <div class="ocr-guide"></div>
+                                            <div class="ocr-guide-label">Align Student Number and Name</div>
+                                        </div>
+
+                                        <div class="ocr-actions">
+                                            <button type="button" id="btnRunAiOcr" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg, #1d4ed8, #2563eb 55%, #3b82f6); box-shadow:0 12px 24px rgba(37,99,235,0.22);">AI Read Student No.</button>
+                                            <button type="button" id="btnRetryOcr" class="btn-ocr btn-ocr-secondary">Clear OCR Result</button>
+                                        </div>
+                                    </div>
+
+                                    <div id="bioSyncPendingPanel" style="display:none; background:linear-gradient(180deg, #f8fafc, #eef2ff); border:1px dashed #cbd5e1; border-radius:12px; padding:30px 22px; text-align:center;">
+                                        <div style="width:60px; height:60px; margin:0 auto 14px; border-radius:18px; background:#dbeafe; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 10px 20px rgba(59,130,246,0.12);">BIO</div>
+                                        <h4 style="margin:0 0 8px; font-size:18px; color:#0f172a; font-weight:800;">BioSync Pending</h4>
+                                        <p style="margin:0; color:#64748b; line-height:1.6; font-size:13px;">This mode is reserved for the upcoming BioSync integration. For now, please switch back to OCR mode or use manual review.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="applicant-modal-panel">
+                        <div id="ocrResultPanel" class="ocr-result-panel">
+                            <p class="ocr-result-help">Review the extracted values below. Staff can correct them before confirming the patient record.</p>
+
+                            <div class="ocr-result-grid">
+                                <div>
+                                    <p class="ocr-result-label">Detected Student Number</p>
+                                    <input type="text" id="ocr_student_number" class="form-control" placeholder="Student number from ID card" style="margin-bottom:0;">
+                                </div>
+                                <div>
+                                    <p class="ocr-result-label">Detected Student Name</p>
+                                    <input type="text" id="ocr_student_name" class="form-control" placeholder="Full name from ID card" style="margin-bottom:0;">
+                                </div>
+                            </div>
+
+                            <div id="ocrStatus" class="ocr-status info" style="display:block;">AI verification could not finish right now.</div>
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <div id="ocrConfidenceText" class="ocr-meta">Student no. confidence: 10%</div>
+                                <div id="ocrLockBadge" class="ocr-lock-badge" style="display:none;">Locked on ID</div>
+                            </div>
+
+                            <div class="ocr-actions" style="margin-top:14px;">
+                                <button type="button" id="btnConfirmOcr" class="btn-ocr btn-ocr-secondary" disabled>Confirm & Continue</button>
+                            </div>
+                        </div>
+
+                        <div class="manual-input-stack">
+                            <p class="manual-toggle-label">Type Student Number Manually</p>
+                            <form id="walkinFormManual">
+                                <input type="text" id="student_id_manual" placeholder="Enter student number" class="form-control" style="margin-bottom:10px;" required>
+                                <button type="submit" class="manual-find-btn">Find</button>
+                            </form>
+                        </div>
+
+                        <canvas id="ocrCanvas" style="display:none;"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     @endif
@@ -1616,8 +1877,7 @@
     let autoProceedInFlight = false;
     let lastAutoProceedKey = '';
     const initialMode = @json($currentMode);
-    const intakeTarget = initialMode === 'applicant' ? 'assessment' : 'consultation';
-    const destinationLabel = intakeTarget === 'assessment' ? 'medical assessment form' : 'consultation form';
+    let intakeTarget = initialMode === 'applicant' ? 'assessment' : 'consultation';
     let scanMethod = 'ocr';
     const liveOcrIntervalMs = 900;
     const ocrCanvasScale = 1;
@@ -1653,10 +1913,18 @@
     }
 
     $(document).ready(function() {
+        const applicantScanModal = document.getElementById('applicantScanModal');
+        const openApplicantScanModalBtn = document.getElementById('openApplicantScanModal');
+        const closeApplicantScanModalBtn = document.getElementById('closeApplicantScanModal');
+
         updateScanModeUI();
 
         if (initialMode === 'scan' || initialMode === 'applicant') {
             startMainScanner();
+        }
+
+        function getDestinationLabel() {
+            return intakeTarget === 'assessment' ? 'medical assessment form' : 'consultation form';
         }
 
         function getScannerVideoElement() {
@@ -1717,6 +1985,18 @@
                     attachVideoTrack();
                     startLiveOcr();
                 }).catch(err => console.warn(err));
+            }
+        }
+
+        function stopMainScanner() {
+            stopLiveOcr();
+            if (mainScanner) {
+                mainScanner.stop().catch(() => {}).finally(() => {
+                    mainScanner = null;
+                    currentVideoTrack = null;
+                });
+            } else {
+                currentVideoTrack = null;
             }
         }
 
@@ -1887,7 +2167,7 @@
 
             autoProceedInFlight = true;
             lastAutoProceedKey = autoProceedKey;
-            buildStatus(`Student number and name matched. Opening the ${destinationLabel} now.`, 'success', 'Auto proceed');
+            buildStatus(`Student number and name matched. Opening the ${getDestinationLabel()} now.`, 'success', 'Auto proceed');
             verifyUser(normalizedStudentNumber, normalizedStudentName, true);
         }
 
@@ -2286,13 +2566,60 @@
             $('#bioSyncPendingPanel').toggle(isBioSync);
             $('#btnShowManual').toggle(!isBioSync);
             $('#manualInputArea').toggle(!isBioSync && $('#manualInputArea').is(':visible'));
-            $('#ocrResultPanel').toggle(!isBioSync && $('#ocrResultPanel').is(':visible'));
+            const keepResultPanelVisible = intakeTarget === 'assessment';
+            $('#ocrResultPanel').toggle(!isBioSync && ($('#ocrResultPanel').is(':visible') || keepResultPanelVisible));
 
             if (isBioSync) {
                 stopLiveOcr();
             } else {
                 startLiveOcr();
             }
+        }
+
+        function openApplicantScanModal() {
+            intakeTarget = 'assessment';
+            scanMethod = 'ocr';
+            manualStudentNumberEdited = false;
+            manualStudentNameEdited = false;
+            $('#student_id_manual').val('');
+            $('#ocr_student_number').val('');
+            $('#ocr_student_name').val('');
+            $('#ocrLockBadge').hide();
+            $('#btnConfirmOcr').prop('disabled', true);
+            $('#manualInputArea').show();
+            buildStatus('AI verification could not finish right now.', 'info');
+            $('#ocrConfidenceText').text('Student no. confidence: 10%');
+            updateScanModeUI();
+            if (applicantScanModal) {
+                applicantScanModal.classList.add('show');
+            }
+            startMainScanner();
+        }
+
+        function closeApplicantScanModal() {
+            if (applicantScanModal) {
+                applicantScanModal.classList.remove('show');
+            }
+            stopMainScanner();
+        }
+
+        if (openApplicantScanModalBtn) {
+            openApplicantScanModalBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                openApplicantScanModal();
+            });
+        }
+
+        if (closeApplicantScanModalBtn) {
+            closeApplicantScanModalBtn.addEventListener('click', closeApplicantScanModal);
+        }
+
+        if (applicantScanModal) {
+            applicantScanModal.addEventListener('click', function (event) {
+                if (event.target === applicantScanModal) {
+                    closeApplicantScanModal();
+                }
+            });
         }
 
         $('#btnShowManual').on('click', function() {

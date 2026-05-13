@@ -601,9 +601,7 @@ class AdminUserController extends Controller
                 $studentPhoto = $user->healthProfile?->student_photo;
                 $studentNumber = trim((string) ($user->student_number ?? ''));
                 $studentId = trim((string) ($user->student_id ?? ''));
-                $resolvedIdentifier = $source === 'student_assistant' && $studentNumber !== ''
-                    ? $studentNumber
-                    : $studentId;
+                $resolvedIdentifier = $studentNumber !== '' ? $studentNumber : $studentId;
 
                 return [
                     'id' => (string) $user->id,

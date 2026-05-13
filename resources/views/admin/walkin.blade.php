@@ -885,6 +885,8 @@
     }
 
     .applicant-modal-head-actions .btn-scan-switch {
+        position: relative;
+        overflow: hidden;
         background: rgba(255, 255, 255, 0.96);
         color: #70131B;
         border-color: rgba(255, 255, 255, 0.86);
@@ -893,6 +895,7 @@
         padding: 11px 18px;
         font-size: 13px;
         gap: 8px;
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
     }
 
     .applicant-modal-head-actions .btn-scan-switch svg {
@@ -900,6 +903,38 @@
         height: 15px;
         flex: 0 0 auto;
         stroke-width: 2.2;
+    }
+
+    .applicant-modal-head-actions .btn-scan-switch::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.2s ease;
+        pointer-events: none;
+    }
+
+    .applicant-modal-head-actions .btn-scan-switch:hover,
+    .applicant-modal-head-actions .btn-scan-switch:focus {
+        transform: translateY(-1px);
+        border-color: #facc15;
+        background: #fff8e1;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+        outline: none;
+    }
+
+    .applicant-modal-head-actions .btn-scan-switch:hover::after,
+    .applicant-modal-head-actions .btn-scan-switch:focus::after {
+        transform: translateX(135%);
     }
 
     .applicant-modal-head-actions .scan-method-badge {
@@ -1160,6 +1195,16 @@
         color: #f8fafc;
         border-color: rgba(250, 204, 21, 0.28);
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-theme="dark"] .applicant-modal-head-actions .btn-scan-switch:hover,
+    html[data-theme="dark"] .applicant-modal-head-actions .btn-scan-switch:focus {
+        background: rgba(112, 19, 27, 0.92);
+        color: #fef3c7;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(0, 0, 0, 0.28);
     }
 
     html[data-theme="dark"] .applicant-modal-head-actions .scan-method-badge {

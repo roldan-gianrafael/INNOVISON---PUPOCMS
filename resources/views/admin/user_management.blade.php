@@ -44,55 +44,128 @@
     .um-entry-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
+        gap: 22px;
     }
 
     .um-entry-card {
         display: block;
         text-decoration: none;
-        padding: 24px 22px;
-        border-radius: 24px;
-        border: 1px solid rgba(128, 0, 0, 0.12);
-        background: rgba(255, 255, 255, 0.96);
-        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+        position: relative;
+        overflow: hidden;
+        padding: 28px 24px 30px;
+        border-radius: 28px;
+        border: 1px solid rgba(234, 179, 8, 0.42);
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 48%, #e5e7eb 100%);
+        box-shadow:
+            0 0 0 1px rgba(250, 204, 21, 0.12),
+            0 24px 38px rgba(234, 179, 8, 0.18),
+            0 52px 72px -38px rgba(202, 138, 4, 0.36);
         color: inherit;
-        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
+    }
+
+    .um-entry-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.10));
+        pointer-events: none;
+    }
+
+    .um-entry-card::after {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        bottom: -24px;
+        height: 38px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(148, 163, 184, 0.34) 0%, rgba(148, 163, 184, 0.14) 42%, transparent 78%);
+        filter: blur(12px);
+        pointer-events: none;
     }
 
     .um-entry-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 24px 38px rgba(112, 19, 27, 0.12);
-        border-color: rgba(112, 19, 27, 0.24);
+        transform: translateY(-4px);
+        border-color: rgba(234, 179, 8, 0.62);
+        box-shadow:
+            0 0 0 1px rgba(250, 204, 21, 0.22),
+            0 28px 44px rgba(234, 179, 8, 0.22),
+            0 58px 78px -38px rgba(202, 138, 4, 0.42);
+    }
+
+    .um-entry-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(241, 245, 249, 0.94);
+        color: #64748b;
+        font-size: .76rem;
+        font-weight: 900;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 1;
     }
 
     .um-entry-icon {
-        width: 58px;
-        height: 58px;
+        width: 68px;
+        height: 68px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 18px;
-        margin-bottom: 16px;
-        color: #70131b;
-        background: linear-gradient(135deg, rgba(255, 247, 230, 0.96), rgba(255, 255, 255, 0.98));
-        box-shadow: inset 0 0 0 1px rgba(112, 19, 27, 0.08);
+        border-radius: 22px;
+        margin: 18px 0 12px;
+        color: #111827;
+        background: linear-gradient(145deg, rgba(254, 240, 138, 0.98), rgba(250, 204, 21, 0.9));
+        border: 1px solid rgba(234, 179, 8, 0.34);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.96),
+            0 18px 28px rgba(234, 179, 8, 0.18);
+        position: relative;
+        z-index: 1;
+        animation: umEntryFloat 3.8s ease-in-out infinite;
+    }
+
+    .um-entry-icon::after {
+        content: "";
+        position: absolute;
+        left: 12%;
+        right: 12%;
+        bottom: -14px;
+        height: 16px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(148, 163, 184, 0.24) 0%, rgba(148, 163, 184, 0.1) 44%, transparent 82%);
+        filter: blur(8px);
+        opacity: 0.72;
+        z-index: -1;
+        pointer-events: none;
     }
 
     .um-entry-icon svg {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
+        display: block;
+        stroke: currentColor;
     }
 
     .um-entry-card h2 {
         margin: 0 0 10px;
-        font-size: 1.3rem;
+        font-size: 1.26rem;
+        font-weight: 900;
         color: #111827;
+        position: relative;
+        z-index: 1;
     }
 
     .um-entry-card p {
         margin: 0;
         color: #475569;
         line-height: 1.65;
+        position: relative;
+        z-index: 1;
     }
 
     .um-entry-meta {
@@ -100,6 +173,8 @@
         font-size: 0.92rem;
         font-weight: 700;
         color: #70131b;
+        position: relative;
+        z-index: 1;
     }
 
     html[data-theme="dark"] .user-management-shell {
@@ -123,23 +198,60 @@
     }
 
     html[data-theme="dark"] .um-entry-card {
-        background: rgba(12, 18, 32, 0.96);
-        border-color: rgba(148, 163, 184, 0.14);
-        box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+        background: linear-gradient(145deg, #5f0012 0%, #7d0b17 45%, #5a0010 100%);
+        border-color: rgba(255, 214, 102, 0.5);
+        box-shadow:
+            0 0 0 1px rgba(255, 214, 102, 0.16),
+            0 24px 38px rgba(95, 0, 18, 0.34),
+            0 52px 72px -38px rgba(193, 138, 16, 0.56);
+    }
+
+    html[data-theme="dark"] .um-entry-card::before {
+        background: linear-gradient(180deg, rgba(193, 138, 16, 0.16), rgba(125, 11, 23, 0.06) 42%, rgba(95, 0, 18, 0.14));
+    }
+
+    html[data-theme="dark"] .um-entry-card::after {
+        background: radial-gradient(circle, rgba(193, 138, 16, 0.34) 0%, rgba(95, 0, 18, 0.18) 42%, transparent 78%);
     }
 
     html[data-theme="dark"] .um-entry-card h2 {
         color: #f8fafc;
     }
 
+    html[data-theme="dark"] .um-entry-card:hover {
+        border-color: rgba(255, 214, 102, 0.68);
+        background: linear-gradient(145deg, #6d0014 0%, #8a0d19 42%, #670012 100%);
+        box-shadow:
+            0 0 0 1px rgba(255, 214, 102, 0.22),
+            0 26px 40px rgba(95, 0, 18, 0.38),
+            0 56px 76px -38px rgba(193, 138, 16, 0.52);
+    }
+
+    html[data-theme="dark"] .um-entry-chip {
+        background: rgba(193, 138, 16, 0.22);
+        color: #ffd86b;
+    }
+
     html[data-theme="dark"] .um-entry-icon {
-        color: #f0d15a;
-        background: linear-gradient(135deg, rgba(48, 31, 12, 0.84), rgba(20, 24, 38, 0.94));
-        box-shadow: inset 0 0 0 1px rgba(240, 209, 90, 0.18);
+        background: linear-gradient(145deg, rgba(255, 214, 102, 0.26), rgba(193, 138, 16, 0.52));
+        border-color: rgba(255, 214, 102, 0.34);
+        color: #111827;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 210, 90, 0.12),
+            0 18px 28px rgba(95, 0, 18, 0.28);
     }
 
     html[data-theme="dark"] .um-entry-meta {
         color: #f0d15a;
+    }
+
+    @keyframes umEntryFloat {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-5px);
+        }
     }
 
     @media (max-width: 900px) {
@@ -161,6 +273,7 @@
 
     <div class="um-entry-grid">
         <a href="{{ route('admin.user-management.account-access') }}" class="um-entry-card">
+            <span class="um-entry-chip" aria-hidden="true">Users Table</span>
             <span class="um-entry-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -175,6 +288,7 @@
         </a>
 
         <a href="{{ route('admin.user-management.admin-hub') }}" class="um-entry-card">
+            <span class="um-entry-chip" aria-hidden="true">Admins Table</span>
             <span class="um-entry-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/>

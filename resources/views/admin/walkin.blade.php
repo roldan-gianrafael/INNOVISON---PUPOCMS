@@ -951,6 +951,11 @@
         margin-bottom: 14px;
     }
 
+    .applicant-modal-panel .scan-method-title,
+    .applicant-modal-panel .scan-method-note {
+        color: #000000 !important;
+    }
+
     .applicant-modal-panel .ocr-actions {
         margin-top: 14px;
     }

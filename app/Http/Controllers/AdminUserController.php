@@ -19,26 +19,29 @@ class AdminUserController extends Controller
     private function redirectToManagementView(Request $request, string $messageType, string $message)
     {
         $managementView = trim((string) $request->input('management_view', $request->query('management_view', '')));
-        $params = [];
 
-        if (in_array($managementView, ['account-access', 'admin-hub'], true)) {
-            $params['management_view'] = $managementView;
-        }
+        $route = match ($managementView) {
+            'account-access' => 'admin.user-management.account-access',
+            'admin-hub' => 'admin.user-management.admin-hub',
+            default => 'admin.user-management',
+        };
 
-        return redirect()
-            ->route('admin.user-management', $params)
-            ->with($messageType, $message);
+        return redirect()->route($route)->with($messageType, $message);
     }
 
-    public function index(Request $request, FacultySyncService $facultySyncService)
+    private function buildManagementData(Request $request, FacultySyncService $facultySyncService, string $forcedManagementView = ''): array
     {
         $lookupSearch = trim((string) $request->query('lookup_search', ''));
-        $managementView = $request->query('entry') === 'menu'
-            ? ''
-            : trim((string) $request->query('management_view', ''));
+        $managementView = $forcedManagementView !== ''
+            ? $forcedManagementView
+            : ($request->query('entry') === 'menu'
+                ? ''
+                : trim((string) $request->query('management_view', '')));
+
         if (!in_array($managementView, ['account-access', 'admin-hub'], true)) {
             $managementView = '';
         }
+
         $currentUserId = Auth::id();
 
         $allLocalUsers = $this->collectLocalUsers('');
@@ -91,14 +94,29 @@ class AdminUserController extends Controller
             'local_total' => count($localRecords),
         ];
 
-        return view('admin.user_management', [
+        return [
             'lookupSearch' => $lookupSearch,
             'managementView' => $managementView,
             'localRecords' => $localRecords,
             'adminHubRecords' => $adminHubRecords,
             'lookupRecords' => $lookupRecords,
             'stats' => $stats,
-        ]);
+        ];
+    }
+
+    public function index(Request $request, FacultySyncService $facultySyncService)
+    {
+        return view('admin.user_management', $this->buildManagementData($request, $facultySyncService));
+    }
+
+    public function accountAccess(Request $request, FacultySyncService $facultySyncService)
+    {
+        return view('admin.user_management_account_access', $this->buildManagementData($request, $facultySyncService, 'account-access'));
+    }
+
+    public function adminHub(Request $request, FacultySyncService $facultySyncService)
+    {
+        return view('admin.user_management_admin_hub', $this->buildManagementData($request, $facultySyncService, 'admin-hub'));
     }
 
     public function update(Request $request, User $user)

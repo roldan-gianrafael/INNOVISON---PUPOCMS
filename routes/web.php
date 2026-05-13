@@ -129,6 +129,8 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::get('/admin/notifications/feed', [AdminController::class, 'notificationsFeed'])->name('admin.notifications.feed');
         Route::post('/admin/notifications/mark-all-read', [AdminController::class, 'markAllAdminNotificationsRead'])->name('admin.notifications.read_all');
         Route::get('/admin/user-management', [AdminUserController::class, 'index'])->name('admin.user-management');
+        Route::get('/admin/user-management/account-access', [AdminUserController::class, 'accountAccess'])->name('admin.user-management.account-access');
+        Route::get('/admin/user-management/admin-hub', [AdminUserController::class, 'adminHub'])->name('admin.user-management.admin-hub');
         Route::post('/admin/user-management/from-lookup', [AdminUserController::class, 'storeFromLookup'])->name('admin.user-management.store-from-lookup');
         Route::put('/admin/user-management/{user}', [AdminUserController::class, 'update'])->name('admin.user-management.update');
         Route::delete('/admin/user-management/{user}', [AdminUserController::class, 'destroy'])->name('admin.user-management.destroy');

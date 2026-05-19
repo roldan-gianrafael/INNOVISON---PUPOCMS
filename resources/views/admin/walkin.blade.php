@@ -1868,10 +1868,27 @@
                                         </div>
                                     </div>
 
-                                    <div id="bioSyncPendingPanel" style="display:none; background:linear-gradient(180deg, #f8fafc, #eef2ff); border:1px dashed #cbd5e1; border-radius:12px; padding:30px 22px; text-align:center;">
-                                        <div style="width:60px; height:60px; margin:0 auto 14px; border-radius:18px; background:#dbeafe; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 10px 20px rgba(59,130,246,0.12);">BIO</div>
-                                        <h4 style="margin:0 0 8px; font-size:18px; color:#0f172a; font-weight:800;">BioSync Pending</h4>
-                                        <p style="margin:0; color:#64748b; line-height:1.6; font-size:13px;">This mode is reserved for the upcoming BioSync integration. For now, please switch back to OCR mode or use manual review.</p>
+                                    <div id="bioSyncPendingPanel" style="display:none; background:linear-gradient(180deg, #f8fafc, #eef2ff); border:1px dashed #cbd5e1; border-radius:12px; padding:30px 22px;">
+                                        <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+                                            <div style="width:60px; height:60px; border-radius:18px; background:#dbeafe; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 10px 20px rgba(59,130,246,0.12); flex-shrink:0;">BIO</div>
+                                            <div style="text-align:left;">
+                                                <h4 style="margin:0; font-size:18px; color:#0f172a; font-weight:800;">BioSync Pending</h4>
+                                            </div>
+                                        </div>
+                                        <div style="display:grid; gap:10px;">
+                                            <div style="display:grid; grid-template-columns:110px minmax(0, 1fr); gap:12px; align-items:center;">
+                                                <span style="font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; color:#475569;">Full Name</span>
+                                                <input type="text" class="form-control" value="Waiting for BioSync" readonly style="margin-bottom:0; background:#ffffff;">
+                                            </div>
+                                            <div style="display:grid; grid-template-columns:110px minmax(0, 1fr); gap:12px; align-items:center;">
+                                                <span style="font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; color:#475569;">ID Number</span>
+                                                <input type="text" class="form-control" value="Waiting for BioSync" readonly style="margin-bottom:0; background:#ffffff;">
+                                            </div>
+                                            <div style="display:grid; grid-template-columns:110px minmax(0, 1fr); gap:12px; align-items:center;">
+                                                <span style="font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; color:#475569;">Role</span>
+                                                <input type="text" class="form-control" value="Waiting for BioSync" readonly style="margin-bottom:0; background:#ffffff;">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1923,20 +1940,7 @@
                             </div>
                             <div class="applicant-biosync-copy">
                                 <h4>BioSync Pending</h4>
-                                <div style="margin-top:14px; display:grid; gap:10px; width:min(100%, 320px);">
-                                    <div style="padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.88); border:1px solid rgba(148,163,184,0.25); text-align:left;">
-                                        <small style="display:block; font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:#64748b;">Full Name</small>
-                                        <strong style="display:block; margin-top:4px; font-size:15px; color:#0f172a;">Waiting for BioSync</strong>
-                                    </div>
-                                    <div style="padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.88); border:1px solid rgba(148,163,184,0.25); text-align:left;">
-                                        <small style="display:block; font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:#64748b;">ID Number</small>
-                                        <strong style="display:block; margin-top:4px; font-size:15px; color:#0f172a;">Waiting for BioSync</strong>
-                                    </div>
-                                    <div style="padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.88); border:1px solid rgba(148,163,184,0.25); text-align:left;">
-                                        <small style="display:block; font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:#64748b;">Role</small>
-                                        <strong style="display:block; margin-top:4px; font-size:15px; color:#0f172a;">Waiting for BioSync</strong>
-                                    </div>
-                                </div>
+                                <p>The fingerprint preview is ready here. Identity details will appear in the left-side BioSync section once the integration is connected.</p>
                             </div>
                         </div>
 

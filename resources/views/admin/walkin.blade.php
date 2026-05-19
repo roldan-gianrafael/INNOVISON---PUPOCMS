@@ -1639,7 +1639,7 @@
         margin-bottom: 14px !important;
         padding: 14px;
         border-radius: 18px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid rgba(127, 29, 29, 0.16);
         background: linear-gradient(180deg, #ffffff, #f8fafc);
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.92);
     }
@@ -1683,7 +1683,7 @@
         width: 100%;
         min-height: 56px;
         padding: 16px 18px;
-        border: 1px solid rgba(148, 163, 184, 0.20);
+        border: 1px solid rgba(127, 29, 29, 0.22);
         border-radius: 18px;
         font-size: 14px;
         color: #111111;
@@ -1708,7 +1708,7 @@
     .assisted-field-card {
         padding: 14px;
         border-radius: 18px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid rgba(127, 29, 29, 0.16);
         background: linear-gradient(180deg, #ffffff, #f8fafc);
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.92);
         min-width: 0;
@@ -1724,7 +1724,7 @@
     }
 
     .assisted-panel-body .form-control:hover {
-        border-color: rgba(139, 0, 0, 0.24);
+        border-color: rgba(139, 0, 0, 0.34);
         box-shadow:
             0 14px 24px rgba(15, 23, 42, 0.10),
             0 8px 18px rgba(139, 0, 0, 0.05),
@@ -2824,17 +2824,19 @@
 @if(in_array($currentMode, ['scan', 'assisted', 'applicant'], true))
 <div class="card p-4 shadow-sm walkin-strip-card" style="border-radius: 15px; border: none; max-width: {{ $currentMode === 'assisted' ? '1180px' : '550px' }}; margin: 20px auto;">
     
-    <div id="dynamicHeader" class="mode-header {{ $currentMode === 'assisted' ? 'bg-register' : 'bg-scan' }}">
-        <div id="headerIcon" class="mode-header-badge">{{ $currentMode === 'assisted' ? 'AI' : ($currentMode === 'applicant' ? 'AP' : 'SB') }}</div>
+    @if($currentMode !== 'assisted')
+    <div id="dynamicHeader" class="mode-header bg-scan">
+        <div id="headerIcon" class="mode-header-badge">{{ $currentMode === 'applicant' ? 'AP' : 'SB' }}</div>
         <div class="mode-header-copy">
             <h3 id="headerTitle" style="margin: 0; font-weight: 800; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
-                {{ $currentMode === 'assisted' ? 'Assisted Intake Ready' : ($currentMode === 'applicant' ? 'Applicant Scan Ready' : 'OCR Ready') }}
+                {{ $currentMode === 'applicant' ? 'Applicant Scan Ready' : 'OCR Ready' }}
             </h3>
             <p id="headerSubtitle">
-                {{ $currentMode === 'assisted' ? 'Capture the patient basics first, then continue to consultation.' : ($currentMode === 'applicant' ? 'Choose OCR scanning or BioSync to identify the applicant and continue to Medical Assessment.' : 'Choose barcode scanning or BioSync mode to identify the patient.') }}
+                {{ $currentMode === 'applicant' ? 'Choose OCR scanning or BioSync to identify the applicant and continue to Medical Assessment.' : 'Choose barcode scanning or BioSync mode to identify the patient.' }}
             </p>
         </div>
     </div>
+    @endif
 
     <div id="scanForm" style="{{ $currentMode === 'assisted' ? 'display:none;' : '' }}">
         <div id="scanStage" class="scan-stage">

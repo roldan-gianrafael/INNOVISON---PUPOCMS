@@ -1640,8 +1640,12 @@
         padding: 14px;
         border-radius: 18px;
         border: 1px solid rgba(127, 29, 29, 0.16);
-        background: linear-gradient(180deg, #ffffff, #f8fafc);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.92);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.10), transparent 34%),
+            linear-gradient(180deg, #fff7f7 0%, #fef2f2 100%);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.94),
+            0 10px 20px rgba(127, 29, 29, 0.04);
     }
 
     .assisted-highlight-card {
@@ -1709,8 +1713,12 @@
         padding: 14px;
         border-radius: 18px;
         border: 1px solid rgba(127, 29, 29, 0.16);
-        background: linear-gradient(180deg, #ffffff, #f8fafc);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.92);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.10), transparent 34%),
+            linear-gradient(180deg, #fff7f7 0%, #fef2f2 100%);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.94),
+            0 10px 20px rgba(127, 29, 29, 0.04);
         min-width: 0;
     }
 
@@ -1732,6 +1740,41 @@
     .assisted-intake-shell > .assisted-panel > .assisted-panel-body > div[style*="background:#fff7ed"] p,
     #registerForm .text-center.mt-3 a {
         color: #000000 !important;
+    }
+
+    .assisted-submit-btn {
+        width: 100%;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #ffffff;
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        box-shadow:
+            0 0 0 3px rgba(139, 0, 0, 0.10),
+            0 16px 28px rgba(112, 19, 27, 0.20);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .assisted-submit-btn:hover {
+        background: #facc15;
+        color: #8B0000;
+        transform: translateY(-2px);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.12),
+            0 18px 30px rgba(139, 0, 0, 0.22);
+    }
+
+    .assisted-submit-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.85;
+        transform: none;
     }
 
     .assisted-panel-body .form-control:hover {
@@ -3065,7 +3108,7 @@
 
             <div id="notification" style="margin: 10px 0;"></div>
             
-            <button type="button" id="confirmBtn" class="btn btn-success w-100 fw-bold py-3 mt-2" style="border-radius: 8px; background: #15803d; border: none; color: white;">
+            <button type="button" id="confirmBtn" class="assisted-submit-btn mt-2">
                 SAVE ASSISTED INTAKE
             </button>
             

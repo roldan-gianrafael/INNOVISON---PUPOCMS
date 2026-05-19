@@ -1901,11 +1901,11 @@
                                 <div style="display:grid; gap:12px;">
                                     <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center;">
                                         <p class="ocr-result-label" style="margin:0;">Full Name</p>
-                                        <input type="text" id="ocr_student_name" class="form-control" placeholder="Enter full name" style="margin-bottom:0;">
+                                        <input type="text" id="ocr_student_name" class="form-control" readonly style="margin-bottom:0; background:linear-gradient(180deg, #f8fafc, #eef2f7); color:#0f172a; border:1px solid #cbd5e1; box-shadow:inset 0 1px 0 rgba(255,255,255,0.9); font-weight:700; cursor:default;">
                                     </div>
                                     <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center;">
                                         <p class="ocr-result-label" style="margin:0;">ID Number</p>
-                                        <input type="text" id="ocr_student_number" class="form-control" placeholder="Enter ID number" style="margin-bottom:0;">
+                                        <input type="text" id="ocr_student_number" class="form-control" readonly style="margin-bottom:0; background:linear-gradient(180deg, #f8fafc, #eef2f7); color:#0f172a; border:1px solid #cbd5e1; box-shadow:inset 0 1px 0 rgba(255,255,255,0.9); font-weight:700; cursor:default;">
                                     </div>
                                 </div>
 

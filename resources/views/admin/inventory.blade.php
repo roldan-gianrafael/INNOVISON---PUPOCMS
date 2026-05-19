@@ -1415,21 +1415,22 @@
         if (!medicineTypeDisplay || !medicineTypeMenu || !medicineTypeWrap.classList.contains('is-open')) return;
 
         const triggerRect = medicineTypeDisplay.getBoundingClientRect();
-        const viewportPadding = 16;
-        const preferredWidth = Math.max(triggerRect.width, 320);
-        const width = Math.min(preferredWidth, window.innerWidth - (viewportPadding * 2));
+        const viewportPadding = 12;
+        const menuGap = 6;
+        const width = Math.min(triggerRect.width, window.innerWidth - (viewportPadding * 2));
         const left = Math.min(Math.max(triggerRect.left, viewportPadding), window.innerWidth - width - viewportPadding);
         const spaceBelow = window.innerHeight - triggerRect.bottom - viewportPadding;
         const spaceAbove = triggerRect.top - viewportPadding;
-        const openAbove = spaceBelow < 260 && spaceAbove > spaceBelow;
-        const maxHeight = Math.max(180, Math.min(360, (openAbove ? spaceAbove : spaceBelow) - 10));
+        const openAbove = spaceBelow < 240 && spaceAbove > spaceBelow;
+        const availableSpace = openAbove ? spaceAbove : spaceBelow;
+        const maxHeight = Math.max(160, Math.min(320, availableSpace - menuGap));
 
         medicineTypeMenu.style.left = `${left}px`;
         medicineTypeMenu.style.width = `${width}px`;
         medicineTypeMenu.style.maxHeight = `${maxHeight}px`;
         medicineTypeMenu.style.top = openAbove
-            ? `${Math.max(viewportPadding, triggerRect.top - maxHeight - 10)}px`
-            : `${Math.min(window.innerHeight - viewportPadding, triggerRect.bottom + 10)}px`;
+            ? `${Math.max(viewportPadding, triggerRect.top - maxHeight - menuGap)}px`
+            : `${triggerRect.bottom + menuGap}px`;
     }
 
     function filterMedicineTypeOptions(query) {

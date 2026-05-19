@@ -225,6 +225,22 @@
         padding-left: 10px;
     }
 
+    .inventory-group-row td {
+        background-color: #f9f9f9;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .inventory-group-label {
+        color: #800000;
+        letter-spacing: 0.04em;
+        text-align: left;
+    }
+
+    .inventory-group-spacer {
+        background-color: #f9f9f9;
+    }
+
     /* 5. Signatures & Footer */
     .footer-signatures { 
         margin-top: 50px; 
@@ -732,19 +748,48 @@
     <table>
         <thead>
             <tr>
-                <th>ITEM DESCRIPTION</th>
-                <th>CATEGORY</th>
+                <th>DATE</th>
+                <th>STOCK NUMBER</th>
+                <th>MEDICINES AND MATERIALS</th>
                 <th>UNIT</th>
-                <th>STARTING STOCK</th>
+                <th>QUANTITY</th>
                 <th>CONSUMED</th>
-                <th>CURRENT BALANCE</th>
+                <th>BALANCE</th>
+                <th>EXPIRATION DATE</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($data as $item)
+            @php
+                $inventoryScope = $inventoryScope ?? 'all';
+                $inventoryGroups = collect($data)
+                    ->sortBy(function ($item) {
+                        $group = $item->category === 'Medicine'
+                            ? ($item->medicine_type ?: 'Uncategorized Medicine')
+                            : ($item->category ?: 'Materials');
+
+                        return strtoupper($group . ' ' . $item->name);
+                    })
+                    ->groupBy(function ($item) {
+                        if ($item->category === 'Medicine') {
+                            return $item->medicine_type ?: 'Uncategorized Medicine';
+                        }
+
+                        return $item->category ?: 'Materials';
+                    });
+            @endphp
+
+            @forelse($inventoryGroups as $groupName => $items)
+                <tr class="inventory-group-row">
+                    <td></td>
+                    <td></td>
+                    <td class="inventory-group-label">{{ $groupName }}</td>
+                    <td colspan="5" class="inventory-group-spacer"></td>
+                </tr>
+                @foreach($items as $item)
                 <tr>
+                    <td>{{ optional($item->date_added)->format('m/d/Y') ?? 'N/A' }}</td>
+                    <td>{{ $item->id }}</td>
                     <td class="text-left">{{ $item->name }}</td>
-                    <td>{{ $item->report_category }}</td>
                     <td>
                         {{ $item->unit }}
                         @if($item->hasDispensingConversion())
@@ -754,9 +799,21 @@
                     <td>{{ rtrim(rtrim(number_format((float) $item->starting_stock, 2, '.', ''), '0'), '.') }}</td>
                     <td>{{ rtrim(rtrim(number_format((float) $item->consumed, 2, '.', ''), '0'), '.') }}</td>
                     <td style="font-weight: bold;">{{ rtrim(rtrim(number_format((float) $item->current_balance, 2, '.', ''), '0'), '.') }}</td>
+                    <td>{{ optional($item->expiration_date)->format('m/d/Y') ?? 'N/A' }}</td>
                 </tr>
+                @endforeach
             @empty
-            <tr><td colspan="6">No items found in the inventory.</td></tr>
+            <tr>
+                <td colspan="8">
+                    @if($inventoryScope === 'medicines')
+                        No medicines found in the inventory.
+                    @elseif($inventoryScope === 'supplies')
+                        No supplies or materials found in the inventory.
+                    @else
+                        No items found in the inventory.
+                    @endif
+                </td>
+            </tr>
             @endforelse
         </tbody>
     </table>

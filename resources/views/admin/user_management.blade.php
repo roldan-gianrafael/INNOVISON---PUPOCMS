@@ -74,6 +74,11 @@
         justify-self: center;
     }
 
+    .um-entry-card > * {
+        position: relative;
+        z-index: 1;
+    }
+
     .um-entry-card::before {
         content: "";
         position: absolute;
@@ -85,23 +90,30 @@
     .um-entry-card::after {
         content: "";
         position: absolute;
-        left: 10%;
-        right: 10%;
-        bottom: -24px;
-        height: 38px;
-        border-radius: 999px;
-        background: radial-gradient(circle, rgba(148, 163, 184, 0.34) 0%, rgba(148, 163, 184, 0.14) 42%, transparent 78%);
-        filter: blur(12px);
+        top: -42%;
+        left: -130%;
+        width: 120%;
+        height: 185%;
+        background: linear-gradient(115deg, rgba(250, 204, 21, 0) 0%, rgba(250, 204, 21, 0.5) 45%, rgba(250, 204, 21, 0) 100%);
+        transform: skewX(-20deg);
+        opacity: 0;
+        transition: left .8s ease, opacity .18s ease;
         pointer-events: none;
+        z-index: 0;
     }
 
     .um-entry-card:hover {
         transform: translateY(-4px);
-        border-color: rgba(112, 19, 27, 0.26);
+        border-color: rgba(234, 179, 8, 0.62);
         box-shadow:
-            0 0 0 1px rgba(112, 19, 27, 0.12),
-            0 28px 44px rgba(112, 19, 27, 0.14),
-            0 58px 78px -38px rgba(15, 23, 42, 0.28);
+            0 0 0 1px rgba(250, 204, 21, 0.22),
+            0 28px 44px rgba(234, 179, 8, 0.18),
+            0 58px 78px -38px rgba(202, 138, 4, 0.38);
+    }
+
+    .um-entry-card:hover::after {
+        opacity: 1;
+        left: 125%;
     }
 
     .um-entry-icon {
@@ -121,6 +133,7 @@
         position: relative;
         z-index: 1;
         animation: umEntryFloat 3.8s ease-in-out infinite;
+        transition: background .22s ease, color .22s ease, border-color .22s ease, transform .22s ease;
     }
 
     .um-entry-icon::after {
@@ -205,7 +218,7 @@
     }
 
     html[data-theme="dark"] .um-entry-card::after {
-        background: radial-gradient(circle, rgba(193, 138, 16, 0.34) 0%, rgba(95, 0, 18, 0.18) 42%, transparent 78%);
+        background: linear-gradient(115deg, rgba(250, 204, 21, 0) 0%, rgba(250, 204, 21, 0.46) 45%, rgba(250, 204, 21, 0) 100%);
     }
 
     html[data-theme="dark"] .um-entry-card h2 {

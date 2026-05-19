@@ -76,6 +76,14 @@
         margin-left: auto;
         flex-wrap: wrap;
     }
+
+    .inventory-toolbar-actions > .btn-add {
+        min-height: 50px;
+        height: 50px;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
     .inventory-search-shell {
         display: inline-flex;
         align-items: center;
@@ -160,11 +168,18 @@
     }
     .inventory-search-toggle:hover,
     .inventory-search-toggle:focus {
+        background: #facc15 !important;
+        color: #111827 !important;
         border-color: #facc15 !important;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16) !important;
         outline: none !important;
+    }
+    .inventory-search-toggle:hover svg,
+    .inventory-search-toggle:focus svg {
+        color: #111827 !important;
+        stroke: currentColor !important;
     }
     .btn-add,
     .inventory-manage-btn,
@@ -215,6 +230,8 @@
     .inventory-manage-btn:hover,
     .inventory-btn-cancel:hover {
         transform: translateY(-1px);
+        background: #facc15;
+        color: #111827;
         border-color: #facc15;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
@@ -272,7 +289,8 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        min-width: 96px;
+        min-width: 42px;
+        min-height: 42px;
         padding: 9px 14px;
         border-radius: 999px;
         border: 1px solid;
@@ -298,10 +316,11 @@
     }
     .btn-edit:hover {
         transform: translateY(-1px);
-        color: #70131B;
-        border-color: rgba(112, 19, 27, 0.46);
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
         box-shadow:
-            0 0 0 3px rgba(112, 19, 27, 0.08),
+            0 0 0 3px rgba(250, 204, 21, 0.18),
             0 10px 22px rgba(112, 19, 27, 0.12);
     }
     .btn-delete {
@@ -312,10 +331,11 @@
     }
     .btn-delete:hover {
         transform: translateY(-1px);
-        background: linear-gradient(180deg, #fee2e2 0%, #fecaca 100%);
-        border-color: rgba(220, 38, 38, 0.42);
+        background: #dc2626;
+        color: #ffffff;
+        border-color: #dc2626;
         box-shadow:
-            0 0 0 3px rgba(248, 113, 113, 0.12),
+            0 0 0 3px rgba(248, 113, 113, 0.18),
             0 10px 22px rgba(127, 29, 29, 0.14);
     }
     .inventory-row-highlight {
@@ -346,6 +366,7 @@
         top: 0; left: 0; 
         width: 100%; 
         height: 100%; 
+        padding: clamp(12px, 2vw, 28px);
         background: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
@@ -355,9 +376,9 @@
     }
     #itemModal .modal-box {
         background: rgba(255, 255, 255, 0.4) !important;
-        width: 820px;
-        max-width: min(94vw, 820px);
-        max-height: min(88vh, 920px);
+        width: min(100%, 1040px);
+        max-width: 100%;
+        max-height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-top: 4px solid #66ff00 !important;
@@ -377,7 +398,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 16px;
-        padding: 16px 20px;
+        padding: clamp(14px, 2vw, 18px) clamp(16px, 2.4vw, 22px);
         background: #70131B;
         border-bottom: 1px solid #eee;
         flex: 0 0 auto;
@@ -401,21 +422,24 @@
         line-height: 1.45;
     }
     #itemModal .inventory-modal-body {
-        padding: 24px;
+        padding: clamp(16px, 2.6vw, 26px);
         overflow-y: auto;
+        min-height: 0;
         background: transparent;
+        overscroll-behavior: contain;
     }
     .modal-form-grid { 
         display: grid; 
-        grid-template-columns: 1fr 1fr; 
-        gap: 20px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); 
+        gap: clamp(14px, 2vw, 22px);
         align-items: start;
     }
     #itemModal .modal-form-panel {
         border: 1px solid rgba(112, 19, 27, 0.15);
-        border-radius: 16px;
+        border-radius: clamp(12px, 1.8vw, 16px);
         background: #ffffff;
-        padding: 18px;
+        padding: clamp(14px, 2vw, 18px);
+        min-width: 0;
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.82),
             0 8px 18px rgba(112, 19, 27, 0.05);
@@ -707,12 +731,12 @@
     }
     .inventory-inline-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
     }
     .inventory-date-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
         align-items: start;
     }
@@ -741,25 +765,86 @@
         stroke-width: 2.2;
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 980px) {
         #itemModal .modal-box {
-            max-width: 96vw;
-            max-height: 90vh;
+            width: min(100%, 760px);
         }
-        .inventory-modal-head {
-            align-items: flex-start;
-        }
+
         .modal-form-grid {
             grid-template-columns: 1fr;
         }
+    }
+
+    @media (max-width: 760px) {
+        .modal-overlay {
+            align-items: stretch;
+            padding: 10px;
+        }
+
+        #itemModal .modal-box {
+            width: 100%;
+            max-height: calc(100dvh - 20px);
+            border-radius: 14px !important;
+        }
+
+        #itemModal .inventory-modal-head {
+            align-items: flex-start;
+            gap: 12px;
+        }
+
         .inventory-inline-grid {
             grid-template-columns: 1fr;
         }
+
         .inventory-date-grid {
             grid-template-columns: 1fr;
         }
-        .inventory-modal-body {
-            padding: 18px;
+
+        #itemModal .inventory-modal-body {
+            padding: 14px;
+        }
+
+        #itemModal .form-group {
+            padding: 10px;
+        }
+
+        .modal-actions-row {
+            position: sticky;
+            bottom: 0;
+            margin: 18px -14px -14px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.92);
+            border-top: 1px solid rgba(112, 19, 27, 0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+    }
+
+    @media (max-width: 420px) {
+        .modal-overlay {
+            padding: 0;
+        }
+
+        #itemModal .modal-box {
+            max-height: 100dvh;
+            border-radius: 0 !important;
+            border-left: 0 !important;
+            border-right: 0 !important;
+        }
+
+        .inventory-modal-title {
+            font-size: 16px;
+        }
+
+        .inventory-modal-copy {
+            font-size: 12px;
+        }
+
+        .inventory-category-display,
+        .inventory-medicine-type-display {
+            min-height: 48px;
+            padding-top: 12px;
+            padding-bottom: 12px;
         }
     }
 
@@ -863,6 +948,11 @@
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.04),
             0 10px 22px rgba(0, 0, 0, 0.24);
+    }
+
+    html[data-theme="dark"] .modal-actions-row {
+        background: rgba(15, 23, 42, 0.92);
+        border-top-color: rgba(250, 204, 21, 0.16);
     }
 
     html[data-theme="dark"] #itemModal .form-group {
@@ -1001,10 +1091,11 @@
     }
 
     html[data-theme="dark"] .btn-edit:hover {
-        color: #ffffff;
-        border-color: rgba(250, 204, 21, 0.34);
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.10),
+            0 0 0 3px rgba(250, 204, 21, 0.18),
             0 12px 24px rgba(0, 0, 0, 0.30);
     }
 
@@ -1016,10 +1107,11 @@
     }
 
     html[data-theme="dark"] .btn-delete:hover {
+        background: #dc2626;
         color: #ffffff;
-        border-color: rgba(248, 113, 113, 0.40);
+        border-color: #dc2626;
         box-shadow:
-            0 0 0 3px rgba(248, 113, 113, 0.12),
+            0 0 0 3px rgba(248, 113, 113, 0.18),
             0 12px 24px rgba(0, 0, 0, 0.32);
     }
 </style>

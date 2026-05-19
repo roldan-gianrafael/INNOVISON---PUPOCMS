@@ -711,11 +711,19 @@
 
     .appointments-search-toggle:hover,
     .appointments-search-toggle:focus {
+        background: #facc15 !important;
+        color: #111827 !important;
         border-color: #facc15 !important;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16) !important;
         outline: none !important;
+    }
+
+    .appointments-search-toggle:hover svg,
+    .appointments-search-toggle:focus svg {
+        color: #111827 !important;
+        stroke: currentColor !important;
     }
 
     .appointments-search-toggle:focus-visible {
@@ -784,11 +792,18 @@
 
     .btn-add-walkin:hover {
         transform: translateY(-2px);
+        background: #facc15;
+        color: #111827 !important;
         border-color: #facc15;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
         text-decoration: none;
+    }
+
+    .btn-add-walkin:hover .btn-icon {
+        background: #111827;
+        color: #facc15;
     }
     .btn-add-walkin:hover::after {
         transform: translateX(135%);

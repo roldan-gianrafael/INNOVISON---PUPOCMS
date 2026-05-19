@@ -2271,17 +2271,25 @@
             color: var(--admin-link-hover);
         }
 
-        /* Keep Reports cards high-contrast even on hover */
+        /* Keep Reports cards high-contrast and match the appointment-style yellow hover */
         .main .report-grid .report-card {
             background: #6f1422 !important;
             border: 1px solid #8f3444 !important;
             color: #ffffff !important;
+            overflow: hidden !important;
+            position: relative !important;
         }
 
         .main .report-grid .report-card:hover {
-            background: #7d1a2a !important;
-            color: #ffffff !important;
+            background: #facc15 !important;
+            background-image: none !important;
+            color: #111111 !important;
             filter: none !important;
+            border-color: #facc15 !important;
+        }
+
+        .main .report-grid .report-card.report-card-primary::before {
+            display: none !important;
         }
 
         .main .report-grid .report-card .report-label {
@@ -2295,6 +2303,21 @@
         .main .report-grid .report-card .report-badge {
             background: rgba(255, 255, 255, 0.16) !important;
             color: #ffffff !important;
+        }
+
+        .main .report-grid .report-card .report-card-icon {
+            color: #facc15 !important;
+        }
+
+        .main .report-grid .report-card:hover .report-label,
+        .main .report-grid .report-card:hover .report-main-title,
+        .main .report-grid .report-card:hover .report-badge,
+        .main .report-grid .report-card:hover .report-card-icon {
+            color: #111111 !important;
+        }
+
+        .main .report-grid .report-card:hover .report-badge {
+            background: rgba(17, 17, 17, 0.10) !important;
         }
 
         .main :where(table th) {
@@ -2336,6 +2359,62 @@
             background: var(--admin-primary-btn-hover) !important;
             border-color: var(--admin-primary-btn-hover) !important;
             color: #ffffff !important;
+        }
+
+        .main .appointments-toolbar .btn-add-walkin:hover,
+        .main .appointments-toolbar .btn-add-walkin:focus {
+            background: #facc15 !important;
+            border-color: #facc15 !important;
+            color: #111827 !important;
+        }
+
+        .main .appointments-toolbar .btn-add-walkin:hover svg,
+        .main .appointments-toolbar .btn-add-walkin:focus svg,
+        .main .appointments-toolbar .btn-add-walkin:hover .btn-text,
+        .main .appointments-toolbar .btn-add-walkin:focus .btn-text {
+            color: #111827 !important;
+            stroke: currentColor !important;
+        }
+
+        .main .inventory-toolbar-actions .btn-add:hover,
+        .main .inventory-toolbar-actions .btn-add:focus {
+            background: #facc15 !important;
+            border-color: #facc15 !important;
+            color: #111827 !important;
+        }
+
+        .main .inventory-toolbar-actions .btn-add:hover svg,
+        .main .inventory-toolbar-actions .btn-add:focus svg {
+            color: #111827 !important;
+            stroke: currentColor !important;
+        }
+
+        .main .health-filter-shell .health-filter-toggle:hover,
+        .main .health-filter-shell .health-filter-toggle:focus,
+        .main .health-filter-shell .health-filter-toggle.is-open {
+            background: #facc15 !important;
+            border-color: #facc15 !important;
+            color: #111827 !important;
+        }
+
+        .main .health-records-search-shell .health-records-search-toggle:hover,
+        .main .health-records-search-shell .health-records-search-toggle:focus {
+            background: #facc15 !important;
+            border-color: #facc15 !important;
+            color: #111827 !important;
+        }
+
+        .main .health-records-search-shell .health-records-search-toggle:hover svg,
+        .main .health-records-search-shell .health-records-search-toggle:focus svg {
+            color: #111827 !important;
+            stroke: currentColor !important;
+        }
+
+        .main .export-hub-container .btn-generate:hover,
+        .main .export-hub-container .btn-generate:focus {
+            background: #facc15 !important;
+            border-color: #facc15 !important;
+            color: #111827 !important;
         }
 
         .main :where(.btn-edit, .btn-view, .btn-outline) {

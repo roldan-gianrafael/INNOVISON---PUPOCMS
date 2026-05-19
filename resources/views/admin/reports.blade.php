@@ -107,24 +107,91 @@
         min-height: 160px;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
-        border: 2px solid #facc15;
+        border: 1px solid rgba(112, 19, 27, 0.22);
         cursor: pointer;
         position: relative;
+        overflow: hidden;
+    }
+
+    .report-card > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    .report-card::after {
+        content: "";
+        position: absolute;
+        top: -45%;
+        bottom: -45%;
+        left: -85%;
+        width: 55%;
+        background: linear-gradient(
+            120deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.16) 45%,
+            rgba(255, 255, 255, 0.34) 50%,
+            transparent 100%
+        );
+        transform: translateX(0) skewX(-18deg);
+        transition: transform 0.65s ease;
+        pointer-events: none;
+        z-index: 1;
     }
 
     .report-card:hover {
+        background: #facc15 !important;
+        background-image: none !important;
+        color: #111111 !important;
         transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-        filter: brightness(1.2);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.12),
+            0 20px 30px rgba(139, 0, 0, 0.22);
+        filter: none;
+        border-color: #facc15 !important;
     }
 
-    .report-card.report-card-primary::before {
-        content: "";
-        position: absolute;
-        inset: 8px;
-        border-radius: 12px;
-        border: 2px solid rgba(112, 19, 27, 0.92);
-        pointer-events: none;
+    .report-card:hover::after {
+        transform: translateX(360%) skewX(-18deg);
+    }
+
+    .report-card:hover .report-label,
+    .report-card:hover .report-main-title,
+    .report-card:hover .report-badge,
+    .report-card:hover .report-card-icon {
+        color: #111111 !important;
+    }
+
+    .report-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .report-card-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        color: #facc15;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+    }
+
+    .report-card-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke-width: 1.8;
+    }
+
+    .report-card:hover .report-card-icon {
+        background: rgba(17, 17, 17, 0.10);
+        border-color: rgba(17, 17, 17, 0.14);
+        transform: translateX(3px) scale(1.04);
     }
 
     .report-label {
@@ -153,7 +220,10 @@
         width: fit-content;
         background: rgba(255,255,255,0.1);
         color: #fff;
-        margin-top: 15px;
+    }
+
+    .report-card:hover .report-badge {
+        background: rgba(17, 17, 17, 0.10) !important;
     }
 
     .back-nav {
@@ -236,7 +306,10 @@
                 <div class="report-label">Personnel Records</div>
                 <div class="report-main-title">Medical Accomplishment (MAR)</div>
             </div>
-            <div class="report-badge">Action Needed</div>
+            <div class="report-card-footer">
+                <div class="report-badge">Action Needed</div>
+                <span class="report-card-icon"><x-outline-icon name="clipboard-document-list" /></span>
+            </div>
         </a>
 
         <a href="{{ $inventorySummaryUrl }}" class="report-card report-card-primary">
@@ -244,7 +317,10 @@
                 <div class="report-label">Stocks & Supplies</div>
                 <div class="report-main-title">Inventory Summary</div>
             </div>
-            <div class="report-badge">All Records</div>
+            <div class="report-card-footer">
+                <div class="report-badge">All Records</div>
+                <span class="report-card-icon"><x-outline-icon name="cube" /></span>
+            </div>
         </a>
 
         <a href="{{ $appointmentStatisticsUrl }}" class="report-card report-card-primary">
@@ -252,7 +328,10 @@
                 <div class="report-label">Consultations</div>
                 <div class="report-main-title">Appointment Statistics</div>
             </div>
-            <div class="report-badge">Scheduled</div>
+            <div class="report-card-footer">
+                <div class="report-badge">Scheduled</div>
+                <span class="report-card-icon"><x-outline-icon name="calendar-days" /></span>
+            </div>
         </a>
 
         <a href="{{ $exportHubUrl }}" class="report-card">
@@ -260,7 +339,10 @@
                 <div class="report-label">Summary Report</div>
                 <div class="report-main-title">Export Reports</div>
             </div>
-            <div class="report-badge">All Reports</div>
+            <div class="report-card-footer">
+                <div class="report-badge">All Reports</div>
+                <span class="report-card-icon"><x-outline-icon name="arrow-long-right" /></span>
+            </div>
         </a>
 
         <a href="{{ $feedbacksUrl }}" class="report-card">
@@ -268,7 +350,10 @@
                 <div class="report-label">Patient Experience</div>
                 <div class="report-main-title">Feedbacks</div>
             </div>
-            <div class="report-badge">Rate of Clinic</div>
+            <div class="report-card-footer">
+                <div class="report-badge">Rate of Clinic</div>
+                <span class="report-card-icon"><x-outline-icon name="megaphone" /></span>
+            </div>
         </a>
 
         <a href="{{ $healthFormsUrl }}" class="report-card">
@@ -276,7 +361,10 @@
                 <div class="report-label">Issued Documents</div>
                 <div class="report-main-title">Health Forms</div>
             </div>
-            <div class="report-badge">Issued Only</div>
+            <div class="report-card-footer">
+                <div class="report-badge">Issued Only</div>
+                <span class="report-card-icon"><x-outline-icon name="document-text" /></span>
+            </div>
         </a>
 
         @if($role !== \App\Models\User::ROLE_ADMIN)
@@ -285,7 +373,10 @@
                     <div class="report-label">System Monitoring</div>
                     <div class="report-main-title">Audit Trail</div>
                 </div>
-                <div class="report-badge">Restricted</div>
+                <div class="report-card-footer">
+                    <div class="report-badge">Restricted</div>
+                    <span class="report-card-icon"><x-outline-icon name="eye" /></span>
+                </div>
             </a>
         @endif
 

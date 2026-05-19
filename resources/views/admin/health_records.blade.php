@@ -330,9 +330,7 @@
         color: #ffffff !important;
     }
 
-    .health-filter-toggle,
-    .health-filter-toggle:hover,
-    .health-filter-toggle:focus {
+    .health-filter-toggle {
         color: #ffffff !important;
     }
 
@@ -355,10 +353,19 @@
     .health-filter-toggle:hover,
     .health-filter-toggle.is-open {
         transform: translateY(-1px);
+        background: #facc15;
+        color: #111827 !important;
         border-color: #facc15;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+
+    .health-filter-toggle:focus {
+        background: #facc15;
+        color: #111827 !important;
+        border-color: #facc15;
+        outline: none;
     }
 
     .health-filter-toggle:hover::after,
@@ -455,11 +462,19 @@
     }
     .health-records-search-toggle:hover,
     .health-records-search-toggle:focus {
+        background: #facc15 !important;
+        color: #111827 !important;
         border-color: #facc15 !important;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16) !important;
         outline: none !important;
+    }
+
+    .health-records-search-toggle:hover svg,
+    .health-records-search-toggle:focus svg {
+        color: #111827 !important;
+        stroke: currentColor !important;
     }
 
     .health-filter-btn {

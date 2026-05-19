@@ -295,12 +295,13 @@
             inset 0 -3px 0 rgba(112, 19, 27, 0.82),
             0 10px 24px rgba(15, 23, 42, 0.05);
         overflow: hidden;
-        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
     }
 
     .intake-option-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12);
+        border-color: #70131B;
+        box-shadow: 0 18px 34px rgba(112, 19, 27, 0.22);
     }
 
     .intake-option-card::before {
@@ -309,26 +310,37 @@
         inset: 0;
         pointer-events: none;
         background: linear-gradient(180deg, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0) 38%);
+        z-index: 0;
     }
 
     .intake-option-card::after {
         content: "";
         position: absolute;
-        top: -42%;
-        left: -130%;
-        width: 120%;
-        height: 185%;
-        background: linear-gradient(115deg, rgba(250, 204, 21, 0) 0%, rgba(250, 204, 21, 0.46) 45%, rgba(250, 204, 21, 0) 100%);
-        transform: skewX(-20deg);
-        opacity: 0;
-        transition: left .8s ease, opacity .18s ease;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 0;
+        background: linear-gradient(180deg, #8f2230 0%, #70131B 100%);
+        opacity: 1;
+        transition: height .34s ease;
         pointer-events: none;
         z-index: 0;
     }
 
     .intake-option-card:hover::after {
-        opacity: 1;
-        left: 125%;
+        height: 100%;
+    }
+
+    .intake-option-card:hover .intake-option-title,
+    .intake-option-card:hover .intake-option-copy {
+        color: #ffffff;
+    }
+
+    .intake-option-card:hover .intake-option-chip,
+    .intake-option-card:hover .intake-option-icon-wrap {
+        background: #facc15;
+        color: #111827;
+        border-color: rgba(250, 204, 21, 0.62);
     }
 
     .intake-option-chip {
@@ -344,6 +356,7 @@
         z-index: 2;
         border: 1px solid rgba(255, 255, 255, 0.55);
         box-shadow: 0 8px 14px rgba(15, 23, 42, 0.14);
+        transition: background .2s ease, color .2s ease, border-color .2s ease;
     }
 
     .intake-option-chip svg {
@@ -365,6 +378,7 @@
         position: relative;
         z-index: 1;
         animation: intakeFloat 3.8s ease-in-out infinite;
+        transition: background .2s ease, color .2s ease, border-color .2s ease;
     }
 
     .intake-option-icon-wrap::after {
@@ -396,6 +410,7 @@
         color: #111827;
         position: relative;
         z-index: 1;
+        transition: color .2s ease;
     }
 
     .intake-option-copy {
@@ -404,6 +419,7 @@
         line-height: 1.55;
         position: relative;
         z-index: 1;
+        transition: color .2s ease;
     }
 
     .intake-option-registration {
@@ -505,7 +521,7 @@
     }
 
     html[data-theme="dark"] .intake-option-card::after {
-        background: linear-gradient(115deg, rgba(163, 53, 72, 0) 0%, rgba(163, 53, 72, 0.62) 45%, rgba(163, 53, 72, 0) 100%);
+        background: linear-gradient(180deg, #8f2230 0%, #70131B 100%);
     }
 
     html[data-theme="dark"] .intake-option-card::before {
@@ -1323,7 +1339,7 @@
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+        transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, color .22s ease;
     }
 
     .registration-mode-btn::before {
@@ -1332,19 +1348,22 @@
         inset: 0;
         background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.10));
         pointer-events: none;
+        z-index: 0;
     }
 
     .registration-mode-btn::after {
         content: "";
         position: absolute;
-        left: 10%;
-        right: 10%;
-        bottom: -22px;
-        height: 36px;
-        border-radius: 999px;
-        background: radial-gradient(circle, rgba(148, 163, 184, 0.34) 0%, rgba(148, 163, 184, 0.14) 42%, transparent 78%);
-        filter: blur(12px);
+        top: -42%;
+        left: -130%;
+        width: 120%;
+        height: 185%;
+        background: linear-gradient(115deg, rgba(250, 204, 21, 0) 0%, rgba(250, 204, 21, 0.5) 45%, rgba(250, 204, 21, 0) 100%);
+        transform: skewX(-20deg);
+        opacity: 0;
         pointer-events: none;
+        transition: left .8s ease, opacity .18s ease;
+        z-index: 0;
     }
 
     .registration-mode-btn:hover {
@@ -1356,6 +1375,11 @@
             0 54px 76px -38px rgba(202, 138, 4, 0.42);
         text-decoration: none;
         color: inherit;
+    }
+
+    .registration-mode-btn:hover::after {
+        opacity: 1;
+        left: 125%;
     }
 
     .registration-mode-btn .um-mode-icon {
@@ -1373,6 +1397,7 @@
         position: relative;
         z-index: 1;
         animation: umModeFloat 3.8s ease-in-out infinite;
+        transition: background .22s ease, color .22s ease, border-color .22s ease, transform .22s ease;
     }
 
     .registration-mode-btn .um-mode-icon::after {
@@ -1411,6 +1436,7 @@
         color: #0f172a;
         position: relative;
         z-index: 1;
+        transition: color .22s ease;
     }
 
     .registration-mode-btn p {
@@ -1420,6 +1446,14 @@
         font-size: .95rem;
         position: relative;
         z-index: 1;
+        transition: color .22s ease;
+    }
+
+    .registration-mode-btn:hover .um-mode-icon {
+        background: linear-gradient(145deg, #facc15, #fde68a);
+        color: #111827;
+        border-color: rgba(250, 204, 21, 0.62);
+        transform: translateY(-2px) scale(1.04);
     }
 
     .registration-actions {
@@ -2649,6 +2683,10 @@
 
     html[data-theme="dark"] .registration-mode-btn::before {
         background: none;
+    }
+
+    html[data-theme="dark"] .registration-mode-btn::after {
+        background: linear-gradient(115deg, rgba(250, 204, 21, 0) 0%, rgba(250, 204, 21, 0.46) 45%, rgba(250, 204, 21, 0) 100%);
     }
 
     html[data-theme="dark"] .registration-mode-btn .eyebrow {

@@ -321,7 +321,7 @@ class ReportsController extends Controller
         return $table;
     }
 
-    private function buildMarGadTables(Collection $categories, int $year, int $month): array
+    private function buildMarGadTables(Collection $categories, Carbon $dateFrom, Carbon $dateTo): array
     {
         $consultations = $categories->flatMap(function ($category) {
             return $category->medicalConditions->flatMap->consultations;
@@ -332,8 +332,7 @@ class ReportsController extends Controller
         })->values();
 
         $onlineAppointments = Appointment::with('user.healthProfile')
-            ->whereYear('date', $year)
-            ->whereMonth('date', $month)
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->where('type', 'online')
             ->where('status', '!=', 'Cancelled')
             ->get();
@@ -551,7 +550,7 @@ class ReportsController extends Controller
         ));
     }
 
-    private function buildInventoryReportData(string $monthFilter)
+    private function buildInventoryReportData(string $monthFilter, string $inventoryScope = 'all')
     {
         $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
         $monthEnd = (clone $monthStart)->endOfMonth();
@@ -564,7 +563,15 @@ class ReportsController extends Controller
             ->groupBy('medicine')
             ->pluck('consumed_total', 'medicine');
 
-          return Item::query()
+          $itemsQuery = Item::query();
+
+          if ($inventoryScope === 'medicines') {
+              $itemsQuery->where('category', 'Medicine');
+          } elseif ($inventoryScope === 'supplies') {
+              $itemsQuery->where('category', '!=', 'Medicine');
+          }
+
+          return $itemsQuery
               ->orderBy('name')
               ->get()
               ->map(function ($item) use ($consumedByMedicine) {
@@ -582,16 +589,38 @@ class ReportsController extends Controller
 
     public function marReport(Request $request)
 {
-    $monthFilter = $request->input('month', date('Y-m')); 
-    $year = date('Y', strtotime($monthFilter));
-    $month = date('m', strtotime($monthFilter));
+    $monthFilter = $request->input('month', date('Y-m'));
+    $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+    $monthEnd = (clone $monthStart)->endOfMonth();
+    $dateFromInput = trim((string) $request->input('date_from', ''));
+    $dateToInput = trim((string) $request->input('date_to', ''));
+
+    try {
+        $dateFrom = $dateFromInput !== '' ? Carbon::parse($dateFromInput)->startOfDay() : (clone $monthStart);
+    } catch (\Throwable $exception) {
+        $dateFrom = (clone $monthStart);
+        $dateFromInput = '';
+    }
+
+    try {
+        $dateTo = $dateToInput !== '' ? Carbon::parse($dateToInput)->endOfDay() : (clone $monthEnd);
+    } catch (\Throwable $exception) {
+        $dateTo = (clone $monthEnd);
+        $dateToInput = '';
+    }
+
+    if ($dateFrom->gt($dateTo)) {
+        [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
+        [$dateFromInput, $dateToInput] = [$dateToInput, $dateFromInput];
+    }
+
+    $monthFilter = $dateFrom->format('Y-m');
 
     // Gamitin ang consultations table columns directly para sa counting
-    $categories = Category::with(['medicalConditions.consultations' => function($query) use ($year, $month) {
-        $query->whereYear('consultation_date', $year)
-              ->whereMonth('consultation_date', $month);
+    $categories = Category::with(['medicalConditions.consultations' => function($query) use ($dateFrom, $dateTo) {
+        $query->whereBetween('consultation_date', [$dateFrom->toDateString(), $dateTo->toDateString()]);
     }])->get();
-    $gadTables = $this->buildMarGadTables($categories, (int) $year, (int) $month);
+    $gadTables = $this->buildMarGadTables($categories, $dateFrom, $dateTo);
 
     $allConditions = MedicalConditions::with('category')->get();
     $categoryList = Category::all();
@@ -603,6 +632,8 @@ class ReportsController extends Controller
         'allConditions' => $allConditions,
         'categoryList' => $categoryList,
         'month' => $monthFilter,
+        'dateFrom' => $dateFrom->toDateString(),
+        'dateTo' => $dateTo->toDateString(),
         'totalToday' => $totalToday
     ]);
 }
@@ -648,9 +679,23 @@ public function printReport(Request $request)
 {
     $type = $request->query('type'); // mar, inventory, or appointment
     $output = trim((string) $request->query('output', 'html'));
+    $inventoryScope = trim((string) $request->query('inventory_scope', 'all'));
+    if (!in_array($inventoryScope, ['all', 'medicines', 'supplies'], true)) {
+        $inventoryScope = 'all';
+    }
     $monthFilter = $request->input('month', date('Y-m'));
     $year = date('Y', strtotime($monthFilter));
     $month = date('m', strtotime($monthFilter));
+    $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+    $monthEnd = (clone $monthStart)->endOfMonth();
+    $dateFromInput = trim((string) $request->input('date_from', ''));
+    $dateToInput = trim((string) $request->input('date_to', ''));
+    $dateFrom = $dateFromInput !== '' ? Carbon::parse($dateFromInput)->startOfDay() : (clone $monthStart);
+    $dateTo = $dateToInput !== '' ? Carbon::parse($dateToInput)->endOfDay() : (clone $monthEnd);
+
+    if ($dateFrom->gt($dateTo)) {
+        [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
+    }
 
     $title = "";
     $data = [];
@@ -658,15 +703,18 @@ public function printReport(Request $request)
     if ($type == 'mar') {
         $title = "MONTHLY ACCOMPLISHMENT REPORT";
         // for categories
-        $data = \App\Models\Category::with(['medicalConditions.consultations' => function($query) use ($year, $month) {
-            $query->whereYear('consultation_date', $year)
-                  ->whereMonth('consultation_date', $month);
+        $data = \App\Models\Category::with(['medicalConditions.consultations' => function($query) use ($dateFrom, $dateTo) {
+            $query->whereBetween('consultation_date', [$dateFrom->toDateString(), $dateTo->toDateString()]);
         }])->get();
-        $gadTables = $this->buildMarGadTables($data, (int) $year, (int) $month);
+        $gadTables = $this->buildMarGadTables($data, $dateFrom, $dateTo);
     } 
     elseif ($type == 'inventory') {
-        $title = "INVENTORY STOCK REPORT";
-        $data = $this->buildInventoryReportData($monthFilter);
+        $title = match ($inventoryScope) {
+            'medicines' => "INVENTORY OF MEDICINES",
+            'supplies' => "INVENTORY OF SUPPLIES",
+            default => "INVENTORY STOCK REPORT",
+        };
+        $data = $this->buildInventoryReportData($monthFilter, $inventoryScope);
     }
     elseif ($type == 'appointment') {
     $title = "APPOINTMENT SUMMARY REPORT";
@@ -721,11 +769,12 @@ public function printReport(Request $request)
             'type' => $type,
             'title' => $title,
             'monthFilter' => $monthFilter,
+            'inventoryScope' => $inventoryScope,
             'gadTables' => $gadTables ?? [],
             'isPdf' => true,
         ])->setPaper('a4', 'portrait');
 
-        $fileType = $type !== '' ? $type : 'report';
+        $fileType = $type === 'inventory' && $inventoryScope !== 'all' ? 'inventory-' . $inventoryScope : ($type !== '' ? $type : 'report');
         $safeMonth = preg_replace('/[^0-9\-]/', '', $monthFilter) ?: now()->format('Y-m');
 
         return $pdf->stream("{$fileType}-report-{$safeMonth}.pdf");
@@ -736,6 +785,7 @@ public function printReport(Request $request)
         'type' => $type,
         'title' => $title,
         'monthFilter' => $monthFilter,
+        'inventoryScope' => $inventoryScope,
         'gadTables' => $gadTables ?? [],
         'isPdf' => false,
         'pdfUnavailable' => $output === 'pdf',

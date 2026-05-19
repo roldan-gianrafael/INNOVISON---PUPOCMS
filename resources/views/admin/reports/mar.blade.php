@@ -56,7 +56,7 @@
         gap: 10px;
         flex-wrap: wrap;
     }
-    .mar-month-input {
+    .mar-date-input {
         min-width: 170px;
         padding: 10px 12px;
         border-radius: 10px;
@@ -65,6 +65,17 @@
         color: #334155;
         font-size: 14px;
         font-weight: 700;
+    }
+    .mar-date-field {
+        display: grid;
+        gap: 5px;
+    }
+    .mar-date-field label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #70131B;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
     .mar-generate-btn {
         background: linear-gradient(135deg, #70131B, #8f2230);
@@ -148,16 +159,20 @@
         color: #ffffff;
     }
     .mar-manage-btn:hover {
-        transform: translateY(-1px);
+        transform: translateY(-2px);
         border-color: #facc15;
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.18),
-            0 14px 24px rgba(112, 19, 27, 0.16);
-        color: #ffffff;
-        background: linear-gradient(135deg, #70131B, #8f2230);
+            0 0 0 3px rgba(250, 204, 21, 0.12),
+            0 18px 30px rgba(139, 0, 0, 0.22);
+        color: #111111;
+        background: #facc15;
     }
     .mar-manage-btn:hover .mar-manage-btn-label {
-        color: #ffffff;
+        color: #111111;
+    }
+    .mar-manage-btn:hover::before {
+        background: #111111;
+        color: #facc15;
     }
     .mar-manage-btn:hover::after {
         transform: translateX(135%);
@@ -211,22 +226,24 @@
         z-index: -1;
     }
     .report-switch-btn:hover {
-        transform: translateY(-1px);
+        background: #facc15;
+        color: #111111;
+        transform: translateY(-2px);
         border-color: #facc15;
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.18),
-            0 14px 24px rgba(112, 19, 27, 0.16);
+            0 0 0 3px rgba(250, 204, 21, 0.12),
+            0 18px 30px rgba(139, 0, 0, 0.22);
     }
     .report-switch-btn:hover::after {
         transform: translateX(135%);
     }
     .report-switch-btn.is-active {
-        background: linear-gradient(135deg, #70131B, #8f2230);
-        color: #fff;
+        background: #facc15;
+        color: #111111;
         border-color: #facc15;
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.18),
-            0 14px 24px rgba(112, 19, 27, 0.16);
+            0 0 0 3px rgba(250, 204, 21, 0.12),
+            0 18px 30px rgba(139, 0, 0, 0.22);
     }
     .report-panel {
         display: none;
@@ -296,10 +313,17 @@
     <form method="GET" class="mar-filter-bar">
         <div class="mar-filter-copy">
             <p class="mar-filter-title">Report Filter</p>
-            <p class="mar-filter-subtitle">Choose the month you want to review, then regenerate the MAR tables below.</p>
+            <p class="mar-filter-subtitle">Set the date range you want to review, then regenerate the MAR tables below.</p>
         </div>
         <div class="mar-filter-controls">
-            <input type="month" name="month" class="mar-month-input" value="{{ $month }}">
+            <div class="mar-date-field">
+                <label for="marDateFrom">From Date</label>
+                <input type="date" id="marDateFrom" name="date_from" class="mar-date-input" value="{{ $dateFrom ?? '' }}">
+            </div>
+            <div class="mar-date-field">
+                <label for="marDateTo">To Date</label>
+                <input type="date" id="marDateTo" name="date_to" class="mar-date-input" value="{{ $dateTo ?? '' }}">
+            </div>
             <button class="mar-generate-btn" type="submit">Generate</button>
         </div>
     </form>

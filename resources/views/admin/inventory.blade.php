@@ -483,6 +483,191 @@
         font-weight: 600;
     }
 
+    .inventory-medicine-type-wrap {
+        position: relative;
+    }
+
+    .inventory-medicine-type-select {
+        position: absolute;
+        width: 1px !important;
+        height: 1px !important;
+        opacity: 0;
+        pointer-events: none;
+        padding: 0 !important;
+        border: 0 !important;
+        margin: 0 !important;
+    }
+
+    .inventory-medicine-type-display {
+        width: 100%;
+        min-height: 52px;
+        padding: 14px 52px 14px 16px;
+        border: 1px solid rgba(127, 29, 29, 0.22);
+        border-radius: 18px;
+        font-size: 14px;
+        color: #111111;
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.10), transparent 36%),
+            linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.08),
+            inset 0 1px 0 rgba(255,255,255,0.86);
+        cursor: pointer;
+        font-weight: 700;
+        text-align: left;
+        transition: all 0.2s ease;
+    }
+
+    .inventory-medicine-type-display:hover {
+        border-color: rgba(139, 0, 0, 0.34);
+        box-shadow:
+            0 14px 24px rgba(15, 23, 42, 0.10),
+            0 8px 18px rgba(139, 0, 0, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.90);
+        transform: translateY(-1px);
+    }
+
+    .inventory-medicine-type-display.is-open,
+    .inventory-medicine-type-display:focus {
+        outline: none;
+        border-color: #8B0000;
+        box-shadow:
+            0 0 0 4px rgba(139, 0, 0, 0.06),
+            0 14px 24px rgba(139, 0, 0, 0.10),
+            inset 0 1px 0 rgba(255,255,255,0.88);
+    }
+
+    .inventory-medicine-type-wrap::after {
+        content: "";
+        position: absolute;
+        top: 26px;
+        right: 18px;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #8B0000;
+        border-bottom: 2px solid #8B0000;
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+        transition: transform 0.18s ease;
+    }
+
+    .inventory-medicine-type-wrap::before {
+        content: "";
+        position: absolute;
+        top: 26px;
+        right: 42px;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 24px;
+        background: rgba(148, 163, 184, 0.24);
+        pointer-events: none;
+    }
+
+    .inventory-medicine-type-wrap.is-open::after {
+        transform: translateY(-20%) rotate(225deg);
+    }
+
+    .inventory-medicine-type-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        right: 0;
+        display: none;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+        z-index: 80;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        max-height: 260px;
+        overflow: hidden;
+    }
+
+    .inventory-medicine-type-wrap.is-open .inventory-medicine-type-menu {
+        display: grid;
+    }
+
+    .inventory-medicine-type-search {
+        width: 100%;
+        min-height: 44px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(127, 29, 29, 0.18);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 36%),
+            linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        color: #111111;
+        font-size: 13px;
+        font-weight: 700;
+        outline: none;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+    }
+
+    .inventory-medicine-type-search::placeholder {
+        color: #6b7280;
+        font-weight: 700;
+    }
+
+    .inventory-medicine-type-search:focus {
+        border-color: #8B0000;
+        box-shadow:
+            0 0 0 3px rgba(139, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255,255,255,0.88);
+    }
+
+    .inventory-medicine-type-options {
+        display: grid;
+        gap: 10px;
+        max-height: 188px;
+        overflow-y: auto;
+        padding-right: 2px;
+    }
+
+    .inventory-medicine-type-option {
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: #1e293b;
+        border-radius: 999px;
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 800;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.08),
+            inset 0 1px 0 rgba(255,255,255,0.82);
+    }
+
+    .inventory-medicine-type-option:hover,
+    .inventory-medicine-type-option.is-selected {
+        transform: translateY(-1px);
+        border-color: #8B0000;
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15;
+        box-shadow: 0 12px 20px rgba(139, 0, 0, 0.16);
+    }
+
+    .inventory-medicine-type-empty {
+        display: none;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px dashed rgba(127, 29, 29, 0.20);
+        color: #6b7280;
+        background: rgba(255, 255, 255, 0.76);
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .inventory-medicine-type-menu.is-filter-empty .inventory-medicine-type-empty {
+        display: block;
+    }
+
     .inventory-subgroup {
         display: none;
         border-left: 3px solid #8B0000;
@@ -675,6 +860,84 @@
 
     html[data-theme="dark"] #itemModal .form-control::placeholder {
         color: #94a3b8;
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-display {
+        color: #f8fafc !important;
+        border-color: rgba(250, 204, 21, 0.16);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 36%),
+            linear-gradient(180deg, rgba(40, 26, 26, 0.98) 0%, rgba(23, 23, 23, 0.98) 100%);
+        box-shadow:
+            0 12px 22px rgba(0, 0, 0, 0.22),
+            inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-display:hover,
+    html[data-theme="dark"] .inventory-medicine-type-display:focus,
+    html[data-theme="dark"] .inventory-medicine-type-display.is-open {
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 4px rgba(250, 204, 21, 0.14),
+            0 14px 24px rgba(0, 0, 0, 0.26),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-wrap::after {
+        border-right-color: #facc15;
+        border-bottom-color: #facc15;
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-wrap::before {
+        background: rgba(250, 204, 21, 0.18);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-menu {
+        background: rgba(18, 18, 18, 0.96);
+        border-color: rgba(250, 204, 21, 0.14);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-search {
+        color: #f8fafc;
+        border-color: rgba(250, 204, 21, 0.16);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 36%),
+            linear-gradient(180deg, rgba(40, 26, 26, 0.98) 0%, rgba(23, 23, 23, 0.98) 100%);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-search::placeholder {
+        color: rgba(248, 250, 252, 0.62);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-search:focus {
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.14),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-option {
+        color: #f8fafc !important;
+        border-color: rgba(250, 204, 21, 0.14);
+        background: linear-gradient(180deg, rgba(40, 26, 26, 0.98) 0%, rgba(23, 23, 23, 0.98) 100%);
+        box-shadow:
+            0 12px 22px rgba(0, 0, 0, 0.22),
+            inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-option:hover,
+    html[data-theme="dark"] .inventory-medicine-type-option.is-selected {
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15 !important;
+        border-color: rgba(250, 204, 21, 0.28);
+    }
+
+    html[data-theme="dark"] .inventory-medicine-type-empty {
+        color: #f8fafc;
+        border-color: rgba(250, 204, 21, 0.18);
+        background: rgba(255, 255, 255, 0.06);
     }
 
     html[data-theme="dark"] #medicineFields,
@@ -903,12 +1166,26 @@
                                 <div id="medicineFields" class="inventory-subgroup">
                                     <div class="form-group">
                                         <label>Medicine Type</label>
-                                        <select name="medicine_type_id" id="iMedicineType" class="form-control">
-                                            <option value="">-- Select Type --</option>
-                                            @foreach($medicineTypes as $medicineType)
-                                                <option value="{{ $medicineType->id }}">{{ $medicineType->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <div class="inventory-medicine-type-wrap" id="inventoryMedicineTypeWrap">
+                                            <select name="medicine_type_id" id="iMedicineType" class="form-control inventory-medicine-type-select">
+                                                <option value="">-- Select Type --</option>
+                                                @foreach($medicineTypes as $medicineType)
+                                                    <option value="{{ $medicineType->id }}">{{ $medicineType->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="button" class="inventory-medicine-type-display" id="inventoryMedicineTypeDisplay" aria-haspopup="listbox" aria-expanded="false">
+                                                Select medicine type
+                                            </button>
+                                            <div class="inventory-medicine-type-menu" id="inventoryMedicineTypeMenu" role="listbox" aria-label="Medicine Type options">
+                                                <input type="search" class="inventory-medicine-type-search" id="inventoryMedicineTypeSearch" placeholder="Search medicine type..." autocomplete="off">
+                                                <div class="inventory-medicine-type-options">
+                                                    @foreach($medicineTypes as $medicineType)
+                                                        <button type="button" class="inventory-medicine-type-option" data-medicine-type-value="{{ $medicineType->id }}" data-medicine-type-name="{{ strtolower($medicineType->name) }}">{{ $medicineType->name }}</button>
+                                                    @endforeach
+                                                </div>
+                                                <div class="inventory-medicine-type-empty" id="inventoryMedicineTypeEmpty">No medicine type found.</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -996,6 +1273,7 @@
 @push('scripts')
 <script>
     const itemModal = document.getElementById('itemModal');
+    const itemForm = document.getElementById('itemForm');
     const medicineFields = document.getElementById('medicineFields');
     const medicineDispensingFields = document.getElementById('medicineDispensingFields');
     const medicineExpiryField = document.getElementById('medicineExpiryField');
@@ -1010,6 +1288,63 @@
     const inventorySearchShell = document.getElementById('inventorySearchShell');
     const inventorySearchToggle = document.getElementById('inventorySearchToggle');
     const inventoryRows = Array.from(document.querySelectorAll('#inventoryTable tbody tr[data-inventory-row]'));
+    const medicineTypeWrap = document.getElementById('inventoryMedicineTypeWrap');
+    const medicineTypeDisplay = document.getElementById('inventoryMedicineTypeDisplay');
+    const medicineTypeMenu = document.getElementById('inventoryMedicineTypeMenu');
+    const medicineTypeSearch = document.getElementById('inventoryMedicineTypeSearch');
+    const medicineTypeOptions = Array.from(document.querySelectorAll('.inventory-medicine-type-option'));
+    const medicineTypeEmpty = document.getElementById('inventoryMedicineTypeEmpty');
+
+    function syncMedicineTypeDisplay() {
+        if (!medicineSelect || !medicineTypeDisplay) return;
+
+        const selectedOption = medicineSelect.options[medicineSelect.selectedIndex];
+        const selectedText = selectedOption && selectedOption.value ? selectedOption.text : 'Select medicine type';
+        medicineTypeDisplay.textContent = selectedText;
+
+        medicineTypeOptions.forEach(function(option) {
+            option.classList.toggle('is-selected', option.dataset.medicineTypeValue === medicineSelect.value);
+        });
+    }
+
+    function setMedicineTypeOpenState(isOpen) {
+        if (!medicineTypeWrap || !medicineTypeDisplay) return;
+
+        medicineTypeWrap.classList.toggle('is-open', isOpen);
+        medicineTypeDisplay.classList.toggle('is-open', isOpen);
+        medicineTypeDisplay.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+        if (isOpen && medicineTypeSearch) {
+            medicineTypeSearch.value = '';
+            filterMedicineTypeOptions('');
+            setTimeout(function() {
+                medicineTypeSearch.focus();
+            }, 0);
+        }
+    }
+
+    function filterMedicineTypeOptions(query) {
+        const normalizedQuery = String(query || '').trim().toLowerCase();
+        let visibleCount = 0;
+
+        medicineTypeOptions.forEach(function(option) {
+            const searchableName = option.dataset.medicineTypeName || option.textContent.toLowerCase();
+            const isVisible = searchableName.includes(normalizedQuery);
+
+            option.style.display = isVisible ? '' : 'none';
+            if (isVisible) {
+                visibleCount += 1;
+            }
+        });
+
+        if (medicineTypeMenu) {
+            medicineTypeMenu.classList.toggle('is-filter-empty', visibleCount === 0);
+        }
+
+        if (medicineTypeEmpty) {
+            medicineTypeEmpty.style.display = visibleCount === 0 ? 'block' : '';
+        }
+    }
 
     function toggleDispensingFields() {
         if (!medicineDispensingFields) return;
@@ -1058,6 +1393,7 @@
             medicineSelect.removeAttribute('required');
             expDateInput.removeAttribute('required');
             medicineSelect.value = ''; 
+            syncMedicineTypeDisplay();
             if (dispensingUnitInput) {
                 dispensingUnitInput.value = '';
             }
@@ -1088,8 +1424,10 @@
         }
         document.getElementById('iDateAdded').value = new Date().toISOString().split('T')[0]; // Set today as default
         document.getElementById('iExpDate').value = '';
+        medicineSelect.value = '';
         
         toggleMedicineFields();
+        syncMedicineTypeDisplay();
     }
 
     function editItem(item) {
@@ -1117,12 +1455,87 @@
             document.getElementById('iMedicineType').value = item.medicine_type_id || '';
             document.getElementById('iExpDate').value = item.expiration_date || '';
         }
+        syncMedicineTypeDisplay();
         toggleDispensingFields();
     }
 
     function closeModal() {
         if (!itemModal) return;
         itemModal.style.display = 'none';
+        setMedicineTypeOpenState(false);
+    }
+
+    if (medicineTypeDisplay && medicineTypeMenu && medicineSelect) {
+        medicineTypeDisplay.addEventListener('click', function(event) {
+            event.preventDefault();
+            setMedicineTypeOpenState(!medicineTypeWrap.classList.contains('is-open'));
+        });
+
+        medicineTypeOptions.forEach(function(option) {
+            option.addEventListener('click', function(event) {
+                event.preventDefault();
+                medicineSelect.value = option.dataset.medicineTypeValue || '';
+                medicineSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                syncMedicineTypeDisplay();
+                setMedicineTypeOpenState(false);
+            });
+        });
+
+        medicineSelect.addEventListener('change', syncMedicineTypeDisplay);
+
+        if (medicineTypeSearch) {
+            medicineTypeSearch.addEventListener('input', function(event) {
+                filterMedicineTypeOptions(event.target.value);
+            });
+
+            medicineTypeSearch.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    setMedicineTypeOpenState(false);
+                    medicineTypeDisplay.focus();
+                } else if (event.key === 'Enter') {
+                    event.preventDefault();
+                    const firstVisibleOption = medicineTypeOptions.find(function(option) {
+                        return option.style.display !== 'none';
+                    });
+
+                    if (firstVisibleOption) {
+                        firstVisibleOption.click();
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('click', function(event) {
+            if (medicineTypeWrap && !medicineTypeWrap.contains(event.target)) {
+                setMedicineTypeOpenState(false);
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                setMedicineTypeOpenState(false);
+            }
+        });
+
+        syncMedicineTypeDisplay();
+    }
+
+    if (itemForm && medicineSelect && medicineTypeDisplay) {
+        itemForm.addEventListener('submit', function(event) {
+            const category = document.getElementById('iCategory').value;
+
+            if (category === 'Medicine' && !medicineSelect.value) {
+                event.preventDefault();
+                setMedicineTypeOpenState(true);
+                medicineTypeDisplay.focus();
+                medicineTypeDisplay.setCustomValidity('Please select a medicine type.');
+                medicineTypeDisplay.reportValidity();
+                setTimeout(function() {
+                    medicineTypeDisplay.setCustomValidity('');
+                }, 0);
+            }
+        });
     }
 
     const clearHighlightQueryParam = function (paramName) {

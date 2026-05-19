@@ -1591,7 +1591,8 @@
 
     .assisted-panel-body > .mb-3,
     .assisted-panel-body > .mb-2,
-    .assisted-panel-body > .d-flex.gap-2,
+    .assisted-panel-body > .assisted-pair-row,
+    .assisted-panel-body > .assisted-field-card,
     .assisted-panel-body > input.form-control,
     .assisted-panel-body > .assisted-callout,
     .assisted-panel-body > div[style*="background:#fff7ed"] {
@@ -1604,12 +1605,13 @@
     }
 
     .assisted-panel-body > .mb-3,
-    .assisted-panel-body > .d-flex.gap-2:first-of-type {
+    .assisted-panel-body > .assisted-pair-row:first-of-type {
         grid-column: 1 / -1;
     }
 
     .assisted-panel-body > .mb-3 label,
-    .assisted-panel-body > .mb-2 label {
+    .assisted-panel-body > .mb-2 label,
+    .assisted-field-label {
         display: block;
         margin: 0 0 9px;
         font-size: 13px !important;
@@ -1621,26 +1623,41 @@
 
     .assisted-panel-body > .mb-3 .form-control,
     .assisted-panel-body > .mb-2 .form-control,
-    .assisted-panel-body > .d-flex.gap-2 .form-control,
+    .assisted-panel-body > .assisted-pair-row .form-control,
+    .assisted-panel-body > .assisted-field-card .form-control,
     .assisted-panel-body > input.form-control {
         width: 100%;
-        min-height: 50px;
-        padding: 12px 16px;
+        min-height: 56px;
+        padding: 16px 18px;
         border: 1px solid rgba(148, 163, 184, 0.20);
         border-radius: 18px;
-        font-size: 15px;
+        font-size: 14px;
         color: #111111;
-        font-weight: 400;
+        font-weight: 700;
         margin-bottom: 0 !important;
-        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.10), transparent 36%),
+            linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
         box-shadow:
-            0 10px 18px rgba(15, 23, 42, 0.05),
+            0 12px 22px rgba(15, 23, 42, 0.08),
             inset 0 1px 0 rgba(255,255,255,0.86);
         transition: all 0.2s ease;
     }
 
-    .assisted-panel-body > .d-flex.gap-2 {
-        gap: 14px !important;
+    .assisted-pair-row {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px !important;
+        align-items: stretch;
+    }
+
+    .assisted-field-card {
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.92);
+        min-width: 0;
     }
 
     .assisted-panel-body > input.form-control {
@@ -1649,7 +1666,16 @@
 
     .assisted-panel-body .form-control::placeholder {
         color: #94a3b8;
-        font-weight: 400;
+        font-weight: 600;
+    }
+
+    .assisted-panel-body .form-control:hover {
+        border-color: rgba(139, 0, 0, 0.24);
+        box-shadow:
+            0 14px 24px rgba(15, 23, 42, 0.10),
+            0 8px 18px rgba(139, 0, 0, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.90);
+        transform: translateY(-1px);
     }
 
     .assisted-panel-body .form-control:focus,
@@ -1661,6 +1687,7 @@
             inset 0 1px 0 rgba(255,255,255,0.88);
         background: #ffffff;
         outline: none;
+        transform: translateY(-1px);
     }
 
     .assisted-panel-body select.form-control {
@@ -1680,10 +1707,17 @@
 
     .assisted-panel-body input[type="date"].form-control {
         letter-spacing: 0.01em;
+        color: #1e293b;
     }
 
-    .assisted-panel-body .d-flex.gap-2 .form-control {
-        flex: 1 1 0;
+    .assisted-panel-body input[type="date"].form-control::-webkit-calendar-picker-indicator {
+        opacity: 0.7;
+        cursor: pointer;
+        filter: sepia(1) saturate(6) hue-rotate(330deg);
+    }
+
+    .assisted-field-card .assisted-gender-wrap {
+        width: 100%;
     }
 
     .assisted-role-wrap {
@@ -1881,6 +1915,12 @@
 
     .assisted-gender-wrap.is-open::after {
         transform: translateY(-20%) rotate(225deg);
+    }
+
+    @media (max-width: 767.98px) {
+        .assisted-pair-row {
+            grid-template-columns: 1fr;
+        }
     }
 
     .assisted-gender-menu {
@@ -2855,10 +2895,8 @@
 
             <div class="mb-3">
                 <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Student Number / Reference ID</label>
-                <div class="d-flex gap-2">
-                    <input type="text" id="reg_student_id" class="form-control mb-0" style="background: #ffffff; font-weight: bold; border: 2px solid #cbd5e1;" placeholder="Enter student number or reference ID" required>
-                    <input type="hidden" id="reg_barcode">
-                </div>
+                <input type="text" id="reg_student_id" class="form-control mb-0" placeholder="Enter student number or reference ID" required>
+                <input type="hidden" id="reg_barcode">
             </div>
             
             <div class="mb-2">
@@ -2885,15 +2923,26 @@
                 </div>
             </div>
             
-            <div class="d-flex gap-2">
-                <input type="text" id="reg_first_name" placeholder="First Name" class="form-control" required>
-                <input type="text" id="reg_last_name" placeholder="Last Name" class="form-control" required>
+            <div class="assisted-pair-row">
+                <div class="assisted-field-card">
+                    <label class="assisted-field-label" for="reg_first_name">First Name</label>
+                    <input type="text" id="reg_first_name" placeholder="Enter first name" class="form-control" required>
+                </div>
+                <div class="assisted-field-card">
+                    <label class="assisted-field-label" for="reg_last_name">Last Name</label>
+                    <input type="text" id="reg_last_name" placeholder="Enter last name" class="form-control" required>
+                </div>
             </div>
 
-            <div class="d-flex gap-2">
-                <input type="date" id="reg_dob" class="form-control" style="margin-bottom:10px;" aria-label="Birthday">
-                <div class="assisted-gender-wrap" id="assistedGenderWrap" style="flex:1 1 0;">
-                    <select id="reg_gender" class="form-control assisted-gender-select" style="margin-bottom:10px;">
+            <div class="assisted-pair-row">
+                <div class="assisted-field-card">
+                    <label class="assisted-field-label" for="reg_dob">Birthday</label>
+                    <input type="date" id="reg_dob" class="form-control" aria-label="Birthday">
+                </div>
+                <div class="assisted-field-card">
+                    <label class="assisted-field-label" for="reg_gender">Sex / Gender</label>
+                    <div class="assisted-gender-wrap" id="assistedGenderWrap">
+                    <select id="reg_gender" class="form-control assisted-gender-select">
                         <option value="">Sex / Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -2908,10 +2957,18 @@
                         <button type="button" class="assisted-gender-option" data-gender-value="Other">Other</button>
                     </div>
                 </div>
+                </div>
             </div>
 
-            <input type="text" id="reg_contact_no" placeholder="Contact Number" class="form-control">
-            <input type="email" id="reg_email" placeholder="Email Address (optional)" class="form-control">
+            <div class="assisted-field-card">
+                <label class="assisted-field-label" for="reg_contact_no">Contact Number</label>
+                <input type="text" id="reg_contact_no" placeholder="Enter contact number" class="form-control">
+            </div>
+
+            <div class="assisted-field-card">
+                <label class="assisted-field-label" for="reg_email">Email Address</label>
+                <input type="email" id="reg_email" placeholder="Enter email address (optional)" class="form-control">
+            </div>
 
             <div style="background:#fff7ed; border:1px dashed #fdba74; border-radius:10px; padding:12px 14px; margin-bottom:10px;">
                 <strong style="display:block; font-size:12px; color:#9a3412; margin-bottom:4px;">No password needed for assisted intake</strong>

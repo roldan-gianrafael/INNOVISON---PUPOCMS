@@ -2309,6 +2309,52 @@
         font-size: 12px !important;
     }
 
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-3,
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-2,
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .assisted-pair-row,
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .assisted-field-card,
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > input.form-control,
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > div[style*="background:#fff7ed"] {
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 34%),
+            linear-gradient(180deg, rgba(47, 24, 24, 0.92) 0%, rgba(30, 18, 18, 0.98) 100%) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.04),
+            0 12px 24px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-3.assisted-highlight-card {
+        border-color: rgba(250, 204, 21, 0.18) !important;
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 34%),
+            linear-gradient(180deg, rgba(74, 24, 31, 0.96) 0%, rgba(52, 18, 23, 0.98) 100%) !important;
+    }
+
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .assisted-pair-row .assisted-field-card,
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .assisted-field-card {
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 34%),
+            linear-gradient(180deg, rgba(47, 24, 24, 0.92) 0%, rgba(30, 18, 18, 0.98) 100%) !important;
+    }
+
+    html[data-theme="dark"] .assisted-intake-shell .assisted-section-divider span {
+        background: rgba(20, 20, 20, 0.9) !important;
+        border-color: rgba(250, 204, 21, 0.18) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body .form-control,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-role-display,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-gender-display {
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 36%),
+            linear-gradient(180deg, rgba(40, 26, 26, 0.98) 0%, rgba(23, 23, 23, 0.98) 100%) !important;
+        color: #f8fafc !important;
+        border-color: rgba(250, 204, 21, 0.16) !important;
+    }
+
     .assisted-summary-block {
         padding: 18px;
         border-radius: 20px;

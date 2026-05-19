@@ -601,10 +601,17 @@
         display: grid;
     }
 
-    #itemModal .inventory-medicine-type-wrap.is-open .inventory-medicine-type-menu {
-        position: static;
-        margin-top: 10px;
-        width: 100%;
+    .inventory-medicine-type-menu.is-open {
+        display: grid;
+    }
+
+    #itemModal .inventory-medicine-type-wrap.is-open .inventory-medicine-type-menu,
+    body > .inventory-medicine-type-menu.is-open {
+        position: fixed;
+        right: auto;
+        z-index: 2200;
+        width: min(420px, calc(100vw - 32px));
+        max-height: min(360px, calc(100vh - 32px));
     }
 
     .inventory-medicine-type-search {
@@ -919,7 +926,8 @@
     }
 
     html[data-theme="dark"] .inventory-category-menu,
-    html[data-theme="dark"] .inventory-medicine-type-menu {
+    html[data-theme="dark"] .inventory-medicine-type-menu,
+    html[data-theme="dark"] body > .inventory-medicine-type-menu {
         background: rgba(18, 18, 18, 0.96);
         border-color: rgba(250, 204, 21, 0.14);
         box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
@@ -1338,6 +1346,7 @@
     const medicineTypeSearch = document.getElementById('inventoryMedicineTypeSearch');
     const medicineTypeOptions = Array.from(document.querySelectorAll('.inventory-medicine-type-option'));
     const medicineTypeEmpty = document.getElementById('inventoryMedicineTypeEmpty');
+    const medicineTypeMenuHome = medicineTypeMenu ? medicineTypeMenu.parentElement : null;
 
     function syncCategoryDisplay() {
         if (!categorySelect || !categoryDisplay) return;
@@ -1376,14 +1385,51 @@
         medicineTypeWrap.classList.toggle('is-open', isOpen);
         medicineTypeDisplay.classList.toggle('is-open', isOpen);
         medicineTypeDisplay.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (medicineTypeMenu) {
+            medicineTypeMenu.classList.toggle('is-open', isOpen);
+        }
 
         if (isOpen && medicineTypeSearch) {
+            if (medicineTypeMenu && medicineTypeMenu.parentElement !== document.body) {
+                document.body.appendChild(medicineTypeMenu);
+            }
+            positionMedicineTypeMenu();
             medicineTypeSearch.value = '';
             filterMedicineTypeOptions('');
             setTimeout(function() {
+                positionMedicineTypeMenu();
                 medicineTypeSearch.focus();
             }, 0);
+        } else if (medicineTypeMenu) {
+            medicineTypeMenu.style.left = '';
+            medicineTypeMenu.style.top = '';
+            medicineTypeMenu.style.width = '';
+            medicineTypeMenu.style.maxHeight = '';
+            if (medicineTypeMenuHome && medicineTypeMenu.parentElement !== medicineTypeMenuHome) {
+                medicineTypeMenuHome.appendChild(medicineTypeMenu);
+            }
         }
+    }
+
+    function positionMedicineTypeMenu() {
+        if (!medicineTypeDisplay || !medicineTypeMenu || !medicineTypeWrap.classList.contains('is-open')) return;
+
+        const triggerRect = medicineTypeDisplay.getBoundingClientRect();
+        const viewportPadding = 16;
+        const preferredWidth = Math.max(triggerRect.width, 320);
+        const width = Math.min(preferredWidth, window.innerWidth - (viewportPadding * 2));
+        const left = Math.min(Math.max(triggerRect.left, viewportPadding), window.innerWidth - width - viewportPadding);
+        const spaceBelow = window.innerHeight - triggerRect.bottom - viewportPadding;
+        const spaceAbove = triggerRect.top - viewportPadding;
+        const openAbove = spaceBelow < 260 && spaceAbove > spaceBelow;
+        const maxHeight = Math.max(180, Math.min(360, (openAbove ? spaceAbove : spaceBelow) - 10));
+
+        medicineTypeMenu.style.left = `${left}px`;
+        medicineTypeMenu.style.width = `${width}px`;
+        medicineTypeMenu.style.maxHeight = `${maxHeight}px`;
+        medicineTypeMenu.style.top = openAbove
+            ? `${Math.max(viewportPadding, triggerRect.top - maxHeight - 10)}px`
+            : `${Math.min(window.innerHeight - viewportPadding, triggerRect.bottom + 10)}px`;
     }
 
     function filterMedicineTypeOptions(query) {
@@ -1581,7 +1627,7 @@
                 filterMedicineTypeOptions(event.target.value);
             });
 
-            medicineTypeSearch.addEventListener('keydown', function(event) {
+        medicineTypeSearch.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape') {
                     event.preventDefault();
                     setMedicineTypeOpenState(false);
@@ -1599,12 +1645,20 @@
             });
         }
 
+        window.addEventListener('resize', positionMedicineTypeMenu);
+        window.addEventListener('scroll', positionMedicineTypeMenu, true);
+
         document.addEventListener('click', function(event) {
             if (categoryWrap && !categoryWrap.contains(event.target)) {
                 setCategoryOpenState(false);
             }
 
-            if (medicineTypeWrap && !medicineTypeWrap.contains(event.target)) {
+            if (
+                medicineTypeWrap &&
+                medicineTypeMenu &&
+                !medicineTypeWrap.contains(event.target) &&
+                !medicineTypeMenu.contains(event.target)
+            ) {
                 setMedicineTypeOpenState(false);
             }
         });

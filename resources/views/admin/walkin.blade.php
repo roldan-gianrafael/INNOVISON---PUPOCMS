@@ -1898,16 +1898,14 @@
                     <div class="applicant-modal-panel">
                         <div id="applicantOcrReviewPanel">
                             <div id="ocrResultPanel" class="ocr-result-panel">
-                                <p class="ocr-result-help">Review the extracted values below. Staff can correct them before confirming the patient record.</p>
-
-                                <div class="ocr-result-grid">
-                                    <div>
-                                        <p class="ocr-result-label">Detected Student Number</p>
-                                        <input type="text" id="ocr_student_number" class="form-control" placeholder="Student number from ID card" style="margin-bottom:0;">
+                                <div style="display:grid; gap:12px;">
+                                    <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center;">
+                                        <p class="ocr-result-label" style="margin:0;">Full Name</p>
+                                        <input type="text" id="ocr_student_name" class="form-control" placeholder="Enter full name" style="margin-bottom:0;">
                                     </div>
-                                    <div>
-                                        <p class="ocr-result-label">Detected Student Name</p>
-                                        <input type="text" id="ocr_student_name" class="form-control" placeholder="Full name from ID card" style="margin-bottom:0;">
+                                    <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center;">
+                                        <p class="ocr-result-label" style="margin:0;">ID Number</p>
+                                        <input type="text" id="ocr_student_number" class="form-control" placeholder="Enter ID number" style="margin-bottom:0;">
                                     </div>
                                 </div>
 

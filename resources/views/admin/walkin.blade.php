@@ -2600,29 +2600,6 @@
                     </div>
                 </section>
 
-                <aside class="assisted-summary-card">
-                    <section class="assisted-panel">
-                        <div class="assisted-panel-body">
-                            <div class="assisted-summary-block">
-                                <p class="assisted-summary-kicker">Record Preview</p>
-                                <h4 class="assisted-summary-title">Assisted Profile Snapshot</h4>
-                                <p class="assisted-summary-copy">This patient will be saved as a local assisted intake record first, then can be linked to a future account using matching identity details.</p>
-                                <div class="assisted-preview-list">
-                                    <div class="assisted-preview-item">
-                                        <small>Status</small>
-                                        <strong>Awaiting save</strong>
-                                    </div>
-                                    <div class="assisted-preview-item">
-                                        <small>Identity Mode</small>
-                                        <strong>Staff-assisted registration</strong>
-                                    </div>
-                                    <div class="assisted-preview-item">
-                                        <small>Next Step</small>
-                                        <strong>Continue to consultation form</strong>
-                                    </div>
-                                </div>
-                            </div>
-
             <div id="notification" style="margin: 10px 0;"></div>
             
             <button type="button" id="confirmBtn" class="btn btn-success w-100 fw-bold py-3 mt-2" style="border-radius: 8px; background: #15803d; border: none; color: white;">
@@ -2632,9 +2609,6 @@
             <div class="text-center mt-3">
                 <a href="{{ url($basePrefix . '/walkin') }}" style="font-size: 12px; color: #64748b; text-decoration: none;">Back to intake options</a>
             </div>
-                        </div>
-                    </section>
-                </aside>
             </div>
         </form>
     </div>

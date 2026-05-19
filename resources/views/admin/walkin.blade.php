@@ -1476,7 +1476,7 @@
 
     .assisted-intake-shell {
         display: grid;
-        grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.7fr);
+        grid-template-columns: minmax(0, 1fr);
         gap: 22px;
         align-items: start;
     }
@@ -1612,10 +1612,10 @@
     .assisted-panel-body > .mb-2 label {
         display: block;
         margin: 0 0 9px;
-        font-size: 11px !important;
-        font-weight: 900 !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
         text-transform: uppercase;
-        letter-spacing: 0.07em;
+        letter-spacing: 0.5px;
         color: #64748b !important;
     }
 
@@ -1623,19 +1623,20 @@
     .assisted-panel-body > .mb-2 .form-control,
     .assisted-panel-body > .d-flex.gap-2 .form-control,
     .assisted-panel-body > input.form-control {
-        border-radius: 16px;
-        border: 1px solid #d6dee8;
-        min-height: 52px;
-        padding: 14px 16px;
+        width: 100%;
+        min-height: 50px;
+        padding: 12px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.20);
+        border-radius: 18px;
+        font-size: 15px;
+        color: #111111;
+        font-weight: 400;
         margin-bottom: 0 !important;
-        background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
-        color: #0f172a;
-        font-size: 14px;
-        font-weight: 600;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
         box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.98),
-            0 1px 2px rgba(15, 23, 42, 0.04);
-        transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease, background-color .18s ease;
+            0 10px 18px rgba(15, 23, 42, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.86);
+        transition: all 0.2s ease;
     }
 
     .assisted-panel-body > .d-flex.gap-2 {
@@ -1648,19 +1649,18 @@
 
     .assisted-panel-body .form-control::placeholder {
         color: #94a3b8;
-        font-weight: 500;
+        font-weight: 400;
     }
 
     .assisted-panel-body .form-control:focus,
     .assisted-panel-body select.form-control:focus {
-        border-color: rgba(112, 19, 27, 0.55);
+        border-color: #8B0000;
         box-shadow:
-            0 0 0 4px rgba(112, 19, 27, 0.10),
-            0 12px 24px rgba(112, 19, 27, 0.08),
-            inset 0 1px 0 rgba(255,255,255,0.98);
+            0 0 0 4px rgba(139, 0, 0, 0.06),
+            0 14px 24px rgba(139, 0, 0, 0.10),
+            inset 0 1px 0 rgba(255,255,255,0.88);
         background: #ffffff;
         outline: none;
-        transform: translateY(-1px);
     }
 
     .assisted-panel-body select.form-control {
@@ -1684,6 +1684,130 @@
 
     .assisted-panel-body .d-flex.gap-2 .form-control {
         flex: 1 1 0;
+    }
+
+    .assisted-role-wrap {
+        position: relative;
+    }
+
+    .assisted-role-select {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        padding: 0;
+        border: 0;
+        margin: 0;
+    }
+
+    .assisted-role-display {
+        width: 100%;
+        min-height: 52px;
+        padding: 14px 52px 14px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.20);
+        border-radius: 18px;
+        font-size: 14px;
+        color: #111111;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.86);
+        cursor: pointer;
+        font-weight: 600;
+        text-align: left;
+        transition: all 0.2s ease;
+    }
+
+    .assisted-role-display:hover {
+        border-color: rgba(139, 0, 0, 0.28);
+        box-shadow: 0 10px 18px rgba(139, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,0.86);
+    }
+
+    .assisted-role-display.is-open,
+    .assisted-role-display:focus {
+        outline: none;
+        border-color: #8B0000;
+        box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.06), 0 10px 18px rgba(139, 0, 0, 0.08);
+    }
+
+    .assisted-role-wrap::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 18px;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #8B0000;
+        border-bottom: 2px solid #8B0000;
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+        transition: transform 0.18s ease;
+    }
+
+    .assisted-role-wrap::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 42px;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 24px;
+        background: rgba(148, 163, 184, 0.24);
+        pointer-events: none;
+    }
+
+    .assisted-role-wrap.is-open::after {
+        transform: translateY(-20%) rotate(225deg);
+    }
+
+    .assisted-role-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        right: 0;
+        display: none;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+        z-index: 80;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .assisted-role-wrap.is-open .assisted-role-menu {
+        display: grid;
+    }
+
+    .assisted-role-option {
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: #1e293b;
+        border-radius: 999px;
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 800;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08), 0 1px 0 rgba(255,255,255,0.82) inset;
+    }
+
+    .assisted-role-option:hover {
+        transform: translateY(-1px);
+        border-color: #8B0000;
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15;
+        box-shadow: 0 12px 20px rgba(139, 0, 0, 0.16);
+    }
+
+    .assisted-role-option.is-selected {
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #ffffff;
+        border-color: #8B0000;
+        box-shadow: 0 14px 24px rgba(139, 0, 0, 0.18);
     }
 
     .assisted-field,
@@ -1742,6 +1866,9 @@
     .assisted-intake-shell > .assisted-panel > .assisted-panel-body {
         display: block;
         padding: 28px 30px;
+        max-width: 880px;
+        margin: 0 auto;
+        width: 100%;
     }
 
     .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-3,
@@ -2612,14 +2739,26 @@
             
             <div class="mb-2">
                 <label style="font-size: 11px; font-weight: 700; color: #475569;">PATIENT ROLE</label>
-                <select id="reg_user_type" class="form-control" required>
-                    <option value="" disabled selected>-- Choose Patient Role --</option>
-                    <option value="Guest">Guest</option>
-                    <option value="Dependent">Dependent</option>
-                    <option value="Student">Student</option>
-                    <option value="Faculty">Faculty</option>
-                    <option value="Admin">Admin</option>
-                </select>
+                <div class="assisted-role-wrap" id="assistedRoleWrap">
+                    <select id="reg_user_type" class="form-control assisted-role-select" required>
+                        <option value="" disabled selected>-- Choose Patient Role --</option>
+                        <option value="Guest">Guest</option>
+                        <option value="Dependent">Dependent</option>
+                        <option value="Student">Student</option>
+                        <option value="Faculty">Faculty</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                    <button type="button" class="assisted-role-display" id="assistedRoleDisplay" aria-haspopup="listbox" aria-expanded="false">
+                        Select patient role
+                    </button>
+                    <div class="assisted-role-menu" id="assistedRoleMenu" role="listbox" aria-label="Patient Role options">
+                        <button type="button" class="assisted-role-option" data-role-value="Guest">Guest</button>
+                        <button type="button" class="assisted-role-option" data-role-value="Dependent">Dependent</button>
+                        <button type="button" class="assisted-role-option" data-role-value="Student">Student</button>
+                        <button type="button" class="assisted-role-option" data-role-value="Faculty">Faculty</button>
+                        <button type="button" class="assisted-role-option" data-role-value="Admin">Admin</button>
+                    </div>
+                </div>
             </div>
             
             <div class="d-flex gap-2">
@@ -2730,11 +2869,39 @@
         const openScanLookupModalBtn = document.getElementById('openScanLookupModal');
         const openApplicantScanModalBtn = document.getElementById('openApplicantScanModal');
         const closeApplicantScanModalBtn = document.getElementById('closeApplicantScanModal');
+        const assistedRoleSelect = document.getElementById('reg_user_type');
+        const assistedRoleDisplay = document.getElementById('assistedRoleDisplay');
+        const assistedRoleMenu = document.getElementById('assistedRoleMenu');
+        const assistedRoleOptions = Array.from(document.querySelectorAll('.assisted-role-option'));
+        const assistedRoleWrap = assistedRoleDisplay ? assistedRoleDisplay.closest('.assisted-role-wrap') : null;
 
         updateScanModeUI();
 
         function getDestinationLabel() {
             return intakeTarget === 'assessment' ? 'medical assessment form' : 'consultation form';
+        }
+
+        function syncAssistedRoleDisplay() {
+            if (!assistedRoleSelect || !assistedRoleDisplay) return;
+
+            const selectedValue = assistedRoleSelect.value || '';
+            const selectedText = selectedValue
+                ? (assistedRoleSelect.options[assistedRoleSelect.selectedIndex]?.text || selectedValue)
+                : 'Select patient role';
+
+            assistedRoleDisplay.textContent = selectedText;
+
+            assistedRoleOptions.forEach(function (option) {
+                option.classList.toggle('is-selected', option.dataset.roleValue === selectedValue);
+            });
+        }
+
+        function setAssistedRoleOpenState(isOpen) {
+            if (!assistedRoleWrap || !assistedRoleDisplay) return;
+
+            assistedRoleWrap.classList.toggle('is-open', isOpen);
+            assistedRoleDisplay.classList.toggle('is-open', isOpen);
+            assistedRoleDisplay.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         }
 
         function getScannerVideoElement() {
@@ -3400,7 +3567,8 @@
             $('#manualInputArea').show();
             buildStatus('AI verification could not finish right now.', 'info');
             $('#ocrConfidenceText').text('Student no. confidence: 10%');
-            updateScanModeUI();
+        updateScanModeUI();
+        syncAssistedRoleDisplay();
             if (applicantScanModal) {
                 applicantScanModal.classList.add('show');
             }
@@ -3435,6 +3603,28 @@
             applicantScanModal.addEventListener('click', function (event) {
                 if (event.target === applicantScanModal) {
                     closeApplicantScanModal();
+                }
+            });
+        }
+
+        if (assistedRoleSelect && assistedRoleDisplay && assistedRoleWrap) {
+            assistedRoleDisplay.addEventListener('click', function () {
+                const shouldOpen = !assistedRoleWrap.classList.contains('is-open');
+                setAssistedRoleOpenState(shouldOpen);
+            });
+
+            assistedRoleOptions.forEach(function (option) {
+                option.addEventListener('click', function () {
+                    const value = option.dataset.roleValue || '';
+                    assistedRoleSelect.value = value;
+                    syncAssistedRoleDisplay();
+                    setAssistedRoleOpenState(false);
+                });
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!assistedRoleWrap.contains(event.target)) {
+                    setAssistedRoleOpenState(false);
                 }
             });
         }

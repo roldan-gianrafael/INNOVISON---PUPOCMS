@@ -1810,6 +1810,130 @@
         box-shadow: 0 14px 24px rgba(139, 0, 0, 0.18);
     }
 
+    .assisted-gender-wrap {
+        position: relative;
+    }
+
+    .assisted-gender-select {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        padding: 0;
+        border: 0;
+        margin: 0;
+    }
+
+    .assisted-gender-display {
+        width: 100%;
+        min-height: 52px;
+        padding: 14px 52px 14px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.20);
+        border-radius: 18px;
+        font-size: 14px;
+        color: #111111;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.86);
+        cursor: pointer;
+        font-weight: 600;
+        text-align: left;
+        transition: all 0.2s ease;
+    }
+
+    .assisted-gender-display:hover {
+        border-color: rgba(139, 0, 0, 0.28);
+        box-shadow: 0 10px 18px rgba(139, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,0.86);
+    }
+
+    .assisted-gender-display.is-open,
+    .assisted-gender-display:focus {
+        outline: none;
+        border-color: #8B0000;
+        box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.06), 0 10px 18px rgba(139, 0, 0, 0.08);
+    }
+
+    .assisted-gender-wrap::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 18px;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #8B0000;
+        border-bottom: 2px solid #8B0000;
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+        transition: transform 0.18s ease;
+    }
+
+    .assisted-gender-wrap::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 42px;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 24px;
+        background: rgba(148, 163, 184, 0.24);
+        pointer-events: none;
+    }
+
+    .assisted-gender-wrap.is-open::after {
+        transform: translateY(-20%) rotate(225deg);
+    }
+
+    .assisted-gender-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        right: 0;
+        display: none;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+        z-index: 80;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .assisted-gender-wrap.is-open .assisted-gender-menu {
+        display: grid;
+    }
+
+    .assisted-gender-option {
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: #1e293b;
+        border-radius: 999px;
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 800;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08), 0 1px 0 rgba(255,255,255,0.82) inset;
+    }
+
+    .assisted-gender-option:hover {
+        transform: translateY(-1px);
+        border-color: #8B0000;
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15;
+        box-shadow: 0 12px 20px rgba(139, 0, 0, 0.16);
+    }
+
+    .assisted-gender-option.is-selected {
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #ffffff;
+        border-color: #8B0000;
+        box-shadow: 0 14px 24px rgba(139, 0, 0, 0.18);
+    }
+
     .assisted-field,
     .assisted-field-full {
         padding: 14px;
@@ -2768,12 +2892,22 @@
 
             <div class="d-flex gap-2">
                 <input type="date" id="reg_dob" class="form-control" style="margin-bottom:10px;" aria-label="Birthday">
-                <select id="reg_gender" class="form-control" style="margin-bottom:10px;">
-                    <option value="">Sex / Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
+                <div class="assisted-gender-wrap" id="assistedGenderWrap" style="flex:1 1 0;">
+                    <select id="reg_gender" class="form-control assisted-gender-select" style="margin-bottom:10px;">
+                        <option value="">Sex / Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <button type="button" class="assisted-gender-display" id="assistedGenderDisplay" aria-haspopup="listbox" aria-expanded="false">
+                        Select sex / gender
+                    </button>
+                    <div class="assisted-gender-menu" id="assistedGenderMenu" role="listbox" aria-label="Sex / Gender options">
+                        <button type="button" class="assisted-gender-option" data-gender-value="Male">Male</button>
+                        <button type="button" class="assisted-gender-option" data-gender-value="Female">Female</button>
+                        <button type="button" class="assisted-gender-option" data-gender-value="Other">Other</button>
+                    </div>
+                </div>
             </div>
 
             <input type="text" id="reg_contact_no" placeholder="Contact Number" class="form-control">
@@ -2874,6 +3008,11 @@
         const assistedRoleMenu = document.getElementById('assistedRoleMenu');
         const assistedRoleOptions = Array.from(document.querySelectorAll('.assisted-role-option'));
         const assistedRoleWrap = assistedRoleDisplay ? assistedRoleDisplay.closest('.assisted-role-wrap') : null;
+        const assistedGenderSelect = document.getElementById('reg_gender');
+        const assistedGenderDisplay = document.getElementById('assistedGenderDisplay');
+        const assistedGenderMenu = document.getElementById('assistedGenderMenu');
+        const assistedGenderOptions = Array.from(document.querySelectorAll('.assisted-gender-option'));
+        const assistedGenderWrap = assistedGenderDisplay ? assistedGenderDisplay.closest('.assisted-gender-wrap') : null;
 
         updateScanModeUI();
 
@@ -2902,6 +3041,29 @@
             assistedRoleWrap.classList.toggle('is-open', isOpen);
             assistedRoleDisplay.classList.toggle('is-open', isOpen);
             assistedRoleDisplay.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        function syncAssistedGenderDisplay() {
+            if (!assistedGenderSelect || !assistedGenderDisplay) return;
+
+            const selectedValue = assistedGenderSelect.value || '';
+            const selectedText = selectedValue
+                ? (assistedGenderSelect.options[assistedGenderSelect.selectedIndex]?.text || selectedValue)
+                : 'Select sex / gender';
+
+            assistedGenderDisplay.textContent = selectedText;
+
+            assistedGenderOptions.forEach(function (option) {
+                option.classList.toggle('is-selected', option.dataset.genderValue === selectedValue);
+            });
+        }
+
+        function setAssistedGenderOpenState(isOpen) {
+            if (!assistedGenderWrap || !assistedGenderDisplay) return;
+
+            assistedGenderWrap.classList.toggle('is-open', isOpen);
+            assistedGenderDisplay.classList.toggle('is-open', isOpen);
+            assistedGenderDisplay.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         }
 
         function getScannerVideoElement() {
@@ -3569,6 +3731,7 @@
             $('#ocrConfidenceText').text('Student no. confidence: 10%');
         updateScanModeUI();
         syncAssistedRoleDisplay();
+        syncAssistedGenderDisplay();
             if (applicantScanModal) {
                 applicantScanModal.classList.add('show');
             }
@@ -3625,6 +3788,28 @@
             document.addEventListener('click', function (event) {
                 if (!assistedRoleWrap.contains(event.target)) {
                     setAssistedRoleOpenState(false);
+                }
+            });
+        }
+
+        if (assistedGenderSelect && assistedGenderDisplay && assistedGenderWrap) {
+            assistedGenderDisplay.addEventListener('click', function () {
+                const shouldOpen = !assistedGenderWrap.classList.contains('is-open');
+                setAssistedGenderOpenState(shouldOpen);
+            });
+
+            assistedGenderOptions.forEach(function (option) {
+                option.addEventListener('click', function () {
+                    const value = option.dataset.genderValue || '';
+                    assistedGenderSelect.value = value;
+                    syncAssistedGenderDisplay();
+                    setAssistedGenderOpenState(false);
+                });
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!assistedGenderWrap.contains(event.target)) {
+                    setAssistedGenderOpenState(false);
                 }
             });
         }

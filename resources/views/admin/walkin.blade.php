@@ -1623,11 +1623,19 @@
     .assisted-panel-body > .mb-2 .form-control,
     .assisted-panel-body > .d-flex.gap-2 .form-control,
     .assisted-panel-body > input.form-control {
-        border-radius: 14px;
-        border: 1px solid #cbd5e1;
-        min-height: 48px;
+        border-radius: 16px;
+        border: 1px solid #d6dee8;
+        min-height: 52px;
+        padding: 14px 16px;
         margin-bottom: 0 !important;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.95);
+        background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+        color: #0f172a;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.98),
+            0 1px 2px rgba(15, 23, 42, 0.04);
+        transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease, background-color .18s ease;
     }
 
     .assisted-panel-body > .d-flex.gap-2 {
@@ -1636,6 +1644,46 @@
 
     .assisted-panel-body > input.form-control {
         width: 100%;
+    }
+
+    .assisted-panel-body .form-control::placeholder {
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    .assisted-panel-body .form-control:focus,
+    .assisted-panel-body select.form-control:focus {
+        border-color: rgba(112, 19, 27, 0.55);
+        box-shadow:
+            0 0 0 4px rgba(112, 19, 27, 0.10),
+            0 12px 24px rgba(112, 19, 27, 0.08),
+            inset 0 1px 0 rgba(255,255,255,0.98);
+        background: #ffffff;
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+    .assisted-panel-body select.form-control {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-right: 44px;
+        background-image:
+            linear-gradient(45deg, transparent 50%, #70131B 50%),
+            linear-gradient(135deg, #70131B 50%, transparent 50%);
+        background-position:
+            calc(100% - 20px) calc(50% - 3px),
+            calc(100% - 14px) calc(50% - 3px);
+        background-size: 6px 6px, 6px 6px;
+        background-repeat: no-repeat;
+    }
+
+    .assisted-panel-body input[type="date"].form-control {
+        letter-spacing: 0.01em;
+    }
+
+    .assisted-panel-body .d-flex.gap-2 .form-control {
+        flex: 1 1 0;
     }
 
     .assisted-field,

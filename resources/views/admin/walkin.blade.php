@@ -1474,6 +1474,350 @@
         background: #ffffff;
     }
 
+    .assisted-intake-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: 18px;
+    }
+
+    .assisted-panel {
+        position: relative;
+        border-radius: 24px;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
+        box-shadow: 0 20px 44px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+        overflow: hidden;
+    }
+
+    .assisted-panel::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 26px;
+        right: 26px;
+        height: 4px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #70131B 0%, #a11d33 54%, #facc15 100%);
+    }
+
+    .assisted-panel-body {
+        padding: 22px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .assisted-hero {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 18px;
+        grid-column: 1 / -1;
+    }
+
+    .assisted-hero-badge {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        background: linear-gradient(145deg, #70131B, #8f2230);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 16px 30px rgba(112, 19, 27, 0.22);
+        flex-shrink: 0;
+    }
+
+    .assisted-hero-badge svg {
+        width: 28px;
+        height: 28px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+    }
+
+    .assisted-hero-copy h3 {
+        margin: 0;
+        font-size: 1.45rem;
+        font-weight: 900;
+        color: #111827;
+        letter-spacing: -0.02em;
+    }
+
+    .assisted-hero-copy p {
+        margin: 8px 0 0;
+        color: #64748b;
+        line-height: 1.6;
+        font-size: .95rem;
+    }
+
+    .assisted-status-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .assisted-status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .assisted-status-chip.pending {
+        background: #fff7ed;
+        border: 1px solid #fdba74;
+        color: #9a3412;
+    }
+
+    .assisted-status-chip.ready {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #047857;
+    }
+
+    .assisted-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .assisted-panel-body > .mb-3,
+    .assisted-panel-body > .mb-2,
+    .assisted-panel-body > .d-flex.gap-2,
+    .assisted-panel-body > input.form-control,
+    .assisted-panel-body > .assisted-callout,
+    .assisted-panel-body > div[style*="background:#fff7ed"] {
+        margin-bottom: 14px !important;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.92);
+    }
+
+    .assisted-panel-body > .mb-3,
+    .assisted-panel-body > .d-flex.gap-2:first-of-type {
+        grid-column: 1 / -1;
+    }
+
+    .assisted-panel-body > .mb-3 label,
+    .assisted-panel-body > .mb-2 label {
+        display: block;
+        margin: 0 0 9px;
+        font-size: 11px !important;
+        font-weight: 900 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #64748b !important;
+    }
+
+    .assisted-panel-body > .mb-3 .form-control,
+    .assisted-panel-body > .mb-2 .form-control,
+    .assisted-panel-body > .d-flex.gap-2 .form-control,
+    .assisted-panel-body > input.form-control {
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        min-height: 48px;
+        margin-bottom: 0 !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.95);
+    }
+
+    .assisted-panel-body > .d-flex.gap-2 {
+        gap: 14px !important;
+    }
+
+    .assisted-panel-body > input.form-control {
+        width: 100%;
+    }
+
+    .assisted-field,
+    .assisted-field-full {
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.92);
+    }
+
+    .assisted-field-full {
+        grid-column: 1 / -1;
+    }
+
+    .assisted-field-label {
+        display: block;
+        margin: 0 0 9px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #64748b;
+    }
+
+    .assisted-field .form-control,
+    .assisted-field select,
+    .assisted-field-full .form-control,
+    .assisted-field-full select {
+        margin-bottom: 0;
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        min-height: 48px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.95);
+    }
+
+    .assisted-inline-identity {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 14px;
+    }
+
+    .assisted-summary-card {
+        display: grid;
+        gap: 14px;
+    }
+
+    .assisted-summary-card .assisted-panel-body {
+        display: block;
+    }
+
+    .assisted-summary-block {
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px solid rgba(112, 19, 27, 0.10);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.16), transparent 34%),
+            linear-gradient(180deg, #fffdf8 0%, #fff9fb 48%, #ffffff 100%);
+        box-shadow: 0 18px 32px rgba(15, 23, 42, 0.06);
+    }
+
+    .assisted-summary-kicker {
+        margin: 0 0 8px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #8b0000;
+    }
+
+    .assisted-summary-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #111827;
+    }
+
+    .assisted-summary-copy {
+        margin: 8px 0 0;
+        color: #64748b;
+        line-height: 1.6;
+        font-size: .93rem;
+    }
+
+    .assisted-preview-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .assisted-preview-item {
+        display: grid;
+        grid-template-columns: 110px minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+        padding: 11px 12px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.9);
+        border: 1px solid rgba(203, 213, 225, 0.7);
+    }
+
+    .assisted-preview-item small {
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+    }
+
+    .assisted-preview-item strong {
+        color: #111827;
+        font-size: 14px;
+    }
+
+    .assisted-callout {
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #fff7ed, #fffaf3);
+        border: 1px dashed #fdba74;
+    }
+
+    .assisted-callout strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: #9a3412;
+    }
+
+    .assisted-callout p {
+        margin: 0;
+        font-size: 12px;
+        color: #7c2d12;
+        line-height: 1.6;
+    }
+
+    .assisted-footer {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px dashed #cbd5e1;
+    }
+
+    .assisted-save-btn {
+        width: 100%;
+        min-height: 56px;
+        border: none;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #15803d, #166534 54%, #14532d);
+        color: #ffffff;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        box-shadow: 0 18px 28px rgba(22, 101, 52, 0.24);
+    }
+
+    .assisted-footer-link {
+        margin-top: 12px;
+        text-align: center;
+    }
+
+    .assisted-footer-link a {
+        font-size: 12px;
+        color: #64748b;
+        text-decoration: none;
+    }
+
+    @media (max-width: 900px) {
+        .assisted-intake-shell,
+        .assisted-inline-identity {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .assisted-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .assisted-preview-item {
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+    }
+
     .fingerprint-hub {
         max-width: 980px;
     }
@@ -2156,9 +2500,24 @@
         <form id="formRegisterStudent">
             @csrf
 
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; margin-bottom:16px;">
-                <strong style="display:block; color:#0f172a; font-size:13px; margin-bottom:4px;">Staff-assisted patient capture</strong>
+            <div class="assisted-intake-shell">
+                <section class="assisted-panel">
+                    <div class="assisted-panel-body">
+                        <div class="assisted-hero">
+                            <div class="assisted-hero-badge" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75V4.875c0-1.036-.84-1.875-1.875-1.875h-3.75c-1.035 0-1.875.84-1.875 1.875V6.75m7.5 0h1.125c1.035 0 1.875.84 1.875 1.875v9.75c0 1.035-.84 1.875-1.875 1.875H7.125c-1.035 0-1.875-.84-1.875-1.875v-9.75c0-1.035.84-1.875 1.875-1.875H8.25m7.5 0h-7.5m3.75 3v3.75m-1.875-1.875h3.75" />
+                                </svg>
+                            </div>
+                            <div class="assisted-hero-copy">
+                                <h3>Clinic Concierge Intake</h3>
+                                <div class="assisted-status-row" style="margin-bottom:10px;">
+                                    <span class="assisted-status-chip pending">Temporary Record</span>
+                                    <span class="assisted-status-chip ready">Ready for Consultation</span>
+                                </div>
                 <p style="margin:0; color:#64748b; font-size:12px; line-height:1.5;">Capture the patient’s basic identity details here, then continue to the consult form for the clinical information and assessment.</p>
+            </div>
+
             </div>
 
             <div class="mb-3">
@@ -2204,6 +2563,32 @@
                 <p style="margin:0; font-size:12px; color:#7c2d12; line-height:1.5;">If no email is provided, the system will create a temporary assisted record and proceed straight to consultation.</p>
             </div>
             
+                    </div>
+                </section>
+
+                <aside class="assisted-summary-card">
+                    <section class="assisted-panel">
+                        <div class="assisted-panel-body">
+                            <div class="assisted-summary-block">
+                                <p class="assisted-summary-kicker">Record Preview</p>
+                                <h4 class="assisted-summary-title">Assisted Profile Snapshot</h4>
+                                <p class="assisted-summary-copy">This patient will be saved as a local assisted intake record first, then can be linked to a future account using matching identity details.</p>
+                                <div class="assisted-preview-list">
+                                    <div class="assisted-preview-item">
+                                        <small>Status</small>
+                                        <strong>Awaiting save</strong>
+                                    </div>
+                                    <div class="assisted-preview-item">
+                                        <small>Identity Mode</small>
+                                        <strong>Staff-assisted registration</strong>
+                                    </div>
+                                    <div class="assisted-preview-item">
+                                        <small>Next Step</small>
+                                        <strong>Continue to consultation form</strong>
+                                    </div>
+                                </div>
+                            </div>
+
             <div id="notification" style="margin: 10px 0;"></div>
             
             <button type="button" id="confirmBtn" class="btn btn-success w-100 fw-bold py-3 mt-2" style="border-radius: 8px; background: #15803d; border: none; color: white;">
@@ -2212,6 +2597,10 @@
             
             <div class="text-center mt-3">
                 <a href="{{ url($basePrefix . '/walkin') }}" style="font-size: 12px; color: #64748b; text-decoration: none;">Back to intake options</a>
+            </div>
+                        </div>
+                    </section>
+                </aside>
             </div>
         </form>
     </div>

@@ -4278,9 +4278,21 @@
         });
 
         $('#confirmBtn').on('click', function() {
+            const form = document.getElementById('formRegisterStudent');
             const role = $('#reg_user_type').val();
+            const email = $('#reg_email').val().trim();
 
             if(!role) { alert("Please select a User Role!"); return; }
+
+            if (!email) {
+                $('#reg_email')[0].reportValidity();
+                return;
+            }
+
+            if (form && !form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
             $(this).prop('disabled', true).text('PROCESSING...');
             
@@ -4292,23 +4304,36 @@
                 student_number: $('#reg_student_id').val(),
                 first_name: $('#reg_first_name').val(),
                 last_name: $('#reg_last_name').val(),
-                email: $('#reg_email').val(),
+                email: email,
                 dob: $('#reg_dob').val(),
                 gender: $('#reg_gender').val(),
                 contact_no: $('#reg_contact_no').val(),
                 barcode: $('#reg_barcode').val() || $('#reg_student_id').val()
             };
 
-            $.post("{{ url($basePrefix . '/walkin/register') }}", formData, function(res) {
+            $.ajax({
+                url: "{{ url($basePrefix . '/walkin/register') }}",
+                method: 'POST',
+                data: formData,
+                headers: {
+                    Accept: 'application/json'
+                }
+            }).done(function(res) {
                 if(res.redirect_url) window.location.href = res.redirect_url;
                 else window.location.reload();
             }).fail(function(xhr) {
-                $('#confirmBtn').prop('disabled', false).text('CONFIRM REGISTRATION');
+                $('#confirmBtn').prop('disabled', false).text('SAVE ASSISTED INTAKE');
                 let errorMsg = "Assisted intake failed.";
                 if(xhr.responseJSON && xhr.responseJSON.errors) {
                     errorMsg = Object.values(xhr.responseJSON.errors)[0][0];
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                } else if (xhr.status === 419) {
+                    errorMsg = "Your session expired. Please refresh the page and try again.";
+                } else if (xhr.status === 409) {
+                    errorMsg = "This account already exists.";
                 }
-                $('#notification').html(`<p style="color:red; font-size:12px; font-weight:bold; background:#fee2e2; padding:10px; border-radius:8px;">${errorMsg}</p>`);
+                $('#notification').html(`<p style="color:#991b1b; font-size:12px; font-weight:bold; background:#fee2e2; padding:10px; border-radius:8px; border:1px solid #fecaca;">${$('<div>').text(errorMsg).html()}</p>`);
             });
         });
     });

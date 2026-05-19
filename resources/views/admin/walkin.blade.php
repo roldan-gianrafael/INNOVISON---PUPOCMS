@@ -1922,8 +1922,21 @@
                                 <div class="applicant-biosync-scanline"></div>
                             </div>
                             <div class="applicant-biosync-copy">
-                                <h4>BioSync Scanner Pending</h4>
-                                <p>The applicant biometric verification panel is not yet active. Keep the scanner ready while we prepare the fingerprint capture workflow.</p>
+                                <h4>BioSync Pending</h4>
+                                <div style="margin-top:14px; display:grid; gap:10px; width:min(100%, 320px);">
+                                    <div style="padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.88); border:1px solid rgba(148,163,184,0.25); text-align:left;">
+                                        <small style="display:block; font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:#64748b;">Full Name</small>
+                                        <strong style="display:block; margin-top:4px; font-size:15px; color:#0f172a;">Waiting for BioSync</strong>
+                                    </div>
+                                    <div style="padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.88); border:1px solid rgba(148,163,184,0.25); text-align:left;">
+                                        <small style="display:block; font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:#64748b;">ID Number</small>
+                                        <strong style="display:block; margin-top:4px; font-size:15px; color:#0f172a;">Waiting for BioSync</strong>
+                                    </div>
+                                    <div style="padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.88); border:1px solid rgba(148,163,184,0.25); text-align:left;">
+                                        <small style="display:block; font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:#64748b;">Role</small>
+                                        <strong style="display:block; margin-top:4px; font-size:15px; color:#0f172a;">Waiting for BioSync</strong>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -2065,16 +2078,14 @@
                     </div>
 
                     <div id="ocrResultPanel" class="ocr-result-panel" style="display:none;">
-                        <p class="ocr-result-help">Review the extracted values below. Staff can correct them before confirming the patient record.</p>
-
-                        <div class="ocr-result-grid">
-                            <div>
-                                <p class="ocr-result-label">Detected Student Number</p>
-                                <input type="text" id="ocr_student_number" class="form-control" placeholder="Student number from ID card" style="margin-bottom:0;">
+                        <div style="display:grid; gap:12px;">
+                            <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center;">
+                                <p class="ocr-result-label" style="margin:0;">Full Name</p>
+                                <input type="text" id="ocr_student_name" class="form-control" placeholder="Enter full name" style="margin-bottom:0;">
                             </div>
-                            <div>
-                                <p class="ocr-result-label">Detected Student Name</p>
-                                <input type="text" id="ocr_student_name" class="form-control" placeholder="Full name from ID card" style="margin-bottom:0;">
+                            <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center;">
+                                <p class="ocr-result-label" style="margin:0;">ID Number</p>
+                                <input type="text" id="ocr_student_number" class="form-control" placeholder="Enter ID number" style="margin-bottom:0;">
                             </div>
                         </div>
 

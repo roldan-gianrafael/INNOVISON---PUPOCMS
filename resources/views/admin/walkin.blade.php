@@ -1777,6 +1777,151 @@
         transform: none;
     }
 
+    html[data-theme="dark"] .assisted-panel {
+        background: linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(28, 18, 18, 0.98));
+        border-color: rgba(250, 204, 21, 0.14);
+        box-shadow:
+            0 22px 46px rgba(0, 0, 0, 0.34),
+            0 0 0 1px rgba(139, 0, 0, 0.18);
+    }
+
+    html[data-theme="dark"] .assisted-hero-copy h3,
+    html[data-theme="dark"] .assisted-hero-copy p,
+    html[data-theme="dark"] .assisted-panel-body > .mb-3 label,
+    html[data-theme="dark"] .assisted-panel-body > .mb-2 label,
+    html[data-theme="dark"] .assisted-field-label,
+    html[data-theme="dark"] .assisted-section-divider span,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-role-display,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-gender-display,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-role-option,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-gender-option,
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > div[style*="background:#fff7ed"] strong,
+    html[data-theme="dark"] .assisted-intake-shell > .assisted-panel > .assisted-panel-body > div[style*="background:#fff7ed"] p,
+    html[data-theme="dark"] #registerForm .text-center.mt-3 a {
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .assisted-status-chip.pending,
+    html[data-theme="dark"] .assisted-status-chip.ready {
+        color: #f8fafc;
+        border-color: rgba(250, 204, 21, 0.24);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="dark"] .assisted-panel-body > .mb-3,
+    html[data-theme="dark"] .assisted-panel-body > .mb-2,
+    html[data-theme="dark"] .assisted-panel-body > .assisted-pair-row,
+    html[data-theme="dark"] .assisted-panel-body > .assisted-field-card,
+    html[data-theme="dark"] .assisted-panel-body > input.form-control,
+    html[data-theme="dark"] .assisted-panel-body > .assisted-callout,
+    html[data-theme="dark"] .assisted-panel-body > div[style*="background:#fff7ed"] {
+        border-color: rgba(250, 204, 21, 0.14);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 34%),
+            linear-gradient(180deg, rgba(47, 24, 24, 0.92) 0%, rgba(30, 18, 18, 0.98) 100%);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.04),
+            0 12px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    html[data-theme="dark"] .assisted-highlight-card {
+        border-color: rgba(250, 204, 21, 0.18) !important;
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 34%),
+            linear-gradient(180deg, rgba(74, 24, 31, 0.96) 0%, rgba(52, 18, 23, 0.98) 100%) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.05),
+            0 12px 24px rgba(0, 0, 0, 0.20);
+    }
+
+    html[data-theme="dark"] .assisted-panel-body > .mb-3 .form-control,
+    html[data-theme="dark"] .assisted-panel-body > .mb-2 .form-control,
+    html[data-theme="dark"] .assisted-panel-body > .assisted-pair-row .form-control,
+    html[data-theme="dark"] .assisted-panel-body > .assisted-field-card .form-control,
+    html[data-theme="dark"] .assisted-panel-body > input.form-control,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-role-display,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-gender-display {
+        color: #f8fafc !important;
+        border-color: rgba(250, 204, 21, 0.16);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 36%),
+            linear-gradient(180deg, rgba(40, 26, 26, 0.98) 0%, rgba(23, 23, 23, 0.98) 100%);
+        box-shadow:
+            0 12px 22px rgba(0, 0, 0, 0.22),
+            inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    html[data-theme="dark"] .assisted-panel-body .form-control::placeholder {
+        color: rgba(248, 250, 252, 0.62);
+    }
+
+    html[data-theme="dark"] .assisted-panel-body .form-control:focus,
+    html[data-theme="dark"] .assisted-panel-body select.form-control:focus,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-role-display:focus,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-gender-display:focus,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-role-display.is-open,
+    html[data-theme="dark"] .assisted-intake-shell .assisted-gender-display.is-open {
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 4px rgba(250, 204, 21, 0.14),
+            0 14px 24px rgba(0, 0, 0, 0.26),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.10), transparent 36%),
+            linear-gradient(180deg, rgba(54, 34, 34, 0.98) 0%, rgba(28, 20, 20, 0.98) 100%);
+    }
+
+    html[data-theme="dark"] .assisted-role-wrap::after,
+    html[data-theme="dark"] .assisted-gender-wrap::after {
+        border-right-color: #facc15;
+        border-bottom-color: #facc15;
+    }
+
+    html[data-theme="dark"] .assisted-role-wrap::before,
+    html[data-theme="dark"] .assisted-gender-wrap::before {
+        background: rgba(250, 204, 21, 0.18);
+    }
+
+    html[data-theme="dark"] .assisted-role-menu,
+    html[data-theme="dark"] .assisted-gender-menu {
+        background: rgba(18, 18, 18, 0.96);
+        border-color: rgba(250, 204, 21, 0.14);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+    }
+
+    html[data-theme="dark"] .assisted-role-option,
+    html[data-theme="dark"] .assisted-gender-option {
+        color: #f8fafc !important;
+        border-color: rgba(250, 204, 21, 0.14);
+        background: linear-gradient(180deg, rgba(40, 26, 26, 0.98) 0%, rgba(23, 23, 23, 0.98) 100%);
+        box-shadow: 0 12px 22px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    html[data-theme="dark"] .assisted-role-option:hover,
+    html[data-theme="dark"] .assisted-role-option.is-selected,
+    html[data-theme="dark"] .assisted-gender-option:hover,
+    html[data-theme="dark"] .assisted-gender-option.is-selected {
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15 !important;
+        border-color: rgba(250, 204, 21, 0.28);
+    }
+
+    html[data-theme="dark"] .assisted-submit-btn {
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #ffffff;
+        box-shadow:
+            0 0 0 3px rgba(139, 0, 0, 0.16),
+            0 16px 28px rgba(0, 0, 0, 0.30);
+    }
+
+    html[data-theme="dark"] .assisted-submit-btn:hover {
+        background: #facc15;
+        color: #111111;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.16),
+            0 18px 30px rgba(0, 0, 0, 0.32);
+    }
+
     .assisted-panel-body .form-control:hover {
         border-color: rgba(139, 0, 0, 0.34);
         box-shadow:

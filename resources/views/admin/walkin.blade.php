@@ -1541,13 +1541,13 @@
         margin: 0;
         font-size: 1.45rem;
         font-weight: 900;
-        color: #111827;
+        color: #000000;
         letter-spacing: -0.02em;
     }
 
     .assisted-hero-copy p {
         margin: 8px 0 0;
-        color: #64748b;
+        color: #000000;
         line-height: 1.6;
         font-size: .95rem;
     }
@@ -1574,13 +1574,13 @@
     .assisted-status-chip.pending {
         background: #fff7ed;
         border: 1px solid #fdba74;
-        color: #9a3412;
+        color: #000000;
     }
 
     .assisted-status-chip.ready {
         background: #ecfdf5;
         border: 1px solid #a7f3d0;
-        color: #047857;
+        color: #000000;
     }
 
     .assisted-grid {
@@ -1612,7 +1612,7 @@
         border-radius: 999px;
         border: 1px solid rgba(148, 163, 184, 0.18);
         background: rgba(255, 255, 255, 0.82);
-        color: #7f1d1d;
+        color: #000000;
         font-size: 11px;
         font-weight: 900;
         text-transform: uppercase;
@@ -1655,7 +1655,7 @@
     }
 
     .assisted-highlight-card label {
-        color: #7f1d1d !important;
+        color: #000000 !important;
     }
 
     .assisted-panel-body > .mb-3,
@@ -1672,7 +1672,7 @@
         font-weight: 700 !important;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #64748b !important;
+        color: #000000 !important;
     }
 
     .assisted-panel-body > .mb-3 .form-control,
@@ -1719,8 +1719,19 @@
     }
 
     .assisted-panel-body .form-control::placeholder {
-        color: #94a3b8;
+        color: #000000;
         font-weight: 600;
+        opacity: 0.72;
+    }
+
+    .assisted-intake-shell .assisted-role-display,
+    .assisted-intake-shell .assisted-gender-display,
+    .assisted-intake-shell .assisted-role-option,
+    .assisted-intake-shell .assisted-gender-option,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > div[style*="background:#fff7ed"] strong,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > div[style*="background:#fff7ed"] p,
+    #registerForm .text-center.mt-3 a {
+        color: #000000 !important;
     }
 
     .assisted-panel-body .form-control:hover {
@@ -2822,7 +2833,7 @@
 @endif
 
 @if(in_array($currentMode, ['scan', 'assisted', 'applicant'], true))
-<div class="card p-4 shadow-sm walkin-strip-card" style="border-radius: 15px; border: none; max-width: {{ $currentMode === 'assisted' ? '1180px' : '550px' }}; margin: 20px auto;">
+<div class="{{ $currentMode === 'assisted' ? '' : 'card p-4 shadow-sm walkin-strip-card' }}" style="{{ $currentMode === 'assisted' ? 'max-width: 1180px; margin: 20px auto; padding: 0; background: transparent; box-shadow: none; border: none;' : 'border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;' }}">
     
     @if($currentMode !== 'assisted')
     <div id="dynamicHeader" class="mode-header bg-scan">

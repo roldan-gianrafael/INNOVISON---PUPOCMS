@@ -483,10 +483,12 @@
         font-weight: 600;
     }
 
+    .inventory-category-wrap,
     .inventory-medicine-type-wrap {
         position: relative;
     }
 
+    .inventory-category-select,
     .inventory-medicine-type-select {
         position: absolute;
         width: 1px !important;
@@ -498,6 +500,7 @@
         margin: 0 !important;
     }
 
+    .inventory-category-display,
     .inventory-medicine-type-display {
         width: 100%;
         min-height: 52px;
@@ -518,6 +521,7 @@
         transition: all 0.2s ease;
     }
 
+    .inventory-category-display:hover,
     .inventory-medicine-type-display:hover {
         border-color: rgba(139, 0, 0, 0.34);
         box-shadow:
@@ -527,6 +531,8 @@
         transform: translateY(-1px);
     }
 
+    .inventory-category-display.is-open,
+    .inventory-category-display:focus,
     .inventory-medicine-type-display.is-open,
     .inventory-medicine-type-display:focus {
         outline: none;
@@ -537,6 +543,7 @@
             inset 0 1px 0 rgba(255,255,255,0.88);
     }
 
+    .inventory-category-wrap::after,
     .inventory-medicine-type-wrap::after {
         content: "";
         position: absolute;
@@ -551,6 +558,7 @@
         transition: transform 0.18s ease;
     }
 
+    .inventory-category-wrap::before,
     .inventory-medicine-type-wrap::before {
         content: "";
         position: absolute;
@@ -563,10 +571,12 @@
         pointer-events: none;
     }
 
+    .inventory-category-wrap.is-open::after,
     .inventory-medicine-type-wrap.is-open::after {
         transform: translateY(-20%) rotate(225deg);
     }
 
+    .inventory-category-menu,
     .inventory-medicine-type-menu {
         position: absolute;
         top: calc(100% + 10px);
@@ -586,8 +596,15 @@
         overflow: hidden;
     }
 
+    .inventory-category-wrap.is-open .inventory-category-menu,
     .inventory-medicine-type-wrap.is-open .inventory-medicine-type-menu {
         display: grid;
+    }
+
+    #itemModal .inventory-medicine-type-wrap.is-open .inventory-medicine-type-menu {
+        position: static;
+        margin-top: 10px;
+        width: 100%;
     }
 
     .inventory-medicine-type-search {
@@ -626,6 +643,7 @@
         padding-right: 2px;
     }
 
+    .inventory-category-option,
     .inventory-medicine-type-option {
         width: 100%;
         border: 1px solid rgba(148, 163, 184, 0.22);
@@ -643,6 +661,8 @@
             inset 0 1px 0 rgba(255,255,255,0.82);
     }
 
+    .inventory-category-option:hover,
+    .inventory-category-option.is-selected,
     .inventory-medicine-type-option:hover,
     .inventory-medicine-type-option.is-selected {
         transform: translateY(-1px);
@@ -862,6 +882,7 @@
         color: #94a3b8;
     }
 
+    html[data-theme="dark"] .inventory-category-display,
     html[data-theme="dark"] .inventory-medicine-type-display {
         color: #f8fafc !important;
         border-color: rgba(250, 204, 21, 0.16);
@@ -873,6 +894,9 @@
             inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
+    html[data-theme="dark"] .inventory-category-display:hover,
+    html[data-theme="dark"] .inventory-category-display:focus,
+    html[data-theme="dark"] .inventory-category-display.is-open,
     html[data-theme="dark"] .inventory-medicine-type-display:hover,
     html[data-theme="dark"] .inventory-medicine-type-display:focus,
     html[data-theme="dark"] .inventory-medicine-type-display.is-open {
@@ -883,15 +907,18 @@
             inset 0 1px 0 rgba(255,255,255,0.06);
     }
 
+    html[data-theme="dark"] .inventory-category-wrap::after,
     html[data-theme="dark"] .inventory-medicine-type-wrap::after {
         border-right-color: #facc15;
         border-bottom-color: #facc15;
     }
 
+    html[data-theme="dark"] .inventory-category-wrap::before,
     html[data-theme="dark"] .inventory-medicine-type-wrap::before {
         background: rgba(250, 204, 21, 0.18);
     }
 
+    html[data-theme="dark"] .inventory-category-menu,
     html[data-theme="dark"] .inventory-medicine-type-menu {
         background: rgba(18, 18, 18, 0.96);
         border-color: rgba(250, 204, 21, 0.14);
@@ -918,6 +945,7 @@
             inset 0 1px 0 rgba(255,255,255,0.06);
     }
 
+    html[data-theme="dark"] .inventory-category-option,
     html[data-theme="dark"] .inventory-medicine-type-option {
         color: #f8fafc !important;
         border-color: rgba(250, 204, 21, 0.14);
@@ -927,6 +955,8 @@
             inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
+    html[data-theme="dark"] .inventory-category-option:hover,
+    html[data-theme="dark"] .inventory-category-option.is-selected,
     html[data-theme="dark"] .inventory-medicine-type-option:hover,
     html[data-theme="dark"] .inventory-medicine-type-option.is-selected {
         background: linear-gradient(135deg, #8B0000, #70131B);
@@ -1156,11 +1186,21 @@
 
                                 <div class="form-group">
                                     <label>Category</label>
-                                    <select name="category" id="iCategory" class="form-control" onchange="toggleMedicineFields()">
-                                        <option value="Medicine">Medicine</option>
-                                        <option value="Equipment">Equipment</option>
-                                        <option value="Supplies">Supplies</option>
-                                    </select>
+                                    <div class="inventory-category-wrap" id="inventoryCategoryWrap">
+                                        <select name="category" id="iCategory" class="form-control inventory-category-select" onchange="toggleMedicineFields()">
+                                            <option value="Medicine">Medicine</option>
+                                            <option value="Equipment">Equipment</option>
+                                            <option value="Supplies">Supplies</option>
+                                        </select>
+                                        <button type="button" class="inventory-category-display" id="inventoryCategoryDisplay" aria-haspopup="listbox" aria-expanded="false">
+                                            Medicine
+                                        </button>
+                                        <div class="inventory-category-menu" id="inventoryCategoryMenu" role="listbox" aria-label="Category options">
+                                            <button type="button" class="inventory-category-option" data-category-value="Medicine">Medicine</button>
+                                            <button type="button" class="inventory-category-option" data-category-value="Equipment">Equipment</button>
+                                            <button type="button" class="inventory-category-option" data-category-value="Supplies">Supplies</button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div id="medicineFields" class="inventory-subgroup">
@@ -1288,12 +1328,35 @@
     const inventorySearchShell = document.getElementById('inventorySearchShell');
     const inventorySearchToggle = document.getElementById('inventorySearchToggle');
     const inventoryRows = Array.from(document.querySelectorAll('#inventoryTable tbody tr[data-inventory-row]'));
+    const categorySelect = document.getElementById('iCategory');
+    const categoryWrap = document.getElementById('inventoryCategoryWrap');
+    const categoryDisplay = document.getElementById('inventoryCategoryDisplay');
+    const categoryOptions = Array.from(document.querySelectorAll('.inventory-category-option'));
     const medicineTypeWrap = document.getElementById('inventoryMedicineTypeWrap');
     const medicineTypeDisplay = document.getElementById('inventoryMedicineTypeDisplay');
     const medicineTypeMenu = document.getElementById('inventoryMedicineTypeMenu');
     const medicineTypeSearch = document.getElementById('inventoryMedicineTypeSearch');
     const medicineTypeOptions = Array.from(document.querySelectorAll('.inventory-medicine-type-option'));
     const medicineTypeEmpty = document.getElementById('inventoryMedicineTypeEmpty');
+
+    function syncCategoryDisplay() {
+        if (!categorySelect || !categoryDisplay) return;
+
+        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        categoryDisplay.textContent = selectedOption ? selectedOption.text : 'Select category';
+
+        categoryOptions.forEach(function(option) {
+            option.classList.toggle('is-selected', option.dataset.categoryValue === categorySelect.value);
+        });
+    }
+
+    function setCategoryOpenState(isOpen) {
+        if (!categoryWrap || !categoryDisplay) return;
+
+        categoryWrap.classList.toggle('is-open', isOpen);
+        categoryDisplay.classList.toggle('is-open', isOpen);
+        categoryDisplay.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
 
     function syncMedicineTypeDisplay() {
         if (!medicineSelect || !medicineTypeDisplay) return;
@@ -1366,7 +1429,7 @@
             return;
         }
 
-        const category = document.getElementById('iCategory').value;
+        const category = categorySelect.value;
         medicineDispensingFields.style.display = category === 'Medicine' ? 'block' : 'none';
         if (itemsPerUnitField) {
             itemsPerUnitField.style.display = category === 'Medicine' ? 'flex' : 'none';
@@ -1374,7 +1437,9 @@
     }
 
     function toggleMedicineFields() {
-        const category = document.getElementById('iCategory').value;
+        const category = categorySelect.value;
+        syncCategoryDisplay();
+
         if (category === 'Medicine') {
             medicineFields.style.display = 'block';
             medicineExpiryField.style.display = 'block';
@@ -1413,7 +1478,7 @@
         
         // Reset inputs
         document.getElementById('iName').value = '';
-        document.getElementById('iCategory').value = 'Medicine';
+        categorySelect.value = 'Medicine';
         document.getElementById('iQty').value = '';
         document.getElementById('iUnit').value = 'pcs';
         if (dispensingUnitInput) {
@@ -1426,6 +1491,7 @@
         document.getElementById('iExpDate').value = '';
         medicineSelect.value = '';
         
+        syncCategoryDisplay();
         toggleMedicineFields();
         syncMedicineTypeDisplay();
     }
@@ -1439,7 +1505,7 @@
         document.getElementById('methodField').innerHTML = '<input type="hidden" name="_method" value="PUT">';
 
         document.getElementById('iName').value = item.name || '';
-        document.getElementById('iCategory').value = item.category || 'Medicine';
+        categorySelect.value = item.category || 'Medicine';
         document.getElementById('iQty').value = item.quantity ?? '';
         document.getElementById('iUnit').value = item.unit || 'pcs';
         if (dispensingUnitInput) {
@@ -1450,6 +1516,7 @@
         }
         document.getElementById('iDateAdded').value = item.date_added || '';
         
+        syncCategoryDisplay();
         toggleMedicineFields();
         if((item.category || '') === 'Medicine') {
             document.getElementById('iMedicineType').value = item.medicine_type_id || '';
@@ -1462,13 +1529,39 @@
     function closeModal() {
         if (!itemModal) return;
         itemModal.style.display = 'none';
+        setCategoryOpenState(false);
         setMedicineTypeOpenState(false);
+    }
+
+    if (categoryDisplay && categorySelect) {
+        categoryDisplay.addEventListener('click', function(event) {
+            event.preventDefault();
+            const shouldOpen = !categoryWrap.classList.contains('is-open');
+            setMedicineTypeOpenState(false);
+            setCategoryOpenState(shouldOpen);
+        });
+
+        categoryOptions.forEach(function(option) {
+            option.addEventListener('click', function(event) {
+                event.preventDefault();
+                categorySelect.value = option.dataset.categoryValue || 'Medicine';
+                categorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+                syncCategoryDisplay();
+                setCategoryOpenState(false);
+            });
+        });
+
+        categorySelect.addEventListener('change', syncCategoryDisplay);
+
+        syncCategoryDisplay();
     }
 
     if (medicineTypeDisplay && medicineTypeMenu && medicineSelect) {
         medicineTypeDisplay.addEventListener('click', function(event) {
             event.preventDefault();
-            setMedicineTypeOpenState(!medicineTypeWrap.classList.contains('is-open'));
+            const shouldOpen = !medicineTypeWrap.classList.contains('is-open');
+            setCategoryOpenState(false);
+            setMedicineTypeOpenState(shouldOpen);
         });
 
         medicineTypeOptions.forEach(function(option) {
@@ -1507,6 +1600,10 @@
         }
 
         document.addEventListener('click', function(event) {
+            if (categoryWrap && !categoryWrap.contains(event.target)) {
+                setCategoryOpenState(false);
+            }
+
             if (medicineTypeWrap && !medicineTypeWrap.contains(event.target)) {
                 setMedicineTypeOpenState(false);
             }
@@ -1514,6 +1611,7 @@
 
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
+                setCategoryOpenState(false);
                 setMedicineTypeOpenState(false);
             }
         });
@@ -1523,7 +1621,7 @@
 
     if (itemForm && medicineSelect && medicineTypeDisplay) {
         itemForm.addEventListener('submit', function(event) {
-            const category = document.getElementById('iCategory').value;
+            const category = categorySelect.value;
 
             if (category === 'Medicine' && !medicineSelect.value) {
                 event.preventDefault();

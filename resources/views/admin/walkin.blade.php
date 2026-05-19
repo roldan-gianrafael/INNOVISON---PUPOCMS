@@ -1827,9 +1827,9 @@
                 <div class="applicant-modal-head-main">
                     <div id="headerIcon" class="applicant-modal-head-badge">AP</div>
                     <div class="applicant-modal-head-copy">
-                        <h3 id="headerTitle">OCR Ready</h3>
-                        <span id="scanMethodBadge" class="scan-method-badge">OCR Active</span>
-                        <p id="headerSubtitle">Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.</p>
+                        <h3 id="headerTitle">BioSync Ready</h3>
+                        <span id="scanMethodBadge" class="scan-method-badge">BioSync Active</span>
+                        <p id="headerSubtitle">Start with BioSync fingerprint identification, or switch to OCR ID scanning when you need to capture the applicant card instead.</p>
                     </div>
                 </div>
                 <div class="applicant-modal-head-actions">
@@ -1837,7 +1837,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                         </svg>
-                        <span>Switch to BioSync</span>
+                        <span>Switch to OCR Scan</span>
                     </button>
                 </div>
                 <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">
@@ -2219,7 +2219,7 @@
     let lastAutoProceedKey = '';
     const initialMode = @json($currentMode);
     let intakeTarget = 'consultation';
-    let scanMethod = 'ocr';
+    let scanMethod = 'biosync';
     const liveOcrIntervalMs = 900;
     const ocrCanvasScale = 1;
     const supportedFormats = window.Html5QrcodeSupportedFormats ? [
@@ -2873,10 +2873,10 @@
         function updateScanModeUI() {
             const isBioSync = scanMethod === 'biosync';
             const isApplicantFlow = intakeTarget === 'assessment';
-            $('#scanMethodTitle').text(isBioSync ? 'BioSync' : 'OCR ID Scan');
+            $('#scanMethodTitle').text(isBioSync ? 'BioSync Fingerprint' : 'OCR ID Scan');
             $('#scanMethodNote').text(
                 isBioSync
-                    ? 'BioSync mode uses the same patient lookup path for now, while presenting the intake flow as biometric identification.'
+                    ? 'Start with the fingerprint-first BioSync panel, then switch to OCR if the applicant needs card-based identification instead.'
                     : isApplicantFlow
                         ? 'Use the live camera feed to extract the applicant student number from the ID card, then proceed to Medical Assessment.'
                         : 'Use the live camera feed to extract the printed student number from the physical ID card, then fill the saved name from records.'
@@ -2886,7 +2886,7 @@
             $('#headerTitle').text(isBioSync ? 'BioSync Ready' : 'OCR Ready');
             $('#headerSubtitle').text(
                 isBioSync
-                    ? ''
+                    ? 'Start with BioSync fingerprint identification, or switch to OCR ID scanning when you need to capture the applicant card instead.'
                     : isApplicantFlow
                         ? 'Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.'
                         : ''
@@ -2894,7 +2894,7 @@
             $('#headerIcon').text(isBioSync ? 'BIO' : (isApplicantFlow ? 'AP' : 'SB'));
             $('#scanInlineNote').text(
                 isBioSync
-                    ? 'BioSync mode is selected. This section is currently in pending state while we complete the biometric workflow.'
+                    ? 'BioSync fingerprint mode is selected first. When the scanner flow is ready, this panel will be the primary identification step before OCR.'
                     : isApplicantFlow
                         ? 'OCR mode is active. Align the physical ID inside the frame and continue once student number and name are matched for Medical Assessment.'
                         : 'OCR mode is active. Align the physical ID inside the frame and the system will keep reading the student number live, then match the saved name automatically.'
@@ -2909,15 +2909,15 @@
             $('#applicantBioSyncInfoPanel').toggle(isBioSync);
 
             if (isBioSync) {
-                stopLiveOcr();
+                stopMainScanner();
             } else {
-                startLiveOcr();
+                startMainScanner();
             }
         }
 
         function openIntakeScanModal(target = 'consultation') {
             intakeTarget = target;
-            scanMethod = 'ocr';
+            scanMethod = 'biosync';
             manualStudentNumberEdited = false;
             manualStudentNameEdited = false;
             $('#student_id_manual').val('');
@@ -2932,7 +2932,6 @@
             if (applicantScanModal) {
                 applicantScanModal.classList.add('show');
             }
-            startMainScanner();
         }
 
         function closeApplicantScanModal() {

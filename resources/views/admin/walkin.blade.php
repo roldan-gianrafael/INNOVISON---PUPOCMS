@@ -1476,8 +1476,9 @@
 
     .assisted-intake-shell {
         display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-        gap: 18px;
+        grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.7fr);
+        gap: 22px;
+        align-items: start;
     }
 
     .assisted-panel {
@@ -1681,6 +1682,9 @@
     .assisted-summary-card {
         display: grid;
         gap: 14px;
+        max-width: 360px;
+        width: 100%;
+        justify-self: end;
     }
 
     .assisted-summary-card .assisted-panel-body {
@@ -1689,7 +1693,7 @@
 
     .assisted-intake-shell > .assisted-panel > .assisted-panel-body {
         display: block;
-        padding: 26px;
+        padding: 28px 30px;
     }
 
     .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-3,
@@ -1830,6 +1834,11 @@
         .assisted-intake-shell,
         .assisted-inline-identity {
             grid-template-columns: 1fr;
+        }
+
+        .assisted-summary-card {
+            max-width: none;
+            justify-self: stretch;
         }
     }
 

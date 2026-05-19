@@ -1687,6 +1687,32 @@
         display: block;
     }
 
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body {
+        display: block;
+        padding: 26px;
+    }
+
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-3,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-2,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .d-flex.gap-2,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > input.form-control,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > div[style*="background:#fff7ed"] {
+        margin-bottom: 16px !important;
+    }
+
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-3,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-2,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .d-flex.gap-2,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > input.form-control,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > div[style*="background:#fff7ed"] {
+        padding: 16px;
+    }
+
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-3 label,
+    .assisted-intake-shell > .assisted-panel > .assisted-panel-body > .mb-2 label {
+        font-size: 12px !important;
+    }
+
     .assisted-summary-block {
         padding: 18px;
         border-radius: 20px;
@@ -2515,10 +2541,9 @@
                                     <span class="assisted-status-chip pending">Temporary Record</span>
                                     <span class="assisted-status-chip ready">Ready for Consultation</span>
                                 </div>
-                <p style="margin:0; color:#64748b; font-size:12px; line-height:1.5;">Capture the patient’s basic identity details here, then continue to the consult form for the clinical information and assessment.</p>
-            </div>
-
-            </div>
+                                <p>Capture the patient identity details here, then continue to the consultation form for clinical notes and assessment.</p>
+                            </div>
+                        </div>
 
             <div class="mb-3">
                 <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Student Number / Reference ID</label>

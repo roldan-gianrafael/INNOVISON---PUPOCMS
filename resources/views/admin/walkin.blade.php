@@ -1589,6 +1589,46 @@
         gap: 14px;
     }
 
+    .assisted-section-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 6px 0 12px;
+    }
+
+    .assisted-section-divider::before,
+    .assisted-section-divider::after {
+        content: "";
+        flex: 1 1 auto;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(148, 163, 184, 0), rgba(148, 163, 184, 0.42), rgba(148, 163, 184, 0));
+    }
+
+    .assisted-section-divider span {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(255, 255, 255, 0.82);
+        color: #7f1d1d;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+        white-space: nowrap;
+    }
+
+    .assisted-section-divider svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+    }
+
     .assisted-panel-body > .mb-3,
     .assisted-panel-body > .mb-2,
     .assisted-panel-body > .assisted-pair-row,
@@ -2922,6 +2962,15 @@
                     </div>
                 </div>
             </div>
+
+            <div class="assisted-section-divider" aria-hidden="true">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.125A7.125 7.125 0 1 0 8.25 7.5a5.625 5.625 0 1 1 6.75 11.625Zm0 0h3.375m-3.375 0v-3.375" />
+                    </svg>
+                    Identity Details
+                </span>
+            </div>
             
             <div class="assisted-pair-row">
                 <div class="assisted-field-card">
@@ -2960,6 +3009,15 @@
                 </div>
             </div>
 
+            <div class="assisted-section-divider" aria-hidden="true">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 8.25v7.5a2.25 2.25 0 0 1-2.25 2.25H4.5a2.25 2.25 0 0 1-2.25-2.25v-7.5m19.5 0-8.69 5.216a2.25 2.25 0 0 1-2.122 0L2.25 8.25m19.5 0A2.25 2.25 0 0 0 19.5 6H4.5a2.25 2.25 0 0 0-2.25 2.25" />
+                    </svg>
+                    Contact Details
+                </span>
+            </div>
+
             <div class="assisted-field-card">
                 <label class="assisted-field-label" for="reg_contact_no">Contact Number</label>
                 <input type="text" id="reg_contact_no" placeholder="Enter contact number" class="form-control">
@@ -2967,12 +3025,12 @@
 
             <div class="assisted-field-card">
                 <label class="assisted-field-label" for="reg_email">Email Address</label>
-                <input type="email" id="reg_email" placeholder="Enter email address (optional)" class="form-control">
+                <input type="email" id="reg_email" placeholder="Enter email address" class="form-control" required>
             </div>
 
             <div style="background:#fff7ed; border:1px dashed #fdba74; border-radius:10px; padding:12px 14px; margin-bottom:10px;">
                 <strong style="display:block; font-size:12px; color:#9a3412; margin-bottom:4px;">No password needed for assisted intake</strong>
-                <p style="margin:0; font-size:12px; color:#7c2d12; line-height:1.5;">If no email is provided, the system will create a temporary assisted record and proceed straight to consultation.</p>
+                <p style="margin:0; font-size:12px; color:#7c2d12; line-height:1.5;">A valid email address is required for assisted intake before proceeding to consultation.</p>
             </div>
             
                     </div>

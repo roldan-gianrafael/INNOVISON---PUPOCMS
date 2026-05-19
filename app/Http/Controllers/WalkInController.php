@@ -560,7 +560,7 @@ PROMPT;
             'student_number' => 'required',
             'first_name' => 'required',
             'last_name'  => 'required',
-            'email'      => 'nullable|email',
+            'email'      => 'required|email',
             'password'   => 'nullable|min:6',
             'user_role'  => 'required',
             'dob'        => 'nullable|date',
@@ -592,10 +592,6 @@ PROMPT;
                 'message' => 'This account already exists.',
                 'redirect_url' => route($this->walkinRouteName($request, 'form'), ['student_id' => $existingUser->student_number ?: $existingUser->student_id])
             ], 409);
-        }
-
-        if ($email === '') {
-            $email = $this->resolveAssistedEmail($studentNumber);
         }
 
         if ($password === '') {

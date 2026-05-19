@@ -2429,7 +2429,7 @@
 @endif
 
 @if(in_array($currentMode, ['scan', 'assisted', 'applicant'], true))
-<div class="card p-4 shadow-sm walkin-strip-card" style="border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;">
+<div class="card p-4 shadow-sm walkin-strip-card" style="border-radius: 15px; border: none; max-width: {{ $currentMode === 'assisted' ? '1180px' : '550px' }}; margin: 20px auto;">
     
     <div id="dynamicHeader" class="mode-header {{ $currentMode === 'assisted' ? 'bg-register' : 'bg-scan' }}">
         <div id="headerIcon" class="mode-header-badge">{{ $currentMode === 'assisted' ? 'AI' : ($currentMode === 'applicant' ? 'AP' : 'SB') }}</div>

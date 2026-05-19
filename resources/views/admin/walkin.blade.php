@@ -1644,6 +1644,20 @@
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.92);
     }
 
+    .assisted-highlight-card {
+        border: 1px solid rgba(127, 29, 29, 0.12) !important;
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.12), transparent 34%),
+            linear-gradient(180deg, #fff4f4 0%, #fef2f2 100%) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.94),
+            0 10px 20px rgba(127, 29, 29, 0.05);
+    }
+
+    .assisted-highlight-card label {
+        color: #7f1d1d !important;
+    }
+
     .assisted-panel-body > .mb-3,
     .assisted-panel-body > .assisted-pair-row:first-of-type {
         grid-column: 1 / -1;
@@ -2933,7 +2947,7 @@
                             </div>
                         </div>
 
-            <div class="mb-3">
+            <div class="mb-3 assisted-highlight-card">
                 <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Student Number / Reference ID</label>
                 <input type="text" id="reg_student_id" class="form-control mb-0" placeholder="Enter student number or reference ID" required>
                 <input type="hidden" id="reg_barcode">

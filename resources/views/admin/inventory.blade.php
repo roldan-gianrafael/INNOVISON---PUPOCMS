@@ -1419,18 +1419,14 @@
         const menuGap = 6;
         const width = Math.min(triggerRect.width, window.innerWidth - (viewportPadding * 2));
         const left = Math.min(Math.max(triggerRect.left, viewportPadding), window.innerWidth - width - viewportPadding);
-        const spaceBelow = window.innerHeight - triggerRect.bottom - viewportPadding;
-        const spaceAbove = triggerRect.top - viewportPadding;
-        const openAbove = spaceBelow < 240 && spaceAbove > spaceBelow;
-        const availableSpace = openAbove ? spaceAbove : spaceBelow;
-        const maxHeight = Math.max(160, Math.min(320, availableSpace - menuGap));
+        const top = triggerRect.bottom + menuGap;
+        const spaceBelow = window.innerHeight - top - viewportPadding;
+        const maxHeight = Math.max(160, Math.min(320, spaceBelow));
 
         medicineTypeMenu.style.left = `${left}px`;
         medicineTypeMenu.style.width = `${width}px`;
         medicineTypeMenu.style.maxHeight = `${maxHeight}px`;
-        medicineTypeMenu.style.top = openAbove
-            ? `${Math.max(viewportPadding, triggerRect.top - maxHeight - menuGap)}px`
-            : `${triggerRect.bottom + menuGap}px`;
+        medicineTypeMenu.style.top = `${top}px`;
     }
 
     function filterMedicineTypeOptions(query) {

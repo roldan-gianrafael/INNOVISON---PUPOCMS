@@ -1897,15 +1897,29 @@
 
                     <div class="applicant-modal-panel">
                         <div id="applicantOcrReviewPanel">
-                            <div id="ocrResultPanel" class="ocr-result-panel">
-                                <div style="display:grid; gap:12px;">
-                                    <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center;">
-                                        <p class="ocr-result-label" style="margin:0;">Full Name</p>
-                                        <input type="text" id="ocr_student_name" class="form-control" readonly style="margin-bottom:0; background:linear-gradient(180deg, #f8fafc, #eef2f7); color:#0f172a; border:1px solid #cbd5e1; box-shadow:inset 0 1px 0 rgba(255,255,255,0.9); font-weight:700; cursor:default;">
+                            <div id="ocrResultPanel" class="ocr-result-panel" style="background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border:1px solid #dbe3ef; box-shadow:0 16px 34px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.92);">
+                                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #e2e8f0;">
+                                    <div style="display:flex; align-items:flex-start; gap:12px;">
+                                        <span style="width:42px; height:42px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #7f1d1d, #991b1b 58%, #b91c1c); color:#ffffff; box-shadow:0 12px 24px rgba(127,29,29,0.18); flex-shrink:0;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" style="width:20px; height:20px; stroke:currentColor; stroke-width:1.9;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5h16.5m-16.5 4.5h10.5m-10.5 4.5h7.5M17.25 5.25h2.25A1.5 1.5 0 0 1 21 6.75v10.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.25V6.75a1.5 1.5 0 0 1 1.5-1.5h2.25" />
+                                            </svg>
+                                        </span>
+                                        <div>
+                                            <p style="margin:0; font-size:11px; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:#8b0000;">Detected Data</p>
+                                            <p style="margin:4px 0 0; font-size:12px; color:#64748b; line-height:1.5;">Captured from OCR scan and arranged for final review.</p>
+                                        </div>
                                     </div>
-                                    <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center;">
-                                        <p class="ocr-result-label" style="margin:0;">ID Number</p>
-                                        <input type="text" id="ocr_student_number" class="form-control" readonly style="margin-bottom:0; background:linear-gradient(180deg, #f8fafc, #eef2f7); color:#0f172a; border:1px solid #cbd5e1; box-shadow:inset 0 1px 0 rgba(255,255,255,0.9); font-weight:700; cursor:default;">
+                                    <span style="display:inline-flex; align-items:center; padding:7px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:11px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; white-space:nowrap;">OCR Result</span>
+                                </div>
+                                <div style="display:grid; gap:12px;">
+                                    <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center; padding:12px 14px; border-radius:14px; background:linear-gradient(180deg, #fdfefe, #f8fafc); border:1px solid #e2e8f0;">
+                                        <p class="ocr-result-label" style="margin:0; color:#334155;">Full Name</p>
+                                        <input type="text" id="ocr_student_name" class="form-control" readonly style="margin-bottom:0; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; box-shadow:inset 0 1px 0 rgba(255,255,255,0.95); font-weight:700; cursor:default;">
+                                    </div>
+                                    <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center; padding:12px 14px; border-radius:14px; background:linear-gradient(180deg, #fdfefe, #f8fafc); border:1px solid #e2e8f0;">
+                                        <p class="ocr-result-label" style="margin:0; color:#334155;">ID Number</p>
+                                        <input type="text" id="ocr_student_number" class="form-control" readonly style="margin-bottom:0; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; box-shadow:inset 0 1px 0 rgba(255,255,255,0.95); font-weight:700; cursor:default;">
                                     </div>
                                 </div>
 
@@ -1924,7 +1938,7 @@
                                 <p class="manual-toggle-label">Type Student Number Manually</p>
                                 <form id="walkinFormManual">
                                     <input type="text" id="student_id_manual" placeholder="Enter student number" class="form-control" style="margin-bottom:10px;" required>
-                                    <button type="submit" class="manual-find-btn">Find</button>
+                                    <button type="submit" id="manualFindBtn" class="manual-find-btn" style="display:none;">Find</button>
                                 </form>
                             </div>
                         </div>
@@ -2982,6 +2996,11 @@
 
         $('#btnShowManual').on('click', function() {
             $('#manualInputArea').toggle();
+        });
+
+        $('#student_id_manual').on('input', function() {
+            const hasValue = $(this).val().trim() !== '';
+            $('#manualFindBtn').toggle(hasValue);
         });
 
         $('#btnSwitchScanMode').on('click', function() {

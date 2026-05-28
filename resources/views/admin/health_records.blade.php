@@ -61,11 +61,28 @@
     .status.review { background: #fee2e2; color: #b91c1c; }
     .status.submitted { background: #e0f2fe; color: #0369a1; }
 
-    html[data-theme="dark"] .status.pending,
-    html[data-theme="dark"] .status.issued,
-    html[data-theme="dark"] .status.review,
+    html[data-theme="dark"] .status.pending {
+        background: #fff7ed;
+        color: #c2410c !important;
+        border-color: #fed7aa;
+    }
+
+    html[data-theme="dark"] .status.issued {
+        background: #dcfce7;
+        color: #15803d !important;
+        border-color: #86efac;
+    }
+
+    html[data-theme="dark"] .status.review {
+        background: #fee2e2;
+        color: #b91c1c !important;
+        border-color: #fecaca;
+    }
+
     html[data-theme="dark"] .status.submitted {
-        color: #ffffff !important;
+        background: #e0f2fe;
+        color: #0369a1 !important;
+        border-color: #bae6fd;
     }
 
     /* Buttons */
@@ -985,16 +1002,21 @@
         border-color: #334155;
     }
 
+    html[data-theme="dark"] .verify-approval-body,
+    html[data-theme="dark"] .verify-approval-body * {
+        color: #e5e7eb !important;
+    }
+
     html[data-theme="dark"] .verify-approval-modal-title,
     html[data-theme="dark"] .verify-approval-meta-v,
     html[data-theme="dark"] .verify-approval-doc-title {
-        color: #f8fafc;
+        color: #f8fafc !important;
     }
 
     html[data-theme="dark"] .verify-approval-modal-copy,
     html[data-theme="dark"] .verify-approval-meta-k,
     html[data-theme="dark"] .verify-approval-doc-missing {
-        color: #cbd5e1;
+        color: #cbd5e1 !important;
     }
 
     html[data-theme="dark"] .verify-approval-modal-close {
@@ -1026,7 +1048,19 @@
     html[data-theme="dark"] .verify-approval-btn-cancel {
         background: #1e293b;
         border-color: #475569;
-        color: #f8fafc;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .verify-approval-btn-approve {
+        background: #70131B;
+        border-color: #8f2230;
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .verify-approval-btn-approve:disabled {
+        background: #334155;
+        border-color: #475569;
+        color: #cbd5e1 !important;
     }
 
     @media (max-width: 980px) {

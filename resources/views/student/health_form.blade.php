@@ -200,6 +200,108 @@
             font-size: 0.93rem;
         }
 
+        .identity-overview {
+            margin-bottom: 18px;
+            border: 1px solid rgba(127, 29, 45, 0.14);
+            border-radius: 20px;
+            background:
+                radial-gradient(circle at top left, rgba(250, 204, 21, 0.18), transparent 32%),
+                linear-gradient(180deg, #ffffff 0%, #fffaf2 100%);
+            box-shadow: 0 14px 30px rgba(127, 29, 45, 0.08);
+            overflow: hidden;
+        }
+
+        .identity-name-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .identity-field {
+            border: 1px solid rgba(127, 29, 45, 0.12);
+            background: rgba(255, 255, 255, 0.86);
+            border-radius: 14px;
+            padding: 12px 14px;
+            min-height: 72px;
+        }
+
+        .identity-field small,
+        .reference-panel small {
+            display: block;
+            color: #6b7280;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .identity-field strong {
+            color: #111827;
+            font-size: 1rem;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+        .reference-panel {
+            text-align: center;
+            padding: 20px 18px 22px;
+            border-top: 1px solid rgba(127, 29, 45, 0.12);
+            background: linear-gradient(135deg, rgba(127, 29, 45, 0.98), rgba(95, 0, 18, 0.98));
+        }
+
+        .reference-panel small {
+            color: rgba(255, 255, 255, 0.78);
+            margin-bottom: 6px;
+        }
+
+        .reference-panel strong {
+            display: block;
+            color: #facc15;
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            line-height: 1;
+            font-weight: 950;
+            letter-spacing: 0.05em;
+            word-break: break-word;
+        }
+
+        .upload-instruction-card {
+            margin-bottom: 18px;
+            padding: 15px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(250, 204, 21, 0.42);
+            background: linear-gradient(135deg, #fff8d6 0%, #fffef4 100%);
+            color: #4b2e05;
+        }
+
+        .upload-instruction-card strong {
+            display: block;
+            color: #70131b;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .upload-instruction-card p {
+            margin: 0;
+            font-size: 0.86rem;
+            line-height: 1.55;
+            font-weight: 600;
+        }
+
+        .upload-instruction-card ol {
+            margin: 0;
+            padding-left: 20px;
+            color: #4b2e05;
+            font-size: 0.86rem;
+            line-height: 1.6;
+            font-weight: 650;
+        }
+
+        .upload-instruction-card li + li {
+            margin-top: 4px;
+        }
+
         .form-label {
             font-weight: 700;
             color: #111827;
@@ -501,6 +603,7 @@
 
             .stepper-shell,
             .profile-readonly-grid,
+            .identity-name-grid,
             .step-one-grid {
                 grid-template-columns: 1fr;
             }
@@ -539,16 +642,35 @@
                 $selectedPwd = old('has_disability', $prefill['has_disability'] ?? 'No');
                 $stepTwoErrorFields = ['has_disability', 'disability_type', 'medical_certificate', 'chest_xray_result', 'pwd_id_proof', 'health_form_upload', 'student_photo'];
                 $startStep = $errors->any() ? 2 : (collect($stepTwoErrorFields)->contains(fn ($field) => $errors->has($field)) ? 2 : 1);
+                $displayFullName = trim((string) old('full_name', $prefill['full_name'] ?? $user->name));
+                $nameParts = preg_split('/\s+/', $displayFullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                $displayFirstName = trim((string) old('first_name', $prefill['first_name'] ?? ''));
+                $displayMiddleName = trim((string) old('middle_name', $prefill['middle_name'] ?? ''));
+                $displayLastName = trim((string) old('last_name', $prefill['last_name'] ?? ''));
+
+                if ($displayFirstName === '' && count($nameParts) >= 1) {
+                    $displayFirstName = array_shift($nameParts);
+                }
+
+                if ($displayLastName === '' && count($nameParts) >= 1) {
+                    $displayLastName = array_pop($nameParts);
+                }
+
+                if ($displayMiddleName === '' && count($nameParts) > 0) {
+                    $displayMiddleName = implode(' ', $nameParts);
+                }
+
+                $displayReferenceNumber = trim((string) old('student_number', $prefill['student_number'] ?? $user->student_number));
             @endphp
 
             <div class="stepper-shell">
                 <div class="step-chip {{ $startStep === 1 ? 'is-active' : '' }}" id="chipStep1">
-                    <small>Step 1</small>
-                    <strong>Information</strong>
+                    <small>Part 1</small>
+                    <strong>Admission Reference</strong>
                 </div>
                 <div class="step-chip {{ $startStep === 2 ? 'is-active' : '' }}" id="chipStep2">
-                    <small>Step 2</small>
-                    <strong>Upload Requirements</strong>
+                    <small>Part 2</small>
+                    <strong>Clinic Requirements</strong>
                 </div>
             </div>
             <div class="stepper-spacer"></div>
@@ -559,109 +681,60 @@
                 <input type="hidden" name="student_number" value="{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}">
 
                 <div class="step-panel {{ $startStep === 2 ? 'is-hidden' : '' }}" id="stepPanel1">
-                    <h2 class="section-title">Step 1: Information</h2>
+                    <h2 class="section-title">Admission Reference</h2>
                     <div class="form-intro">
                         <h1>Student Health Profile</h1>
-                        <p>Complete personal information and upload required clinic documents.</p>
-                    </div>
-                    <div class="profile-readonly-grid">
-                        <div class="readonly-item">
-                            <small>Student Name</small>
-                            <strong>{{ old('full_name', $prefill['full_name'] ?? $user->name) }}</strong>
-                        </div>
-                        <div class="readonly-item">
-                            <small>Course</small>
-                            <strong>{{ old('course_college', $prefill['course_college'] ?? $user->course) }}</strong>
-                        </div>
-                        <div class="readonly-item">
-                            <small>Email</small>
-                            <strong>{{ old('email', $prefill['email'] ?? $user->email) }}</strong>
-                        </div>
-                        <div class="readonly-item">
-                            <small>Student Number</small>
-                            <strong>{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}</strong>
-                        </div>
+                        <p>Confirm your admission reference details, then proceed with the required clinic document uploads.</p>
                     </div>
 
-                    <p class="step-fill-note">Please fill in this fields.</p>
-                    <div class="step-one-grid">
-                        <div class="form-field">
-                            <label class="form-label">School Year <span class="required">*</span></label>
-                            <input type="text" name="school_year" class="form-control" required value="{{ old('school_year', $prefill['school_year'] ?? '') }}">
-                            <p class="field-helper">Type NONE if nothing to add.</p>
+                    <div class="identity-overview">
+                        <div class="identity-name-grid">
+                            <div class="identity-field">
+                                <small>First Name</small>
+                                <strong>{{ $displayFirstName !== '' ? $displayFirstName : 'N/A' }}</strong>
+                            </div>
+                            <div class="identity-field">
+                                <small>Middle Name</small>
+                                <strong>{{ $displayMiddleName !== '' ? $displayMiddleName : 'N/A' }}</strong>
+                            </div>
+                            <div class="identity-field">
+                                <small>Last Name</small>
+                                <strong>{{ $displayLastName !== '' ? $displayLastName : 'N/A' }}</strong>
+                            </div>
                         </div>
-
-                        <div class="form-field">
-                            <label class="form-label">Home Address <span class="required">*</span></label>
-                            <input type="text" name="home_address" class="form-control" readonly required value="{{ old('home_address', $prefill['home_address'] ?? '') }}">
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Zip Code <span class="required">*</span></label>
-                            <input type="text" name="zipcode" class="form-control" readonly required value="{{ old('zipcode', $prefill['zipcode'] ?? '') }}">
-                        </div>
-
-                        <div class="form-field">
-                            <label class="form-label">Birthday <span class="required">*</span></label>
-                            <input type="date" name="birthday" id="birthday" class="form-control" readonly required value="{{ old('birthday', $prefill['birthday'] ?? '') }}">
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Age <span class="required">*</span></label>
-                            <input type="number" name="age" id="age" class="form-control" min="15" max="100" readonly required value="{{ old('age', $prefill['age'] ?? '') }}">
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Gender <span class="required">*</span></label>
-                            <input type="text" name="sex" class="form-control" readonly required value="{{ old('sex', $prefill['sex'] ?? '') }}">
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Civil Status <span class="required">*</span></label>
-                            <input type="text" name="civil_status" class="form-control" readonly required value="{{ old('civil_status', $prefill['civil_status'] ?? '') }}">
-                        </div>
-
-                        <div class="form-field">
-                            <label class="form-label">Height (cm) <span class="required">*</span></label>
-                            <input type="number" step="0.01" min="0" name="height" class="form-control field-maroon" required value="{{ old('height', $prefill['height'] ?? '') }}">
-                            <p class="field-helper">Enter a numeric value.</p>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Weight (kg) <span class="required">*</span></label>
-                            <input type="number" step="0.01" min="0" name="weight" class="form-control field-maroon" required value="{{ old('weight', $prefill['weight'] ?? '') }}">
-                            <p class="field-helper">Enter a numeric value.</p>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Blood Type <span class="required">*</span></label>
-                            <select name="blood_type" class="form-select field-maroon" required>
-                                @php
-                                    $selectedBloodType = old('blood_type', $prefill['blood_type'] ?? '');
-                                    $bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Unknown'];
-                                @endphp
-                                <option value="">Select Blood Type</option>
-                                @foreach ($bloodTypes as $bloodType)
-                                    <option value="{{ $bloodType }}" {{ $selectedBloodType === $bloodType ? 'selected' : '' }}>{{ $bloodType }}</option>
-                                @endforeach
-                            </select>
-                            <p class="field-helper">Select Unknownif nothing to add.</p>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Contact Number <span class="required">*</span></label>
-                            <input type="text" name="contact_no" class="form-control" readonly required value="{{ old('contact_no', $prefill['contact_number'] ?? $user->contact_no) }}">
-                        </div>
-
-                        <div class="form-field">
-                            <label class="form-label">Guardian Name <span class="required">*</span></label>
-                            <input type="text" name="guardian_name" class="form-control field-maroon" required value="{{ old('guardian_name', $prefill['guardian_name'] ?? '') }}">
-                            <p class="field-helper">Type NONE if nothing to add.</p>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Guardian Contact <span class="required">*</span></label>
-                            <input type="text" name="cellphone" class="form-control field-maroon" required value="{{ old('cellphone', $prefill['cellphone'] ?? '') }}">
-                            <p class="field-helper">Type NONE if nothing to add.</p>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">Landline (Optional)</label>
-                            <input type="text" name="landline" class="form-control field-maroon" value="{{ old('landline', $prefill['landline'] ?? '') }}">
-                            <p class="field-helper">Type NONE if nothing to add.</p>
+                        <div class="reference-panel">
+                            <small>Reference Number</small>
+                            <strong>{{ $displayReferenceNumber !== '' ? $displayReferenceNumber : 'Pending' }}</strong>
                         </div>
                     </div>
+
+                    <div class="upload-instruction-card">
+                        <strong>Instructions for Uploading Documents</strong>
+                        <ol>
+                            <li>Prepare clear PDF copies of your medical certificate, chest X-ray result, and completed health form.</li>
+                            <li>If you are a PWD, upload your PWD ID in Step 2.</li>
+                            <li>Upload your 2x2 photo as JPG or PNG only.</li>
+                        </ol>
+                    </div>
+
+                    {{--
+                        Legacy profile fields hidden for the simplified health form flow.
+                        Restore the old visible field grid here if the clinic decides to collect these details again.
+                    --}}
+                    <input type="hidden" name="school_year" value="{{ old('school_year', $prefill['school_year'] ?? '2025-2026') }}">
+                    <input type="hidden" name="home_address" value="{{ old('home_address', $prefill['home_address'] ?? 'NONE') }}">
+                    <input type="hidden" name="zipcode" value="{{ old('zipcode', $prefill['zipcode'] ?? 'NONE') }}">
+                    <input type="hidden" name="birthday" id="birthday" value="{{ old('birthday', $prefill['birthday'] ?? '2000-01-01') }}">
+                    <input type="hidden" name="age" id="age" value="{{ old('age', $prefill['age'] ?? 18) }}">
+                    <input type="hidden" name="sex" value="{{ old('sex', $prefill['sex'] ?? 'NONE') }}">
+                    <input type="hidden" name="civil_status" value="{{ old('civil_status', $prefill['civil_status'] ?? 'Single') }}">
+                    <input type="hidden" name="height" value="{{ old('height', $prefill['height'] ?? 0) }}">
+                    <input type="hidden" name="weight" value="{{ old('weight', $prefill['weight'] ?? 0) }}">
+                    <input type="hidden" name="blood_type" value="{{ old('blood_type', $prefill['blood_type'] ?? 'Unknown') }}">
+                    <input type="hidden" name="contact_no" value="{{ old('contact_no', $prefill['contact_number'] ?? $user->contact_no ?? 'NONE') }}">
+                    <input type="hidden" name="guardian_name" value="{{ old('guardian_name', $prefill['guardian_name'] ?? 'NONE') }}">
+                    <input type="hidden" name="cellphone" value="{{ old('cellphone', $prefill['cellphone'] ?? 'NONE') }}">
+                    <input type="hidden" name="landline" value="{{ old('landline', $prefill['landline'] ?? 'NONE') }}">
 
                     <div class="btn-row">
                         <a href="{{ url('/student/account') }}" class="btn btn-health btn-health-back">Back</a>
@@ -673,7 +746,7 @@
                 </div>
 
                 <div class="step-panel {{ $startStep === 1 ? 'is-hidden' : '' }}" id="stepPanel2">
-                    <h2 class="section-title">Step 2: Uploading Documents</h2>
+                    <h2 class="section-title">Clinic Requirements</h2>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="form-field">
@@ -694,7 +767,7 @@
                         </div>
                     </div>
 
-                    <h2 class="section-title mt-4">Required Uploads</h2>
+                    <h2 class="section-title mt-4">Required Documents</h2>
                     <div class="row g-3">
                         <div class="col-md-6" id="pwdUploadWrap">
                             <div class="upload-card">

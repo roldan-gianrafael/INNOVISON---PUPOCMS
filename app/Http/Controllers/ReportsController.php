@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Consultation;
 use App\Models\AppointmentFeedback;
 use App\Models\Appointment;
+use App\Models\InventoryMovement;
 use App\Models\Item;
 use App\Models\HealthProfile;
 use App\Models\User;
@@ -555,13 +556,12 @@ class ReportsController extends Controller
         $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
         $monthEnd = (clone $monthStart)->endOfMonth();
 
-        $consumedByMedicine = Consultation::query()
-            ->select('medicine', DB::raw('SUM(medicine_quantity) as consumed_total'))
-            ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-            ->whereNotNull('medicine')
-            ->where('medicine', '!=', '')
-            ->groupBy('medicine')
-            ->pluck('consumed_total', 'medicine');
+        $consumedByItem = InventoryMovement::query()
+            ->select('item_id', DB::raw('SUM(ABS(quantity)) as consumed_total'))
+            ->where('type', 'consumed')
+            ->whereBetween('created_at', [$monthStart, $monthEnd])
+            ->groupBy('item_id')
+            ->pluck('consumed_total', 'item_id');
 
           $itemsQuery = Item::query();
 
@@ -574,12 +574,13 @@ class ReportsController extends Controller
           return $itemsQuery
               ->orderBy('name')
               ->get()
-              ->map(function ($item) use ($consumedByMedicine) {
-                  $consumed = (float) ($consumedByMedicine[$item->name] ?? 0);
-                  $consumedInStockUnit = $this->consumedStockQuantityForItem($item, $consumed);
+              ->map(function ($item) use ($consumedByItem) {
+                  $consumedInStockUnit = (float) ($consumedByItem[$item->id] ?? 0);
                   $item->unit = $item->unit ?: 'pcs';
                   $item->consumed = $consumedInStockUnit;
-                  $item->consumed_display = $consumed;
+                  $item->consumed_display = $item->hasDispensingConversion()
+                      ? $consumedInStockUnit * $item->unitsPerStockUnit()
+                      : $consumedInStockUnit;
                   $item->current_balance = (float) $item->quantity;
                   $item->starting_stock = $item->current_balance + $consumedInStockUnit;
                   $item->report_category = $this->inventoryReportCategoryLabel($item);

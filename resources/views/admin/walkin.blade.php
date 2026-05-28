@@ -1082,88 +1082,6 @@
         color: #7f1d1d;
     }
 
-    .applicant-biosync-visual {
-        position: relative;
-        min-height: 360px;
-        border-radius: 18px;
-        overflow: hidden;
-        background: radial-gradient(circle at top, #eff6ff 0%, #dbeafe 38%, #eef2ff 100%);
-        border: 1px dashed #93c5fd;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        padding: 28px 24px;
-        text-align: center;
-    }
-
-    .applicant-biosync-ring {
-        position: relative;
-        width: 190px;
-        height: 190px;
-        border-radius: 999px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(219,234,254,0.9) 52%, rgba(191,219,254,0.72) 100%);
-        box-shadow:
-            inset 0 0 0 1px rgba(59, 130, 246, 0.16),
-            0 22px 42px rgba(59, 130, 246, 0.14);
-    }
-
-    .applicant-biosync-ring::before,
-    .applicant-biosync-ring::after {
-        content: "";
-        position: absolute;
-        border-radius: 999px;
-        inset: -14px;
-        border: 1px solid rgba(59, 130, 246, 0.18);
-        animation: biosyncPulse 2.6s ease-in-out infinite;
-    }
-
-    .applicant-biosync-ring::after {
-        inset: -28px;
-        animation-delay: 1.2s;
-    }
-
-    .applicant-biosync-fingerprint {
-        width: 104px;
-        height: 104px;
-        color: #2563eb;
-        display: block;
-    }
-
-    .applicant-biosync-scanline {
-        position: absolute;
-        left: 20%;
-        right: 20%;
-        top: 50%;
-        height: 4px;
-        border-radius: 999px;
-        background: linear-gradient(90deg, rgba(37,99,235,0) 0%, rgba(37,99,235,0.95) 50%, rgba(37,99,235,0) 100%);
-        box-shadow: 0 0 14px rgba(37,99,235,0.34);
-        animation: biosyncScan 2s ease-in-out infinite;
-    }
-
-    .applicant-biosync-copy {
-        margin-top: 28px;
-        max-width: 320px;
-    }
-
-    .applicant-biosync-copy h4 {
-        margin: 0 0 8px;
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #0f172a;
-    }
-
-    .applicant-biosync-copy p {
-        margin: 0;
-        font-size: 13px;
-        line-height: 1.65;
-        color: #475569;
-    }
-
     html[data-theme="dark"] .applicant-modal-shell {
         background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.96));
         border-color: rgba(148, 163, 184, 0.16);
@@ -1235,41 +1153,6 @@
 
     html[data-theme="dark"] .applicant-modal-panel .manual-toggle-label {
         color: #facc15;
-    }
-
-    html[data-theme="dark"] .applicant-biosync-visual {
-        background: radial-gradient(circle at top, rgba(30,41,59,0.98) 0%, rgba(15,23,42,0.94) 38%, rgba(17,24,39,0.96) 100%);
-        border-color: rgba(96, 165, 250, 0.22);
-    }
-
-    html[data-theme="dark"] .applicant-biosync-ring {
-        background: radial-gradient(circle, rgba(30,41,59,0.98) 0%, rgba(30,64,175,0.18) 52%, rgba(30,41,59,0.92) 100%);
-        box-shadow:
-            inset 0 0 0 1px rgba(96, 165, 250, 0.18),
-            0 22px 42px rgba(0, 0, 0, 0.26);
-    }
-
-    html[data-theme="dark"] .applicant-biosync-fingerprint {
-        color: #93c5fd;
-    }
-
-    html[data-theme="dark"] .applicant-biosync-copy h4 {
-        color: #f8fafc;
-    }
-
-    html[data-theme="dark"] .applicant-biosync-copy p {
-        color: #cbd5e1;
-    }
-
-    @keyframes biosyncPulse {
-        0%, 100% { transform: scale(1); opacity: 0.45; }
-        50% { transform: scale(1.04); opacity: 0.9; }
-    }
-
-    @keyframes biosyncScan {
-        0% { top: 28%; opacity: 0.72; }
-        50% { top: 72%; opacity: 1; }
-        100% { top: 28%; opacity: 0.72; }
     }
 
     .registration-hub {
@@ -2525,122 +2408,6 @@
         }
     }
 
-    .fingerprint-hub {
-        max-width: 980px;
-    }
-
-    .fingerprint-hero {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        align-items: center;
-        gap: 18px;
-        margin-bottom: 16px;
-    }
-
-    .fingerprint-orbit {
-        width: 94px;
-        height: 94px;
-        border-radius: 999px;
-        background: radial-gradient(circle, rgba(250, 204, 21, 0.35) 0%, rgba(112, 19, 27, 0.12) 56%, transparent 100%);
-        display: grid;
-        place-items: center;
-        animation: fingerPulse 2.8s ease-in-out infinite;
-    }
-
-    .fingerprint-core {
-        width: 70px;
-        height: 70px;
-        border-radius: 20px;
-        background: linear-gradient(145deg, #70131B, #8f2230);
-        color: #ffffff;
-        border: 1px solid rgba(250, 204, 21, 0.4);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 14px 28px rgba(112, 19, 27, 0.3);
-    }
-
-    .fingerprint-core i {
-        font-size: 30px;
-    }
-
-    .fingerprint-core svg {
-        width: 34px;
-        height: 34px;
-        stroke: #ffffff;
-        stroke-width: 2;
-        fill: none;
-    }
-
-    .fingerprint-kicker {
-        margin: 0 0 8px;
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        font-weight: 900;
-        color: #8b0000;
-    }
-
-    .fingerprint-copy h3 {
-        margin: 0;
-        font-size: 1.55rem;
-        font-weight: 900;
-        color: #111827;
-    }
-
-    .fingerprint-copy p {
-        margin: 8px 0 0;
-        color: #475569;
-        line-height: 1.6;
-    }
-
-    .fingerprint-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-
-    .fingerprint-step {
-        border: 1px solid rgba(148, 163, 184, 0.26);
-        background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92));
-        border-radius: 14px;
-        padding: 14px;
-        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.05);
-    }
-
-    .fingerprint-step span {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        font-weight: 900;
-        color: #7c2d12;
-    }
-
-    .fingerprint-step strong {
-        display: block;
-        margin-top: 8px;
-        color: #0f172a;
-    }
-
-    .fingerprint-step p {
-        margin: 6px 0 0;
-        color: #64748b;
-        font-size: 13px;
-        line-height: 1.5;
-    }
-
-    .fingerprint-status {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 4px;
-    }
-
     .status-chip {
         display: inline-flex;
         align-items: center;
@@ -2662,15 +2429,12 @@
         font-size: 13px;
     }
 
-    html[data-theme="dark"] .registration-kicker,
-    html[data-theme="dark"] .fingerprint-kicker {
+    html[data-theme="dark"] .registration-kicker {
         color: #fde68a;
     }
 
     html[data-theme="dark"] .registration-head h3,
     html[data-theme="dark"] .registration-head p,
-    html[data-theme="dark"] .fingerprint-copy h3,
-    html[data-theme="dark"] .fingerprint-copy p,
     html[data-theme="dark"] .status-note {
         color: #ffffff;
     }
@@ -2699,16 +2463,6 @@
         color: #ffffff;
     }
 
-    html[data-theme="dark"] .fingerprint-step {
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(17, 24, 39, 0.92));
-        border-color: rgba(148, 163, 184, 0.22);
-    }
-
-    html[data-theme="dark"] .fingerprint-step strong,
-    html[data-theme="dark"] .fingerprint-step p {
-        color: #ffffff;
-    }
-
     html[data-theme="dark"] .status-chip.pending {
         background: rgba(234, 179, 8, 0.16);
         border-color: rgba(250, 204, 21, 0.5);
@@ -2722,19 +2476,6 @@
     }
 
     @media (max-width: 860px) {
-        .fingerprint-hero {
-            grid-template-columns: 1fr;
-            text-align: center;
-        }
-
-        .fingerprint-orbit {
-            margin: 0 auto;
-        }
-
-        .fingerprint-grid {
-            grid-template-columns: 1fr;
-        }
-
         .registration-actions {
             justify-content: flex-start;
         }
@@ -2770,7 +2511,7 @@
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $basePrefix = $role === \App\Models\User::ROLE_ADMIN ? '/assistant' : '/admin';
-    $currentMode = in_array($mode ?? '', ['assisted', 'registration', 'fingerprint'], true) ? $mode : '';
+    $currentMode = in_array($mode ?? '', ['scan', 'assisted', 'registration', 'applicant'], true) ? $mode : '';
     $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
     $idpClientId = trim((string) config('services.idp.client_id', ''));
     $portalRegisterUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
@@ -2788,7 +2529,7 @@
             <span class="toast-subtitle">Record saved successfully.</span>
         </div>
     </div>
-    <button onclick="location.href='{{ url($basePrefix . '/walkin') }}?mode=scan'" class="btn-toast-action">Open Scan / Bio</button>
+    <button onclick="location.href='{{ url($basePrefix . '/walkin') }}?mode=scan'" class="btn-toast-action">Open OCR / Manual ID</button>
 </div>
 @endif
 
@@ -2819,7 +2560,7 @@
                         </svg>
                     </span>
                     <h3 class="intake-option-title">Registration</h3>
-                    <p class="intake-option-copy">Open registration options for IDP account creation or fingerprint enrollment through BioSync.</p>
+                    <p class="intake-option-copy">Open registration options for IDP account creation or assisted manual profile setup.</p>
                 </div>
             </a>
 
@@ -2835,8 +2576,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5v9A1.5 1.5 0 0 1 19.5 18h-15A1.5 1.5 0 0 1 3 16.5v-9Zm3 3h12m-12 3h7.5" />
                         </svg>
                     </span>
-                    <h3 class="intake-option-title">Scan / Bio</h3>
-                    <p class="intake-option-copy">Use OCR ID scanning, BioSync, or manual student number entry to identify an existing school user and continue directly to consultation.</p>
+                    <h3 class="intake-option-title">OCR / Manual ID</h3>
+                    <p class="intake-option-copy">Use OCR ID scanning or manual student number entry to identify an existing school user and continue directly to consultation.</p>
                 </div>
             </a>
 
@@ -2870,7 +2611,7 @@
                         </svg>
                     </span>
                     <h3 class="intake-option-title">Applicants</h3>
-                    <p class="intake-option-copy">Use OCR ID scanning, BioSync, or manual student number entry, then proceed directly to Medical Assessment.</p>
+                    <p class="intake-option-copy">Use OCR ID scanning or manual student number entry, then proceed directly to Medical Assessment.</p>
                 </div>
             </a>
         </div>
@@ -2882,17 +2623,17 @@
                 <div class="applicant-modal-head-main">
                     <div id="headerIcon" class="applicant-modal-head-badge">AP</div>
                     <div class="applicant-modal-head-copy">
-                        <h3 id="headerTitle">BioSync Ready</h3>
-                        <span id="scanMethodBadge" class="scan-method-badge">BioSync Active</span>
-                        <p id="headerSubtitle">Start with BioSync fingerprint identification, or switch to OCR ID scanning when you need to capture the applicant card instead.</p>
+                        <h3 id="headerTitle">OCR Ready</h3>
+                        <span id="scanMethodBadge" class="scan-method-badge">OCR Active</span>
+                        <p id="headerSubtitle">Start with OCR ID scanning, or use manual student number entry when the card cannot be captured clearly.</p>
                     </div>
                 </div>
-                <div class="applicant-modal-head-actions">
+                <div class="applicant-modal-head-actions" style="display:none;">
                     <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                         </svg>
-                        <span>Switch to OCR Scan</span>
+                        <span>OCR Scan Active</span>
                     </button>
                 </div>
                 <button type="button" class="applicant-modal-close" id="closeApplicantScanModal" aria-label="Close applicant scan modal">
@@ -2923,28 +2664,6 @@
                                         </div>
                                     </div>
 
-                                    <div id="bioSyncPendingPanel" style="display:none; background:linear-gradient(180deg, #f8fafc, #eef2ff); border:1px dashed #cbd5e1; border-radius:12px; padding:30px 22px;">
-                                        <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
-                                            <div style="width:60px; height:60px; border-radius:18px; background:#dbeafe; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 10px 20px rgba(59,130,246,0.12); flex-shrink:0;">BIO</div>
-                                            <div style="text-align:left;">
-                                                <h4 style="margin:0; font-size:18px; color:#0f172a; font-weight:800;">BioSync Pending</h4>
-                                            </div>
-                                        </div>
-                                        <div style="display:grid; gap:10px;">
-                                            <div style="display:grid; grid-template-columns:110px minmax(0, 1fr); gap:12px; align-items:center;">
-                                                <span style="font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; color:#475569;">Full Name</span>
-                                                <input type="text" class="form-control" value="Waiting for BioSync" readonly style="margin-bottom:0; background:#ffffff;">
-                                            </div>
-                                            <div style="display:grid; grid-template-columns:110px minmax(0, 1fr); gap:12px; align-items:center;">
-                                                <span style="font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; color:#475569;">ID Number</span>
-                                                <input type="text" class="form-control" value="Waiting for BioSync" readonly style="margin-bottom:0; background:#ffffff;">
-                                            </div>
-                                            <div style="display:grid; grid-template-columns:110px minmax(0, 1fr); gap:12px; align-items:center;">
-                                                <span style="font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; color:#475569;">Role</span>
-                                                <input type="text" class="form-control" value="Waiting for BioSync" readonly style="margin-bottom:0; background:#ffffff;">
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2998,19 +2717,6 @@
                             </div>
                         </div>
 
-                        <div id="applicantBioSyncInfoPanel" class="applicant-biosync-visual" style="display:none;">
-                            <div class="applicant-biosync-ring">
-                                <svg class="applicant-biosync-fingerprint" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33" />
-                                </svg>
-                                <div class="applicant-biosync-scanline"></div>
-                            </div>
-                            <div class="applicant-biosync-copy">
-                                <h4>BioSync Pending</h4>
-                                <p>The fingerprint preview is ready here. Identity details will appear in the left-side BioSync section once the integration is connected.</p>
-                            </div>
-                        </div>
-
                         <canvas id="ocrCanvas" style="display:none;"></canvas>
                     </div>
                 </div>
@@ -3046,63 +2752,20 @@
             <p>Open the official Identity Provider registration form and complete applicant account enrollment.</p>
         </a>
 
-        <a href="{{ url()->current() }}?mode=fingerprint" class="um-mode-btn registration-mode-btn">
+        <a href="{{ url()->current() }}?mode=assisted" class="um-mode-btn registration-mode-btn">
             <span class="um-mode-icon" aria-hidden="true">
-                <img width="100" height="100" src="https://img.icons8.com/bubbles/100/fingerprint.png" alt="fingerprint" />
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75h3A2.25 2.25 0 0 1 21 9v7.5A2.25 2.25 0 0 1 18.75 18.75H5.25A2.25 2.25 0 0 1 3 16.5V9a2.25 2.25 0 0 1 2.25-2.25h3m1.5 0a2.25 2.25 0 0 1 4.5 0m-4.5 0h4.5m-6 5.25h6m-6 3h3.75" />
+                </svg>
             </span>
-            <h3>Register Fingerprint</h3>
-            <p>Proceed to the BioSync enrollment interface to capture and bind fingerprint data for clinic use.</p>
+            <h3>Manual Registration</h3>
+            <p>Capture the patient record on their behalf when illness or urgency makes self-registration impractical.</p>
         </a>
     </div>
 </div>
 @endif
 
-@if($currentMode === 'fingerprint')
-<div class="card p-4 shadow-sm walkin-strip-card fingerprint-hub" style="border-radius: 16px; border: none; margin: 20px auto;">
-    <div class="fingerprint-hero">
-        <div class="fingerprint-orbit">
-            <span class="fingerprint-core">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33" />
-                </svg>
-            </span>
-        </div>
-        <div class="fingerprint-copy">
-            <p class="fingerprint-kicker">BioSync Enrollment</p>
-            <h3>Register Fingerprint</h3>
-            <p>Capture applicant biometrics for identity matching and secure clinic verification. This interface is ready for the BioSync device integration flow.</p>
-        </div>
-    </div>
 
-    <div class="fingerprint-grid">
-        <div class="fingerprint-step">
-            <span><i class="fa-solid fa-plug-circle-bolt"></i> Step 1</span>
-            <strong>Connect Reader</strong>
-            <p>Ensure the BioSync fingerprint scanner is connected and recognized by this workstation.</p>
-        </div>
-        <div class="fingerprint-step">
-            <span><i class="fa-solid fa-hand-pointer"></i> Step 2</span>
-            <strong>Capture Fingerprint</strong>
-            <p>Ask the applicant to press their finger until the enrollment quality meets the required threshold.</p>
-        </div>
-        <div class="fingerprint-step">
-            <span><i class="fa-solid fa-shield-heart"></i> Step 3</span>
-            <strong>Save Template</strong>
-            <p>Bind the biometric template to the applicant profile and confirm enrollment success.</p>
-        </div>
-    </div>
-
-    <div class="fingerprint-status">
-        <span class="status-chip pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Waiting for scanner handshake</span>
-        <span class="status-note">Device bridge can be connected here once BioSync runtime service is available.</span>
-    </div>
-
-    <div class="registration-actions">
-        <a href="{{ url()->current() }}?mode=registration" class="btn">Back</a>
-        <button type="button" class="btn" disabled>Start Enrollment</button>
-    </div>
-</div>
-@endif
 
 @if(in_array($currentMode, ['scan', 'assisted', 'applicant'], true))
 <div class="{{ $currentMode === 'assisted' ? '' : 'card p-4 shadow-sm walkin-strip-card' }}" style="{{ $currentMode === 'assisted' ? 'max-width: 1180px; margin: 20px auto; padding: 0; background: transparent; box-shadow: none; border: none;' : 'border-radius: 15px; border: none; max-width: 550px; margin: 20px auto;' }}">
@@ -3115,7 +2778,7 @@
                 {{ $currentMode === 'applicant' ? 'Applicant Scan Ready' : 'OCR Ready' }}
             </h3>
             <p id="headerSubtitle">
-                {{ $currentMode === 'applicant' ? 'Choose OCR scanning or BioSync to identify the applicant and continue to Medical Assessment.' : 'Choose barcode scanning or BioSync mode to identify the patient.' }}
+                {{ $currentMode === 'applicant' ? 'Choose OCR scanning or manual ID entry to identify the applicant and continue to Medical Assessment.' : 'Choose OCR scanning or manual ID entry to identify the patient.' }}
             </p>
         </div>
     </div>
@@ -3125,15 +2788,15 @@
         <div id="scanStage" class="scan-stage">
             <div class="scan-method-bar">
                 <div>
-                <p id="scanMethodTitle" class="scan-method-title">Scan Barcode</p>
-                <p id="scanMethodNote" class="scan-method-note">Use the camera to capture the patient barcode, or switch to BioSync mode for identity matching.</p>
-                <span id="scanMethodBadge" class="scan-method-badge">Barcode Active</span>
+                <p id="scanMethodTitle" class="scan-method-title">OCR ID Scan</p>
+                <p id="scanMethodNote" class="scan-method-note">Use the camera to extract the student number from the physical ID card, or enter it manually.</p>
+                <span id="scanMethodBadge" class="scan-method-badge">OCR Active</span>
                 </div>
-                <button type="button" id="btnSwitchScanMode" class="btn-scan-switch">Switch to BioSync</button>
+                <button type="button" id="btnSwitchScanMode" class="btn-scan-switch" style="display:none;">OCR Scan Active</button>
             </div>
 
             <div id="scanner-container-scan" class="scan-surface" style="position: relative;">
-                <p id="scanInlineNote" class="scan-inline-note">Barcode mode is active. Point the camera at the patient barcode, or switch to BioSync for the upcoming biometric flow.</p>
+                <p id="scanInlineNote" class="scan-inline-note">OCR mode is active. Align the physical ID inside the frame, or type the student number manually.</p>
                 <div id="barcodeScanPanel">
                     <div id="scan-loading">
                         <div class="spinner"></div>
@@ -3176,11 +2839,6 @@
                     <canvas id="ocrCanvas" style="display:none;"></canvas>
                 </div>
 
-                <div id="bioSyncPendingPanel" style="display:none; background:linear-gradient(180deg, #f8fafc, #eef2ff); border:1px dashed #cbd5e1; border-radius:12px; padding:30px 22px; text-align:center;">
-                    <div style="width:60px; height:60px; margin:0 auto 14px; border-radius:18px; background:#dbeafe; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 10px 20px rgba(59,130,246,0.12);">BIO</div>
-                    <h4 style="margin:0 0 8px; font-size:18px; color:#0f172a; font-weight:800;">BioSync Pending</h4>
-                    <p style="margin:0; color:#64748b; line-height:1.6; font-size:13px;">This mode is reserved for the upcoming BioSync integration. For now, please switch back to barcode scanning or use assisted intake.</p>
-                </div>
             </div>
         
             <div class="text-center mt-3">
@@ -3223,7 +2881,7 @@
                                 </svg>
                             </div>
                             <div class="assisted-hero-copy">
-                                <h3>Clinic Concierge Intake</h3>
+                                <h3>Clinic Patient Registration</h3>
                                 <div class="assisted-status-row" style="margin-bottom:10px;">
                                     <span class="assisted-status-chip pending">Temporary Record</span>
                                     <span class="assisted-status-chip ready">Ready for Consultation</span>
@@ -3378,7 +3036,7 @@
     let lastAutoProceedKey = '';
     const initialMode = @json($currentMode);
     let intakeTarget = 'consultation';
-    let scanMethod = 'biosync';
+    let scanMethod = 'ocr';
     const liveOcrIntervalMs = 900;
     const ocrCanvasScale = 1;
     const supportedFormats = window.Html5QrcodeSupportedFormats ? [
@@ -3485,7 +3143,7 @@
         }
 
         function isOcrMode() {
-            return scanMethod !== 'biosync';
+            return true;
         }
 
         function attachVideoTrack() {
@@ -4086,53 +3744,42 @@
         }
 
         function updateScanModeUI() {
-            const isBioSync = scanMethod === 'biosync';
+            scanMethod = 'ocr';
             const isApplicantFlow = intakeTarget === 'assessment';
-            $('#scanMethodTitle').text(isBioSync ? 'BioSync Fingerprint' : 'OCR ID Scan');
+            $('#scanMethodTitle').text('OCR ID Scan');
             $('#scanMethodNote').text(
-                isBioSync
-                    ? 'Start with the fingerprint-first BioSync panel, then switch to OCR if the applicant needs card-based identification instead.'
-                    : isApplicantFlow
+                isApplicantFlow
                         ? 'Use the live camera feed to extract the applicant student number from the ID card, then proceed to Medical Assessment.'
                         : 'Use the live camera feed to extract the printed student number from the physical ID card, then fill the saved name from records.'
             );
-            $('#scanMethodBadge').text(isBioSync ? 'BioSync Active' : 'OCR Active');
-            $('#btnSwitchScanMode span').text(isBioSync ? 'Switch to OCR Scan' : 'Switch to BioSync');
-            $('#headerTitle').text(isBioSync ? 'BioSync Ready' : 'OCR Ready');
+            $('#scanMethodBadge').text('OCR Active');
+            $('#btnSwitchScanMode').hide();
+            $('#btnSwitchScanMode span').text('OCR Scan Active');
+            $('#headerTitle').text('OCR Ready');
             $('#headerSubtitle').text(
-                isBioSync
-                    ? 'Start with BioSync fingerprint identification, or switch to OCR ID scanning when you need to capture the applicant card instead.'
-                    : isApplicantFlow
-                        ? 'Choose OCR ID scanning or BioSync mode to identify the applicant and proceed to Medical Assessment.'
+                isApplicantFlow
+                        ? 'Choose OCR ID scanning or manual ID entry to identify the applicant and proceed to Medical Assessment.'
                         : ''
             );
-            $('#headerIcon').text(isBioSync ? 'BIO' : (isApplicantFlow ? 'AP' : 'SB'));
+            $('#headerIcon').text(isApplicantFlow ? 'AP' : 'SB');
             $('#scanInlineNote').text(
-                isBioSync
-                    ? 'BioSync fingerprint mode is selected first. When the scanner flow is ready, this panel will be the primary identification step before OCR.'
-                    : isApplicantFlow
+                isApplicantFlow
                         ? 'OCR mode is active. Align the physical ID inside the frame and continue once student number and name are matched for Medical Assessment.'
                         : 'OCR mode is active. Align the physical ID inside the frame and the system will keep reading the student number live, then match the saved name automatically.'
             );
-            $('#barcodeScanPanel').toggle(!isBioSync);
-            $('#bioSyncPendingPanel').toggle(isBioSync);
-            $('#btnShowManual').toggle(!isBioSync);
-            $('#manualInputArea').toggle(!isBioSync && $('#manualInputArea').is(':visible'));
+            $('#barcodeScanPanel').show();
+            $('#btnShowManual').show();
+            $('#manualInputArea').toggle($('#manualInputArea').is(':visible'));
             const keepResultPanelVisible = intakeTarget === 'assessment';
-            $('#ocrResultPanel').toggle(!isBioSync && ($('#ocrResultPanel').is(':visible') || keepResultPanelVisible));
-            $('#applicantOcrReviewPanel').toggle(!isBioSync);
-            $('#applicantBioSyncInfoPanel').toggle(isBioSync);
+            $('#ocrResultPanel').toggle($('#ocrResultPanel').is(':visible') || keepResultPanelVisible);
+            $('#applicantOcrReviewPanel').show();
 
-            if (isBioSync) {
-                stopMainScanner();
-            } else {
-                startMainScanner();
-            }
+            startMainScanner();
         }
 
         function openIntakeScanModal(target = 'consultation') {
             intakeTarget = target;
-            scanMethod = 'biosync';
+            scanMethod = 'ocr';
             manualStudentNumberEdited = false;
             manualStudentNameEdited = false;
             $('#student_id_manual').val('');
@@ -4238,21 +3885,8 @@
         });
 
         $('#btnSwitchScanMode').on('click', function() {
-            const $scanStage = $('#scanStage');
-            if ($scanStage.hasClass('is-flipping')) {
-                return;
-            }
-
-            $scanStage.addClass('is-flipping');
-
-            window.setTimeout(function () {
-            scanMethod = scanMethod === 'biosync' ? 'ocr' : 'biosync';
+            scanMethod = 'ocr';
             updateScanModeUI();
-            }, 180);
-
-            window.setTimeout(function () {
-                $scanStage.removeClass('is-flipping');
-            }, 560);
         });
 
         $('#btnRunAiOcr').on('click', function() {

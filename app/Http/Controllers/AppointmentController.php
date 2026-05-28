@@ -1021,37 +1021,11 @@ public function updateContact(Request $request)
         return redirect()->back()->with('error', 'User session not found.');
     }
 
-    $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
-    $normalizedContactNo = preg_replace('/\D+/', '', (string) $request->input('contact_no', ''));
-    $request->merge([
-        'contact_no' => $normalizedContactNo === '' ? null : $normalizedContactNo,
-    ]);
-
-    // 2. I-validate ang lahat ng fields (Contact, Year, Section, etc.)
+    // 2. GUISIS owns student profile details. Clinic profile edits only allow height and weight.
     $validated = $request->validate([
-        'contact_no' => ['nullable', 'regex:/^[0-9]{10,13}$/'],
-        'year'       => ['nullable', 'string', 'max:10'],
-        'section'    => ['nullable', 'string', 'max:10'],
         'height'     => ['nullable', 'string', 'max:20', 'regex:/^\s*\d+(\.\d+)?(\s*cm)?\s*$/i'],
         'weight'     => ['nullable', 'string', 'max:20', 'regex:/^\s*\d+(\.\d+)?(\s*kg)?\s*$/i'],
-        'guardian_name' => ['nullable', 'string', 'max:255'],
-        'cellphone' => ['nullable', 'string', 'max:25'],
-        'admin_profile_id' => ['nullable', 'integer', 'exists:admins,admin_id'],
-        'first_name' => ['nullable', 'string', 'max:255'],
-        'middle_name' => ['nullable', 'string', 'max:255'],
-        'last_name' => ['nullable', 'string', 'max:255'],
-        'suffix_name' => ['nullable', 'string', 'max:50'],
-        'email' => ['nullable', 'email', 'max:255'],
-        'birthday' => ['nullable', 'date'],
-        'age' => ['nullable', 'integer', 'min:0'],
-        'gender' => ['nullable', 'string', 'max:255'],
-        'civil_status' => ['nullable', 'string', 'max:255'],
-        'address' => ['nullable', 'string', 'max:1000'],
-        'emergency_contact_person' => ['nullable', 'string', 'max:255'],
-        'emergency_contact_no' => ['nullable', 'string', 'max:255'],
-        'office' => ['nullable', 'string', 'max:255'],
     ], [
-        'contact_no.regex' => 'Please enter a valid contact number using 10 to 13 digits.',
         'height.regex' => 'Height must be a valid number (optional unit: cm).',
         'weight.regex' => 'Weight must be a valid number (optional unit: kg).',
     ]);
@@ -1061,40 +1035,9 @@ public function updateContact(Request $request)
     $normalizedHeight = $heightNumeric !== null ? $this->normalizeMeasurement($heightNumeric, 'cm') : null;
     $normalizedWeight = $weightNumeric !== null ? $this->normalizeMeasurement($weightNumeric, 'kg') : null;
 
-    // 3. I-track ang changes para sa Log (Optional: Para alam ng Admin kung ano ang binago)
-    $oldYear = $user->year;
-    $newYear = $validated['year'] ?? $user->year;
-
-    // 4. I-save ang mga bagong data
-    if (array_key_exists('contact_no', $validated) && $validated['contact_no'] !== null) {
-        $user->contact_no = $validated['contact_no'];
-    }
-    $user->year = $validated['year'] ?? $user->year;
-    $user->section = $validated['section'] ?? $user->section;
+    // 3. Save only clinic-controlled measurements.
     $user->height = $heightNumeric ?? $user->height;
     $user->weight = $weightNumeric ?? $user->weight;
-    if ($linkedAdminProfile && isset($validated['admin_profile_id']) && (int) $validated['admin_profile_id'] === (int) $linkedAdminProfile->admin_id) {
-        $linkedAdminProfile->first_name = $validated['first_name'] ?? $linkedAdminProfile->first_name;
-        $linkedAdminProfile->middle_name = $validated['middle_name'] ?? $linkedAdminProfile->middle_name;
-        $linkedAdminProfile->last_name = $validated['last_name'] ?? $linkedAdminProfile->last_name;
-        $linkedAdminProfile->suffix_name = $validated['suffix_name'] ?? $linkedAdminProfile->suffix_name;
-        $linkedAdminProfile->email = $validated['email'] ?? $linkedAdminProfile->email;
-        $linkedAdminProfile->birthday = $validated['birthday'] ?? $linkedAdminProfile->birthday;
-        $linkedAdminProfile->age = $validated['age'] ?? $linkedAdminProfile->age;
-        $linkedAdminProfile->gender = $validated['gender'] ?? $linkedAdminProfile->gender;
-        $linkedAdminProfile->civil_status = $validated['civil_status'] ?? $linkedAdminProfile->civil_status;
-        $linkedAdminProfile->address = $validated['address'] ?? $linkedAdminProfile->address;
-        $linkedAdminProfile->emergency_contact_person = $validated['emergency_contact_person'] ?? $linkedAdminProfile->emergency_contact_person;
-        $linkedAdminProfile->emergency_contact_no = $validated['emergency_contact_no'] ?? $linkedAdminProfile->emergency_contact_no;
-        $linkedAdminProfile->office = $validated['office'] ?? $linkedAdminProfile->office;
-        $linkedAdminProfile->save();
-
-        $user->first_name = $validated['first_name'] ?? $user->first_name;
-        $user->last_name = $validated['last_name'] ?? $user->last_name;
-        $user->name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: $user->name;
-        $user->email = $validated['email'] ?? $user->email;
-    }
-
     $user->save();
 
     $healthProfile = $user->healthProfile()->first();
@@ -1105,12 +1048,6 @@ public function updateContact(Request $request)
         if ($normalizedWeight !== null) {
             $healthProfile->weight = $normalizedWeight;
         }
-        if (array_key_exists('guardian_name', $validated) && $validated['guardian_name'] !== null) {
-            $healthProfile->guardian_name = $validated['guardian_name'];
-        }
-        if (array_key_exists('cellphone', $validated) && $validated['cellphone'] !== null) {
-            $healthProfile->cellphone = $validated['cellphone'];
-        }
         $healthProfile->save();
     }
 
@@ -1119,7 +1056,7 @@ public function updateContact(Request $request)
         'user_id'     => $user->id,
         'user_name'   => $user->name,
         'action'      => 'Profile Update',
-        'description' => "Updated profile: Year ($oldYear to $newYear), Section, Medical Info, and linked designee info when available.",
+        'description' => 'Updated clinic profile measurements: height and weight.',
         'ip_address'  => $request->ip(),
         'user_agent'  => $request->userAgent(),
     ]);

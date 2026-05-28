@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Item extends Model
@@ -18,9 +19,13 @@ class Item extends Model
         'medicine_type',
         'illness_category_id',
         'quantity',
+        'starting_stock',
+        'minimum_stock',
         'unit',
         'dispensing_unit',
         'units_per_stock_unit',
+        'batch_number',
+        'supplier_source',
         'date_added',      
         'expiration_date',
         'description'
@@ -28,6 +33,8 @@ class Item extends Model
 
     protected $casts = [
         'quantity' => 'decimal:2',
+        'starting_stock' => 'decimal:2',
+        'minimum_stock' => 'decimal:2',
         'units_per_stock_unit' => 'integer',
         'date_added' => 'date',
         'expiration_date' => 'date',
@@ -41,6 +48,11 @@ class Item extends Model
     public function medicineType(): BelongsTo
     {
         return $this->belongsTo(MedicineType::class, 'medicine_type_id');
+    }
+
+    public function movements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class)->latest();
     }
 
     public function normalizedUnit(): string

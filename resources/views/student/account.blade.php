@@ -335,7 +335,8 @@
             0 4px 10px rgba(15, 23, 42, 0.06);
     }
     .profile-frame-equal {
-        height: 280px;
+        min-height: 280px;
+        height: auto;
         display: flex;
         flex-direction: column;
     }
@@ -661,6 +662,44 @@
         white-space: normal;
         word-break: break-word;
     }
+    .guisis-sync-banner {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(250, 204, 21, 0.46);
+        background: linear-gradient(135deg, #fff8d6 0%, #fffef4 100%);
+        color: #4b2e05;
+        box-shadow: 0 12px 24px rgba(112, 19, 27, 0.06);
+    }
+    .guisis-sync-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: #70131B;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .guisis-sync-copy {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.55;
+    }
+    .guisis-pending-value {
+        color: #7f1d2d !important;
+        font-weight: 800;
+    }
     .profile-grid-3 > div .form-control:disabled,
     .profile-grid-2 > div .form-control:disabled,
     .profile-info-row .form-control:disabled {
@@ -775,6 +814,19 @@
         background: linear-gradient(180deg, #111214 0%, #17171a 100%) !important;
         border-color: rgba(250, 204, 21, 0.16) !important;
         color: #f8fafc;
+    }
+    html[data-theme="dark"] .guisis-sync-banner {
+        background: linear-gradient(135deg, rgba(112, 19, 27, 0.58), rgba(15, 23, 42, 0.92));
+        border-color: rgba(250, 204, 21, 0.24);
+        color: #fef3c7;
+        box-shadow: 0 14px 26px rgba(0, 0, 0, 0.24);
+    }
+    html[data-theme="dark"] .guisis-sync-badge {
+        background: #facc15;
+        color: #111827;
+    }
+    html[data-theme="dark"] .guisis-pending-value {
+        color: #fde68a !important;
     }
     html[data-theme="dark"] .profile-grid-3 > div .form-control:focus,
     html[data-theme="dark"] .profile-grid-2 > div .form-control:focus,
@@ -1774,6 +1826,9 @@
     $showOfficeField = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin', 'faculty'], true) || str_contains($linkedAccessLevel, 'faculty');
     $displayStudentNumber = trim((string) ($accountProfileData['student_number'] ?? $user->student_number ?? ''));
     $displayCourse = trim((string) ($accountProfileData['course_college'] ?? $user->course ?? ''));
+    $guisisPendingText = 'Available once enrolled';
+    $guisisValue = fn ($value) => trim((string) $value) !== '' ? trim((string) $value) : $guisisPendingText;
+    $guisisPendingClass = fn ($value) => trim((string) $value) === '' ? ' guisis-pending-value' : '';
     $heightRaw = old('height', $accountProfileData['height'] ?? $user->height ?? '');
     $weightRaw = old('weight', $accountProfileData['weight'] ?? $user->weight ?? '');
     preg_match('/\d+(?:\.\d+)?/', (string) $heightRaw, $heightMatch);
@@ -1827,11 +1882,11 @@
         <div class="hero-info">
             <h1 class="hero-name">{{ $user->name }} <span class="hero-badge">Active</span></h1>
             <div class="hero-course" @if($linkedRoleLabel) style="display: none;" @endif>
-                {{ $user->student_number }} • {{ $user->course ?? 'BS Information Technology' }}
+                {{ $guisisValue($displayStudentNumber) }} &bull; {{ $guisisValue($displayCourse) }}
             </div>
             @if($linkedRoleLabel)
                 <div class="hero-course">
-                    {{ $user->student_number }} - {{ $linkedRoleLabel }}
+                    {{ $guisisValue($displayStudentNumber) }} - {{ $linkedRoleLabel }}
                 </div>
             @endif
 
@@ -1884,6 +1939,11 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <button type="button" id="editBtn" class="profile-edit-btn" onclick="enableEditing()">Edit Profile</button>
     </div>
+
+    <div class="guisis-sync-banner">
+        <span class="guisis-sync-badge">GUISIS Sync Pending</span>
+        <p class="guisis-sync-copy">Student information will sync from GUISIS once the enrollment record is available. Only height and weight can be updated in the clinic profile.</p>
+    </div>
     
     <form action="{{ route('student.updateContact') }}" method="POST">
         @csrf
@@ -1898,16 +1958,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         <h3 class="profile-form-section-title"><x-outline-icon name="document-text" />Academic Information</h3>
                         <div class="profile-grid-3">
                             <div>
+                                <label class="input-label">Student Number / Reference Number</label>
+                                <div class="form-control profile-static-field{{ $guisisPendingClass($displayStudentNumber) }}">{{ $guisisValue($displayStudentNumber) }}</div>
+                            </div>
+                            <div>
                                 <label class="input-label">Course</label>
-                                <div class="form-control profile-course-field profile-static-field">{{ $accountProfileData['course_college'] ?? $user->course }}</div>
+                                <div class="form-control profile-course-field profile-static-field{{ $guisisPendingClass($displayCourse) }}">{{ $guisisValue($displayCourse) }}</div>
                             </div>
                             <div>
                                 <label class="input-label">Year</label>
-                                <input type="text" name="year" class="form-control" value="{{ old('year', $user->year) }}" disabled>
+                                <input type="text" name="year" class="form-control{{ $guisisPendingClass(old('year', $user->year)) }}" value="{{ old('year', $user->year) }}" placeholder="{{ $guisisPendingText }}" disabled>
                             </div>
                             <div>
                                 <label class="input-label">Section</label>
-                                <input type="text" name="section" class="form-control" value="{{ old('section', $user->section) }}" disabled>
+                                <input type="text" name="section" class="form-control{{ $guisisPendingClass(old('section', $user->section)) }}" value="{{ old('section', $user->section) }}" placeholder="{{ $guisisPendingText }}" disabled>
                             </div>
                         </div>
                     </section>
@@ -1917,11 +1981,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="profile-grid-2">
                             <div>
                                 <label class="input-label">Gender</label>
-                                <input type="text" class="form-control" value="{{ $accountProfileData['sex'] ?? $user->gender }}" readonly style="background-color: #f8fafc;">
+                                <input type="text" class="form-control{{ $guisisPendingClass($accountProfileData['sex'] ?? $user->gender) }}" value="{{ $accountProfileData['sex'] ?? $user->gender }}" placeholder="{{ $guisisPendingText }}" readonly style="background-color: #f8fafc;">
                             </div>
                             <div>
                                 <label class="input-label">Birthday (DOB)</label>
-                                <input type="text" class="form-control" value="{{ $accountProfileData['birthday'] ?? $user->DOB }}" readonly style="background-color: #f8fafc;">
+                                <input type="text" class="form-control{{ $guisisPendingClass($accountProfileData['birthday'] ?? $user->DOB) }}" value="{{ $accountProfileData['birthday'] ?? $user->DOB }}" placeholder="{{ $guisisPendingText }}" readonly style="background-color: #f8fafc;">
                             </div>
                         </div>
                         <div class="profile-grid-2">
@@ -1946,11 +2010,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <h3 class="profile-form-section-title"><x-outline-icon name="clock" />Contact Information</h3>
                         <div class="profile-info-row">
                             <label class="input-label">Contact Number</label>
-                            <input type="text" name="contact_no" class="form-control" value="{{ old('contact_no', $user->contact_no) }}" disabled>
+                            <input type="text" name="contact_no" class="form-control{{ $guisisPendingClass(old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no)) }}" value="{{ old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no) }}" placeholder="{{ $guisisPendingText }}" disabled>
                         </div>
                         <div class="profile-info-row">
                             <label class="input-label">Address</label>
-                            <textarea class="form-control" rows="2" disabled>{{ old('home_address', $accountProfileData['home_address'] ?? '') }}</textarea>
+                            <textarea class="form-control{{ $guisisPendingClass(old('home_address', $accountProfileData['home_address'] ?? '')) }}" rows="2" placeholder="{{ $guisisPendingText }}" disabled>{{ old('home_address', $accountProfileData['home_address'] ?? '') }}</textarea>
                         </div>
                     </section>
 
@@ -1959,11 +2023,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="profile-grid-2">
                             <div class="soft-field">
                                 <label class="input-label">Emergency Contact Person</label>
-                                <input type="text" name="guardian_name" class="form-control editable-input" value="{{ old('guardian_name', $accountProfileData['guardian_name'] ?? '') }}" disabled>
+                                <input type="text" name="guardian_name" class="form-control{{ $guisisPendingClass(old('guardian_name', $accountProfileData['guardian_name'] ?? '')) }}" value="{{ old('guardian_name', $accountProfileData['guardian_name'] ?? '') }}" placeholder="{{ $guisisPendingText }}" disabled>
                             </div>
                             <div class="soft-field">
                                 <label class="input-label">Emergency Contact Number</label>
-                                <input type="text" name="cellphone" class="form-control editable-input" value="{{ old('cellphone', $accountProfileData['cellphone'] ?? '') }}" disabled>
+                                <input type="text" name="cellphone" class="form-control{{ $guisisPendingClass(old('cellphone', $accountProfileData['cellphone'] ?? '')) }}" value="{{ old('cellphone', $accountProfileData['cellphone'] ?? '') }}" placeholder="{{ $guisisPendingText }}" disabled>
                             </div>
                         </div>
                     </section>
@@ -1975,47 +2039,66 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="profile-sections-grid">
             <section class="profile-form-section accent-maroon">
                 <h3 class="profile-form-section-title"><x-outline-icon name="information-circle" />Personal Information</h3>
+                <div class="profile-info-row">
+                    <label class="input-label">Student Number / Reference Number</label>
+                    <div class="form-control profile-static-field{{ $guisisPendingClass($displayStudentNumber) }}">{{ $guisisValue($displayStudentNumber) }}</div>
+                </div>
                 <div class="profile-grid-2">
                     <div>
                         <label class="input-label">First Name</label>
-                        <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $accountProfileData['first_name'] ?? $linkedAdminProfile->first_name) }}" disabled>
+                        <input type="text" name="first_name" class="form-control{{ $guisisPendingClass(old('first_name', $accountProfileData['first_name'] ?? $linkedAdminProfile->first_name)) }}" value="{{ old('first_name', $accountProfileData['first_name'] ?? $linkedAdminProfile->first_name) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                     <div>
                         <label class="input-label">Middle Name</label>
-                        <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name', $accountProfileData['middle_name'] ?? $linkedAdminProfile->middle_name) }}" disabled>
+                        <input type="text" name="middle_name" class="form-control{{ $guisisPendingClass(old('middle_name', $accountProfileData['middle_name'] ?? $linkedAdminProfile->middle_name)) }}" value="{{ old('middle_name', $accountProfileData['middle_name'] ?? $linkedAdminProfile->middle_name) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                 </div>
 
                 <div class="profile-grid-2">
                     <div>
                         <label class="input-label">Last Name</label>
-                        <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $accountProfileData['last_name'] ?? $linkedAdminProfile->last_name) }}" disabled>
+                        <input type="text" name="last_name" class="form-control{{ $guisisPendingClass(old('last_name', $accountProfileData['last_name'] ?? $linkedAdminProfile->last_name)) }}" value="{{ old('last_name', $accountProfileData['last_name'] ?? $linkedAdminProfile->last_name) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                     <div>
                         <label class="input-label">Suffix Name</label>
-                        <input type="text" name="suffix_name" class="form-control" value="{{ old('suffix_name', $accountProfileData['suffix_name'] ?? $linkedAdminProfile->suffix_name) }}" disabled>
+                        <input type="text" name="suffix_name" class="form-control{{ $guisisPendingClass(old('suffix_name', $accountProfileData['suffix_name'] ?? $linkedAdminProfile->suffix_name)) }}" value="{{ old('suffix_name', $accountProfileData['suffix_name'] ?? $linkedAdminProfile->suffix_name) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                 </div>
 
                 <div class="profile-grid-2">
                     <div>
                         <label class="input-label">Birthday</label>
-                        <input type="date" name="birthday" class="form-control" value="{{ old('birthday', $accountProfileData['birthday'] ?? $linkedAdminProfile->birthday) }}" disabled>
+                        <input type="text" name="birthday" class="form-control{{ $guisisPendingClass(old('birthday', $accountProfileData['birthday'] ?? $linkedAdminProfile->birthday)) }}" value="{{ old('birthday', $accountProfileData['birthday'] ?? $linkedAdminProfile->birthday) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                     <div>
                         <label class="input-label">Gender</label>
-                        <input type="text" name="gender" class="form-control" value="{{ old('gender', $accountProfileData['sex'] ?? $linkedAdminProfile->gender) }}" disabled>
+                        <input type="text" name="gender" class="form-control{{ $guisisPendingClass(old('gender', $accountProfileData['sex'] ?? $linkedAdminProfile->gender)) }}" value="{{ old('gender', $accountProfileData['sex'] ?? $linkedAdminProfile->gender) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                 </div>
 
                 <div class="profile-grid-2">
                     <div>
                         <label class="input-label">Age</label>
-                        <input type="number" name="age" class="form-control" value="{{ old('age', $accountProfileData['age'] ?? $linkedAdminProfile->age) }}" disabled>
+                        <input type="text" name="age" class="form-control{{ $guisisPendingClass(old('age', $accountProfileData['age'] ?? $linkedAdminProfile->age)) }}" value="{{ old('age', $accountProfileData['age'] ?? $linkedAdminProfile->age) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                     <div>
                         <label class="input-label">Civil Status</label>
-                        <input type="text" name="civil_status" class="form-control editable-input" value="{{ old('civil_status', $accountProfileData['civil_status'] ?? $linkedAdminProfile->civil_status) }}" disabled>
+                        <input type="text" name="civil_status" class="form-control{{ $guisisPendingClass(old('civil_status', $accountProfileData['civil_status'] ?? $linkedAdminProfile->civil_status)) }}" value="{{ old('civil_status', $accountProfileData['civil_status'] ?? $linkedAdminProfile->civil_status) }}" placeholder="{{ $guisisPendingText }}" disabled>
+                    </div>
+                </div>
+
+                <div class="profile-grid-2">
+                    <div>
+                        <label class="input-label">Height (cm)</label>
+                        <div class="metric-field">
+                            <input type="text" name="height" class="form-control editable-input" inputmode="decimal" value="{{ $heightDisplay }}" disabled>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="input-label">Weight (kg)</label>
+                        <div class="metric-field">
+                            <input type="text" name="weight" class="form-control editable-input" inputmode="decimal" value="{{ $weightDisplay }}" disabled>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -2025,26 +2108,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="profile-grid-2">
                     <div>
                         <label class="input-label">Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ old('email', $accountProfileData['email'] ?? $linkedAdminProfile->email) }}" disabled>
+                        <input type="email" name="email" class="form-control{{ $guisisPendingClass(old('email', $accountProfileData['email'] ?? $linkedAdminProfile->email)) }}" value="{{ old('email', $accountProfileData['email'] ?? $linkedAdminProfile->email) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                     <div>
                         <label class="input-label">Contact Number</label>
-                        <input type="text" name="contact_no" class="form-control editable-input" value="{{ old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no) }}" disabled>
+                        <input type="text" name="contact_no" class="form-control{{ $guisisPendingClass(old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no)) }}" value="{{ old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                 </div>
                 <div class="profile-info-row">
                     <label class="input-label">Address</label>
-                    <textarea name="address" class="form-control editable-input" rows="2" disabled>{{ old('address', $accountProfileData['home_address'] ?? $linkedAdminProfile->address) }}</textarea>
+                    <textarea name="address" class="form-control{{ $guisisPendingClass(old('address', $accountProfileData['home_address'] ?? $linkedAdminProfile->address)) }}" rows="2" placeholder="{{ $guisisPendingText }}" disabled>{{ old('address', $accountProfileData['home_address'] ?? $linkedAdminProfile->address) }}</textarea>
                 </div>
 
                 <div class="profile-grid-2">
                     <div class="soft-field">
                         <label class="input-label">Emergency Contact Person</label>
-                        <input type="text" name="emergency_contact_person" class="form-control editable-input" value="{{ old('emergency_contact_person', $accountProfileData['guardian_name'] ?? $linkedAdminProfile->emergency_contact_person) }}" disabled>
+                        <input type="text" name="emergency_contact_person" class="form-control{{ $guisisPendingClass(old('emergency_contact_person', $accountProfileData['guardian_name'] ?? $linkedAdminProfile->emergency_contact_person)) }}" value="{{ old('emergency_contact_person', $accountProfileData['guardian_name'] ?? $linkedAdminProfile->emergency_contact_person) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                     <div class="soft-field">
                         <label class="input-label">Emergency Contact Number</label>
-                        <input type="text" name="emergency_contact_no" class="form-control editable-input" value="{{ old('emergency_contact_no', $accountProfileData['cellphone'] ?? $linkedAdminProfile->emergency_contact_no) }}" disabled>
+                        <input type="text" name="emergency_contact_no" class="form-control{{ $guisisPendingClass(old('emergency_contact_no', $accountProfileData['cellphone'] ?? $linkedAdminProfile->emergency_contact_no)) }}" value="{{ old('emergency_contact_no', $accountProfileData['cellphone'] ?? $linkedAdminProfile->emergency_contact_no) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                 </div>
 
@@ -2052,7 +2135,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="profile-grid-2">
                     <div>
                         <label class="input-label">Office</label>
-                        <input type="text" name="office" class="form-control editable-input" value="{{ old('office', $accountProfileData['office'] ?? $linkedAdminProfile->office) }}" disabled>
+                        <input type="text" name="office" class="form-control{{ $guisisPendingClass(old('office', $accountProfileData['office'] ?? $linkedAdminProfile->office)) }}" value="{{ old('office', $accountProfileData['office'] ?? $linkedAdminProfile->office) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                 </div>
                 @endif
@@ -2494,7 +2577,7 @@ function enableEditing() {
         form.classList.add('profile-is-editing');
     }
     const inputs = form
-        ? form.querySelectorAll('[name="height"], [name="weight"], [name="guardian_name"], [name="cellphone"], [name="emergency_contact_person"], [name="emergency_contact_no"]')
+        ? form.querySelectorAll('[name="height"], [name="weight"]')
         : [];
     
     inputs.forEach(input => {

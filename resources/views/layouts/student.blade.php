@@ -1892,7 +1892,7 @@
                     </span>
                     <span class="brand-text">
                         <span class="brand-title">PUP TAGUIG</span>
-                        <span class="brand-subtitle">ONLINE CLINIC</span>
+                        <span class="brand-subtitle">MEDICAL CLINIC</span>
                     </span>
                 </a>
             </div>

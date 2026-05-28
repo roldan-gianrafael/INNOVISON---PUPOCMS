@@ -339,7 +339,7 @@
         <div class="summary-card">
             <span class="summary-label">Consumed This Month</span>
             <h3 class="summary-value">{{ $totalConsumed }}</h3>
-            <div class="summary-meta">Based on medicine deductions recorded in consultations.</div>
+            <div class="summary-meta">Based on inventory movement records for the selected month.</div>
         </div>
         <div class="summary-card">
             <span class="summary-label">Stock Alerts</span>
@@ -351,7 +351,7 @@
     <div class="summary-panels">
         <div class="summary-panel">
             <h4 class="summary-table-title">Inventory Performance by Item</h4>
-            <p class="summary-table-subtitle">Starting stock is derived from current balance plus recorded consumption for the selected month.</p>
+            <p class="summary-table-subtitle">Starting stock is derived from current balance plus movement-recorded consumption for the selected month.</p>
             <table class="summary-table">
                 <thead>
                     <tr>

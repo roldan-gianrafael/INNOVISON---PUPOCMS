@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Appointment;
 use App\Models\HealthProfile;
+use App\Models\InventoryMovement;
 use App\Models\Item;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Hash;
@@ -773,8 +774,22 @@ PROMPT;
                     }
 
                     $stockDeduction = $item->convertDispensingQuantityToStockQuantity($issuedQuantity);
+                    $stockBefore = (float) $item->quantity;
                     $item->quantity = max(0, round((float) $item->quantity - $stockDeduction, 2));
                     $item->save();
+
+                    InventoryMovement::create([
+                        'item_id' => $item->id,
+                        'user_id' => auth()->id(),
+                        'type' => 'consumed',
+                        'quantity' => -1 * $stockDeduction,
+                        'stock_before' => $stockBefore,
+                        'stock_after' => (float) $item->quantity,
+                        'unit' => $item->unit ?: 'pcs',
+                        'batch_number' => $item->batch_number,
+                        'supplier_source' => $item->supplier_source,
+                        'notes' => 'Issued during consultation.',
+                    ]);
                 }
             }
 

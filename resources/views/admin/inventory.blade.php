@@ -284,6 +284,44 @@
         gap: 8px;
         flex-wrap: wrap;
     }
+    .inventory-filter-bar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 0 0 14px;
+    }
+    .inventory-filter-btn {
+        border: 1px solid rgba(127, 29, 45, 0.18);
+        background: #ffffff;
+        color: #70131B;
+        border-radius: 999px;
+        min-height: 36px;
+        padding: 0 13px;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .inventory-filter-btn:hover,
+    .inventory-filter-btn.is-active {
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+        transform: translateY(-1px);
+    }
+    .inventory-meta-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        padding: 0 8px;
+        border-radius: 999px;
+        background: #fff7ed;
+        color: #9a3412;
+        border: 1px solid #fed7aa;
+        font-size: 11px;
+        font-weight: 800;
+        margin-top: 4px;
+    }
     .btn-icon {
         display: inline-flex;
         align-items: center;
@@ -883,6 +921,17 @@
             0 0 0 3px rgba(112, 19, 27, 0.16),
             0 12px 22px rgba(0, 0, 0, 0.24) !important;
     }
+    html[data-theme="dark"] .inventory-filter-btn {
+        background: rgba(15, 23, 42, 0.92);
+        color: #f8fafc;
+        border-color: rgba(250, 204, 21, 0.18);
+    }
+    html[data-theme="dark"] .inventory-filter-btn:hover,
+    html[data-theme="dark"] .inventory-filter-btn.is-active {
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+    }
 
     @media (max-width: 920px) {
         .controls {
@@ -1142,6 +1191,14 @@
     </div>
 
     <div class="card inventory-summary-card">
+        <div class="inventory-filter-bar" aria-label="Inventory filters">
+            <button type="button" class="inventory-filter-btn is-active" data-inventory-filter="all">All</button>
+            <button type="button" class="inventory-filter-btn" data-inventory-filter="medicine">Medicines</button>
+            <button type="button" class="inventory-filter-btn" data-inventory-filter="supplies">Supplies</button>
+            <button type="button" class="inventory-filter-btn" data-inventory-filter="equipment">Equipment</button>
+            <button type="button" class="inventory-filter-btn" data-inventory-filter="low">Low Stock</button>
+            <button type="button" class="inventory-filter-btn" data-inventory-filter="out">Out of Stock</button>
+        </div>
         <table id="inventoryTable">
             <thead>
                 <tr>    
@@ -1165,6 +1222,9 @@
                     <tr
                         id="inventory-item-{{ $item->id }}"
                         data-inventory-row
+                        data-category="{{ strtolower($item->category) }}"
+                        data-stock="{{ (float) $item->quantity }}"
+                        data-minimum-stock="{{ (float) ($item->minimum_stock ?: 10) }}"
                         class="{{ $highlightClass }}"
                     >
                         <td style="font-weight: 600;">{{ $item->name }}</td>
@@ -1172,6 +1232,12 @@
                             {{ $item->category }}
                             @if($item->category == 'Medicine' && $item->medicine_type)
                                 <small style="display:block; color:#64748b; font-style: italic;">({{ $item->medicine_type }})</small>
+                            @endif
+                            @if($item->batch_number)
+                                <span class="inventory-meta-pill">Batch: {{ $item->batch_number }}</span>
+                            @endif
+                            @if($item->supplier_source)
+                                <small style="display:block; color:#64748b; margin-top:4px;">Source: {{ $item->supplier_source }}</small>
                             @endif
                         </td>
                         <td>
@@ -1190,6 +1256,12 @@
                                     : null;
                             @endphp
                             <div style="font-weight: 700;">{{ $stockDisplay }} {{ $item->unit ?: 'pcs' }}</div>
+                            <small style="display:block; color:#64748b; margin-top:4px;">
+                                Starting stock: {{ rtrim(rtrim(number_format((float) ($item->starting_stock ?: 0), 2, '.', ''), '0'), '.') }} {{ $item->unit ?: 'pcs' }}
+                            </small>
+                            <small style="display:block; color:#64748b; margin-top:4px;">
+                                Minimum stock: {{ rtrim(rtrim(number_format((float) ($item->minimum_stock ?: 10), 2, '.', ''), '0'), '.') }} {{ $item->unit ?: 'pcs' }}
+                            </small>
                             @if($item->category == 'Medicine' && $item->hasDispensingConversion())
                                 <small style="display:block; color:#64748b; margin-top:4px;">
                                     Available to dispense: {{ $availableDispensing }} {{ $item->dispensing_unit }}
@@ -1207,7 +1279,7 @@
                         <td>
                             @if($item->quantity == 0)
                                 <span class="status out">Out of Stock</span>
-                            @elseif($item->quantity < 10)
+                            @elseif((float) $item->quantity <= (float) ($item->minimum_stock ?: 10))
                                 <span class="status low">Low Stock</span>
                             @else
                                 <span class="status in">In Stock</span>
@@ -1222,19 +1294,44 @@
                                         'category' => $item->category,
                                         'quantity' => $item->quantity,
                                         'unit' => $item->unit,
+                                        'minimum_stock' => $item->minimum_stock,
+                                        'batch_number' => $item->batch_number,
+                                        'supplier_source' => $item->supplier_source,
                                         'medicine_type_id' => $item->medicine_type_id,
                                         'dispensing_unit' => $item->dispensing_unit,
                                         'units_per_stock_unit' => $item->units_per_stock_unit,
                                         'medicine_type' => $item->medicine_type,
                                         'date_added' => optional($item->date_added)->format('Y-m-d'),
                                         'expiration_date' => optional($item->expiration_date)->format('Y-m-d'),
+                                        'movements' => $item->movements->take(10)->map(function ($movement) {
+                                            return [
+                                                'type' => $movement->type,
+                                                'quantity' => $movement->quantity,
+                                                'stock_before' => $movement->stock_before,
+                                                'stock_after' => $movement->stock_after,
+                                                'unit' => $movement->unit,
+                                                'batch_number' => $movement->batch_number,
+                                                'supplier_source' => $movement->supplier_source,
+                                                'notes' => $movement->notes,
+                                                'user_name' => optional($movement->user)->name,
+                                                'created_at' => optional($movement->created_at)->format('M d, Y g:i A'),
+                                            ];
+                                        })->values(),
                                     ];
                                 @endphp
                                 <div class="inventory-actions">
+                                    <button class="btn-icon btn-edit" onclick='openRestockModal(@json($editItemPayload))'>
+                                        <x-outline-icon name="plus-circle" />
+                                        <span>Restock</span>
+                                    </button>
                                     <button class="btn-icon btn-edit" 
                                         onclick='editItem(@json($editItemPayload))'>
                                         <x-outline-icon name="pencil-square" />
                                         <span>Edit</span>
+                                    </button>
+                                    <button class="btn-icon btn-edit" onclick='openHistoryModal(@json($editItemPayload))'>
+                                        <x-outline-icon name="clock" />
+                                        <span>History</span>
                                     </button>
 
                                     <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="display:inline;">
@@ -1341,6 +1438,13 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <label>Minimum Stock</label>
+                                        <input type="number" name="minimum_stock" id="iMinimumStock" class="form-control" min="0" step="0.01" placeholder="e.g. 10">
+                                    </div>
+                                </div>
+
+                                <div class="inventory-inline-grid">
+                                    <div class="form-group">
                                         <label>Unit</label>
                                         <input type="text" name="unit" id="iUnit" class="form-control" list="inventoryUnitSuggestions" required placeholder="e.g. pcs, box, bottle, vial">
                                         <datalist id="inventoryUnitSuggestions">
@@ -1361,6 +1465,16 @@
                                             <option value="mg">
                                         </datalist>
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Batch / Lot Number</label>
+                                        <input type="text" name="batch_number" id="iBatchNumber" class="form-control" placeholder="e.g. LOT-2026-05">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Supplier / Source</label>
+                                    <input type="text" name="supplier_source" id="iSupplierSource" class="form-control" placeholder="e.g. Campus supply office, donated, purchased">
                                 </div>
 
                                 <div id="medicineDispensingFields" class="inventory-subgroup">
@@ -1407,13 +1521,79 @@
                 </form>
             </div>
         </div>
+
+        <div id="restockModal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="inventory-modal-head">
+                    <div class="inventory-modal-head-main">
+                        <h3 class="inventory-modal-title">Restock Item</h3>
+                        <p class="inventory-modal-copy" id="restockItemName">Add stock without overwriting the item record.</p>
+                    </div>
+                    <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeRestockModal()" aria-label="Close restock modal">
+                        <x-outline-icon name="x-mark" />
+                    </button>
+                </div>
+                <form id="restockForm" method="POST" action="#">
+                    @csrf
+                    <div class="inventory-modal-body">
+                        <div class="inventory-inline-grid">
+                            <div class="form-group">
+                                <label>Quantity to Add</label>
+                                <input type="number" name="restock_quantity" id="restockQuantity" class="form-control" min="0.01" step="0.01" required placeholder="e.g. 5">
+                            </div>
+                            <div class="form-group">
+                                <label>Restock Date</label>
+                                <input type="date" name="restock_date" id="restockDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="inventory-inline-grid">
+                            <div class="form-group">
+                                <label>Batch / Lot Number</label>
+                                <input type="text" name="batch_number" id="restockBatchNumber" class="form-control" placeholder="Optional">
+                            </div>
+                            <div class="form-group">
+                                <label>Supplier / Source</label>
+                                <input type="text" name="supplier_source" id="restockSupplierSource" class="form-control" placeholder="Optional">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <textarea name="restock_notes" class="form-control" rows="3" placeholder="Optional restock note"></textarea>
+                        </div>
+                        <div class="modal-actions-row">
+                            <button type="submit" class="btn-add">Save Restock</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="historyModal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="inventory-modal-head">
+                    <div class="inventory-modal-head-main">
+                        <h3 class="inventory-modal-title">Stock Movement History</h3>
+                        <p class="inventory-modal-copy" id="historyItemName">Recent inventory activity.</p>
+                    </div>
+                    <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeHistoryModal()" aria-label="Close history modal">
+                        <x-outline-icon name="x-mark" />
+                    </button>
+                </div>
+                <div class="inventory-modal-body">
+                    <div id="historyList" style="display:grid; gap:10px;"></div>
+                </div>
+            </div>
+        </div>
     @endif
 @endsection
 
 @push('scripts')
 <script>
     const itemModal = document.getElementById('itemModal');
+    const restockModal = document.getElementById('restockModal');
+    const historyModal = document.getElementById('historyModal');
     const itemForm = document.getElementById('itemForm');
+    const restockForm = document.getElementById('restockForm');
     const medicineFields = document.getElementById('medicineFields');
     const medicineDispensingFields = document.getElementById('medicineDispensingFields');
     const medicineExpiryField = document.getElementById('medicineExpiryField');
@@ -1428,6 +1608,8 @@
     const inventorySearchShell = document.getElementById('inventorySearchShell');
     const inventorySearchToggle = document.getElementById('inventorySearchToggle');
     const inventoryRows = Array.from(document.querySelectorAll('#inventoryTable tbody tr[data-inventory-row]'));
+    const inventoryFilterButtons = Array.from(document.querySelectorAll('[data-inventory-filter]'));
+    let activeInventoryFilter = 'all';
     const categorySelect = document.getElementById('iCategory');
     const categoryWrap = document.getElementById('inventoryCategoryWrap');
     const categoryDisplay = document.getElementById('inventoryCategoryDisplay');
@@ -1615,7 +1797,10 @@
         document.getElementById('iName').value = '';
         categorySelect.value = 'Medicine';
         document.getElementById('iQty').value = '';
+        document.getElementById('iMinimumStock').value = '10';
         document.getElementById('iUnit').value = 'pcs';
+        document.getElementById('iBatchNumber').value = '';
+        document.getElementById('iSupplierSource').value = '';
         if (dispensingUnitInput) {
             dispensingUnitInput.value = '';
         }
@@ -1642,7 +1827,10 @@
         document.getElementById('iName').value = item.name || '';
         categorySelect.value = item.category || 'Medicine';
         document.getElementById('iQty').value = item.quantity ?? '';
+        document.getElementById('iMinimumStock').value = item.minimum_stock ?? '10';
         document.getElementById('iUnit').value = item.unit || 'pcs';
+        document.getElementById('iBatchNumber').value = item.batch_number || '';
+        document.getElementById('iSupplierSource').value = item.supplier_source || '';
         if (dispensingUnitInput) {
             dispensingUnitInput.value = item.dispensing_unit || '';
         }
@@ -1666,6 +1854,55 @@
         itemModal.style.display = 'none';
         setCategoryOpenState(false);
         setMedicineTypeOpenState(false);
+    }
+
+    function openRestockModal(item) {
+        if (!restockModal || !restockForm) return;
+        restockModal.style.display = 'flex';
+        restockForm.action = `/admin/inventory/${item.id}/restock`;
+        document.getElementById('restockItemName').textContent = `Add stock to ${item.name || 'this item'}. Current stock: ${item.quantity ?? 0} ${item.unit || 'pcs'}.`;
+        document.getElementById('restockQuantity').value = '';
+        document.getElementById('restockDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('restockBatchNumber').value = item.batch_number || '';
+        document.getElementById('restockSupplierSource').value = item.supplier_source || '';
+    }
+
+    function closeRestockModal() {
+        if (!restockModal) return;
+        restockModal.style.display = 'none';
+    }
+
+    function openHistoryModal(item) {
+        if (!historyModal) return;
+        historyModal.style.display = 'flex';
+        document.getElementById('historyItemName').textContent = item.name ? `Recent activity for ${item.name}.` : 'Recent inventory activity.';
+        const historyList = document.getElementById('historyList');
+        const movements = Array.isArray(item.movements) ? item.movements : [];
+        if (!movements.length) {
+            historyList.innerHTML = '<div style="padding:14px; border-radius:14px; background:#f8fafc; color:#64748b; font-weight:700;">No movement history yet.</div>';
+            return;
+        }
+
+        historyList.innerHTML = movements.map(function(movement) {
+            const quantity = Number(movement.quantity || 0);
+            const signedQuantity = quantity > 0 ? `+${quantity}` : `${quantity}`;
+            return `
+                <div style="padding:14px; border-radius:14px; border:1px solid #e2e8f0; background:#ffffff;">
+                    <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                        <strong style="text-transform:uppercase; color:#70131B;">${movement.type || 'movement'}</strong>
+                        <span style="color:#64748b; font-size:12px; font-weight:800;">${movement.created_at || ''}</span>
+                    </div>
+                    <div style="margin-top:6px; color:#111827; font-weight:700;">${signedQuantity} ${movement.unit || ''} | ${movement.stock_before} &rarr; ${movement.stock_after}</div>
+                    <div style="margin-top:4px; color:#64748b; font-size:12px;">${movement.notes || ''}</div>
+                    <div style="margin-top:4px; color:#64748b; font-size:12px;">${movement.user_name ? `By ${movement.user_name}` : ''}${movement.batch_number ? ` | Batch ${movement.batch_number}` : ''}${movement.supplier_source ? ` | ${movement.supplier_source}` : ''}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function closeHistoryModal() {
+        if (!historyModal) return;
+        historyModal.style.display = 'none';
     }
 
     if (categoryDisplay && categorySelect) {
@@ -1815,12 +2052,33 @@
     }
 
     if (inventorySearchInput) {
-        inventorySearchInput.addEventListener('input', function () {
-            const searchTerm = this.value.trim().toLowerCase();
+        function applyInventoryFilters() {
+            const searchTerm = inventorySearchInput.value.trim().toLowerCase();
 
             inventoryRows.forEach(function (row) {
                 const rowText = row.innerText.toLowerCase();
-                row.style.display = rowText.includes(searchTerm) ? '' : 'none';
+                const category = row.dataset.category || '';
+                const stock = Number(row.dataset.stock || 0);
+                const minimumStock = Number(row.dataset.minimumStock || 10);
+                const matchesSearch = rowText.includes(searchTerm);
+                const matchesFilter = activeInventoryFilter === 'all'
+                    || activeInventoryFilter === category
+                    || (activeInventoryFilter === 'low' && stock > 0 && stock <= minimumStock)
+                    || (activeInventoryFilter === 'out' && stock <= 0);
+
+                row.style.display = matchesSearch && matchesFilter ? '' : 'none';
+            });
+        }
+
+        inventorySearchInput.addEventListener('input', applyInventoryFilters);
+
+        inventoryFilterButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                activeInventoryFilter = button.dataset.inventoryFilter || 'all';
+                inventoryFilterButtons.forEach(function(btn) {
+                    btn.classList.toggle('is-active', btn === button);
+                });
+                applyInventoryFilters();
             });
         });
     }

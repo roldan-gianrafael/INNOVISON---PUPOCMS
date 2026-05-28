@@ -1135,7 +1135,7 @@
             </div>
             <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="btn-add-walkin">
                 <span class="btn-icon">&#128247;</span>
-                <span class="btn-text">Scan ID / Fingerprint</span>
+                <span class="btn-text">OCR / Manual ID Entry</span>
             </a>
         </div>
     </div>

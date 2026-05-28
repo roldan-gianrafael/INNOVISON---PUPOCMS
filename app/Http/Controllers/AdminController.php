@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Appointment;
 use App\Models\ActivityLog;
+use App\Models\InventoryMovement;
 use App\Models\Item;
 use App\Models\MedicineType;
 use App\Models\Setting;
@@ -35,6 +36,22 @@ class AdminController extends Controller
         }
 
         return rtrim(rtrim(number_format($rounded, 2, '.', ''), '0'), '.');
+    }
+
+    private function recordInventoryMovement(Item $item, string $type, float $quantity, float $stockBefore, float $stockAfter, ?string $notes = null): void
+    {
+        InventoryMovement::create([
+            'item_id' => $item->id,
+            'user_id' => auth()->id(),
+            'type' => $type,
+            'quantity' => $quantity,
+            'stock_before' => $stockBefore,
+            'stock_after' => $stockAfter,
+            'unit' => $item->unit ?: 'pcs',
+            'batch_number' => $item->batch_number,
+            'supplier_source' => $item->supplier_source,
+            'notes' => $notes,
+        ]);
     }
 
     private function consumedStockQuantityForItem(Item $item, float $consumedTotal): float
@@ -321,27 +338,6 @@ class AdminController extends Controller
         $completed = Appointment::where('status', 'Completed')->count();
         $cancelled = Appointment::where('status', 'Cancelled')->count();
 
-        $currentYear = now()->year;
-        $monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-        $monthlyTotalsRaw = Appointment::selectRaw('MONTH(date) as month_num, COUNT(*) as total')
-            ->whereYear('date', $currentYear)
-            ->groupBy('month_num')
-            ->pluck('total', 'month_num');
-
-        $monthlyCompletedRaw = Appointment::selectRaw('MONTH(date) as month_num, COUNT(*) as total')
-            ->whereYear('date', $currentYear)
-            ->where('status', 'Completed')
-            ->groupBy('month_num')
-            ->pluck('total', 'month_num');
-
-        $monthlyTotals = [];
-        $monthlyCompleted = [];
-        for ($month = 1; $month <= 12; $month++) {
-            $monthlyTotals[] = (int) ($monthlyTotalsRaw[$month] ?? 0);
-            $monthlyCompleted[] = (int) ($monthlyCompletedRaw[$month] ?? 0);
-        }
-
         $recentAppointments = Appointment::latest()->take(5)->get();
 
         return view('admin.dashboard', compact(
@@ -350,11 +346,7 @@ class AdminController extends Controller
             'upcoming',
             'completed',
             'cancelled',
-            'recentAppointments',
-            'currentYear',
-            'monthLabels',
-            'monthlyTotals',
-            'monthlyCompleted'
+            'recentAppointments'
         ));
     }
 
@@ -1511,7 +1503,7 @@ public function updateClearance(Request $request, $id)
     public function inventory()
     {
         $items = Item::query()
-            ->with('medicineType')
+            ->with(['medicineType', 'movements.user'])
             ->orderBy('name')
             ->get();
         $medicineTypes = MedicineType::query()
@@ -1533,7 +1525,7 @@ public function updateClearance(Request $request, $id)
     $cancelled = Appointment::where('status', 'Cancelled')->count();
     
 
-    $lowStockCount = Item::where('quantity', '<', 10)->count(); 
+    $lowStockCount = Item::whereColumn('quantity', '<=', 'minimum_stock')->where('quantity', '>', 0)->count(); 
     
    
     $appointmentsToday = Appointment::where('status', 'Approved')
@@ -1723,6 +1715,9 @@ public function storeItem(Request $request)
         'category' => ['required', 'string', 'max:255'],
         'quantity' => ['required', 'numeric', 'min:0'],
         'unit' => ['required', 'string', 'max:50'],
+        'minimum_stock' => ['nullable', 'numeric', 'min:0'],
+        'batch_number' => ['nullable', 'string', 'max:120'],
+        'supplier_source' => ['nullable', 'string', 'max:255'],
         'dispensing_unit' => ['nullable', 'string', 'max:50'],
         'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
         'date_added' => ['required', 'date'],
@@ -1733,6 +1728,10 @@ public function storeItem(Request $request)
     // 1. Prepare data and sanitize medicine-specific fields
     $data = $request->all();
     $data['unit'] = trim((string) $request->input('unit', 'pcs')) ?: 'pcs';
+    $data['starting_stock'] = (float) $request->input('quantity', 0);
+    $data['minimum_stock'] = $request->filled('minimum_stock') ? (float) $request->input('minimum_stock') : 10;
+    $data['batch_number'] = trim((string) $request->input('batch_number', '')) ?: null;
+    $data['supplier_source'] = trim((string) $request->input('supplier_source', '')) ?: null;
     $data['dispensing_unit'] = trim((string) $request->input('dispensing_unit', '')) ?: null;
     $data['units_per_stock_unit'] = $request->filled('units_per_stock_unit')
         ? max(1, (int) $request->input('units_per_stock_unit'))
@@ -1754,6 +1753,14 @@ public function storeItem(Request $request)
     }
 
     $item = Item::create($data);
+    $this->recordInventoryMovement(
+        $item,
+        'created',
+        (float) $item->quantity,
+        0,
+        (float) $item->quantity,
+        'Initial stock encoded.'
+    );
 
     // 2. LOGS CODES
     $typeInfo = $item->medicine_type ? " ({$item->medicine_type})" : "";
@@ -1784,6 +1791,9 @@ public function updateItem($id, Request $request)
             'category' => ['required', 'string', 'max:255'],
             'quantity' => ['required', 'numeric', 'min:0'],
             'unit' => ['required', 'string', 'max:50'],
+            'minimum_stock' => ['nullable', 'numeric', 'min:0'],
+            'batch_number' => ['nullable', 'string', 'max:120'],
+            'supplier_source' => ['nullable', 'string', 'max:255'],
             'dispensing_unit' => ['nullable', 'string', 'max:50'],
             'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
             'date_added' => ['required', 'date'],
@@ -1792,10 +1802,14 @@ public function updateItem($id, Request $request)
         ]);
 
         $oldName = $item->name; // Using 'name' as per your blade file
+        $oldQuantity = (float) $item->quantity;
         
         // 1. Prepare and sanitize data for update
         $data = $request->all();
         $data['unit'] = trim((string) $request->input('unit', 'pcs')) ?: 'pcs';
+        $data['minimum_stock'] = $request->filled('minimum_stock') ? (float) $request->input('minimum_stock') : (float) ($item->minimum_stock ?: 10);
+        $data['batch_number'] = trim((string) $request->input('batch_number', '')) ?: null;
+        $data['supplier_source'] = trim((string) $request->input('supplier_source', '')) ?: null;
         $data['dispensing_unit'] = trim((string) $request->input('dispensing_unit', '')) ?: null;
         $data['units_per_stock_unit'] = $request->filled('units_per_stock_unit')
             ? max(1, (int) $request->input('units_per_stock_unit'))
@@ -1817,6 +1831,19 @@ public function updateItem($id, Request $request)
         }
 
         $item->update($data);
+        $newQuantity = (float) $item->quantity;
+        if (abs($newQuantity - $oldQuantity) > 0.00001) {
+            $this->recordInventoryMovement(
+                $item,
+                'adjusted',
+                $newQuantity - $oldQuantity,
+                $oldQuantity,
+                $newQuantity,
+                'Quantity adjusted through edit item.'
+            );
+        } else {
+            $this->recordInventoryMovement($item, 'edited', 0, $oldQuantity, $newQuantity, 'Item details updated.');
+        }
         $conversionInfo = $item->hasDispensingConversion()
             ? " | Dispense as: {$item->dispensing_unit} ({$item->units_per_stock_unit} per {$item->unit})"
             : "";
@@ -1837,12 +1864,68 @@ public function updateItem($id, Request $request)
     return redirect()->back()->with('error', 'Item not found.');
 }
 
+public function restockItem($id, Request $request)
+{
+    $item = Item::find($id);
+    if (!$item) {
+        return redirect()->back()->with('error', 'Item not found.');
+    }
+
+    $validated = $request->validate([
+        'restock_quantity' => ['required', 'numeric', 'min:0.01'],
+        'restock_date' => ['nullable', 'date'],
+        'batch_number' => ['nullable', 'string', 'max:120'],
+        'supplier_source' => ['nullable', 'string', 'max:255'],
+        'restock_notes' => ['nullable', 'string', 'max:1000'],
+    ]);
+
+    $stockBefore = (float) $item->quantity;
+    $restockQuantity = (float) $validated['restock_quantity'];
+    $item->quantity = $stockBefore + $restockQuantity;
+
+    if (trim((string) ($validated['batch_number'] ?? '')) !== '') {
+        $item->batch_number = trim((string) $validated['batch_number']);
+    }
+
+    if (trim((string) ($validated['supplier_source'] ?? '')) !== '') {
+        $item->supplier_source = trim((string) $validated['supplier_source']);
+    }
+
+    if (!empty($validated['restock_date'])) {
+        $item->date_added = $validated['restock_date'];
+    }
+
+    $item->save();
+
+    $this->recordInventoryMovement(
+        $item,
+        'restocked',
+        $restockQuantity,
+        $stockBefore,
+        (float) $item->quantity,
+        $validated['restock_notes'] ?? 'Stock restocked.'
+    );
+
+    ActivityLog::create([
+        'user_id' => auth()->id(),
+        'user_name' => auth()->user()->name,
+        'action' => 'Inventory Restocked',
+        'description' => "Restocked {$item->name}: +" . $this->formatInventoryQuantity($restockQuantity) . " {$item->unit}. Current stock: " . $this->formatInventoryQuantity((float) $item->quantity) . " {$item->unit}.",
+        'ip_address' => request()->ip(),
+        'user_agent' => request()->userAgent(),
+    ]);
+
+    return redirect()->back()->with('success', 'Item restocked successfully.');
+}
+
 public function deleteItem($id)
 {
     $item = Item::find($id);
 
     if ($item) {
         $itemName = $item->name; 
+        $stockBefore = (float) $item->quantity;
+        $this->recordInventoryMovement($item, 'deleted', 0, $stockBefore, 0, 'Item deleted from inventory.');
 
         $item->delete();
 
@@ -2133,24 +2216,24 @@ public function exportInventory()
     $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
     $monthEnd = (clone $monthStart)->endOfMonth();
 
-    $consumedByMedicine = \App\Models\Consultation::query()
-        ->select('medicine', DB::raw('SUM(medicine_quantity) as consumed_total'))
-        ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-        ->whereNotNull('medicine')
-        ->where('medicine', '!=', '')
-        ->groupBy('medicine')
-        ->pluck('consumed_total', 'medicine');
+    $consumedByItem = InventoryMovement::query()
+        ->select('item_id', DB::raw('SUM(ABS(quantity)) as consumed_total'))
+        ->where('type', 'consumed')
+        ->whereBetween('created_at', [$monthStart, $monthEnd])
+        ->groupBy('item_id')
+        ->pluck('consumed_total', 'item_id');
 
       $items = Item::query()
           ->orderBy('name')
           ->get()
-          ->map(function ($item) use ($consumedByMedicine) {
-              $consumed = (float) ($consumedByMedicine[$item->name] ?? 0);
-              $consumedInStockUnit = $this->consumedStockQuantityForItem($item, $consumed);
+          ->map(function ($item) use ($consumedByItem) {
+              $consumedInStockUnit = (float) ($consumedByItem[$item->id] ?? 0);
               $item->unit = $item->unit ?: 'pcs';
               $item->starting_stock = (float) $item->quantity + $consumedInStockUnit;
               $item->consumed = $consumedInStockUnit;
-              $item->consumed_display = $consumed;
+              $item->consumed_display = $item->hasDispensingConversion()
+                  ? $consumedInStockUnit * $item->unitsPerStockUnit()
+                  : $consumedInStockUnit;
               $item->current_balance = (float) $item->quantity;
               $item->report_category = $this->inventoryReportCategoryLabel($item);
               return $item;
@@ -2216,29 +2299,29 @@ public function exportInventory()
 }
 
     // 6. FOR INVENTORY SUMMARY
-    public function inventorySummary()
+public function inventorySummary()
 {
     $monthFilter = request()->query('month', now()->format('Y-m'));
     $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
     $monthEnd = (clone $monthStart)->endOfMonth();
 
-    $consumedByMedicine = \App\Models\Consultation::query()
-        ->select('medicine', DB::raw('SUM(medicine_quantity) as consumed_total'))
-        ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-        ->whereNotNull('medicine')
-        ->where('medicine', '!=', '')
-        ->groupBy('medicine')
-        ->pluck('consumed_total', 'medicine');
+    $consumedByItem = InventoryMovement::query()
+        ->select('item_id', DB::raw('SUM(ABS(quantity)) as consumed_total'))
+        ->where('type', 'consumed')
+        ->whereBetween('created_at', [$monthStart, $monthEnd])
+        ->groupBy('item_id')
+        ->pluck('consumed_total', 'item_id');
 
     $itemPerformance = Item::query()
         ->orderBy('name')
         ->get()
-        ->map(function ($item) use ($consumedByMedicine) {
-            $consumed = (float) ($consumedByMedicine[$item->name] ?? 0);
-            $consumedInStockUnit = $this->consumedStockQuantityForItem($item, $consumed);
+        ->map(function ($item) use ($consumedByItem) {
+            $consumedInStockUnit = (float) ($consumedByItem[$item->id] ?? 0);
             $item->unit = $item->unit ?: 'pcs';
             $item->consumed = $consumedInStockUnit;
-            $item->consumed_display = $consumed;
+            $item->consumed_display = $item->hasDispensingConversion()
+                ? $consumedInStockUnit * $item->unitsPerStockUnit()
+                : $consumedInStockUnit;
             $item->current_balance = (float) $item->quantity;
             $item->starting_stock = $item->current_balance + $consumedInStockUnit;
             $item->report_category = $this->inventoryReportCategoryLabel($item);
@@ -2250,7 +2333,7 @@ public function exportInventory()
     $totalConsumed = $itemPerformance->sum('consumed');
     $outOfStock = $itemPerformance->where('current_balance', 0)->count();
     $lowStockItems = $itemPerformance
-        ->filter(fn($item) => $item->current_balance > 0 && $item->current_balance < 10)
+        ->filter(fn($item) => $item->current_balance > 0 && $item->current_balance <= (float) ($item->minimum_stock ?: 10))
         ->values();
     $lowStockCount = $lowStockItems->count();
     

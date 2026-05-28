@@ -3899,8 +3899,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
   <aside class="sidebar" id="adminSidebar">
     <div class="sidebar-logo">
       <div class="sidebar-logo-badges">
-        <img src="{{ $brandUniversityLogo }}" alt="PUP Logo" class="sidebar-logo-badge">
-        <img src="{{ $brandLogo }}" alt="Clinic Logo" class="sidebar-logo-badge sidebar-logo-badge--clinic">
+        
       </div>
       <div class="sidebar-logo-text">
         <div class="sidebar-logo-title">PUP TAGUIG</div>

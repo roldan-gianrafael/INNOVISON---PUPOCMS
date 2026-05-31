@@ -283,6 +283,66 @@
         align-items: center;
         gap: 8px;
         flex-wrap: wrap;
+        position: relative;
+    }
+    .inventory-actions-dropdown {
+        position: relative;
+        display: inline-flex;
+        align-items: stretch;
+    }
+    .inventory-actions-toggle {
+        min-width: 120px;
+        padding: 10px 16px;
+    }
+    .inventory-actions-menu {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        width: min(220px, 100vw);
+        padding: 10px;
+        background: #ffffff;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        border-radius: 18px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+        z-index: 20;
+    }
+    .inventory-actions-dropdown.is-open .inventory-actions-menu {
+        display: flex;
+    }
+    .inventory-actions-menu-item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        background: #f8fafc;
+        color: #111827;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        border-radius: 14px;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background .18s ease, transform .18s ease, color .18s ease, border-color .18s ease;
+        text-align: left;
+    }
+    .inventory-actions-menu-item:hover {
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+        transform: translateY(-1px);
+    }
+    .inventory-actions-menu-item.btn-delete {
+        background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+        color: #b91c1c;
+        border-color: rgba(220, 38, 38, 0.22);
+    }
+    .inventory-actions-menu-item.btn-delete:hover {
+        background: #dc2626;
+        color: #ffffff;
+        border-color: #dc2626;
     }
     .inventory-filter-bar {
         display: flex;
@@ -1320,27 +1380,29 @@
                                     ];
                                 @endphp
                                 <div class="inventory-actions">
-                                    <button class="btn-icon btn-edit" onclick='openRestockModal(@json($editItemPayload))'>
-                                        <x-outline-icon name="plus-circle" />
-                                        <span>Restock</span>
-                                    </button>
-                                    <button class="btn-icon btn-edit" 
-                                        onclick='editItem(@json($editItemPayload))'>
-                                        <x-outline-icon name="pencil-square" />
-                                        <span>Edit</span>
-                                    </button>
-                                    <button class="btn-icon btn-edit" onclick='openHistoryModal(@json($editItemPayload))'>
-                                        <x-outline-icon name="clock" />
-                                        <span>History</span>
-                                    </button>
-
-                                    <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="display:inline;">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="btn-icon btn-delete" onclick="return confirm('Delete this item?')">
-                                            <x-outline-icon name="trash" />
-                                            <span>Delete</span>
+                                    <div class="inventory-actions-dropdown">
+                                        <button type="button" class="btn-icon btn-edit inventory-actions-toggle" onclick="toggleInventoryActionMenu(event)">
+                                            <x-outline-icon name="bars-3" />
+                                            <span>Actions</span>
                                         </button>
-                                    </form>
+                                        <div class="inventory-actions-menu" role="menu">
+                                            <button type="button" class="inventory-actions-menu-item" onclick='closeInventoryActionMenus(); openRestockModal(@json($editItemPayload));'>
+                                                <span>Restock</span>
+                                            </button>
+                                            <button type="button" class="inventory-actions-menu-item" onclick='closeInventoryActionMenus(); editItem(@json($editItemPayload));'>
+                                                <span>Edit</span>
+                                            </button>
+                                            <button type="button" class="inventory-actions-menu-item" onclick='closeInventoryActionMenus(); openHistoryModal(@json($editItemPayload));'>
+                                                <span>History</span>
+                                            </button>
+                                            <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="margin:0;">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="inventory-actions-menu-item btn-delete" onclick="return confirm('Delete this item?')">
+                                                    <span>Delete</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             @else
                                 <span style="font-size: 12px; color: #64748b; font-weight: 700;">View Only</span>
@@ -1817,6 +1879,7 @@
     }
 
     function editItem(item) {
+        closeInventoryActionMenus();
         if (!itemModal) return;
         itemModal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Edit Item';
@@ -1857,6 +1920,7 @@
     }
 
     function openRestockModal(item) {
+        closeInventoryActionMenus();
         if (!restockModal || !restockForm) return;
         restockModal.style.display = 'flex';
         restockForm.action = `/admin/inventory/${item.id}/restock`;
@@ -1873,6 +1937,7 @@
     }
 
     function openHistoryModal(item) {
+        closeInventoryActionMenus();
         if (!historyModal) return;
         historyModal.style.display = 'flex';
         document.getElementById('historyItemName').textContent = item.name ? `Recent activity for ${item.name}.` : 'Recent inventory activity.';
@@ -1904,6 +1969,34 @@
         if (!historyModal) return;
         historyModal.style.display = 'none';
     }
+
+    function closeInventoryActionMenus() {
+        document.querySelectorAll('.inventory-actions-dropdown.is-open').forEach(function(dropdown) {
+            dropdown.classList.remove('is-open');
+        });
+    }
+
+    function toggleInventoryActionMenu(event) {
+        event.stopPropagation();
+        const button = event.currentTarget;
+        const dropdown = button.closest('.inventory-actions-dropdown');
+        if (!dropdown) return;
+        const isOpen = dropdown.classList.contains('is-open');
+        closeInventoryActionMenus();
+        dropdown.classList.toggle('is-open', !isOpen);
+    }
+
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.inventory-actions-dropdown')) {
+            closeInventoryActionMenus();
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeInventoryActionMenus();
+        }
+    });
 
     if (categoryDisplay && categorySelect) {
         categoryDisplay.addEventListener('click', function(event) {

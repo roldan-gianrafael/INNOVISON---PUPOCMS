@@ -316,6 +316,13 @@
     </style>
 </head>
 <body>
+    @php
+        $normalizedUserRole = \App\Models\User::normalizeRole($user->user_role ?? '');
+        $showStudentSide = $normalizedUserRole === \App\Models\User::ROLE_STUDENT;
+        $showAdminSide = in_array($normalizedUserRole, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPERADMIN], true);
+        $showBothSides = !$showStudentSide && !$showAdminSide;
+    @endphp
+
     <div class="chooser-shell">
         <section class="chooser-card">
             <div class="chooser-hero-mark" aria-hidden="true">
@@ -334,51 +341,55 @@
             </div>
 
             <div class="chooser-grid">
-                <a href="{{ route('assistant.enter-student') }}" class="chooser-link">
-                    <article class="chooser-option">
-                        <span class="chooser-chip">Portal Choice</span>
-                        <div class="chooser-icon" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 class="chooser-heading">Student Side</h2>
-                            <p class="chooser-description">
-                                Continue into the student portal to view health record status, booking pages, and student-facing account screens.
-                            </p>
-                        </div>
-                        <span class="chooser-cta">
-                            Enter Student Side
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                            </svg>
-                        </span>
-                    </article>
-                </a>
+                @if($showStudentSide || $showBothSides)
+                    <a href="{{ route('assistant.enter-student') }}" class="chooser-link">
+                        <article class="chooser-option">
+                            <span class="chooser-chip">Portal Choice</span>
+                            <div class="chooser-icon" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="chooser-heading">Student Side</h2>
+                                <p class="chooser-description">
+                                    Continue into the student portal to view health record status, booking pages, and student-facing account screens.
+                                </p>
+                            </div>
+                            <span class="chooser-cta">
+                                Enter Student Side
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                </svg>
+                            </span>
+                        </article>
+                    </a>
+                @endif
 
-                <a href="{{ route('assistant.enter-admin') }}" class="chooser-link">
-                    <article class="chooser-option">
-                        <span class="chooser-chip">Portal Choice</span>
-                        <div class="chooser-icon" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V3.75A.75.75 0 0 1 4.5 3ZM9 21v-5.25m6 5.25v-5.25" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 class="chooser-heading">Admin Side</h2>
-                            <p class="chooser-description">
-                                Open the clinic operations dashboard to handle appointments, walk-ins, reports, and inventory workflows.
-                            </p>
-                        </div>
-                        <span class="chooser-cta">
-                            Enter Admin Side
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                            </svg>
-                        </span>
-                    </article>
-                </a>
+                @if($showAdminSide || $showBothSides)
+                    <a href="{{ route('assistant.enter-admin') }}" class="chooser-link">
+                        <article class="chooser-option">
+                            <span class="chooser-chip">Portal Choice</span>
+                            <div class="chooser-icon" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V3.75A.75.75 0 0 1 4.5 3ZM9 21v-5.25m6 5.25v-5.25" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="chooser-heading">Admin Side</h2>
+                                <p class="chooser-description">
+                                    Open the clinic operations dashboard to handle appointments, walk-ins, reports, and inventory workflows.
+                                </p>
+                            </div>
+                            <span class="chooser-cta">
+                                Enter Admin Side
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                </svg>
+                            </span>
+                        </article>
+                    </a>
+                @endif
             </div>
         </section>
     </div>

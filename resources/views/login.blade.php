@@ -100,6 +100,96 @@
         }
         .btn-submit:hover { background: var(--accent-dark); transform: translateY(-2px); }
 
+        .idp-login-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .idp-login-note {
+            font-size: 13px;
+            color: var(--text-light);
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        .dev-login-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 28px;
+        }
+        .dev-login-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 22px;
+            text-align: left;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+            color: #111827;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 220px;
+        }
+        .dev-login-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(139, 0, 0, 0.08);
+            color: #8B0000;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 18px;
+        }
+        .dev-login-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #8B0000, #c2410c);
+            color: #ffffff;
+            margin-bottom: 18px;
+        }
+        .dev-login-title {
+            margin: 0 0 14px;
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .dev-login-copy {
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+        .dev-login-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px 0;
+            border-radius: 14px;
+            background: #f8fafc;
+            color: #111827;
+            font-weight: 700;
+            border: 1px solid rgba(0,0,0,0.08);
+            cursor: not-allowed;
+            opacity: 0.75;
+            text-decoration: none;
+        }
+        .dev-login-cta span {
+            display: block;
+            width: 100%;
+        }
+
         /* --- 4. MODAL STYLES --- */
         .modal-overlay {
             position: fixed;
@@ -284,19 +374,46 @@
 
         @php
             $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
-            $idpClientId = trim((string) config('services.idp.client_id', ''));
-            $portalLoginUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
-                ? $idpBaseUrl . '/login?' . http_build_query(['client_id' => $idpClientId])
+            $portalLoginUrl = $idpBaseUrl !== ''
+                ? $idpBaseUrl . '/login'
                 : route('login');
         @endphp
 
         @if(config('services.idp.enabled'))
-            <a href="{{ $portalLoginUrl }}" class="btn-submit" style="display:block; text-decoration:none; text-align:center;">
-                Continue with Identity Provider
-            </a>
-            <p style="margin-top: 12px; font-size: 12px;">
-                Centralized sign-in is enabled for this system.
-            </p>
+            <div class="idp-login-wrap">
+                <a href="{{ $portalLoginUrl }}" class="btn-submit" style="display:block; text-decoration:none; text-align:center;">
+                    Login through Identity Provider
+                </a>
+                <p class="idp-login-note">
+                    Centralized sign-in is enabled for this system. Use the button above to authenticate through the campus identity provider.
+                </p>
+            </div>
+
+            <section class="dev-login-grid" aria-label="Static developer login options">
+                <div class="dev-login-card">
+                    <div>
+                        <div class="dev-login-chip">Dev Login</div>
+                        <div class="dev-login-icon">S</div>
+                        <h3 class="dev-login-title">Student</h3>
+                        <p class="dev-login-copy">Static student login placeholder. This option is for local preview only and does not perform authentication yet.</p>
+                    </div>
+                    <a href="#" class="dev-login-cta" onclick="event.preventDefault();">
+                        Student Login
+                    </a>
+                </div>
+
+                <div class="dev-login-card">
+                    <div>
+                        <div class="dev-login-chip">Dev Login</div>
+                        <div class="dev-login-icon">A</div>
+                        <h3 class="dev-login-title">Admin</h3>
+                        <p class="dev-login-copy">Static admin login placeholder. This option is for local preview only and does not perform authentication yet.</p>
+                    </div>
+                    <a href="#" class="dev-login-cta" onclick="event.preventDefault();">
+                        Admin Login
+                    </a>
+                </div>
+            </section>
         @else
             <form id="loginForm" action="{{ url('/login-action') }}" method="POST">
                 @csrf

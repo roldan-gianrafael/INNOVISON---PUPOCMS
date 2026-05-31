@@ -287,9 +287,8 @@
 <body>
     @php
         $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
-        $idpClientId = trim((string) config('services.idp.client_id', ''));
-        $portalLoginUrl = ($idpBaseUrl !== '' && $idpClientId !== '')
-            ? $idpBaseUrl . '/login?' . http_build_query(['client_id' => $idpClientId])
+        $portalLoginUrl = $idpBaseUrl !== ''
+            ? $idpBaseUrl . '/login'
             : route('login');
     @endphp
     <main class="page">

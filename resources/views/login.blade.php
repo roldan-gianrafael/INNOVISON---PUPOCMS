@@ -373,10 +373,7 @@
         @endif
 
         @php
-            $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
-            $portalLoginUrl = $idpBaseUrl !== ''
-                ? $idpBaseUrl . '/login'
-                : route('login');
+            $portalLoginUrl = route('login');
         @endphp
 
         @if(config('services.idp.enabled'))

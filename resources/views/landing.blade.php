@@ -287,10 +287,7 @@
 </head>
 <body>
     @php
-        $idpBaseUrl = rtrim((string) config('services.idp.base_url', ''), '/');
-        $portalLoginUrl = $idpBaseUrl !== ''
-            ? $idpBaseUrl . '/login'
-            : route('login');
+        $portalLoginUrl = route('login');
 
         $isAdminAuthenticated = auth('admin')->check();
         $isStudentAuthenticated = auth('student')->check();

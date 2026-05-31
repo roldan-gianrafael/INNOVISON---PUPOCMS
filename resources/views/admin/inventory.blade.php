@@ -296,8 +296,9 @@
     }
     .inventory-actions-menu {
         position: absolute;
-        right: 0;
-        top: calc(100% + 10px);
+        right: calc(100% + 10px);
+        top: 50%;
+        transform: translateY(-50%);
         display: none;
         flex-direction: column;
         gap: 8px;
@@ -346,11 +347,64 @@
     }
     .inventory-filter-bar {
         display: flex;
-        gap: 8px;
+        gap: 0;
         flex-wrap: wrap;
         margin: 0 0 14px;
+        position: relative;
     }
-    .inventory-filter-btn {
+    .inventory-filter-dropdown {
+        position: relative;
+        display: inline-flex;
+        width: auto;
+    }
+    .inventory-filter-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid rgba(127, 29, 45, 0.18);
+        background: #ffffff;
+        color: #70131B;
+        border-radius: 999px;
+        min-height: 36px;
+        padding: 0 16px;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+        white-space: nowrap;
+    }
+    .inventory-filter-toggle.is-open svg {
+        transform: rotate(90deg);
+    }
+    .inventory-filter-toggle:hover,
+    .inventory-filter-toggle.is-active {
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+        transform: translateY(-1px);
+    }
+    .inventory-filter-menu {
+        position: absolute;
+        z-index: 20;
+        top: calc(100% + 10px);
+        left: 0;
+        min-width: 220px;
+        width: max-content;
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(127, 29, 45, 0.14);
+        background: #ffffff;
+        box-shadow: 0 24px 40px rgba(15, 23, 42, 0.12);
+        backdrop-filter: blur(12px);
+    }
+    .inventory-filter-menu.is-open {
+        display: flex;
+    }
+    .inventory-filter-item {
         border: 1px solid rgba(127, 29, 45, 0.18);
         background: #ffffff;
         color: #70131B;
@@ -360,10 +414,11 @@
         font-size: 12px;
         font-weight: 900;
         cursor: pointer;
+        text-align: left;
         transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
     }
-    .inventory-filter-btn:hover,
-    .inventory-filter-btn.is-active {
+    .inventory-filter-item:hover,
+    .inventory-filter-item.is-active {
         background: #facc15;
         color: #111827;
         border-color: #facc15;
@@ -472,45 +527,176 @@
         justify-content: center; 
         align-items: center; 
     }
+    .modal-box {
+        background: rgba(255, 255, 255, 0.95);
+        width: min(100%, 920px);
+        max-width: 100%;
+        height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
+        max-height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
+        border: 1px solid rgba(112, 19, 27, 0.14);
+        border-radius: 22px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
+        overflow: hidden;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        min-width: 320px;
+        min-height: 0;
+        backdrop-filter: blur(4px);
+    }
     #itemModal .modal-box {
-        background: rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.42) !important;
         width: min(100%, 1040px);
         max-width: 100%;
+        height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
         max-height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-top: 4px solid #66ff00 !important;
         border-bottom: 4px solid #70131B !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        position: relative;
     }
-    #itemModal .inventory-modal-head {
+    .modal-box .inventory-modal-head {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
-        gap: 16px;
-        padding: clamp(14px, 2vw, 18px) clamp(16px, 2.4vw, 22px);
-        background: #70131B;
-        border-bottom: 1px solid #eee;
+        gap: 12px;
+        padding: clamp(12px, 1.4vw, 18px);
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         flex: 0 0 auto;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(8px);
     }
-    .inventory-modal-head-main {
+    .modal-box .inventory-modal-head-main {
         min-width: 0;
         flex: 1 1 auto;
+        color: #ffffff;
     }
-    .inventory-modal-title {
-        margin: 0;
+    .modal-box .inventory-modal-title,
+    .modal-box .inventory-modal-copy {
         color: #ffffff !important;
-        font-size: 18px;
+    }
+    .modal-box .inventory-modal-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: clamp(18px, 2.2vw, 26px);
+        min-height: 0;
+        background: transparent;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .modal-box .inventory-modal-body::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+    .modal-box .inventory-modal-body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .modal-box .inventory-modal-body::-webkit-scrollbar-thumb {
+        background: transparent;
+    }
+    .inventory-modal-preview,
+    .inventory-modal-summary-row {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+    }
+    .inventory-modal-preview {
+        padding: 16px;
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px solid rgba(112, 19, 27, 0.1);
+    }
+    .inventory-modal-preview .preview-row,
+    .inventory-modal-summary-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+    .inventory-modal-preview .preview-label,
+    .inventory-modal-summary-card .summary-label {
+        color: #475569;
+        font-size: 13px;
+        font-weight: 700;
+    }
+    .inventory-modal-preview .preview-row strong,
+    .inventory-modal-summary-card .summary-value {
+        color: #111827;
+        font-size: 14px;
+        font-weight: 900;
+    }
+    .form-note {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+    .inventory-modal-summary-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .inventory-modal-summary-card {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: #ffffff;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+    .inventory-history-list {
+        display: grid;
+        gap: 14px;
+    }
+    .history-card {
+        padding: 16px;
+        border-radius: 18px;
+        background: #ffffff;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        box-shadow: 0 12px 20px rgba(15, 23, 42, 0.06);
+    }
+    .history-card-head {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+    .history-card-type {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #f8fafc;
+        color: #70131B;
+        font-size: 12px;
         font-weight: 800;
-        line-height: 1.2;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+    .history-card-body {
+        display: grid;
+        gap: 8px;
+    }
+    .history-card-quantity {
+        color: #111827;
+        font-size: 16px;
+        font-weight: 800;
+    }
+    .history-card-stock,
+    .history-card-note,
+    .history-card-meta {
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    .history-card-meta {
+        font-weight: 700;
     }
     .inventory-modal-copy {
         margin: 6px 0 0;
@@ -841,11 +1027,21 @@
     #medicineExpiryField {
         display: none;
     }
+    #itemModal form {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
     .modal-actions-row {
         display: flex;
         gap: 10px;
         justify-content: flex-end;
-        margin-top: 22px;
+        margin: 0;
+        padding: 18px clamp(18px, 2.2vw, 26px);
+        background: transparent;
+        border-top: none;
+        flex: 0 0 auto;
     }
     .inventory-modal-close {
         width: 40px;
@@ -907,14 +1103,13 @@
         }
 
         .modal-actions-row {
-            position: sticky;
-            bottom: 0;
-            margin: 18px -14px -14px;
-            padding: 12px 14px;
-            background: rgba(255, 255, 255, 0.92);
-            border-top: 1px solid rgba(112, 19, 27, 0.12);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            position: static;
+            margin: 18px 0 0;
+            padding: 12px 14px 0;
+            background: transparent;
+            border-top: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
     }
 
@@ -1252,12 +1447,20 @@
 
     <div class="card inventory-summary-card">
         <div class="inventory-filter-bar" aria-label="Inventory filters">
-            <button type="button" class="inventory-filter-btn is-active" data-inventory-filter="all">All</button>
-            <button type="button" class="inventory-filter-btn" data-inventory-filter="medicine">Medicines</button>
-            <button type="button" class="inventory-filter-btn" data-inventory-filter="supplies">Supplies</button>
-            <button type="button" class="inventory-filter-btn" data-inventory-filter="equipment">Equipment</button>
-            <button type="button" class="inventory-filter-btn" data-inventory-filter="low">Low Stock</button>
-            <button type="button" class="inventory-filter-btn" data-inventory-filter="out">Out of Stock</button>
+            <div class="inventory-filter-dropdown">
+                <button type="button" id="inventoryFilterToggle" class="inventory-filter-toggle is-active" aria-haspopup="true" aria-expanded="false">
+                    <span class="inventory-filter-label">All</span>
+                    <x-outline-icon name="chevron-right" />
+                </button>
+                <div class="inventory-filter-menu" id="inventoryFilterMenu" role="menu" aria-label="Inventory filter options">
+                    <button type="button" class="inventory-filter-item is-active" data-inventory-filter="all" role="menuitem">All</button>
+                    <button type="button" class="inventory-filter-item" data-inventory-filter="medicine" role="menuitem">Medicines</button>
+                    <button type="button" class="inventory-filter-item" data-inventory-filter="supplies" role="menuitem">Supplies</button>
+                    <button type="button" class="inventory-filter-item" data-inventory-filter="equipment" role="menuitem">Equipment</button>
+                    <button type="button" class="inventory-filter-item" data-inventory-filter="low" role="menuitem">Low Stock</button>
+                    <button type="button" class="inventory-filter-item" data-inventory-filter="out" role="menuitem">Out of Stock</button>
+                </div>
+            </div>
         </div>
         <table id="inventoryTable">
             <thead>
@@ -1590,6 +1793,16 @@
                     <div class="inventory-modal-head-main">
                         <h3 class="inventory-modal-title">Restock Item</h3>
                         <p class="inventory-modal-copy" id="restockItemName">Add stock without overwriting the item record.</p>
+                        <div class="inventory-modal-preview">
+                            <div class="preview-row">
+                                <span class="preview-label">Current stock</span>
+                                <strong id="restockCurrentStock">0 pcs</strong>
+                            </div>
+                            <div class="preview-row">
+                                <span class="preview-label">After restock</span>
+                                <strong id="restockPreviewLine">0 pcs</strong>
+                            </div>
+                        </div>
                     </div>
                     <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeRestockModal()" aria-label="Close restock modal">
                         <x-outline-icon name="x-mark" />
@@ -1602,6 +1815,7 @@
                             <div class="form-group">
                                 <label>Quantity to Add</label>
                                 <input type="number" name="restock_quantity" id="restockQuantity" class="form-control" min="0.01" step="0.01" required placeholder="e.g. 5">
+                                <small class="form-note">Enter the quantity you want to add to current stock.</small>
                             </div>
                             <div class="form-group">
                                 <label>Restock Date</label>
@@ -1636,13 +1850,23 @@
                     <div class="inventory-modal-head-main">
                         <h3 class="inventory-modal-title">Stock Movement History</h3>
                         <p class="inventory-modal-copy" id="historyItemName">Recent inventory activity.</p>
+                        <div class="inventory-modal-summary-row">
+                            <div class="inventory-modal-summary-card">
+                                <span class="summary-label">Total movements</span>
+                                <span class="summary-value" id="historyMovementCount">0</span>
+                            </div>
+                            <div class="inventory-modal-summary-card">
+                                <span class="summary-label">Net change</span>
+                                <span class="summary-value" id="historyNetChange">0 pcs</span>
+                            </div>
+                        </div>
                     </div>
                     <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeHistoryModal()" aria-label="Close history modal">
                         <x-outline-icon name="x-mark" />
                     </button>
                 </div>
                 <div class="inventory-modal-body">
-                    <div id="historyList" style="display:grid; gap:10px;"></div>
+                    <div id="historyList" class="inventory-history-list"></div>
                 </div>
             </div>
         </div>
@@ -1670,7 +1894,9 @@
     const inventorySearchShell = document.getElementById('inventorySearchShell');
     const inventorySearchToggle = document.getElementById('inventorySearchToggle');
     const inventoryRows = Array.from(document.querySelectorAll('#inventoryTable tbody tr[data-inventory-row]'));
-    const inventoryFilterButtons = Array.from(document.querySelectorAll('[data-inventory-filter]'));
+    const inventoryFilterToggle = document.getElementById('inventoryFilterToggle');
+    const inventoryFilterMenu = document.getElementById('inventoryFilterMenu');
+    const inventoryFilterItems = Array.from(document.querySelectorAll('.inventory-filter-item'));
     let activeInventoryFilter = 'all';
     const categorySelect = document.getElementById('iCategory');
     const categoryWrap = document.getElementById('inventoryCategoryWrap');
@@ -1683,6 +1909,26 @@
     const medicineTypeOptions = Array.from(document.querySelectorAll('.inventory-medicine-type-option'));
     const medicineTypeEmpty = document.getElementById('inventoryMedicineTypeEmpty');
     const medicineTypeMenuHome = medicineTypeMenu ? medicineTypeMenu.parentElement : null;
+    const restockQuantityInput = document.getElementById('restockQuantity');
+    const restockCurrentStockDisplay = document.getElementById('restockCurrentStock');
+    const restockPreviewLine = document.getElementById('restockPreviewLine');
+    const historyMovementCount = document.getElementById('historyMovementCount');
+    const historyNetChange = document.getElementById('historyNetChange');
+    const historyList = document.getElementById('historyList');
+    let restockCurrentQuantity = 0;
+    let restockCurrentUnit = 'pcs';
+
+    function updateRestockPreview() {
+        if (!restockCurrentStockDisplay || !restockPreviewLine || !restockQuantityInput) return;
+        const added = Number(restockQuantityInput.value) || 0;
+        const newQty = restockCurrentQuantity + added;
+        restockCurrentStockDisplay.textContent = `${restockCurrentQuantity} ${restockCurrentUnit}`;
+        restockPreviewLine.textContent = `${restockCurrentQuantity} + ${added} = ${newQty} ${restockCurrentUnit}`;
+    }
+
+    if (restockQuantityInput) {
+        restockQuantityInput.addEventListener('input', updateRestockPreview);
+    }
 
     function syncCategoryDisplay() {
         if (!categorySelect || !categoryDisplay) return;
@@ -1925,10 +2171,16 @@
         restockModal.style.display = 'flex';
         restockForm.action = `/admin/inventory/${item.id}/restock`;
         document.getElementById('restockItemName').textContent = `Add stock to ${item.name || 'this item'}. Current stock: ${item.quantity ?? 0} ${item.unit || 'pcs'}.`;
+        restockCurrentQuantity = Number(item.quantity || 0);
+        restockCurrentUnit = item.unit || 'pcs';
         document.getElementById('restockQuantity').value = '';
         document.getElementById('restockDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('restockBatchNumber').value = item.batch_number || '';
         document.getElementById('restockSupplierSource').value = item.supplier_source || '';
+        updateRestockPreview();
+        if (restockQuantityInput) {
+            restockQuantityInput.focus();
+        }
     }
 
     function closeRestockModal() {
@@ -1938,28 +2190,40 @@
 
     function openHistoryModal(item) {
         closeInventoryActionMenus();
-        if (!historyModal) return;
+        if (!historyModal || !historyList || !historyMovementCount || !historyNetChange) return;
         historyModal.style.display = 'flex';
         document.getElementById('historyItemName').textContent = item.name ? `Recent activity for ${item.name}.` : 'Recent inventory activity.';
-        const historyList = document.getElementById('historyList');
         const movements = Array.isArray(item.movements) ? item.movements : [];
+        const netChange = movements.reduce(function(sum, movement) {
+            return sum + (Number(movement.quantity) || 0);
+        }, 0);
+        historyMovementCount.textContent = movements.length;
+        historyNetChange.textContent = `${netChange >= 0 ? '+' + netChange : netChange} ${item.unit || 'pcs'}`;
+
         if (!movements.length) {
-            historyList.innerHTML = '<div style="padding:14px; border-radius:14px; background:#f8fafc; color:#64748b; font-weight:700;">No movement history yet.</div>';
+            historyList.innerHTML = '<div class="history-card"><div style="color:#64748b; font-weight:700;">No movement history yet. This item has not been restocked or used.</div></div>';
             return;
         }
 
         historyList.innerHTML = movements.map(function(movement) {
             const quantity = Number(movement.quantity || 0);
             const signedQuantity = quantity > 0 ? `+${quantity}` : `${quantity}`;
+            const metaParts = [];
+            if (movement.user_name) metaParts.push(`By ${movement.user_name}`);
+            if (movement.batch_number) metaParts.push(`Batch ${movement.batch_number}`);
+            if (movement.supplier_source) metaParts.push(movement.supplier_source);
             return `
-                <div style="padding:14px; border-radius:14px; border:1px solid #e2e8f0; background:#ffffff;">
-                    <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-                        <strong style="text-transform:uppercase; color:#70131B;">${movement.type || 'movement'}</strong>
-                        <span style="color:#64748b; font-size:12px; font-weight:800;">${movement.created_at || ''}</span>
+                <div class="history-card">
+                    <div class="history-card-head">
+                        <span class="history-card-type">${movement.type || 'Movement'}</span>
+                        <span>${movement.created_at || ''}</span>
                     </div>
-                    <div style="margin-top:6px; color:#111827; font-weight:700;">${signedQuantity} ${movement.unit || ''} | ${movement.stock_before} &rarr; ${movement.stock_after}</div>
-                    <div style="margin-top:4px; color:#64748b; font-size:12px;">${movement.notes || ''}</div>
-                    <div style="margin-top:4px; color:#64748b; font-size:12px;">${movement.user_name ? `By ${movement.user_name}` : ''}${movement.batch_number ? ` | Batch ${movement.batch_number}` : ''}${movement.supplier_source ? ` | ${movement.supplier_source}` : ''}</div>
+                    <div class="history-card-body">
+                        <div class="history-card-quantity">${signedQuantity} ${movement.unit || item.unit || 'pcs'}</div>
+                        <div class="history-card-stock">${movement.stock_before ?? 0} → ${movement.stock_after ?? 0}</div>
+                        <div class="history-card-note">${movement.notes || 'No notes available.'}</div>
+                        <div class="history-card-meta">${metaParts.join(' · ')}</div>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -2165,14 +2429,46 @@
 
         inventorySearchInput.addEventListener('input', applyInventoryFilters);
 
-        inventoryFilterButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                activeInventoryFilter = button.dataset.inventoryFilter || 'all';
-                inventoryFilterButtons.forEach(function(btn) {
-                    btn.classList.toggle('is-active', btn === button);
-                });
-                applyInventoryFilters();
+        function setInventoryFilter(filter) {
+            activeInventoryFilter = filter || 'all';
+            inventoryFilterItems.forEach(function(item) {
+                item.classList.toggle('is-active', item.dataset.inventoryFilter === activeInventoryFilter);
             });
+            if (inventoryFilterToggle) {
+                const label = inventoryFilterItems.find(item => item.dataset.inventoryFilter === activeInventoryFilter);
+                inventoryFilterToggle.querySelector('.inventory-filter-label').innerText = label ? label.innerText : 'All';
+                inventoryFilterToggle.classList.toggle('is-active', activeInventoryFilter === 'all');
+                inventoryFilterToggle.classList.remove('is-open');
+                inventoryFilterToggle.setAttribute('aria-expanded', 'false');
+            }
+            if (inventoryFilterMenu) {
+                inventoryFilterMenu.classList.remove('is-open');
+            }
+            applyInventoryFilters();
+        }
+
+        if (inventoryFilterToggle && inventoryFilterMenu) {
+            inventoryFilterToggle.addEventListener('click', function(event) {
+                event.stopPropagation();
+                const open = !inventoryFilterMenu.classList.contains('is-open');
+                inventoryFilterMenu.classList.toggle('is-open', open);
+                inventoryFilterToggle.classList.toggle('is-open', open);
+                inventoryFilterToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+        }
+
+        inventoryFilterItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                setInventoryFilter(item.dataset.inventoryFilter || 'all');
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            if (inventoryFilterMenu && inventoryFilterToggle && !inventoryFilterMenu.contains(event.target) && !inventoryFilterToggle.contains(event.target)) {
+                inventoryFilterMenu.classList.remove('is-open');
+                inventoryFilterToggle.classList.remove('is-open');
+                inventoryFilterToggle.setAttribute('aria-expanded', 'false');
+            }
         });
     }
 

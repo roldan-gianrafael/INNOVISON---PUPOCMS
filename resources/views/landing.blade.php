@@ -296,9 +296,22 @@
         $studentPortalLink = $isStudentAuthenticated
             ? route('assistant.enter-student')
             : $portalLoginUrl;
-        $adminPortalLink = $isAdminAuthenticated
-            ? route('assistant.enter-admin')
-            : $portalLoginUrl;
+
+        $adminPortalLink = $portalLoginUrl;
+        if ($isAdminAuthenticated) {
+            $adminUser = auth('admin')->user();
+            $adminUserType = strtolower(trim((string) ($adminUser->user_type ?? '')));
+            $isStudentAssistant = in_array($adminUserType, ['assistant', 'student assistant', 'student_assistant'], true);
+            $adminRole = \App\Models\User::normalizeRole((string) ($adminUser->user_role ?? ''));
+
+            if ($isStudentAssistant) {
+                $adminPortalLink = route('assistant.enter-admin');
+            } elseif ($adminRole === \App\Models\User::ROLE_SUPERADMIN) {
+                $adminPortalLink = route('admin.dashboard');
+            } else {
+                $adminPortalLink = route('assistant.dashboard');
+            }
+        }
 
         $showStudentCard = !$isAuthenticated || $isStudentAuthenticated;
         $showAdminCard = !$isAuthenticated || $isAdminAuthenticated;

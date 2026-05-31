@@ -111,7 +111,7 @@
 
         .cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 480px));
             justify-content: center;
             gap: 28px;
         }

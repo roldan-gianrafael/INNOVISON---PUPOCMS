@@ -290,6 +290,20 @@
         $portalLoginUrl = $idpBaseUrl !== ''
             ? $idpBaseUrl . '/login'
             : route('login');
+
+        $isAdminAuthenticated = auth('admin')->check();
+        $isStudentAuthenticated = auth('student')->check();
+        $isAuthenticated = $isAdminAuthenticated || $isStudentAuthenticated;
+
+        $studentPortalLink = $isStudentAuthenticated
+            ? route('assistant.enter-student')
+            : $portalLoginUrl;
+        $adminPortalLink = $isAdminAuthenticated
+            ? route('assistant.enter-admin')
+            : $portalLoginUrl;
+
+        $showStudentCard = !$isAuthenticated || $isStudentAuthenticated;
+        $showAdminCard = !$isAuthenticated || $isAdminAuthenticated;
     @endphp
     <main class="page">
         <section class="content" aria-label="PUP Taguig online clinic role selection">
@@ -304,29 +318,33 @@
             </header>
 
             <div class="cards">
-                <a href="{{ $portalLoginUrl }}" class="role-card" aria-label="Open student portal">
-                    <div class="role-icon">
-                        <x-outline-icon name="academic-cap" />
-                    </div>
-                    <h2>Student</h2>
-                    <p>Access appointments, health forms, account details, and the services built for enrolled students.</p>
-                    <span class="role-link">
-                        <span>Open Student Portal</span>
-                        <x-outline-icon name="arrow-long-right" />
-                    </span>
-                </a>
+                @if($showStudentCard)
+                    <a href="{{ $studentPortalLink }}" class="role-card" aria-label="Open student portal">
+                        <div class="role-icon">
+                            <x-outline-icon name="academic-cap" />
+                        </div>
+                        <h2>Student</h2>
+                        <p>Access appointments, health forms, account details, and the services built for enrolled students.</p>
+                        <span class="role-link">
+                            <span>Open Student Portal</span>
+                            <x-outline-icon name="arrow-long-right" />
+                        </span>
+                    </a>
+                @endif
 
-                <a href="{{ $portalLoginUrl }}" class="role-card" aria-label="Open admin portal">
-                    <div class="role-icon">
-                        <x-outline-icon name="briefcase" />
-                    </div>
-                    <h2>Admin</h2>
-                    <p>Manage appointments, monitor records, review clinic activity, and handle administrative workflows.</p>
-                    <span class="role-link">
-                        <span>Open Admin Portal</span>
-                        <x-outline-icon name="arrow-long-right" />
-                    </span>
-                </a>
+                @if($showAdminCard)
+                    <a href="{{ $adminPortalLink }}" class="role-card" aria-label="Open admin portal">
+                        <div class="role-icon">
+                            <x-outline-icon name="briefcase" />
+                        </div>
+                        <h2>Admin</h2>
+                        <p>Manage appointments, monitor records, review clinic activity, and handle administrative workflows.</p>
+                        <span class="role-link">
+                            <span>Open Admin Portal</span>
+                            <x-outline-icon name="arrow-long-right" />
+                        </span>
+                    </a>
+                @endif
             </div>
 
         </section>

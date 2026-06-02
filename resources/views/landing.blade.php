@@ -65,19 +65,19 @@
         }
 
         .brand-logo {
-            width: 88px;
-            height: 88px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
             border-radius: 22px;
-            background: rgba(255, 255, 255, 0.96);
-            border: 1px solid rgba(255, 255, 255, 0.24);
-            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.22);
+            background: transparent;
+            border: none;
+            box-shadow: none;
             padding: 8px;
         }
 
         .brand-logo--clinic {
-            width: 88px;
-            height: 88px;
+            width: 120px;
+            height: 120px;
             padding: 8px;
             background: transparent !important;
             border: none !important;

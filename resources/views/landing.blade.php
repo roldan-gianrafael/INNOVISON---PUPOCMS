@@ -76,8 +76,8 @@
         }
 
         .brand-logo--clinic {
-            width: 120px;
-            height: 120px;
+            width: 160px;
+            height: 160px;
             padding: 8px;
             background: transparent !important;
             border: none !important;

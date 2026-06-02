@@ -1888,7 +1888,7 @@
                 <a class="brand-link" href="{{ url('/student/home') }}">
                     <span class="brand-badges">
                         <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="brand-img">
-                        <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="brand-img brand-img--clinic">
+                        <img src="{{ asset('images/clinic_logo.png') }}?v={{ filemtime(public_path('images/clinic_logo.png')) }}" alt="Clinic Logo" class="brand-img brand-img--clinic">
                     </span>
                     <span class="brand-text">
                         <span class="brand-title">PUP TAGUIG</span>

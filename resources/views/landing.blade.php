@@ -193,7 +193,7 @@
             <div class="brand">
                 <div class="brand-logos" aria-label="PUP and clinic logos">
                     <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="brand-logo">
-                    <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="brand-logo brand-logo--clinic">
+                    <img src="{{ asset('images/clinic_logo.png') }}?v={{ filemtime(public_path('images/clinic_logo.png')) }}" alt="Clinic Logo" class="brand-logo brand-logo--clinic">
                 </div>
                 <div>
                     <p class="eyebrow">Medical Clinic</p>

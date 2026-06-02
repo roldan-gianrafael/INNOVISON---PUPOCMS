@@ -601,7 +601,7 @@
 
   <div class="logo-header">
     <div class="logo-brand">
-      <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="logo-icon">
+      <img src="{{ asset('images/clinic_logo.png') }}?v={{ filemtime(public_path('images/clinic_logo.png')) }}" alt="Clinic Logo" class="logo-icon">
       <div class="logo-text">
         <div class="logo-title">PUP TAGUIG</div>
         <div class="logo-subtitle">ONLINE CLINIC</div>
@@ -779,7 +779,7 @@
 
   <div id="loginLoadingOverlay" class="login-loading-overlay" aria-hidden="true">
       <div class="login-loading-card">
-          <img src="{{ asset('images/clinic_logo.png') }}" alt="Loading" class="login-loading-logo">
+          <img src="{{ asset('images/clinic_logo.png') }}?v={{ filemtime(public_path('images/clinic_logo.png')) }}" alt="Loading" class="login-loading-logo">
           <div class="login-loading-text">Signing in...</div>
       </div>
   </div>

@@ -2504,6 +2504,251 @@
         100% { top: 16%; opacity: 0.9; }
     }
     @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* --- Applicant Reference Panel --- */
+    .applicant-ref-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: stretch;
+    }
+    .applicant-ref-col {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(112, 19, 27, 0.13);
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 24px rgba(15, 23, 42, 0.05);
+    }
+    .applicant-ref-kicker {
+        margin: 0 0 3px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #8b0000;
+    }
+    .applicant-ref-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+    .applicant-ref-copy {
+        margin: 4px 0 0;
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.5;
+    }
+    .applicant-ref-input {
+        width: 100%;
+        min-height: 52px;
+        padding: 14px 16px;
+        border: 1px solid rgba(112, 19, 27, 0.18);
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #111827;
+        background: linear-gradient(180deg, #ffffff, #fff8f6);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+        transition: border-color .2s ease, box-shadow .2s ease;
+        margin-bottom: 0;
+        outline: none;
+    }
+    .applicant-ref-input:focus {
+        border-color: rgba(112, 19, 27, 0.42);
+        box-shadow: 0 0 0 3px rgba(112, 19, 27, 0.08), 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+    .applicant-ref-status {
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.5;
+        display: none;
+    }
+    .applicant-ref-status.info    { display:block; background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; }
+    .applicant-ref-status.success { display:block; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; }
+    .applicant-ref-status.error   { display:block; background:#fff1f2; border:1px solid #fecdd3; color:#be123c; }
+    .btn-medical-assessment {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 15px 20px;
+        border-radius: 14px;
+        border: none;
+        font-size: 15px;
+        font-weight: 800;
+        color: #ffffff;
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        box-shadow: 0 12px 24px rgba(112, 19, 27, 0.22);
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, opacity .2s ease;
+        margin-top: auto;
+    }
+    .btn-medical-assessment:hover {
+        background: #facc15;
+        color: #8B0000;
+        transform: translateY(-2px);
+        box-shadow: 0 16px 28px rgba(112, 19, 27, 0.22);
+    }
+    .btn-medical-assessment:disabled,
+    .btn-medical-assessment.is-disabled {
+        opacity: 0.42;
+        cursor: not-allowed;
+        pointer-events: none;
+        transform: none;
+    }
+    .btn-medical-assessment svg { width:20px; height:20px; stroke-width:2; flex:0 0 auto; }
+
+    /* --- Medical Assessment inline modal form --- */
+    .ma-section {
+        margin-bottom: 14px;
+        padding: 16px 18px;
+        border-radius: 16px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 20px rgba(15, 23, 42, 0.05);
+    }
+    .ma-section-title {
+        margin: 0 0 14px;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #70131B;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .ma-section-num {
+        width: 26px; height: 26px; border-radius: 999px;
+        background: #fff1f2; border: 1px solid #fecdd3;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 900; color: #70131B; flex: 0 0 auto;
+    }
+    .ma-grid   { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .ma-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    .ma-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+    .ma-grid-1 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .ma-field  { display: flex; flex-direction: column; gap: 5px; }
+    .ma-label  { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: #64748b; }
+    .ma-control {
+        width: 100%; min-height: 44px; padding: 10px 14px;
+        border: 1px solid rgba(112, 19, 27, 0.15); border-radius: 12px;
+        background: linear-gradient(180deg, #ffffff, #fff8f6);
+        color: #111827; font-size: 13px; font-weight: 700;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.92),
+            0 2px 4px rgba(112, 19, 27, 0.04),
+            0 8px 16px rgba(112, 19, 27, 0.07),
+            0 18px 28px rgba(112, 19, 27, 0.05);
+        transition: border-color .18s ease, box-shadow .2s ease, transform .18s ease;
+        outline: none;
+    }
+    .ma-control:focus {
+        border-color: #70131B;
+        transform: translateY(-1px);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.92),
+            0 0 0 3px rgba(112, 19, 27, 0.08),
+            0 10px 24px rgba(112, 19, 27, 0.12);
+    }
+    .ma-required-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+        color: #be123c;
+        font-size: 9px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        margin-left: 5px;
+        vertical-align: middle;
+    }
+    .ma-control[readonly] { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+    textarea.ma-control   { min-height: 96px; resize: vertical; line-height: 1.55; }
+    .ma-radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ma-radio {
+        display: inline-flex; align-items: center; gap: 6px;
+        min-height: 40px; padding: 0 14px; border-radius: 999px;
+        background: #f8fafc; border: 1px solid #e2e8f0;
+        color: #334155; font-size: 12px; font-weight: 900; cursor: pointer;
+    }
+    .ma-radio input { accent-color: #70131B; }
+    .ma-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 6px; }
+    .ma-btn {
+        min-height: 44px; border-radius: 999px; padding: 0 20px;
+        font-size: 13px; font-weight: 900; cursor: pointer;
+        border: 1px solid transparent; display: inline-flex;
+        align-items: center; gap: 8px;
+        transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+    .ma-btn:hover { transform: translateY(-1px); }
+    .ma-btn-cancel { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+    .ma-btn-cancel:hover { background: #e2e8f0; }
+    .ma-btn-save {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff; border-color: #8f2230;
+        box-shadow: 0 10px 22px rgba(112, 19, 27, 0.22);
+    }
+    .ma-btn-save:hover { background: #facc15; color: #111827; border-color: #facc15; }
+    html[data-theme="dark"] .ma-section {
+        background: linear-gradient(180deg, rgba(17,24,39,0.96), rgba(15,23,42,0.94));
+        border-color: rgba(250,204,21,0.14);
+    }
+    html[data-theme="dark"] .ma-control {
+        background: rgba(17,24,39,0.88); color: #f8fafc;
+        border-color: rgba(148,163,184,0.22);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.04),
+            0 2px 4px rgba(0,0,0,0.10),
+            0 8px 18px rgba(0,0,0,0.18);
+    }
+    html[data-theme="dark"] .ma-control:focus {
+        border-color: #facc15;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.04),
+            0 0 0 3px rgba(250,204,21,0.12),
+            0 10px 24px rgba(0,0,0,0.24);
+    }
+    html[data-theme="dark"] .ma-required-badge {
+        background: rgba(190,18,60,0.18);
+        border-color: rgba(253,164,175,0.28);
+        color: #fda4af;
+    }
+    @media (max-width: 640px) {
+        .ma-grid-4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    html[data-theme="dark"] .ma-control[readonly] { background: rgba(30,41,59,0.82); color: #94a3b8; }
+    html[data-theme="dark"] .ma-radio { background: rgba(17,24,39,0.86); color: #f8fafc; border-color: rgba(148,163,184,0.18); }
+    html[data-theme="dark"] .ma-label { color: #94a3b8; }
+    html[data-theme="dark"] .ma-btn-cancel { background: rgba(30,41,59,0.96); color: #f8fafc; border-color: rgba(148,163,184,0.28); }
+    @media (max-width: 640px) {
+        .ma-grid, .ma-grid-3 { grid-template-columns: 1fr; }
+    }
+    html[data-theme="dark"] .applicant-ref-col {
+        background: linear-gradient(180deg, rgba(18,18,18,0.98), rgba(28,18,18,0.98));
+        border-color: rgba(250, 204, 21, 0.14);
+    }
+    html[data-theme="dark"] .applicant-ref-title { color: #f8fafc; }
+    html[data-theme="dark"] .applicant-ref-copy  { color: #94a3b8; }
+    html[data-theme="dark"] .applicant-ref-input {
+        background: rgba(30, 41, 59, 0.9);
+        border-color: rgba(148, 163, 184, 0.24);
+        color: #f1f5f9;
+    }
+    @media (max-width: 640px) {
+        .applicant-ref-grid { grid-template-columns: 1fr; }
+    }
 </style>
 @endpush
 
@@ -2598,7 +2843,8 @@
                 </div>
             </a>
 
-            <a href="#" class="intake-option-link" id="openApplicantScanModal">
+            {{-- Applicants card — opens the reference number modal --}}
+            <a href="#" class="intake-option-link" id="openApplicantRefModal">
                 <div class="intake-option-card intake-option-applicant {{ $currentMode === 'applicant' ? 'is-active' : '' }}">
                     <span class="intake-option-chip" aria-hidden="true">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -2607,16 +2853,211 @@
                     </span>
                     <span class="intake-option-icon-wrap" aria-hidden="true">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a6 6 0 0 0-6 6v1.5m12-1.5A6 6 0 0 0 12 3m6 6v4.5m-12-4.5v3m3-5.25A3.75 3.75 0 0 1 12 5.25m0 0A3.75 3.75 0 0 1 15 6.75m-3 12.75v-4.5m-3 4.5c0-1.95 1.05-3.75 3-4.5m3 4.5c0-1.95-1.05-3.75-3-4.5" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                         </svg>
                     </span>
                     <h3 class="intake-option-title">Applicants</h3>
-                    <p class="intake-option-copy">Use OCR ID scanning or manual student number entry, then proceed directly to Medical Assessment.</p>
+                    <p class="intake-option-copy">Enter a reference number and proceed directly to Medical Assessment.</p>
                 </div>
             </a>
+
         </div>
     </div>
 
+    {{-- Applicants Modal: Reference Number + Medical Assessment --}}
+    <div class="applicant-modal-backdrop" id="applicantRefModal">
+        <div class="applicant-modal-shell" style="width:min(480px,100%)">
+            <div class="applicant-modal-head">
+                <div class="applicant-modal-head-main">
+                    <div class="applicant-modal-head-badge">AP</div>
+                    <div class="applicant-modal-head-copy">
+                        <h3>Applicants</h3>
+                        <p>Enter the applicant's reference number on the left, then proceed to Medical Assessment on the right.</p>
+                    </div>
+                </div>
+                <button type="button" class="applicant-modal-close" id="closeApplicantRefModal" aria-label="Close modal">
+                    <x-outline-icon name="x-mark" />
+                </button>
+            </div>
+
+            <div class="applicant-modal-body" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:220px; gap:18px;">
+
+                <div style="text-align:center; max-width:480px;">
+                    <p style="margin:0 0 6px; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:#8b0000;">Proceed</p>
+                    <h4 style="margin:0 0 8px; font-size:20px; font-weight:900; color:#111827;">Medical Assessment</h4>
+                    <p style="margin:0; font-size:13px; color:#64748b; line-height:1.55;">Click below to open the Medical Assessment form for the applicant.</p>
+                </div>
+
+                <button type="button" id="btnMedicalAssessment" class="btn-medical-assessment" style="max-width:360px; width:100%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:20px;height:20px;stroke-width:2;flex:0 0 auto;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                    </svg>
+                    Go to Medical Assessment
+                </button>
+
+                {{-- Hidden stubs so existing JS references don't throw null errors --}}
+                <span style="display:none;">
+                    <input type="text" id="applicantRefInput">
+                    <button id="btnFindApplicant"></button>
+                    <div id="applicantRefStatus"></div>
+                    <div id="applicantFoundCard"><p id="applicantFoundName"></p></div>
+                </span>
+
+            </div>
+        </div>
+    </div>
+
+    {{-- Medical Assessment Modal (inline fillable form) --}}
+    <div class="applicant-modal-backdrop" id="medicalAssessmentModal">
+        <div class="applicant-modal-shell" style="width:min(880px,100%); overflow:hidden;">
+            <div class="applicant-modal-head">
+                <div class="applicant-modal-head-main">
+                    <div class="applicant-modal-head-badge">MA</div>
+                    <div class="applicant-modal-head-copy">
+                        <h3>Medical Assessment</h3>
+                        <p id="maPatientSubtitle">Recording assessment for applicant.</p>
+                    </div>
+                </div>
+                <button type="button" class="applicant-modal-close" id="closeMedicalAssessmentModal" aria-label="Close">
+                    <x-outline-icon name="x-mark" />
+                </button>
+            </div>
+
+            <div class="applicant-modal-body">
+                <form id="medicalAssessmentForm" method="POST" action="#">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="_method" value="PUT">
+
+                    {{-- 00: Applicant Information --}}
+                    <div class="ma-section" style="border-color:rgba(29,78,216,0.18); background:linear-gradient(180deg,#eff6ff,#f0f9ff);">
+                        <p class="ma-section-title" style="color:#1d4ed8;">
+                            <span class="ma-section-num" style="background:#dbeafe;border-color:#bfdbfe;color:#1d4ed8;">ID</span>
+                            Applicant Information
+                            <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:none;letter-spacing:0;">— Used to merge record when applicant registers</span>
+                        </p>
+                        <div class="ma-grid-4" style="margin-bottom:12px;">
+                            <div class="ma-field">
+                                <label class="ma-label">First Name <span class="ma-required-badge">Required</span></label>
+                                <input type="text" name="ma_first_name" class="ma-control" placeholder="First name" required autocomplete="given-name">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Middle Name</label>
+                                <input type="text" name="ma_middle_name" class="ma-control" placeholder="Middle name" autocomplete="additional-name">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Last Name <span class="ma-required-badge">Required</span></label>
+                                <input type="text" name="ma_last_name" class="ma-control" placeholder="Last name" required autocomplete="family-name">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Suffix</label>
+                                <input type="text" name="ma_suffix" class="ma-control" placeholder="e.g. Jr., III">
+                            </div>
+                        </div>
+                        <div class="ma-grid">
+                            <div class="ma-field" style="grid-column:1/-1;">
+                                <label class="ma-label">Email Address <span class="ma-required-badge">Required</span></label>
+                                <input type="email" name="ma_email" class="ma-control" placeholder="applicant@email.com" required autocomplete="email"
+                                    style="border-color:rgba(29,78,216,0.28);">
+                                <span style="margin-top:5px;font-size:11px;color:#3b82f6;font-weight:700;">
+                                    This email will be used to link and merge the applicant's record once they register in the system.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 01: Assessment Context --}}
+                    <div class="ma-section">
+                        <p class="ma-section-title"><span class="ma-section-num">01</span> Assessment Context</p>
+                        <div class="ma-grid">
+                            <div class="ma-field">
+                                <label class="ma-label">Assessment Date</label>
+                                <input type="date" name="assessment_date" id="maAssessmentDate" class="ma-control" required>
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Date of Birth</label>
+                                <input type="text" id="maDateOfBirth" class="ma-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 02: Vitals --}}
+                    <div class="ma-section">
+                        <p class="ma-section-title"><span class="ma-section-num">02</span> Vitals</p>
+                        <div class="ma-grid-3">
+                            <div class="ma-field">
+                                <label class="ma-label">Height</label>
+                                <input type="text" name="height" class="ma-control" placeholder="e.g. 164 cm">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Weight</label>
+                                <input type="text" name="weight" class="ma-control" placeholder="e.g. 52 kg">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Blood Pressure</label>
+                                <input type="text" name="blood_pressure" class="ma-control" placeholder="e.g. 120/80">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Respiratory Rate</label>
+                                <input type="text" name="respiratory_rate" class="ma-control" placeholder="e.g. 18">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Temperature</label>
+                                <input type="text" name="temperature" class="ma-control" placeholder="e.g. 36.8 C">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Covid Positive?</label>
+                                <div class="ma-radio-group">
+                                    <label class="ma-radio"><input type="radio" name="covid_positive" value="Yes"> Yes</label>
+                                    <label class="ma-radio"><input type="radio" name="covid_positive" value="No" checked> No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 03: Document Review --}}
+                    <div class="ma-section">
+                        <p class="ma-section-title"><span class="ma-section-num">03</span> Document Review</p>
+                        <div class="ma-grid">
+                            <div class="ma-field">
+                                <label class="ma-label">Medical Certificate Issued By</label>
+                                <input type="text" name="medical_certificate_issued_by" class="ma-control" placeholder="Doctor name">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Date Issued</label>
+                                <input type="date" name="medical_certificate_issued_at" class="ma-control">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">Chest X-ray Result</label>
+                                <input type="text" name="chest_xray_result_text" class="ma-control" placeholder="e.g. Normal / With findings">
+                            </div>
+                            <div class="ma-field">
+                                <label class="ma-label">X-ray Date</label>
+                                <input type="date" name="chest_xray_date" class="ma-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 04: Clinical Remarks --}}
+                    <div class="ma-section">
+                        <p class="ma-section-title"><span class="ma-section-num">04</span> Clinical Remarks</p>
+                        <div class="ma-grid-1">
+                            <div class="ma-field">
+                                <label class="ma-label">Remarks</label>
+                                <textarea name="assessment_remarks" class="ma-control" rows="4" placeholder="Enter assessment remarks..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ma-actions">
+                        <button type="button" id="closeMedicalAssessmentModal2" class="ma-btn ma-btn-cancel">Cancel</button>
+                        <button type="submit" class="ma-btn ma-btn-save">Save Assessment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- OCR / Manual ID shared modal (used by OCR/Manual ID card and legacy assessment flow) --}}
     <div class="applicant-modal-backdrop" id="applicantScanModal">
         <div class="applicant-modal-shell">
             <div class="applicant-modal-head">
@@ -2645,25 +3086,23 @@
                     <div class="applicant-modal-panel">
                         <div id="scanForm">
                             <div id="scanStage" class="scan-stage">
-                                <div id="scanner-container-scan" class="scan-surface" style="position: relative;">
-                                    <p id="scanInlineNote" class="scan-inline-note">OCR mode is active. Align the physical ID inside the frame and continue once student number and name are matched for Medical Assessment.</p>
+                                <div id="scanner-container-scan" class="scan-surface" style="position:relative;">
+                                    <p id="scanInlineNote" class="scan-inline-note">OCR mode is active. Align the physical ID inside the frame and continue once student number and name are matched.</p>
                                     <div id="barcodeScanPanel">
                                         <div id="scan-loading">
                                             <div class="spinner"></div>
-                                            <p style="margin-top:10px; color:#8B0000; font-weight:bold; font-size: 12px;">Verifying...</p>
+                                            <p style="margin-top:10px;color:#8B0000;font-weight:bold;font-size:12px;">Verifying...</p>
                                         </div>
                                         <div id="readerScan" class="scanner-box">
                                             <div class="scan-line-overlay"></div>
                                             <div class="ocr-guide"></div>
                                             <div class="ocr-guide-label">Align Student Number and Name</div>
                                         </div>
-
                                         <div class="ocr-actions">
-                                            <button type="button" id="btnRunAiOcr" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg, #1d4ed8, #2563eb 55%, #3b82f6); box-shadow:0 12px 24px rgba(37,99,235,0.22);">AI Read Student No.</button>
+                                            <button type="button" id="btnRunAiOcr" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg,#1d4ed8,#2563eb 55%,#3b82f6);box-shadow:0 12px 24px rgba(37,99,235,0.22);">AI Read Student No.</button>
                                             <button type="button" id="btnRetryOcr" class="btn-ocr btn-ocr-secondary">Clear OCR Result</button>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -2671,43 +3110,40 @@
 
                     <div class="applicant-modal-panel">
                         <div id="applicantOcrReviewPanel">
-                            <div id="ocrResultPanel" class="ocr-result-panel" style="background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border:1px solid #dbe3ef; box-shadow:0 16px 34px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.92);">
-                                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #e2e8f0;">
-                                    <div style="display:flex; align-items:flex-start; gap:12px;">
-                                        <span style="width:42px; height:42px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #7f1d1d, #991b1b 58%, #b91c1c); color:#ffffff; box-shadow:0 12px 24px rgba(127,29,29,0.18); flex-shrink:0;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" style="width:20px; height:20px; stroke:currentColor; stroke-width:1.9;">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5h16.5m-16.5 4.5h10.5m-10.5 4.5h7.5M17.25 5.25h2.25A1.5 1.5 0 0 1 21 6.75v10.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.25V6.75a1.5 1.5 0 0 1 1.5-1.5h2.25" />
+                            <div id="ocrResultPanel" class="ocr-result-panel" style="background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);border:1px solid #dbe3ef;box-shadow:0 16px 34px rgba(15,23,42,0.08),inset 0 1px 0 rgba(255,255,255,0.92);">
+                                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;">
+                                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                                        <span style="width:42px;height:42px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7f1d1d,#991b1b 58%,#b91c1c);color:#ffffff;box-shadow:0 12px 24px rgba(127,29,29,0.18);flex-shrink:0;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" style="width:20px;height:20px;stroke:currentColor;stroke-width:1.9;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5h16.5m-16.5 4.5h10.5m-10.5 4.5h7.5M17.25 5.25h2.25A1.5 1.5 0 0 1 21 6.75v10.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.25V6.75a1.5 1.5 0 0 1 1.5-1.5h2.25"/>
                                             </svg>
                                         </span>
                                         <div>
-                                            <p style="margin:0; font-size:11px; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:#8b0000;">Detected Data</p>
-                                            <p style="margin:4px 0 0; font-size:12px; color:#64748b; line-height:1.5;">Captured from OCR scan and arranged for final review.</p>
+                                            <p style="margin:0;font-size:11px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:#8b0000;">Detected Data</p>
+                                            <p style="margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.5;">Captured from OCR scan and arranged for final review.</p>
                                         </div>
                                     </div>
-                                    <span style="display:inline-flex; align-items:center; padding:7px 10px; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:11px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; white-space:nowrap;">OCR Result</span>
+                                    <span style="display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;font-size:11px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;">OCR Result</span>
                                 </div>
-                                <div style="display:grid; gap:12px;">
-                                    <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center; padding:12px 14px; border-radius:14px; background:linear-gradient(180deg, #fdfefe, #f8fafc); border:1px solid #e2e8f0;">
-                                        <p class="ocr-result-label" style="margin:0; color:#334155;">Full Name</p>
-                                        <input type="text" id="ocr_student_name" class="form-control" readonly style="margin-bottom:0; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; box-shadow:inset 0 1px 0 rgba(255,255,255,0.95); font-weight:700; cursor:default;">
+                                <div style="display:grid;gap:12px;">
+                                    <div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:linear-gradient(180deg,#fdfefe,#f8fafc);border:1px solid #e2e8f0;">
+                                        <p class="ocr-result-label" style="margin:0;color:#334155;">Full Name</p>
+                                        <input type="text" id="ocr_student_name" class="form-control" readonly style="margin-bottom:0;background:#ffffff;color:#0f172a;border:1px solid #cbd5e1;box-shadow:inset 0 1px 0 rgba(255,255,255,0.95);font-weight:700;cursor:default;">
                                     </div>
-                                    <div style="display:grid; grid-template-columns: 120px minmax(0, 1fr); gap:12px; align-items:center; padding:12px 14px; border-radius:14px; background:linear-gradient(180deg, #fdfefe, #f8fafc); border:1px solid #e2e8f0;">
-                                        <p class="ocr-result-label" style="margin:0; color:#334155;">ID Number</p>
-                                        <input type="text" id="ocr_student_number" class="form-control" readonly style="margin-bottom:0; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; box-shadow:inset 0 1px 0 rgba(255,255,255,0.95); font-weight:700; cursor:default;">
+                                    <div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:linear-gradient(180deg,#fdfefe,#f8fafc);border:1px solid #e2e8f0;">
+                                        <p class="ocr-result-label" style="margin:0;color:#334155;">ID Number</p>
+                                        <input type="text" id="ocr_student_number" class="form-control" readonly style="margin-bottom:0;background:#ffffff;color:#0f172a;border:1px solid #cbd5e1;box-shadow:inset 0 1px 0 rgba(255,255,255,0.95);font-weight:700;cursor:default;">
                                     </div>
                                 </div>
-
                                 <div id="ocrStatus" class="ocr-status info" style="display:block;">AI verification could not finish right now.</div>
-                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                                     <div id="ocrConfidenceText" class="ocr-meta">Student no. confidence: 10%</div>
                                     <div id="ocrLockBadge" class="ocr-lock-badge" style="display:none;">Locked on ID</div>
                                 </div>
-
                                 <div class="ocr-actions" style="margin-top:14px;">
-                                    <button type="button" id="btnConfirmOcr" class="btn-ocr btn-ocr-secondary" disabled>Confirm & Continue</button>
+                                    <button type="button" id="btnConfirmOcr" class="btn-ocr btn-ocr-secondary" disabled>Confirm &amp; Continue</button>
                                 </div>
                             </div>
-
                             <div class="manual-input-stack">
                                 <p class="manual-toggle-label">Type Student Number Manually</p>
                                 <form id="walkinFormManual">
@@ -2716,7 +3152,6 @@
                                 </form>
                             </div>
                         </div>
-
                         <canvas id="ocrCanvas" style="display:none;"></canvas>
                     </div>
                 </div>
@@ -4009,5 +4444,107 @@
             });
         });
     });
+
+    // --- Applicants Modal: Reference Number → Medical Assessment ---
+    (function () {
+        const backdrop      = document.getElementById('applicantRefModal');
+        const openBtn       = document.getElementById('openApplicantRefModal');
+        const closeBtn      = document.getElementById('closeApplicantRefModal');
+        const refInput      = document.getElementById('applicantRefInput');
+        const refStatus     = document.getElementById('applicantRefStatus');
+        const findBtn       = document.getElementById('btnFindApplicant');
+        const assessBtn     = document.getElementById('btnMedicalAssessment');
+        const foundCard     = document.getElementById('applicantFoundCard');
+        const foundName     = document.getElementById('applicantFoundName');
+        const getStudentUrl = '{{ url($basePrefix . "/walkin/get-student") }}';
+        let assessUrl       = '';
+
+        function openModal() {
+            if (!backdrop) return;
+            backdrop.classList.add('show');
+            if (refInput) { refInput.value = ''; refInput.focus(); }
+            resetState();
+        }
+
+        function closeModal() {
+            if (backdrop) backdrop.classList.remove('show');
+            resetState();
+        }
+
+        function resetState() {
+            if (refStatus) { refStatus.className = 'ocr-status'; refStatus.textContent = ''; }
+            if (foundCard) foundCard.style.display = 'none';
+            if (foundName) foundName.textContent = '';
+            assessUrl = '';
+        }
+
+        function setStatus(type, msg) {
+            if (!refStatus) return;
+            refStatus.className = 'ocr-status ' + type;
+            refStatus.textContent = msg;
+        }
+
+        function enableAssess(url, name) {
+            assessUrl = url;
+            if (foundCard && foundName) {
+                foundName.textContent = name || 'Record located';
+                foundCard.style.display = 'block';
+            }
+            if (assessBtn) { assessBtn.disabled = false; assessBtn.classList.remove('is-disabled'); }
+        }
+
+        function doLookup() {
+            const ref = (refInput ? refInput.value : '').trim();
+            if (!ref) { setStatus('error', 'Please enter a reference number first.'); return; }
+
+            setStatus('info', 'Looking up applicant…');
+            if (assessBtn) { assessBtn.disabled = true; assessBtn.classList.add('is-disabled'); }
+            if (foundCard) foundCard.style.display = 'none';
+
+            fetch(`${getStudentUrl}?student_id=${encodeURIComponent(ref)}&preview_only=true`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'preview' || data.status === 'found') {
+                    setStatus('success', 'Patient found. Ready to proceed to Medical Assessment.');
+                    enableAssess('__ready__', data.student_name || '');
+                } else {
+                    setStatus('error', data.message || 'No applicant found with that reference number.');
+                }
+            })
+            .catch(() => setStatus('error', 'Unable to look up right now. Please try again.'));
+        }
+
+        if (openBtn)  openBtn.addEventListener('click',  function(e) { e.preventDefault(); openModal(); });
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        if (backdrop) backdrop.addEventListener('click', function(e) { if (e.target === backdrop) closeModal(); });
+
+        if (findBtn) findBtn.addEventListener('click', doLookup);
+        if (refInput) refInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); doLookup(); } });
+
+        if (assessBtn) {
+            assessBtn.addEventListener('click', function () {
+                // Open the Medical Assessment form modal directly
+                const maAssessmentDate = document.getElementById('maAssessmentDate');
+                if (maAssessmentDate && !maAssessmentDate.value) {
+                    maAssessmentDate.value = new Date().toISOString().split('T')[0];
+                }
+                closeModal();
+                const maBackdrop = document.getElementById('medicalAssessmentModal');
+                if (maBackdrop) maBackdrop.classList.add('show');
+            });
+        }
+
+        // Medical Assessment modal close
+        const maBackdrop = document.getElementById('medicalAssessmentModal');
+        const maClose1   = document.getElementById('closeMedicalAssessmentModal');
+        const maClose2   = document.getElementById('closeMedicalAssessmentModal2');
+
+        function closeMaModal() { if (maBackdrop) maBackdrop.classList.remove('show'); }
+        if (maClose1)  maClose1.addEventListener('click', closeMaModal);
+        if (maClose2)  maClose2.addEventListener('click', closeMaModal);
+        if (maBackdrop) maBackdrop.addEventListener('click', function(e) { if (e.target === maBackdrop) closeMaModal(); });
+    })();
 </script>
 @endpush

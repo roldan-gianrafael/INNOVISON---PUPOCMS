@@ -7,215 +7,351 @@
     <style>
         :root {
             --accent: #8B0000;
-            --accent-dark: #600000;
+            --accent-deep: #5e0000;
             --accent-gold: #facc15;
-            --white: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --text-dark: #20343a;
-            --text-light: #64748b;
-            --error-bg: #fee2e2;
-            --error-text: #b91c1c;
-            --warn-bg: #fff7ed;
-            --warn-text: #9a3412;
+            --paper: rgba(255,255,255,0.96);
+            --ink: #12202b;
+            --muted: #667085;
+            --line: rgba(139, 0, 0, 0.18);
+            --danger-bg: #fff1f2;
+            --danger-fg: #9f1239;
+            --success-bg: #ecfdf5;
+            --success-fg: #047857;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            color: #fff;
             background:
-                linear-gradient(rgba(15, 27, 38, 0.76), rgba(15, 27, 38, 0.86)),
-                url('{{ asset("images/PUPBG.jpg") }}') no-repeat center center fixed;
-            background-size: cover;
-            color: var(--white);
+                linear-gradient(rgba(9, 14, 19, 0.68), rgba(9, 14, 19, 0.82)),
+                url('{{ asset("images/PUPBG.jpg") }}') center/cover fixed no-repeat;
         }
-        .logo-header {
-            background: var(--accent);
-            padding: 16px 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        .topbar {
+            padding: 18px 24px;
+            background: rgba(91, 0, 0, 0.92);
+            border-bottom: 1px solid rgba(255,255,255,0.12);
             display: flex;
             justify-content: center;
-            position: relative;
-            z-index: 10;
+            backdrop-filter: blur(10px);
         }
-        .logo-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-icon { width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; }
-        .logo-text { color: var(--white); line-height: 1.1; }
-        .logo-title { font-weight: 800; font-size: 18px; letter-spacing: 0.5px; }
-        .logo-subtitle { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; }
-        .lp-container {
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+        .brand img {
+            width: 46px;
+            height: 46px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.24);
+        }
+        .brand-title {
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .brand-subtitle {
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0.88;
+        }
+        .shell {
             flex: 1;
+            display: grid;
+            place-items: center;
+            padding: 28px 16px;
+        }
+        .panel {
+            width: min(100%, 520px);
+            border-radius: 26px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.94));
+            color: var(--ink);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(14px);
+            overflow: hidden;
+        }
+        .panel-head {
+            padding: 24px 26px 18px;
+            background:
+                linear-gradient(135deg, rgba(91,0,0,0.98), rgba(127,29,29,0.98) 55%, rgba(168,18,18,0.98));
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        .head-row {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .mark {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            padding: 24px 16px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.16);
+            flex: 0 0 auto;
         }
-        .login-box {
-            width: 100%;
-            max-width: 440px;
-            background: var(--glass-bg);
-            border-radius: 20px;
-            padding: 38px;
-            color: var(--text-dark);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-        }
-        .login-badge {
+        .mark svg { width: 24px; height: 24px; stroke: #fff; stroke-width: 2; }
+        .badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 12px;
+            padding: 7px 12px;
             border-radius: 999px;
-            background: rgba(139, 0, 0, 0.08);
-            color: var(--accent);
+            background: rgba(250, 204, 21, 0.14);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            color: #fff7cc;
             font-size: 11px;
             font-weight: 800;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 16px;
+            white-space: nowrap;
         }
-        .login-box h1 {
-            color: var(--accent);
-            font-size: 28px;
-            line-height: 1.1;
+        .badge span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.15);
+        }
+        .panel-title {
+            font-size: 32px;
+            line-height: 1.05;
+            font-weight: 900;
             margin-bottom: 10px;
         }
-        .login-box p {
-            color: var(--text-light);
+        .panel-copy {
             font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 22px;
+            line-height: 1.7;
+            max-width: 44ch;
+            color: rgba(255,255,255,0.88);
         }
-        .alert-error,
-        .alert-warn {
+        .status-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .status-chip {
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.16);
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.92);
+        }
+        .panel-body {
+            padding: 24px 26px 26px;
+        }
+        .alert {
             padding: 12px 14px;
-            border-radius: 10px;
-            margin-bottom: 18px;
+            border-radius: 14px;
+            margin-bottom: 14px;
             font-size: 13px;
-            line-height: 1.5;
+            line-height: 1.55;
             border: 1px solid transparent;
         }
-        .alert-error { background: var(--error-bg); color: var(--error-text); border-color: #fecaca; }
-        .alert-warn { background: var(--warn-bg); color: var(--warn-text); border-color: #fed7aa; }
-        .form-group { margin-bottom: 14px; text-align: left; }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
+        .alert-error { background: var(--danger-bg); color: var(--danger-fg); border-color: #fecdd3; }
+        .alert-success { background: var(--success-bg); color: var(--success-fg); border-color: #a7f3d0; }
+        form { display: grid; gap: 14px; }
+        .field {
+            display: grid;
+            gap: 6px;
+        }
+        .field label {
+            font-size: 11px;
+            font-weight: 900;
+            color: #7a1b1b;
             text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
-        .form-group input {
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            stroke: #8b0000;
+            stroke-width: 2;
+            pointer-events: none;
+        }
+        .field input {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 14px;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .form-group input:focus {
+            min-height: 50px;
+            padding: 12px 16px 12px 44px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: linear-gradient(180deg, #fff, #fff8f6);
+            color: #111827;
+            font-size: 15px;
+            font-weight: 700;
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
+            transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
         }
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            margin-top: 8px;
-            border: none;
-            border-radius: 10px;
-            background: var(--accent);
-            color: #fff;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: transform 0.2s ease, background 0.2s ease;
-        }
-        .btn-submit:hover {
-            background: var(--accent-dark);
+        .field input:focus {
+            border-color: #8b0000;
+            box-shadow: 0 0 0 4px rgba(139,0,0,0.09);
             transform: translateY(-1px);
         }
-        .emergency-note {
-            margin-top: 18px;
+        .submit {
+            min-height: 52px;
+            border: 0;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #5e0000, #8b0000 60%, #a61b1b);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 16px 26px rgba(91,0,0,0.26);
+            transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+        }
+        .submit svg {
+            width: 18px;
+            height: 18px;
+            stroke: #fff;
+            stroke-width: 2;
+            flex: 0 0 auto;
+        }
+        .submit:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.03);
+            box-shadow: 0 20px 32px rgba(91,0,0,0.3);
+        }
+        .footnote {
+            margin-top: 16px;
             padding-top: 16px;
-            border-top: 1px solid rgba(148, 163, 184, 0.22);
-            color: var(--text-light);
+            border-top: 1px solid rgba(15,23,42,0.08);
+            color: var(--muted);
             font-size: 12px;
             line-height: 1.6;
         }
-        .emergency-note strong {
+        .footnote strong {
             display: block;
-            color: #7f1d1d;
             margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            color: #7a1b1b;
             font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
-        .lp-foot {
-            background: rgba(17, 24, 39, 0.92);
-            border-top: 2px solid var(--accent);
-            text-align: center;
+        .bottom-bar {
             padding: 14px 16px;
+            text-align: center;
+            background: rgba(11, 16, 22, 0.92);
+            color: rgba(255,255,255,0.92);
             font-size: 13px;
-            color: #f8fafc;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         @media (max-width: 640px) {
-            .login-box { padding: 28px 20px; }
-            .login-box h1 { font-size: 24px; }
+            .panel-head, .panel-body { padding-left: 18px; padding-right: 18px; }
+            .panel-title { font-size: 27px; }
+            .head-row { align-items: flex-start; }
+            .badge { font-size: 10px; }
         }
     </style>
 </head>
 <body>
-    <header class="logo-header">
-        <a href="{{ url('/') }}" class="logo-brand" aria-label="Clinic home">
-            <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="logo-icon">
-            <div class="logo-text">
-                <div class="logo-title">PUP Taguig Clinic Management System</div>
-                <div class="logo-subtitle">Emergency Backup Access</div>
+    <header class="topbar">
+        <a href="{{ url('/') }}" class="brand" aria-label="Clinic home">
+            <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
+            <div>
+                <div class="brand-title">PUP Taguig Clinic Management System</div>
+                <div class="brand-subtitle">Emergency Backup Access</div>
             </div>
         </a>
     </header>
 
-    <main class="lp-container">
-        <section class="login-box" aria-labelledby="emergency-login-title">
-            <div class="login-badge">Local Fallback</div>
-            <h1 id="emergency-login-title">Emergency Login</h1>
-            <p>Use this only when the external IdP or One Portal is unavailable. Access is limited to the configured clinic admin or nurse emergency account.</p>
-
-            @if($errors->any())
-                <div class="alert-error">
-                    {{ $errors->first() }}
+    <main class="shell">
+        <section class="panel" aria-labelledby="emergency-login-title">
+            <div class="panel-head">
+                <div class="head-row">
+                    <div class="mark" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75 3.75 8.25v7.5L12 20.25l8.25-4.5v-7.5L12 3.75Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v7.5m-3-2.25 3 2.25 3-2.25" />
+                        </svg>
+                    </div>
+                    <div class="badge"><span></span> Emergency Access</div>
                 </div>
-            @endif
 
-            @if(session('status'))
-                <div class="alert-warn">
-                    {{ session('status') }}
-                </div>
-            @endif
+                <h1 class="panel-title" id="emergency-login-title">Emergency Login</h1>
+                <p class="panel-copy">Use this only when the IdP or One Portal is unavailable. This opens the clinic side through the configured backup admin or nurse account.</p>
 
-            <form method="POST" action="{{ route('system-admin.emergency-login.submit') }}" autocomplete="off">
-                @csrf
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" name="email" id="email" value="{{ old('email') }}" required autofocus>
+                <div class="status-row" aria-label="Emergency access status">
+                    <span class="status-chip">Fallback mode</span>
+                    <span class="status-chip">Config-driven</span>
+                    <span class="status-chip">Hidden route</span>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" name="password" id="password" required>
-                </div>
-                <button type="submit" class="btn-submit">Sign In</button>
-            </form>
+            </div>
 
-            <div class="emergency-note">
-                <strong>Emergency use only</strong>
-                This page is intentionally unlinked from the normal navigation and should stay hidden.
+            <div class="panel-body">
+                @if($errors->any())
+                    <div class="alert alert-error">{{ $errors->first() }}</div>
+                @endif
+
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+
+                <form method="POST" action="{{ route('system-admin.emergency-login.submit') }}" autocomplete="off">
+                    @csrf
+                    <div class="field">
+                        <label for="email">Email address</label>
+                        <div class="input-wrap">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25v7.5A2.25 2.25 0 0 1 18.75 18H5.25A2.25 2.25 0 0 1 3 15.75v-7.5m18 0A2.25 2.25 0 0 0 18.75 6H5.25A2.25 2.25 0 0 0 3 8.25m18 0-7.47 4.662a2.25 2.25 0 0 1-2.42 0L3 8.25" />
+                            </svg>
+                            <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="backup-admin@clinic.local" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <div class="input-wrap">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V7.875a4.5 4.5 0 1 0-9 0V10.5m9 0A2.25 2.25 0 0 1 18.75 12.75v4.5A2.25 2.25 0 0 1 16.5 19.5h-9A2.25 2.25 0 0 1 5.25 17.25v-4.5A2.25 2.25 0 0 1 7.5 10.5m9 0h-9" />
+                            </svg>
+                            <input type="password" name="password" id="password" placeholder="Enter emergency password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25a3.75 3.75 0 0 0-7.5 0V9m10.5 0H5.25A1.5 1.5 0 0 0 3.75 10.5v7.5A1.5 1.5 0 0 0 5.25 19.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5A1.5 1.5 0 0 0 18.75 9Z" />
+                        </svg>
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="footnote">
+                    <strong>Emergency use only</strong>
+                    Keep this page unlinked from normal navigation and restrict the configured credentials to trusted clinic staff.
+                </div>
             </div>
         </section>
     </main>
 
-    <footer class="lp-foot">
+    <footer class="bottom-bar">
         PUP Taguig Clinic Management System
     </footer>
 </body>

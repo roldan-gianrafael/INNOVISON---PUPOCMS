@@ -65,6 +65,14 @@ return [
         'logout_url' => env('IDP_LOGOUT_URL'),
     ],
 
+    'emergency' => [
+        'enabled' => filter_var(env('EMERGENCY_ACCESS_ENABLED', false), FILTER_VALIDATE_BOOL),
+        'email' => env('EMERGENCY_ADMIN_EMAIL'),
+        'password' => env('EMERGENCY_ADMIN_PASSWORD'),
+        'password_hash' => env('EMERGENCY_ADMIN_PASSWORD_HASH'),
+        'role' => env('EMERGENCY_ADMIN_ROLE', 'admin'),
+    ],
+
     'external_admin_profile' => [
         'api_key' => env('EXTERNAL_ADMIN_PROFILE_API_KEY'),
         'header' => env('EXTERNAL_ADMIN_PROFILE_HEADER', 'X-External-Api-Key'),

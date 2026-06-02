@@ -8,11 +8,16 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 class EmergencyAuthController extends Controller
 {
-    public function showLoginForm(): RedirectResponse|\Illuminate\View\View
+    public function showLoginForm(): RedirectResponse|View
     {
         if (Auth::guard('admin')->check()) {
             return redirect()->route('admin.dashboard');
@@ -31,27 +36,64 @@ class EmergencyAuthController extends Controller
         $email = strtolower(trim((string) $validated['email']));
         $password = (string) $validated['password'];
         $guard = Auth::guard('admin');
+        $bootstrapEnabled = (bool) config('services.emergency.enabled', false);
+        $bootstrapEmail = strtolower(trim((string) config('services.emergency.email', '')));
+        $bootstrapPassword = (string) config('services.emergency.password', '');
+        $bootstrapPasswordHash = trim((string) config('services.emergency.password_hash', ''));
+        $bootstrapRole = User::normalizeRole((string) config('services.emergency.role', User::ROLE_ADMIN));
 
-        if (!$guard->attempt(['email' => $email, 'password' => $password], false)) {
-            $this->logAttempt($request, null, 'Emergency login failed because the email or password was invalid.', 401);
+        if (!$bootstrapEnabled || $bootstrapEmail === '' || ($bootstrapPassword === '' && $bootstrapPasswordHash === '')) {
+            $this->logAttempt($request, null, 'Emergency login failed because bootstrap credentials are not configured.', 503);
 
-            return back()
-                ->withErrors(['email' => 'Invalid emergency credentials.'])
-                ->withInput($request->only('email'));
+            throw ValidationException::withMessages([
+                'email' => 'Emergency login is not configured on this server.',
+            ]);
         }
+
+        $passwordMatches = $bootstrapPasswordHash !== ''
+            ? Hash::check($password, $bootstrapPasswordHash)
+            : hash_equals($bootstrapPassword, $password);
+
+        if ($email !== $bootstrapEmail || !$passwordMatches) {
+            $this->logAttempt($request, null, 'Emergency login failed because the bootstrap credentials did not match.', 401);
+
+            throw ValidationException::withMessages([
+                'email' => 'Invalid emergency credentials.',
+            ]);
+        }
+
+        $user = User::query()->where('email', $bootstrapEmail)->first();
+        $newUser = false;
+        if (!$user) {
+            $user = new User();
+            $newUser = true;
+        }
+
+        $user->email = $bootstrapEmail;
+        $user->first_name = $user->first_name ?: 'Emergency';
+        $user->last_name = $user->last_name ?: 'Admin';
+        $user->name = trim(($user->first_name ?? 'Emergency') . ' ' . ($user->last_name ?? 'Admin'));
+        $user->user_role = $bootstrapRole;
+        $user->status = 'active';
+        $user->password = $bootstrapPasswordHash !== ''
+            ? $bootstrapPasswordHash
+            : Hash::make($bootstrapPassword);
+
+        if (Schema::hasColumn('users', 'student_id') && empty($user->student_id)) {
+            $user->student_id = 'emergency-admin';
+        }
+        if (Schema::hasColumn('users', 'student_number') && empty($user->student_number)) {
+            $user->student_number = 'emergency-admin';
+        }
+        if (Schema::hasColumn('users', 'user_type')) {
+            $user->user_type = $bootstrapRole === User::ROLE_ADMIN ? 'Assistant' : 'Regular';
+        }
+
+        $user->save();
 
         $request->session()->regenerate();
         Auth::shouldUse('admin');
-
-        /** @var \App\Models\User|null $user */
-        $user = $guard->user();
-        if (!$user) {
-            $guard->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return back()->withErrors(['email' => 'Emergency login could not complete.'])->withInput($request->only('email'));
-        }
+        $guard->login($user, false);
 
         $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
         if (!in_array($normalizedRole, [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true)) {
@@ -61,9 +103,9 @@ class EmergencyAuthController extends Controller
 
             $this->logAttempt($request, $user, 'Emergency login blocked because the account is not an admin or nurse account.', 403);
 
-            return back()->withErrors([
+            throw ValidationException::withMessages([
                 'email' => 'This backdoor is limited to clinic admin and nurse accounts.',
-            ])->withInput($request->only('email'));
+            ]);
         }
 
         if (strtolower(trim((string) ($user->status ?? 'active'))) === 'inactive') {
@@ -73,12 +115,19 @@ class EmergencyAuthController extends Controller
 
             $this->logAttempt($request, $user, 'Emergency login blocked because the account is inactive.', 423);
 
-            return back()->withErrors([
+            throw ValidationException::withMessages([
                 'email' => 'This account is inactive.',
-            ])->withInput($request->only('email'));
+            ]);
         }
 
-        $this->logAttempt($request, $user, 'Emergency login succeeded.', 200);
+        $this->logAttempt(
+            $request,
+            $user,
+            $newUser
+                ? 'Emergency login succeeded and bootstrap account was created.'
+                : 'Emergency login succeeded.',
+            200
+        );
 
         return redirect()
             ->route($normalizedRole === User::ROLE_SUPERADMIN ? 'admin.dashboard' : 'assistant.dashboard')

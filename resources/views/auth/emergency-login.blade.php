@@ -181,7 +181,7 @@
         <section class="login-box" aria-labelledby="emergency-login-title">
             <div class="login-badge">Local Fallback</div>
             <h1 id="emergency-login-title">Emergency Login</h1>
-            <p>Use this only when the external IdP or One Portal is unavailable. Access is limited to clinic admin and nurse accounts stored locally.</p>
+            <p>Use this only when the external IdP or One Portal is unavailable. Access is limited to the configured clinic admin or nurse emergency account.</p>
 
             @if($errors->any())
                 <div class="alert-error">
@@ -205,12 +205,12 @@
                     <label for="password">Password</label>
                     <input type="password" name="password" id="password" required>
                 </div>
-                <button type="submit" class="btn-submit">Sign In Locally</button>
+                <button type="submit" class="btn-submit">Sign In</button>
             </form>
 
             <div class="emergency-note">
                 <strong>Emergency use only</strong>
-                This page is intentionally unlinked from the normal navigation.
+                This page is intentionally unlinked from the normal navigation and should stay hidden.
             </div>
         </section>
     </main>

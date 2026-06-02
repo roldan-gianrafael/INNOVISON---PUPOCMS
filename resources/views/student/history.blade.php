@@ -136,7 +136,7 @@
       }
       .history-summary-grid {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 14px;
           margin-bottom: 18px;
       }
@@ -345,10 +345,219 @@
           gap: 12px;
           flex-wrap: wrap;
       }
+      .apt-footer-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          flex-wrap: wrap;
+      }
       .apt-action-note {
           font-size: 12px;
           font-weight: 700;
           color: #94a3b8;
+      }
+      .cancel-appointment-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-height: 42px;
+          padding: 0 16px;
+          border-radius: 999px;
+          border: 1px solid rgba(139, 0, 0, 0.22);
+          background: linear-gradient(180deg, #ffffff 0%, #fff5f5 100%);
+          color: #8B0000;
+          font-size: 13px;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 10px 20px rgba(139, 0, 0, 0.08);
+          transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+      }
+      .cancel-appointment-btn:hover,
+      .cancel-appointment-btn:focus-visible {
+          transform: translateY(-1px);
+          background: #8B0000;
+          color: #facc15;
+          box-shadow: 0 16px 24px rgba(139, 0, 0, 0.18);
+      }
+      .cancel-appointment-btn svg {
+          width: 16px;
+          height: 16px;
+          flex: 0 0 auto;
+      }
+      .cancel-appointment-btn.secondary {
+          background: #f8fafc;
+          color: #475569;
+          border-color: #e2e8f0;
+          box-shadow: none;
+      }
+      .cancel-appointment-btn.secondary:hover,
+      .cancel-appointment-btn.secondary:focus-visible {
+          background: #eef2ff;
+          color: #1e293b;
+          box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+      }
+      .cancel-dialog-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 1200;
+          display: none;
+          align-items: center;
+          justify-content: center;
+          padding: 18px;
+          background: rgba(15, 23, 42, 0.56);
+          backdrop-filter: blur(10px);
+      }
+      .cancel-dialog-backdrop.is-open {
+          display: flex;
+      }
+      .cancel-dialog {
+          width: min(100%, 560px);
+          border-radius: 24px;
+          border: 1px solid rgba(139, 0, 0, 0.14);
+          background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
+          box-shadow: 0 26px 60px rgba(15, 23, 42, 0.22);
+          overflow: hidden;
+      }
+      .cancel-dialog-header {
+          position: relative;
+          padding: 20px 22px 18px;
+          background:
+              linear-gradient(135deg, rgba(139, 0, 0, 0.11) 0%, rgba(250, 204, 21, 0.13) 100%),
+              linear-gradient(180deg, #fffdf9 0%, #fff6f6 100%);
+          border-bottom: 1px solid rgba(139, 0, 0, 0.10);
+      }
+      .cancel-dialog-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 10px;
+          border-radius: 999px;
+          background: rgba(139, 0, 0, 0.08);
+          color: #8B0000;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-bottom: 10px;
+      }
+      .cancel-dialog-title {
+          margin: 0;
+          font-size: 22px;
+          line-height: 1.15;
+          color: #4c0519;
+          font-weight: 800;
+      }
+      .cancel-dialog-copy {
+          margin-top: 8px;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #64748b;
+      }
+      .cancel-dialog-body {
+          padding: 20px 22px 22px;
+      }
+      .cancel-dialog-summary {
+          display: grid;
+          gap: 12px;
+          padding: 16px;
+          border-radius: 18px;
+          background: #fff;
+          border: 1px solid rgba(30, 41, 59, 0.08);
+          box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+      }
+      .cancel-dialog-summary-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: flex-start;
+      }
+      .cancel-dialog-summary-label {
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #94a3b8;
+      }
+      .cancel-dialog-summary-value {
+          text-align: right;
+          font-size: 14px;
+          font-weight: 700;
+          color: #20343a;
+          max-width: 60%;
+          word-break: break-word;
+      }
+      .cancel-dialog-warning {
+          margin-top: 14px;
+          padding: 12px 14px;
+          border-radius: 14px;
+          background: #fff7ed;
+          border: 1px solid rgba(249, 115, 22, 0.18);
+          color: #9a3412;
+          font-size: 13px;
+          line-height: 1.55;
+          font-weight: 600;
+      }
+      .cancel-dialog-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          flex-wrap: wrap;
+          padding: 0 22px 22px;
+      }
+      html[data-theme="dark"] .cancel-appointment-btn {
+          background: #17171a !important;
+          color: #ffffff !important;
+          border-color: rgba(250, 204, 21, 0.14) !important;
+      }
+      html[data-theme="dark"] .cancel-appointment-btn:hover,
+      html[data-theme="dark"] .cancel-appointment-btn:focus-visible {
+          background: #8B0000 !important;
+          color: #facc15 !important;
+          border-color: #8B0000 !important;
+      }
+      html[data-theme="dark"] .cancel-appointment-btn.secondary {
+          background: #17171a !important;
+          color: #f8fafc !important;
+          border-color: rgba(250, 204, 21, 0.14) !important;
+      }
+      html[data-theme="dark"] .cancel-appointment-btn.secondary:hover,
+      html[data-theme="dark"] .cancel-appointment-btn.secondary:focus-visible {
+          background: #1f2937 !important;
+          color: #ffffff !important;
+      }
+      html[data-theme="dark"] .cancel-dialog {
+          background: linear-gradient(180deg, #0f0f10 0%, #161618 100%) !important;
+          border-color: rgba(250, 204, 21, 0.14) !important;
+      }
+      html[data-theme="dark"] .cancel-dialog-header {
+          background:
+              linear-gradient(135deg, rgba(139, 0, 0, 0.20) 0%, rgba(250, 204, 21, 0.12) 100%),
+              linear-gradient(180deg, #17171a 0%, #1c1c20 100%) !important;
+          border-bottom-color: rgba(250, 204, 21, 0.10) !important;
+      }
+      html[data-theme="dark"] .cancel-dialog-kicker {
+          background: rgba(250, 204, 21, 0.10) !important;
+          color: #facc15 !important;
+      }
+      html[data-theme="dark"] .cancel-dialog-title {
+          color: #ffffff !important;
+      }
+      html[data-theme="dark"] .cancel-dialog-copy,
+      html[data-theme="dark"] .cancel-dialog-summary-label {
+          color: #cbd5e1 !important;
+      }
+      html[data-theme="dark"] .cancel-dialog-summary {
+          background: #111113 !important;
+          border-color: rgba(250, 204, 21, 0.10) !important;
+      }
+      html[data-theme="dark"] .cancel-dialog-summary-value {
+          color: #f8fafc !important;
+      }
+      html[data-theme="dark"] .cancel-dialog-warning {
+          background: rgba(146, 64, 14, 0.20) !important;
+          border-color: rgba(250, 204, 21, 0.16) !important;
+          color: #fde68a !important;
       }
       
       .status-badge { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -676,6 +885,11 @@
       html[data-theme="dark"] .apt-card::before {
           background: #0f0f10 !important;
       }
+      @media (max-width: 980px) {
+          .history-summary-grid {
+              grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+      }
       @media (max-width: 680px) {
           .page-header {
               padding: 16px 16px;
@@ -721,6 +935,7 @@
         $pendingAppointments = $appointments->filter(fn ($appt) => strtolower((string) $appt->status) === 'pending')->count();
         $approvedAppointments = $appointments->filter(fn ($appt) => strtolower((string) $appt->status) === 'approved')->count();
         $completedAppointments = $appointments->filter(fn ($appt) => strtolower((string) $appt->status) === 'completed')->count();
+        $missedAppointments = $appointments->filter(fn ($appt) => strtolower((string) $appt->status) === 'missed')->count();
     @endphp
     <div class="container" style="padding-top: 5px; padding-bottom: 60px;">
       <div class="page-header">
@@ -767,6 +982,11 @@
             <span class="history-summary-value">{{ $completedAppointments }}</span>
             <div class="history-summary-note">Finished consultations on record.</div>
           </div>
+          <div class="history-summary-card">
+            <span class="history-summary-label">Missed</span>
+            <span class="history-summary-value">{{ $missedAppointments }}</span>
+            <div class="history-summary-note">Appointments marked as not attended.</div>
+          </div>
         </div>
 
         @if($appointments->isNotEmpty())
@@ -777,6 +997,7 @@
               <button type="button" class="history-filter-btn" data-filter="pending">Pending</button>
               <button type="button" class="history-filter-btn" data-filter="approved">Approved</button>
               <button type="button" class="history-filter-btn" data-filter="completed">Completed</button>
+              <button type="button" class="history-filter-btn" data-filter="missed">Missed</button>
               <button type="button" class="history-filter-btn" data-filter="cancelled">Cancelled</button>
             </div>
           </div>
@@ -820,14 +1041,22 @@
                   @endif
                   
                   <div class="apt-footer">
-                    <div style="display:flex; justify-content:flex-end; gap:8px">
+                    <div class="apt-footer-actions">
                       @if($appt->status == 'Pending' || $appt->status == 'Approved')
-                          <form action="{{ url('/student/appointments/' . $appt->id . '/cancel') }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
-                              @csrf
-                              <button type="submit" class="btn-outline" style="border-color:#8B0000; color:#8B0000; cursor:pointer;">
-                                  Cancel Appointment
-                              </button>
-                          </form>
+                          <button
+                              type="button"
+                              class="cancel-appointment-btn js-open-cancel-dialog"
+                              data-cancel-url="{{ url('/student/appointments/' . $appt->id . '/cancel') }}"
+                              data-cancel-service="{{ $appt->service }}"
+                              data-cancel-date="{{ \Carbon\Carbon::parse($appt->date)->format('M d, Y') }}"
+                              data-cancel-time="{{ \Carbon\Carbon::parse($appt->time)->format('g:i A') }}"
+                              data-cancel-name="{{ $appt->name }}"
+                          >
+                              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                  <path d="M12 8v4m0 4h.01M10.29 3.86l-7.3 12.71A2 2 0 0 0 4.7 19.5h14.6a2 2 0 0 0 1.71-2.93l-7.3-12.71a2 2 0 0 0-3.42 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                              Cancel Appointment
+                          </button>
                       @else
                           <span class="apt-action-note">No actions available</span>
                       @endif
@@ -862,6 +1091,44 @@
                 </div>
             @endforelse
         </div>
+
+        <div class="cancel-dialog-backdrop" id="cancelDialogBackdrop" aria-hidden="true">
+          <div class="cancel-dialog" role="dialog" aria-modal="true" aria-labelledby="cancelDialogTitle">
+            <div class="cancel-dialog-header">
+              <div class="cancel-dialog-kicker">Appointment Control</div>
+              <h2 class="cancel-dialog-title" id="cancelDialogTitle">Cancel appointment</h2>
+              <div class="cancel-dialog-copy">
+                Please review the appointment details before submitting the cancellation.
+              </div>
+            </div>
+            <div class="cancel-dialog-body">
+              <div class="cancel-dialog-summary">
+                <div class="cancel-dialog-summary-row">
+                  <span class="cancel-dialog-summary-label">Student</span>
+                  <span class="cancel-dialog-summary-value" id="cancelDialogName">-</span>
+                </div>
+                <div class="cancel-dialog-summary-row">
+                  <span class="cancel-dialog-summary-label">Service</span>
+                  <span class="cancel-dialog-summary-value" id="cancelDialogService">-</span>
+                </div>
+                <div class="cancel-dialog-summary-row">
+                  <span class="cancel-dialog-summary-label">Schedule</span>
+                  <span class="cancel-dialog-summary-value" id="cancelDialogSchedule">-</span>
+                </div>
+              </div>
+              <div class="cancel-dialog-warning">
+                Once cancelled, this appointment will move to your history as cancelled and you will need to book again if you still need the service.
+              </div>
+            </div>
+            <form method="POST" id="cancelDialogForm">
+              @csrf
+              <div class="cancel-dialog-actions">
+                <button type="button" class="cancel-appointment-btn secondary" id="cancelDialogClose">Keep Appointment</button>
+                <button type="submit" class="cancel-appointment-btn">Yes, Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
         
       </section>
     </div>
@@ -874,6 +1141,44 @@ document.addEventListener('DOMContentLoaded', function () {
     const cta = document.getElementById('emptyHistoryCta');
     const filterRow = document.getElementById('historyFilterRow');
     const historyCards = Array.from(document.querySelectorAll('.apt-card[data-history-status]'));
+    const cancelBackdrop = document.getElementById('cancelDialogBackdrop');
+    const cancelDialogForm = document.getElementById('cancelDialogForm');
+    const cancelDialogName = document.getElementById('cancelDialogName');
+    const cancelDialogService = document.getElementById('cancelDialogService');
+    const cancelDialogSchedule = document.getElementById('cancelDialogSchedule');
+    const cancelDialogTitle = document.getElementById('cancelDialogTitle');
+    const cancelDialogClose = document.getElementById('cancelDialogClose');
+    const cancelButtons = Array.from(document.querySelectorAll('.js-open-cancel-dialog'));
+    let lastFocusedElement = null;
+
+    const closeCancelDialog = function () {
+        if (!cancelBackdrop) {
+            return;
+        }
+
+        cancelBackdrop.classList.remove('is-open');
+        cancelBackdrop.setAttribute('aria-hidden', 'true');
+
+        if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+            lastFocusedElement.focus();
+        }
+    };
+
+    const openCancelDialog = function (button) {
+        if (!cancelBackdrop || !cancelDialogForm) {
+            return;
+        }
+
+        lastFocusedElement = button || document.activeElement;
+        cancelDialogForm.action = button.dataset.cancelUrl || '#';
+        cancelDialogName.textContent = button.dataset.cancelName || '-';
+        cancelDialogService.textContent = button.dataset.cancelService || '-';
+        cancelDialogSchedule.textContent = `${button.dataset.cancelDate || '-'} at ${button.dataset.cancelTime || '-'}`;
+        cancelDialogTitle.textContent = `Cancel ${button.dataset.cancelService || 'appointment'}`;
+        cancelBackdrop.classList.add('is-open');
+        cancelBackdrop.setAttribute('aria-hidden', 'false');
+        cancelDialogClose.focus();
+    };
 
     if (filterRow && historyCards.length) {
         const filterButtons = Array.from(filterRow.querySelectorAll('.history-filter-btn'));
@@ -894,6 +1199,30 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+
+    cancelButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            openCancelDialog(button);
+        });
+    });
+
+    if (cancelBackdrop) {
+        cancelBackdrop.addEventListener('click', function (event) {
+            if (event.target === cancelBackdrop) {
+                closeCancelDialog();
+            }
+        });
+    }
+
+    if (cancelDialogClose) {
+        cancelDialogClose.addEventListener('click', closeCancelDialog);
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && cancelBackdrop && cancelBackdrop.classList.contains('is-open')) {
+            closeCancelDialog();
+        }
+    });
 
     if (!emptyState || !cta) {
         return;

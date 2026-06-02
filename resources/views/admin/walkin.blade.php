@@ -2644,16 +2644,21 @@
     }
 
     .applicant-ref-instruction {
-        width: 100%;
-        max-width: 460px;
-        padding: 12px 14px;
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        max-width: 240px;
+        padding: 10px 13px;
         border-radius: 14px;
         background: #fff7ed;
         border: 1px solid #fed7aa;
         color: #9a3412;
-        font-size: 13px;
-        line-height: 1.55;
+        font-size: 11px;
+        line-height: 1.5;
+        z-index: 2;
+        box-shadow: 0 8px 18px rgba(180, 83, 9, 0.10);
     }
+    .applicant-ref-panel { position: relative; }
 
     .applicant-ref-instruction strong {
         display: block;
@@ -3087,8 +3092,8 @@
 
                 <div class="applicant-ref-panel" id="applicantRefEntry">
                     <div class="applicant-ref-instruction">
-                        <strong>Reference lookup</strong>
-                        Find the reference number in the Admission System.
+                        <strong>💡 Where to find it?</strong>
+                        The reference number is found in the <strong>Admission System</strong> — look under the applicant's profile or registration form.
                     </div>
                     <div class="applicant-ref-field">
                         <label for="applicantRefInput">Reference Number</label>

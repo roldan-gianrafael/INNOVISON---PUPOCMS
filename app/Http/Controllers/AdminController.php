@@ -2445,6 +2445,12 @@ public function inventorySummary()
             ->distinct('user_id')
             ->count('user_id');
         $failedEvents = (clone $query)->where('status_code', '>=', 400)->count();
+        $emergencyEvents = (clone $query)
+            ->where(function ($builder) {
+                $builder->where('action', 'like', '%Emergency Login%')
+                    ->orWhere('description', 'like', '%Emergency login%');
+            })
+            ->count();
 
         $roleBreakdown = (clone $query)
             ->selectRaw("COALESCE(NULLIF(user_role, ''), 'unknown') as role, COUNT(*) as total")
@@ -2486,6 +2492,7 @@ public function inventorySummary()
             'todayEvents',
             'uniqueActors',
             'failedEvents',
+            'emergencyEvents',
             'roleBreakdown',
             'moduleBreakdown',
             'roleOptions',

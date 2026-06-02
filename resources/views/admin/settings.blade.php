@@ -503,72 +503,143 @@
         transform: translateX(135%);
     }
 
+    /* ── Settings Modals — MA-style design ─────────────────────── */
     .modal-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        padding: 24px 16px;
-        background: rgba(15,23,42,0.34);
-        backdrop-filter: blur(8px);
-        z-index: 1000;
+        padding: clamp(12px, 2vw, 28px);
+        background: rgba(15, 23, 42, 0.52);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 1200;
         justify-content: center;
-        align-items: flex-start;
-        overflow-y: auto;
+        align-items: center;
     }
     .modal-box {
-        width: min(640px, 100%);
-        max-width: 96vw;
-        border-radius: 24px;
+        width: min(680px, 100%);
+        max-width: 100%;
+        height: min(860px, calc(100dvh - clamp(24px, 4vw, 56px)));
+        max-height: min(860px, calc(100dvh - clamp(24px, 4vw, 56px)));
+        border-radius: 22px;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
         background: #ffffff;
-        border: 1px solid rgba(148,163,184,0.16);
-        box-shadow: 0 26px 70px rgba(15,23,42,0.18);
+        border-left: 1px solid rgba(112, 19, 27, 0.12);
+        border-right: 1px solid rgba(112, 19, 27, 0.12);
+        border-top: 4px solid #66ff00;
+        border-bottom: 4px solid #70131B;
+        box-shadow: 0 26px 70px rgba(15, 23, 42, 0.22);
     }
+    /* Fixed header */
     .modal-head {
-        padding: 30px 32px 10px;
-        border-bottom: 1px solid rgba(148,163,184,0.14);
-        background: #ffffff;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: clamp(12px, 1.4vw, 18px) clamp(14px, 1.6vw, 22px);
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        flex: 0 0 auto;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        text-align: left;
     }
+    .modal-head-main {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+    .modal-head-badge {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+    }
+    .modal-head-copy { min-width: 0; }
     .modal-head h3 {
         margin: 0;
-        color: var(--stg-maroon);
-        font-size: 24px;
+        color: #ffffff !important;
+        font-size: clamp(15px, 1.4vw, 18px);
         font-weight: 900;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
     }
     .modal-head p {
-        margin: 8px auto 0;
-        color: var(--stg-muted);
-        font-size: 13px;
-        line-height: 1.6;
-        max-width: 420px;
+        margin: 3px 0 0;
+        color: rgba(255, 255, 255, 0.82) !important;
+        font-size: 12px;
+        line-height: 1.5;
     }
+    .modal-head .section-spot { display: none; }
+    .modal-head-close {
+        width: 38px; height: 38px; flex: 0 0 38px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        display: inline-flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: background .18s ease, transform .18s ease;
+    }
+    .modal-head-close:hover { background: rgba(255,255,255,0.24); transform: translateY(-1px); }
+    .modal-head-close svg { width: 16px; height: 16px; stroke-width: 2.2; }
+    /* Scrollable body */
     .modal-body {
-        padding: 22px 32px 28px;
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 22px 26px 10px;
+        min-height: 0;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
+    .modal-body::-webkit-scrollbar { display: none; }
+    /* Sticky footer */
     .modal-actions {
-        position: sticky;
-        bottom: 0;
+        flex: 0 0 auto;
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        padding: 14px 32px 28px;
-        background: #ffffff;
-        border-top: 1px solid rgba(148,163,184,0.14);
+        padding: 14px 26px 20px;
+        background: rgba(255, 255, 255, 0.96);
+        border-top: 1px solid rgba(112, 19, 27, 0.10);
+        backdrop-filter: blur(8px);
+    }
+    /* Form must also flex so body expands */
+    .modal-box > form,
+    .modal-box form {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
     }
     .btn-cancel {
-        padding: 11px 16px;
-        border-radius: 12px;
-        border: 1px solid rgba(127,0,0,0.10);
-        background: rgba(127,0,0,0.04);
-        color: var(--stg-maroon);
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(112, 19, 27, 0.18);
+        background: #f8fafc;
+        color: #334155;
         font-weight: 800;
+        font-size: 13px;
         cursor: pointer;
+        transition: background .18s ease, transform .18s ease;
     }
-    .modal-head .section-spot {
-        display: none;
-    }
+    .btn-cancel:hover { background: #e2e8f0; transform: translateY(-1px); }
+    /* Field styles with shadow */
     .modal-body .field-grid,
     .modal-body .field-grid.two,
     .modal-body .field-grid.three {
@@ -588,40 +659,55 @@
         transform: none;
         display: block;
         min-height: 0;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         padding: 0;
         border: none;
         border-radius: 0;
         background: transparent;
         box-shadow: none;
-        color: #5f6677;
-        font-size: 12px;
-        letter-spacing: 0.04em;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
     }
     .modal-body .field input,
     .modal-body .field select {
-        min-height: 56px;
-        padding: 14px 16px;
-        border-radius: 14px;
-        border: 1px solid #d7dde5;
-        background: #ffffff;
-        box-shadow: none;
-        transform: none !important;
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(112, 19, 27, 0.15);
+        background: linear-gradient(180deg, #ffffff, #fff8f6);
+        color: #111827;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.92),
+            0 2px 4px rgba(112, 19, 27, 0.04),
+            0 8px 16px rgba(112, 19, 27, 0.07);
+        transition: border-color .18s ease, box-shadow .2s ease, transform .18s ease;
+        outline: none;
     }
     .modal-body .field input:hover,
     .modal-body .field select:hover {
-        border-color: #c4ccd6;
-        box-shadow: none;
+        border-color: rgba(112, 19, 27, 0.28);
     }
     .modal-body .field input:focus,
     .modal-body .field select:focus {
-        border-color: var(--stg-maroon);
-        box-shadow: 0 0 0 4px rgba(127,0,0,0.10);
-        transform: none !important;
+        border-color: #70131B;
+        transform: translateY(-1px);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.92),
+            0 0 0 3px rgba(112, 19, 27, 0.08),
+            0 10px 22px rgba(112, 19, 27, 0.10);
     }
     .modal-body .field input:disabled {
         background: #f8fafc;
         color: #64748b;
+        border-color: #e2e8f0;
+        box-shadow: none;
+        transform: none;
     }
     .modal-body .field-help {
         margin: 8px 0 0;
@@ -813,23 +899,38 @@
         color: #c9aab3;
     }
     html[data-theme="dark"] .modal-overlay {
-        background: rgba(5, 2, 4, 0.62);
+        background: rgba(5, 2, 4, 0.68);
     }
     html[data-theme="dark"] .modal-box {
-        background: linear-gradient(180deg, rgba(43, 17, 25, 0.98), rgba(28, 10, 16, 0.98));
-        border-color: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 34px 90px rgba(0,0,0,0.34);
+        background: rgba(15, 23, 42, 0.98);
+        border-top-color: #facc15;
+        border-bottom-color: #facc15;
+        border-left-color: rgba(143, 34, 48, 0.36);
+        border-right-color: rgba(143, 34, 48, 0.36);
+        box-shadow: 0 34px 90px rgba(0,0,0,0.42);
     }
-    html[data-theme="dark"] .modal-head,
+    html[data-theme="dark"] .modal-head {
+        background: #4d0d17;
+        border-bottom-color: rgba(250, 204, 21, 0.2);
+    }
     html[data-theme="dark"] .modal-actions {
-        background: rgba(43, 17, 25, 0.98);
-        border-color: rgba(255, 255, 255, 0.08);
+        background: rgba(15, 23, 42, 0.96);
+        border-top-color: rgba(250, 204, 21, 0.14);
     }
-    html[data-theme="dark"] .modal-head h3 {
-        color: #ffd7df;
+    html[data-theme="dark"] .modal-body .field input,
+    html[data-theme="dark"] .modal-body .field select {
+        background: rgba(17, 24, 39, 0.88);
+        color: #f8fafc;
+        border-color: rgba(148, 163, 184, 0.22);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 2px 4px rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.18);
     }
-    html[data-theme="dark"] .modal-head p {
-        color: #d7b3bc;
+    html[data-theme="dark"] .modal-body .field input:focus,
+    html[data-theme="dark"] .modal-body .field select:focus {
+        border-color: #facc15;
+        box-shadow: 0 0 0 3px rgba(250,204,21,0.12), 0 10px 24px rgba(0,0,0,0.22);
+    }
+    html[data-theme="dark"] .modal-body .field label {
+        color: #94a3b8;
     }
     html[data-theme="dark"] .btn-cancel {
         background: rgba(255,255,255,0.06);
@@ -1054,9 +1155,16 @@
     <div id="clinicInfoModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-head">
-                <div class="section-spot">Clinic Data</div>
-                <h3>Edit Clinic Information</h3>
-                <p>Update the clinic identity details shown across the system.</p>
+                <div class="modal-head-main">
+                    <div class="modal-head-badge">CI</div>
+                    <div class="modal-head-copy">
+                        <h3>Edit Clinic Information</h3>
+                        <p>Update the clinic identity details shown across the system.</p>
+                    </div>
+                </div>
+                <button type="button" class="modal-head-close" onclick="closeSettingsModal('clinicInfoModal')" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
             </div>
             <form action="{{ url('/admin/settings/update') }}" method="POST">
                 @csrf @method('PUT')
@@ -1083,9 +1191,16 @@
     <div id="clinicHoursModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-head">
-                <div class="section-spot">Clinic Schedule</div>
-                <h3>Edit Clinic Hours</h3>
-                <p>Update the daily opening and closing schedule for the clinic.</p>
+                <div class="modal-head-main">
+                    <div class="modal-head-badge">CH</div>
+                    <div class="modal-head-copy">
+                        <h3>Edit Clinic Hours</h3>
+                        <p>Update the daily opening and closing schedule for the clinic.</p>
+                    </div>
+                </div>
+                <button type="button" class="modal-head-close" onclick="closeSettingsModal('clinicHoursModal')" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
             </div>
             <form action="{{ url('/admin/settings/update') }}" method="POST">
                 @csrf @method('PUT')
@@ -1112,9 +1227,16 @@
     <div id="profileModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-head">
-                <div class="section-spot">Edit Admin</div>
-                <h3>Edit Profile</h3>
-                <p>Keep your admin identity and clinic contact details aligned with the hub record.</p>
+                <div class="modal-head-main">
+                    <div class="modal-head-badge">PR</div>
+                    <div class="modal-head-copy">
+                        <h3>Edit Profile</h3>
+                        <p>Keep your admin identity and clinic contact details aligned with the hub record.</p>
+                    </div>
+                </div>
+                <button type="button" class="modal-head-close" onclick="closeProfileModal()" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
             </div>
 
             <form action="{{ url('/admin/profile/update') }}" method="POST">

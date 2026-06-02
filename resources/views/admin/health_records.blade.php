@@ -1109,6 +1109,180 @@
         }
 
     }
+
+    /* ── Health Records — Medical Assessment Modal ───────────── */
+    .hr-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1300;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(12px, 2vw, 28px);
+        background: rgba(15, 23, 42, 0.52);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    .hr-modal-backdrop.show { display: flex; }
+    .hr-modal-shell {
+        width: min(520px, 100%);
+        max-height: calc(100dvh - clamp(24px, 4vw, 56px));
+        border-radius: 24px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255,255,255,0.96);
+        border-left: 1px solid rgba(112,19,27,0.12);
+        border-right: 1px solid rgba(112,19,27,0.12);
+        border-top: 4px solid #66ff00;
+        border-bottom: 4px solid #70131B;
+        box-shadow: 0 26px 60px rgba(15,23,42,0.22);
+    }
+    .hr-modal-shell.hr-ma-shell { width: min(880px, 100%); }
+    .hr-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: clamp(12px,1.4vw,18px) clamp(14px,1.6vw,22px);
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        border-bottom: 1px solid rgba(255,255,255,0.12);
+        flex: 0 0 auto;
+    }
+    .hr-modal-head-main { display:flex; align-items:center; gap:14px; min-width:0; flex:1 1 auto; }
+    .hr-modal-head-badge {
+        width:44px; height:44px; flex:0 0 44px; border-radius:14px;
+        display:inline-flex; align-items:center; justify-content:center;
+        background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.24);
+        color:#ffffff; font-size:12px; font-weight:900; letter-spacing:.06em;
+    }
+    .hr-modal-head h3 { margin:0; color:#ffffff !important; font-size:clamp(15px,1.4vw,18px); font-weight:900; }
+    .hr-modal-head p  { margin:3px 0 0; color:rgba(255,255,255,0.82) !important; font-size:12px; line-height:1.5; }
+    .hr-modal-close {
+        width:38px; height:38px; flex:0 0 38px; border-radius:999px;
+        border:1px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.12);
+        color:#ffffff; display:inline-flex; align-items:center; justify-content:center;
+        cursor:pointer; transition:background .18s ease, transform .18s ease;
+    }
+    .hr-modal-close:hover { background:rgba(255,255,255,0.26); transform:translateY(-1px); }
+    .hr-modal-close svg { width:16px; height:16px; stroke-width:2.2; }
+    .hr-modal-body {
+        flex:1 1 auto; overflow-y:auto; padding:24px;
+        min-height:0; scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .hr-modal-body::-webkit-scrollbar { display:none; }
+    /* Default pane */
+    .hr-ref-default {
+        display:flex; flex-direction:column;
+        align-items:center; text-align:center; gap:16px; padding:8px 0;
+    }
+    .hr-ref-default h4 { margin:0; font-size:20px; font-weight:900; color:#111827; }
+    .hr-ref-default p  { margin:0; font-size:13px; color:#64748b; line-height:1.55; max-width:360px; }
+    /* Entry pane */
+    .hr-ref-entry { display:none; position:relative; }
+    .hr-ref-entry.is-visible { display:block; }
+    .hr-ref-tip {
+        position:absolute; top:0; right:0;
+        max-width:210px; padding:10px 12px;
+        border-radius:14px; background:#fff7ed;
+        border:1px solid #fed7aa; color:#9a3412;
+        font-size:11px; line-height:1.5;
+        box-shadow:0 8px 18px rgba(180,83,9,0.10);
+    }
+    .hr-ref-tip strong { display:block; margin-bottom:3px; font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; }
+    .hr-ref-label { font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:#475569; margin-bottom:6px; display:block; }
+    .hr-ref-input {
+        width:100%; min-height:52px; padding:14px 16px;
+        border:1px solid rgba(112,19,27,0.18); border-radius:14px;
+        background:linear-gradient(180deg,#ffffff,#fff8f6); color:#111827;
+        font-size:14px; font-weight:700; outline:none;
+        box-shadow:0 8px 18px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+        transition:border-color .18s ease, box-shadow .18s ease;
+        margin-bottom:10px;
+    }
+    .hr-ref-input:focus { border-color:#70131B; box-shadow:0 0 0 3px rgba(112,19,27,0.08), 0 8px 18px rgba(15,23,42,0.08); }
+    .hr-ref-status { margin:8px 0; padding:10px 12px; border-radius:10px; font-size:12px; font-weight:700; display:none; }
+    .hr-ref-status.info    { display:block; background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; }
+    .hr-ref-status.success { display:block; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; }
+    .hr-ref-status.error   { display:block; background:#fff1f2; border:1px solid #fecdd3; color:#be123c; }
+    .hr-ref-actions { display:flex; gap:10px; margin-top:12px; }
+    .hr-btn {
+        flex:1; min-height:46px; border-radius:999px; padding:0 18px;
+        font-size:13px; font-weight:900; cursor:pointer;
+        border:1px solid transparent; display:inline-flex;
+        align-items:center; justify-content:center; gap:8px;
+        transition:transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+    .hr-btn:hover { transform:translateY(-1px); }
+    .hr-btn-cancel { background:#f1f5f9; color:#334155; border-color:#cbd5e1; }
+    .hr-btn-cancel:hover { background:#e2e8f0; }
+    .hr-btn-primary {
+        background:linear-gradient(135deg,#70131B,#8f2230);
+        color:#ffffff; border-color:#8f2230;
+        box-shadow:0 10px 22px rgba(112,19,27,0.22);
+    }
+    .hr-btn-primary:hover { background:#facc15; color:#111827; border-color:#facc15; }
+    .hr-btn-toggle {
+        background:#ffffff; color:#70131B; border-color:rgba(112,19,27,0.18);
+        box-shadow:0 6px 14px rgba(15,23,42,0.06);
+    }
+    .hr-btn-toggle:hover { border-color:rgba(112,19,27,0.32); }
+    /* MA form inside modal */
+    .hr-ma-section {
+        margin-bottom:14px; padding:16px 18px; border-radius:16px;
+        border:1px solid rgba(112,19,27,0.12);
+        background:linear-gradient(180deg,#ffffff,#f8fafc);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 20px rgba(15,23,42,0.05);
+    }
+    .hr-ma-section-title {
+        margin:0 0 14px; font-size:12px; font-weight:900;
+        text-transform:uppercase; letter-spacing:.08em; color:#70131B;
+        display:flex; align-items:center; gap:8px;
+    }
+    .hr-ma-section-num {
+        width:26px; height:26px; border-radius:999px;
+        background:#fff1f2; border:1px solid #fecdd3;
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:11px; font-weight:900; color:#70131B; flex:0 0 auto;
+    }
+    .hr-ma-grid   { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .hr-ma-grid-3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .hr-ma-grid-4 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .hr-ma-grid-1 { display:grid; grid-template-columns:1fr; gap:12px; }
+    .hr-ma-field  { display:flex; flex-direction:column; gap:5px; }
+    .hr-ma-label  { font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:#64748b; }
+    .hr-ma-control {
+        width:100%; min-height:44px; padding:10px 14px;
+        border:1px solid rgba(112,19,27,0.15); border-radius:12px;
+        background:linear-gradient(180deg,#ffffff,#fff8f6); color:#111827;
+        font-size:13px; font-weight:700; outline:none;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.92), 0 2px 4px rgba(112,19,27,0.04), 0 8px 16px rgba(112,19,27,0.07);
+        transition:border-color .18s ease, box-shadow .2s ease, transform .18s ease;
+    }
+    .hr-ma-control:focus { border-color:#70131B; transform:translateY(-1px); box-shadow:inset 0 1px 0 rgba(255,255,255,0.92), 0 0 0 3px rgba(112,19,27,0.08), 0 10px 24px rgba(112,19,27,0.12); }
+    .hr-ma-control[readonly] { background:#f8fafc; color:#64748b; border-color:#e2e8f0; }
+    textarea.hr-ma-control { min-height:96px; resize:vertical; line-height:1.55; }
+    .hr-ma-radio-group { display:flex; gap:8px; flex-wrap:wrap; }
+    .hr-ma-radio {
+        display:inline-flex; align-items:center; gap:6px; min-height:40px;
+        padding:0 14px; border-radius:999px; background:#f8fafc;
+        border:1px solid #e2e8f0; color:#334155; font-size:12px; font-weight:900; cursor:pointer;
+    }
+    .hr-ma-radio input { accent-color:#70131B; }
+    .hr-ma-required { display:inline-flex; align-items:center; padding:2px 7px; border-radius:999px; background:#fff1f2; border:1px solid #fecdd3; color:#be123c; font-size:9px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; margin-left:5px; }
+    .hr-ma-actions { display:flex; justify-content:flex-end; gap:10px; padding:14px 0 4px; border-top:1px solid rgba(112,19,27,0.10); margin-top:6px; }
+    @media (max-width:640px) {
+        .hr-ma-grid, .hr-ma-grid-3, .hr-ma-grid-4 { grid-template-columns:1fr; }
+    }
+    html[data-theme="dark"] .hr-modal-shell { background:rgba(15,23,42,0.98); border-top-color:#facc15; border-bottom-color:#facc15; }
+    html[data-theme="dark"] .hr-modal-head { background:#4d0d17; }
+    html[data-theme="dark"] .hr-ma-section { background:linear-gradient(180deg,rgba(17,24,39,0.96),rgba(15,23,42,0.94)); border-color:rgba(250,204,21,0.14); }
+    html[data-theme="dark"] .hr-ma-control { background:rgba(17,24,39,0.88); color:#f8fafc; border-color:rgba(148,163,184,0.22); }
+    html[data-theme="dark"] .hr-ma-label { color:#94a3b8; }
+    html[data-theme="dark"] .hr-ref-input { background:rgba(30,41,59,0.9); color:#f1f5f9; border-color:rgba(148,163,184,0.24); }
+    html[data-theme="dark"] .hr-ref-default h4, html[data-theme="dark"] .hr-ref-default p { color:#f1f5f9; }
+    html[data-theme="dark"] .hr-ma-radio { background:rgba(17,24,39,0.86); color:#f8fafc; border-color:rgba(148,163,184,0.18); }
+
 </style>
 @endpush
 
@@ -1161,12 +1335,12 @@
             </div>
         </div>
         <div class="summary-item">
-            <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="summary-medical-assessment-btn card p-3">
+            <button type="button" id="openHrMedicalModal" class="summary-medical-assessment-btn card p-3" style="border:none;cursor:pointer;text-align:left;">
                 <div class="health-summary-row">
                     <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Medical</span><span>Assessment</span></small>
-                    <h3 class="fw-bold mb-0 health-summary-value"><x-outline-icon name="qr-code" /></h3>
+                    <h3 class="fw-bold mb-0 health-summary-value"><x-outline-icon name="clipboard-document-list" /></h3>
                 </div>
-            </a>
+            </button>
         </div>
     </div>
 
@@ -1381,6 +1555,180 @@
         </form>
     </div>
 </div>
+{{-- Medical Assessment entry modal --}}
+<div class="hr-modal-backdrop" id="hrMedicalModal">
+    <div class="hr-modal-shell">
+        <div class="hr-modal-head">
+            <div class="hr-modal-head-main">
+                <div class="hr-modal-head-badge">MA</div>
+                <div>
+                    <h3>Medical Assessment</h3>
+                    <p>Open the assessment form directly or look up by reference number.</p>
+                </div>
+            </div>
+            <button type="button" class="hr-modal-close" id="closeHrMedicalModal" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="hr-modal-body">
+            {{-- Default pane --}}
+            <div class="hr-ref-default" id="hrRefDefault">
+                <div>
+                    <p style="margin:0 0 4px; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:#8b0000;">Proceed</p>
+                    <h4>Medical Assessment</h4>
+                    <p>Open the Medical Assessment form for the applicant, or enter a reference number to look them up first.</p>
+                </div>
+                <button type="button" id="hrBtnOpenAssessment" class="hr-btn hr-btn-primary" style="width:100%; max-width:360px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:18px;height:18px;stroke-width:2;flex:0 0 auto;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                    </svg>
+                    Go to Medical Assessment
+                </button>
+                <button type="button" id="hrBtnShowRef" class="hr-btn hr-btn-toggle" style="width:100%; max-width:360px;">
+                    Input Reference Number
+                </button>
+            </div>
+
+            {{-- Entry pane --}}
+            <div class="hr-ref-entry" id="hrRefEntry">
+                <div class="hr-ref-tip">
+                    <strong>💡 Where to find it?</strong>
+                    Reference number is in the <strong>Admission System</strong> under the applicant's profile or registration form.
+                </div>
+                <label class="hr-ref-label" for="hrRefInput" style="margin-top:8px;">Reference Number</label>
+                <input type="text" id="hrRefInput" class="hr-ref-input" placeholder="e.g. 2024-00001 or Student No." autocomplete="off">
+                <div id="hrRefStatus" class="hr-ref-status"></div>
+                <div class="hr-ref-actions">
+                    <button type="button" id="hrBtnCancelRef" class="hr-btn hr-btn-cancel">Cancel</button>
+                    <button type="button" id="hrBtnFind" class="hr-btn hr-btn-primary">Find</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- MA fillable form modal --}}
+<div class="hr-modal-backdrop" id="hrAssessmentModal">
+    <div class="hr-modal-shell hr-ma-shell">
+        <div class="hr-modal-head">
+            <div class="hr-modal-head-main">
+                <div class="hr-modal-head-badge">MA</div>
+                <div>
+                    <h3>Medical Assessment</h3>
+                    <p id="hrMaSubtitle">Recording assessment for applicant.</p>
+                </div>
+            </div>
+            <button type="button" class="hr-modal-close" id="closeHrAssessmentModal" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="hr-modal-body">
+            <form id="hrAssessmentForm" method="POST" action="#">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="PUT">
+
+                {{-- 00: Applicant Identity --}}
+                <div class="hr-ma-section" style="border-color:rgba(29,78,216,0.18);background:linear-gradient(180deg,#eff6ff,#f0f9ff);">
+                    <p class="hr-ma-section-title" style="color:#1d4ed8;">
+                        <span class="hr-ma-section-num" style="background:#dbeafe;border-color:#bfdbfe;color:#1d4ed8;">ID</span>
+                        Applicant Information
+                        <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:none;letter-spacing:0;">— Email used to merge record on registration</span>
+                    </p>
+                    <div class="hr-ma-grid-4" style="margin-bottom:12px;">
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">First Name <span class="hr-ma-required">Required</span></label>
+                            <input type="text" name="ma_first_name" class="hr-ma-control" placeholder="First name" required>
+                        </div>
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">Middle Name</label>
+                            <input type="text" name="ma_middle_name" class="hr-ma-control" placeholder="Middle name">
+                        </div>
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">Last Name <span class="hr-ma-required">Required</span></label>
+                            <input type="text" name="ma_last_name" class="hr-ma-control" placeholder="Last name" required>
+                        </div>
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">Suffix</label>
+                            <input type="text" name="ma_suffix" class="hr-ma-control" placeholder="e.g. Jr.">
+                        </div>
+                    </div>
+                    <div class="hr-ma-grid-1">
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">Email Address <span class="hr-ma-required">Required</span></label>
+                            <input type="email" name="ma_email" class="hr-ma-control" placeholder="applicant@email.com" required style="border-color:rgba(29,78,216,0.28);">
+                            <span style="margin-top:4px;font-size:11px;color:#3b82f6;font-weight:700;">Used to link record when the applicant registers.</span>
+                        </div>
+                    </div>
+                    <div class="hr-ma-grid-1" style="margin-top:12px;">
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">Reference Number</label>
+                            <input type="text" name="ma_reference_number" id="hrMaReference" class="hr-ma-control" placeholder="Auto-filled from lookup" readonly style="background:#f8fafc;color:#64748b;">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 01: Assessment Context --}}
+                <div class="hr-ma-section">
+                    <p class="hr-ma-section-title"><span class="hr-ma-section-num">01</span> Assessment Context</p>
+                    <div class="hr-ma-grid">
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">Assessment Date</label>
+                            <input type="date" name="assessment_date" id="hrMaDate" class="hr-ma-control" required>
+                        </div>
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">Date of Birth</label>
+                            <input type="text" id="hrMaDob" class="hr-ma-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 02: Vitals --}}
+                <div class="hr-ma-section">
+                    <p class="hr-ma-section-title"><span class="hr-ma-section-num">02</span> Vitals</p>
+                    <div class="hr-ma-grid-3">
+                        <div class="hr-ma-field"><label class="hr-ma-label">Height</label><input type="text" name="height" class="hr-ma-control" placeholder="e.g. 164 cm"></div>
+                        <div class="hr-ma-field"><label class="hr-ma-label">Weight</label><input type="text" name="weight" class="hr-ma-control" placeholder="e.g. 52 kg"></div>
+                        <div class="hr-ma-field"><label class="hr-ma-label">Blood Pressure</label><input type="text" name="blood_pressure" class="hr-ma-control" placeholder="e.g. 120/80"></div>
+                        <div class="hr-ma-field"><label class="hr-ma-label">Respiratory Rate</label><input type="text" name="respiratory_rate" class="hr-ma-control" placeholder="e.g. 18"></div>
+                        <div class="hr-ma-field"><label class="hr-ma-label">Temperature</label><input type="text" name="temperature" class="hr-ma-control" placeholder="e.g. 36.8 C"></div>
+                        <div class="hr-ma-field">
+                            <label class="hr-ma-label">Covid Positive?</label>
+                            <div class="hr-ma-radio-group">
+                                <label class="hr-ma-radio"><input type="radio" name="covid_positive" value="Yes"> Yes</label>
+                                <label class="hr-ma-radio"><input type="radio" name="covid_positive" value="No" checked> No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 03: Document Review --}}
+                <div class="hr-ma-section">
+                    <p class="hr-ma-section-title"><span class="hr-ma-section-num">03</span> Document Review</p>
+                    <div class="hr-ma-grid">
+                        <div class="hr-ma-field"><label class="hr-ma-label">Medical Certificate Issued By</label><input type="text" name="medical_certificate_issued_by" class="hr-ma-control" placeholder="Doctor name"></div>
+                        <div class="hr-ma-field"><label class="hr-ma-label">Date Issued</label><input type="date" name="medical_certificate_issued_at" class="hr-ma-control"></div>
+                        <div class="hr-ma-field"><label class="hr-ma-label">Chest X-ray Result</label><input type="text" name="chest_xray_result_text" class="hr-ma-control" placeholder="e.g. Normal / With findings"></div>
+                        <div class="hr-ma-field"><label class="hr-ma-label">X-ray Date</label><input type="date" name="chest_xray_date" class="hr-ma-control"></div>
+                    </div>
+                </div>
+
+                {{-- 04: Remarks --}}
+                <div class="hr-ma-section">
+                    <p class="hr-ma-section-title"><span class="hr-ma-section-num">04</span> Clinical Remarks</p>
+                    <div class="hr-ma-grid-1">
+                        <div class="hr-ma-field"><label class="hr-ma-label">Remarks</label><textarea name="assessment_remarks" class="hr-ma-control" rows="4" placeholder="Enter assessment remarks..."></textarea></div>
+                    </div>
+                </div>
+
+                <div class="hr-ma-actions">
+                    <button type="button" id="hrBtnCancelAssessment" class="hr-btn hr-btn-cancel">Cancel</button>
+                    <button type="submit" class="hr-btn hr-btn-primary">Save Assessment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -1690,6 +2038,110 @@
                 window.clearInterval(healthLivePollTimer);
             }
         }, { once: true });
+    })();
+
+    // ── Health Records Medical Assessment Modal ──────────────────
+    (function () {
+        const openTrigger   = document.getElementById('openHrMedicalModal');
+        const modal1        = document.getElementById('hrMedicalModal');
+        const modal2        = document.getElementById('hrAssessmentModal');
+        const closeModal1   = document.getElementById('closeHrMedicalModal');
+        const closeModal2   = document.getElementById('closeHrAssessmentModal');
+        const cancelAssess  = document.getElementById('hrBtnCancelAssessment');
+        const defaultPane   = document.getElementById('hrRefDefault');
+        const entryPane     = document.getElementById('hrRefEntry');
+        const btnOpenAssess = document.getElementById('hrBtnOpenAssessment');
+        const btnShowRef    = document.getElementById('hrBtnShowRef');
+        const btnCancelRef  = document.getElementById('hrBtnCancelRef');
+        const btnFind       = document.getElementById('hrBtnFind');
+        const refInput      = document.getElementById('hrRefInput');
+        const refStatus     = document.getElementById('hrRefStatus');
+        const hrMaSubtitle  = document.getElementById('hrMaSubtitle');
+        const hrMaReference = document.getElementById('hrMaReference');
+        const hrMaDate      = document.getElementById('hrMaDate');
+        const hrForm        = document.getElementById('hrAssessmentForm');
+        const getStudentUrl = '{{ url($basePrefix . "/walkin/get-student") }}';
+
+        function setStatus(type, msg) {
+            if (!refStatus) return;
+            refStatus.className = 'hr-ref-status ' + type;
+            refStatus.textContent = msg;
+        }
+
+        function showDefaultPane() {
+            if (defaultPane) defaultPane.style.display = 'flex';
+            if (entryPane)   entryPane.classList.remove('is-visible');
+            if (refStatus)   { refStatus.className = 'hr-ref-status'; refStatus.textContent = ''; }
+        }
+
+        function showEntryPane() {
+            if (defaultPane) defaultPane.style.display = 'none';
+            if (entryPane)   entryPane.classList.add('is-visible');
+            setTimeout(() => { if (refInput) refInput.focus(); }, 0);
+        }
+
+        function openAssessmentModal(refNumber, patientName) {
+            if (hrMaDate && !hrMaDate.value) {
+                hrMaDate.value = new Date().toISOString().split('T')[0];
+            }
+            if (hrMaReference) hrMaReference.value = refNumber || '';
+            if (hrMaSubtitle) {
+                hrMaSubtitle.textContent = patientName
+                    ? 'Recording assessment for ' + patientName + '.'
+                    : 'Recording assessment for applicant.';
+            }
+            if (modal1) modal1.classList.remove('show');
+            if (modal2) modal2.classList.add('show');
+        }
+
+        function doFind() {
+            const ref = (refInput ? refInput.value : '').trim();
+            if (!ref) { setStatus('error', 'Please enter a reference number first.'); return; }
+
+            setStatus('info', 'Looking up applicant...');
+
+            fetch(`${getStudentUrl}?student_id=${encodeURIComponent(ref)}&preview_only=true`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'preview' || data.status === 'found') {
+                    const name = data.student_name || '';
+                    setStatus('success', name ? 'Patient found: ' + name + '. Proceed to assessment.' : 'Patient found. Proceed to assessment.');
+
+                    // Also fetch the profile ID for the form action
+                    fetch(`${getStudentUrl}?student_id=${encodeURIComponent(ref)}&intake_target=assessment`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                    })
+                    .then(r2 => r2.json())
+                    .then(d2 => {
+                        if (d2.redirect_url && hrForm) {
+                            const match = d2.redirect_url.match(/\/health-profile\/(\d+)\/medical-assessment/);
+                            if (match) hrForm.action = '/health-profile/' + match[1] + '/medical-assessment';
+                        }
+                        openAssessmentModal(ref, name);
+                    })
+                    .catch(() => openAssessmentModal(ref, name));
+                } else {
+                    setStatus('error', data.message || 'No applicant found with that reference number.');
+                }
+            })
+            .catch(() => setStatus('error', 'Unable to look up right now. Please try again.'));
+        }
+
+        if (openTrigger) openTrigger.addEventListener('click', function () {
+            if (modal1) { modal1.classList.add('show'); showDefaultPane(); }
+        });
+        if (closeModal1) closeModal1.addEventListener('click', function () { if (modal1) modal1.classList.remove('show'); });
+        if (closeModal2) closeModal2.addEventListener('click', function () { if (modal2) modal2.classList.remove('show'); });
+        if (cancelAssess) cancelAssess.addEventListener('click', function () { if (modal2) modal2.classList.remove('show'); });
+        if (btnOpenAssess) btnOpenAssess.addEventListener('click', function () { openAssessmentModal('', ''); });
+        if (btnShowRef) btnShowRef.addEventListener('click', showEntryPane);
+        if (btnCancelRef) btnCancelRef.addEventListener('click', showDefaultPane);
+        if (btnFind) btnFind.addEventListener('click', doFind);
+        if (refInput) refInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); doFind(); } });
+        if (modal1) modal1.addEventListener('click', function (e) { if (e.target === modal1) { modal1.classList.remove('show'); } });
+        if (modal2) modal2.addEventListener('click', function (e) { if (e.target === modal2) { modal2.classList.remove('show'); } });
     })();
 
 </script>

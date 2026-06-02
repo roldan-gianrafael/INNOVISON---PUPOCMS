@@ -9,10 +9,12 @@
         :root {
             --accent: #8B0000;      /* PUP Maroon */
             --accent-dark: #600000;
+            --accent-gold: #facc15;
             --white: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --text-dark: #20343a;
-            --text-light: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.96);
+            --glass-border: rgba(255, 255, 255, 0.42);
+            --text-dark: #12202b;
+            --text-light: #667085;
             --error-bg: #fee2e2;
             --error-text: #b91c1c;
         }
@@ -30,13 +32,35 @@
 
         /* --- 2. LOGO HEADER --- */
         .logo-header {
-            background-color: var(--accent);
-            padding: 16px 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            background: rgba(91, 0, 0, 0.92);
+            padding: 18px 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.22);
             display: flex;
             justify-content: center;
             position: relative;
             z-index: 10;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+        .logo-header::after,
+        .login-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, transparent 35%, rgba(250, 204, 21, 0.18) 50%, transparent 65%);
+            transform: translateX(-140%);
+            pointer-events: none;
+        }
+        .logo-header::after { animation: headerSweep 4s ease-in-out infinite; }
+        .login-hero::after { animation: headerSweep 4s ease-in-out infinite; }
+        .logo-header::after,
+        .login-hero::after {
+            z-index: 0;
+        }
+        .logo-header > *,
+        .login-hero > * {
+            position: relative;
+            z-index: 1;
         }
         .logo-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-icon { width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; }
@@ -51,25 +75,97 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 28px 16px;
             text-align: center;
             width: 100%;
         }
 
-        /* Login Box Styling */
         .login-box {
-            background: var(--glass-bg);
-            padding: 40px;
-            border-radius: 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(248,250,252,0.95));
+            padding: 34px;
+            border-radius: 26px;
             width: 100%;
-            max-width: 420px;
+            max-width: 520px;
             color: var(--text-dark);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            animation: slideUp 0.8s ease-out;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 28px 70px rgba(0,0,0,0.35);
+            animation: slideUp 0.7s ease-out;
+            overflow: hidden;
         }
 
-        .login-box h2 { color: var(--accent); font-weight: 800; margin-bottom: 8px; }
-        .login-box p { color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
+        .login-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 22px 22px 20px;
+            margin: -34px -34px 24px;
+            background: linear-gradient(135deg, rgba(91,0,0,0.98), rgba(127,29,29,0.98) 55%, rgba(168,18,18,0.98));
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        .login-hero-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .login-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(250, 204, 21, 0.14);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            color: #fff7cc;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .login-hero-badge span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.15);
+        }
+        .login-box h2 {
+            color: #fff;
+            font-weight: 900;
+            font-size: 32px;
+            line-height: 1.05;
+            margin-bottom: 10px;
+        }
+        .login-box p {
+            color: rgba(255,255,255,0.88);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 0;
+            max-width: 44ch;
+        }
+        .login-box p.login-hero-copy {
+            max-width: 100%;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .login-subline {
+            margin-top: 14px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .login-chip {
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.16);
+            color: rgba(255,255,255,0.9);
+            font-size: 11px;
+            font-weight: 700;
+        }
 
         /* Error Alert Styling */
         .alert-error {
@@ -86,31 +182,94 @@
 
         /* Form Elements */
         .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 6px; letter-spacing: 0.5px; }
-        .form-group input, .form-group select {
-            width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; transition: border 0.3s;
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 900;
+            color: #7a1b1b;
+            margin-bottom: 6px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
-        .form-group input:focus { outline: none; border-color: var(--accent); }
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            stroke: #8b0000;
+            stroke-width: 2;
+            pointer-events: none;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid rgba(139, 0, 0, 0.18);
+            border-radius: 14px;
+            font-size: 14px;
+            background: linear-gradient(180deg, #ffffff, #fff8f6);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .input-wrap .form-control,
+        .input-wrap input {
+            padding-left: 44px;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .mini-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        .btn-submit {
-            width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
-            border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.3s;
+        .login-box form .btn-submit,
+        .idp-login-wrap .btn-submit {
+            width: 100%;
+            min-height: 52px;
+            padding: 14px;
+            background: linear-gradient(135deg, #5e0000, #8b0000 60%, #a61b1b);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 16px 26px rgba(91,0,0,0.24);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease, background 0.18s ease, color 0.18s ease;
         }
-        .btn-submit:hover { background: var(--accent-dark); transform: translateY(-2px); }
+        .login-box form .btn-submit:hover,
+        .login-box form .btn-submit:focus,
+        .idp-login-wrap .btn-submit:hover,
+        .idp-login-wrap .btn-submit:focus {
+            background: var(--accent-gold);
+            color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 20px 32px rgba(91,0,0,0.28);
+            filter: brightness(1.02);
+        }
+        .login-box form .btn-submit:hover svg,
+        .login-box form .btn-submit:focus svg,
+        .idp-login-wrap .btn-submit:hover svg,
+        .idp-login-wrap .btn-submit:focus svg {
+            stroke: var(--accent);
+        }
 
         .idp-login-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 18px;
         }
         .idp-login-note {
             font-size: 13px;
             color: var(--text-light);
-            max-width: 320px;
+            max-width: 360px;
             margin: 0 auto;
         }
 
@@ -118,14 +277,14 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 14px;
-            margin-top: 28px;
+            margin-top: 26px;
         }
         .dev-login-card {
-            background: #ffffff;
-            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+            border-radius: 24px;
             padding: 22px;
             text-align: left;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(139, 0, 0, 0.12);
             box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
             color: #111827;
             display: flex;
@@ -154,7 +313,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #8B0000, #c2410c);
+            background: linear-gradient(135deg, #5e0000, #8B0000);
             color: #ffffff;
             margin-bottom: 18px;
         }
@@ -180,7 +339,7 @@
             background: #f8fafc;
             color: #111827;
             font-weight: 700;
-            border: 1px solid rgba(0,0,0,0.08);
+            border: 1px solid rgba(139, 0, 0, 0.14);
             cursor: not-allowed;
             opacity: 0.75;
             text-decoration: none;
@@ -202,17 +361,103 @@
             backdrop-filter: blur(8px);
         }
         .modal-content {
-            background: var(--white);
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
             color: var(--text-dark);
             width: 95%;
             max-width: 600px;
             padding: 40px;
-            border-radius: 24px;
+            border-radius: 26px;
             position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: none;
+            overflow-y: visible;
+            border: 1px solid rgba(139, 0, 0, 0.12);
+            box-shadow: 0 28px 70px rgba(0,0,0,0.28);
         }
         .modal-close { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 28px; color: var(--text-light); }
+        .register-hero {
+            display: grid;
+            gap: 10px;
+            padding: 18px 18px 16px;
+            margin: -40px -40px 22px;
+            background: linear-gradient(135deg, rgba(91,0,0,0.98), rgba(127,29,29,0.98) 55%, rgba(168,18,18,0.98));
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        .register-hero-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .register-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(250, 204, 21, 0.14);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            color: #fff7cc;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .register-hero h2 {
+            margin: 0;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 28px;
+            line-height: 1.1;
+        }
+        .register-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 50ch;
+            text-align: left;
+        }
+        .register-grid {
+            display: grid;
+            gap: 14px;
+        }
+        .register-submit {
+            width: 100%;
+            min-height: 54px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding: 14px 18px;
+            border: 0;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #5e0000, #8b0000 60%, #a61b1b);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            box-shadow: 0 18px 30px rgba(91,0,0,0.24);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+        }
+        .register-submit:hover,
+        .register-submit:focus-visible {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, #fff2a8, #facc15);
+            color: #7b1113;
+            box-shadow: 0 22px 36px rgba(91,0,0,0.26);
+            outline: none;
+        }
+        .register-submit svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 2;
+            flex: 0 0 auto;
+        }
 
         .switch-form { margin-top: 20px; font-size: 14px; color: var(--text-light); }
         .switch-form span { color: var(--accent); cursor: pointer; font-weight: 700; text-decoration: underline; }
@@ -258,11 +503,12 @@
         .login-loading-card {
             text-align: center;
             color: #ffffff;
-            background: rgba(15, 23, 42, 0.28);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 14px;
-            padding: 18px 20px;
+            background: rgba(9, 14, 19, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 22px;
+            padding: 24px 28px;
             min-width: 180px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
         .login-loading-logo {
             width: 72px;
@@ -300,7 +546,7 @@
 
             .login-box {
                 padding: 28px 18px;
-                border-radius: 16px;
+                border-radius: 20px;
                 max-width: 100%;
             }
 
@@ -317,9 +563,10 @@
             .modal-content {
                 width: 100%;
                 max-width: 100%;
-                max-height: 92vh;
                 padding: 24px 16px 20px;
                 border-radius: 18px 18px 0 0;
+                max-height: none;
+                overflow-y: visible;
             }
 
             .modal-close {
@@ -343,6 +590,11 @@
             50% { transform: translateY(-10px); }
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes headerSweep {
+            0% { transform: translateX(-140%); }
+            35% { transform: translateX(140%); }
+            100% { transform: translateX(140%); }
+        }
     </style>
 </head>
 <body>
@@ -359,8 +611,18 @@
 
   <main class="lp-container">
     <div class="login-box">
-        <h2>Clinic Portal</h2>
-        <p>Login to your account to continue</p>
+        <div class="login-hero">
+            <div class="login-hero-top">
+                <div class="login-hero-badge"><span></span> Clinic Access</div>
+                <div class="login-chip">Local Sign In</div>
+            </div>
+            <h2>Clinic Portal</h2>
+            <p class="login-hero-copy">Login to your account to continue. The same system keeps student and clinic access in one place.</p>
+            <div class="login-subline">
+                <span class="login-chip">IdP Ready</span>
+                <span class="login-chip">Local Fallback</span>
+            </div>
+        </div>
 
         @if ($errors->any())
             <div class="alert-error">
@@ -416,12 +678,22 @@
                 @csrf
                 <div class="form-group">
                     <label>EMAIL ADDRESS</label>
-                    <input type="email" name="email" value="{{ old('email') }}" placeholder="" required>
+                    <div class="input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25v7.5A2.25 2.25 0 0 1 18.75 18H5.25A2.25 2.25 0 0 1 3 15.75v-7.5m18 0A2.25 2.25 0 0 0 18.75 6H5.25A2.25 2.25 0 0 0 3 8.25m18 0-7.47 4.662a2.25 2.25 0 0 1-2.42 0L3 8.25" />
+                        </svg>
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter your email address" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>PASSWORD</label>
-                    <input type="password" name="password" placeholder="" required>
+                    <div class="input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V7.875a4.5 4.5 0 0 0-9 0V10.5m-.75 0A2.25 2.25 0 0 0 4.5 12.75v5.25A2.25 2.25 0 0 0 6.75 20.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-5.25A2.25 2.25 0 0 0 17.25 10.5h-10.5Z" />
+                        </svg>
+                        <input type="password" name="password" placeholder="Enter your password" required>
+                    </div>
                 </div>
 
                 <button id="loginSubmitBtn" type="submit" class="btn-submit">Login to Portal</button>
@@ -438,9 +710,13 @@
       <div id="registerModal" class="modal-overlay">
           <div class="modal-content">
               <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
-              <h2 style="color: var(--accent); font-weight: 800; margin-bottom: 5px;">Student Registration</h2>
-              <p style="color: var(--text-light); margin-bottom: 25px; font-size: 14px;">Please fill out the form to create your medical profile.</p>
-              
+              <div class="register-hero">
+                  <div class="register-hero-top">
+                      <div class="register-kicker">Local Registration</div>
+                  </div>
+                  <h2>Create Account</h2>
+                  <p>Complete the quick local registration form to create your clinic account.</p>
+              </div>
               <form action="{{ url('/register-action') }}" method="POST">
                   @csrf
                   <div class="form-row">
@@ -454,23 +730,12 @@
                       </div>
                   </div>
 
-                  <div class="form-row">
+                  <div class="register-grid">
                       <div class="form-group">
-                          <label>STUDENT ID</label>
-                          <input type="text" name="student_id" placeholder="202X-XXXXX-TG-0" required>
+                          <label>EMAIL ADDRESS</label>
+                          <input type="email" name="email" required>
                       </div>
-                      <div class="form-group">
-                          <label>DATE OF BIRTH</label>
-                          <input type="date" name="DOB" required>
-                      </div>
-                  </div>
 
-                  <div class="form-group">
-                      <label>EMAIL ADDRESS</label>
-                      <input type="email" name="email" required>
-                  </div>
-
-                  <div class="form-row">
                       <div class="form-group">
                           <label>COURSE</label>
                           <select name="course" required>
@@ -486,31 +751,27 @@
                             <option value="DIT">Diploma in Information Technology</option>
                             <option value="DOMT">Diploma in Office Management and Technology</option>
                             <option value="FACULTY">Faculty</option>
-                        
-                              
                           </select>
                       </div>
-                      <div class="form-group">
-                          <label>YEAR & SECTION</label>
-                          <div class="mini-form-row">
-                              <input type="text" name="year" placeholder="Year" required>
-                              <input type="text" name="section" placeholder="Sec" required>
+                      <div class="form-row">
+                          <div class="form-group">
+                              <label>PASSWORD</label>
+                              <input type="password" name="password" required>
+                          </div>
+                          <div class="form-group">
+                              <label>CONFIRM PASSWORD</label>
+                              <input type="password" name="password_confirmation" required>
                           </div>
                       </div>
                   </div>
 
-                  <div class="form-row">
-                      <div class="form-group">
-                          <label>PASSWORD</label>
-                          <input type="password" name="password" required>
-                      </div>
-                      <div class="form-group">
-                          <label>CONFIRM PASSWORD</label>
-                          <input type="password" name="password_confirmation" required>
-                      </div>
-                  </div>
-
-                  <button type="submit" class="btn-submit">Register Account</button>
+                  <button type="submit" class="register-submit">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M10 17l5-5-5-5" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H4" />
+                      </svg>
+                      Register Account
+                  </button>
               </form>
           </div>
       </div>

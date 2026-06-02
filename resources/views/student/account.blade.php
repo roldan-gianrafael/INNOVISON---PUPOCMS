@@ -437,14 +437,66 @@
         transform: translateY(-1px);
         border-color: #facc15;
         box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 0 0 3px rgba(250, 204, 21, 0.22),
             0 14px 24px rgba(112, 19, 27, 0.16);
-        color: #ffffff;
-        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #70131B;
+        background: #facc15;
     }
 
     .profile-edit-btn:hover::after {
         transform: translateX(135%);
+    }
+
+    .profile-enrollment-empty {
+        display: grid;
+        gap: 14px;
+        padding: 22px;
+        border-radius: 20px;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf6 100%);
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+        margin-top: 10px;
+    }
+    .profile-enrollment-empty-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .profile-enrollment-empty-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(139, 0, 0, 0.08);
+        color: #8B0000;
+        flex: 0 0 auto;
+    }
+    .profile-enrollment-empty-title {
+        margin: 0;
+        color: #8B0000;
+        font-size: 18px;
+        font-weight: 800;
+    }
+    .profile-enrollment-empty-copy {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    .profile-enrollment-empty-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: fit-content;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(250, 204, 21, 0.12);
+        color: #7c2d12;
+        font-size: 12px;
+        font-weight: 800;
     }
 
     #profileActionBar {
@@ -789,6 +841,35 @@
         box-shadow:
             0 0 0 3px rgba(112, 19, 27, 0.12),
             0 12px 24px rgba(0, 0, 0, 0.28);
+    }
+    html[data-theme="dark"] .profile-edit-btn:hover {
+        background: #facc15;
+        color: #70131B;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.22),
+            0 14px 24px rgba(0, 0, 0, 0.28);
+    }
+    html[data-theme="dark"] .profile-enrollment-empty {
+        background: linear-gradient(180deg, #0f0f10 0%, #161618 100%) !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        box-shadow:
+            0 18px 36px rgba(0, 0, 0, 0.30),
+            0 0 0 1px rgba(250, 204, 21, 0.04) inset !important;
+    }
+    html[data-theme="dark"] .profile-enrollment-empty-icon {
+        background: rgba(250, 204, 21, 0.10) !important;
+        color: #facc15 !important;
+    }
+    html[data-theme="dark"] .profile-enrollment-empty-title {
+        color: #ffffff !important;
+    }
+    html[data-theme="dark"] .profile-enrollment-empty-copy {
+        color: #cbd5e1 !important;
+    }
+    html[data-theme="dark"] .profile-enrollment-empty-note {
+        background: rgba(250, 204, 21, 0.12) !important;
+        color: #facc15 !important;
     }
     html[data-theme="dark"] .profile-action-btn.save {
         background: linear-gradient(135deg, #70131B, #8f2230);
@@ -1822,6 +1903,7 @@
         ? (str_contains($linkedAccessLevel, 'faculty') ? 'Faculty' : 'Admin')
         : null;
     $accountProfileData = $accountProfileData ?? [];
+    $isEnrolled = (bool) ($isEnrolled ?? false);
     $accountView = in_array(($accountView ?? 'profile'), ['profile', 'health-record', 'notifications'], true) ? $accountView : 'profile';
     $showOfficeField = in_array($linkedAccessLevel, ['clinic_staff', 'designee', 'superadmin', 'super_admin', 'faculty'], true) || str_contains($linkedAccessLevel, 'faculty');
     $displayStudentNumber = trim((string) ($accountProfileData['student_number'] ?? $user->student_number ?? ''));
@@ -1881,13 +1963,17 @@
         </div>
         <div class="hero-info">
             <h1 class="hero-name">{{ $user->name }} <span class="hero-badge">Active</span></h1>
-            <div class="hero-course" @if($linkedRoleLabel) style="display: none;" @endif>
-                {{ $guisisValue($displayStudentNumber) }} &bull; {{ $guisisValue($displayCourse) }}
-            </div>
-            @if($linkedRoleLabel)
-                <div class="hero-course">
-                    {{ $guisisValue($displayStudentNumber) }} - {{ $linkedRoleLabel }}
+            @if($isEnrolled)
+                <div class="hero-course" @if($linkedRoleLabel) style="display: none;" @endif>
+                    {{ $guisisValue($displayStudentNumber) }} &bull; {{ $guisisValue($displayCourse) }}
                 </div>
+                @if($linkedRoleLabel)
+                    <div class="hero-course">
+                        {{ $guisisValue($displayStudentNumber) }} - {{ $linkedRoleLabel }}
+                    </div>
+                @endif
+            @else
+                <div class="hero-course">Available once enrolled</div>
             @endif
 
             <div class="hero-stats">
@@ -1937,7 +2023,9 @@ document.addEventListener('DOMContentLoaded', function () {
             <h1 class="profile-card-title">Personal Information</h1>
             <p class="profile-card-description">Review your personal account details and keep your clinic information up to date.</p>
         </div>
-        <button type="button" id="editBtn" class="profile-edit-btn" onclick="enableEditing()">Edit Profile</button>
+        @if($isEnrolled)
+            <button type="button" id="editBtn" class="profile-edit-btn" onclick="enableEditing()">Edit Profile</button>
+        @endif
     </div>
 
     <div class="guisis-sync-banner">
@@ -1951,7 +2039,22 @@ document.addEventListener('DOMContentLoaded', function () {
             <input type="hidden" name="admin_profile_id" value="{{ $linkedAdminProfile->admin_id }}">
         @endif
         
-        @if(empty($linkedAdminProfile))
+        @if(!$isEnrolled)
+            <div class="profile-enrollment-empty">
+                <div class="profile-enrollment-empty-head">
+                    <div class="profile-enrollment-empty-icon" aria-hidden="true">
+                        <x-outline-icon name="lock-closed" />
+                    </div>
+                    <div>
+                        <h3 class="profile-enrollment-empty-title">Student information is locked</h3>
+                        <p class="profile-enrollment-empty-copy">
+                            These fields will appear once your enrollment record is available in the system.
+                        </p>
+                    </div>
+                </div>
+                <div class="profile-enrollment-empty-note">Available once enrolled</div>
+            </div>
+        @elseif(empty($linkedAdminProfile))
             <div class="profile-sections-grid">
                 <div class="profile-column-stack">
                     <section class="profile-form-section accent-maroon profile-frame-equal">
@@ -1967,11 +2070,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                             <div>
                                 <label class="input-label">Year</label>
-                                <input type="text" name="year" class="form-control{{ $guisisPendingClass(old('year', $user->year)) }}" value="{{ old('year', $user->year) }}" placeholder="{{ $guisisPendingText }}" disabled>
+                                <input type="text" name="year" class="form-control{{ $guisisPendingClass(old('year', $user->year)) }}" value="{{ $guisisValue(old('year', $user->year)) }}" disabled>
                             </div>
                             <div>
                                 <label class="input-label">Section</label>
-                                <input type="text" name="section" class="form-control{{ $guisisPendingClass(old('section', $user->section)) }}" value="{{ old('section', $user->section) }}" placeholder="{{ $guisisPendingText }}" disabled>
+                                <input type="text" name="section" class="form-control{{ $guisisPendingClass(old('section', $user->section)) }}" value="{{ $guisisValue(old('section', $user->section)) }}" disabled>
                             </div>
                         </div>
                     </section>
@@ -1981,11 +2084,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="profile-grid-2">
                             <div>
                                 <label class="input-label">Gender</label>
-                                <input type="text" class="form-control{{ $guisisPendingClass($accountProfileData['sex'] ?? $user->gender) }}" value="{{ $accountProfileData['sex'] ?? $user->gender }}" placeholder="{{ $guisisPendingText }}" readonly style="background-color: #f8fafc;">
+                                <input type="text" class="form-control{{ $guisisPendingClass($accountProfileData['sex'] ?? $user->gender) }}" value="{{ $guisisValue($accountProfileData['sex'] ?? $user->gender) }}" readonly style="background-color: #f8fafc;">
                             </div>
                             <div>
                                 <label class="input-label">Birthday (DOB)</label>
-                                <input type="text" class="form-control{{ $guisisPendingClass($accountProfileData['birthday'] ?? $user->DOB) }}" value="{{ $accountProfileData['birthday'] ?? $user->DOB }}" placeholder="{{ $guisisPendingText }}" readonly style="background-color: #f8fafc;">
+                                <input type="text" class="form-control{{ $guisisPendingClass($accountProfileData['birthday'] ?? $user->DOB) }}" value="{{ $guisisValue($accountProfileData['birthday'] ?? $user->DOB) }}" readonly style="background-color: #f8fafc;">
                             </div>
                         </div>
                         <div class="profile-grid-2">
@@ -2010,7 +2113,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <h3 class="profile-form-section-title"><x-outline-icon name="clock" />Contact Information</h3>
                         <div class="profile-info-row">
                             <label class="input-label">Contact Number</label>
-                            <input type="text" name="contact_no" class="form-control{{ $guisisPendingClass(old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no)) }}" value="{{ old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no) }}" placeholder="{{ $guisisPendingText }}" disabled>
+                            <input type="text" name="contact_no" class="form-control{{ $guisisPendingClass(old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no)) }}" value="{{ $guisisValue(old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no)) }}" disabled>
                         </div>
                         <div class="profile-info-row">
                             <label class="input-label">Address</label>
@@ -2035,7 +2138,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         @endif
 
-        @if(!empty($linkedAdminProfile))
+        @if($isEnrolled && !empty($linkedAdminProfile))
             <div class="profile-sections-grid">
             <section class="profile-form-section accent-maroon">
                 <h3 class="profile-form-section-title"><x-outline-icon name="information-circle" />Personal Information</h3>
@@ -2112,7 +2215,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div>
                         <label class="input-label">Contact Number</label>
-                        <input type="text" name="contact_no" class="form-control{{ $guisisPendingClass(old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no)) }}" value="{{ old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no) }}" placeholder="{{ $guisisPendingText }}" disabled>
+                        <input type="text" name="contact_no" class="form-control{{ $guisisPendingClass(old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no)) }}" value="{{ $guisisValue(old('contact_no', $accountProfileData['contact_number'] ?? $user->contact_no)) }}" disabled>
                     </div>
                 </div>
                 <div class="profile-info-row">
@@ -2143,16 +2246,18 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         @endif
 
-        <div id="profileActionBar">
-            <div id="saveAction">
-                <button type="submit" class="profile-action-btn save">
-                    Save Changes
-                </button>
-                <button type="button" class="profile-action-btn cancel" onclick="window.location.reload()">
-                    Cancel
-                </button>
+        @if($isEnrolled)
+            <div id="profileActionBar">
+                <div id="saveAction">
+                    <button type="submit" class="profile-action-btn save">
+                        Save Changes
+                    </button>
+                    <button type="button" class="profile-action-btn cancel" onclick="window.location.reload()">
+                        Cancel
+                    </button>
+                </div>
             </div>
-        </div>
+        @endif
     </form>
 </div>
 @elseif($accountView === 'health-record')

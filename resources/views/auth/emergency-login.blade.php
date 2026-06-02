@@ -35,6 +35,24 @@
             display: flex;
             justify-content: center;
             backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .topbar::after,
+        .panel-head::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, transparent 35%, rgba(250, 204, 21, 0.18) 50%, transparent 65%);
+            transform: translateX(-140%);
+            pointer-events: none;
+            animation: headerSweep 4s ease-in-out infinite;
+            z-index: 0;
+        }
+        .topbar > *,
+        .panel-head > * {
+            position: relative;
+            z-index: 1;
         }
         .brand {
             display: inline-flex;
@@ -78,6 +96,8 @@
             overflow: hidden;
         }
         .panel-head {
+            position: relative;
+            overflow: hidden;
             padding: 24px 26px 18px;
             background:
                 linear-gradient(135deg, rgba(91,0,0,0.98), rgba(127,29,29,0.98) 55%, rgba(168,18,18,0.98));
@@ -223,7 +243,7 @@
             font-weight: 900;
             cursor: pointer;
             box-shadow: 0 16px 26px rgba(91,0,0,0.26);
-            transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+            transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, background .18s ease, color .18s ease;
         }
         .submit svg {
             width: 18px;
@@ -233,9 +253,14 @@
             flex: 0 0 auto;
         }
         .submit:hover {
+            background: var(--accent-gold);
+            color: var(--accent);
             transform: translateY(-1px);
             filter: brightness(1.03);
             box-shadow: 0 20px 32px rgba(91,0,0,0.3);
+        }
+        .submit:hover svg {
+            stroke: var(--accent);
         }
         .footnote {
             margin-top: 16px;
@@ -261,6 +286,11 @@
             color: rgba(255,255,255,0.92);
             font-size: 13px;
             border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        @keyframes headerSweep {
+            0% { transform: translateX(-140%); }
+            35% { transform: translateX(140%); }
+            100% { transform: translateX(140%); }
         }
         @media (max-width: 640px) {
             .panel-head, .panel-body { padding-left: 18px; padding-right: 18px; }

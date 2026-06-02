@@ -841,6 +841,7 @@ public function account(Request $request)
     // 5. Return view user
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
     $accountProfileData = $this->buildHealthFormPrefill($user, $linkedAdminProfile, $user->healthProfile);
+    $isEnrolled = (bool) $user->is_health_profile_completed;
     $accountView = in_array((string) $request->query('view', 'profile'), ['profile', 'health-record', 'notifications'], true)
         ? (string) $request->query('view', 'profile')
         : 'profile';
@@ -856,6 +857,7 @@ public function account(Request $request)
         'linkedAdminProfile',
         'hasSubmittedHealthProfile',
         'accountProfileData',
+        'isEnrolled',
         'accountView'
     ));
 }

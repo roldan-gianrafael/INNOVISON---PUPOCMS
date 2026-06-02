@@ -15,11 +15,65 @@ use App\Http\Controllers\WalkInController;
 use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 // --- PUBLIC ROUTES (No login required) ---
-Route::get('/', [LoginController::class, 'checkSession'])->name('landing');
+Route::get('/', function () {
+    $user = Auth::guard('admin')->user() ?? Auth::guard('student')->user();
+    if ($user instanceof User) {
+        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
+        return match ($normalizedRole) {
+            User::ROLE_ADMIN, User::ROLE_SUPERADMIN => redirect('/admin/dashboard'),
+            default => redirect('/student/home'),
+        };
+    }
+
+    return view('landing');
+})->name('landing');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::get('/login/portal', function () {
+    $existingUser = Auth::guard('admin')->user() ?? Auth::guard('student')->user();
+    if ($existingUser instanceof User) {
+        $normalizedRole = User::normalizeRole((string) ($existingUser->user_role ?? ''));
+        return match ($normalizedRole) {
+            User::ROLE_ADMIN, User::ROLE_SUPERADMIN => redirect('/admin/dashboard'),
+            default => redirect('/student/home'),
+        };
+    }
+
+    $clientId = trim((string) config('services.idp.client_id', ''));
+    $redirectUri = trim((string) config('services.idp.redirect_uri', ''));
+    $responseType = trim((string) config('services.idp.authorize_response_type', 'code')) ?: 'code';
+    $authorizePath = trim((string) config('services.idp.authorize_path', '/api/v1/auth/authorize'));
+    $baseUrl = trim((string) config('services.idp.base_url', ''));
+
+    if ($clientId === '' || $redirectUri === '' || $baseUrl === '') {
+        Log::warning('Portal login route blocked because IDP configuration is incomplete.', [
+            'has_client_id' => $clientId !== '',
+            'has_redirect_uri' => $redirectUri !== '',
+            'has_base_url' => $baseUrl !== '',
+        ]);
+
+        return redirect()->route('landing')->withErrors([
+            'idp' => 'Identity provider login is not configured.',
+        ]);
+    }
+
+    $authorizeUrl = rtrim($baseUrl, '/') . '/' . ltrim($authorizePath, '/');
+    $query = [
+        'client_id' => $clientId,
+        'redirect_uri' => $redirectUri,
+        'response_type' => $responseType,
+    ];
+
+    $scope = trim((string) config('services.idp.authorize_scope', ''));
+    if ($scope !== '') {
+        $query['scope'] = $scope;
+    }
+
+    return redirect()->away($authorizeUrl . '?' . http_build_query($query));
+})->name('login.portal');
 Route::get('/auth/callback', [LoginController::class, 'handleIdpCallback'])->name('auth.callback');
 Route::post('/login-action', [LoginController::class, 'login']);
 Route::get('/system-admin/emergency-login', [EmergencyAuthController::class, 'showLoginForm'])->name('system-admin.emergency-login');

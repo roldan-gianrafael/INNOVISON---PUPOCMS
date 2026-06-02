@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -19,25 +20,26 @@ class RegisterController extends Controller
     $request->validate([
         'first_name' => 'required|string|max:255',
         'last_name'  => 'required|string|max:255',
-        'student_id' => 'required|unique:users',
         'email'      => 'required|email|unique:users',
-        'DOB'        => 'required|date',
         'course'     => 'required',
-        'year'       => 'required',
-        'section'    => 'required',
         'password'   => 'required|min:6|confirmed',
     ]);
+
+    $studentId = 'LOC-' . strtoupper(Str::random(10));
+    while (User::where('student_id', $studentId)->exists()) {
+        $studentId = 'LOC-' . strtoupper(Str::random(10));
+    }
 
     $payload = [
         'first_name' => $request->first_name,
         'last_name'  => $request->last_name,
         'name'       => $request->first_name . ' ' . $request->last_name, // Automated concatenation
-        'student_id' => $request->student_id,
+        'student_id' => $studentId,
         'email'      => $request->email,
-        'DOB'        => $request->DOB,
+        'DOB'        => null,
         'course'     => $request->course,
-        'year'       => $request->year,
-        'section'    => $request->section,
+        'year'       => null,
+        'section'    => null,
         'user_role'  => 'student', // Default role
         'password'   => Hash::make($request->password),
     ];

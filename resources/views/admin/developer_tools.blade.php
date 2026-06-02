@@ -921,7 +921,7 @@
                     <p class="dev-option-copy">Static preview for a future logo update workflow.</p>
                     <div class="dev-logo-preview">
                         <div class="dev-logo-box">
-                            <img src="{{ asset('images/clinic_logo.png') }}?v={{ filemtime(public_path('images/clinic_logo.png')) }}" alt="Current clinic logo">
+                            <img src="{{ asset('images/clinic_logo_transparent.png') }}?v={{ filemtime(public_path('images/clinic_logo_transparent.png')) }}" alt="Current clinic logo">
                             <div>
                                 <div class="dev-logo-label">Current Logo</div>
                                 <div class="dev-logo-hint">Used in headers and navigation.</div>

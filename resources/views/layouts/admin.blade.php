@@ -3620,7 +3620,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $displayName = optional($authUser)->name ?? 'Clinic User';
     $welcomeName = in_array($displayName, ['Admin Account', 'Super Admin Account'], true) ? 'Nurse Joyce' : $displayName;
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
-    $brandLogo = asset('images/clinic_logo.png') . '?v=' . filemtime(public_path('images/clinic_logo.png'));
+    $brandLogo = asset('images/clinic_logo_transparent.png') . '?v=' . filemtime(public_path('images/clinic_logo_transparent.png'));
     $brandUniversityLogo = asset('images/pup_logo.png');
     \App\Models\Appointment::expireOverduePending();
     $roleLabelMap = [

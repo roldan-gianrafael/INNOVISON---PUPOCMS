@@ -1710,6 +1710,15 @@
         transition: background .16s ease, color .16s ease, border-color .16s ease, transform .16s ease, box-shadow .16s ease;
         box-shadow: 0 4px 10px rgba(112, 19, 27, 0.08);
     }
+    .restock-quick-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #70131B;
+        align-self: center;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        flex: 0 0 auto;
+    }
     .restock-quick-btn:hover {
         background: linear-gradient(135deg, #70131B, #8f2230);
         color: #facc15;
@@ -1719,13 +1728,16 @@
     }
     html[data-theme="dark"] .restock-quick-btn {
         background: rgba(112, 19, 27, 0.22);
-        color: #fca5a5;
-        border-color: rgba(112, 19, 27, 0.36);
+        color: #ffffff;
+        border-color: #facc15;
     }
     html[data-theme="dark"] .restock-quick-btn:hover {
         background: linear-gradient(135deg, #70131B, #8f2230);
         color: #facc15;
-        border-color: #8f2230;
+        border-color: #facc15;
+    }
+    html[data-theme="dark"] .restock-quick-label {
+        color: #ffffff;
     }
 
     /* --- History stat bar (Total In / Total Out / Net) --- */
@@ -2239,7 +2251,7 @@
                     @csrf
                     <div class="inventory-modal-body">
                         <div class="restock-quick-btns" id="restockQuickBtns" aria-label="Quick add presets">
-                            <span style="font-size:11px;font-weight:800;color:#70131B;align-self:center;text-transform:uppercase;letter-spacing:.06em;flex:0 0 auto;">Quick Add:</span>
+                            <span class="restock-quick-label">Quick Add:</span>
                             <button type="button" class="restock-quick-btn" data-preset="5">+5</button>
                             <button type="button" class="restock-quick-btn" data-preset="10">+10</button>
                             <button type="button" class="restock-quick-btn" data-preset="25">+25</button>

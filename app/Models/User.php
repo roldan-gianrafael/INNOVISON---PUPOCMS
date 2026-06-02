@@ -24,7 +24,7 @@ class User extends Authenticatable
 
         return match ($normalizedRole) {
             'superadmin', 'super_admin' => self::ROLE_SUPERADMIN,
-            'admin', 'student_assistant', 'studentassistant', 'assistant' => self::ROLE_ADMIN,
+            'admin', 'student_assistant', 'studentassistant', 'assistant', 'nurse' => self::ROLE_ADMIN,
             default => $normalizedRole,
         };
     }

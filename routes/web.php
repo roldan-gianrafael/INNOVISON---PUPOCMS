@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminAssistantController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\Auth\EmergencyAuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\MedicalConditionController;
@@ -21,6 +22,10 @@ Route::get('/', [LoginController::class, 'checkSession'])->name('landing');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/auth/callback', [LoginController::class, 'handleIdpCallback'])->name('auth.callback');
 Route::post('/login-action', [LoginController::class, 'login']);
+Route::get('/system-admin/emergency-login', [EmergencyAuthController::class, 'showLoginForm'])->name('system-admin.emergency-login');
+Route::post('/system-admin/emergency-login', [EmergencyAuthController::class, 'login'])
+    ->middleware('throttle:10,1')
+    ->name('system-admin.emergency-login.submit');
 Route::post('/register-action', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout'); 
 

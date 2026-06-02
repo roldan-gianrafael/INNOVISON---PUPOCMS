@@ -137,6 +137,13 @@
         transition: 0.2s;
     }
     .btn-view-all:hover { background: #ffe4e6; }
+    html[data-theme="dark"] .btn-view-all {
+        color: #0f172a;
+        background: #f8fafc;
+    }
+    html[data-theme="dark"] .btn-view-all:hover {
+        background: #ffffff;
+    }
 
     /* Table Styles */
     table { width: 100%; border-collapse: separate; border-spacing: 0; }

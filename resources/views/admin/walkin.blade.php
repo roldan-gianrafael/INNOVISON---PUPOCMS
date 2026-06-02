@@ -2606,6 +2606,190 @@
     }
     .btn-medical-assessment svg { width:20px; height:20px; stroke-width:2; flex:0 0 auto; }
 
+    .applicant-ref-mode {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        align-items: center;
+    }
+
+    .applicant-ref-copy {
+        width: 100%;
+        max-width: 460px;
+        text-align: center;
+    }
+
+    .applicant-ref-copy .applicant-ref-kicker {
+        margin: 0 0 6px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #8b0000;
+    }
+
+    .applicant-ref-copy h4 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        font-weight: 900;
+        color: #111827;
+    }
+
+    .applicant-ref-copy p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.55;
+        color: #64748b;
+    }
+
+    .applicant-ref-instruction {
+        width: 100%;
+        max-width: 460px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .applicant-ref-instruction strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .applicant-ref-toggle-btn,
+    .applicant-ref-action-btn {
+        width: 100%;
+        min-height: 46px;
+        border-radius: 14px;
+        border: 1px solid transparent;
+        font-size: 14px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
+    }
+
+    .applicant-ref-toggle-btn {
+        background: #ffffff;
+        color: #70131B;
+        border-color: rgba(112, 19, 27, 0.18);
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+    }
+
+    .applicant-ref-toggle-btn:hover,
+    .applicant-ref-toggle-btn:focus {
+        transform: translateY(-1px);
+        border-color: rgba(112, 19, 27, 0.32);
+        box-shadow: 0 14px 24px rgba(15, 23, 42, 0.08);
+        outline: none;
+    }
+
+    .applicant-ref-panel {
+        width: 100%;
+        display: none;
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+        max-width: 460px;
+    }
+
+    .applicant-ref-panel.is-visible {
+        display: flex;
+    }
+
+    .applicant-ref-field label {
+        display: block;
+        margin: 0 0 6px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+    }
+
+    .applicant-ref-input {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 14px;
+        border: 1px solid rgba(112, 19, 27, 0.15);
+        border-radius: 12px;
+        background: linear-gradient(180deg, #ffffff, #fff8f6);
+        color: #111827;
+        font-size: 14px;
+        font-weight: 700;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+        transition: border-color .2s ease, box-shadow .2s ease;
+        outline: none;
+    }
+    .applicant-ref-input:focus {
+        border-color: rgba(112, 19, 27, 0.42);
+        box-shadow: 0 0 0 3px rgba(112, 19, 27, 0.08), 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .applicant-ref-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .applicant-ref-cancel-btn {
+        background: #f1f5f9;
+        color: #334155;
+        border-color: #cbd5e1;
+    }
+
+    .applicant-ref-cancel-btn:hover,
+    .applicant-ref-cancel-btn:focus {
+        background: #e2e8f0;
+        border-color: #b8c2d3;
+        outline: none;
+    }
+
+    .applicant-ref-find-btn {
+        background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c);
+        color: #ffffff;
+        box-shadow: 0 12px 24px rgba(127, 29, 29, 0.24);
+    }
+
+    .applicant-ref-find-btn:hover,
+    .applicant-ref-find-btn:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 28px rgba(127, 29, 29, 0.3);
+        outline: none;
+    }
+
+    .applicant-ref-result {
+        display: none;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #047857;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.5;
+    }
+
+    .applicant-ref-result strong {
+        display: block;
+        margin-top: 2px;
+        color: #064e3b;
+        font-size: 13px;
+    }
+
+    @media (max-width: 640px) {
+        .applicant-ref-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+
     /* --- Medical Assessment inline modal form --- */
     .ma-section {
         margin-bottom: 14px;
@@ -2640,7 +2824,7 @@
     .ma-label  { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: #64748b; }
     .ma-control {
         width: 100%; min-height: 44px; padding: 10px 14px;
-        border: 1px solid rgba(112, 19, 27, 0.15); border-radius: 12px;
+        border: 1px solid #70131B; border-radius: 12px;
         background: linear-gradient(180deg, #ffffff, #fff8f6);
         color: #111827; font-size: 13px; font-weight: 700;
         box-shadow:
@@ -2676,6 +2860,7 @@
     }
     .ma-control[readonly] { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
     textarea.ma-control   { min-height: 96px; resize: vertical; line-height: 1.55; }
+    .ma-control.is-locked { background: #eef2f7; color: #475569; }
     .ma-radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
     .ma-radio {
         display: inline-flex; align-items: center; gap: 6px;
@@ -2707,17 +2892,17 @@
     }
     html[data-theme="dark"] .ma-control {
         background: rgba(17,24,39,0.88); color: #f8fafc;
-        border-color: rgba(148,163,184,0.22);
+        border-color: #70131B;
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.04),
             0 2px 4px rgba(0,0,0,0.10),
             0 8px 18px rgba(0,0,0,0.18);
     }
     html[data-theme="dark"] .ma-control:focus {
-        border-color: #facc15;
+        border-color: #70131B;
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.04),
-            0 0 0 3px rgba(250,204,21,0.12),
+            0 0 0 3px rgba(112,19,27,0.16),
             0 10px 24px rgba(0,0,0,0.24);
     }
     html[data-theme="dark"] .ma-required-badge {
@@ -2881,28 +3066,47 @@
             </div>
 
             <div class="applicant-modal-body" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:220px; gap:18px;">
+                <div class="applicant-ref-mode" id="applicantRefDefault">
+                    <div class="applicant-ref-copy">
+                        <p class="applicant-ref-kicker">Proceed</p>
+                        <h4>Medical Assessment</h4>
+                        <p>Open the medical form right away, or switch to reference lookup if you already have the applicant's number.</p>
+                    </div>
 
-                <div style="text-align:center; max-width:480px;">
-                    <p style="margin:0 0 6px; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:#8b0000;">Proceed</p>
-                    <h4 style="margin:0 0 8px; font-size:20px; font-weight:900; color:#111827;">Medical Assessment</h4>
-                    <p style="margin:0; font-size:13px; color:#64748b; line-height:1.55;">Click below to open the Medical Assessment form for the applicant.</p>
+                    <button type="button" id="btnMedicalAssessment" class="btn-medical-assessment" style="max-width:360px; width:100%;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:20px;height:20px;stroke-width:2;flex:0 0 auto;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                        </svg>
+                        Go to Medical Assessment
+                    </button>
+
+                    <button type="button" id="btnShowApplicantRefInput" class="applicant-ref-toggle-btn" style="max-width:360px;">
+                        Input Reference Number
+                    </button>
                 </div>
 
-                <button type="button" id="btnMedicalAssessment" class="btn-medical-assessment" style="max-width:360px; width:100%;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:20px;height:20px;stroke-width:2;flex:0 0 auto;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
-                    </svg>
-                    Go to Medical Assessment
-                </button>
+                <div class="applicant-ref-panel" id="applicantRefEntry">
+                    <div class="applicant-ref-instruction">
+                        <strong>Reference lookup</strong>
+                        Find the reference number in the Admission System.
+                    </div>
+                    <div class="applicant-ref-field">
+                        <label for="applicantRefInput">Reference Number</label>
+                        <input type="text" id="applicantRefInput" class="applicant-ref-input" placeholder="Enter reference number">
+                    </div>
 
-                {{-- Hidden stubs so existing JS references don't throw null errors --}}
-                <span style="display:none;">
-                    <input type="text" id="applicantRefInput">
-                    <button id="btnFindApplicant"></button>
-                    <div id="applicantRefStatus"></div>
-                    <div id="applicantFoundCard"><p id="applicantFoundName"></p></div>
-                </span>
+                    <div id="applicantRefStatus" class="ocr-status"></div>
 
+                    <div id="applicantFoundCard" class="applicant-ref-result">
+                        Applicant located
+                        <strong id="applicantFoundName"></strong>
+                    </div>
+
+                    <div class="applicant-ref-actions">
+                        <button type="button" id="btnCancelApplicantRef" class="applicant-ref-action-btn applicant-ref-cancel-btn">Cancel</button>
+                        <button type="button" id="btnFindApplicant" class="applicant-ref-action-btn applicant-ref-find-btn">Find</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2935,6 +3139,12 @@
                             Applicant Information
                             <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:none;letter-spacing:0;">— Used to merge record when applicant registers</span>
                         </p>
+                        <div class="ma-grid" style="margin-bottom:12px;">
+                            <div class="ma-field" style="grid-column:1/-1;">
+                                <label class="ma-label">Reference Number</label>
+                                <input type="text" name="ma_reference_number" id="maReferenceNumber" class="ma-control is-locked" placeholder="Reference number" readonly>
+                            </div>
+                        </div>
                         <div class="ma-grid-4" style="margin-bottom:12px;">
                             <div class="ma-field">
                                 <label class="ma-label">First Name <span class="ma-required-badge">Required</span></label>
@@ -4445,37 +4655,72 @@
         });
     });
 
-    // --- Applicants Modal: Reference Number → Medical Assessment ---
+    // --- Applicants Modal: Reference Number -> Medical Assessment ---
     (function () {
-        const backdrop      = document.getElementById('applicantRefModal');
-        const openBtn       = document.getElementById('openApplicantRefModal');
-        const closeBtn      = document.getElementById('closeApplicantRefModal');
-        const refInput      = document.getElementById('applicantRefInput');
-        const refStatus     = document.getElementById('applicantRefStatus');
-        const findBtn       = document.getElementById('btnFindApplicant');
-        const assessBtn     = document.getElementById('btnMedicalAssessment');
-        const foundCard     = document.getElementById('applicantFoundCard');
-        const foundName     = document.getElementById('applicantFoundName');
-        const getStudentUrl = '{{ url($basePrefix . "/walkin/get-student") }}';
-        let assessUrl       = '';
+        const backdrop        = document.getElementById('applicantRefModal');
+        const openBtn         = document.getElementById('openApplicantRefModal');
+        const closeBtn        = document.getElementById('closeApplicantRefModal');
+        const defaultPane     = document.getElementById('applicantRefDefault');
+        const entryPane       = document.getElementById('applicantRefEntry');
+        const showEntryBtn    = document.getElementById('btnShowApplicantRefInput');
+        const cancelEntryBtn  = document.getElementById('btnCancelApplicantRef');
+        const refInput        = document.getElementById('applicantRefInput');
+        const refStatus       = document.getElementById('applicantRefStatus');
+        const findBtn         = document.getElementById('btnFindApplicant');
+        const foundCard       = document.getElementById('applicantFoundCard');
+        const foundName       = document.getElementById('applicantFoundName');
+        const medicalBtn      = document.getElementById('btnMedicalAssessment');
+        const getStudentUrl   = '{{ url($basePrefix . '/walkin/get-student') }}';
+        const maBackdrop      = document.getElementById('medicalAssessmentModal');
+        const maClose1        = document.getElementById('closeMedicalAssessmentModal');
+        const maClose2        = document.getElementById('closeMedicalAssessmentModal2');
+        const maSubtitle      = document.getElementById('maPatientSubtitle');
+        const maReference     = document.getElementById('maReferenceNumber');
+        const defaultSubtitle = 'Recording assessment for applicant.';
 
-        function openModal() {
-            if (!backdrop) return;
-            backdrop.classList.add('show');
-            if (refInput) { refInput.value = ''; refInput.focus(); }
-            resetState();
+        function setEntryMode(isActive) {
+            if (defaultPane) defaultPane.style.display = isActive ? 'none' : 'flex';
+            if (entryPane) entryPane.classList.toggle('is-visible', isActive);
+            if (!isActive) resetLookupState();
+            if (isActive && refInput) {
+                setTimeout(() => refInput.focus(), 0);
+            }
         }
 
-        function closeModal() {
-            if (backdrop) backdrop.classList.remove('show');
-            resetState();
-        }
-
-        function resetState() {
+        function resetLookupState() {
             if (refStatus) { refStatus.className = 'ocr-status'; refStatus.textContent = ''; }
             if (foundCard) foundCard.style.display = 'none';
             if (foundName) foundName.textContent = '';
-            assessUrl = '';
+        }
+
+        function openApplicantsModal() {
+            if (!backdrop) return;
+            backdrop.classList.add('show');
+            setEntryMode(false);
+            if (refInput) refInput.value = '';
+        }
+
+        function closeApplicantsModal() {
+            if (backdrop) backdrop.classList.remove('show');
+            setEntryMode(false);
+            if (refInput) refInput.value = '';
+        }
+
+        function openMedicalAssessment(referenceNumber, applicantName) {
+            const maAssessmentDate = document.getElementById('maAssessmentDate');
+            if (maAssessmentDate && !maAssessmentDate.value) {
+                maAssessmentDate.value = new Date().toISOString().split('T')[0];
+            }
+            if (maReference) {
+                maReference.value = referenceNumber || '';
+            }
+            if (maSubtitle) {
+                maSubtitle.textContent = applicantName
+                    ? 'Recording assessment for ' + applicantName + '.'
+                    : defaultSubtitle;
+            }
+            closeApplicantsModal();
+            if (maBackdrop) maBackdrop.classList.add('show');
         }
 
         function setStatus(type, msg) {
@@ -4484,31 +4729,29 @@
             refStatus.textContent = msg;
         }
 
-        function enableAssess(url, name) {
-            assessUrl = url;
-            if (foundCard && foundName) {
-                foundName.textContent = name || 'Record located';
-                foundCard.style.display = 'block';
-            }
-            if (assessBtn) { assessBtn.disabled = false; assessBtn.classList.remove('is-disabled'); }
-        }
-
         function doLookup() {
             const ref = (refInput ? refInput.value : '').trim();
-            if (!ref) { setStatus('error', 'Please enter a reference number first.'); return; }
+            if (!ref) {
+                setStatus('error', 'Please enter a reference number first.');
+                return;
+            }
 
-            setStatus('info', 'Looking up applicant…');
-            if (assessBtn) { assessBtn.disabled = true; assessBtn.classList.add('is-disabled'); }
+            setStatus('info', 'Looking up applicant...');
             if (foundCard) foundCard.style.display = 'none';
 
-            fetch(`${getStudentUrl}?student_id=${encodeURIComponent(ref)}&preview_only=true`, {
+            fetch(getStudentUrl + '?student_id=' + encodeURIComponent(ref) + '&preview_only=true', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
             })
             .then(r => r.json())
             .then(data => {
                 if (data.status === 'preview' || data.status === 'found') {
-                    setStatus('success', 'Patient found. Ready to proceed to Medical Assessment.');
-                    enableAssess('__ready__', data.student_name || '');
+                    const applicantName = data.student_name || '';
+                    setStatus('success', 'Applicant found. Opening Medical Assessment.');
+                    if (foundCard && foundName) {
+                        foundName.textContent = applicantName || ref;
+                        foundCard.style.display = 'block';
+                    }
+                    setTimeout(() => openMedicalAssessment(data.student_number || ref, applicantName), 250);
                 } else {
                     setStatus('error', data.message || 'No applicant found with that reference number.');
                 }
@@ -4516,35 +4759,38 @@
             .catch(() => setStatus('error', 'Unable to look up right now. Please try again.'));
         }
 
-        if (openBtn)  openBtn.addEventListener('click',  function(e) { e.preventDefault(); openModal(); });
-        if (closeBtn) closeBtn.addEventListener('click', closeModal);
-        if (backdrop) backdrop.addEventListener('click', function(e) { if (e.target === backdrop) closeModal(); });
-
+        if (openBtn) openBtn.addEventListener('click', function (e) { e.preventDefault(); openApplicantsModal(); });
+        if (closeBtn) closeBtn.addEventListener('click', closeApplicantsModal);
+        if (backdrop) backdrop.addEventListener('click', function (e) { if (e.target === backdrop) closeApplicantsModal(); });
+        if (showEntryBtn) showEntryBtn.addEventListener('click', function () { setEntryMode(true); });
+        if (cancelEntryBtn) cancelEntryBtn.addEventListener('click', function () {
+            if (refInput) refInput.value = '';
+            setEntryMode(false);
+        });
         if (findBtn) findBtn.addEventListener('click', doLookup);
-        if (refInput) refInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); doLookup(); } });
-
-        if (assessBtn) {
-            assessBtn.addEventListener('click', function () {
-                // Open the Medical Assessment form modal directly
-                const maAssessmentDate = document.getElementById('maAssessmentDate');
-                if (maAssessmentDate && !maAssessmentDate.value) {
-                    maAssessmentDate.value = new Date().toISOString().split('T')[0];
+        if (refInput) {
+            refInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    doLookup();
                 }
-                closeModal();
-                const maBackdrop = document.getElementById('medicalAssessmentModal');
-                if (maBackdrop) maBackdrop.classList.add('show');
             });
         }
 
-        // Medical Assessment modal close
-        const maBackdrop = document.getElementById('medicalAssessmentModal');
-        const maClose1   = document.getElementById('closeMedicalAssessmentModal');
-        const maClose2   = document.getElementById('closeMedicalAssessmentModal2');
+        if (medicalBtn) {
+            medicalBtn.addEventListener('click', function () {
+                openMedicalAssessment('', '');
+            });
+        }
 
-        function closeMaModal() { if (maBackdrop) maBackdrop.classList.remove('show'); }
-        if (maClose1)  maClose1.addEventListener('click', closeMaModal);
-        if (maClose2)  maClose2.addEventListener('click', closeMaModal);
-        if (maBackdrop) maBackdrop.addEventListener('click', function(e) { if (e.target === maBackdrop) closeMaModal(); });
+        function closeMaModal() {
+            if (maBackdrop) maBackdrop.classList.remove('show');
+            if (maSubtitle) maSubtitle.textContent = defaultSubtitle;
+        }
+
+        if (maClose1) maClose1.addEventListener('click', closeMaModal);
+        if (maClose2) maClose2.addEventListener('click', closeMaModal);
+        if (maBackdrop) maBackdrop.addEventListener('click', function (e) { if (e.target === maBackdrop) closeMaModal(); });
     })();
 </script>
 @endpush

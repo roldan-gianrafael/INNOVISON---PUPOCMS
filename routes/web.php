@@ -17,9 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // --- PUBLIC ROUTES (No login required) ---
-Route::get('/', function () {
-    return view('landing');
-})->name('landing');
+Route::get('/', [LoginController::class, 'checkSession'])->name('landing');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/auth/callback', [LoginController::class, 'handleIdpCallback'])->name('auth.callback');
 Route::post('/login-action', [LoginController::class, 'login']);

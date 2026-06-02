@@ -1143,6 +1143,46 @@ class LoginController extends Controller
         return $user;
     }
 
+    public function checkSession(Request $request)
+    {
+        // Already have a valid local session — send straight to the right dashboard.
+        $authenticatedUser = $this->authenticatedUser();
+        if ($authenticatedUser) {
+            return redirect($this->resolveRedirectPathForUser($authenticatedUser));
+        }
+
+        // IDP auth disabled or client not configured — render landing page directly.
+        if (!$this->useIdpAuth()) {
+            return view('landing');
+        }
+
+        $authorizeUrl = $this->buildAuthorizeUrl();
+        if ($authorizeUrl === null) {
+            return view('landing');
+        }
+
+        // Collect all extra query parameters so we append them in a single pass.
+        $extraParams = ['prompt' => 'none'];
+
+        if ($this->useIdpPkce()) {
+            $pkceVerifier = $this->buildPkceVerifier();
+            $request->session()->put('idp_pkce_verifier', $pkceVerifier);
+            $extraParams['code_challenge']        = $this->buildPkceChallenge($pkceVerifier);
+            $extraParams['code_challenge_method'] = $this->idpPkceChallengeMethod();
+        } else {
+            $request->session()->forget('idp_pkce_verifier');
+        }
+
+        $separator   = str_contains($authorizeUrl, '?') ? '&' : '?';
+        $authorizeUrl .= $separator . http_build_query($extraParams);
+
+        Log::info('Initiating silent authentication via IdP.', [
+            'authorize_url_base' => strtok($authorizeUrl, '?'),
+        ]);
+
+        return redirect()->away($authorizeUrl);
+    }
+
     public function login(Request $request)
     {
         if ($this->useIdpAuth()) {
@@ -1240,6 +1280,41 @@ class LoginController extends Controller
         if (!$this->useIdpAuth()) {
             Log::warning('IDP callback aborted because IDP auth is disabled.');
             return redirect('/login');
+        }
+
+        // Handle IdP error responses before checking for the auth code.
+        // Soft errors from a prompt=none silent-auth attempt mean the IdP has no active
+        // session for this user — gracefully fall back to the landing page so they can
+        // log in manually. Hard errors are unexpected and go to the login error page.
+        $idpError = trim((string) $request->query('error', ''));
+        if ($idpError !== '') {
+            $silentAuthErrors = [
+                'login_required',
+                'interaction_required',
+                'consent_required',
+                'account_selection_required',
+            ];
+
+            if (in_array($idpError, $silentAuthErrors, true)) {
+                Log::info('Silent authentication found no active IdP session.', [
+                    'error'             => $idpError,
+                    'error_description' => $request->query('error_description'),
+                ]);
+
+                return view('landing');
+            }
+
+            $errorDescription = trim((string) $request->query('error_description', ''));
+            Log::warning('IDP callback returned an unexpected error.', [
+                'error'             => $idpError,
+                'error_description' => $errorDescription,
+            ]);
+
+            return redirect('/login?idp_error=1')->withErrors([
+                'idp' => $errorDescription !== ''
+                    ? "Sign-in failed: {$errorDescription}"
+                    : 'The identity provider returned an error. Please try again.',
+            ]);
         }
 
         $code = trim((string) $request->query('code', ''));

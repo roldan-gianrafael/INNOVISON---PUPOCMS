@@ -76,9 +76,12 @@
         }
 
         .brand-logo--clinic {
-            width: 94px;
-            height: 94px;
-            padding: 10px;
+            width: 88px;
+            height: 88px;
+            padding: 8px;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
 
         .eyebrow {

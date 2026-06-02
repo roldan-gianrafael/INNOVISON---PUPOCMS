@@ -512,9 +512,25 @@
         background: rgba(15, 23, 42, 0.52);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        z-index: 1200;
+        z-index: 500050 !important;
         justify-content: center;
         align-items: center;
+    }
+    body.settings-modal-open .admin-header,
+    body.settings-modal-open .medicine-alert-fab,
+    body.settings-modal-open .medicine-alert-panel,
+    body.settings-modal-open .medicine-hover-hint,
+    body.settings-modal-open .admin-live-alert {
+        z-index: 1 !important;
+        pointer-events: none !important;
+    }
+    body.settings-modal-open .main {
+        position: relative;
+        z-index: 1000 !important;
+        isolation: isolate;
+    }
+    body.settings-modal-open .admin-header {
+        filter: blur(6px) saturate(0.9);
     }
     .modal-box {
         width: min(680px, 100%);
@@ -585,17 +601,55 @@
     }
     .modal-head .section-spot { display: none; }
     .modal-head-close {
-        width: 38px; height: 38px; flex: 0 0 38px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        padding: 0;
+        flex: 0 0 40px;
+        margin-left: auto;
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        background: rgba(255, 255, 255, 0.12);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
         color: #ffffff;
         display: inline-flex; align-items: center; justify-content: center;
         cursor: pointer;
-        transition: background .18s ease, transform .18s ease;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 0;
     }
-    .modal-head-close:hover { background: rgba(255,255,255,0.24); transform: translateY(-1px); }
-    .modal-head-close svg { width: 16px; height: 16px; stroke-width: 2.2; }
+    .modal-head-close::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
+    }
+    .modal-head-close:hover {
+        transform: translateY(-1px);
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+    .modal-head-close:hover::after {
+        transform: translateX(135%);
+    }
+    .modal-head-close svg { width: 18px; height: 18px; stroke-width: 2.2; }
     /* Scrollable body */
     .modal-body {
         flex: 1 1 auto;
@@ -1339,20 +1393,6 @@
                             </div>
                         </div>
 
-                        <div style="margin: 6px 0 4px; padding-top: 10px; border-top: 1px solid rgba(127,0,0,0.10);">
-                            <p class="field-help" style="margin:0; font-weight:900; letter-spacing:0.06em; text-transform:uppercase;">Change Password (Optional)</p>
-                        </div>
-
-                        <div class="field-grid two">
-                            <div class="field">
-                                <label>New Password</label>
-                                <input type="password" name="password" placeholder="Leave blank to keep current">
-                            </div>
-                            <div class="field">
-                                <label>Confirm Password</label>
-                                <input type="password" name="password_confirmation" placeholder="Retype password">
-                            </div>
-                        </div>
                     </section>
                 </div>
 
@@ -1372,6 +1412,7 @@
         const modal = document.getElementById(id);
         if (modal) {
             modal.style.display = 'flex';
+            document.body.classList.add('settings-modal-open');
         }
     }
 
@@ -1380,15 +1421,22 @@
         if (modal) {
             modal.style.display = 'none';
         }
+        if (!document.querySelector('.modal-overlay[style*="display: flex"]')) {
+            document.body.classList.remove('settings-modal-open');
+        }
     }
 
     function openProfileModal() {
         document.getElementById('profileModal').style.display = 'flex';
+        document.body.classList.add('settings-modal-open');
         syncCmsAge();
     }
 
     function closeProfileModal() {
         document.getElementById('profileModal').style.display = 'none';
+        if (!document.querySelector('.modal-overlay[style*="display: flex"]')) {
+            document.body.classList.remove('settings-modal-open');
+        }
     }
 
     window.addEventListener('click', function (e) {

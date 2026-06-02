@@ -22,6 +22,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     $user = Auth::guard('admin')->user() ?? Auth::guard('student')->user();
     if ($user instanceof User) {
+        $rawRole = strtolower(trim((string) ($user->user_role ?? '')));
+        $userType = strtolower(trim((string) ($user->user_type ?? '')));
+        $isStudentAssistant = in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+            || in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true);
+
+        if ($isStudentAssistant) {
+            return redirect('/assistant/choose-portal');
+        }
+
         $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
         return match ($normalizedRole) {
             User::ROLE_ADMIN, User::ROLE_SUPERADMIN => redirect('/admin/dashboard'),
@@ -35,6 +44,15 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/login/portal', function () {
     $existingUser = Auth::guard('admin')->user() ?? Auth::guard('student')->user();
     if ($existingUser instanceof User) {
+        $rawRole = strtolower(trim((string) ($existingUser->user_role ?? '')));
+        $userType = strtolower(trim((string) ($existingUser->user_type ?? '')));
+        $isStudentAssistant = in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+            || in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true);
+
+        if ($isStudentAssistant) {
+            return redirect('/assistant/choose-portal');
+        }
+
         $normalizedRole = User::normalizeRole((string) ($existingUser->user_role ?? ''));
         return match ($normalizedRole) {
             User::ROLE_ADMIN, User::ROLE_SUPERADMIN => redirect('/admin/dashboard'),
@@ -200,6 +218,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::put('/admin/user-management/admin-hub/{admin}', [AdminUserController::class, 'updateAdminHub'])->name('admin.user-management.admin-hub.update');
         Route::delete('/admin/user-management/admin-hub/{admin}', [AdminUserController::class, 'destroyAdminHub'])->name('admin.user-management.admin-hub.destroy');
         Route::delete('/admin/user-management/admin-hub/{admin}/delete-record', [AdminUserController::class, 'deleteAdminHubRecord'])->name('admin.user-management.admin-hub.delete-record');
+        Route::get('/admin/developer-tools', [AdminController::class, 'developerTools'])->name('admin.developer-tools');
         Route::get('/admin/api-testing', [AdminController::class, 'apiTesting'])->name('admin.api-testing');
         Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])
             ->middleware('role:superadmin')
@@ -258,6 +277,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::get('/reports/print-reports', [ReportsController::class, 'printReport'])->name('reports.print');
         Route::get('/notifications/feed', [AdminController::class, 'notificationsFeed'])->name('notifications.feed');
         Route::post('/notifications/mark-all-read', [AdminController::class, 'markAllAdminNotificationsRead'])->name('notifications.read_all');
+        Route::get('/developer-tools', [AdminController::class, 'developerTools'])->name('developer-tools');
         Route::get('/api-testing', [AdminController::class, 'apiTesting'])->name('api-testing');
     });
 });

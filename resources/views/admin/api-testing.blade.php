@@ -1,18 +1,20 @@
 @extends('layouts.admin')
 
-@section('title', 'For API Testing')
+@section('title', 'API Testing Page')
 @section('disable_voice_inputs', 'true')
 
 @section('content')
 <style>
     .api-testing-shell {
         display: grid;
-        gap: 22px;
+        gap: 20px;
     }
 
     .api-testing-card {
+        position: relative;
+        overflow: hidden;
         background: rgba(255, 255, 255, 0.96);
-        border-radius: 24px;
+        border-radius: 22px;
         padding: 26px;
         box-shadow: 0 22px 50px rgba(15, 23, 42, 0.14);
         border: 1px solid rgba(128, 0, 0, 0.08);
@@ -26,6 +28,8 @@
 
     .api-testing-head h2 {
         margin: 0 0 8px;
+        font-size: 1.45rem;
+        font-weight: 900;
         color: #7f1d2d;
     }
 
@@ -51,7 +55,12 @@
         grid-template-columns: 220px minmax(0, 1fr) auto;
         gap: 14px;
         align-items: end;
-        margin-top: 18px;
+        margin-top: 22px;
+        padding: 18px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(248,250,252,.72));
+        border: 1px solid rgba(127, 29, 45, 0.10);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.86);
     }
 
     .api-system-group.is-hidden {
@@ -216,16 +225,35 @@
         padding: 14px 16px;
         font-size: 15px;
         outline: none;
+        background: rgba(255,255,255,.98);
+        transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    .api-search-form input:focus,
+    .api-search-form select:focus {
+        border-color: #7f1d2d;
+        box-shadow: 0 0 0 4px rgba(127, 29, 45, 0.10);
+        transform: translateY(-1px);
     }
 
     .api-search-form button {
         min-width: 148px;
-        border: none;
+        border: 1px solid #8f2230;
         border-radius: 16px;
         padding: 14px 18px;
-        background: linear-gradient(135deg, #7f1d2d, #5b0c0e);
+        background: linear-gradient(135deg, #70131B, #8f2230);
         color: #fff;
-        font-weight: 700;
+        font-weight: 900;
+        box-shadow: 0 12px 24px rgba(112,19,27,.18);
+        cursor: pointer;
+        transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
+    }
+
+    .api-search-form button:hover {
+        transform: translateY(-1px);
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
     }
 
     .api-alert {
@@ -238,9 +266,9 @@
     }
 
     .api-connection-note {
-        margin-top: 16px;
+        margin-top: 14px;
         border-radius: 18px;
-        padding: 16px 18px;
+        padding: 13px 16px;
         background: linear-gradient(180deg, rgba(255, 248, 230, 0.98), rgba(255, 252, 244, 0.98));
         border: 1px solid rgba(234, 179, 8, 0.28);
         box-shadow: 0 16px 28px rgba(234, 179, 8, 0.10);
@@ -599,37 +627,9 @@
 <div class="api-testing-shell">
     <section class="api-testing-card">
         <div class="api-testing-head">
-            <h2>For API Testing</h2>
-            <p>
-                Temporary admin tool for checking if another system API is reachable and returning faculty profile information.
-                Current faculty test endpoint:
-                <strong>{{ config('services.pupt_flss.faculty_profiles_url') }}</strong>
-            </p>
+            <h2>API Testing Page</h2>
+            <p>Validate integration responses and local developer data from one protected workspace.</p>
         </div>
-
-        @if(($source ?? 'faculty') === 'faculty')
-            <div class="api-connection-note">
-                <strong>FLSS Connection Check</strong>
-                <code>{{ config('services.pupt_flss.faculty_profiles_url') }}</code>
-                <small>
-                    This is the exact faculty endpoint the page is using right now. If production still behaves differently after updating
-                    <code>PUPT_FLSS_FACULTY_PROFILES_URL</code>, run <code>php artisan optimize:clear</code> on the server first.
-                </small>
-            </div>
-        @endif
-
-        @if(str_starts_with(($source ?? ''), 'guisis_'))
-            <div class="api-connection-note">
-                <strong>GuiSIS Connection Check</strong>
-                <code>{{ config('services.guisis.base_url') }}</code>
-                <small>
-                    This test source uses the GuiSIS M2M flow:
-                    <code>POST /auth/m2m/token</code> then
-                    <code>Authorization: Bearer &lt;accessToken&gt;</code>.
-                    Make sure <code>GUISIS_M2M_CLIENT_ID</code> and <code>GUISIS_M2M_CLIENT_SECRET</code> are configured.
-                </small>
-            </div>
-        @endif
 
         @php
             $apiTestingCurrentSource = $source ?? 'faculty';
@@ -690,7 +690,7 @@
                     placeholder="{{ $apiTestingSearchPlaceholder }}"
                 >
             </div>
-            <button type="submit">Search API's</button>
+            <button type="submit">Run Test</button>
         </form>
 
         @if(($source ?? '') === 'database_info')

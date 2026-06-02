@@ -202,8 +202,10 @@
     .summary-medical-assessment-btn {
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        gap: 16px;
         width: 100%;
-        height: 90px;
+        min-height: 104px;
         box-sizing: border-box;
         padding: 15px 24px !important;
         border-radius: 12px;
@@ -212,10 +214,13 @@
         background: linear-gradient(135deg, #70131B, #8f2230);
         color: #ffffff;
         text-decoration: none;
+        text-align: left;
         box-shadow:
             0 0 0 3px rgba(112, 19, 27, 0.12),
             0 10px 22px rgba(112, 19, 27, 0.20);
-        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
+        position: relative;
+        overflow: hidden;
     }
     .summary-medical-assessment-btn:hover {
         color: #ffffff;
@@ -226,18 +231,63 @@
             0 0 0 3px rgba(250, 204, 21, 0.18),
             0 14px 24px rgba(112, 19, 27, 0.16);
     }
+    .summary-medical-assessment-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto -20%;
+        width: 42%;
+        height: 220%;
+        transform: rotate(18deg);
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.16), rgba(250,204,21,0.38), rgba(255,255,255,0.16), transparent);
+        opacity: 0;
+        transition: left .8s ease, opacity .18s ease;
+        pointer-events: none;
+    }
+    .summary-medical-assessment-btn:hover::after {
+        opacity: 1;
+        left: 126%;
+    }
     .summary-medical-assessment-btn svg {
-        width: 19px;
-        height: 19px;
+        width: 22px;
+        height: 22px;
         flex: 0 0 auto;
         stroke-width: 2;
+    }
+    .summary-medical-assessment-btn .health-summary-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
     }
     .summary-medical-assessment-btn .health-summary-label,
     .summary-medical-assessment-btn .health-summary-value {
         color: #ffffff !important;
     }
-    .summary-medical-assessment-btn .health-summary-row {
-        width: 100%;
+    .summary-medical-assessment-btn .health-summary-copy {
+        display: block;
+        margin-top: 5px;
+        color: rgba(255,255,255,0.82);
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.45;
+    }
+    .summary-medical-assessment-btn .health-summary-icon {
+        width: 52px;
+        height: 52px;
+        flex: 0 0 52px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.18);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
+    }
+    .summary-medical-assessment-btn .health-summary-text {
+        min-width: 0;
+        display: grid;
+        gap: 2px;
     }
 
     .health-records-title {
@@ -282,6 +332,90 @@
         gap: 12px;
         flex-wrap: wrap;
         margin-left: auto;
+    }
+
+    .health-medical-launch-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 50px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        white-space: nowrap;
+    }
+
+    .health-medical-launch-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        pointer-events: none;
+    }
+
+    .health-medical-launch-btn:hover,
+    .health-medical-launch-btn:focus {
+        transform: translateY(-1px);
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+        outline: none;
+    }
+
+    .health-medical-launch-btn:hover::after,
+    .health-medical-launch-btn:focus::after {
+        transform: translateX(135%);
+    }
+
+    .health-medical-launch-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.16);
+        border: 1px solid rgba(255,255,255,0.20);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 28px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .health-medical-launch-btn svg {
+        width: 16px;
+        height: 16px;
+        stroke-width: 2;
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .health-medical-launch-text {
+        position: relative;
+        z-index: 1;
     }
     .health-records-search-shell {
         display: inline-flex;
@@ -742,6 +876,19 @@
             0 16px 28px rgba(0, 0, 0, 0.22);
     }
 
+    html[data-theme="dark"] .health-medical-launch-btn {
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.16),
+            0 12px 22px rgba(0, 0, 0, 0.24);
+    }
+
+    html[data-theme="dark"] .health-medical-launch-btn:hover,
+    html[data-theme="dark"] .health-medical-launch-btn:focus {
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(0, 0, 0, 0.22);
+    }
+
     html[data-theme="dark"] .btn-view {
         background: linear-gradient(135deg, rgba(127, 29, 45, 0.22), rgba(148, 28, 57, 0.18));
         border-color: rgba(250, 204, 21, 0.18);
@@ -1081,6 +1228,11 @@
             width: 100%;
         }
 
+        .health-medical-launch-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
         .health-records-search-shell {
             width: 100%;
         }
@@ -1179,17 +1331,26 @@
     .hr-ref-default h4 { margin:0; font-size:20px; font-weight:900; color:#111827; }
     .hr-ref-default p  { margin:0; font-size:13px; color:#64748b; line-height:1.55; max-width:360px; }
     /* Entry pane */
-    .hr-ref-entry { display:none; position:relative; }
-    .hr-ref-entry.is-visible { display:block; }
+    .hr-ref-entry {
+        display: none;
+        position: relative;
+        gap: 12px;
+    }
+    .hr-ref-entry.is-visible { display: grid; }
     .hr-ref-tip {
-        position:absolute; top:0; right:0;
-        max-width:210px; padding:10px 12px;
+        position: relative;
+        max-width: 100%;
+        padding:10px 12px;
         border-radius:14px; background:#fff7ed;
         border:1px solid #fed7aa; color:#9a3412;
-        font-size:11px; line-height:1.5;
+        font-size:12px; line-height:1.5;
         box-shadow:0 8px 18px rgba(180,83,9,0.10);
     }
     .hr-ref-tip strong { display:block; margin-bottom:3px; font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; }
+    .hr-ref-tip::before,
+    .hr-ref-tip::after {
+        display: none;
+    }
     .hr-ref-label { font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:#475569; margin-bottom:6px; display:block; }
     .hr-ref-input {
         width:100%; min-height:52px; padding:14px 16px;
@@ -1313,6 +1474,12 @@
                     <x-outline-icon name="magnifying-glass" />
                 </button>
             </div>
+            <button type="button" id="openHrMedicalModal" class="health-medical-launch-btn">
+                <span class="health-medical-launch-icon" aria-hidden="true">
+                    <x-outline-icon name="clipboard-document-list" />
+                </span>
+                <span class="health-medical-launch-text">Medical Assessment</span>
+            </button>
         </div>
     </div>
 
@@ -1333,14 +1500,6 @@
                     <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_disability', 'Yes')->count() }}</h3>
                 </div>
             </div>
-        </div>
-        <div class="summary-item">
-            <button type="button" id="openHrMedicalModal" class="summary-medical-assessment-btn card p-3" style="border:none;cursor:pointer;text-align:left;">
-                <div class="health-summary-row">
-                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Medical</span><span>Assessment</span></small>
-                    <h3 class="fw-bold mb-0 health-summary-value"><x-outline-icon name="clipboard-document-list" /></h3>
-                </div>
-            </button>
         </div>
     </div>
 
@@ -1592,7 +1751,7 @@
             {{-- Entry pane --}}
             <div class="hr-ref-entry" id="hrRefEntry">
                 <div class="hr-ref-tip">
-                    <strong>💡 Where to find it?</strong>
+                    <strong>Where to find it?</strong>
                     Reference number is in the <strong>Admission System</strong> under the applicant's profile or registration form.
                 </div>
                 <label class="hr-ref-label" for="hrRefInput" style="margin-top:8px;">Reference Number</label>

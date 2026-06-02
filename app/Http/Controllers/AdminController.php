@@ -81,6 +81,24 @@ class AdminController extends Controller
         return User::normalizeRole($user->user_role) === User::ROLE_SUPERADMIN;
     }
 
+    private function canAccessApiTesting(User $user): bool
+    {
+        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
+        $allowedRoles = array_map(static fn ($role) => User::normalizeRole((string) $role), (array) config('services.api_testing.allowed_roles', ['superadmin']));
+        $allowedEmails = array_map(static fn ($email) => strtolower(trim((string) $email)), (array) config('services.api_testing.allowed_emails', []));
+        $email = strtolower(trim((string) ($user->email ?? '')));
+
+        if ($normalizedRole === User::ROLE_SUPERADMIN) {
+            return true;
+        }
+
+        if ($email !== '' && in_array($email, $allowedEmails, true)) {
+            return true;
+        }
+
+        return in_array($normalizedRole, $allowedRoles, true);
+    }
+
     private function findLinkedAdminProfile(User $user): ?Admin
     {
         return $this->findLinkedAdminProfileByEmails([
@@ -350,8 +368,19 @@ class AdminController extends Controller
         ));
     }
 
+    public function developerTools()
+    {
+        $user = Auth::user();
+        abort_unless($user instanceof User && $this->canAccessApiTesting($user), 403);
+
+        return view('admin.developer_tools');
+    }
+
     public function apiTesting(Request $request, FacultySyncService $facultySyncService, GuisisApiService $guisisApiService)
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User && $this->canAccessApiTesting($user), 403);
+
         $search = trim((string) $request->query('search', ''));
         $source = trim((string) $request->query('source', 'faculty'));
         $dbTable = trim((string) $request->query('db_table', 'users'));

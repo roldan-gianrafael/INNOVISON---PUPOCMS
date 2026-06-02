@@ -3612,6 +3612,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         ? route('assistant.notifications.feed')
         : route('admin.notifications.feed');
     $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
+    $developerToolsUrl = $isStudentAssistant ? url('/assistant/developer-tools') : url('/admin/developer-tools');
     $settingsUrl = url('/admin/settings');
     $userManagementUrl = url('/admin/user-management?entry=menu');
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
@@ -3940,8 +3941,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             <span class="sidebar-short"><x-outline-icon name="cog-6-tooth" /></span><span class="sidebar-label">Settings</span>
           </a>
       @endif
-      <a href="{{ $apiTestingUrl }}" class="{{ (Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
-        <span class="sidebar-short"><x-outline-icon name="code-bracket-square" /></span><span class="sidebar-label">For API Testing</span>
+      <a href="{{ $developerToolsUrl }}" class="{{ (Request::is('admin/developer-tools*') || Request::is('assistant/developer-tools*') || Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
+        <span class="sidebar-short"><x-outline-icon name="code-bracket-square" /></span><span class="sidebar-label">Developer Tools</span>
       </a>
 
     </nav>

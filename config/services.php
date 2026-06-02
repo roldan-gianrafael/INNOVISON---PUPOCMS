@@ -90,6 +90,17 @@ return [
         'timeout' => (int) env('TEMP_API_TESTING_TIMEOUT', 20),
     ],
 
+    'api_testing' => [
+        'allowed_emails' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('API_TESTING_ALLOWED_EMAILS', 'pupocms2027@gmail.com'))
+        ))),
+        'allowed_roles' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('API_TESTING_ALLOWED_ROLES', 'superadmin'))
+        ))),
+    ],
+
     'pupt_flss' => [
         'faculty_profiles_url' => env('PUPT_FLSS_FACULTY_PROFILES_URL', 'https://flss-backend-api-d9eecxcnhpccdpdk.southeastasia-01.azurewebsites.net/api/v1/faculty-profiles'),
         'system_id' => env('PUPT_FLSS_SYSTEM_ID', 'ocms'),

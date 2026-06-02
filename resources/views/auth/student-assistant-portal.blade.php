@@ -318,9 +318,13 @@
 <body>
     @php
         $normalizedUserRole = \App\Models\User::normalizeRole($user->user_role ?? '');
-        $showStudentSide = $normalizedUserRole === \App\Models\User::ROLE_STUDENT;
-        $showAdminSide = in_array($normalizedUserRole, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPERADMIN], true);
-        $showBothSides = !$showStudentSide && !$showAdminSide;
+        $rawUserRole = strtolower(trim((string) ($user->user_role ?? '')));
+        $userType = strtolower(trim((string) ($user->user_type ?? '')));
+        $isStudentAssistant = in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+            || in_array($rawUserRole, ['student_assistant', 'studentassistant', 'assistant'], true);
+        $showStudentSide = $isStudentAssistant || $normalizedUserRole === \App\Models\User::ROLE_STUDENT;
+        $showAdminSide = $isStudentAssistant || in_array($normalizedUserRole, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPERADMIN], true);
+        $showBothSides = $isStudentAssistant || (!$showStudentSide && !$showAdminSide);
     @endphp
 
     <div class="chooser-shell">

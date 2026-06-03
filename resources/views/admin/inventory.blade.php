@@ -566,10 +566,10 @@
     }
     .modal-box {
         background: rgba(255, 255, 255, 0.95);
-        width: min(100%, 920px);
+        width: min(100%, 1120px);
         max-width: 100%;
-        height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
-        max-height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
+        height: min(900px, calc(100dvh - clamp(18px, 3vw, 40px)));
+        max-height: min(900px, calc(100dvh - clamp(18px, 3vw, 40px)));
         border: 1px solid rgba(112, 19, 27, 0.14);
         border-radius: 22px;
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
@@ -584,10 +584,10 @@
     }
     #itemModal .modal-box {
         background: rgba(255, 255, 255, 0.42) !important;
-        width: min(100%, 1040px);
+        width: min(100%, 1180px);
         max-width: 100%;
-        height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
-        max-height: min(920px, calc(100dvh - clamp(24px, 4vw, 56px)));
+        height: min(900px, calc(100dvh - clamp(18px, 3vw, 40px)));
+        max-height: min(900px, calc(100dvh - clamp(18px, 3vw, 40px)));
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-top: 4px solid #66ff00 !important;
@@ -985,8 +985,8 @@
         position: fixed;
         right: auto;
         z-index: 2200;
-        width: min(420px, calc(100vw - 32px));
-        max-height: min(360px, calc(100vh - 32px));
+        width: min(460px, calc(100vw - 24px));
+        max-height: min(420px, calc(100vh - 24px));
     }
 
     .inventory-medicine-type-search {
@@ -1020,7 +1020,7 @@
     .inventory-medicine-type-options {
         display: grid;
         gap: 10px;
-        max-height: 188px;
+        max-height: 248px;
         overflow-y: auto;
         padding-right: 2px;
     }
@@ -2497,9 +2497,14 @@
         const menuGap = 6;
         const width = Math.min(triggerRect.width, window.innerWidth - (viewportPadding * 2));
         const left = Math.min(Math.max(triggerRect.left, viewportPadding), window.innerWidth - width - viewportPadding);
-        const top = triggerRect.bottom + menuGap;
-        const spaceBelow = window.innerHeight - top - viewportPadding;
-        const maxHeight = Math.max(160, Math.min(320, spaceBelow));
+        const spaceBelow = window.innerHeight - triggerRect.bottom - viewportPadding - menuGap;
+        const spaceAbove = triggerRect.top - viewportPadding - menuGap;
+        const openUpward = spaceBelow < 240 && spaceAbove > spaceBelow;
+        const availableHeight = openUpward ? spaceAbove : spaceBelow;
+        const maxHeight = Math.max(180, Math.min(420, availableHeight));
+        const top = openUpward
+            ? Math.max(viewportPadding, triggerRect.top - menuGap - maxHeight)
+            : triggerRect.bottom + menuGap;
 
         medicineTypeMenu.style.left = `${left}px`;
         medicineTypeMenu.style.width = `${width}px`;

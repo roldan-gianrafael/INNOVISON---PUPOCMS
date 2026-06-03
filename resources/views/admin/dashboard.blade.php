@@ -171,12 +171,140 @@
     .st-completed { background: #dbeafe; color: #1e40af; }
     .st-cancelled { background: #fee2e2; color: #b91c1c; }
 
+    .dashboard-chart-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: -12px 0 22px;
+    }
+
+    .dashboard-chart-card {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .dashboard-chart-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .dashboard-chart-title {
+        margin: 0;
+        color: #0f172a;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .dashboard-chart-copy {
+        margin: 3px 0 0;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .dashboard-chart-total {
+        min-width: 54px;
+        text-align: right;
+        color: #8B0000;
+        font-size: 22px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .dashboard-chart-total span {
+        display: block;
+        margin-top: 3px;
+        color: #94a3b8;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .dashboard-chart-bars {
+        display: grid;
+        gap: 9px;
+    }
+
+    .dashboard-chart-row {
+        display: grid;
+        grid-template-columns: 92px 1fr 42px;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .dashboard-chart-label {
+        color: #334155;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .dashboard-chart-track {
+        height: 9px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #f1f5f9;
+    }
+
+    .dashboard-chart-fill {
+        display: block;
+        height: 100%;
+        min-width: 4px;
+        border-radius: inherit;
+        background: #94a3b8;
+    }
+
+    .dashboard-chart-fill.success { background: #22c55e; }
+    .dashboard-chart-fill.warning { background: #f59e0b; }
+    .dashboard-chart-fill.info { background: #3b82f6; }
+    .dashboard-chart-fill.danger { background: #ef4444; }
+
+    .dashboard-chart-value {
+        color: #0f172a;
+        font-size: 12px;
+        font-weight: 900;
+        text-align: right;
+    }
+
+    html[data-theme="dark"] .dashboard-chart-card {
+        background: rgba(15, 23, 42, 0.78);
+        border-color: rgba(250, 204, 21, 0.16);
+    }
+
+    html[data-theme="dark"] .dashboard-chart-title,
+    html[data-theme="dark"] .dashboard-chart-value,
+    html[data-theme="dark"] .dashboard-chart-label {
+        color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .dashboard-chart-copy,
+    html[data-theme="dark"] .dashboard-chart-total span {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .dashboard-chart-total {
+        color: #fde68a;
+    }
+
+    html[data-theme="dark"] .dashboard-chart-track {
+        background: rgba(255, 255, 255, 0.12);
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
         .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        .dashboard-chart-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 768px) {
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .dashboard-chart-row { grid-template-columns: 84px 1fr 36px; }
     }
     @media (max-width: 500px) { .stats-grid { grid-template-columns: 1fr; } }
 </style>
@@ -230,6 +358,57 @@
             <div class="stat-badge badge-danger">Inactive</div>
         </div>
 
+    </div>
+
+    @php
+        $appointmentChartMax = max(1, collect($appointmentChartStats)->max('value') ?? 0);
+        $inventoryChartMax = max(1, collect($inventoryChartStats)->max('value') ?? 0);
+    @endphp
+
+    <div class="dashboard-chart-grid" aria-label="Dashboard statistics charts">
+        <section class="dashboard-chart-card">
+            <div class="dashboard-chart-head">
+                <div>
+                    <h3 class="dashboard-chart-title">Appointment Status</h3>
+                    <p class="dashboard-chart-copy">Quick count of current request outcomes.</p>
+                </div>
+                <div class="dashboard-chart-total">{{ $total }}<span>Total</span></div>
+            </div>
+            <div class="dashboard-chart-bars">
+                @foreach($appointmentChartStats as $chartItem)
+                    @php $width = max(4, round(((int) $chartItem['value'] / $appointmentChartMax) * 100)); @endphp
+                    <div class="dashboard-chart-row">
+                        <div class="dashboard-chart-label">{{ $chartItem['label'] }}</div>
+                        <div class="dashboard-chart-track" aria-hidden="true">
+                            <span class="dashboard-chart-fill {{ $chartItem['class'] }}" style="width: {{ $width }}%;"></span>
+                        </div>
+                        <div class="dashboard-chart-value">{{ number_format($chartItem['value']) }}</div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <section class="dashboard-chart-card">
+            <div class="dashboard-chart-head">
+                <div>
+                    <h3 class="dashboard-chart-title">Inventory Health</h3>
+                    <p class="dashboard-chart-copy">Stock condition across encoded items.</p>
+                </div>
+                <div class="dashboard-chart-total">{{ $inventoryTotal }}<span>Items</span></div>
+            </div>
+            <div class="dashboard-chart-bars">
+                @foreach($inventoryChartStats as $chartItem)
+                    @php $width = max(4, round(((int) $chartItem['value'] / $inventoryChartMax) * 100)); @endphp
+                    <div class="dashboard-chart-row">
+                        <div class="dashboard-chart-label">{{ $chartItem['label'] }}</div>
+                        <div class="dashboard-chart-track" aria-hidden="true">
+                            <span class="dashboard-chart-fill {{ $chartItem['class'] }}" style="width: {{ $width }}%;"></span>
+                        </div>
+                        <div class="dashboard-chart-value">{{ number_format($chartItem['value']) }}</div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
     </div>
 
     <div class="panel">

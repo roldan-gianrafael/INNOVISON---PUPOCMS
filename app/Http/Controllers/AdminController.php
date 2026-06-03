@@ -356,6 +356,28 @@ class AdminController extends Controller
         $completed = Appointment::where('status', 'Completed')->count();
         $cancelled = Appointment::where('status', 'Cancelled')->count();
 
+        $inventoryTotal = Item::count();
+        $inventoryInStock = Item::where('quantity', '>', 0)
+            ->whereColumn('quantity', '>', 'minimum_stock')
+            ->count();
+        $inventoryLowStock = Item::where('quantity', '>', 0)
+            ->whereColumn('quantity', '<=', 'minimum_stock')
+            ->count();
+        $inventoryOutOfStock = Item::where('quantity', '<=', 0)->count();
+
+        $appointmentChartStats = [
+            ['label' => 'Pending', 'value' => $pending, 'class' => 'warning'],
+            ['label' => 'Approved', 'value' => $upcoming, 'class' => 'success'],
+            ['label' => 'Completed', 'value' => $completed, 'class' => 'info'],
+            ['label' => 'Cancelled', 'value' => $cancelled, 'class' => 'danger'],
+        ];
+
+        $inventoryChartStats = [
+            ['label' => 'In Stock', 'value' => $inventoryInStock, 'class' => 'success'],
+            ['label' => 'Low Stock', 'value' => $inventoryLowStock, 'class' => 'warning'],
+            ['label' => 'Out', 'value' => $inventoryOutOfStock, 'class' => 'danger'],
+        ];
+
         $recentAppointments = Appointment::latest()->take(5)->get();
 
         return view('admin.dashboard', compact(
@@ -364,6 +386,9 @@ class AdminController extends Controller
             'upcoming',
             'completed',
             'cancelled',
+            'inventoryTotal',
+            'appointmentChartStats',
+            'inventoryChartStats',
             'recentAppointments'
         ));
     }

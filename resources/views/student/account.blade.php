@@ -2078,11 +2078,6 @@ document.addEventListener('DOMContentLoaded', function () {
         @endif
     </div>
 
-    <div class="guisis-sync-banner">
-        <span class="guisis-sync-badge">GUISIS Sync Pending</span>
-        <p class="guisis-sync-copy">Student information will sync from GUISIS once the enrollment record is available. Only height and weight can be updated in the clinic profile.</p>
-    </div>
-    
     <form action="{{ route('student.updateContact') }}" method="POST">
         @csrf
         @if(!empty($linkedAdminProfile))

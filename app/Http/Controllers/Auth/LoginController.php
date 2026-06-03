@@ -1430,8 +1430,11 @@ class LoginController extends Controller
             $this->recordAuthEvent($request, 'Logout', 'User logged out from the system.', $user);
         }
 
-        if ($guard) {
-            Auth::guard($guard)->logout();
+        Auth::guard($this->adminGuardName())->logout();
+        Auth::guard($this->studentGuardName())->logout();
+
+        if ($guard === 'web') {
+            Auth::guard('web')->logout();
         }
 
         $request->session()->regenerateToken();

@@ -253,7 +253,7 @@
     <div class="profile-card">
         <div class="profile-switch-head">
             <div class="profile-switch" role="tablist" aria-label="Health profile sections">
-                <button type="button" class="profile-tab is-active" data-profile-tab-target="summaryPanel">Medical Summary</button>
+                <button type="button" class="profile-tab is-active" data-profile-tab-target="summaryPanel">Health Summary</button>
                 <button type="button" class="profile-tab" data-profile-tab-target="docsPanel">Uploaded Documents</button>
             </div>
             <span class="profile-status-badge {{ $profileStatusClass }}">

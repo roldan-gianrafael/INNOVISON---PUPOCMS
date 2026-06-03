@@ -31,6 +31,15 @@
             padding: 28px 12px 120px;
         }
 
+        body.health-form-page .system-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: 0 -12px 30px rgba(15, 23, 42, 0.18);
+        }
+
         .health-shell {
             max-width: 980px;
             margin: 0 auto;
@@ -623,7 +632,7 @@
         }
     </style>
 </head>
-<body>
+<body class="health-form-page">
     @php
         $prefill = $healthFormPrefill ?? [];
     @endphp

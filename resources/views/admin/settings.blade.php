@@ -229,7 +229,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #fff;
+        color: #facc15;
         font-size: 16px;
         font-weight: 900;
         letter-spacing: 0.02em;

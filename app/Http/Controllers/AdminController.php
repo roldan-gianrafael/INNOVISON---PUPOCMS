@@ -83,20 +83,13 @@ class AdminController extends Controller
 
     private function canAccessApiTesting(User $user): bool
     {
-        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
-        $allowedRoles = array_map(static fn ($role) => User::normalizeRole((string) $role), (array) config('services.api_testing.allowed_roles', ['superadmin']));
-        $allowedEmails = array_map(static fn ($email) => strtolower(trim((string) $email)), (array) config('services.api_testing.allowed_emails', []));
+        $allowedEmails = array_map(static fn ($email) => strtolower(trim((string) $email)), array_filter(array_merge(
+            ['pupocms2027@gmail.com'],
+            (array) config('services.api_testing.allowed_emails', [])
+        )));
         $email = strtolower(trim((string) ($user->email ?? '')));
 
-        if ($normalizedRole === User::ROLE_SUPERADMIN) {
-            return true;
-        }
-
-        if ($email !== '' && in_array($email, $allowedEmails, true)) {
-            return true;
-        }
-
-        return in_array($normalizedRole, $allowedRoles, true);
+        return $email !== '' && in_array($email, $allowedEmails, true);
     }
 
     private function findLinkedAdminProfile(User $user): ?Admin
@@ -802,7 +795,8 @@ class AdminController extends Controller
 
     public function updateApiTestingDatabaseRecord(Request $request, string $table, int $id)
     {
-        abort_unless(User::normalizeRole(optional(Auth::user())->user_role ?? '') === User::ROLE_SUPERADMIN, 403);
+        $user = Auth::user();
+        abort_unless($user instanceof User && $this->canAccessApiTesting($user), 403);
 
         if ($table === 'users') {
             $request->validate([
@@ -880,7 +874,8 @@ class AdminController extends Controller
 
     public function deleteApiTestingDatabaseRecord(string $table, int $id)
     {
-        abort_unless(User::normalizeRole(optional(Auth::user())->user_role ?? '') === User::ROLE_SUPERADMIN, 403);
+        $user = Auth::user();
+        abort_unless($user instanceof User && $this->canAccessApiTesting($user), 403);
 
         if ($table === 'users') {
             User::findOrFail($id)->delete();

@@ -22,18 +22,23 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     $user = Auth::guard('admin')->user() ?? Auth::guard('student')->user();
     if ($user instanceof User) {
+        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
+
+        if ($normalizedRole === User::ROLE_SUPERADMIN) {
+            return redirect('/admin/dashboard');
+        }
+
         $rawRole = strtolower(trim((string) ($user->user_role ?? '')));
         $userType = strtolower(trim((string) ($user->user_type ?? '')));
         $isStudentAssistant = in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
             || in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true);
 
-        if ($isStudentAssistant) {
+        if ($normalizedRole === User::ROLE_ADMIN && $isStudentAssistant) {
             return redirect('/assistant/choose-portal');
         }
 
-        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
         return match ($normalizedRole) {
-            User::ROLE_ADMIN, User::ROLE_SUPERADMIN => redirect('/admin/dashboard'),
+            User::ROLE_ADMIN => redirect('/assistant/dashboard'),
             default => redirect('/student/home'),
         };
     }
@@ -44,18 +49,23 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/login/portal', function () {
     $existingUser = Auth::guard('admin')->user() ?? Auth::guard('student')->user();
     if ($existingUser instanceof User) {
+        $normalizedRole = User::normalizeRole((string) ($existingUser->user_role ?? ''));
+
+        if ($normalizedRole === User::ROLE_SUPERADMIN) {
+            return redirect('/admin/dashboard');
+        }
+
         $rawRole = strtolower(trim((string) ($existingUser->user_role ?? '')));
         $userType = strtolower(trim((string) ($existingUser->user_type ?? '')));
         $isStudentAssistant = in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
             || in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true);
 
-        if ($isStudentAssistant) {
+        if ($normalizedRole === User::ROLE_ADMIN && $isStudentAssistant) {
             return redirect('/assistant/choose-portal');
         }
 
-        $normalizedRole = User::normalizeRole((string) ($existingUser->user_role ?? ''));
         return match ($normalizedRole) {
-            User::ROLE_ADMIN, User::ROLE_SUPERADMIN => redirect('/admin/dashboard'),
+            User::ROLE_ADMIN => redirect('/assistant/dashboard'),
             default => redirect('/student/home'),
         };
     }

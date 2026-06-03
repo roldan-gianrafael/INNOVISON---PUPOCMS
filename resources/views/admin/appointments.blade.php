@@ -456,7 +456,7 @@
     }
     .modal-box > .modal-row:first-of-type,
     .modal-box form > .modal-row:first-of-type {
-        margin-top: clamp(16px, 2vw, 24px);
+        margin-top: clamp(20px, 2.4vw, 30px);
     }
     .modal-box form {
         display: flex;
@@ -481,7 +481,7 @@
     }
     .modal-header .modal-subtitle {
         margin: 6px 0 0;
-        color: rgba(255, 255, 255, 0.84);
+        color: #ffffff;
         font-size: 13px;
         line-height: 1.5;
     }
@@ -579,6 +579,27 @@
         transition: 0.2s;
         border-bottom: 1px solid yellow;
         border-bottom-radius: 6px;
+    }
+    .dialog-btn-confirm {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        border: 1px solid #8f2230;
+        box-shadow: 0 12px 24px rgba(112, 19, 27, 0.20);
+        gap: 8px;
+    }
+    .dialog-btn-confirm:hover,
+    .dialog-btn-confirm:focus-visible {
+        background: linear-gradient(135deg, #facc15, #fde68a);
+        color: #70131B;
+        border-color: #facc15;
+        transform: translateY(-1px);
+        outline: none;
+    }
+    .dialog-btn-confirm svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2.2;
+        flex: 0 0 auto;
     }
     .dialog-btn-neutral {
         background: #eee;
@@ -1695,9 +1716,6 @@
             <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="mService"></div></div>
             <div class="modal-row"><div class="modal-label">Scheduled For</div><div class="modal-val" id="mDateTime"></div></div>
             <div class="modal-row"><div class="modal-label">Notes</div><div class="modal-val modal-notes" id="mNotes"></div></div>
-            <div class="dialog-actions">
-                <button type="button" class="dialog-btn dialog-btn-primary" onclick="closeInfoModal()">Close</button>
-            </div>
         </div>
     </div>
 
@@ -1717,8 +1735,10 @@
             <div class="modal-row"><div class="modal-label">Service Request</div><div class="modal-val" id="sService"></div></div>
             <div class="modal-row"><div class="modal-label">Schedule</div><div class="modal-val" id="sDateTime"></div></div>
             <div class="dialog-actions">
-                <button type="button" class="dialog-btn dialog-btn-neutral" onclick="closeStatusActionModal()">Cancel</button>
-                <a id="statusActionConfirm" href="#" class="dialog-btn dialog-btn-primary">Confirm</a>
+                <a id="statusActionConfirm" href="#" class="dialog-btn dialog-btn-confirm">
+                    <x-outline-icon name="check" />
+                    <span>Confirm</span>
+                </a>
             </div>
         </div>
     </div>
@@ -1743,8 +1763,10 @@
                 <div class="modal-row is-form"><label class="modal-label">New Date</label><input type="date" name="date" id="rDate" class="form-input" required></div>
                 <div class="modal-row is-form"><label class="modal-label">New Time</label><input type="time" name="time" id="rTime" class="form-input" required></div>
                 <div class="dialog-actions">
-                    <button type="button" class="dialog-btn dialog-btn-neutral" onclick="closeRescheduleModal()">Cancel</button>
-                    <button type="submit" class="dialog-btn dialog-btn-primary">Confirm New Schedule</button>
+                    <button type="submit" class="dialog-btn dialog-btn-confirm">
+                        <x-outline-icon name="check" />
+                        <span>Confirm New Schedule</span>
+                    </button>
                 </div>
             </form>
         </div>

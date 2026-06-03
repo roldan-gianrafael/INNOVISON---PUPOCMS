@@ -3613,6 +3613,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         : route('admin.notifications.feed');
     $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
     $developerToolsUrl = $isStudentAssistant ? url('/assistant/developer-tools') : url('/admin/developer-tools');
+    $developerToolEmails = array_map(static fn ($email) => strtolower(trim((string) $email)), array_filter(array_merge(
+        ['pupocms2027@gmail.com'],
+        (array) config('services.api_testing.allowed_emails', [])
+    )));
+    $canSeeDeveloperTools = in_array(strtolower(trim((string) optional($authUser)->email)), $developerToolEmails, true);
     $settingsUrl = url('/admin/settings');
     $userManagementUrl = url('/admin/user-management?entry=menu');
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
@@ -3941,9 +3946,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             <span class="sidebar-short"><x-outline-icon name="cog-6-tooth" /></span><span class="sidebar-label">Settings</span>
           </a>
       @endif
-      <a href="{{ $developerToolsUrl }}" class="{{ (Request::is('admin/developer-tools*') || Request::is('assistant/developer-tools*') || Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
-        <span class="sidebar-short"><x-outline-icon name="code-bracket-square" /></span><span class="sidebar-label">Developer Tools</span>
-      </a>
+      @if($canSeeDeveloperTools)
+        <a href="{{ $developerToolsUrl }}" class="{{ (Request::is('admin/developer-tools*') || Request::is('assistant/developer-tools*') || Request::is('admin/api-testing*') || Request::is('assistant/api-testing*')) ? 'active' : '' }}">
+          <span class="sidebar-short"><x-outline-icon name="code-bracket-square" /></span><span class="sidebar-label">Developer Tools</span>
+        </a>
+      @endif
 
     </nav>
 
@@ -3967,6 +3974,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 <form id="layoutLogoutForm" method="POST" action="{{ route('logout') }}" style="display:none;">
     @csrf
     <input type="hidden" name="portal_guard" value="admin">
+    <input type="hidden" name="logout_all" value="1">
 </form>
 
 <section class="medicine-alert-panel" id="medicineAlertPanel" aria-live="polite">

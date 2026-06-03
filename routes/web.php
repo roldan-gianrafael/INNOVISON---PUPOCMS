@@ -168,12 +168,9 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
     Route::get('/health-profile/{id}/pdf', [AdminController::class, 'exportHealthPdf'])
         ->middleware('role:superadmin,admin')
         ->name('admin.health_pdf');
-    Route::get('/health-profile/{id}/medical-assessment', [AdminController::class, 'showMedicalAssessment'])
-        ->middleware('role:superadmin,admin')
-        ->name('admin.medical_assessment');
-    Route::put('/health-profile/{id}/medical-assessment', [AdminController::class, 'updateMedicalAssessment'])
-        ->middleware('role:superadmin,admin')
-        ->name('admin.medical_assessment.update');
+    Route::post('/health-profile/medical-assessment-upload', [AdminController::class, 'uploadMedicalAssessmentCopy'])
+        ->middleware('role:superadmin,admin,nurse')
+        ->name('admin.medical_assessment_upload');
     Route::get('/health-profile/{id}/sign', [AdminController::class, 'showSignPage'])
         ->middleware('role:superadmin')
         ->name('admin.sign_page');

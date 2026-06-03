@@ -851,13 +851,16 @@
         align-items: center; 
     }
     .modal-box {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.4);
         width: min(100%, 1120px);
         max-width: 100%;
         height: min(900px, calc(100dvh - clamp(18px, 3vw, 40px)));
         max-height: min(900px, calc(100dvh - clamp(18px, 3vw, 40px)));
-        border: 1px solid rgba(112, 19, 27, 0.14);
-        border-radius: 22px;
+        border-left: 1px solid rgba(112, 19, 27, 0.12);
+        border-right: 1px solid rgba(112, 19, 27, 0.12);
+        border-top: 4px solid #facc15;
+        border-bottom: 4px solid #facc15;
+        border-radius: 18px;
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
         overflow: hidden;
         padding: 0;
@@ -866,27 +869,33 @@
         position: relative;
         min-width: 320px;
         min-height: 0;
-        backdrop-filter: blur(4px);
+        backdrop-filter: blur(8px);
     }
     #itemModal .modal-box {
-        background: rgba(255, 255, 255, 0.42) !important;
+        background: rgba(255, 255, 255, 0.98) !important;
         width: min(100%, 1180px);
         max-width: 100%;
         height: min(900px, calc(100dvh - clamp(18px, 3vw, 40px)));
         max-height: min(900px, calc(100dvh - clamp(18px, 3vw, 40px)));
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-top: 4px solid #66ff00 !important;
-        border-bottom: 4px solid #70131B !important;
+        border-top: 4px solid #facc15 !important;
+        border-bottom: 4px solid #facc15 !important;
         border-radius: 18px !important;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
     }
     #restockModal .modal-box,
     #historyModal .modal-box {
+        width: min(100%, 860px);
+        max-width: 100%;
+        height: min(760px, calc(100dvh - clamp(18px, 3vw, 40px)));
+        max-height: min(760px, calc(100dvh - clamp(18px, 3vw, 40px)));
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-top: 4px solid #66ff00 !important;
-        border-bottom: 4px solid #70131B !important;
+        border-top: 4px solid #facc15 !important;
+        border-bottom: 4px solid #facc15 !important;
         border-radius: 18px !important;
     }
     .modal-box .inventory-modal-head {
@@ -1002,6 +1011,27 @@
         border: 1px solid rgba(112, 19, 27, 0.12);
         box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
     }
+    .history-summary-panel {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: #ffffff;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+    .history-summary-title {
+        font-size: 13px;
+        font-weight: 900;
+        color: #70131B;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+    .history-summary-copy {
+        font-size: 13px;
+        line-height: 1.5;
+        color: #475569;
+    }
     .inventory-history-list {
         display: grid;
         gap: 14px;
@@ -1062,7 +1092,7 @@
         padding: clamp(16px, 2.6vw, 26px);
         overflow-y: auto;
         min-height: 0;
-        background: transparent;
+        background: linear-gradient(180deg, #fffdfb 0%, #fff8f2 100%);
         overscroll-behavior: contain;
     }
     .modal-form-grid { 
@@ -1074,7 +1104,7 @@
     #itemModal .modal-form-panel {
         border: 1px solid rgba(112, 19, 27, 0.15);
         border-radius: clamp(12px, 1.8vw, 16px);
-        background: #ffffff;
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
         padding: clamp(14px, 2vw, 18px);
         min-width: 0;
         box-shadow:
@@ -1093,7 +1123,7 @@
         display: flex;
         flex-direction: column;
         border: 1px solid rgba(112, 19, 27, 0.15);
-        background: rgba(255, 255, 255, 0.46);
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
         border-radius: 12px;
         padding: 11px 12px;
         box-shadow:
@@ -1447,9 +1477,76 @@
             grid-template-columns: 1fr;
         }
 
-        #itemModal .inventory-modal-body {
-            padding: 14px;
-        }
+    #itemModal .inventory-modal-body {
+        padding: 14px;
+    }
+
+    #itemModal .inventory-modal-head {
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    #itemModal .inventory-modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        padding: 0;
+        margin-left: 0;
+        border-radius: 999px;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        z-index: 2;
+    }
+
+    #itemModal .inventory-modal-close svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2.2;
+        position: relative;
+        z-index: 1;
+    }
+
+    #itemModal .inventory-modal-close::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    #itemModal .inventory-modal-close:hover {
+        border-color: #facc15;
+        transform: translateY(-1px);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
+    }
+
+    #itemModal .inventory-modal-close:hover::after {
+        transform: translateX(135%);
+    }
 
         #itemModal .form-group {
             padding: 10px;
@@ -1576,13 +1673,14 @@
 
     html[data-theme="dark"] #restockModal .modal-box,
     html[data-theme="dark"] #historyModal .modal-box {
+        background: rgba(17, 24, 39, 0.96) !important;
         border-left: 1px solid rgba(143, 34, 48, 0.36) !important;
         border-right: 1px solid rgba(143, 34, 48, 0.36) !important;
         border-top: 4px solid #facc15 !important;
         border-bottom: 4px solid #facc15 !important;
     }
     html[data-theme="dark"] #itemModal .modal-box {
-        background: rgba(28, 20, 22, 0.34) !important;
+        background: rgba(17, 24, 39, 0.96) !important;
         border-left: 1px solid rgba(143, 34, 48, 0.36) !important;
         border-right: 1px solid rgba(143, 34, 48, 0.36) !important;
         border-top: 4px solid #facc15 !important;
@@ -1810,6 +1908,10 @@
         align-items: stretch;
         gap: 16px;
     }
+    #historyModal .inventory-modal-head {
+        align-items: stretch;
+        gap: 16px;
+    }
     .restock-head-right {
         display: flex;
         flex-direction: column;
@@ -1863,6 +1965,9 @@
     }
     @media (max-width: 600px) {
         #restockModal .inventory-modal-head {
+            flex-wrap: wrap;
+        }
+        #historyModal .inventory-modal-head {
             flex-wrap: wrap;
         }
         .restock-head-right {
@@ -2030,7 +2135,7 @@
     .history-stat-bar {
         display: flex;
         gap: 8px;
-        margin-top: 12px;
+        margin-top: 0;
         flex-wrap: wrap;
     }
     .history-stat-chip {
@@ -2077,10 +2182,41 @@
         border-color: rgba(255, 255, 255, 0.18);
         color: #ffffff;
     }
+    .history-summary-panel {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: #ffffff;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+    .history-summary-title {
+        font-size: 13px;
+        font-weight: 900;
+        color: #70131B;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+    .history-summary-copy {
+        font-size: 13px;
+        line-height: 1.5;
+        color: #475569;
+    }
     html[data-theme="dark"] .history-stat-chip.chip-in      { background: rgba(21,128,61,0.72);   border-color: rgba(255,255,255,0.14); color: #ffffff; }
     html[data-theme="dark"] .history-stat-chip.chip-out     { background: rgba(185,28,28,0.72);   border-color: rgba(255,255,255,0.14); color: #ffffff; }
     html[data-theme="dark"] .history-stat-chip.chip-net-pos { background: rgba(29,78,216,0.72);   border-color: rgba(255,255,255,0.14); color: #ffffff; }
     html[data-theme="dark"] .history-stat-chip.chip-net-neg { background: rgba(180,83,9,0.72);    border-color: rgba(255,255,255,0.14); color: #ffffff; }
+    html[data-theme="dark"] .history-summary-panel {
+        background: rgba(17, 24, 39, 0.82);
+        border-color: rgba(250, 204, 21, 0.16);
+    }
+    html[data-theme="dark"] .history-summary-title {
+        color: #facc15;
+    }
+    html[data-theme="dark"] .history-summary-copy {
+        color: #e2e8f0;
+    }
 
     /* --- History card color-coded by type --- */
     .history-card {
@@ -2610,7 +2746,16 @@
                 <div class="inventory-modal-head">
                     <div class="inventory-modal-head-main">
                         <h3 class="inventory-modal-title">Stock Movement History</h3>
-                        <p class="inventory-modal-copy" id="historyItemName">Recent inventory activity.</p>
+                        <p class="inventory-modal-copy">Review item movement activity, stock changes, and related notes.</p>
+                    </div>
+                    <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeHistoryModal()" aria-label="Close history modal">
+                        <x-outline-icon name="x-mark" />
+                    </button>
+                </div>
+                <div class="inventory-modal-body">
+                    <div class="history-summary-panel">
+                        <div class="history-summary-title" id="historyItemName">Recent inventory activity.</div>
+                        <div class="history-summary-copy">Quick totals for incoming stock, outgoing stock, and the current movement count.</div>
                         <div class="history-stat-bar">
                             <div class="history-stat-chip chip-in">
                                 <span class="history-stat-chip-label">Total In</span>
@@ -2630,11 +2775,6 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeHistoryModal()" aria-label="Close history modal">
-                        <x-outline-icon name="x-mark" />
-                    </button>
-                </div>
-                <div class="inventory-modal-body">
                     <div id="historyList" class="inventory-history-list"></div>
                 </div>
             </div>

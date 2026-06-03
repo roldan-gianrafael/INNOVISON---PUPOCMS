@@ -544,7 +544,7 @@
         background: #ffffff;
         border-left: 1px solid rgba(112, 19, 27, 0.12);
         border-right: 1px solid rgba(112, 19, 27, 0.12);
-        border-top: 4px solid #66ff00;
+        border-top: 4px solid #facc15;
         border-bottom: 4px solid #70131B;
         box-shadow: 0 26px 70px rgba(15, 23, 42, 0.22);
     }

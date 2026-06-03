@@ -1421,89 +1421,6 @@ class AdminController extends Controller
         return view('admin.show_health', compact('profile', 'calculatedAge'));
     }
 
-    public function showMedicalAssessment($id)
-    {
-        $profile = HealthProfile::with('user')->findOrFail($id);
-
-        $calculatedAge = !empty($profile->user->DOB)
-            ? Carbon::parse($profile->user->DOB)->age
-            : null;
-
-        return view('admin.medical_assessment', compact('profile', 'calculatedAge'));
-    }
-
-    public function updateMedicalAssessment(Request $request, $id)
-    {
-        $profile = HealthProfile::with('user')->findOrFail($id);
-
-        $validated = $request->validate([
-            'assessment_date' => ['required', 'date'],
-            'height' => ['nullable', 'string', 'max:30'],
-            'weight' => ['nullable', 'string', 'max:30'],
-            'blood_pressure' => ['nullable', 'string', 'max:30'],
-            'respiratory_rate' => ['nullable', 'string', 'max:30'],
-            'temperature' => ['nullable', 'string', 'max:30'],
-            'covid_positive' => ['nullable', Rule::in(['Yes', 'No'])],
-            'medical_certificate_issued_by' => ['nullable', 'string', 'max:120'],
-            'medical_certificate_issued_at' => ['nullable', 'date'],
-            'chest_xray_result_text' => ['nullable', 'string', 'max:200'],
-            'chest_xray_date' => ['nullable', 'date'],
-            'assessment_remarks' => ['nullable', 'string', 'max:2000'],
-        ]);
-
-        $profile->fill($validated);
-        $profile->clearance_status = 'Issued';
-        $profile->pending_reason = null;
-        $profile->verified_at = now();
-        $profile->save();
-
-        $syncMessage = 'Student approved after medical assessment.';
-        if ($profile->user) {
-            $profile->user->is_health_profile_completed = 1;
-            $profile->user->save();
-
-            try {
-                $puptasService = app(PuptasWebhookService::class);
-                $referenceNumber = $this->resolvePuptasReferenceNumber($profile);
-                $idpStudentId = $this->resolvePuptasIdpStudentId($profile);
-
-                if ($referenceNumber === '') {
-                    $this->updatePuptasSyncState($profile, 'missing_reference_number', 'PUPTAS sync skipped because the reference number is still missing.');
-                    $syncMessage = 'Student approved, but PUPTAS sync was skipped because reference number is missing.';
-                } elseif ($idpStudentId === '') {
-                    $this->updatePuptasSyncState($profile, 'missing_student_id', 'PUPTAS sync skipped because the IDP student ID is still missing.');
-                    $syncMessage = 'Student approved, but PUPTAS sync was skipped because the IDP student ID is missing.';
-                } else {
-                    $this->updatePuptasSyncState($profile, 'syncing', 'Preparing the approved health clearance for PUPTAS.');
-                    $syncResult = $puptasService->sendWithRetry($referenceNumber, $idpStudentId, true);
-
-                    if (!$syncResult['success']) {
-                        $this->updatePuptasSyncState(
-                            $profile,
-                            'failed',
-                            $syncResult['message'] ?? 'The PUPTAS sync attempt failed.',
-                        );
-                        $syncMessage = 'Student approved, but PUPTAS sync still needs attention.';
-                        \Log::error("PUPTAS Sync Failed for reference {$referenceNumber} / student_id {$idpStudentId}: " . ($syncResult['message'] ?? 'Unknown error'));
-                    } else {
-                        $this->updatePuptasSyncState($profile, 'synced', 'Approved health clearance synced to PUPTAS.', true);
-                        $syncMessage = 'Student approved and synced to PUPTAS.';
-                    }
-                }
-            } catch (\Exception $e) {
-                $referenceNumber = trim((string) (($profile->reference_number ?? '') ?: ($profile->student_number ?? '') ?: optional($profile->user)->student_number));
-                $idpStudentId = trim((string) (optional($profile->user)->student_id ?: $profile->student_id));
-                $this->updatePuptasSyncState($profile, 'failed', $e->getMessage());
-                $syncMessage = 'Student approved, but PUPTAS sync failed.';
-                \Log::error("PUPTAS Sync Failed for reference {$referenceNumber} / student_id {$idpStudentId}: " . $e->getMessage());
-            }
-        }
-
-        return redirect()
-            ->route('admin.medical_assessment', $profile->id)
-            ->with('success', 'Medical assessment saved successfully. ' . $syncMessage);
-    }
-
     public function exportHealthPdf($id)
     {
         $profile = HealthProfile::with('user')->findOrFail($id);
@@ -1620,6 +1537,66 @@ public function updateClearance(Request $request, $id)
 
     return back()->with('error', 'Failed to save to database.');
 }
+
+    public function uploadMedicalAssessmentCopy(Request $request)
+    {
+        $validated = $request->validate([
+            'reference_number' => ['required', 'string', 'max:120'],
+            'medical_assessment_copy' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+        ]);
+
+        $referenceNumber = trim((string) $validated['reference_number']);
+        $user = User::query()
+            ->where('student_number', $referenceNumber)
+            ->orWhere('student_id', $referenceNumber)
+            ->first();
+
+        if (!$user) {
+            return $request->expectsJson()
+                ? response()->json(['status' => 'not_found', 'message' => 'No student record matched that reference number.'], 404)
+                : back()->with('error', 'No student record matched that reference number.');
+        }
+
+        $profile = HealthProfile::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'student_id' => (string) ($user->student_id ?? ''),
+                'student_number' => (string) ($user->student_number ?? ''),
+                'reference_number' => $referenceNumber,
+                'course_college' => (string) ($user->course ?? ''),
+                'birthday' => (string) ($user->DOB ?? ''),
+                'sex' => (string) ($user->gender ?? ''),
+            ]
+        );
+
+        $profile->student_id = $profile->student_id ?: (string) ($user->student_id ?? '');
+        $profile->student_number = $profile->student_number ?: (string) ($user->student_number ?? '');
+        $profile->reference_number = $referenceNumber;
+        $profile->course_college = $profile->course_college ?: (string) ($user->course ?? '');
+        $profile->birthday = $profile->birthday ?: (string) ($user->DOB ?? '');
+        $profile->sex = $profile->sex ?: (string) ($user->gender ?? '');
+
+        if (!empty($profile->medical_assessment_upload) && Storage::disk('public')->exists($profile->medical_assessment_upload)) {
+            Storage::disk('public')->delete($profile->medical_assessment_upload);
+        }
+
+        $profile->medical_assessment_upload = $request->file('medical_assessment_copy')
+            ->store('health_profiles/medical_assessment_uploads', 'public');
+        $profile->save();
+
+        $message = 'Medical assessment copy uploaded successfully.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'ok',
+                'message' => $message,
+                'medical_assessment_upload' => $profile->medical_assessment_upload,
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
+
     public function appointments()
     {
         Appointment::expireOverduePending();

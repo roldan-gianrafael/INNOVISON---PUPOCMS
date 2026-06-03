@@ -114,6 +114,20 @@
             </div>
 
             <div class="verify-doc">
+                <h4>Medical Assessment Copy</h4>
+                @if(!empty($record->medical_assessment_upload))
+                    <a class="verify-link" href="{{ asset('storage/' . $record->medical_assessment_upload) }}" target="_blank" rel="noopener">
+                        <x-outline-icon name="document-text" /> Open
+                    </a>
+                    <div class="verify-doc-preview">
+                        <iframe src="{{ asset('storage/' . $record->medical_assessment_upload) }}"></iframe>
+                    </div>
+                @else
+                    <div class="verify-missing">No medical assessment copy uploaded.</div>
+                @endif
+            </div>
+
+            <div class="verify-doc">
                 <h4>Chest X-ray Result (PDF)</h4>
                 @if(!empty($record->chest_xray_result))
                     <a class="verify-link" href="{{ asset('storage/' . $record->chest_xray_result) }}" target="_blank" rel="noopener">

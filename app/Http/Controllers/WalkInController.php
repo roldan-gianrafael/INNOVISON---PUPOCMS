@@ -386,12 +386,26 @@ class WalkInController extends Controller
 
         if ($student) {
             $resolvedName = trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? ''))));
+            $healthProfile = HealthProfile::where('user_id', $student->id)->first();
+            $resolvedCourse = trim((string) ($student->course ?? $student->course_college ?? ''));
+            $resolvedYear = trim((string) ($student->year ?? ''));
+            $resolvedSection = trim((string) ($student->section ?? ''));
+            $resolvedDob = !empty($student->DOB) ? (string) $student->DOB : '';
+            $resolvedEmail = trim((string) ($student->email ?? ''));
 
             if ($previewOnly) {
                 return response()->json([
                     'status' => 'preview',
                     'student_number' => $student->student_number ?: $student->student_id,
+                    'student_id' => $student->student_id ?: '',
                     'student_name' => $resolvedName,
+                    'course' => $resolvedCourse,
+                    'year' => $resolvedYear,
+                    'section' => $resolvedSection,
+                    'dob' => $resolvedDob,
+                    'email' => $resolvedEmail,
+                    'health_profile_id' => optional($healthProfile)->id,
+                    'medical_assessment_upload' => optional($healthProfile)->medical_assessment_upload,
                     'name_matches' => $lookupName !== '' ? $this->namesRoughlyMatch($lookupName, $student) : null,
                     'lookup_status' => $lookupStatus,
                 ]);
@@ -411,6 +425,16 @@ class WalkInController extends Controller
 
             return response()->json([
                 'status' => 'found',
+                'student_number' => $student->student_number ?: $student->student_id,
+                'student_id' => $student->student_id ?: '',
+                'student_name' => $resolvedName,
+                'course' => $resolvedCourse,
+                'year' => $resolvedYear,
+                'section' => $resolvedSection,
+                'dob' => $resolvedDob,
+                'email' => $resolvedEmail,
+                'health_profile_id' => optional($healthProfile)->id,
+                'medical_assessment_upload' => optional($healthProfile)->medical_assessment_upload,
                 'redirect_url' => $intakeTarget === 'assessment'
                     ? (function () use ($student) {
                         $profile = HealthProfile::firstOrCreate(
@@ -443,7 +467,7 @@ class WalkInController extends Controller
                             $profile->save();
                         }
 
-                        return route('admin.medical_assessment', $profile->id);
+                        return route('admin.show_health', $profile->id);
                     })()
                     : route($this->walkinRouteName($request, 'form'), [
                         'student_id' => $student->student_number ?: $student->student_id,

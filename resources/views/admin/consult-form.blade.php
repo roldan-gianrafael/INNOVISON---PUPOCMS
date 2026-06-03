@@ -278,7 +278,7 @@
         <h3>Clinical Findings</h3>
         <div class="form-group">
             <label>Remarks / Assessment</label>
-            <textarea name="remarks" class="form-control" rows="5" required placeholder="Describe symptoms or medical assessment...">{{ old('remarks') }}</textarea>
+            <textarea name="remarks" class="form-control" rows="5" required placeholder="Describe symptoms or concerns...">{{ old('remarks') }}</textarea>
         </div>
 
         <div style="display: flex; gap: 15px; margin-top: 10px;">

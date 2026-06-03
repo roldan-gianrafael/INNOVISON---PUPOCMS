@@ -351,8 +351,8 @@
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         border-left: 1px solid rgba(112, 19, 27, 0.12);
         border-right: 1px solid rgba(112, 19, 27, 0.12);
-        border-top: 4px solid #66ff00;
-        border-bottom: 4px solid #66ff00;
+        border-top: 4px solid #facc15;
+        border-bottom: 4px solid #facc15;
     }
     .main #infoModal .modal-box,
     .main #statusActionModal .modal-box,
@@ -360,8 +360,8 @@
         background: rgba(255, 255, 255, 0.4) !important;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
-        border-top: 4px solid #66ff00 !important;
-        border-bottom: 4px solid #70131B !important;
+        border-top: 4px solid #facc15 !important;
+        border-bottom: 4px solid #facc15 !important;
         border-radius: 18px !important;
         backdrop-filter: blur(8px) !important;
         -webkit-backdrop-filter: blur(8px) !important;
@@ -634,6 +634,12 @@
         justify-content: flex-end;
     }
 
+    .appointments-filter-shell {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+    }
+
     .appointments-search-wrap {
         width: 0;
         max-width: 100%;
@@ -745,6 +751,255 @@
     .appointments-search-toggle:focus svg {
         color: #111827 !important;
         stroke: currentColor !important;
+    }
+
+    .appointments-filter-toggle {
+        min-height: 50px;
+        min-width: 140px !important;
+        padding: 0 16px !important;
+        gap: 8px !important;
+        width: auto !important;
+        border-radius: 14px !important;
+    }
+
+    .appointments-filter-toggle svg {
+        width: 18px !important;
+        height: 18px !important;
+        flex: 0 0 auto;
+    }
+
+    .appointments-filter-panel {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        z-index: 40;
+        width: min(290px, 92vw);
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 24px 38px rgba(15, 23, 42, 0.12);
+        display: none;
+    }
+
+    .appointments-filter-shell.is-open .appointments-filter-panel {
+        display: block;
+    }
+
+    .appointments-filter-panel-title {
+        margin: 0 0 10px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #70131B;
+    }
+
+    .appointments-status-wrap {
+        position: relative;
+    }
+
+    .appointments-status-select {
+        position: absolute;
+        width: 1px !important;
+        height: 1px !important;
+        opacity: 0;
+        pointer-events: none;
+        padding: 0 !important;
+        border: 0 !important;
+        margin: 0 !important;
+    }
+
+    .appointments-status-display {
+        width: 100%;
+        min-height: 46px;
+        padding: 12px 50px 12px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(127, 29, 29, 0.22);
+        background:
+            radial-gradient(circle at top right, rgba(250, 204, 21, 0.10), transparent 36%),
+            linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+        color: #111827;
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.08),
+            inset 0 1px 0 rgba(255,255,255,0.86);
+        text-align: left;
+        font-weight: 700;
+        outline: none;
+        cursor: pointer;
+        transition: all .2s ease;
+        position: relative;
+    }
+
+    .appointments-status-display:hover {
+        border-color: rgba(139, 0, 0, 0.34);
+        box-shadow:
+            0 14px 24px rgba(15, 23, 42, 0.10),
+            0 8px 18px rgba(139, 0, 0, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.90);
+        transform: translateY(-1px);
+    }
+
+    .appointments-status-display:focus,
+    .appointments-status-display.is-open {
+        border-color: #8B0000;
+        box-shadow:
+            0 0 0 4px rgba(139, 0, 0, 0.06),
+            0 14px 24px rgba(139, 0, 0, 0.10),
+            inset 0 1px 0 rgba(255,255,255,0.88);
+    }
+
+    .appointments-status-wrap::after {
+        content: "";
+        position: absolute;
+        top: 23px;
+        right: 18px;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #8B0000;
+        border-bottom: 2px solid #8B0000;
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+        transition: transform .18s ease;
+    }
+
+    .appointments-status-wrap::before {
+        content: "";
+        position: absolute;
+        top: 23px;
+        right: 42px;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 24px;
+        background: rgba(148, 163, 184, 0.24);
+        pointer-events: none;
+    }
+
+    .appointments-status-wrap.is-open::after {
+        transform: translateY(-20%) rotate(225deg);
+    }
+
+    .appointments-status-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        right: 0;
+        display: none;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(139, 0, 0, 0.12);
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+        z-index: 80;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        max-height: 260px;
+        overflow: hidden;
+    }
+
+    .appointments-status-wrap.is-open .appointments-status-menu {
+        display: grid;
+    }
+
+    .appointments-status-options {
+        display: grid;
+        gap: 10px;
+        max-height: 228px;
+        overflow-y: auto;
+        padding-right: 2px;
+    }
+
+    .appointments-status-option {
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: #1e293b;
+        border-radius: 999px;
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 800;
+        text-align: left;
+        cursor: pointer;
+        transition: all .18s ease;
+        box-shadow:
+            0 12px 22px rgba(15, 23, 42, 0.08),
+            inset 0 1px 0 rgba(255,255,255,0.82);
+    }
+
+    .appointments-status-option:hover,
+    .appointments-status-option.is-selected {
+        transform: translateY(-1px);
+        border-color: #8B0000;
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15;
+        box-shadow: 0 12px 20px rgba(139, 0, 0, 0.16);
+    }
+
+    .appointments-filter-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .appointments-filter-reset,
+    .appointments-filter-close {
+        flex: 1 1 0;
+        min-height: 42px;
+        border-radius: 12px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .appointments-filter-reset:hover,
+    .appointments-filter-close:hover {
+        background: #fff3f5;
+        color: #70131B;
+    }
+
+    html[data-theme="dark"] .appointments-filter-panel {
+        background: rgba(15, 23, 42, 0.96);
+        border-color: rgba(250, 204, 21, 0.14);
+        box-shadow: 0 24px 38px rgba(0, 0, 0, 0.28);
+    }
+
+    html[data-theme="dark"] .appointments-filter-panel-title {
+        color: #facc15;
+    }
+
+    html[data-theme="dark"] .appointments-status-display {
+        background: rgba(15, 23, 42, 0.92);
+        color: #e5eefb;
+        border-color: rgba(148, 163, 184, 0.22);
+    }
+
+    html[data-theme="dark"] .appointments-status-menu {
+        background: rgba(15, 23, 42, 0.98);
+        border-color: rgba(250, 204, 21, 0.14);
+        box-shadow: 0 24px 38px rgba(0, 0, 0, 0.28);
+    }
+
+    html[data-theme="dark"] .appointments-status-option {
+        background: rgba(30, 41, 59, 0.92);
+        color: #e2e8f0;
+        border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    html[data-theme="dark"] .appointments-status-option:hover,
+    html[data-theme="dark"] .appointments-status-option.is-selected {
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15;
+        border-color: #facc15;
+    }
+
+    html[data-theme="dark"] .appointments-filter-reset,
+    html[data-theme="dark"] .appointments-filter-close {
+        background: rgba(30, 41, 59, 0.92);
+        color: #e2e8f0;
+        border-color: rgba(148, 163, 184, 0.18);
     }
 
     .appointments-search-toggle:focus-visible {
@@ -1154,10 +1409,44 @@
                     <x-outline-icon name="magnifying-glass" />
                 </button>
             </div>
-            <a href="{{ url($basePrefix . '/walkin?mode=scan') }}" class="btn-add-walkin">
-                <span class="btn-icon">&#128247;</span>
-                <span class="btn-text">OCR / Manual ID Entry</span>
-            </a>
+            <div class="appointments-filter-shell" id="appointmentsFilterShell">
+                <button type="button" class="btn-add-walkin appointments-filter-toggle" id="appointmentsFilterToggle" aria-label="Open status filter" aria-expanded="false" aria-controls="appointmentsFilterPanel">
+                    <x-outline-icon name="funnel" />
+                    <span class="btn-text">Filter</span>
+                </button>
+                <div class="appointments-filter-panel" id="appointmentsFilterPanel" aria-hidden="true">
+                    <div class="appointments-filter-panel-title">Status Filter</div>
+                    <div class="appointments-status-wrap" id="appointmentsStatusWrap">
+                        <select id="appointmentStatusFilter" class="appointments-status-select" aria-hidden="true" tabindex="-1">
+                            <option value="">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Expired">Expired</option>
+                            <option value="Missed">Missed</option>
+                        </select>
+                        <button type="button" class="appointments-status-display" id="appointmentsStatusDisplay" aria-haspopup="listbox" aria-expanded="false">
+                            All Statuses
+                        </button>
+                        <div class="appointments-status-menu" id="appointmentsStatusMenu" role="listbox" aria-label="Appointment status options">
+                            <div class="appointments-status-options">
+                                <button type="button" class="appointments-status-option is-selected" data-status-value="">All Statuses</button>
+                                <button type="button" class="appointments-status-option" data-status-value="Pending">Pending</button>
+                                <button type="button" class="appointments-status-option" data-status-value="Approved">Approved</button>
+                                <button type="button" class="appointments-status-option" data-status-value="Completed">Completed</button>
+                                <button type="button" class="appointments-status-option" data-status-value="Cancelled">Cancelled</button>
+                                <button type="button" class="appointments-status-option" data-status-value="Expired">Expired</button>
+                                <button type="button" class="appointments-status-option" data-status-value="Missed">Missed</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="appointments-filter-actions">
+                        <button type="button" class="appointments-filter-reset" id="appointmentsFilterReset">Reset</button>
+                        <button type="button" class="appointments-filter-close" id="appointmentsFilterClose">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 <div class="card appointments-summary-card">
@@ -1719,6 +2008,19 @@
         const searchInput = document.getElementById('searchInput');
         const searchShell = document.getElementById('appointmentsSearchShell');
         const searchToggle = document.getElementById('appointmentsSearchToggle');
+        const filterShell = document.getElementById('appointmentsFilterShell');
+        const filterToggle = document.getElementById('appointmentsFilterToggle');
+        const filterPanel = document.getElementById('appointmentsFilterPanel');
+        const statusFilter = document.getElementById('appointmentStatusFilter');
+        const statusWrap = document.getElementById('appointmentsStatusWrap');
+        const statusDisplay = document.getElementById('appointmentsStatusDisplay');
+        const statusMenu = document.getElementById('appointmentsStatusMenu');
+        const statusOptions = Array.from(document.querySelectorAll('.appointments-status-option'));
+        const filterReset = document.getElementById('appointmentsFilterReset');
+        const filterClose = document.getElementById('appointmentsFilterClose');
+        const appointmentRows = Array.from(document.querySelectorAll('[data-appointment-row]'));
+        let currentSearchTerm = '';
+        let currentStatusFilter = '';
 
         function setSearchOpenState(isOpen) {
             if (!searchShell || !searchToggle) {
@@ -1728,6 +2030,60 @@
             searchShell.classList.toggle('is-open', isOpen);
             searchToggle.classList.toggle('is-open', isOpen);
             searchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        function setFilterOpenState(isOpen) {
+            if (!filterShell || !filterToggle || !filterPanel) {
+                return;
+            }
+
+            filterShell.classList.toggle('is-open', isOpen);
+            filterToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            filterPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        }
+
+        function setStatusDropdownOpen(isOpen) {
+            if (!statusWrap || !statusDisplay) {
+                return;
+            }
+
+            statusWrap.classList.toggle('is-open', isOpen);
+            statusDisplay.classList.toggle('is-open', isOpen);
+            statusDisplay.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+            if (statusMenu) {
+                statusMenu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+            }
+        }
+
+        function syncStatusDisplay() {
+            if (!statusFilter || !statusDisplay) {
+                return;
+            }
+
+            const selectedOption = statusOptions.find(function(option) {
+                return (option.dataset.statusValue || '') === statusFilter.value;
+            });
+
+            statusDisplay.textContent = selectedOption ? selectedOption.textContent : 'All Statuses';
+
+            statusOptions.forEach(function(option) {
+                option.classList.toggle('is-selected', (option.dataset.statusValue || '') === statusFilter.value);
+            });
+        }
+
+        function applyAppointmentFilters() {
+            appointmentRows.forEach(function(row) {
+                const nameCell = row.getElementsByTagName('td')[0];
+                const nameNode = nameCell ? nameCell.getElementsByClassName('student-name')[0] : null;
+                const rowName = nameNode ? (nameNode.textContent || nameNode.innerText || '') : '';
+                const rowStatus = (row.dataset.viewStatus || '').trim().toLowerCase();
+
+                const matchesSearch = currentSearchTerm === '' || rowName.toLowerCase().indexOf(currentSearchTerm) > -1;
+                const matchesStatus = currentStatusFilter === '' || rowStatus === currentStatusFilter.toLowerCase();
+
+                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+            });
         }
 
         if (searchInput && searchInput.value.trim() !== '') {
@@ -1751,22 +2107,81 @@
 
         if (searchInput) {
             searchInput.addEventListener('keyup', function() {
-                const filter = this.value.toUpperCase();
-                const tr = document.getElementById('apptTable').getElementsByTagName('tr');
-                for (let i = 1; i < tr.length; i++) {
-                    const td = tr[i].getElementsByTagName('td')[0];
-                    if (td) {
-                        const nameNode = td.getElementsByClassName('student-name')[0];
-                        const txtValue = nameNode ? (nameNode.textContent || nameNode.innerText) : '';
-                        tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? '' : 'none';
-                    }
-                }
+                currentSearchTerm = this.value.trim().toLowerCase();
+                applyAppointmentFilters();
             });
 
             searchInput.addEventListener('focus', function() {
                 setSearchOpenState(true);
             });
         }
+
+        if (filterToggle) {
+            filterToggle.addEventListener('click', function() {
+                if (!filterShell) {
+                    return;
+                }
+                setFilterOpenState(!filterShell.classList.contains('is-open'));
+            });
+        }
+
+        if (statusFilter) {
+            statusFilter.addEventListener('change', function() {
+                currentStatusFilter = this.value;
+                syncStatusDisplay();
+                applyAppointmentFilters();
+            });
+        }
+
+        if (statusDisplay) {
+            statusDisplay.addEventListener('click', function(event) {
+                event.stopPropagation();
+                const isOpen = statusWrap ? statusWrap.classList.contains('is-open') : false;
+                setStatusDropdownOpen(!isOpen);
+            });
+        }
+
+        statusOptions.forEach(function(option) {
+            option.addEventListener('click', function() {
+                const nextValue = this.dataset.statusValue || '';
+                if (statusFilter) {
+                    statusFilter.value = nextValue;
+                    statusFilter.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                setStatusDropdownOpen(false);
+            });
+        });
+
+        if (filterReset) {
+            filterReset.addEventListener('click', function() {
+                currentStatusFilter = '';
+                if (statusFilter) {
+                    statusFilter.value = '';
+                    syncStatusDisplay();
+                }
+                applyAppointmentFilters();
+                setStatusDropdownOpen(false);
+            });
+        }
+
+        if (filterClose) {
+            filterClose.addEventListener('click', function() {
+                setFilterOpenState(false);
+                setStatusDropdownOpen(false);
+            });
+        }
+
+        document.addEventListener('click', function(event) {
+            if (filterShell && !filterShell.contains(event.target)) {
+                setFilterOpenState(false);
+            }
+
+            if (statusWrap && !statusWrap.contains(event.target)) {
+                setStatusDropdownOpen(false);
+            }
+        });
+
+        syncStatusDisplay();
 
         const actionMenus = document.querySelectorAll('[data-appointment-action-menu]');
         const closeActionMenus = function(exceptMenu = null) {

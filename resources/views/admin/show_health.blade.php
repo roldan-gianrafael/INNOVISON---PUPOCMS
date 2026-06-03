@@ -242,10 +242,6 @@
                 <p class="profile-sub">Issued health profile details and submitted documents.</p>
             </div>
             <div class="profile-head-actions">
-                <a href="{{ route('admin.medical_assessment', $profile->id) }}" class="profile-top-btn">
-                    <x-outline-icon name="clipboard-document-list" />
-                    Assess
-                </a>
                 <a href="{{ route('admin.health_records') }}" class="profile-top-btn">
                     <x-outline-icon name="arrow-left-on-rectangle" />
                     Back
@@ -326,6 +322,20 @@
                     <div class="doc-preview"><iframe src="{{ asset('storage/' . $profile->medical_certificate) }}"></iframe></div>
                 @else
                     <div class="doc-missing">No medical certificate uploaded.</div>
+                @endif
+            </div>
+
+            <div class="doc-file">
+                <h4>Medical Assessment Copy</h4>
+                @if(!empty($profile->medical_assessment_upload))
+                    <div class="doc-actions">
+                        <a class="doc-link" href="{{ asset('storage/' . $profile->medical_assessment_upload) }}" target="_blank" rel="noopener">
+                            <x-outline-icon name="document-text" /> Open
+                        </a>
+                    </div>
+                    <div class="doc-preview"><iframe src="{{ asset('storage/' . $profile->medical_assessment_upload) }}"></iframe></div>
+                @else
+                    <div class="doc-missing">No medical assessment copy uploaded.</div>
                 @endif
             </div>
 

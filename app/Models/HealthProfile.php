@@ -16,7 +16,7 @@ class HealthProfile extends Model
         'chest_xray_result',
         'has_disability', 'disability_type',
         'pwd_id_proof',
-        'medical_certificate', 'health_form_upload', 'clearance_status',
+        'medical_certificate', 'health_form_upload', 'medical_assessment_upload', 'clearance_status',
         'assessment_date',
         'blood_pressure',
         'respiratory_rate',

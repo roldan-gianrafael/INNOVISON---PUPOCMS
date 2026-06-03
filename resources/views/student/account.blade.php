@@ -1271,6 +1271,14 @@
         .profile-info-row .form-control {
             text-align: left;
         }
+        .health-status-meta-grid,
+        .record-modal-summary,
+        .record-modal-grid {
+            grid-template-columns: 1fr;
+        }
+        .record-modal-links {
+            grid-template-columns: 1fr;
+        }
     }
 
   
@@ -1458,6 +1466,37 @@
         margin-top: 12px;
         display: block;
     }
+    .health-status-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+    }
+    .health-status-meta {
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(112, 19, 27, 0.10);
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
+        box-shadow:
+            0 10px 18px rgba(15, 23, 42, 0.05),
+            inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .health-status-meta-label {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 800;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+    .health-status-meta-value {
+        font-size: 14px;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1.45;
+        word-break: break-word;
+    }
     .btn-print-form {
         display: inline-flex;
         align-items: center;
@@ -1554,6 +1593,32 @@
     html[data-theme="dark"] .health-status-link,
     html[data-theme="dark"] .health-status-note {
         color: var(--text-light, #a9b4c4);
+    }
+    html[data-theme="dark"] .health-status-meta {
+        background: rgba(17, 24, 39, 0.78);
+        border-color: rgba(250, 204, 21, 0.18);
+    }
+    html[data-theme="dark"] .health-status-meta-label {
+        color: #cbd5e1;
+    }
+    html[data-theme="dark"] .health-status-meta-value {
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .record-modal-summary-card,
+    html[data-theme="dark"] .record-modal-card {
+        background: rgba(17, 24, 39, 0.82);
+        border-color: rgba(250, 204, 21, 0.16);
+    }
+    html[data-theme="dark"] .record-modal-label {
+        color: #cbd5e1;
+    }
+    html[data-theme="dark"] .record-modal-value {
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .record-modal-empty {
+        background: rgba(69, 26, 3, 0.32);
+        border-color: rgba(250, 204, 21, 0.18);
+        color: #fde68a;
     }
     .record-modal-overlay {
         display: none;
@@ -1674,42 +1739,23 @@
         padding: 20px 24px 24px;
         position: relative;
     }
+    .record-modal-summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .record-modal-summary-card {
+        border: 1px solid rgba(112, 19, 27, 0.10);
+        border-radius: 14px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.84);
+        box-shadow:
+            0 10px 18px rgba(15, 23, 42, 0.06),
+            inset 0 1px 0 rgba(255,255,255,0.82);
+    }
     .record-modal-body-fade {
         display: none;
-    }
-    .record-modal-footer {
-        position: sticky;
-        bottom: 0;
-        padding: 12px 24px 18px;
-        display: flex;
-        justify-content: center;
-        z-index: 3;
-        background: transparent;
-    }
-    .record-modal-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        min-height: 40px;
-        padding: 0 18px;
-        border-radius: 999px;
-        border: 1px solid rgba(139, 0, 0, 0.14);
-        background: rgba(255, 255, 255, 0.86);
-        color: #8B0000;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
-    }
-    .record-modal-indicator svg {
-        width: 14px;
-        height: 14px;
-        flex: 0 0 auto;
-        transition: transform 0.18s ease;
-    }
-    .record-modal-indicator.is-top svg {
-        transform: rotate(180deg);
     }
     .record-modal-grid {
         display: grid;
@@ -1744,6 +1790,15 @@
         font-weight: 700;
         line-height: 1.55;
         word-break: break-word;
+    }
+    .record-modal-empty {
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 1px dashed rgba(112, 19, 27, 0.18);
+        background: rgba(255, 251, 247, 0.84);
+        color: #7c2d12;
+        font-size: 14px;
+        font-weight: 700;
     }
     .record-modal-status {
         display: inline-flex;
@@ -1873,11 +1928,6 @@
         background: #8B0000 !important;
         color: #facc15 !important;
         border-color: #8B0000 !important;
-    }
-    html[data-theme="dark"] .record-modal-indicator {
-        background: #17171a !important;
-        color: #ffffff !important;
-        border-color: rgba(250, 204, 21, 0.14) !important;
     }
     html[data-theme="dark"] .record-modal-link-top {
         background: rgba(250, 204, 21, 0.10) !important;
@@ -2273,6 +2323,8 @@ document.addEventListener('DOMContentLoaded', function () {
         $puptasSyncMessage = trim((string) optional($user->healthProfile)->puptas_sync_message);
         $puptasSyncedAt = optional(optional($user->healthProfile)->puptas_synced_at)->format('M d, Y g:i A');
         $recordVerifiedAt = optional(optional($user->healthProfile)->verified_at)->format('M d, Y g:i A');
+        $recordReferenceNumber = trim((string) optional($healthProfileRecord)->reference_number);
+        $recordReferenceNumber = $recordReferenceNumber !== '' ? $recordReferenceNumber : trim((string) (optional($healthProfileRecord)->student_number ?: ($accountProfileData['student_number'] ?? $user->student_number ?? $user->student_id ?? '-')));
         $recordBirthday = trim((string) optional($healthProfileRecord)->birthday);
         $recordBirthday = $recordBirthday !== '' ? optional(\Carbon\Carbon::parse($recordBirthday))->format('M d, Y') : '-';
         $recordAssessmentDate = optional(optional($healthProfileRecord)->assessment_date)->format('M d, Y');
@@ -2285,18 +2337,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
             </svg>
         </div>
-        <div class="page-hero-kicker">Clinic Record</div>
-        <h1 class="page-hero-title">Health Record</h1>
-        <p class="page-hero-text">Check the status of your submitted health profile, review clinic approval, and view your uploaded documents.</p>
+        <div class="page-hero-kicker">Health Record</div>
+        <h1 class="page-hero-title">Record Review</h1>
+        <p class="page-hero-text">Track your submitted profile, clinic approval, and uploaded digital copies in one place.</p>
         <div class="page-hero-steps">
             <div class="page-hero-step">
-                <span>Submission Review</span>
+                <span>Submitted</span>
             </div>
             <div class="page-hero-step">
-                <span>Clinic Verification</span>
+                <span>Under Review</span>
             </div>
             <div class="page-hero-step">
-                <span>Record Approval</span>
+                <span>Issued</span>
             </div>
         </div>
     </div>
@@ -2304,7 +2356,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="health-status-head">
             <span class="health-status-title">
                 <x-outline-icon name="clipboard-document-list" />
-                Health Information Record
+                Record Summary
             </span>
         </div>
 
@@ -2348,6 +2400,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="health-status-summary">
                     <span class="health-status-state issued"><x-outline-icon name="check" /> Approved</span>
                     <p class="health-status-message">Your health profile is approved and already available in your health record.</p>
+                </div>
+
+                <div class="health-status-meta-grid">
+                    <div class="health-status-meta">
+                        <span class="health-status-meta-label">Reference Number</span>
+                        <span class="health-status-meta-value">{{ $recordReferenceNumber !== '' ? $recordReferenceNumber : '-' }}</span>
+                    </div>
+                    <div class="health-status-meta">
+                        <span class="health-status-meta-label">Assessment Date</span>
+                        <span class="health-status-meta-value">{{ $recordAssessmentDate ?: '-' }}</span>
+                    </div>
+                    <div class="health-status-meta">
+                        <span class="health-status-meta-label">Verified At</span>
+                        <span class="health-status-meta-value">{{ $recordVerifiedAt ?: '-' }}</span>
+                    </div>
                 </div>
 
                 @if($puptasSyncStatus === 'synced')
@@ -2411,6 +2478,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="health-status-message">Your profile has been submitted and is currently <strong>awaiting medical review</strong>.</p>
                 </div>
 
+                <div class="health-status-meta-grid">
+                    <div class="health-status-meta">
+                        <span class="health-status-meta-label">Reference Number</span>
+                        <span class="health-status-meta-value">{{ $recordReferenceNumber !== '' ? $recordReferenceNumber : '-' }}</span>
+                    </div>
+                    <div class="health-status-meta">
+                        <span class="health-status-meta-label">Submission Status</span>
+                        <span class="health-status-meta-value">Waiting for clinic review</span>
+                    </div>
+                    <div class="health-status-meta">
+                        <span class="health-status-meta-label">View Mode</span>
+                        <span class="health-status-meta-value">Digital copy and status only</span>
+                    </div>
+                </div>
+
                 <div class="health-status-actions">
                     <button type="button" class="btn-print-form pending" onclick="openHealthRecordModal()">
                         <x-outline-icon name="eye" />
@@ -2423,16 +2505,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <span class="health-status-note">Clinic approval is required before your record can be marked as issued.</span>
             @endif
-        @else
-            <div class="health-status-summary">
-                <span class="health-status-state incomplete"><x-outline-icon name="x-mark" /> Not Completed</span>
-                <p class="health-status-message">You haven't completed your health profile yet.</p>
-            </div>
-            <a href="{{ route('health.form') }}" class="btn-print-form incomplete">
-                <x-outline-icon name="document-text" />
-                Complete Form Now
-            </a>
-            <span class="health-status-note">Required for clinic consultations.</span>
+            @else
+                <div class="health-status-summary">
+                    <span class="health-status-state incomplete"><x-outline-icon name="x-mark" /> Not Yet Submitted</span>
+                    <p class="health-status-message">Your health profile has not been submitted yet.</p>
+                </div>
+                <a href="{{ route('health.form') }}" class="btn-print-form incomplete">
+                    <x-outline-icon name="document-text" />
+                    Complete Form Now
+                </a>
+            <span class="health-status-note">Submit your health profile to unlock clinic review.</span>
         @endif
     </div>
     @if($healthFormSubmitted && $healthProfileRecord)
@@ -2443,17 +2525,32 @@ document.addEventListener('DOMContentLoaded', function () {
                         <x-outline-icon name="x-mark" />
                     </button>
                     <h2 class="record-modal-title" id="healthRecordModalTitle">Health Record Details</h2>
-                    <p class="record-modal-subtitle">Review your submitted health profile, clinic status, and uploaded record documents in one place.</p>
+                    <p class="record-modal-subtitle">Review your submitted health profile, admission reference, clinic status, and uploaded digital copies in one place.</p>
                 </div>
                 <div class="record-modal-body" id="healthRecordModalBody">
-                    <div class="record-modal-grid">
-                        <div class="record-modal-card">
+                    <div class="record-modal-summary">
+                        <div class="record-modal-summary-card">
                             <span class="record-modal-label">Current Status</span>
                             <span class="record-modal-status">{{ $status }}</span>
                         </div>
+                        <div class="record-modal-summary-card">
+                            <span class="record-modal-label">Reference Number</span>
+                            <div class="record-modal-value">{{ $recordReferenceNumber !== '' ? $recordReferenceNumber : '-' }}</div>
+                        </div>
+                        <div class="record-modal-summary-card">
+                            <span class="record-modal-label">Assessment Date</span>
+                            <div class="record-modal-value">{{ $recordAssessmentDate ?: '-' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="record-modal-grid">
                         <div class="record-modal-card">
-                            <span class="record-modal-label">Student Number</span>
-                            <div class="record-modal-value">{{ optional($healthProfileRecord)->student_number ?: ($accountProfileData['student_number'] ?? $user->student_number ?? '-') }}</div>
+                            <span class="record-modal-label">Student ID</span>
+                            <div class="record-modal-value">{{ $user->student_id ?: '-' }}</div>
+                        </div>
+                        <div class="record-modal-card">
+                            <span class="record-modal-label">Admission Reference</span>
+                            <div class="record-modal-value">{{ $recordReferenceNumber !== '' ? $recordReferenceNumber : '-' }}</div>
                         </div>
                         <div class="record-modal-card">
                             <span class="record-modal-label">Course</span>
@@ -2532,7 +2629,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="record-modal-value">{{ optional($healthProfileRecord)->pending_reason ?: '-' }}</div>
                         </div>
                         <div class="record-modal-card is-full">
-                            <span class="record-modal-label">Uploaded Documents</span>
+                            <span class="record-modal-label">Uploaded Digital Copies</span>
                             <div class="record-modal-links">
                                 @if(optional($healthProfileRecord)->student_photo)
                                     <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->student_photo) }}" target="_blank" rel="noopener noreferrer">
@@ -2564,21 +2661,23 @@ document.addEventListener('DOMContentLoaded', function () {
                                         <span class="record-modal-link-arrow">Open File</span>
                                     </a>
                                 @endif
-                                @if(!optional($healthProfileRecord)->student_photo && !optional($healthProfileRecord)->medical_certificate && !optional($healthProfileRecord)->health_form_upload)
-                                    <div class="record-modal-value">No uploaded files available.</div>
+                                @if(optional($healthProfileRecord)->medical_assessment_upload)
+                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->medical_assessment_upload) }}" target="_blank" rel="noopener noreferrer">
+                                        <span class="record-modal-link-top"><x-outline-icon name="document-text" /></span>
+                                        <span class="record-modal-link-body">
+                                            <span class="record-modal-link-title">Medical Assessment Copy</span>
+                                            <span class="record-modal-link-meta">PDF or Image Upload</span>
+                                        </span>
+                                        <span class="record-modal-link-arrow">Open File</span>
+                                    </a>
+                                @endif
+                                @if(!optional($healthProfileRecord)->student_photo && !optional($healthProfileRecord)->medical_certificate && !optional($healthProfileRecord)->health_form_upload && !optional($healthProfileRecord)->medical_assessment_upload)
+                                    <div class="record-modal-empty">No digital copies uploaded yet.</div>
                                 @endif
                             </div>
                         </div>
                     </div>
                     <div class="record-modal-body-fade" aria-hidden="true"></div>
-                </div>
-                <div class="record-modal-footer">
-                    <div class="record-modal-indicator" id="healthRecordModalIndicator">
-                        <span id="healthRecordModalIndicatorText">More data below</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25 12 15.75 4.5 8.25" />
-                        </svg>
-                    </div>
                 </div>
             </div>
         </div>
@@ -2656,7 +2755,6 @@ function openHealthRecordModal() {
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    updateHealthRecordModalIndicator();
 }
 
 function closeHealthRecordModal() {
@@ -2667,21 +2765,6 @@ function closeHealthRecordModal() {
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-}
-
-function updateHealthRecordModalIndicator() {
-    const modal = document.querySelector('#healthRecordModal .record-modal');
-    const indicator = document.getElementById('healthRecordModalIndicator');
-    const indicatorText = document.getElementById('healthRecordModalIndicatorText');
-
-    if (!modal || !indicator || !indicatorText) {
-        return;
-    }
-
-    const reachedBottom = modal.scrollTop + modal.clientHeight >= modal.scrollHeight - 4;
-
-    indicator.classList.toggle('is-top', reachedBottom);
-    indicatorText.textContent = reachedBottom ? 'More data above' : 'More data below';
 }
 
 function enableEditing() {

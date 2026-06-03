@@ -11,6 +11,52 @@
         padding: 20px;
     }
 
+    /* --- REPORTS HEADER --- */
+    .reports-header {
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .reports-header-kicker {
+        margin: 0 0 8px;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 1.2px;
+        color: #70131B;
+        text-transform: uppercase;
+    }
+
+    .reports-header-title {
+        margin: 0 0 12px;
+        font-size: 32px;
+        font-weight: 950;
+        letter-spacing: -0.02em;
+        color: #111827;
+        line-height: 1.1;
+    }
+
+    .reports-header-description {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #64748b;
+        max-width: 720px;
+        line-height: 1.5;
+    }
+
+    html[data-theme="dark"] .reports-header-kicker {
+        color: #facc15;
+    }
+
+    html[data-theme="dark"] .reports-header-title {
+        color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .reports-header-description {
+        color: #cbd5e1;
+    }
+
     /* --- TOP STATS ROW (Naiiwan sa pwesto gaya ng gusto mo) --- */
     .stats-grid {
         display: grid;
@@ -278,25 +324,11 @@
     $exportHubUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports/export-hub') : url('/admin/reports/export-hub');
 @endphp
 <div class="dashboard-container">
-
-    <div class="stats-grid">
-        <div class="stat-card-mini">
-            <span>Monthly Cases</span>
-            <h3>{{ $totalConsultations ?? '0' }}</h3>
-        </div>
-        <div class="stat-card-mini" style="border-left-color: #70131B;">
-            <span>Low Stock Items</span>
-            <h3>{{ $lowStockCount ?? '0' }}</h3>
-        </div>
-        <div class="stat-card-mini" style="border-left-color: #8f2230;">
-            <span>Scheduled Today</span>
-            <h3>{{ $appointmentsToday ?? '0' }}</h3>
-        </div>
-    </div>
-
     <div class="reports-frame">
-        <div class="reports-title-frame">
-            <h2 class="reports-section-title"><x-outline-icon name="chart-bar" />Select Report to Generate</h2>
+        {{-- Reports Header --}}
+        <div class="reports-header">
+            <h1 class="reports-header-title">Reports</h1>
+            <p class="reports-header-description">Access comprehensive reports on clinic operations, medical records, inventory, and patient statistics.</p>
         </div>
 
         <div class="report-grid">

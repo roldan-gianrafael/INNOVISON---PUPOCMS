@@ -136,7 +136,8 @@ class AppointmentController extends Controller
                     'message' => match ($puptasSyncStatus) {
                         'synced' => 'Your approved health clearance was synced to PUPTAS.',
                         'syncing' => 'Your approved health clearance is being prepared for PUPTAS sync.',
-                        'missing_student_number' => 'Your clearance is approved, but PUPTAS sync is waiting for a valid student number.',
+                        'missing_reference_number', 'missing_student_number' => 'Your clearance is approved, but PUPTAS sync is waiting for a valid reference number.',
+                        'missing_student_id' => 'Your clearance is approved, but PUPTAS sync is waiting for your IdP student ID.',
                         'failed' => 'Your clearance is approved, but the PUPTAS sync still needs attention.',
                         default => 'Your clearance approval is being checked for PUPTAS sync.',
                     },
@@ -1305,6 +1306,7 @@ public function storeHealthForm(Request $request)
             [
                 'student_id'         => $request->student_id,
                 'student_number'     => $request->student_number,
+                'reference_number'   => $request->student_number,
                 'school_year'        => $request->school_year,
                 'home_address'       => $request->home_address,
                 'zipcode'            => $request->zipcode,

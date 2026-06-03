@@ -135,7 +135,7 @@ class WalkInController extends Controller
         return $candidate;
     }
 
-    private function resolveLocalUserFromApplicant(array $applicant): User
+    private function resolveLocalUserFromApplicant(array $applicant, bool $persist = true): User
     {
         $studentNumber = trim((string) data_get($applicant, 'student_number'));
         $idpUserId = trim((string) data_get($applicant, 'idp_user_id'));
@@ -195,7 +195,9 @@ class WalkInController extends Controller
             $user->email = Str::slug($seed, '.') . '@idp.local';
         }
 
-        $user->save();
+        if ($persist) {
+            $user->save();
+        }
 
         return $user;
     }
@@ -382,7 +384,7 @@ class WalkInController extends Controller
             $applicant = $lookupResult['data'] ?? null;
 
             if (is_array($applicant)) {
-                $student = $this->resolveLocalUserFromApplicant($applicant);
+                $student = $this->resolveLocalUserFromApplicant($applicant, !$previewOnly);
             }
         }
 

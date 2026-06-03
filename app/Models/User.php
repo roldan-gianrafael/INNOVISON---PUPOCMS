@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -75,6 +76,42 @@ class User extends Authenticatable
         'is_admin' => 'boolean',
         'notification_read_map' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (User $user): void {
+            $firstName = trim((string) ($user->first_name ?? ''));
+            $lastName = trim((string) ($user->last_name ?? ''));
+            $name = trim((string) ($user->name ?? ''));
+
+            if ($firstName === '' && $name !== '') {
+                $parts = preg_split('/\s+/', $name) ?: [];
+                $firstName = $parts[0] ?? '';
+                $lastName = count($parts) > 1 ? trim(implode(' ', array_slice($parts, 1))) : '';
+            }
+
+            if ($firstName === '') {
+                $firstName = 'Applicant';
+            }
+
+            if ($lastName === '') {
+                $lastName = 'User';
+            }
+
+            if ($name === '') {
+                $name = trim($firstName . ' ' . $lastName);
+            }
+
+            $user->first_name = $firstName;
+            $user->last_name = $lastName;
+            $user->name = $name;
+
+            if (trim((string) ($user->email ?? '')) === '') {
+                $seed = trim((string) ($user->student_number ?? $user->student_id ?? Str::lower(Str::random(8))));
+                $user->email = Str::slug($seed, '.') . '@idp.local';
+            }
+        });
+    }
 
     /**
      * MAGIC ACCESSOR for $user->name

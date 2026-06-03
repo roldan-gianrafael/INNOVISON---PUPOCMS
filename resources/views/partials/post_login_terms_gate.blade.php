@@ -197,7 +197,7 @@
 @if (session('show_terms_modal'))
     <div class="post-login-loader" id="postLoginLoader" aria-live="polite" aria-label="Loading">
         <div class="post-login-loader-card">
-            <img src="{{ asset('images/clinic_logo.png') }}" alt="Loading" class="post-login-loader-logo">
+            <img src="{{ asset('images/clinic_logo_transparent.png') }}?v={{ filemtime(public_path('images/clinic_logo_transparent.png')) }}" alt="Loading" class="post-login-loader-logo">
             <div class="post-login-loader-text">Loading...</div>
         </div>
     </div>

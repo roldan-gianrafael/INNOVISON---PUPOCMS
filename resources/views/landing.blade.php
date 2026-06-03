@@ -65,20 +65,23 @@
         }
 
         .brand-logo {
-            width: 88px;
-            height: 88px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
             border-radius: 22px;
-            background: rgba(255, 255, 255, 0.96);
-            border: 1px solid rgba(255, 255, 255, 0.24);
-            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.22);
+            background: transparent;
+            border: none;
+            box-shadow: none;
             padding: 8px;
         }
 
         .brand-logo--clinic {
-            width: 94px;
-            height: 94px;
-            padding: 10px;
+            width: 160px;
+            height: 160px;
+            padding: 8px;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
 
         .eyebrow {
@@ -193,7 +196,7 @@
             <div class="brand">
                 <div class="brand-logos" aria-label="PUP and clinic logos">
                     <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo" class="brand-logo">
-                    <img src="{{ asset('images/clinic_logo.png') }}" alt="Clinic Logo" class="brand-logo brand-logo--clinic">
+                    <img src="{{ asset('images/clinic_logo_transparent.png') }}?v={{ filemtime(public_path('images/clinic_logo_transparent.png')) }}" alt="Clinic Logo" class="brand-logo brand-logo--clinic">
                 </div>
                 <div>
                     <p class="eyebrow">Medical Clinic</p>

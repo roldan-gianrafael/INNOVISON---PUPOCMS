@@ -287,94 +287,65 @@
         <div class="appt-stat-card"><span>Most Common Illness</span><strong>{{ $topDisease->condition ?? 'No data yet' }}</strong></div>
     </div>
 
-    <div class="appt-stats-layout">
-        <section class="appt-panel">
-            <h3>Service Breakdown</h3>
-            @if($serviceBreakdown->count() > 0)
-                <table class="appt-table">
-                    <thead>
-                        <tr>
-                            <th>Service</th>
-                            <th>Total</th>
-                            <th>Pending</th>
-                            <th>Approved</th>
-                            <th>Completed</th>
-                            <th>Cancelled</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($serviceBreakdown as $service)
-                            <tr>
-                                <td>{{ $service->service }}</td>
-                                <td>{{ $service->count }}</td>
-                                <td>{{ $service->pending }}</td>
-                                <td>{{ $service->approved }}</td>
-                                <td>{{ $service->completed }}</td>
-                                <td>{{ $service->cancelled }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <div class="appt-empty">No appointments were found for the selected month.</div>
-            @endif
-        </section>
-
-        <section class="appt-panel">
-            <h3>Most Disease or Illness This Month</h3>
-            @if($monthlyDiseaseBreakdown->count() > 0)
-                <div class="appt-disease-list">
-                    @foreach($monthlyDiseaseBreakdown->take(6) as $index => $disease)
-                        <div class="appt-disease-item">
-                            <span class="appt-disease-rank">{{ $index + 1 }}</span>
-                            <div>
-                                <p class="appt-disease-name">{{ $disease->condition }}</p>
-                                <p class="appt-disease-category">{{ $disease->category }}</p>
-                            </div>
-                            <span class="appt-disease-count">{{ $disease->count }}</span>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="appt-empty">No disease or illness data is available for the selected month.</div>
-            @endif
-        </section>
-    </div>
-
-    <div class="appt-stats-layout" style="margin-top: 22px;">
-        <section class="appt-panel">
-            <h3>Daily Trend</h3>
-            @if($dailyTrend->count() > 0)
-                <div class="appt-trend-list">
-                    @foreach($dailyTrend as $day)
-                        <div class="appt-trend-item">
-                            <span>{{ $day->day }}</span>
-                            <strong>{{ $day->count }}</strong>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="appt-empty">No daily trend data is available for the selected month.</div>
-            @endif
-        </section>
-
-        <section class="appt-panel">
-            <h3>Month Summary</h3>
-            <div class="appt-trend-list">
-                <div class="appt-trend-item">
-                    <span>Reporting Month</span>
-                    <strong>{{ \Carbon\Carbon::parse($monthFilter . '-01')->format('F Y') }}</strong>
-                </div>
-                <div class="appt-trend-item">
-                    <span>Most Common Illness Count</span>
-                    <strong>{{ $topDisease->count ?? 0 }}</strong>
-                </div>
-                <div class="appt-trend-item">
-                    <span>Total Diagnosed Conditions Logged</span>
-                    <strong>{{ $monthlyDiseaseBreakdown->sum('count') }}</strong>
-                </div>
-            </div>
-        </section>
-    </div>
+    <section class="appt-panel" style="margin-top: 22px;">
+        <h3>Daily Appointment Trend</h3>
+        @if($dailyTrend->count() > 0)
+            <canvas id="appointmentTrendChart" height="80"></canvas>
+        @else
+            <div class="appt-empty">No appointment data available for the selected month.</div>
+        @endif
+    </section>
 </div>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const canvasEl = document.getElementById('appointmentTrendChart');
+        if (!canvasEl) return;
+
+        const chartData = @json($dailyTrend);
+        if (!chartData || chartData.length === 0) return;
+
+        const ctx = canvasEl.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.map(d => d.day),
+                datasets: [{
+                    label: 'Appointments',
+                    data: chartData.map(d => d.count),
+                    borderColor: '#70131B',
+                    backgroundColor: 'rgba(112, 19, 27, 0.1)',
+                    borderWidth: 2.5,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#70131B',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush
+
 @endsection

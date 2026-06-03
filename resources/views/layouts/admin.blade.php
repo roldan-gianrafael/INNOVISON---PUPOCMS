@@ -2012,7 +2012,7 @@
             -webkit-overflow-scrolling: touch;
             -ms-overflow-style: none;
             scrollbar-width: none;
-            padding: 10px;
+            padding: 10px 10px 4px;
             color: var(--admin-card-text);
             background: var(--admin-shell-bg);
             border: 1px solid var(--admin-shell-border);

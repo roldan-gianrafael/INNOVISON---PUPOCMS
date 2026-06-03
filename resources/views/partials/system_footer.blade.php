@@ -32,7 +32,7 @@
 
         .system-footer {
             width: 100%;
-            margin: 8px 0 0;
+            margin: 0;
             background: var(--system-footer-bg);
             border-top: 3px solid var(--system-footer-border);
             border-bottom: 2px solid var(--system-footer-bottom);
@@ -83,7 +83,7 @@
 
         @media (max-width: 640px) {
             .system-footer {
-                margin-top: 6px;
+                margin-top: 0;
             }
 
             .system-footer__inner {

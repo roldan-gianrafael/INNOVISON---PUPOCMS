@@ -2376,12 +2376,20 @@ document.addEventListener('DOMContentLoaded', function () {
                             {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The approved clearance has not been accepted by PUPTAS yet.' }}
                         </span>
                     </div>
-                @elseif($puptasSyncStatus === 'missing_student_number')
+                @elseif(in_array($puptasSyncStatus, ['missing_reference_number', 'missing_student_number'], true))
                     <div class="health-status-sync missing">
                         <x-outline-icon name="information-circle" />
                         <span>
-                            <strong>PUPTAS sync is waiting for a valid student number.</strong>
-                            {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The clinic approval is complete, but the admission sync cannot finish until the school student number is resolved.' }}
+                            <strong>PUPTAS sync is waiting for a valid reference number.</strong>
+                            {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The clinic approval is complete, but the admission sync cannot finish until the Admission reference number is resolved.' }}
+                        </span>
+                    </div>
+                @elseif($puptasSyncStatus === 'missing_student_id')
+                    <div class="health-status-sync missing">
+                        <x-outline-icon name="information-circle" />
+                        <span>
+                            <strong>PUPTAS sync is waiting for the IdP student ID.</strong>
+                            {{ $puptasSyncMessage !== '' ? $puptasSyncMessage : 'The clinic approval is complete, but the admission sync cannot finish until the IdP student ID is resolved.' }}
                         </span>
                     </div>
                 @endif

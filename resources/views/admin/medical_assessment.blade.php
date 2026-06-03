@@ -597,7 +597,7 @@
         ->take(2)
         ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
         ->implode('') ?: 'PT';
-    $referenceNumber = $profile->user->student_number ?: ($profile->user->student_id ?? 'N/A');
+    $referenceNumber = $profile->reference_number ?: ($profile->student_number ?: ($profile->user->student_number ?: ($profile->user->student_id ?? 'N/A')));
     $dateOfBirth = !empty($profile->user->DOB) ? \Carbon\Carbon::parse($profile->user->DOB)->format('m/d/Y') : 'N/A';
     $ageDisplay = $calculatedAge !== null ? $calculatedAge . ' years old' : 'N/A';
 @endphp

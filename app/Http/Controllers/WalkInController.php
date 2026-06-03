@@ -418,6 +418,7 @@ class WalkInController extends Controller
                             [
                                 'student_id' => (string) ($student->student_id ?? ''),
                                 'student_number' => (string) ($student->student_number ?? ''),
+                                'reference_number' => (string) ($student->student_number ?? ''),
                                 'course_college' => (string) ($student->course ?? ''),
                                 'birthday' => (string) ($student->DOB ?? ''),
                                 'sex' => (string) ($student->gender ?? ''),
@@ -428,6 +429,10 @@ class WalkInController extends Controller
                         $profileNeedsSave = false;
                         if (empty($profile->student_number) && !empty($student->student_number)) {
                             $profile->student_number = (string) $student->student_number;
+                            $profileNeedsSave = true;
+                        }
+                        if (empty($profile->reference_number) && !empty($student->student_number)) {
+                            $profile->reference_number = (string) $student->student_number;
                             $profileNeedsSave = true;
                         }
                         if (empty($profile->student_id) && !empty($student->student_id)) {

@@ -292,12 +292,18 @@ class PuptasWebhookService
         }
     }
 
-    public function sendMedicalClearance(string $studentNumber, bool $isCleared = true): array
+    public function sendMedicalClearance(string $referenceNumber, string $studentId, bool $isCleared = true): array
     {
         try {
-            $studentNumber = trim($studentNumber);
-            if ($studentNumber === '') {
-                return ['success' => false, 'message' => 'Student number is required.'];
+            $referenceNumber = trim($referenceNumber);
+            $studentId = trim($studentId);
+
+            if ($referenceNumber === '') {
+                return ['success' => false, 'message' => 'Reference number is required.'];
+            }
+
+            if ($studentId === '') {
+                return ['success' => false, 'message' => 'IDP student ID is required.'];
             }
 
             if ($this->apiUrl === '' || $this->webhookSecret === '') {
@@ -311,7 +317,8 @@ class PuptasWebhookService
             // in addition to the documented `medical_status` field, so we send both.
             // We also include timestamp and nonce values so the receiving system can verify freshness.
             $payload = json_encode([
-                'student_number' => $studentNumber,
+                'reference_number' => $referenceNumber,
+                'student_id' => $studentId,
                 'medical_status' => $isCleared ? 'cleared' : 'failed',
                 'is_health_profile_completed' => $isCleared ? 1 : 0,
                 'timestamp' => $timestamp,
@@ -359,7 +366,8 @@ class PuptasWebhookService
 
             if ($response->successful()) {
                 Log::info('PUPTAS webhook sent successfully', [
-                    'student_number' => $studentNumber,
+                    'reference_number' => $referenceNumber,
+                    'student_id' => $studentId,
                     'timestamp' => $timestamp,
                     'nonce' => $nonce,
                 ]);
@@ -369,7 +377,8 @@ class PuptasWebhookService
             $errorMessage = $this->extractWebhookFailureMessage($response->body());
             Log::error('PUPTAS webhook failed', [
                 'status' => $response->status(),
-                'student_number' => $studentNumber,
+                'reference_number' => $referenceNumber,
+                'student_id' => $studentId,
                 'timestamp' => $timestamp,
                 'nonce' => $nonce,
                 'error' => $response->body(),
@@ -381,13 +390,13 @@ class PuptasWebhookService
         }
     }
 
-    public function sendWithRetry(string $studentNumber, bool $isCleared = true, int $maxRetries = 3): array
+    public function sendWithRetry(string $referenceNumber, string $studentId, bool $isCleared = true, int $maxRetries = 3): array
     {
         $attempt = 0;
         $lastResult = ['success' => false, 'message' => 'No webhook attempts were made.'];
 
         while ($attempt < $maxRetries) {
-            $result = $this->sendMedicalClearance($studentNumber, $isCleared);
+            $result = $this->sendMedicalClearance($referenceNumber, $studentId, $isCleared);
             $lastResult = $result;
 
             if ($result['success']) {

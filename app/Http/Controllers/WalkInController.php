@@ -150,6 +150,9 @@ class WalkInController extends Controller
         $firstName = trim((string) data_get($applicant, 'first_name'));
         $lastName = trim((string) data_get($applicant, 'last_name'));
         $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+        $fallbackFirstName = $firstName !== '' ? $firstName : 'Applicant';
+        $fallbackLastName = $lastName !== '' ? $lastName : 'User';
+        $fallbackFullName = $fullName !== '' ? $fullName : trim($fallbackFirstName . ' ' . $fallbackLastName);
 
         if (!$user) {
             $user = new User();
@@ -169,14 +172,20 @@ class WalkInController extends Controller
 
         if ($firstName !== '') {
             $user->first_name = $firstName;
+        } elseif (trim((string) $user->first_name) === '') {
+            $user->first_name = $fallbackFirstName;
         }
 
         if ($lastName !== '') {
             $user->last_name = $lastName;
+        } elseif (trim((string) $user->last_name) === '') {
+            $user->last_name = $fallbackLastName;
         }
 
         if ($fullName !== '') {
             $user->name = $fullName;
+        } elseif (trim((string) $user->name) === '') {
+            $user->name = $fallbackFullName;
         }
 
         if ($email !== '') {

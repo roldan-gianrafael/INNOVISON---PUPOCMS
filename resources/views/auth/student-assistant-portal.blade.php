@@ -16,13 +16,18 @@
                 radial-gradient(circle at bottom left, rgba(112, 19, 27, 0.10), transparent 30%),
                 linear-gradient(135deg, #fffdf6 0%, #fff8fb 42%, #ffffff 100%);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 28px;
         }
 
         .chooser-shell {
             width: min(980px, 100%);
+            flex: 1 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px;
         }
 
         .chooser-card {
@@ -293,6 +298,10 @@
         }
 
         @media (max-width: 760px) {
+            .chooser-shell {
+                padding: 18px;
+            }
+
             .chooser-card {
                 padding: 28px 22px 30px;
                 border-radius: 24px;

@@ -515,6 +515,27 @@
     .dialog-btn-primary:hover {
         background: #5a0f16;
     }
+    .main .dialog-actions a.dialog-btn-primary,
+    .main .dialog-actions a.dialog-btn-primary:visited,
+    .main .dialog-actions a.dialog-btn-approve,
+    .main .dialog-actions a.dialog-btn-approve:visited,
+    .main .dialog-actions a.dialog-btn-reject,
+    .main .dialog-actions a.dialog-btn-reject:visited,
+    .main .dialog-actions a.dialog-btn-warning,
+    .main .dialog-actions a.dialog-btn-warning:visited {
+        color: #ffffff !important;
+    }
+    .main .dialog-actions a.dialog-btn-primary:hover,
+    .main .dialog-actions a.dialog-btn-primary:focus-visible,
+    .main .dialog-actions a.dialog-btn-approve:hover,
+    .main .dialog-actions a.dialog-btn-approve:focus-visible,
+    .main .dialog-actions a.dialog-btn-reject:hover,
+    .main .dialog-actions a.dialog-btn-reject:focus-visible,
+    .main .dialog-actions a.dialog-btn-warning:hover,
+    .main .dialog-actions a.dialog-btn-warning:focus-visible {
+        color: #ffffff !important;
+        text-decoration: none;
+    }
     .dialog-btn-approve {
         background: #70131B;
         color: #fff;

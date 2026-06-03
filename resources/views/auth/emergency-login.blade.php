@@ -384,5 +384,6 @@
     <footer class="bottom-bar">
         PUP Taguig Clinic Management System
     </footer>
+    @include('partials.system_footer')
 </body>
 </html>

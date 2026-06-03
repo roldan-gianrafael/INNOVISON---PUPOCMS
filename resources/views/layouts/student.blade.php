@@ -2042,6 +2042,7 @@
     </main>
 
     @include('partials.post_login_terms_gate')
+    @include('partials.system_footer')
 
     <div class="student-quick-actions-wrap student-quick-actions-fab-wrap" data-nav-dropdown>
         <button

@@ -226,5 +226,6 @@
             </p>
         </section>
     </main>
+    @include('partials.system_footer')
 </body>
 </html>

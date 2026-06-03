@@ -985,5 +985,6 @@
     </script>
 
     @include('partials.student_voice_input_support')
+    @include('partials.system_footer')
 </body>
 </html>

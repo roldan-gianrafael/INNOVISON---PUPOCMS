@@ -784,13 +784,7 @@
       </div>
   </div>
 
-  <footer class="lp-foot">
-      <span>&copy; 1998-{{ now()->year }} <strong>Polytechnic University of the Philippines</strong></span>
-      <span class="sep">|</span>
-      <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>
-      <span class="sep">|</span>
-      <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
-  </footer>
+  @include('partials.system_footer')
 
   <script>
       function openModal(id) { document.getElementById(id).style.display = 'flex'; }

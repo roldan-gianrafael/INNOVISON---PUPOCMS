@@ -5096,5 +5096,6 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     });
 </script>
 
+@include('partials.system_footer')
 </body>
 </html>

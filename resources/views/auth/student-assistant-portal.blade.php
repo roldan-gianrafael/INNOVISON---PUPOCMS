@@ -397,5 +397,6 @@
             </div>
         </section>
     </div>
+    @include('partials.system_footer')
 </body>
 </html>

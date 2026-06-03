@@ -461,6 +461,185 @@
         border-color: rgba(250, 204, 21, 0.28);
         color: #fde68a !important;
     }
+
+    body.admin-inventory-page .admin-header {
+        padding-block: 10px;
+    }
+
+    body.admin-inventory-page .header-brand-avatar {
+        width: 46px;
+        height: 46px;
+    }
+
+    body.admin-inventory-page .header-title {
+        font-size: clamp(22px, 1.8vw, 28px);
+        line-height: 1.08;
+    }
+
+    body.admin-inventory-page .header-kicker {
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    body.admin-inventory-page .header-subtitle {
+        font-size: 14px;
+        line-height: 1.35;
+        margin-top: 3px;
+    }
+
+    body.admin-inventory-page .admin-layout {
+        gap: 14px;
+        padding: 14px 26px 26px;
+    }
+
+    body.admin-inventory-page .sidebar {
+        padding: 16px 12px;
+    }
+
+    body.admin-inventory-page .sidebar-logo {
+        margin-bottom: 14px;
+        padding-bottom: 14px;
+    }
+
+    body.admin-inventory-page .sidebar-nav a {
+        min-height: 52px;
+        padding: 9px 12px;
+    }
+
+    body.admin-inventory-page .sidebar-short {
+        width: 38px;
+        height: 38px;
+    }
+
+    body.admin-inventory-page .sidebar-logout {
+        padding-top: 12px;
+    }
+
+    body.admin-inventory-page .controls {
+        margin-bottom: 10px;
+        padding: 12px 16px;
+        border-radius: 0 0 18px 18px;
+    }
+
+    body.admin-inventory-page .inventory-page-title {
+        padding: 8px 16px;
+        font-size: 26px;
+        line-height: 1.15;
+    }
+
+    body.admin-inventory-page .inventory-toolbar-actions > .btn-add,
+    body.admin-inventory-page .inventory-search-toggle {
+        min-height: 46px !important;
+        height: 46px !important;
+    }
+
+    body.admin-inventory-page .inventory-toolbar-actions > .btn-add {
+        padding-inline: 18px;
+    }
+
+    body.admin-inventory-page .inventory-search-toggle {
+        width: 46px !important;
+        min-width: 46px !important;
+        flex-basis: 46px !important;
+    }
+
+    body.admin-inventory-page .inventory-search-toggle svg {
+        width: 25px !important;
+        height: 25px !important;
+    }
+
+    body.admin-inventory-page .card {
+        padding: 18px 22px 14px;
+        border-radius: 18px;
+    }
+
+    body.admin-inventory-page .inventory-summary-card::before {
+        left: 16px;
+        right: 16px;
+        height: 5px;
+    }
+
+    body.admin-inventory-page .inventory-filter-bar {
+        margin-bottom: 10px;
+    }
+
+    body.admin-inventory-page .inventory-filter-pill {
+        min-height: 32px;
+        padding-inline: 15px;
+    }
+
+    body.admin-inventory-page table {
+        margin-top: 10px;
+    }
+
+    body.admin-inventory-page th {
+        padding: 10px 12px;
+        font-size: 11px;
+        line-height: 1.35;
+        letter-spacing: 0.04em;
+    }
+
+    body.admin-inventory-page td {
+        padding: 12px;
+        font-size: 13px;
+        line-height: 1.35;
+        vertical-align: middle;
+    }
+
+    body.admin-inventory-page #inventoryTable th:nth-child(1),
+    body.admin-inventory-page #inventoryTable td:nth-child(1) {
+        width: 92px;
+    }
+
+    body.admin-inventory-page #inventoryTable th:nth-child(2),
+    body.admin-inventory-page #inventoryTable td:nth-child(2) {
+        width: 90px;
+    }
+
+    body.admin-inventory-page #inventoryTable th:nth-child(4),
+    body.admin-inventory-page #inventoryTable td:nth-child(4) {
+        width: 86px;
+    }
+
+    body.admin-inventory-page #inventoryTable th:nth-child(5),
+    body.admin-inventory-page #inventoryTable td:nth-child(5),
+    body.admin-inventory-page #inventoryTable th:nth-child(6),
+    body.admin-inventory-page #inventoryTable td:nth-child(6),
+    body.admin-inventory-page #inventoryTable th:nth-child(7),
+    body.admin-inventory-page #inventoryTable td:nth-child(7) {
+        width: 116px;
+    }
+
+    body.admin-inventory-page #inventoryTable th:nth-child(8),
+    body.admin-inventory-page #inventoryTable td:nth-child(8) {
+        width: 126px;
+    }
+
+    body.admin-inventory-page #inventoryTable th:nth-child(9),
+    body.admin-inventory-page #inventoryTable td:nth-child(9) {
+        width: 112px;
+    }
+
+    body.admin-inventory-page #inventoryTable th:nth-child(10),
+    body.admin-inventory-page #inventoryTable td:nth-child(10) {
+        width: 138px;
+    }
+
+    body.admin-inventory-page .inventory-actions-toggle {
+        min-width: 112px;
+        padding: 9px 14px;
+    }
+
+    body.admin-inventory-page .status {
+        padding: 4px 9px;
+        font-size: 10.5px;
+    }
+
+    body.admin-inventory-page .system-footer__inner {
+        min-height: 38px;
+        padding-block: 6px;
+    }
+
     .inventory-meta-pill {
         display: inline-flex;
         align-items: center;

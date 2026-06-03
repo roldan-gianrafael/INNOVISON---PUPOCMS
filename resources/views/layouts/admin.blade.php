@@ -3575,7 +3575,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         }
     </style>
 </head>
-<body>
+<body class="{{ (request()->routeIs('admin.inventory*') || request()->routeIs('assistant.inventory*')) ? 'admin-inventory-page' : '' }}">
 @php
     $authUser = auth()->user();
     $currentRole = \App\Models\User::normalizeRole(optional($authUser)->user_role ?? '');

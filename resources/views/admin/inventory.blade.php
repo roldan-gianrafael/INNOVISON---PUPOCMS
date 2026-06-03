@@ -352,6 +352,80 @@
         margin: 0 0 14px;
         align-items: center;
     }
+    .inventory-subfilter-bar {
+        display: none;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 14px;
+        padding: 12px 14px;
+        border: 1px solid rgba(127, 29, 45, 0.14);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.72);
+    }
+    .inventory-subfilter-bar.is-visible {
+        display: flex;
+    }
+    .inventory-subfilter-label {
+        display: inline-flex;
+        align-items: center;
+        padding: 0 4px 0 0;
+        color: #70131B;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        align-self: center;
+    }
+    .inventory-subfilter-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(127, 29, 45, 0.16);
+        background: #ffffff;
+        color: #70131B;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+    .inventory-subfilter-pill:hover {
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(250, 204, 21, 0.22);
+    }
+    .inventory-subfilter-pill.is-active {
+        background: #70131B;
+        color: #ffffff;
+        border-color: #70131B;
+    }
+    html[data-theme="dark"] .inventory-subfilter-bar {
+        background: rgba(15, 23, 42, 0.72);
+        border-color: rgba(250, 204, 21, 0.14);
+    }
+    html[data-theme="dark"] .inventory-subfilter-label {
+        color: #fde68a;
+    }
+    html[data-theme="dark"] .inventory-subfilter-pill {
+        background: rgba(30, 41, 59, 0.72);
+        color: #ffffff;
+        border-color: rgba(250, 204, 21, 0.16);
+    }
+    html[data-theme="dark"] .inventory-subfilter-pill:hover {
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+    }
+    html[data-theme="dark"] .inventory-subfilter-pill.is-active {
+        background: #facc15;
+        color: #111827;
+        border-color: #facc15;
+    }
     @keyframes filterPillSlideIn {
         from { opacity: 0; transform: translateX(-12px) scale(0.92); }
         to   { opacity: 1; transform: translateX(0)    scale(1); }
@@ -460,6 +534,12 @@
         background: rgba(250, 204, 21, 0.14);
         border-color: rgba(250, 204, 21, 0.28);
         color: #fde68a !important;
+    }
+
+    @media (max-width: 768px) {
+        .inventory-subfilter-bar {
+            padding: 10px 12px;
+        }
     }
 
     body.admin-inventory-page .admin-header {
@@ -2065,6 +2145,18 @@
             <button type="button" class="inventory-filter-pill inventory-filter-option" data-inventory-filter="low">Low Stock</button>
             <button type="button" class="inventory-filter-pill inventory-filter-option" data-inventory-filter="out">Out of Stock</button>
         </div>
+        <div class="inventory-subfilter-bar" id="inventoryMedicineTypeBar" aria-label="Medicine type filters">
+            <span class="inventory-subfilter-label">Medicine Types</span>
+            <button type="button" class="inventory-subfilter-pill is-active" data-medicine-filter="all" id="inventoryMedicineTypeAllBtn">All Types</button>
+            @foreach($medicineTypes as $medicineType)
+                @php
+                    $medicineTypeFilterValue = strtolower(trim((string) $medicineType->name));
+                @endphp
+                <button type="button" class="inventory-subfilter-pill" data-medicine-filter="{{ $medicineTypeFilterValue }}">
+                    {{ $medicineType->name }}
+                </button>
+            @endforeach
+        </div>
         <table id="inventoryTable">
             <thead>
                 <tr>    
@@ -2097,6 +2189,7 @@
                         id="inventory-item-{{ $item->id }}"
                         data-inventory-row
                         data-category="{{ strtolower($item->category) }}"
+                        data-medicine-type="{{ strtolower(trim((string) ($item->medicine_type ?: ''))) }}"
                         data-stock="{{ (float) $item->quantity }}"
                         data-starting-stock="{{ (float) ($item->starting_stock ?: $item->quantity) }}"
                         data-effective-qty="{{ $effectiveQty }}"
@@ -2547,6 +2640,7 @@
     const inventoryFilterMenu = document.getElementById('inventoryFilterMenu');
     const inventoryFilterItems = Array.from(document.querySelectorAll('.inventory-filter-pill'));
     let activeInventoryFilter = 'all';
+    let activeMedicineTypeFilter = 'all';
     const categorySelect = document.getElementById('iCategory');
     const categoryWrap = document.getElementById('inventoryCategoryWrap');
     const categoryDisplay = document.getElementById('inventoryCategoryDisplay');
@@ -2560,6 +2654,8 @@
     const medicineTypeSearch = document.getElementById('inventoryMedicineTypeSearch');
     const medicineTypeOptions = Array.from(document.querySelectorAll('.inventory-medicine-type-option'));
     const medicineTypeEmpty = document.getElementById('inventoryMedicineTypeEmpty');
+    const inventoryMedicineTypeBar = document.getElementById('inventoryMedicineTypeBar');
+    const inventoryMedicineTypeItems = Array.from(document.querySelectorAll('.inventory-subfilter-pill'));
     const medicineTypeCustomWrap = document.getElementById('medicineTypeCustomWrap');
     const medicineTypeCustomInput = document.getElementById('iMedicineTypeCustom');
     const medicineTypeMenuHome = medicineTypeMenu ? medicineTypeMenu.parentElement : null;
@@ -3182,6 +3278,7 @@
             inventoryRows.forEach(function (row) {
                 const rowText = row.innerText.toLowerCase();
                 const category     = row.dataset.category || '';
+                const medicineType = row.dataset.medicineType || '';
                 const stock        = Number(row.dataset.stock || 0);
                 const effectiveQty = Number(row.dataset.effectiveQty ?? row.dataset.stock ?? 0);
                 const minimumStock = Number(row.dataset.minimumStock || 10);
@@ -3190,12 +3287,29 @@
                     || activeInventoryFilter === category
                     || (activeInventoryFilter === 'low' && stock > 0 && effectiveQty <= minimumStock)
                     || (activeInventoryFilter === 'out' && stock <= 0);
+                const matchesMedicineType = activeInventoryFilter !== 'medicine'
+                    || activeMedicineTypeFilter === 'all'
+                    || medicineType === activeMedicineTypeFilter;
 
-                row.style.display = matchesSearch && matchesFilter ? '' : 'none';
+                row.style.display = matchesSearch && matchesFilter && matchesMedicineType ? '' : 'none';
             });
         }
 
         inventorySearchInput.addEventListener('input', applyInventoryFilters);
+
+        function updateMedicineTypeFilterBarVisibility() {
+            if (!inventoryMedicineTypeBar) return;
+            inventoryMedicineTypeBar.classList.toggle('is-visible', activeInventoryFilter === 'medicine');
+        }
+
+        function setMedicineTypeFilter(filter) {
+            activeMedicineTypeFilter = filter || 'all';
+            inventoryMedicineTypeItems.forEach(function(item) {
+                item.classList.toggle('is-active', item.dataset.medicineFilter === activeMedicineTypeFilter);
+            });
+            updateMedicineTypeFilterBarVisibility();
+            applyInventoryFilters();
+        }
 
         function setInventoryFilter(filter) {
             activeInventoryFilter = filter || 'all';
@@ -3215,8 +3329,20 @@
                 }
             }
 
+            if (activeInventoryFilter !== 'medicine') {
+                setMedicineTypeFilter('all');
+            } else {
+                updateMedicineTypeFilterBarVisibility();
+            }
+
             applyInventoryFilters();
         }
+
+        inventoryMedicineTypeItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                setMedicineTypeFilter(item.dataset.medicineFilter || 'all');
+            });
+        });
 
         const inventoryFilterBar    = document.getElementById('inventoryFilterBar');
         const inventoryFilterAllBtn = document.getElementById('inventoryFilterAllBtn');

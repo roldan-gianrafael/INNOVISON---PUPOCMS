@@ -215,4 +215,12 @@ for the improvement of healthcare services.
             </div>
         </div>
     </div>
+
+    <div class="generated-report-caption">
+        <div class="signature-note">This is system-generated, signature is not required.</div>
+        <div class="privacy-note">
+            This document contains personal-identifiable information that is subject to Data Privacy.<br>
+            Please keep this document protected and in a safe place.
+        </div>
+    </div>
 </div>

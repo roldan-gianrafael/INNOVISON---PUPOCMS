@@ -189,6 +189,27 @@
             min-height: 15px;
             margin-bottom: 2px;
         }
+
+        .generated-report-caption {
+            border-top: 1px solid #9ca3af;
+            margin: 16px 0 0;
+            padding-top: 7px;
+            font-size: 10px;
+            line-height: 1.35;
+        }
+
+        .generated-report-caption .signature-note {
+            text-align: right;
+            color: #4b5563;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .generated-report-caption .privacy-note {
+            text-align: center;
+            color: #9f4b5a;
+            font-weight: 800;
+        }
     </style>
 </head>
 <body>

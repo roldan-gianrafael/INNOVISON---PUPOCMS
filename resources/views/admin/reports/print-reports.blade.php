@@ -283,9 +283,30 @@
         color: #000;
     }
 
+    .generated-report-caption {
+        border-top: 1px solid #9ca3af;
+        margin-top: 14px;
+        padding-top: 7px;
+        font-size: 10px;
+        line-height: 1.35;
+    }
+
+    .generated-report-caption .signature-note {
+        text-align: right;
+        color: #4b5563;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .generated-report-caption .privacy-note {
+        text-align: center;
+        color: #9f4b5a;
+        font-weight: 800;
+    }
+
     .page-footer {
         display: none;
-        padding: 8px 28px 0;
+        padding: 7px 28px 0;
         background: #fff;
         border-top: 2px solid #800000;
         font-size: 9px;
@@ -308,6 +329,26 @@
         text-transform: uppercase;
         text-align: right;
         white-space: nowrap;
+    }
+
+    .page-footer-generated {
+        border-top: 1px solid #9ca3af;
+        margin-top: 6px;
+        padding-top: 4px;
+        font-size: 8.5px;
+        line-height: 1.25;
+    }
+
+    .page-footer-generated .signature-note {
+        text-align: right;
+        color: #4b5563;
+        font-weight: 700;
+    }
+
+    .page-footer-generated .privacy-note {
+        text-align: center;
+        color: #9f4b5a;
+        font-weight: 800;
     }
 
     @media print {
@@ -381,6 +422,13 @@
                 <br>Direct Line (02) 8837 5658 to 60 | Website: www.pup.edu.ph | Email: taguig@pup.edu.ph
             </div>
             <div class="page-footer-motto">The Country's First PolytechnicU</div>
+        </div>
+        <div class="page-footer-generated">
+            <div class="signature-note">This is system-generated, signature is not required.</div>
+            <div class="privacy-note">
+                This document contains personal-identifiable information that is subject to Data Privacy.<br>
+                Please keep this document protected and in a safe place.
+            </div>
         </div>
     </div>
 
@@ -892,6 +940,13 @@
         </div>
         <div class="footer-motto">
             THE COUNTRY'S FIRST POLYTECHNICU
+        </div>
+        <div class="generated-report-caption">
+            <div class="signature-note">This is system-generated, signature is not required.</div>
+            <div class="privacy-note">
+                This document contains personal-identifiable information that is subject to Data Privacy.<br>
+                Please keep this document protected and in a safe place.
+            </div>
         </div>
     </div>
     </div>

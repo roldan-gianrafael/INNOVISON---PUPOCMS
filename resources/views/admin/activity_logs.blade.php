@@ -253,8 +253,66 @@
         gap: 12px;
     }
 
+    .audit-collapsible {
+        padding: 0;
+    }
+
+    .audit-collapsible details {
+        position: relative;
+        z-index: 1;
+    }
+
+    .audit-collapse-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 20px;
+        cursor: pointer;
+        user-select: none;
+        color: #0f172a;
+        font-size: 14px;
+        font-weight: 900;
+        list-style: none;
+    }
+
+    .audit-collapse-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .audit-collapse-summary::after {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: rotate(45deg);
+        transition: transform .18s ease;
+        flex: 0 0 auto;
+    }
+
+    .audit-collapsible details[open] .audit-collapse-summary::after {
+        transform: rotate(225deg) translate(-2px, -2px);
+    }
+
+    .audit-collapse-summary:hover {
+        color: #8B0000;
+    }
+
+    .audit-collapse-summary-sub {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .audit-collapse-body {
+        padding: 0 20px 20px;
+    }
+
     .audit-list-title {
-        margin: 0 0 10px;
+        margin: 0;
         color: #0f172a;
         font-size: 14px;
         font-weight: 900;
@@ -404,6 +462,10 @@
         color: #334155;
     }
 
+    .audit-muted {
+        color: #64748b;
+    }
+
     .audit-empty {
         text-align: center;
         color: #64748b;
@@ -421,6 +483,7 @@
         background: linear-gradient(180deg, rgba(17,24,39,0.98), rgba(15,23,42,0.96));
         border-color: rgba(148,163,184,0.18);
         box-shadow: 0 24px 54px rgba(0,0,0,0.26);
+        color: #f8fafc !important;
     }
 
     html[data-theme="dark"] .audit-card::before {
@@ -429,18 +492,21 @@
 
     html[data-theme="dark"] .audit-title,
     html[data-theme="dark"] .audit-list-title,
+    html[data-theme="dark"] .audit-collapse-summary,
     html[data-theme="dark"] .audit-stat-value,
     html[data-theme="dark"] .audit-mini-label,
     html[data-theme="dark"] .audit-table td {
-        color: #f8fafc;
+        color: #f8fafc !important;
     }
 
     html[data-theme="dark"] .audit-subtitle,
     html[data-theme="dark"] .audit-head-note,
     html[data-theme="dark"] .audit-filter-label,
+    html[data-theme="dark"] .audit-collapse-summary-sub,
     html[data-theme="dark"] .audit-mono,
+    html[data-theme="dark"] .audit-muted,
     html[data-theme="dark"] .audit-empty {
-        color: #94a3b8;
+        color: #cbd5e1 !important;
     }
 
     html[data-theme="dark"] .audit-chip,
@@ -451,12 +517,22 @@
     html[data-theme="dark"] .audit-btn-light {
         background: rgba(17,24,39,0.92);
         border-color: rgba(148,163,184,0.2);
-        color: #f8fafc;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .audit-input::placeholder {
+        color: #cbd5e1;
+        opacity: 0.78;
+    }
+
+    html[data-theme="dark"] .audit-mini-count {
+        color: #fde68a !important;
     }
 
     html[data-theme="dark"] .audit-table tbody tr {
         background: linear-gradient(180deg, rgba(17,24,39,0.98), rgba(15,23,42,0.96));
         box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        color: #f8fafc !important;
     }
 
     html[data-theme="dark"] .audit-table thead th {
@@ -469,10 +545,14 @@
         border-color: rgba(148,163,184,0.14);
     }
 
+    html[data-theme="dark"] .audit-table td *:not(.audit-role-badge):not(.audit-event-badge):not(.audit-status-badge):not(.audit-muted):not(.audit-mono) {
+        color: #f8fafc !important;
+    }
+
     html[data-theme="dark"] .audit-kicker {
         background: rgba(250, 204, 21, 0.12);
         border-color: rgba(250, 204, 21, 0.22);
-        color: #fde68a;
+        color: #fde68a !important;
     }
 
     html[data-theme="dark"] .audit-btn-light:hover,
@@ -559,126 +639,146 @@
         </article>
     </section>
 
-    <section class="audit-card">
-        <form method="GET" action="{{ route('admin.logs') }}">
-            <div class="audit-filters">
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_q">Search</label>
-                    <input id="audit_q" name="q" type="text" class="audit-input" value="{{ request('q') }}" placeholder="Name, action, module, route, IP...">
+    <section class="audit-card audit-collapsible">
+        <details open>
+            <summary class="audit-collapse-summary">
+                <span>Audit Filters</span>
+                <span class="audit-collapse-summary-sub">Search and refine records</span>
+            </summary>
+            <form method="GET" action="{{ route('admin.logs') }}" class="audit-collapse-body">
+                <div class="audit-filters">
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_q">Search</label>
+                        <input id="audit_q" name="q" type="text" class="audit-input" value="{{ request('q') }}" placeholder="Name, action, module, route, IP...">
+                    </div>
+
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_actor_role">Actor Role</label>
+                        <select id="audit_actor_role" name="actor_role" class="audit-select">
+                            <option value="">All Roles</option>
+                            @foreach($roleOptions as $roleOption)
+                                <option value="{{ $roleOption }}" @selected(request('actor_role') === $roleOption)>
+                                    {{ $roleLabelMap[$roleOption] ?? ucwords(str_replace('_', ' ', $roleOption)) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_event_type">Event Type</label>
+                        <select id="audit_event_type" name="event_type" class="audit-select">
+                            <option value="">All Types</option>
+                            @foreach($eventTypeOptions as $eventTypeOption)
+                                <option value="{{ $eventTypeOption }}" @selected(request('event_type') === $eventTypeOption)>
+                                    {{ strtoupper($eventTypeOption) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_module">Module</label>
+                        <select id="audit_module" name="module" class="audit-select">
+                            <option value="">All Modules</option>
+                            @foreach($moduleOptions as $moduleOption)
+                                <option value="{{ $moduleOption }}" @selected(request('module') === $moduleOption)>
+                                    {{ $moduleOption }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_http_method">HTTP Method</label>
+                        <select id="audit_http_method" name="http_method" class="audit-select">
+                            <option value="">All Methods</option>
+                            @foreach(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as $methodOption)
+                                <option value="{{ $methodOption }}" @selected(request('http_method') === $methodOption)>
+                                    {{ $methodOption }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_status_class">Status Class</label>
+                        <select id="audit_status_class" name="status_class" class="audit-select">
+                            <option value="">All Statuses</option>
+                            <option value="success" @selected(request('status_class') === 'success')>Success (&lt; 400)</option>
+                            <option value="error" @selected(request('status_class') === 'error')>Error (400+)</option>
+                        </select>
+                    </div>
+
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_date_from">Date From</label>
+                        <input id="audit_date_from" name="date_from" type="date" class="audit-input" value="{{ request('date_from') }}">
+                    </div>
+
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_date_to">Date To</label>
+                        <input id="audit_date_to" name="date_to" type="date" class="audit-input" value="{{ request('date_to') }}">
+                    </div>
+
+                    <div class="audit-filter-group">
+                        <label class="audit-filter-label" for="audit_per_page">Rows</label>
+                        <select id="audit_per_page" name="per_page" class="audit-select">
+                            @foreach([25, 50, 100] as $rowsOption)
+                                <option value="{{ $rowsOption }}" @selected((int) request('per_page', 25) === $rowsOption)>
+                                    {{ $rowsOption }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_actor_role">Actor Role</label>
-                    <select id="audit_actor_role" name="actor_role" class="audit-select">
-                        <option value="">All Roles</option>
-                        @foreach($roleOptions as $roleOption)
-                            <option value="{{ $roleOption }}" @selected(request('actor_role') === $roleOption)>
-                                {{ $roleLabelMap[$roleOption] ?? ucwords(str_replace('_', ' ', $roleOption)) }}
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="audit-filter-actions">
+                    <a href="{{ route('admin.logs') }}" class="audit-btn audit-btn-light">Reset</a>
+                    <button type="submit" class="audit-btn audit-btn-primary">Apply Filters</button>
                 </div>
-
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_event_type">Event Type</label>
-                    <select id="audit_event_type" name="event_type" class="audit-select">
-                        <option value="">All Types</option>
-                        @foreach($eventTypeOptions as $eventTypeOption)
-                            <option value="{{ $eventTypeOption }}" @selected(request('event_type') === $eventTypeOption)>
-                                {{ strtoupper($eventTypeOption) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_module">Module</label>
-                    <select id="audit_module" name="module" class="audit-select">
-                        <option value="">All Modules</option>
-                        @foreach($moduleOptions as $moduleOption)
-                            <option value="{{ $moduleOption }}" @selected(request('module') === $moduleOption)>
-                                {{ $moduleOption }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_http_method">HTTP Method</label>
-                    <select id="audit_http_method" name="http_method" class="audit-select">
-                        <option value="">All Methods</option>
-                        @foreach(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as $methodOption)
-                            <option value="{{ $methodOption }}" @selected(request('http_method') === $methodOption)>
-                                {{ $methodOption }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_status_class">Status Class</label>
-                    <select id="audit_status_class" name="status_class" class="audit-select">
-                        <option value="">All Statuses</option>
-                        <option value="success" @selected(request('status_class') === 'success')>Success (&lt; 400)</option>
-                        <option value="error" @selected(request('status_class') === 'error')>Error (400+)</option>
-                    </select>
-                </div>
-
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_date_from">Date From</label>
-                    <input id="audit_date_from" name="date_from" type="date" class="audit-input" value="{{ request('date_from') }}">
-                </div>
-
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_date_to">Date To</label>
-                    <input id="audit_date_to" name="date_to" type="date" class="audit-input" value="{{ request('date_to') }}">
-                </div>
-
-                <div class="audit-filter-group">
-                    <label class="audit-filter-label" for="audit_per_page">Rows</label>
-                    <select id="audit_per_page" name="per_page" class="audit-select">
-                        @foreach([25, 50, 100] as $rowsOption)
-                            <option value="{{ $rowsOption }}" @selected((int) request('per_page', 25) === $rowsOption)>
-                                {{ $rowsOption }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="audit-filter-actions">
-                <a href="{{ route('admin.logs') }}" class="audit-btn audit-btn-light">Reset</a>
-                <button type="submit" class="audit-btn audit-btn-primary">Apply Filters</button>
-            </div>
-        </form>
+            </form>
+        </details>
     </section>
 
     <section class="audit-breakdowns">
-        <article class="audit-card">
-            <h3 class="audit-list-title">Activity by Role</h3>
-            <ul class="audit-mini-list">
-                @forelse($roleBreakdown as $row)
-                    <li class="audit-mini-item">
-                        <span class="audit-mini-label">{{ $roleLabelMap[$row->role] ?? ucwords(str_replace('_', ' ', $row->role)) }}</span>
-                        <span class="audit-mini-count">{{ number_format($row->total) }}</span>
-                    </li>
-                @empty
-                    <li class="audit-empty">No role activity yet.</li>
-                @endforelse
-            </ul>
+        <article class="audit-card audit-collapsible">
+            <details open>
+                <summary class="audit-collapse-summary">
+                    <span class="audit-list-title">Activity by Role</span>
+                    <span class="audit-collapse-summary-sub">Actor totals</span>
+                </summary>
+                <div class="audit-collapse-body">
+                    <ul class="audit-mini-list">
+                        @forelse($roleBreakdown as $row)
+                            <li class="audit-mini-item">
+                                <span class="audit-mini-label">{{ $roleLabelMap[$row->role] ?? ucwords(str_replace('_', ' ', $row->role)) }}</span>
+                                <span class="audit-mini-count">{{ number_format($row->total) }}</span>
+                            </li>
+                        @empty
+                            <li class="audit-empty">No role activity yet.</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </details>
         </article>
-        <article class="audit-card">
-            <h3 class="audit-list-title">Top Modules</h3>
-            <ul class="audit-mini-list">
-                @forelse($moduleBreakdown as $row)
-                    <li class="audit-mini-item">
-                        <span class="audit-mini-label">{{ $row->module_name }}</span>
-                        <span class="audit-mini-count">{{ number_format($row->total) }}</span>
-                    </li>
-                @empty
-                    <li class="audit-empty">No module activity yet.</li>
-                @endforelse
-            </ul>
+        <article class="audit-card audit-collapsible">
+            <details open>
+                <summary class="audit-collapse-summary">
+                    <span class="audit-list-title">Top Modules</span>
+                    <span class="audit-collapse-summary-sub">Most active areas</span>
+                </summary>
+                <div class="audit-collapse-body">
+                    <ul class="audit-mini-list">
+                        @forelse($moduleBreakdown as $row)
+                            <li class="audit-mini-item">
+                                <span class="audit-mini-label">{{ $row->module_name }}</span>
+                                <span class="audit-mini-count">{{ number_format($row->total) }}</span>
+                            </li>
+                        @empty
+                            <li class="audit-empty">No module activity yet.</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </details>
         </article>
     </section>
 
@@ -712,14 +812,14 @@
                         <tr>
                             <td>
                                 <div>{{ optional($log->created_at)->format('M d, Y') }}</div>
-                                <div style="color:#64748b; font-size:12px;">{{ optional($log->created_at)->format('g:i:s A') }}</div>
+                                <div class="audit-muted" style="font-size:12px;">{{ optional($log->created_at)->format('g:i:s A') }}</div>
                             </td>
                             <td>
                                 <div class="audit-user">
                                     <span class="audit-avatar">{{ strtoupper(substr((string) ($log->user_name ?? 'U'), 0, 1)) }}</span>
                                     <div>
                                         <div style="font-weight:700;">{{ $log->user_name ?? 'Unknown User' }}</div>
-                                        <div style="font-size:11px; color:#64748b;">UID: {{ $log->user_id ?? 'N/A' }}</div>
+                                        <div class="audit-muted" style="font-size:11px;">UID: {{ $log->user_id ?? 'N/A' }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -738,7 +838,7 @@
                             <td>{{ $subjectText !== '' ? $subjectText : '-' }}</td>
                             <td>
                                 <div class="audit-mono">{{ $log->http_method ?? '-' }}</div>
-                                <div class="audit-mono" style="color:#64748b;">{{ $log->request_path ?? '-' }}</div>
+                                <div class="audit-mono audit-muted">{{ $log->request_path ?? '-' }}</div>
                             </td>
                             <td>
                                 <span class="audit-status-badge audit-status-{{ $statusClass }}">
@@ -749,7 +849,7 @@
                             <td style="min-width:250px;">
                                 <div>{{ $log->description }}</div>
                                 @if($log->route_name)
-                                    <div style="margin-top:4px; font-size:11px; color:#64748b;">Route: {{ $log->route_name }}</div>
+                                    <div class="audit-muted" style="margin-top:4px; font-size:11px;">Route: {{ $log->route_name }}</div>
                                 @endif
                             </td>
                         </tr>

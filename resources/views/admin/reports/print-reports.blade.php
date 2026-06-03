@@ -788,7 +788,7 @@
                 @foreach($items as $item)
                 <tr>
                     <td>{{ optional($item->date_added)->format('m/d/Y') ?? 'N/A' }}</td>
-                    <td>{{ $item->id }}</td>
+                    <td>{{ $item->stock_number ?: 'N/A' }}</td>
                     <td class="text-left">{{ $item->name }}</td>
                     <td>
                         {{ $item->unit }}

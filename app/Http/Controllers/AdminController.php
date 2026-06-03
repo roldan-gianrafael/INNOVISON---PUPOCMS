@@ -1538,6 +1538,38 @@ public function updateClearance(Request $request, $id)
         $medicineTypes = MedicineType::query()
             ->orderBy('name')
             ->get();
+        if ($medicineTypes->isEmpty()) {
+            $defaultMedicineTypes = [
+                'ANALGESIC',
+                'MUSCLE RELAXANT',
+                'ANTIPYRETIC',
+                'MUCOLYTIC',
+                'DECONGESTANT',
+                'ANTITUSSIVE',
+                'ANTI-HYPERTENSION',
+                'CORONARY DILATOR',
+                'ANTIVERTIGO',
+                'ANTIBIOTIC',
+                'ANTISPASMODIC',
+                'GASTROKINETIC/ANTIEMETIC',
+                'ANTIMOTILITY',
+                'ELECTROLYTE ORAL',
+                'ANTACID/ANTIFLATULENT',
+                'PROTON PUMP INHIBITOR',
+                'ANTIHISTAMINE',
+                'ANTI-ASTHMA',
+                'IV SET',
+                'TOPICAL OINTMENT/GEL/LOTION',
+                'EYE / EAR DROPS',
+            ];
+
+            $medicineTypes = collect($defaultMedicineTypes)->map(function ($name) {
+                return (object) [
+                    'id' => $name,
+                    'name' => $name,
+                ];
+            });
+        }
         $reportMonth = now()->format('Y-m');
 
         return view('admin.inventory', compact('items', 'medicineTypes', 'reportMonth'));
@@ -1742,6 +1774,8 @@ public function storeItem(Request $request)
     $request->validate([
         'name' => ['required', 'string', 'max:255'],
         'category' => ['required', 'string', 'max:255'],
+        'stock_number' => ['nullable', 'string', 'max:50'],
+        'starting_stock' => ['required', 'numeric', 'min:0'],
         'quantity' => ['required', 'numeric', 'min:0'],
         'unit' => ['required', 'string', 'max:50'],
         'minimum_stock' => ['nullable', 'numeric', 'min:0'],
@@ -1750,14 +1784,18 @@ public function storeItem(Request $request)
         'dispensing_unit' => ['nullable', 'string', 'max:50'],
         'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
         'date_added' => ['required', 'date'],
-        'medicine_type_id' => ['nullable', 'integer', 'exists:medicine_types,id'],
+        'medicine_type_id' => ['nullable', 'string', 'max:255'],
         'expiration_date' => ['nullable', 'date'],
     ]);
 
     // 1. Prepare data and sanitize medicine-specific fields
     $data = $request->all();
     $data['unit'] = trim((string) $request->input('unit', 'pcs')) ?: 'pcs';
-    $data['starting_stock'] = (float) $request->input('quantity', 0);
+    if (Schema::hasColumn('items', 'stock_number')) {
+        $data['stock_number'] = trim((string) $request->input('stock_number', '')) ?: null;
+    }
+    $data['starting_stock'] = (float) $request->input('starting_stock', 0);
+    $data['quantity'] = (float) $request->input('quantity', 0);
     $data['minimum_stock'] = $request->filled('minimum_stock') ? (float) $request->input('minimum_stock') : 10;
     $data['batch_number'] = trim((string) $request->input('batch_number', '')) ?: null;
     $data['supplier_source'] = trim((string) $request->input('supplier_source', '')) ?: null;
@@ -1765,9 +1803,13 @@ public function storeItem(Request $request)
     $data['units_per_stock_unit'] = $request->filled('units_per_stock_unit')
         ? max(1, (int) $request->input('units_per_stock_unit'))
         : null;
-    $selectedMedicineType = $request->filled('medicine_type_id')
-        ? MedicineType::find($request->input('medicine_type_id'))
-        : null;
+    $selectedMedicineType = null;
+    $medicineTypeValue = trim((string) $request->input('medicine_type_id', ''));
+    if ($medicineTypeValue !== '') {
+        $selectedMedicineType = ctype_digit($medicineTypeValue)
+            ? MedicineType::find((int) $medicineTypeValue)
+            : MedicineType::firstOrCreate(['name' => $medicineTypeValue]);
+    }
     $data['medicine_type_id'] = $selectedMedicineType?->id;
     $data['medicine_type'] = $selectedMedicineType?->name;
     if ($request->category !== 'Medicine') {
@@ -1781,15 +1823,30 @@ public function storeItem(Request $request)
         $data['units_per_stock_unit'] = null;
     }
 
+    if ($data['quantity'] > $data['starting_stock']) {
+        return redirect()->back()->withInput()->with('error', 'Balance cannot be greater than the starting quantity.');
+    }
+
     $item = Item::create($data);
     $this->recordInventoryMovement(
         $item,
         'created',
-        (float) $item->quantity,
+        (float) $item->starting_stock,
         0,
-        (float) $item->quantity,
+        (float) $item->starting_stock,
         'Initial stock encoded.'
     );
+    $consumedQuantity = max(0, (float) $item->starting_stock - (float) $item->quantity);
+    if ($consumedQuantity > 0) {
+        $this->recordInventoryMovement(
+            $item,
+            'consumed',
+            $consumedQuantity,
+            (float) $item->starting_stock,
+            (float) $item->quantity,
+            'Initial consumed quantity encoded.'
+        );
+    }
 
     // 2. LOGS CODES
     $typeInfo = $item->medicine_type ? " ({$item->medicine_type})" : "";
@@ -1815,18 +1872,20 @@ public function updateItem($id, Request $request)
     $item = Item::find($id);
     
     if ($item) {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:255'],
-            'quantity' => ['required', 'numeric', 'min:0'],
-            'unit' => ['required', 'string', 'max:50'],
-            'minimum_stock' => ['nullable', 'numeric', 'min:0'],
+    $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'category' => ['required', 'string', 'max:255'],
+        'stock_number' => ['nullable', 'string', 'max:50'],
+        'starting_stock' => ['required', 'numeric', 'min:0'],
+        'quantity' => ['required', 'numeric', 'min:0'],
+        'unit' => ['required', 'string', 'max:50'],
+        'minimum_stock' => ['nullable', 'numeric', 'min:0'],
             'batch_number' => ['nullable', 'string', 'max:120'],
             'supplier_source' => ['nullable', 'string', 'max:255'],
             'dispensing_unit' => ['nullable', 'string', 'max:50'],
             'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
             'date_added' => ['required', 'date'],
-            'medicine_type_id' => ['nullable', 'integer', 'exists:medicine_types,id'],
+            'medicine_type_id' => ['nullable', 'string', 'max:255'],
             'expiration_date' => ['nullable', 'date'],
         ]);
 
@@ -1836,6 +1895,11 @@ public function updateItem($id, Request $request)
         // 1. Prepare and sanitize data for update
         $data = $request->all();
         $data['unit'] = trim((string) $request->input('unit', 'pcs')) ?: 'pcs';
+        if (Schema::hasColumn('items', 'stock_number')) {
+            $data['stock_number'] = trim((string) $request->input('stock_number', '')) ?: null;
+        }
+        $data['starting_stock'] = (float) $request->input('starting_stock', 0);
+        $data['quantity'] = (float) $request->input('quantity', 0);
         $data['minimum_stock'] = $request->filled('minimum_stock') ? (float) $request->input('minimum_stock') : (float) ($item->minimum_stock ?: 10);
         $data['batch_number'] = trim((string) $request->input('batch_number', '')) ?: null;
         $data['supplier_source'] = trim((string) $request->input('supplier_source', '')) ?: null;
@@ -1843,9 +1907,13 @@ public function updateItem($id, Request $request)
         $data['units_per_stock_unit'] = $request->filled('units_per_stock_unit')
             ? max(1, (int) $request->input('units_per_stock_unit'))
             : null;
-        $selectedMedicineType = $request->filled('medicine_type_id')
-            ? MedicineType::find($request->input('medicine_type_id'))
-            : null;
+        $selectedMedicineType = null;
+        $medicineTypeValue = trim((string) $request->input('medicine_type_id', ''));
+        if ($medicineTypeValue !== '') {
+            $selectedMedicineType = ctype_digit($medicineTypeValue)
+                ? MedicineType::find((int) $medicineTypeValue)
+                : MedicineType::firstOrCreate(['name' => $medicineTypeValue]);
+        }
         $data['medicine_type_id'] = $selectedMedicineType?->id;
         $data['medicine_type'] = $selectedMedicineType?->name;
         if ($request->category !== 'Medicine') {
@@ -1857,6 +1925,10 @@ public function updateItem($id, Request $request)
         } elseif ($data['dispensing_unit'] === null || ($data['units_per_stock_unit'] ?? null) === null || (int) $data['units_per_stock_unit'] <= 1) {
             $data['dispensing_unit'] = null;
             $data['units_per_stock_unit'] = null;
+        }
+
+        if ($data['quantity'] > $data['starting_stock']) {
+            return redirect()->back()->withInput()->with('error', 'Balance cannot be greater than the starting quantity.');
         }
 
         $item->update($data);

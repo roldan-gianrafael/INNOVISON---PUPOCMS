@@ -15,6 +15,7 @@ class Item extends Model
     protected $fillable = [
         'name',
         'category',
+        'stock_number',
         'medicine_type_id',
         'medicine_type',
         'illness_category_id',

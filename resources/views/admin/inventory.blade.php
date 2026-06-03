@@ -1889,10 +1889,14 @@
         <table id="inventoryTable">
             <thead>
                 <tr>    
-                    <th>Item Name</th>
-                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Stock No.</th>
+                    <th>Medicines &amp; Materials</th>
                     <th>Unit</th>
-                    <th>Quantity & Dates</th>
+                    <th>Quantity</th>
+                    <th>Consumed</th>
+                    <th>Balance</th>
+                    <th>Expiration Date</th>
                     <th>Stock Status</th>
                     <th>{{ $canManageInventory ? 'Actions' : 'Access' }}</th>
                 </tr>
@@ -1915,16 +1919,21 @@
                         data-inventory-row
                         data-category="{{ strtolower($item->category) }}"
                         data-stock="{{ (float) $item->quantity }}"
+                        data-starting-stock="{{ (float) ($item->starting_stock ?: $item->quantity) }}"
                         data-effective-qty="{{ $effectiveQty }}"
                         data-minimum-stock="{{ (float) ($item->minimum_stock ?: 10) }}"
                         class="{{ $highlightClass }}"
                     >
-                        <td style="font-weight: 600;">{{ $item->name }}</td>
+                        <td style="font-weight: 700;">{{ $item->date_added ? \Carbon\Carbon::parse($item->date_added)->format('M d, Y') : 'N/A' }}</td>
+                        <td style="font-weight: 700;">{{ $item->stock_number ?: $item->batch_number ?: 'N/A' }}</td>
                         <td>
-                            {{ $item->category }}
-                            @if($item->category == 'Medicine' && $item->medicine_type)
-                                <small style="display:block; color:#64748b; font-style: italic;">({{ $item->medicine_type }})</small>
-                            @endif
+                            <div style="font-weight: 700;">{{ $item->name }}</div>
+                            <small style="display:block; color:#64748b; margin-top:4px;">
+                                {{ $item->category }}
+                                @if($item->category == 'Medicine' && $item->medicine_type)
+                                    <span style="font-style: italic;">({{ $item->medicine_type }})</span>
+                                @endif
+                            </small>
                             @if($item->batch_number)
                                 <span class="inventory-meta-pill">Batch: {{ $item->batch_number }}</span>
                             @endif
@@ -1940,6 +1949,22 @@
                                 </small>
                             @endif
                         </td>
+                                                <td>
+                            @php
+                                $startingStock = (float) ($item->starting_stock ?: $item->quantity);
+                                $startingDisplay = rtrim(rtrim(number_format($startingStock, 2, '.', ''), '0'), '.');
+                            @endphp
+                            <div style="font-weight: 700;">{{ $startingDisplay }} {{ $item->unit ?: 'pcs' }}</div>
+                            <small style="display:block; color:#64748b; margin-top:4px;">Starting stock</small>
+                        </td>
+                        <td>
+                            @php
+                                $startingStock = (float) ($item->starting_stock ?: $item->quantity);
+                                $consumedDisplay = max(0, $startingStock - (float) $item->quantity);
+                            @endphp
+                            <div style="font-weight: 700;">{{ rtrim(rtrim(number_format($consumedDisplay, 2, '.', ''), '0'), '.') }}</div>
+                            <small style="display:block; color:#64748b; margin-top:4px;">Consumed</small>
+                        </td>
                         <td>
                             @php
                                 $stockDisplay = rtrim(rtrim(number_format((float) $item->quantity, 2, '.', ''), '0'), '.');
@@ -1949,9 +1974,6 @@
                             @endphp
                             <div style="font-weight: 700;">{{ $stockDisplay }} {{ $item->unit ?: 'pcs' }}</div>
                             <small style="display:block; color:#64748b; margin-top:4px;">
-                                Starting stock: {{ rtrim(rtrim(number_format((float) ($item->starting_stock ?: 0), 2, '.', ''), '0'), '.') }} {{ $item->unit ?: 'pcs' }}
-                            </small>
-                            <small style="display:block; color:#64748b; margin-top:4px;">
                                 Minimum stock: {{ rtrim(rtrim(number_format((float) ($item->minimum_stock ?: 10), 2, '.', ''), '0'), '.') }} {{ $effectiveMinUnit }}
                             </small>
                             @if($item->category == 'Medicine' && $item->hasDispensingConversion())
@@ -1959,13 +1981,14 @@
                                     Available to dispense: {{ $availableDispensing }} {{ $item->dispensing_unit }}
                                 </small>
                             @endif
-                            <small style="display:block; color:#64748b; margin-top:4px;">
-                                📅 Added: {{ $item->date_added ? \Carbon\Carbon::parse($item->date_added)->format('M d, Y') : 'N/A' }}
-                            </small>
-                            @if($item->category == 'Medicine' && $item->expiration_date)
+                        </td>
+                        <td>
+                            @if($item->expiration_date)
                                 <small style="display:block; color: {{ \Carbon\Carbon::parse($item->expiration_date)->isPast() ? '#b91c1c' : '#c2410c' }}; font-weight:600;">
-                                    ⌛ Exp: {{ \Carbon\Carbon::parse($item->expiration_date)->format('M d, Y') }}
+                                    {{ \Carbon\Carbon::parse($item->expiration_date)->format('M d, Y') }}
                                 </small>
+                            @else
+                                N/A
                             @endif
                         </td>
                         <td>
@@ -1985,7 +2008,9 @@
                                         'name' => $item->name,
                                         'category' => $item->category,
                                         'quantity' => $item->quantity,
+                                        'starting_stock' => $item->starting_stock,
                                         'unit' => $item->unit,
+                                        'stock_number' => $item->stock_number,
                                         'minimum_stock' => $item->minimum_stock,
                                         'batch_number' => $item->batch_number,
                                         'supplier_source' => $item->supplier_source,
@@ -2042,7 +2067,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" style="text-align: center; padding: 30px; color: #888;">No items in inventory.</td></tr>
+                    <tr><td colspan="10" style="text-align: center; padding: 30px; color: #888;">No items in inventory.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -2080,6 +2105,11 @@
                                 <div class="form-group">
                                     <label>Item Name</label>
                                     <input name="name" id="iName" class="form-control" required placeholder="e.g. Paracetamol">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Stock Number</label>
+                                    <input name="stock_number" id="iStockNumber" class="form-control" placeholder="e.g. 03-005">
                                 </div>
 
                                 <div class="form-group">
@@ -2135,7 +2165,19 @@
                                 <div class="inventory-inline-grid">
                                     <div class="form-group">
                                         <label>Quantity</label>
-                                        <input type="number" name="quantity" id="iQty" class="form-control" required min="0" step="0.01" placeholder="e.g. 100">
+                                        <input type="number" name="starting_stock" id="iStartingStock" class="form-control" required min="0" step="0.01" placeholder="e.g. 100">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Consumed</label>
+                                        <input type="number" id="iConsumedQuantity" class="form-control" readonly tabindex="-1">
+                                    </div>
+                                </div>
+
+                                <div class="inventory-inline-grid">
+                                    <div class="form-group">
+                                        <label>Balance</label>
+                                        <input type="number" name="quantity" id="iQty" class="form-control" required min="0" step="0.01" placeholder="e.g. 86">
                                     </div>
 
                                     <div class="form-group">
@@ -2357,6 +2399,10 @@
     const categoryWrap = document.getElementById('inventoryCategoryWrap');
     const categoryDisplay = document.getElementById('inventoryCategoryDisplay');
     const categoryOptions = Array.from(document.querySelectorAll('.inventory-category-option'));
+    const stockNumberInput = document.getElementById('iStockNumber');
+    const startingStockInput = document.getElementById('iStartingStock');
+    const consumedQuantityInput = document.getElementById('iConsumedQuantity');
+    const balanceInput = document.getElementById('iQty');
     const medicineTypeWrap = document.getElementById('inventoryMedicineTypeWrap');
     const medicineTypeDisplay = document.getElementById('inventoryMedicineTypeDisplay');
     const medicineTypeMenu = document.getElementById('inventoryMedicineTypeMenu');
@@ -2560,8 +2606,17 @@
         
         // Reset inputs
         document.getElementById('iName').value = '';
+        if (stockNumberInput) {
+            stockNumberInput.value = '';
+        }
         categorySelect.value = 'Medicine';
+        if (startingStockInput) {
+            startingStockInput.value = '';
+        }
         document.getElementById('iQty').value = '';
+        if (consumedQuantityInput) {
+            consumedQuantityInput.value = '0';
+        }
         document.getElementById('iMinimumStock').value = '10';
         document.getElementById('iUnit').value = 'pcs';
         document.getElementById('iBatchNumber').value = '';
@@ -2580,6 +2635,7 @@
         toggleMedicineFields();
         syncMedicineTypeDisplay();
         syncMinStockUnitLabel();
+        syncConsumedQuantity();
     }
 
     function editItem(item) {
@@ -2592,8 +2648,19 @@
         document.getElementById('methodField').innerHTML = '<input type="hidden" name="_method" value="PUT">';
 
         document.getElementById('iName').value = item.name || '';
+        if (stockNumberInput) {
+            stockNumberInput.value = item.stock_number || '';
+        }
         categorySelect.value = item.category || 'Medicine';
+        if (startingStockInput) {
+            startingStockInput.value = item.starting_stock ?? item.quantity ?? '';
+        }
         document.getElementById('iQty').value = item.quantity ?? '';
+        if (consumedQuantityInput) {
+            const startingStock = Number(item.starting_stock || item.quantity || 0);
+            const balance = Number(item.quantity || 0);
+            consumedQuantityInput.value = String(Math.max(0, startingStock - balance));
+        }
         document.getElementById('iMinimumStock').value = item.minimum_stock ?? '10';
         document.getElementById('iUnit').value = item.unit || 'pcs';
         document.getElementById('iBatchNumber').value = item.batch_number || '';
@@ -2615,6 +2682,7 @@
         syncMedicineTypeDisplay();
         toggleDispensingFields();
         syncMinStockUnitLabel();
+        syncConsumedQuantity();
     }
 
     function closeModal() {
@@ -3033,6 +3101,14 @@
             : `Value is in the stock unit (${stockUnit}).`;
     }
 
+    function syncConsumedQuantity() {
+        if (!startingStockInput || !consumedQuantityInput || !balanceInput) return;
+        const startingStock = Number(startingStockInput.value || 0);
+        const balance = Number(balanceInput.value || 0);
+        const consumed = Math.max(0, startingStock - balance);
+        consumedQuantityInput.value = String(consumed || 0);
+    }
+
     if (unitInput) {
         unitInput.addEventListener('input',  () => { toggleDispensingFields(); syncMinStockUnitLabel(); });
         unitInput.addEventListener('change', () => { toggleDispensingFields(); syncMinStockUnitLabel(); });
@@ -3042,5 +3118,8 @@
     const unitsPerStockUnitWatcher = document.getElementById('iUnitsPerStockUnit');
     if (dispensingUnitWatcher)    dispensingUnitWatcher.addEventListener('input',  syncMinStockUnitLabel);
     if (unitsPerStockUnitWatcher) unitsPerStockUnitWatcher.addEventListener('input', syncMinStockUnitLabel);
+    if (startingStockInput) startingStockInput.addEventListener('input', syncConsumedQuantity);
+    if (balanceInput) balanceInput.addEventListener('input', syncConsumedQuantity);
 </script>
 @endpush
+

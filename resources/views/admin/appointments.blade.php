@@ -331,56 +331,86 @@
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: rgba(15, 23, 42, 0.58);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         z-index: 1000;
         justify-content: center;
         align-items: center;
+        padding: clamp(14px, 2.2vw, 28px);
         animation: fadeIn 0.2s;
     }
     .modal-box {
-        background: rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        padding: 24px;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        padding: 0;
         border-radius: 18px;
-        width: 560px;
-        max-width: 90%;
+        width: min(100%, 620px);
+        max-width: 100%;
+        max-height: min(760px, calc(100dvh - clamp(24px, 4vw, 56px)));
         position: relative;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
         border-left: 1px solid rgba(112, 19, 27, 0.12);
         border-right: 1px solid rgba(112, 19, 27, 0.12);
         border-top: 4px solid #facc15;
         border-bottom: 4px solid #facc15;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        scrollbar-width: none;
     }
+    .modal-box::-webkit-scrollbar { display: none; }
     .main #infoModal .modal-box,
     .main #statusActionModal .modal-box,
     .main #rescheduleModal .modal-box {
-        background: rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.98) !important;
         border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
         border-top: 4px solid #facc15 !important;
         border-bottom: 4px solid #facc15 !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    #rescheduleModal .modal-box {
+        width: min(100%, 680px);
     }
     .modal-header {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         gap: 16px;
-        margin-bottom: 16px;
-        padding: 16px 20px;
-        margin: -24px -24px 16px -24px;
-        border-radius: 14px 14px 0 0;
-        background: #70131B;
-        border-bottom: 1px solid #eee;
+        padding: clamp(14px, 1.5vw, 18px) clamp(16px, 1.8vw, 24px);
+        margin: 0;
+        border-radius: 0;
+        background: linear-gradient(135deg, #70131B, #8f2230);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        position: relative;
+        overflow: hidden;
+        flex: 0 0 auto;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .modal-header::after {
+        content: "";
+        position: absolute;
+        right: 54px;
+        top: 50%;
+        width: 80px;
+        height: 80px;
+        transform: translateY(-50%);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        pointer-events: none;
     }
     .modal-header-main {
         min-width: 0;
         flex: 1 1 auto;
+        position: relative;
+        z-index: 1;
     }
     .modal-status-badge {
         flex: 0 0 auto;
@@ -412,10 +442,26 @@
         padding: 12px 14px;
         border-radius: 16px;
         border: 1px solid rgba(112, 19, 27, 0.15);
-        background: rgba(255, 255, 255, 0.6);
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.82),
             0 8px 18px rgba(112, 19, 27, 0.05);
+    }
+    .modal-box > .modal-row,
+    .modal-box > .dialog-actions,
+    .modal-box form > .modal-row,
+    .modal-box form > .dialog-actions {
+        margin-left: clamp(16px, 2vw, 24px);
+        margin-right: clamp(16px, 2vw, 24px);
+    }
+    .modal-box > .modal-row:first-of-type,
+    .modal-box form > .modal-row:first-of-type {
+        margin-top: clamp(16px, 2vw, 24px);
+    }
+    .modal-box form {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
     .modal-label { font-size: 12px; font-weight: 700; color: #111827; text-transform: uppercase; }
     .modal-val { font-size: 15px; color: #111827; font-weight: 500; }
@@ -445,27 +491,58 @@
         margin-bottom: 16px;
     }
     .modal-header-close {
-        width: 38px;
-        height: 38px;
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        background: rgba(255, 255, 255, 0.12);
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        border: 1px solid #8f2230;
+        background: linear-gradient(135deg, #70131B, #8f2230);
         color: #ffffff;
         border-radius: 999px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s ease;
+        overflow: hidden;
+        position: relative;
+        z-index: 2;
+        box-shadow:
+            0 0 0 3px rgba(112, 19, 27, 0.12),
+            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
     .modal-header-close:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.34);
+        border-color: #facc15;
         transform: translateY(-1px);
+        box-shadow:
+            0 0 0 3px rgba(250, 204, 21, 0.18),
+            0 14px 24px rgba(112, 19, 27, 0.16);
     }
     .modal-header-close svg {
         width: 18px;
         height: 18px;
         stroke-width: 2.2;
+        position: relative;
+        z-index: 1;
+    }
+    .modal-header-close::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg,
+                rgba(255, 248, 196, 0) 0%,
+                rgba(255, 239, 181, 0.14) 22%,
+                rgba(255, 239, 181, 0.52) 48%,
+                rgba(255, 239, 181, 0.14) 72%,
+                rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        pointer-events: none;
+        z-index: 0;
+    }
+    .modal-header-close:hover::after {
+        transform: translateX(135%);
     }
     .modal-status-badge.action-approve { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
     .modal-status-badge.action-reject { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
@@ -485,6 +562,8 @@
         gap: 10px;
         justify-content: flex-end;
         margin-top: 22px;
+        margin-bottom: clamp(16px, 2vw, 24px);
+        padding-top: 10px;
     }
     .dialog-btn {
         display: inline-flex;
@@ -1252,7 +1331,7 @@
     }
 
     html[data-theme="dark"] .modal-box {
-        background: rgba(28, 20, 22, 0.34);
+        background: rgba(15, 23, 42, 0.98);
         border-left: 1px solid rgba(143, 34, 48, 0.36);
         border-right: 1px solid rgba(143, 34, 48, 0.36);
         border-top: 4px solid #facc15;
@@ -1264,7 +1343,7 @@
     html[data-theme="dark"] .main #infoModal .modal-box,
     html[data-theme="dark"] .main #statusActionModal .modal-box,
     html[data-theme="dark"] .main #rescheduleModal .modal-box {
-        background: rgba(28, 20, 22, 0.34) !important;
+        background: rgba(15, 23, 42, 0.98) !important;
         border-left: 1px solid rgba(143, 34, 48, 0.36) !important;
         border-right: 1px solid rgba(143, 34, 48, 0.36) !important;
         border-top: 4px solid #facc15 !important;
@@ -1290,12 +1369,12 @@
         color: rgba(255, 255, 255, 0.76);
     }
     html[data-theme="dark"] .modal-header-close {
-        background: rgba(255, 255, 255, 0.08);
+        background: linear-gradient(135deg, #70131B, #8f2230);
         border-color: rgba(250, 204, 21, 0.22);
         color: #ffffff;
     }
     html[data-theme="dark"] .modal-header-close:hover {
-        background: rgba(255, 255, 255, 0.14);
+        background: linear-gradient(135deg, #70131B, #8f2230);
         border-color: rgba(250, 204, 21, 0.34);
     }
 
@@ -1607,6 +1686,9 @@
                     <h3 class="modal-title">Appointment Details</h3>
                 </div>
                 <span class="modal-status-badge" id="mStatus">-</span>
+                <button type="button" class="modal-header-close" onclick="closeInfoModal()" aria-label="Close appointment details modal">
+                    <x-outline-icon name="x-mark" />
+                </button>
             </div>
             <div class="modal-row"><div class="modal-label">Student Name</div><div class="modal-val" id="mName"></div></div>
             <div class="modal-row"><div class="modal-label">Email</div><div class="modal-val" id="mEmail"></div></div>

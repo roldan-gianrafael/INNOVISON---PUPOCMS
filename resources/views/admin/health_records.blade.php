@@ -376,72 +376,60 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 50px;
-        min-width: 140px !important;
-        padding: 0 16px !important;
-        gap: 8px !important;
-        width: auto !important;
-        border-radius: 14px !important;
-        border: 1px solid #e2e8f0;
+        min-height: 40px;
+        padding: 0 16px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
         background: #ffffff;
-        color: #70131B;
+        color: #374151;
         cursor: pointer;
-        font-weight: 700;
+        font-weight: 500;
         font-size: 13px;
-        transition: all .18s ease;
-        white-space: nowrap;
+        transition: all .15s ease;
+        pointer-events: auto;
     }
 
-    .health-filter-toggle svg {
-        width: 18px !important;
-        height: 18px !important;
-        flex: 0 0 auto;
-        stroke: currentColor;
-        fill: none;
-        stroke-width: 2;
+    .health-filter-toggle:hover {
+        background: #f3f4f6;
+        border-color: #9ca3af;
     }
 
-    .health-filter-toggle:hover,
-    .health-filter-toggle.is-open {
-        background: #fef3c7;
-        border-color: #facc15;
-        color: #111827 !important;
-        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.18);
+    .health-filter-toggle:active {
+        background: #e5e7eb;
     }
 
     .health-records-search-toggle {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 50px;
-        min-width: 50px;
-        padding: 0 14px;
-        border-radius: 14px;
-        border: 1px solid #e2e8f0;
+        min-height: 40px;
+        min-width: 40px;
+        padding: 0;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
         background: #ffffff;
-        color: #70131B;
+        color: #374151;
         cursor: pointer;
-        transition: all .18s ease;
-        z-index: 1;
-        position: relative;
-        overflow: hidden;
+        transition: all .15s ease;
+        pointer-events: auto;
     }
 
-    .health-records-search-toggle:hover,
-    .health-records-search-toggle:focus {
-        background: #fef3c7;
-        border-color: #facc15;
-        color: #111827;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.18);
+    .health-records-search-toggle:hover {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+    }
+
+    .health-records-search-toggle:active {
+        background: #e5e7eb;
     }
 
     .health-records-search-toggle svg {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         stroke-width: 2;
         stroke: currentColor;
         fill: none;
+        pointer-events: none;
     }
 
     .health-filter-form {

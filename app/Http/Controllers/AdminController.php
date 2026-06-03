@@ -1776,15 +1776,15 @@ public function storeItem(Request $request)
         'category' => ['required', 'string', 'max:255'],
         'stock_number' => ['nullable', 'string', 'max:50'],
         'starting_stock' => ['required', 'numeric', 'min:0'],
+        'consumed' => ['nullable', 'numeric', 'min:0'],
         'quantity' => ['required', 'numeric', 'min:0'],
         'unit' => ['required', 'string', 'max:50'],
         'minimum_stock' => ['nullable', 'numeric', 'min:0'],
-        'batch_number' => ['nullable', 'string', 'max:120'],
-        'supplier_source' => ['nullable', 'string', 'max:255'],
         'dispensing_unit' => ['nullable', 'string', 'max:50'],
         'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
         'date_added' => ['required', 'date'],
         'medicine_type_id' => ['nullable', 'string', 'max:255'],
+        'medicine_type_custom' => ['nullable', 'string', 'max:255'],
         'expiration_date' => ['nullable', 'date'],
     ]);
 
@@ -1795,17 +1795,22 @@ public function storeItem(Request $request)
         $data['stock_number'] = trim((string) $request->input('stock_number', '')) ?: null;
     }
     $data['starting_stock'] = (float) $request->input('starting_stock', 0);
+    $data['consumed'] = max(0, (float) $request->input('consumed', 0));
     $data['quantity'] = (float) $request->input('quantity', 0);
     $data['minimum_stock'] = $request->filled('minimum_stock') ? (float) $request->input('minimum_stock') : 10;
-    $data['batch_number'] = trim((string) $request->input('batch_number', '')) ?: null;
-    $data['supplier_source'] = trim((string) $request->input('supplier_source', '')) ?: null;
     $data['dispensing_unit'] = trim((string) $request->input('dispensing_unit', '')) ?: null;
     $data['units_per_stock_unit'] = $request->filled('units_per_stock_unit')
         ? max(1, (int) $request->input('units_per_stock_unit'))
         : null;
     $selectedMedicineType = null;
     $medicineTypeValue = trim((string) $request->input('medicine_type_id', ''));
-    if ($medicineTypeValue !== '') {
+    $medicineTypeCustom = trim((string) $request->input('medicine_type_custom', ''));
+    if ($medicineTypeValue === '__custom__' || $medicineTypeCustom !== '') {
+        $medicineTypeName = $medicineTypeCustom !== '' ? $medicineTypeCustom : trim((string) $request->input('medicine_type_id', ''));
+        if ($medicineTypeName !== '' && $medicineTypeName !== '__custom__') {
+            $selectedMedicineType = MedicineType::firstOrCreate(['name' => $medicineTypeName]);
+        }
+    } elseif ($medicineTypeValue !== '') {
         $selectedMedicineType = ctype_digit($medicineTypeValue)
             ? MedicineType::find((int) $medicineTypeValue)
             : MedicineType::firstOrCreate(['name' => $medicineTypeValue]);
@@ -1818,13 +1823,6 @@ public function storeItem(Request $request)
         $data['expiration_date'] = null;
         $data['dispensing_unit'] = null;
         $data['units_per_stock_unit'] = null;
-    } elseif ($data['dispensing_unit'] === null || ($data['units_per_stock_unit'] ?? null) === null || (int) $data['units_per_stock_unit'] <= 1) {
-        $data['dispensing_unit'] = null;
-        $data['units_per_stock_unit'] = null;
-    }
-
-    if ($data['quantity'] > $data['starting_stock']) {
-        return redirect()->back()->withInput()->with('error', 'Balance cannot be greater than the starting quantity.');
     }
 
     $item = Item::create($data);
@@ -1836,12 +1834,11 @@ public function storeItem(Request $request)
         (float) $item->starting_stock,
         'Initial stock encoded.'
     );
-    $consumedQuantity = max(0, (float) $item->starting_stock - (float) $item->quantity);
-    if ($consumedQuantity > 0) {
+    if ((float) $item->consumed > 0) {
         $this->recordInventoryMovement(
             $item,
             'consumed',
-            $consumedQuantity,
+            (float) $item->consumed,
             (float) $item->starting_stock,
             (float) $item->quantity,
             'Initial consumed quantity encoded.'
@@ -1872,20 +1869,20 @@ public function updateItem($id, Request $request)
     $item = Item::find($id);
     
     if ($item) {
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'category' => ['required', 'string', 'max:255'],
-        'stock_number' => ['nullable', 'string', 'max:50'],
-        'starting_stock' => ['required', 'numeric', 'min:0'],
-        'quantity' => ['required', 'numeric', 'min:0'],
-        'unit' => ['required', 'string', 'max:50'],
-        'minimum_stock' => ['nullable', 'numeric', 'min:0'],
-            'batch_number' => ['nullable', 'string', 'max:120'],
-            'supplier_source' => ['nullable', 'string', 'max:255'],
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:255'],
+            'stock_number' => ['nullable', 'string', 'max:50'],
+            'starting_stock' => ['required', 'numeric', 'min:0'],
+            'consumed' => ['nullable', 'numeric', 'min:0'],
+            'quantity' => ['required', 'numeric', 'min:0'],
+            'unit' => ['required', 'string', 'max:50'],
+            'minimum_stock' => ['nullable', 'numeric', 'min:0'],
             'dispensing_unit' => ['nullable', 'string', 'max:50'],
             'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
             'date_added' => ['required', 'date'],
             'medicine_type_id' => ['nullable', 'string', 'max:255'],
+            'medicine_type_custom' => ['nullable', 'string', 'max:255'],
             'expiration_date' => ['nullable', 'date'],
         ]);
 
@@ -1899,17 +1896,22 @@ public function updateItem($id, Request $request)
             $data['stock_number'] = trim((string) $request->input('stock_number', '')) ?: null;
         }
         $data['starting_stock'] = (float) $request->input('starting_stock', 0);
+        $data['consumed'] = max(0, (float) $request->input('consumed', 0));
         $data['quantity'] = (float) $request->input('quantity', 0);
         $data['minimum_stock'] = $request->filled('minimum_stock') ? (float) $request->input('minimum_stock') : (float) ($item->minimum_stock ?: 10);
-        $data['batch_number'] = trim((string) $request->input('batch_number', '')) ?: null;
-        $data['supplier_source'] = trim((string) $request->input('supplier_source', '')) ?: null;
         $data['dispensing_unit'] = trim((string) $request->input('dispensing_unit', '')) ?: null;
         $data['units_per_stock_unit'] = $request->filled('units_per_stock_unit')
             ? max(1, (int) $request->input('units_per_stock_unit'))
             : null;
         $selectedMedicineType = null;
         $medicineTypeValue = trim((string) $request->input('medicine_type_id', ''));
-        if ($medicineTypeValue !== '') {
+        $medicineTypeCustom = trim((string) $request->input('medicine_type_custom', ''));
+        if ($medicineTypeValue === '__custom__' || $medicineTypeCustom !== '') {
+            $medicineTypeName = $medicineTypeCustom !== '' ? $medicineTypeCustom : trim((string) $request->input('medicine_type_id', ''));
+            if ($medicineTypeName !== '' && $medicineTypeName !== '__custom__') {
+                $selectedMedicineType = MedicineType::firstOrCreate(['name' => $medicineTypeName]);
+            }
+        } elseif ($medicineTypeValue !== '') {
             $selectedMedicineType = ctype_digit($medicineTypeValue)
                 ? MedicineType::find((int) $medicineTypeValue)
                 : MedicineType::firstOrCreate(['name' => $medicineTypeValue]);
@@ -1922,13 +1924,6 @@ public function updateItem($id, Request $request)
             $data['expiration_date'] = null;
             $data['dispensing_unit'] = null;
             $data['units_per_stock_unit'] = null;
-        } elseif ($data['dispensing_unit'] === null || ($data['units_per_stock_unit'] ?? null) === null || (int) $data['units_per_stock_unit'] <= 1) {
-            $data['dispensing_unit'] = null;
-            $data['units_per_stock_unit'] = null;
-        }
-
-        if ($data['quantity'] > $data['starting_stock']) {
-            return redirect()->back()->withInput()->with('error', 'Balance cannot be greater than the starting quantity.');
         }
 
         $item->update($data);

@@ -21,6 +21,7 @@ class Item extends Model
         'illness_category_id',
         'quantity',
         'starting_stock',
+        'consumed',
         'minimum_stock',
         'unit',
         'dispensing_unit',
@@ -35,6 +36,7 @@ class Item extends Model
     protected $casts = [
         'quantity' => 'decimal:2',
         'starting_stock' => 'decimal:2',
+        'consumed' => 'decimal:2',
         'minimum_stock' => 'decimal:2',
         'units_per_stock_unit' => 'integer',
         'date_added' => 'date',

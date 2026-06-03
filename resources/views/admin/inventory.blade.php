@@ -1925,7 +1925,7 @@
                         class="{{ $highlightClass }}"
                     >
                         <td style="font-weight: 700;">{{ $item->date_added ? \Carbon\Carbon::parse($item->date_added)->format('M d, Y') : 'N/A' }}</td>
-                        <td style="font-weight: 700;">{{ $item->stock_number ?: $item->batch_number ?: 'N/A' }}</td>
+                        <td style="font-weight: 700;">{{ $item->stock_number ?: 'N/A' }}</td>
                         <td>
                             <div style="font-weight: 700;">{{ $item->name }}</div>
                             <small style="display:block; color:#64748b; margin-top:4px;">
@@ -1934,12 +1934,6 @@
                                     <span style="font-style: italic;">({{ $item->medicine_type }})</span>
                                 @endif
                             </small>
-                            @if($item->batch_number)
-                                <span class="inventory-meta-pill">Batch: {{ $item->batch_number }}</span>
-                            @endif
-                            @if($item->supplier_source)
-                                <small style="display:block; color:#64748b; margin-top:4px;">Source: {{ $item->supplier_source }}</small>
-                            @endif
                         </td>
                         <td>
                             <div style="font-weight: 700;">{{ $item->unit ?: 'pcs' }}</div>
@@ -1959,8 +1953,7 @@
                         </td>
                         <td>
                             @php
-                                $startingStock = (float) ($item->starting_stock ?: $item->quantity);
-                                $consumedDisplay = max(0, $startingStock - (float) $item->quantity);
+                                $consumedDisplay = (float) ($item->consumed ?? 0);
                             @endphp
                             <div style="font-weight: 700;">{{ rtrim(rtrim(number_format($consumedDisplay, 2, '.', ''), '0'), '.') }}</div>
                             <small style="display:block; color:#64748b; margin-top:4px;">Consumed</small>
@@ -2012,8 +2005,6 @@
                                         'unit' => $item->unit,
                                         'stock_number' => $item->stock_number,
                                         'minimum_stock' => $item->minimum_stock,
-                                        'batch_number' => $item->batch_number,
-                                        'supplier_source' => $item->supplier_source,
                                         'medicine_type_id' => $item->medicine_type_id,
                                         'dispensing_unit' => $item->dispensing_unit,
                                         'units_per_stock_unit' => $item->units_per_stock_unit,
@@ -2027,8 +2018,6 @@
                                                 'stock_before' => $movement->stock_before,
                                                 'stock_after' => $movement->stock_after,
                                                 'unit' => $movement->unit,
-                                                'batch_number' => $movement->batch_number,
-                                                'supplier_source' => $movement->supplier_source,
                                                 'notes' => $movement->notes,
                                                 'user_name' => optional($movement->user)->name,
                                                 'created_at' => optional($movement->created_at)->format('M d, Y g:i A'),
@@ -2135,26 +2124,32 @@
                                     <div class="form-group">
                                         <label>Medicine Type</label>
                                         <div class="inventory-medicine-type-wrap" id="inventoryMedicineTypeWrap">
-                                            <select name="medicine_type_id" id="iMedicineType" class="form-control inventory-medicine-type-select">
-                                                <option value="">-- Select Type --</option>
-                                                @foreach($medicineTypes as $medicineType)
-                                                    <option value="{{ $medicineType->id }}">{{ $medicineType->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <button type="button" class="inventory-medicine-type-display" id="inventoryMedicineTypeDisplay" aria-haspopup="listbox" aria-expanded="false">
-                                                Select medicine type
-                                            </button>
-                                            <div class="inventory-medicine-type-menu" id="inventoryMedicineTypeMenu" role="listbox" aria-label="Medicine Type options">
+                                        <select name="medicine_type_id" id="iMedicineType" class="form-control inventory-medicine-type-select">
+                                            <option value="">-- Select Type --</option>
+                                            @foreach($medicineTypes as $medicineType)
+                                                <option value="{{ $medicineType->id }}">{{ $medicineType->name }}</option>
+                                            @endforeach
+                                            <option value="__custom__">Add new medicine type...</option>
+                                        </select>
+                                        <button type="button" class="inventory-medicine-type-display" id="inventoryMedicineTypeDisplay" aria-haspopup="listbox" aria-expanded="false">
+                                            Select medicine type
+                                        </button>
+                                        <div class="inventory-medicine-type-menu" id="inventoryMedicineTypeMenu" role="listbox" aria-label="Medicine Type options">
                                                 <input type="search" class="inventory-medicine-type-search" id="inventoryMedicineTypeSearch" placeholder="Search medicine type..." autocomplete="off">
                                                 <div class="inventory-medicine-type-options">
                                                     @foreach($medicineTypes as $medicineType)
                                                         <button type="button" class="inventory-medicine-type-option" data-medicine-type-value="{{ $medicineType->id }}" data-medicine-type-name="{{ strtolower($medicineType->name) }}">{{ $medicineType->name }}</button>
-                                                    @endforeach
-                                                </div>
-                                                <div class="inventory-medicine-type-empty" id="inventoryMedicineTypeEmpty">No medicine type found.</div>
+                                                @endforeach
+                                                <button type="button" class="inventory-medicine-type-option" data-medicine-type-value="__custom__" data-medicine-type-name="__custom__">Add new medicine type...</button>
                                             </div>
+                                            <div class="inventory-medicine-type-empty" id="inventoryMedicineTypeEmpty">No medicine type found.</div>
                                         </div>
                                     </div>
+                                    <div class="form-group" id="medicineTypeCustomWrap" style="display:none;">
+                                        <label>New Medicine Type</label>
+                                        <input type="text" name="medicine_type_custom" id="iMedicineTypeCustom" class="form-control" placeholder="Type a new medicine type">
+                                    </div>
+                                </div>
                                 </div>
 
                             </div>
@@ -2170,7 +2165,7 @@
 
                                     <div class="form-group">
                                         <label>Consumed</label>
-                                        <input type="number" id="iConsumedQuantity" class="form-control" readonly tabindex="-1">
+                                        <input type="number" name="consumed" id="iConsumedQuantity" class="form-control" min="0" step="0.01" placeholder="e.g. 14">
                                     </div>
                                 </div>
 
@@ -2187,38 +2182,26 @@
                                     </div>
                                 </div>
 
-                                <div class="inventory-inline-grid">
-                                    <div class="form-group">
-                                        <label>Unit</label>
-                                        <input type="text" name="unit" id="iUnit" class="form-control" list="inventoryUnitSuggestions" required placeholder="e.g. pcs, box, bottle, vial">
-                                        <datalist id="inventoryUnitSuggestions">
-                                            <option value="pcs">
-                                            <option value="box">
-                                            <option value="bottle">
-                                            <option value="vial">
-                                            <option value="ampule">
-                                            <option value="tablet">
-                                            <option value="capsule">
-                                            <option value="pack">
-                                            <option value="set">
-                                            <option value="tube">
-                                            <option value="sachet">
-                                            <option value="roll">
-                                            <option value="pair">
-                                            <option value="ml">
-                                            <option value="mg">
-                                        </datalist>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Batch / Lot Number</label>
-                                        <input type="text" name="batch_number" id="iBatchNumber" class="form-control" placeholder="e.g. LOT-2026-05">
-                                    </div>
-                                </div>
-
                                 <div class="form-group">
-                                    <label>Supplier / Source</label>
-                                    <input type="text" name="supplier_source" id="iSupplierSource" class="form-control" placeholder="e.g. Campus supply office, donated, purchased">
+                                    <label>Unit</label>
+                                    <input type="text" name="unit" id="iUnit" class="form-control" list="inventoryUnitSuggestions" required placeholder="e.g. pcs, box, bottle, vial">
+                                    <datalist id="inventoryUnitSuggestions">
+                                        <option value="pcs">
+                                        <option value="box">
+                                        <option value="bottle">
+                                        <option value="vial">
+                                        <option value="ampule">
+                                        <option value="tablet">
+                                        <option value="capsule">
+                                        <option value="pack">
+                                        <option value="set">
+                                        <option value="tube">
+                                        <option value="sachet">
+                                        <option value="roll">
+                                        <option value="pair">
+                                        <option value="ml">
+                                        <option value="mg">
+                                    </datalist>
                                 </div>
 
                                 <div id="medicineDispensingFields" class="inventory-subgroup">
@@ -2311,16 +2294,6 @@
                                 <input type="date" name="restock_date" id="restockDate" class="form-control">
                             </div>
                         </div>
-                        <div class="inventory-inline-grid">
-                            <div class="form-group">
-                                <label>Batch / Lot Number</label>
-                                <input type="text" name="batch_number" id="restockBatchNumber" class="form-control" placeholder="Optional">
-                            </div>
-                            <div class="form-group">
-                                <label>Supplier / Source</label>
-                                <input type="text" name="supplier_source" id="restockSupplierSource" class="form-control" placeholder="Optional">
-                            </div>
-                        </div>
                         <div class="form-group">
                             <label>Notes</label>
                             <textarea name="restock_notes" class="form-control" rows="3" placeholder="Optional restock note"></textarea>
@@ -2402,13 +2375,14 @@
     const stockNumberInput = document.getElementById('iStockNumber');
     const startingStockInput = document.getElementById('iStartingStock');
     const consumedQuantityInput = document.getElementById('iConsumedQuantity');
-    const balanceInput = document.getElementById('iQty');
     const medicineTypeWrap = document.getElementById('inventoryMedicineTypeWrap');
     const medicineTypeDisplay = document.getElementById('inventoryMedicineTypeDisplay');
     const medicineTypeMenu = document.getElementById('inventoryMedicineTypeMenu');
     const medicineTypeSearch = document.getElementById('inventoryMedicineTypeSearch');
     const medicineTypeOptions = Array.from(document.querySelectorAll('.inventory-medicine-type-option'));
     const medicineTypeEmpty = document.getElementById('inventoryMedicineTypeEmpty');
+    const medicineTypeCustomWrap = document.getElementById('medicineTypeCustomWrap');
+    const medicineTypeCustomInput = document.getElementById('iMedicineTypeCustom');
     const medicineTypeMenuHome = medicineTypeMenu ? medicineTypeMenu.parentElement : null;
     const restockQuantityInput = document.getElementById('restockQuantity');
     const restockCurrentStockDisplay = document.getElementById('restockCurrentStock');
@@ -2456,12 +2430,31 @@
         if (!medicineSelect || !medicineTypeDisplay) return;
 
         const selectedOption = medicineSelect.options[medicineSelect.selectedIndex];
-        const selectedText = selectedOption && selectedOption.value ? selectedOption.text : 'Select medicine type';
+        const isCustom = medicineSelect.value === '__custom__';
+        const selectedText = isCustom
+            ? (medicineTypeCustomInput && medicineTypeCustomInput.value.trim() ? medicineTypeCustomInput.value.trim() : 'Add new medicine type')
+            : (selectedOption && selectedOption.value ? selectedOption.text : 'Select medicine type');
         medicineTypeDisplay.textContent = selectedText;
 
         medicineTypeOptions.forEach(function(option) {
             option.classList.toggle('is-selected', option.dataset.medicineTypeValue === medicineSelect.value);
         });
+        if (medicineTypeCustomWrap) {
+            medicineTypeCustomWrap.style.display = isCustom ? 'block' : 'none';
+        }
+        if (medicineTypeCustomInput) {
+            medicineTypeCustomInput.required = isCustom;
+            if (!isCustom) {
+                medicineTypeCustomInput.value = '';
+            }
+        }
+    }
+
+    function syncMedicineTypeCustom() {
+        if (!medicineSelect || !medicineTypeDisplay || !medicineTypeCustomInput) return;
+        if (medicineSelect.value === '__custom__') {
+            medicineTypeDisplay.textContent = medicineTypeCustomInput.value.trim() || 'Add new medicine type';
+        }
     }
 
     function setMedicineTypeOpenState(isOpen) {
@@ -2619,8 +2612,6 @@
         }
         document.getElementById('iMinimumStock').value = '10';
         document.getElementById('iUnit').value = 'pcs';
-        document.getElementById('iBatchNumber').value = '';
-        document.getElementById('iSupplierSource').value = '';
         if (dispensingUnitInput) {
             dispensingUnitInput.value = '';
         }
@@ -2630,12 +2621,14 @@
         document.getElementById('iDateAdded').value = new Date().toISOString().split('T')[0]; // Set today as default
         document.getElementById('iExpDate').value = '';
         medicineSelect.value = '';
+        if (medicineTypeCustomInput) {
+            medicineTypeCustomInput.value = '';
+        }
         
         syncCategoryDisplay();
         toggleMedicineFields();
         syncMedicineTypeDisplay();
         syncMinStockUnitLabel();
-        syncConsumedQuantity();
     }
 
     function editItem(item) {
@@ -2657,14 +2650,10 @@
         }
         document.getElementById('iQty').value = item.quantity ?? '';
         if (consumedQuantityInput) {
-            const startingStock = Number(item.starting_stock || item.quantity || 0);
-            const balance = Number(item.quantity || 0);
-            consumedQuantityInput.value = String(Math.max(0, startingStock - balance));
+            consumedQuantityInput.value = item.consumed ?? '';
         }
         document.getElementById('iMinimumStock').value = item.minimum_stock ?? '10';
         document.getElementById('iUnit').value = item.unit || 'pcs';
-        document.getElementById('iBatchNumber').value = item.batch_number || '';
-        document.getElementById('iSupplierSource').value = item.supplier_source || '';
         if (dispensingUnitInput) {
             dispensingUnitInput.value = item.dispensing_unit || '';
         }
@@ -2676,13 +2665,25 @@
         syncCategoryDisplay();
         toggleMedicineFields();
         if((item.category || '') === 'Medicine') {
-            document.getElementById('iMedicineType').value = item.medicine_type_id || '';
+            const hasKnownType = Array.from(medicineSelect.options).some(function(option) {
+                return String(option.value) === String(item.medicine_type_id || '');
+            });
+            if (item.medicine_type_id && hasKnownType) {
+                medicineSelect.value = String(item.medicine_type_id);
+                if (medicineTypeCustomInput) {
+                    medicineTypeCustomInput.value = '';
+                }
+            } else {
+                medicineSelect.value = '__custom__';
+                if (medicineTypeCustomInput) {
+                    medicineTypeCustomInput.value = item.medicine_type || '';
+                }
+            }
             document.getElementById('iExpDate').value = item.expiration_date || '';
         }
         syncMedicineTypeDisplay();
         toggleDispensingFields();
         syncMinStockUnitLabel();
-        syncConsumedQuantity();
     }
 
     function closeModal() {
@@ -2702,8 +2703,6 @@
         restockCurrentUnit = item.unit || 'pcs';
         document.getElementById('restockQuantity').value = '';
         document.getElementById('restockDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('restockBatchNumber').value = item.batch_number || '';
-        document.getElementById('restockSupplierSource').value = item.supplier_source || '';
 
         const unitLabel = document.getElementById('restockUnitLabel');
         if (unitLabel) unitLabel.textContent = restockCurrentUnit;
@@ -2779,8 +2778,6 @@
             const signedQuantity = quantity > 0 ? `+${quantity}` : `${quantity}`;
             const metaParts = [];
             if (movement.user_name)    metaParts.push(`By ${movement.user_name}`);
-            if (movement.batch_number) metaParts.push(`Batch ${movement.batch_number}`);
-            if (movement.supplier_source) metaParts.push(movement.supplier_source);
             const unitLabel = movement.unit || unit;
 
             return `
@@ -2878,6 +2875,12 @@
         });
 
         medicineSelect.addEventListener('change', syncMedicineTypeDisplay);
+        if (medicineTypeCustomInput) {
+            medicineTypeCustomInput.addEventListener('input', function() {
+                syncMedicineTypeCustom();
+                syncMedicineTypeDisplay();
+            });
+        }
 
         if (medicineTypeSearch) {
             medicineTypeSearch.addEventListener('input', function(event) {
@@ -2943,6 +2946,12 @@
                 setTimeout(function() {
                     medicineTypeDisplay.setCustomValidity('');
                 }, 0);
+            } else if (category === 'Medicine' && medicineSelect.value === '__custom__' && (!medicineTypeCustomInput || !medicineTypeCustomInput.value.trim())) {
+                event.preventDefault();
+                setMedicineTypeOpenState(true);
+                if (medicineTypeCustomInput) {
+                    medicineTypeCustomInput.focus();
+                }
             }
         });
     }
@@ -3101,14 +3110,6 @@
             : `Value is in the stock unit (${stockUnit}).`;
     }
 
-    function syncConsumedQuantity() {
-        if (!startingStockInput || !consumedQuantityInput || !balanceInput) return;
-        const startingStock = Number(startingStockInput.value || 0);
-        const balance = Number(balanceInput.value || 0);
-        const consumed = Math.max(0, startingStock - balance);
-        consumedQuantityInput.value = String(consumed || 0);
-    }
-
     if (unitInput) {
         unitInput.addEventListener('input',  () => { toggleDispensingFields(); syncMinStockUnitLabel(); });
         unitInput.addEventListener('change', () => { toggleDispensingFields(); syncMinStockUnitLabel(); });
@@ -3118,8 +3119,6 @@
     const unitsPerStockUnitWatcher = document.getElementById('iUnitsPerStockUnit');
     if (dispensingUnitWatcher)    dispensingUnitWatcher.addEventListener('input',  syncMinStockUnitLabel);
     if (unitsPerStockUnitWatcher) unitsPerStockUnitWatcher.addEventListener('input', syncMinStockUnitLabel);
-    if (startingStockInput) startingStockInput.addEventListener('input', syncConsumedQuantity);
-    if (balanceInput) balanceInput.addEventListener('input', syncConsumedQuantity);
 </script>
 @endpush
 

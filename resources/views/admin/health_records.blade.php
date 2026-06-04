@@ -25,6 +25,12 @@
         height: 100%;
         width: 100%;
     }
+    .awaiting-links-btn .health-summary-label {
+        color: #ffffff !important;
+    }
+    .awaiting-links-btn h3 {
+        color: #ffffff !important;
+    }
     .awaiting-links-btn::before {
         content: '';
         position: absolute;
@@ -1644,10 +1650,15 @@
             </div>
         </div>
         <div class="summary-item">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 10px 24px !important; border-left: 5px solid #70131B;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
-                <div class="health-summary-row">
-                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
-                    <h3 class="fw-bold mb-0" style="color: #111827;">{{ count($approvedApplicants) }}</h3>
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 2px 24px !important; border-left: 5px solid #70131B;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
+                <div class="health-summary-row" style="display: flex; align-items: center; gap: 8px;">
+                    <div style="display: flex; align-items: center; color: #ffffff; font-size: 16px;">
+                        <x-outline-icon name="link" />
+                    </div>
+                    <div style="flex: 1;">
+                        <small class="text-muted fw-bold text-uppercase health-summary-label" style="color: #ffffff !important;"><span>Awaiting</span><span>Links</span></small>
+                        <h3 class="fw-bold mb-0" style="color: #ffffff;">{{ count($approvedApplicants) }}</h3>
+                    </div>
                 </div>
             </button>
         </div>

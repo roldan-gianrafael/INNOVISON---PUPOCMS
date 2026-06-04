@@ -14,16 +14,37 @@
         height: 100%; /* Para pantay ang taas nila */
     }
     .awaiting-links-btn {
-        background: #fff !important;
-        border: 1px solid #f0f0f0 !important;
-        border-left: 5px solid #0369a1 !important;
+        background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%) !important;
+        border: 1px solid #e0f2fe !important;
+        border-left: 6px solid #0369a1 !important;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 4px 12px rgba(3, 105, 161, 0.08), 0 0 0 0 rgba(3, 105, 161, 0);
+        position: relative;
+        overflow: hidden;
+    }
+    .awaiting-links-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.6s ease;
+    }
+    .awaiting-links-btn:hover::before {
+        left: 100%;
     }
     .awaiting-links-btn:hover {
-        box-shadow: 0 8px 20px rgba(3, 105, 161, 0.15);
-        transform: translateY(-2px);
-        background: #f0f9ff !important;
+        box-shadow: 0 12px 24px rgba(3, 105, 161, 0.2), 0 0 0 0 rgba(3, 105, 161, 0.15);
+        transform: translateY(-3px);
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+        border-color: #0369a1 !important;
+    }
+    .awaiting-links-btn:active {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(3, 105, 161, 0.15);
     }
     .health-summary-card {
         position: relative;
@@ -429,29 +450,35 @@
         min-width: 50px;
         padding: 0 14px;
         border-radius: 14px;
-        border: 1px solid #e2e8f0;
-        background: #ffffff;
-        color: #70131B;
+        border: none;
+        background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+        color: #ffffff;
         cursor: pointer;
         transition: all .18s ease;
         z-index: 1;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 4px 12px rgba(3, 105, 161, 0.2);
     }
 
     .health-records-search-toggle:hover,
     .health-records-search-toggle:focus {
-        background: #fef3c7;
-        border-color: #facc15;
-        color: #111827;
+        background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+        color: #ffffff;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.18);
+        box-shadow: 0 8px 20px rgba(3, 105, 161, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .health-records-search-toggle:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(3, 105, 161, 0.2);
     }
 
     .health-records-search-toggle svg {
-        width: 18px;
-        height: 18px;
-        stroke-width: 2;
+        width: 20px;
+        height: 20px;
+        stroke-width: 2.5;
         stroke: currentColor;
         fill: none;
     }

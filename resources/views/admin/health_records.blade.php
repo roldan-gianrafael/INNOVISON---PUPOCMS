@@ -1418,6 +1418,29 @@
         </div>
     </div>
 
+    {{-- Get approved applicants data --}}
+    @php
+        $approvedApplicants = [];
+        try {
+            $approvalLogs = \App\Models\ActivityLog::where('event_type', 'applicant_approval')->get();
+            $referenceNumbers = $approvalLogs->pluck('subject_id')->unique();
+
+            foreach($referenceNumbers as $ref) {
+                $approvalLog = $approvalLogs->where('subject_id', $ref)->last();
+                $pendingAssessment = \App\Models\PendingMedicalAssessment::where('reference_number', $ref)->first();
+
+                $approvedApplicants[] = [
+                    'reference_number' => $ref,
+                    'name' => $approvalLog->description ?? 'Unknown',
+                    'approve_date' => $approvalLog->created_at,
+                    'has_uploaded' => $pendingAssessment !== null,
+                ];
+            }
+        } catch (\Exception $e) {
+            // Tables may not exist
+        }
+    @endphp
+
     {{-- Summary Cards - Hardcoded Side by Side --}}
     <div class="summary-container">
         <div class="summary-item">
@@ -1435,6 +1458,14 @@
                     <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_disability', 'Yes')->count() }}</h3>
                 </div>
             </div>
+        </div>
+        <div class="summary-item">
+            <button type="button" class="card p-3" id="awaitingLinksBtn" style="padding: 15px 24px !important; border-left: 5px solid #0369a1; background: none; border: none; cursor: pointer; width: 100%; text-align: left; transition: all 0.3s ease;">
+                <div class="health-summary-row">
+                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
+                    <h3 class="fw-bold mb-0" style="color: #0369a1;">{{ count($approvedApplicants) }}</h3>
+                </div>
+            </button>
         </div>
     </div>
 
@@ -1525,6 +1556,112 @@
         </tbody>
     </table>
 </div>
+
+{{-- Awaiting Links Modal --}}
+<div id="awaitingLinksModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; width: min(900px, 95%); max-height: 90vh; overflow-y: auto; box-shadow: 0 26px 60px rgba(15, 23, 42, 0.24);">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; background: white;">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #111827;">Awaiting Links</h3>
+            <button type="button" id="closeAwaitingLinksModal" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #64748b;">✕</button>
+        </div>
+        <div style="padding: 24px;">
+            @if(count($approvedApplicants) > 0)
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #f1f5f9;">
+                            <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Reference Number</th>
+                            <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Name</th>
+                            <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Email</th>
+                            <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Approve Date</th>
+                            <th style="text-align: center; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Uploaded Requirements</th>
+                            <th style="text-align: center; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($approvedApplicants as $applicant)
+                            <tr style="border-bottom: 1px solid #f8fafc;">
+                                <td style="padding: 16px; color: #111827; font-weight: 700;">{{ $applicant['reference_number'] }}</td>
+                                <td style="padding: 16px; color: #111827;">{{ $applicant['name'] }}</td>
+                                <td style="padding: 16px; color: #111827;">-</td>
+                                <td style="padding: 16px; color: #111827;">{{ $applicant['approve_date']->format('M d, Y h:i A') }}</td>
+                                <td style="text-align: center; padding: 16px;">
+                                    @if($applicant['has_uploaded'])
+                                        <span style="background: #dcfce7; color: #15803d; padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase;">✓ Uploaded</span>
+                                    @else
+                                        <span style="background: #fee2e2; color: #b91c1c; padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase;">✗ Not Uploaded</span>
+                                    @endif
+                                </td>
+                                <td style="text-align: center; padding: 16px;">
+                                    <a href="#" class="link-button" style="color: #0369a1; text-decoration: none; font-weight: 600; font-size: 13px;">View</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div style="text-align: center; padding: 40px; color: #94a3b8;">
+                    <p>No approved applicants yet.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+{{-- Pending Medical Assessments Section --}}
+@php
+    $pendingAssessments = [];
+    try {
+        $pendingAssessments = \App\Models\PendingMedicalAssessment::all();
+    } catch (\Exception $e) {
+        // Table may not exist
+    }
+@endphp
+
+@if(count($pendingAssessments) > 0)
+<div class="card health-summary-card" style="margin-top: 30px;">
+    <div class="health-table-head">
+        <div class="health-table-title">Pending Medical Assessments</div>
+        <p style="margin: 0; font-size: 13px; color: #64748b; margin-top: 4px;">Medical assessments uploaded via reference lookup, waiting to be linked to student accounts.</p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Reference Number</th>
+                <th>Email</th>
+                <th>File Name</th>
+                <th>Uploaded Date</th>
+                <th>Status</th>
+                <th>Student Name</th>
+                <th style="text-align: center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($pendingAssessments as $assessment)
+                <tr>
+                    <td class="fw-bold">{{ $assessment->reference_number }}</td>
+                    <td>{{ $assessment->email }}</td>
+                    <td style="word-break: break-word; max-width: 250px;">{{ $assessment->file_name }}</td>
+                    <td>{{ $assessment->created_at->format('M d, Y h:i A') }}</td>
+                    <td>
+                        @if($assessment->user_id)
+                            <span class="status issued">Linked</span>
+                        @else
+                            <span class="status pending">Pending</span>
+                        @endif
+                    </td>
+                    <td>{{ $assessment->user?->name ?? 'Not yet linked' }}</td>
+                    <td style="text-align: center;">
+                        <a href="{{ asset('storage/' . $assessment->file_path) }}" target="_blank" class="btn-action btn-view" style="display: inline-block;">
+                            <x-outline-icon name="document-text" />
+                            View
+                        </a>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endif
 
 <div class="verify-approval-modal" id="verifyApprovalModal" aria-hidden="true">
     <div class="verify-approval-modal-card">
@@ -1778,6 +1915,35 @@
         verifyApprovalModal.addEventListener('click', function (event) {
             if (event.target === verifyApprovalModal) {
                 setVerifyApprovalModalOpenState(false);
+            }
+        });
+    }
+
+    // Awaiting Links Modal
+    const awaitingLinksBtn = document.getElementById('awaitingLinksBtn');
+    const awaitingLinksModal = document.getElementById('awaitingLinksModal');
+    const closeAwaitingLinksModal = document.getElementById('closeAwaitingLinksModal');
+
+    if (awaitingLinksBtn) {
+        awaitingLinksBtn.addEventListener('click', function () {
+            if (awaitingLinksModal) {
+                awaitingLinksModal.style.display = 'flex';
+            }
+        });
+    }
+
+    if (closeAwaitingLinksModal) {
+        closeAwaitingLinksModal.addEventListener('click', function () {
+            if (awaitingLinksModal) {
+                awaitingLinksModal.style.display = 'none';
+            }
+        });
+    }
+
+    if (awaitingLinksModal) {
+        awaitingLinksModal.addEventListener('click', function (event) {
+            if (event.target === awaitingLinksModal) {
+                awaitingLinksModal.style.display = 'none';
             }
         });
     }

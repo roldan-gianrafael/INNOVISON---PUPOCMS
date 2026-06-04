@@ -1861,25 +1861,31 @@
         });
     }
 
-    if (healthRecordsSearchShell && healthRecordsSearchInput && healthRecordsSearchToggle) {
-        const setHealthRecordsSearchOpenState = function (isOpen) {
-            healthRecordsSearchShell.classList.toggle('is-open', isOpen);
-            healthRecordsSearchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        };
+    document.addEventListener('DOMContentLoaded', function () {
+        const healthRecordsSearchShell = document.getElementById('healthRecordsSearchShell');
+        const healthRecordsSearchInput = document.getElementById('recordSearch');
+        const healthRecordsSearchToggle = document.getElementById('healthRecordsSearchToggle');
 
-        setHealthRecordsSearchOpenState(healthRecordsSearchInput.value.trim() !== '');
+        if (healthRecordsSearchShell && healthRecordsSearchInput && healthRecordsSearchToggle) {
+            const setHealthRecordsSearchOpenState = function (isOpen) {
+                healthRecordsSearchShell.classList.toggle('is-open', isOpen);
+                healthRecordsSearchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            };
 
-        healthRecordsSearchToggle.addEventListener('click', function () {
-            const shouldOpen = !healthRecordsSearchShell.classList.contains('is-open');
-            setHealthRecordsSearchOpenState(shouldOpen);
+            setHealthRecordsSearchOpenState(healthRecordsSearchInput.value.trim() !== '');
 
-            if (shouldOpen) {
-                window.requestAnimationFrame(function () {
-                    healthRecordsSearchInput.focus();
-                });
-            }
-        });
-    }
+            healthRecordsSearchToggle.addEventListener('click', function () {
+                const shouldOpen = !healthRecordsSearchShell.classList.contains('is-open');
+                setHealthRecordsSearchOpenState(shouldOpen);
+
+                if (shouldOpen) {
+                    window.requestAnimationFrame(function () {
+                        healthRecordsSearchInput.focus();
+                    });
+                }
+            });
+        }
+    });
 
     window.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('[data-health-row][data-view-url]').forEach(function (row) {
@@ -1927,44 +1933,46 @@
         });
     }
 
-    // Awaiting Links Modal
-    const awaitingLinksBtn = document.getElementById('awaitingLinksBtn');
-    const awaitingLinksModal = document.getElementById('awaitingLinksModal');
-    const closeAwaitingLinksModal = document.getElementById('closeAwaitingLinksModal');
+    // Awaiting Links Modal - wrapped in DOMContentLoaded to ensure elements exist
+    document.addEventListener('DOMContentLoaded', function() {
+        const awaitingLinksBtn = document.getElementById('awaitingLinksBtn');
+        const awaitingLinksModal = document.getElementById('awaitingLinksModal');
+        const closeAwaitingLinksModal = document.getElementById('closeAwaitingLinksModal');
 
-    console.log('Awaiting Links Debug:', {
-        btnFound: !!awaitingLinksBtn,
-        modalFound: !!awaitingLinksModal,
-        closeFound: !!closeAwaitingLinksModal
+        console.log('Awaiting Links Debug:', {
+            btnFound: !!awaitingLinksBtn,
+            modalFound: !!awaitingLinksModal,
+            closeFound: !!closeAwaitingLinksModal
+        });
+
+        if (awaitingLinksBtn) {
+            awaitingLinksBtn.addEventListener('click', function () {
+                console.log('Awaiting Links button clicked');
+                if (awaitingLinksModal) {
+                    awaitingLinksModal.style.display = 'flex';
+                    console.log('Modal opened');
+                }
+            });
+        } else {
+            console.warn('Awaiting Links button not found');
+        }
+
+        if (closeAwaitingLinksModal) {
+            closeAwaitingLinksModal.addEventListener('click', function () {
+                if (awaitingLinksModal) {
+                    awaitingLinksModal.style.display = 'none';
+                }
+            });
+        }
+
+        if (awaitingLinksModal) {
+            awaitingLinksModal.addEventListener('click', function (event) {
+                if (event.target === awaitingLinksModal) {
+                    awaitingLinksModal.style.display = 'none';
+                }
+            });
+        }
     });
-
-    if (awaitingLinksBtn) {
-        awaitingLinksBtn.addEventListener('click', function () {
-            console.log('Awaiting Links button clicked');
-            if (awaitingLinksModal) {
-                awaitingLinksModal.style.display = 'flex';
-                console.log('Modal opened');
-            }
-        });
-    } else {
-        console.warn('Awaiting Links button not found');
-    }
-
-    if (closeAwaitingLinksModal) {
-        closeAwaitingLinksModal.addEventListener('click', function () {
-            if (awaitingLinksModal) {
-                awaitingLinksModal.style.display = 'none';
-            }
-        });
-    }
-
-    if (awaitingLinksModal) {
-        awaitingLinksModal.addEventListener('click', function (event) {
-            if (event.target === awaitingLinksModal) {
-                awaitingLinksModal.style.display = 'none';
-            }
-        });
-    }
 
     document.querySelectorAll('.js-open-verify-modal').forEach(function (button) {
         button.addEventListener('click', function () {

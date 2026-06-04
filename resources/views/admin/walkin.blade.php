@@ -2869,28 +2869,69 @@
     .applicant-lookup-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px 14px;
+        gap: 16px;
     }
 
     .applicant-lookup-item {
         min-width: 0;
     }
 
+    .applicant-lookup-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border: 1px solid #e2e8f0;
+        transition: all .2s ease;
+    }
+
+    .applicant-lookup-card:hover {
+        border-color: #facc15;
+        box-shadow: 0 4px 12px rgba(250, 204, 21, 0.12);
+        background: linear-gradient(135deg, #fffbeb 0%, #fefce8 100%);
+    }
+
+    .applicant-lookup-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #facc15, #fde68a);
+        color: #701315;
+    }
+
+    .applicant-lookup-icon svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2;
+    }
+
+    .applicant-lookup-content {
+        flex: 1;
+        min-width: 0;
+    }
+
     .applicant-lookup-label {
-        margin: 0 0 3px;
-        font-size: 10px;
-        font-weight: 900;
+        margin: 0 0 6px;
+        font-size: 11px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.05em;
         color: #64748b;
     }
 
     .applicant-lookup-value {
         margin: 0;
-        font-size: 13px;
-        font-weight: 800;
-        color: #111827;
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e293b;
         word-break: break-word;
+        line-height: 1.4;
     }
 
     .applicant-upload-wrap {
@@ -2935,12 +2976,23 @@
         border-color: rgba(250, 204, 21, 0.14);
     }
 
+    html[data-theme="dark"] .applicant-lookup-card {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%);
+        border-color: rgba(71, 85, 105, 0.4);
+    }
+
+    html[data-theme="dark"] .applicant-lookup-card:hover {
+        border-color: rgba(250, 204, 21, 0.3);
+        box-shadow: 0 4px 12px rgba(250, 204, 21, 0.08);
+        background: linear-gradient(135deg, rgba(63, 57, 18, 0.8) 0%, rgba(41, 37, 12, 0.8) 100%);
+    }
+
     html[data-theme="dark"] .applicant-lookup-label {
         color: #94a3b8;
     }
 
     html[data-theme="dark"] .applicant-lookup-value {
-        color: #f8fafc;
+        color: #f1f5f9;
     }
 
     html[data-theme="dark"] .applicant-upload-note {
@@ -3132,21 +3184,49 @@
                     <div id="applicantLookupDetails" class="applicant-lookup-details">
                         <div class="applicant-lookup-grid">
                             <div class="applicant-lookup-item">
-                                <p class="applicant-lookup-label">Reference Number</p>
-                                <p class="applicant-lookup-value" id="applicantLookupRef">-</p>
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">
+                                        <x-outline-icon name="document-text" />
+                                    </div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Reference Number</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupRef">-</p>
+                                    </div>
+                                </div>
                             </div>
                             <div class="applicant-lookup-item">
-                                <p class="applicant-lookup-label">Student ID</p>
-                                <p class="applicant-lookup-value" id="applicantLookupStudentId">-</p>
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">
+                                        <x-outline-icon name="identification" />
+                                    </div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Student ID</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupStudentId">-</p>
+                                    </div>
+                                </div>
                             </div>
-                            
+
                             <div class="applicant-lookup-item">
-                                <p class="applicant-lookup-label">Date of Birth</p>
-                                <p class="applicant-lookup-value" id="applicantLookupDob">-</p>
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">
+                                        <x-outline-icon name="calendar" />
+                                    </div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Date of Birth</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupDob">-</p>
+                                    </div>
+                                </div>
                             </div>
                             <div class="applicant-lookup-item">
-                                <p class="applicant-lookup-label">Email</p>
-                                <p class="applicant-lookup-value" id="applicantLookupEmail">-</p>
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">
+                                        <x-outline-icon name="envelope" />
+                                    </div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Email</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupEmail">-</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

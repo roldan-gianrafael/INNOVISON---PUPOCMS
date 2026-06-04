@@ -1169,7 +1169,7 @@
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                credentials: 'same-origin'
+                credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {
@@ -1232,7 +1232,7 @@
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                credentials: 'same-origin'
+                credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {

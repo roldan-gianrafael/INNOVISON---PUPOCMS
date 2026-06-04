@@ -2938,7 +2938,92 @@
     .applicant-upload-wrap {
         display: none;
         width: 100%;
-        gap: 10px;
+        gap: 12px;
+        flex-direction: column;
+    }
+
+    .applicant-upload-preview-area {
+        width: 100%;
+    }
+
+    .applicant-upload-preview-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%;
+        border-radius: 14px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border: 2px solid #facc15;
+        box-shadow: 0 8px 24px rgba(250, 204, 21, 0.16);
+    }
+
+    .applicant-upload-preview-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .applicant-upload-preview-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        backdrop-filter: blur(2px);
+    }
+
+    .applicant-upload-preview-container:hover .applicant-upload-preview-overlay {
+        opacity: 1;
+    }
+
+    .applicant-preview-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+
+    .applicant-preview-view-btn {
+        background: #facc15;
+        color: #701315;
+    }
+
+    .applicant-preview-view-btn:hover {
+        background: #fde68a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+    }
+
+    .applicant-preview-replace-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .applicant-preview-replace-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.6);
+        transform: translateY(-1px);
+    }
+
+    .applicant-preview-btn svg {
+        width: 16px;
+        height: 16px;
     }
 
     .applicant-upload-btn {
@@ -2998,6 +3083,33 @@
 
     html[data-theme="dark"] .applicant-upload-note {
         color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .applicant-upload-preview-container {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%);
+        border-color: rgba(250, 204, 21, 0.3);
+        box-shadow: 0 8px 24px rgba(250, 204, 21, 0.08);
+    }
+
+    html[data-theme="dark"] .applicant-preview-view-btn {
+        background: #facc15;
+        color: #701315;
+    }
+
+    html[data-theme="dark"] .applicant-preview-view-btn:hover {
+        background: #fde68a;
+        box-shadow: 0 4px 12px rgba(250, 204, 21, 0.2);
+    }
+
+    html[data-theme="dark"] .applicant-preview-replace-btn {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(250, 204, 21, 0.3);
+        color: #f1f5f9;
+    }
+
+    html[data-theme="dark"] .applicant-preview-replace-btn:hover {
+        background: rgba(250, 204, 21, 0.2);
+        border-color: rgba(250, 204, 21, 0.5);
     }
 
     @media (max-width: 640px) {
@@ -3237,6 +3349,23 @@
                         <input type="hidden" name="reference_number" id="applicantAssessmentReferenceNumber">
                         <input type="hidden" name="student_number" id="applicantAssessmentStudentNumber">
                         <input type="file" name="medical_assessment_copy" id="applicantAssessmentUploadInput" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*" style="display:none;">
+
+                        <div id="applicantUploadPreviewArea" class="applicant-upload-preview-area" style="display:none;">
+                            <div class="applicant-upload-preview-container">
+                                <img id="applicantUploadPreviewImage" src="" alt="Medical Assessment Preview" class="applicant-upload-preview-image">
+                                <div class="applicant-upload-preview-overlay">
+                                    <button type="button" id="btnViewAssessmentCopy" class="applicant-preview-btn applicant-preview-view-btn" aria-label="View image">
+                                        <x-outline-icon name="eye" />
+                                        <span>View</span>
+                                    </button>
+                                    <button type="button" id="btnReplaceAssessmentCopy" class="applicant-preview-btn applicant-preview-replace-btn" aria-label="Replace image">
+                                        <x-outline-icon name="arrow-path" />
+                                        <span>Replace</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="button" id="btnUploadAssessmentCopy" class="applicant-upload-btn">
                             <x-outline-icon name="arrow-up-tray" />
                             Upload Medical Assessment Copy
@@ -4876,9 +5005,51 @@
             uploadInput.addEventListener('change', function () {
                 const file = this.files && this.files[0] ? this.files[0] : null;
                 if (file) {
+                    showAssessmentPreview(file);
                     uploadAssessmentCopy(file);
                 }
             });
+
+            function showAssessmentPreview(file) {
+                const previewArea = document.getElementById('applicantUploadPreviewArea');
+                const previewImage = document.getElementById('applicantUploadPreviewImage');
+                const uploadBtn = document.getElementById('btnUploadAssessmentCopy');
+
+                if (!previewArea || !previewImage) return;
+
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewArea.style.display = 'block';
+                        uploadBtn.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file && file.type === 'application/pdf') {
+                    previewImage.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M7 2h10l5 5v13a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2z%22 fill=%22%23dc2626%22/%3E%3Ctext x=%2212%22 y=%2217%22 text-anchor=%22middle%22 font-size=%2210%22 fill=%22white%22 font-weight=%22bold%22%3EPDF%3C/text%3E%3C/svg%3E';
+                    previewArea.style.display = 'block';
+                    uploadBtn.style.display = 'none';
+                }
+            }
+
+            const viewBtn = document.getElementById('btnViewAssessmentCopy');
+            if (viewBtn) {
+                viewBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const previewImage = document.getElementById('applicantUploadPreviewImage');
+                    if (previewImage && previewImage.src) {
+                        window.open(previewImage.src, '_blank');
+                    }
+                });
+            }
+
+            const replaceBtn = document.getElementById('btnReplaceAssessmentCopy');
+            if (replaceBtn) {
+                replaceBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (uploadInput) uploadInput.click();
+                });
+            }
         }
         if (refInput) {
             refInput.addEventListener('keydown', function (e) {

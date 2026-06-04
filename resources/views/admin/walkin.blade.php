@@ -4853,6 +4853,13 @@
             currentLookupRef = '';
             if (defaultPane) defaultPane.style.display = 'flex';
             if (entryPane) entryPane.classList.remove('is-visible');
+
+            const modalBody = document.querySelector('.applicant-modal-body');
+            if (modalBody) {
+                modalBody.style.alignItems = 'center';
+                modalBody.style.justifyContent = 'center';
+                modalBody.style.minHeight = '220px';
+            }
         }
 
         function openApplicantsModal() {
@@ -4896,6 +4903,9 @@
 
             const modalBody = document.querySelector('.applicant-modal-body');
             if (modalBody) {
+                modalBody.style.alignItems = 'stretch';
+                modalBody.style.justifyContent = 'flex-start';
+                modalBody.style.minHeight = 'auto';
                 modalBody.scrollTop = 0;
             }
         }
@@ -4970,7 +4980,7 @@
 
                     // Hide input sections and show only results
                     if (defaultPane) defaultPane.style.display = 'none';
-                    if (entryPane) entryPane.style.display = 'none';
+                    if (entryPane) entryPane.classList.remove('is-visible');
 
                     // Change button to Approve mode
                     isApprovalMode = true;

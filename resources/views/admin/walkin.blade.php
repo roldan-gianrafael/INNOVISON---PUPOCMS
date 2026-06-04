@@ -4854,6 +4854,13 @@
             if (defaultPane) defaultPane.style.display = 'flex';
             if (entryPane) entryPane.classList.remove('is-visible');
 
+            // Show input form elements again
+            const lookupRow = document.querySelector('.applicant-ref-lookup-row');
+            if (lookupRow) lookupRow.style.display = 'flex';
+
+            const actionButtons = document.querySelector('.applicant-ref-actions');
+            if (actionButtons) actionButtons.style.display = 'flex';
+
             const modalBody = document.querySelector('.applicant-modal-body');
             if (modalBody) {
                 modalBody.style.alignItems = 'center';
@@ -4994,7 +5001,13 @@
 
                     // Hide input sections and show only results
                     if (defaultPane) defaultPane.style.display = 'none';
-                    if (entryPane) entryPane.classList.remove('is-visible');
+
+                    // Hide only the input form row and action buttons, not the entire entryPane
+                    const lookupRow = document.querySelector('.applicant-ref-lookup-row');
+                    if (lookupRow) lookupRow.style.display = 'none';
+
+                    const actionButtons = document.querySelector('.applicant-ref-actions');
+                    if (actionButtons) actionButtons.style.display = 'none';
 
                     // Change button to Approve mode
                     isApprovalMode = true;

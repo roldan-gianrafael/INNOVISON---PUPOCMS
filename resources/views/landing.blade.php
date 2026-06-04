@@ -1173,7 +1173,9 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.authenticated) {
+                console.log('Session check response:', data);
+
+                if (data.authenticated === true) {
                     // User is logged in
                     updateUIForAuthenticated(data);
                 } else {
@@ -1190,21 +1192,23 @@
         }
 
         function updateUIForGuest() {
+            // Show login buttons
             if (guestButtons) guestButtons.style.display = 'grid';
             if (authButtons) authButtons.style.display = 'none';
             if (saSelector) saSelector.classList.remove('visible');
         }
 
         function updateUIForAuthenticated(sessionData) {
+            // Hide guest buttons
             if (guestButtons) guestButtons.style.display = 'none';
 
-            // Check if user is student assistant
-            if (sessionData.isStudentAssistant) {
+            // Check if user is student assistant (exact JSON structure check)
+            if (sessionData.isStudentAssistant === true) {
                 // Show SA workspace selector directly
                 if (authButtons) authButtons.style.display = 'none';
                 if (saSelector) saSelector.classList.add('visible');
             } else {
-                // Show View Homepage button for regular users
+                // Show View Homepage button for regular users (superadmin, admin, student)
                 if (authButtons) authButtons.style.display = 'grid';
                 if (saSelector) saSelector.classList.remove('visible');
             }

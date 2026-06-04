@@ -1496,81 +1496,40 @@ class LoginController extends Controller
     public function apiCheckSession(Request $request)
     {
         $user = null;
-        $activeGuard = null;
-        $authSource = 'none';
 
-        // STEP 1: Check all authentication guards (local session)
-        if (Auth::guard($this->adminGuardName())->check()) {
-            $user = Auth::guard($this->adminGuardName())->user();
-            $activeGuard = $this->adminGuardName();
-            $authSource = 'local_session';
-        } elseif (Auth::guard($this->studentGuardName())->check()) {
-            $user = Auth::guard($this->studentGuardName())->user();
-            $activeGuard = $this->studentGuardName();
-            $authSource = 'local_session';
-        } elseif (Auth::guard('web')->check()) {
+        // EXPLICIT MULTI-GUARD CHECK: Check all clinic authentication guards
+        // Guard priority: admin (superadmin, admin, student_assistant) > student > web
+
+        // Check ADMIN guard (handles superadmin, admin, student_assistant roles)
+        if (Auth::guard('admin')->check()) {
+            $user = Auth::guard('admin')->user();
+        }
+        // Check STUDENT guard
+        elseif (Auth::guard('student')->check()) {
+            $user = Auth::guard('student')->user();
+        }
+        // Check WEB guard (fallback)
+        elseif (Auth::guard('web')->check()) {
             $user = Auth::guard('web')->user();
-            $activeGuard = 'web';
-            $authSource = 'local_session';
         }
 
-        // STEP 2: If no local session, check for IDP access token cookie
-        if (!$user instanceof User && (bool) config('services.idp.enabled', false)) {
-            $accessTokenCookieName = trim((string) config('services.idp.access_cookie_name', 'access_token'));
-            $accessToken = $request->cookie($accessTokenCookieName);
-
-            if ($accessToken && $accessToken !== '') {
-                // Try to validate/fetch profile using the IDP access token
-                $idpProfile = $this->fetchProfileFromIdp($accessToken);
-
-                if ($idpProfile !== null) {
-                    // We have a valid IDP token with profile info
-                    // Try to find the user in the local database using email or IDP user ID
-                    $email = trim((string) ($idpProfile['email'] ?? ''));
-                    $idpUserId = trim((string) ($idpProfile['id'] ?? $idpProfile['user_id'] ?? ''));
-
-                    if ($email !== '') {
-                        $user = User::query()->where('email', $email)->first();
-                        $authSource = 'idp_token_with_local_user';
-                    } elseif ($idpUserId !== '') {
-                        // Try to find by student_id or IDP user ID mapping
-                        $user = User::query()
-                            ->where('student_id', $idpUserId)
-                            ->orWhere('email', 'like', '%' . $idpUserId . '%')
-                            ->first();
-                        $authSource = 'idp_token_with_local_user';
-                    }
-
-                    // If user found, determine their guard
-                    if ($user instanceof User) {
-                        $activeGuard = $this->guardForUser($user);
-                    }
-                }
-            }
-        }
-
-        // STEP 3: Return response
+        // If still not authenticated, return guest state
         if (!$user instanceof User) {
             return response()->json([
                 'authenticated' => false,
+                'role' => null,
                 'isStudentAssistant' => false,
-                'authSource' => $authSource,
-                'message' => 'No active session found (local or IDP)',
             ]);
         }
 
+        // User is authenticated - determine role and assistant status
+        $userRole = User::normalizeRole((string) ($user->user_role ?? ''));
         $isStudentAssistant = $this->isStudentAssistantAccount($user);
-        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
 
         return response()->json([
             'authenticated' => true,
-            'userId' => $user->id,
-            'email' => $user->email,
-            'userRole' => $user->user_role,
-            'normalizedRole' => $normalizedRole,
+            'role' => $userRole,
             'isStudentAssistant' => $isStudentAssistant,
-            'activeGuard' => $activeGuard,
-            'authSource' => $authSource,
         ]);
     }
 

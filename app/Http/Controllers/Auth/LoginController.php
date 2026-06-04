@@ -1495,31 +1495,67 @@ class LoginController extends Controller
 
     public function apiCheckSession(Request $request)
     {
-        // Check all authentication guards explicitly
         $user = null;
         $activeGuard = null;
+        $authSource = 'none';
 
-        // Check admin guard first (priority)
+        // STEP 1: Check all authentication guards (local session)
         if (Auth::guard($this->adminGuardName())->check()) {
             $user = Auth::guard($this->adminGuardName())->user();
             $activeGuard = $this->adminGuardName();
-        }
-        // Then check student guard
-        elseif (Auth::guard($this->studentGuardName())->check()) {
+            $authSource = 'local_session';
+        } elseif (Auth::guard($this->studentGuardName())->check()) {
             $user = Auth::guard($this->studentGuardName())->user();
             $activeGuard = $this->studentGuardName();
-        }
-        // Finally check default web guard
-        elseif (Auth::guard('web')->check()) {
+            $authSource = 'local_session';
+        } elseif (Auth::guard('web')->check()) {
             $user = Auth::guard('web')->user();
             $activeGuard = 'web';
+            $authSource = 'local_session';
         }
 
+        // STEP 2: If no local session, check for IDP access token cookie
+        if (!$user instanceof User && (bool) config('services.idp.enabled', false)) {
+            $accessTokenCookieName = trim((string) config('services.idp.access_cookie_name', 'access_token'));
+            $accessToken = $request->cookie($accessTokenCookieName);
+
+            if ($accessToken && $accessToken !== '') {
+                // Try to validate/fetch profile using the IDP access token
+                $idpProfile = $this->fetchProfileFromIdp($accessToken);
+
+                if ($idpProfile !== null) {
+                    // We have a valid IDP token with profile info
+                    // Try to find the user in the local database using email or IDP user ID
+                    $email = trim((string) ($idpProfile['email'] ?? ''));
+                    $idpUserId = trim((string) ($idpProfile['id'] ?? $idpProfile['user_id'] ?? ''));
+
+                    if ($email !== '') {
+                        $user = User::query()->where('email', $email)->first();
+                        $authSource = 'idp_token_with_local_user';
+                    } elseif ($idpUserId !== '') {
+                        // Try to find by student_id or IDP user ID mapping
+                        $user = User::query()
+                            ->where('student_id', $idpUserId)
+                            ->orWhere('email', 'like', '%' . $idpUserId . '%')
+                            ->first();
+                        $authSource = 'idp_token_with_local_user';
+                    }
+
+                    // If user found, determine their guard
+                    if ($user instanceof User) {
+                        $activeGuard = $this->guardForUser($user);
+                    }
+                }
+            }
+        }
+
+        // STEP 3: Return response
         if (!$user instanceof User) {
             return response()->json([
                 'authenticated' => false,
                 'isStudentAssistant' => false,
-                'message' => 'No active session found in any guard',
+                'authSource' => $authSource,
+                'message' => 'No active session found (local or IDP)',
             ]);
         }
 
@@ -1534,15 +1570,16 @@ class LoginController extends Controller
             'normalizedRole' => $normalizedRole,
             'isStudentAssistant' => $isStudentAssistant,
             'activeGuard' => $activeGuard,
+            'authSource' => $authSource,
         ]);
     }
 
     public function apiGetRedirectPath(Request $request)
     {
-        // Check all authentication guards explicitly (same as apiCheckSession)
         $user = null;
         $activeGuard = null;
 
+        // STEP 1: Check all authentication guards (local session)
         if (Auth::guard($this->adminGuardName())->check()) {
             $user = Auth::guard($this->adminGuardName())->user();
             $activeGuard = $this->adminGuardName();
@@ -1554,11 +1591,42 @@ class LoginController extends Controller
             $activeGuard = 'web';
         }
 
+        // STEP 2: If no local session, check for IDP access token cookie
+        if (!$user instanceof User && (bool) config('services.idp.enabled', false)) {
+            $accessTokenCookieName = trim((string) config('services.idp.access_cookie_name', 'access_token'));
+            $accessToken = $request->cookie($accessTokenCookieName);
+
+            if ($accessToken && $accessToken !== '') {
+                // Try to validate/fetch profile using the IDP access token
+                $idpProfile = $this->fetchProfileFromIdp($accessToken);
+
+                if ($idpProfile !== null) {
+                    // We have a valid IDP token with profile info
+                    $email = trim((string) ($idpProfile['email'] ?? ''));
+                    $idpUserId = trim((string) ($idpProfile['id'] ?? $idpProfile['user_id'] ?? ''));
+
+                    if ($email !== '') {
+                        $user = User::query()->where('email', $email)->first();
+                    } elseif ($idpUserId !== '') {
+                        $user = User::query()
+                            ->where('student_id', $idpUserId)
+                            ->orWhere('email', 'like', '%' . $idpUserId . '%')
+                            ->first();
+                    }
+
+                    if ($user instanceof User) {
+                        $activeGuard = $this->guardForUser($user);
+                    }
+                }
+            }
+        }
+
+        // STEP 3: Return response
         if (!$user instanceof User) {
             return response()->json([
                 'redirectPath' => null,
                 'error' => 'Not authenticated',
-                'message' => 'No active session found',
+                'message' => 'No active session found (local or IDP)',
             ], 401);
         }
 

@@ -112,9 +112,10 @@ Route::post('/register-action', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // --- API ROUTES (For AJAX/Frontend) ---
+// These routes need the web middleware to access session cookies and authentication guards
 Route::middleware('web')->group(function () {
-    Route::get('/api/check-session', [LoginController::class, 'apiCheckSession']);
-    Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath']);
+    Route::get('/api/check-session', [LoginController::class, 'apiCheckSession'])->withoutMiddleware('csrf');
+    Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath'])->withoutMiddleware('csrf');
 });
 
 // --- PROTECTED ROUTES (Login required) ---

@@ -1495,33 +1495,70 @@ class LoginController extends Controller
 
     public function apiCheckSession(Request $request)
     {
-        $user = $this->authenticatedUser();
+        // Check all authentication guards explicitly
+        $user = null;
+        $activeGuard = null;
+
+        // Check admin guard first (priority)
+        if (Auth::guard($this->adminGuardName())->check()) {
+            $user = Auth::guard($this->adminGuardName())->user();
+            $activeGuard = $this->adminGuardName();
+        }
+        // Then check student guard
+        elseif (Auth::guard($this->studentGuardName())->check()) {
+            $user = Auth::guard($this->studentGuardName())->user();
+            $activeGuard = $this->studentGuardName();
+        }
+        // Finally check default web guard
+        elseif (Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user();
+            $activeGuard = 'web';
+        }
 
         if (!$user instanceof User) {
             return response()->json([
                 'authenticated' => false,
                 'isStudentAssistant' => false,
+                'message' => 'No active session found in any guard',
             ]);
         }
 
         $isStudentAssistant = $this->isStudentAssistantAccount($user);
+        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
 
         return response()->json([
             'authenticated' => true,
             'userId' => $user->id,
+            'email' => $user->email,
             'userRole' => $user->user_role,
+            'normalizedRole' => $normalizedRole,
             'isStudentAssistant' => $isStudentAssistant,
+            'activeGuard' => $activeGuard,
         ]);
     }
 
     public function apiGetRedirectPath(Request $request)
     {
-        $user = $this->authenticatedUser();
+        // Check all authentication guards explicitly (same as apiCheckSession)
+        $user = null;
+        $activeGuard = null;
+
+        if (Auth::guard($this->adminGuardName())->check()) {
+            $user = Auth::guard($this->adminGuardName())->user();
+            $activeGuard = $this->adminGuardName();
+        } elseif (Auth::guard($this->studentGuardName())->check()) {
+            $user = Auth::guard($this->studentGuardName())->user();
+            $activeGuard = $this->studentGuardName();
+        } elseif (Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user();
+            $activeGuard = 'web';
+        }
 
         if (!$user instanceof User) {
             return response()->json([
                 'redirectPath' => null,
                 'error' => 'Not authenticated',
+                'message' => 'No active session found',
             ], 401);
         }
 
@@ -1530,6 +1567,8 @@ class LoginController extends Controller
         return response()->json([
             'redirectPath' => $redirectPath,
             'userRole' => $user->user_role,
+            'activeGuard' => $activeGuard,
+            'isStudentAssistant' => $this->isStudentAssistantAccount($user),
         ]);
     }
 }

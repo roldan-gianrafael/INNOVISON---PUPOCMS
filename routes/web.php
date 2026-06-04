@@ -112,8 +112,10 @@ Route::post('/register-action', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // --- API ROUTES (For AJAX/Frontend) ---
-Route::get('/api/check-session', [LoginController::class, 'apiCheckSession']);
-Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath']);
+Route::middleware('web')->group(function () {
+    Route::get('/api/check-session', [LoginController::class, 'apiCheckSession']);
+    Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath']);
+});
 
 // --- PROTECTED ROUTES (Login required) ---
 Route::middleware(['auth:student', 'audit'])->group(function () {

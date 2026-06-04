@@ -1541,43 +1541,60 @@ public function updateClearance(Request $request, $id)
         ]);
 
         $referenceNumber = trim((string) $validated['reference_number']);
+        $file = $request->file('medical_assessment_copy');
+
+        // Try to find existing user first
         $user = User::query()
             ->where('student_number', $referenceNumber)
             ->orWhere('student_id', $referenceNumber)
             ->first();
 
-        if (!$user) {
-            return $request->expectsJson()
-                ? response()->json(['status' => 'not_found', 'message' => 'No student record matched that reference number.'], 404)
-                : back()->with('error', 'No student record matched that reference number.');
+        // If user exists, save to health profile
+        if ($user) {
+            $profile = HealthProfile::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'student_id' => (string) ($user->student_id ?? ''),
+                    'student_number' => (string) ($user->student_number ?? ''),
+                    'reference_number' => $referenceNumber,
+                    'course_college' => (string) ($user->course ?? ''),
+                    'birthday' => (string) ($user->DOB ?? ''),
+                    'sex' => (string) ($user->gender ?? ''),
+                ]
+            );
+
+            $profile->student_id = $profile->student_id ?: (string) ($user->student_id ?? '');
+            $profile->student_number = $profile->student_number ?: (string) ($user->student_number ?? '');
+            $profile->reference_number = $referenceNumber;
+            $profile->course_college = $profile->course_college ?: (string) ($user->course ?? '');
+            $profile->birthday = $profile->birthday ?: (string) ($user->DOB ?? '');
+            $profile->sex = $profile->sex ?: (string) ($user->gender ?? '');
+
+            if (!empty($profile->medical_assessment_upload) && Storage::disk('public')->exists($profile->medical_assessment_upload)) {
+                Storage::disk('public')->delete($profile->medical_assessment_upload);
+            }
+
+            $profile->medical_assessment_upload = $file->store('health_profiles/medical_assessment_uploads', 'public');
+            $profile->save();
+        } else {
+            // Applicant not yet in system - save to pending assessments table
+            // Will be linked when they register/login later
+            $filePath = $file->store('pending_medical_assessments', 'public');
+
+            \App\Models\PendingMedicalAssessment::updateOrCreate(
+                [
+                    'reference_number' => $referenceNumber,
+                    // Email will need to come from applicant data in the form
+                ],
+                [
+                    'email' => trim((string) $request->input('email', '')),
+                    'file_path' => $filePath,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]
+            );
         }
-
-        $profile = HealthProfile::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'student_id' => (string) ($user->student_id ?? ''),
-                'student_number' => (string) ($user->student_number ?? ''),
-                'reference_number' => $referenceNumber,
-                'course_college' => (string) ($user->course ?? ''),
-                'birthday' => (string) ($user->DOB ?? ''),
-                'sex' => (string) ($user->gender ?? ''),
-            ]
-        );
-
-        $profile->student_id = $profile->student_id ?: (string) ($user->student_id ?? '');
-        $profile->student_number = $profile->student_number ?: (string) ($user->student_number ?? '');
-        $profile->reference_number = $referenceNumber;
-        $profile->course_college = $profile->course_college ?: (string) ($user->course ?? '');
-        $profile->birthday = $profile->birthday ?: (string) ($user->DOB ?? '');
-        $profile->sex = $profile->sex ?: (string) ($user->gender ?? '');
-
-        if (!empty($profile->medical_assessment_upload) && Storage::disk('public')->exists($profile->medical_assessment_upload)) {
-            Storage::disk('public')->delete($profile->medical_assessment_upload);
-        }
-
-        $profile->medical_assessment_upload = $request->file('medical_assessment_copy')
-            ->store('health_profiles/medical_assessment_uploads', 'public');
-        $profile->save();
 
         $message = 'Medical assessment copy uploaded successfully.';
 
@@ -1585,7 +1602,6 @@ public function updateClearance(Request $request, $id)
             return response()->json([
                 'status' => 'ok',
                 'message' => $message,
-                'medical_assessment_upload' => $profile->medical_assessment_upload,
             ]);
         }
 

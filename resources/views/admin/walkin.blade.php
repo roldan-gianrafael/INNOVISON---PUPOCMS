@@ -3468,6 +3468,7 @@
                         @csrf
                         <input type="hidden" name="reference_number" id="applicantAssessmentReferenceNumber">
                         <input type="hidden" name="student_number" id="applicantAssessmentStudentNumber">
+                        <input type="hidden" name="email" id="applicantAssessmentEmail">
                         <input type="file" name="medical_assessment_copy" id="applicantAssessmentUploadInput" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*" style="display:none;">
 
                         <div id="applicantUploadPreviewArea" class="applicant-upload-preview-area" style="display:none;">
@@ -5023,6 +5024,9 @@
             if (uploadForm) uploadForm.style.display = 'grid';
             if (uploadRefInput) uploadRefInput.value = data.student_number || fallbackRef || '';
             if (uploadStudentNo) uploadStudentNo.value = data.student_id || studentNumber || '';
+
+            const uploadEmailInput = document.getElementById('applicantAssessmentEmail');
+            if (uploadEmailInput) uploadEmailInput.value = data.email || '';
 
             const modalBody = document.querySelector('.applicant-modal-body');
             if (modalBody) {

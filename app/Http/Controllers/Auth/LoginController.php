@@ -1497,23 +1497,47 @@ class LoginController extends Controller
     {
         $user = null;
 
-        // EXPLICIT MULTI-GUARD CHECK: Check all clinic authentication guards
-        // Guard priority: admin (superadmin, admin, student_assistant) > student > web
-
-        // Check ADMIN guard (handles superadmin, admin, student_assistant roles)
-        if (Auth::guard('admin')->check()) {
-            $user = Auth::guard('admin')->user();
-        }
-        // Check STUDENT guard
-        elseif (Auth::guard('student')->check()) {
-            $user = Auth::guard('student')->user();
-        }
-        // Check WEB guard (fallback)
-        elseif (Auth::guard('web')->check()) {
+        // STEP 1: Check standard Laravel session guards
+        // These work when laravel_session cookie is present
+        if (Auth::guard($this->adminGuardName())->check()) {
+            $user = Auth::guard($this->adminGuardName())->user();
+        } elseif (Auth::guard($this->studentGuardName())->check()) {
+            $user = Auth::guard($this->studentGuardName())->user();
+        } elseif (Auth::guard('web')->check()) {
             $user = Auth::guard('web')->user();
         }
 
-        // If still not authenticated, return guest state
+        // STEP 2: FALLBACK - If no session detected, check for IDP access token
+        // This handles cases where the laravel_session cookie isn't sent (browser cookie isolation)
+        if (!$user instanceof User && (bool) config('services.idp.enabled', false)) {
+            $accessTokenCookieName = trim((string) config('services.idp.access_cookie_name', 'access_token'));
+            $accessToken = $request->cookie($accessTokenCookieName);
+
+            if ($accessToken && $accessToken !== '') {
+                // Validate token by fetching user profile from IDP
+                $idpProfile = $this->fetchProfileFromIdp($accessToken);
+
+                if ($idpProfile !== null) {
+                    // Extract user email from profile
+                    $email = trim((string) ($idpProfile['email'] ?? ''));
+
+                    // Look up user in local database by email
+                    if ($email !== '') {
+                        $user = User::query()->where('email', $email)->first();
+                    }
+
+                    // If user found, log them into the proper guard on-the-fly
+                    if ($user instanceof User) {
+                        // Determine which guard based on user role
+                        $guard = $this->guardForUser($user);
+                        Auth::guard($guard)->login($user);
+                        Auth::shouldUse($guard);
+                    }
+                }
+            }
+        }
+
+        // STEP 3: Return response
         if (!$user instanceof User) {
             return response()->json([
                 'authenticated' => false,

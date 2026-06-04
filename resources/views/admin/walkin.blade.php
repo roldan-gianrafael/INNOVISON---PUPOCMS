@@ -5121,26 +5121,64 @@
                     }
 
                     currentLookupRef = data.student_number || ref;
-                    setStatus('success', applicantName ? 'Applicant found: ' + applicantName + '.' : 'Applicant found.');
-                    if (foundCard && foundName) {
-                        foundName.textContent = applicantName || ref;
-                        foundCard.style.display = 'block';
-                    }
-                    showLookupDetails(data, ref);
 
-                    // Hide input sections and show only results
-                    if (defaultPane) defaultPane.style.display = 'none';
+                    // Check if applicant is already approved
+                    const isAlreadyApproved = data.is_health_profile_completed === true
+                        || data.is_health_profile_completed === 1
+                        || data.medical_status === 'cleared'
+                        || data.approved === true
+                        || data.approved === 1;
 
-                    // Hide only the input form row, keep action buttons visible
-                    const lookupRow = document.querySelector('.applicant-ref-lookup-row');
-                    if (lookupRow) lookupRow.style.display = 'none';
+                    if (isAlreadyApproved) {
+                        setStatus('success', applicantName ? 'Applicant found: ' + applicantName + ' (Already Approved)' : 'Applicant found (Already Approved)');
+                        if (foundCard && foundName) {
+                            foundName.textContent = (applicantName || ref) + ' ✓';
+                            foundCard.style.display = 'block';
+                        }
+                        showLookupDetails(data, ref);
 
-                    // Change button to Approve mode
-                    isApprovalMode = true;
-                    if (findBtn) {
-                        findBtn.textContent = 'Approve';
-                        findBtn.removeEventListener('click', doLookup);
-                        findBtn.addEventListener('click', doApprove);
+                        // Hide input sections and show only results
+                        if (defaultPane) defaultPane.style.display = 'none';
+
+                        // Hide only the input form row, keep action buttons visible
+                        const lookupRow = document.querySelector('.applicant-ref-lookup-row');
+                        if (lookupRow) lookupRow.style.display = 'none';
+
+                        // Show message but disable Approve button
+                        isApprovalMode = false;
+                        if (findBtn) {
+                            findBtn.textContent = 'Already Approved';
+                            findBtn.disabled = true;
+                            findBtn.style.opacity = '0.6';
+                            findBtn.style.cursor = 'not-allowed';
+                            findBtn.removeEventListener('click', doLookup);
+                            findBtn.removeEventListener('click', doApprove);
+                        }
+                    } else {
+                        setStatus('success', applicantName ? 'Applicant found: ' + applicantName + '.' : 'Applicant found.');
+                        if (foundCard && foundName) {
+                            foundName.textContent = applicantName || ref;
+                            foundCard.style.display = 'block';
+                        }
+                        showLookupDetails(data, ref);
+
+                        // Hide input sections and show only results
+                        if (defaultPane) defaultPane.style.display = 'none';
+
+                        // Hide only the input form row, keep action buttons visible
+                        const lookupRow = document.querySelector('.applicant-ref-lookup-row');
+                        if (lookupRow) lookupRow.style.display = 'none';
+
+                        // Change button to Approve mode
+                        isApprovalMode = true;
+                        if (findBtn) {
+                            findBtn.textContent = 'Approve';
+                            findBtn.disabled = false;
+                            findBtn.style.opacity = '1';
+                            findBtn.style.cursor = 'pointer';
+                            findBtn.removeEventListener('click', doLookup);
+                            findBtn.addEventListener('click', doApprove);
+                        }
                     }
                 } else {
                     setStatus('error', data.message || 'No applicant found with that reference number.');

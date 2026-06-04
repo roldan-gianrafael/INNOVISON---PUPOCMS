@@ -16,12 +16,14 @@
     .awaiting-links-btn {
         background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%) !important;
         border: 1px solid #e0f2fe !important;
-        border-left: 6px solid #0369a1 !important;
+        border-left: 5px solid #0369a1 !important;
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 4px 12px rgba(3, 105, 161, 0.08), 0 0 0 0 rgba(3, 105, 161, 0);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         position: relative;
         overflow: hidden;
+        height: 100%;
+        width: 100%;
     }
     .awaiting-links-btn::before {
         content: '';
@@ -37,14 +39,14 @@
         left: 100%;
     }
     .awaiting-links-btn:hover {
-        box-shadow: 0 12px 24px rgba(3, 105, 161, 0.2), 0 0 0 0 rgba(3, 105, 161, 0.15);
-        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(3, 105, 161, 0.15);
+        transform: translateY(-2px);
         background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
         border-color: #0369a1 !important;
     }
     .awaiting-links-btn:active {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 12px rgba(3, 105, 161, 0.15);
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(3, 105, 161, 0.1);
     }
 
     /* Awaiting Links Modal Styling */

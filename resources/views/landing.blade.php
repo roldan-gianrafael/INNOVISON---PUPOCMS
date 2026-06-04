@@ -915,112 +915,44 @@
                                 <span class="help-guide-number">1</span>
                                 <span class="help-guide-text">
                                     <strong>For Students</strong>
-                                    <span>Make sure you are using your official One Portal account.</span>
+                                    <span>• Make sure you are using your official One Portal account.</span>
+                                    <span>• If One Portal does not open, refresh the page and try again.</span>
+                                    <span>• If you can log in but cannot see your clinic record, contact the clinic staff.</span>
+                                    <span>• For medical clearance, prepare your Admission System reference number.</span>
+                                    <span>• Visit the clinic if you are instructed to proceed with medical assessment.</span>
                                 </span>
                             </div>
+                            
+                            
                             <div class="help-guide-item">
                                 <span class="help-guide-number">2</span>
                                 <span class="help-guide-text">
-                                    <strong>For Students</strong>
-                                    <span>If One Portal does not open, refresh the page and try again.</span>
+                                    <strong>For Clinic Staff</strong>
+                                    <span>• Use One Portal for normal login.</span>
+                                    <span>•If One Portal is unavailable, contact the system administrator.</span>
+                                </span>
                                 </span>
                             </div>
+                           
                             <div class="help-guide-item">
                                 <span class="help-guide-number">3</span>
                                 <span class="help-guide-text">
-                                    <strong>For Students</strong>
-                                    <span>If you can log in but cannot see your clinic record, contact the clinic staff.</span>
+                                    <strong>Common Issues</strong>
+                                    <span>• One Portal is unavailable</span>
+                                    <span>• Wrong account used</span>
+                                    <span>• Missing applicant reference number</span>
+                                    <span>• Health profile not yet submitted</span>
+                                    <span>• Medical status not yet approved</span>
+                                    <span>• Clinic record is still under review</span>
                                 </span>
                             </div>
+                           
+                                   
                             <div class="help-guide-item">
                                 <span class="help-guide-number">4</span>
                                 <span class="help-guide-text">
-                                    <strong>For Students</strong>
-                                    <span>For medical clearance, prepare your Admission System reference number.</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">5</span>
-                                <span class="help-guide-text">
-                                    <strong>For Students</strong>
-                                    <span>Visit the clinic if you are instructed to proceed with medical assessment.</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">6</span>
-                                <span class="help-guide-text">
-                                    <strong>For Clinic Staff</strong>
-                                    <span>Use One Portal for normal login.</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">7</span>
-                                <span class="help-guide-text">
-                                    <strong>For Clinic Staff</strong>
-                                    <span>If One Portal is unavailable, contact the system administrator.</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">8</span>
-                                <span class="help-guide-text">
-                                    <strong>For Clinic Staff</strong>
-                                    <span>Emergency local access is only for authorized clinic admin accounts.</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">9</span>
-                                <span class="help-guide-text">
-                                    <strong>For Clinic Staff</strong>
-                                    <span>Do not share emergency login credentials.</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">10</span>
-                                <span class="help-guide-text">
-                                    <strong>Common Issues</strong>
-                                    <span>One Portal is unavailable</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">11</span>
-                                <span class="help-guide-text">
-                                    <strong>Common Issues</strong>
-                                    <span>Wrong account used</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">12</span>
-                                <span class="help-guide-text">
-                                    <strong>Common Issues</strong>
-                                    <span>Missing applicant reference number</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">13</span>
-                                <span class="help-guide-text">
-                                    <strong>Common Issues</strong>
-                                    <span>Health profile not yet submitted</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">14</span>
-                                <span class="help-guide-text">
-                                    <strong>Common Issues</strong>
-                                    <span>Medical status not yet approved</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">15</span>
-                                <span class="help-guide-text">
-                                    <strong>Common Issues</strong>
-                                    <span>Clinic record is still under review</span>
-                                </span>
-                            </div>
-                            <div class="help-guide-item">
-                                <span class="help-guide-number">16</span>
-                                <span class="help-guide-text">
                                     <strong>Contact</strong>
-                                    <span>For assistance, contact the PUP Taguig Medical Clinic or the system administrator.</span>
+                                    <span>• For assistance, contact the PUP Taguig Medical Clinic or the system administrator.</span>
                                 </span>
                             </div>
                         </div>

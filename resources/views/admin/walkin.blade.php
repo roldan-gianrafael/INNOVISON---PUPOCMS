@@ -3125,7 +3125,7 @@
                     <div id="applicantRefStatus" class="ocr-status"></div>
 
                     <div id="applicantFoundCard" class="applicant-ref-result">
-                        Applicant located
+                        Full Name
                         <strong id="applicantFoundName"></strong>
                     </div>
 
@@ -3139,14 +3139,7 @@
                                 <p class="applicant-lookup-label">Student ID</p>
                                 <p class="applicant-lookup-value" id="applicantLookupStudentId">-</p>
                             </div>
-                            <div class="applicant-lookup-item">
-                                <p class="applicant-lookup-label">Course</p>
-                                <p class="applicant-lookup-value" id="applicantLookupCourse">-</p>
-                            </div>
-                            <div class="applicant-lookup-item">
-                                <p class="applicant-lookup-label">Year / Section</p>
-                                <p class="applicant-lookup-value" id="applicantLookupYearSection">-</p>
-                            </div>
+                            
                             <div class="applicant-lookup-item">
                                 <p class="applicant-lookup-label">Date of Birth</p>
                                 <p class="applicant-lookup-value" id="applicantLookupDob">-</p>

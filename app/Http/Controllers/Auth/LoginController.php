@@ -1492,4 +1492,44 @@ class LoginController extends Controller
 
         return view('login');
     }
+
+    public function apiCheckSession(Request $request)
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user instanceof User) {
+            return response()->json([
+                'authenticated' => false,
+                'isStudentAssistant' => false,
+            ]);
+        }
+
+        $isStudentAssistant = $this->isStudentAssistantAccount($user);
+
+        return response()->json([
+            'authenticated' => true,
+            'userId' => $user->id,
+            'userRole' => $user->user_role,
+            'isStudentAssistant' => $isStudentAssistant,
+        ]);
+    }
+
+    public function apiGetRedirectPath(Request $request)
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user instanceof User) {
+            return response()->json([
+                'redirectPath' => null,
+                'error' => 'Not authenticated',
+            ], 401);
+        }
+
+        $redirectPath = $this->resolveRedirectPathForUser($user);
+
+        return response()->json([
+            'redirectPath' => $redirectPath,
+            'userRole' => $user->user_role,
+        ]);
+    }
 }

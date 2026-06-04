@@ -767,9 +767,128 @@
                 height: 58px;
             }
         }
+
+        /* Preloader Styles */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(51, 8, 13, 0.98), rgba(112, 19, 27, 0.95));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            visibility: visible;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .preloader-logo {
+            width: 120px;
+            height: 120px;
+            animation: pulseLogo 2.5s ease-in-out infinite;
+        }
+
+        .preloader-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @keyframes pulseLogo {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+        }
+
+        /* SA Workspace Selection Styles */
+        .sa-workspace-selector {
+            display: none;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .sa-workspace-selector.visible {
+            display: grid;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .workspace-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 54px;
+            width: 100%;
+            padding: 0 24px;
+            border-radius: 999px;
+            border: 1px solid var(--maroon);
+            background: linear-gradient(135deg, var(--maroon), var(--maroon-strong));
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 950;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(112, 19, 27, 0.08);
+            transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .workspace-btn:hover,
+        .workspace-btn:focus-visible {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+            border-color: var(--gold);
+            color: var(--maroon);
+            box-shadow: 0 0 0 4px rgba(112, 19, 27, 0.14), 0 16px 30px rgba(112, 19, 27, 0.18);
+            outline: none;
+        }
+
+        .workspace-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            font-weight: 800;
+        }
     </style>
 </head>
 <body>
+    <!-- Full-Screen Preloader -->
+    <div id="preloader">
+        <div class="preloader-logo">
+            <img src="{{ asset('images/clinic_logo_transparent.png') }}" alt="Clinic Logo">
+        </div>
+    </div>
     <main class="landing-shell">
         <section class="landing-panel" aria-label="PUP medical clinic access">
             <div class="info-column">
@@ -902,23 +1021,62 @@
                             <div class="notice">{{ $errors->first('idp') }}</div>
                         @endif
 
-                        <a class="portal-btn" href="{{ route('login.portal') }}">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Login via One Portal</span>
-                        </a>
+                        <!-- Guest State Buttons -->
+                        <div id="guestButtons" style="display: grid; gap: 12px;">
+                            <a class="portal-btn" href="{{ route('login.portal') }}">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>Login via One Portal</span>
+                            </a>
 
-                        <button class="help-btn" type="button" id="landingNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Need Help</span>
-                        </button>
+                            <button class="help-btn" type="button" id="landingNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>Need Help</span>
+                            </button>
+                        </div>
+
+                        <!-- Authenticated State Buttons -->
+                        <div id="authButtons" style="display: none; grid-column: 1; grid-row: 1; gap: 12px;">
+                            <a class="portal-btn" id="viewHomepageBtn" href="#" onclick="handleViewHomepage(event)">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M3 12l9-9 9 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M5 10v10a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1v-10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>View Homepage</span>
+                            </a>
+
+                            <button class="help-btn" type="button" id="authNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>Need Help</span>
+                            </button>
+                        </div>
+
+                        <!-- Student Assistant Workspace Selector -->
+                        <div id="saWorkspaceSelector" class="sa-workspace-selector">
+                            <div class="login-copy" style="margin-bottom: 8px;">
+                                <h2>Choose Your Workspace</h2>
+                                <p>Select where you want to continue today.</p>
+                            </div>
+                            <a class="workspace-btn" href="/student/home">
+                                <span class="workspace-badge">👤</span>
+                                <span>Go to Student Side</span>
+                            </a>
+                            <a class="workspace-btn" href="/assistant/dashboard">
+                                <span class="workspace-badge">⚙️</span>
+                                <span>Go to Admin/SA Side</span>
+                            </a>
+                        </div>
 
                         <p class="system-foot">PUP Taguig Clinic Management System</p>
                     </div>
@@ -984,12 +1142,108 @@
     </main>
     @include('partials.system_footer')
     <script>
+        // ============ PRELOADER & SESSION CHECK ============
+        const preloader = document.getElementById('preloader');
+        const guestButtons = document.getElementById('guestButtons');
+        const authButtons = document.getElementById('authButtons');
+        const saSelector = document.getElementById('saWorkspaceSelector');
         const landingPanel = document.querySelector('.landing-panel');
         const helpPanel = document.getElementById('landingHelpPanel');
         const infoLoginSwap = document.querySelector('.info-login-swap');
         const helpButtons = Array.from(document.querySelectorAll('.help-btn'));
         let isHelpMode = false;
 
+        // Initialize: Show preloader, check session
+        function initializeLanding() {
+            if (preloader) {
+                preloader.classList.remove('hidden');
+            }
+            checkSessionStatus();
+        }
+
+        // Async session check
+        function checkSessionStatus() {
+            fetch('/api/check-session', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.authenticated) {
+                    // User is logged in
+                    updateUIForAuthenticated(data);
+                } else {
+                    // User is guest
+                    updateUIForGuest();
+                }
+                hidePreloader();
+            })
+            .catch(error => {
+                console.warn('Session check failed:', error);
+                updateUIForGuest();
+                hidePreloader();
+            });
+        }
+
+        function updateUIForGuest() {
+            if (guestButtons) guestButtons.style.display = 'grid';
+            if (authButtons) authButtons.style.display = 'none';
+            if (saSelector) saSelector.classList.remove('visible');
+        }
+
+        function updateUIForAuthenticated(sessionData) {
+            if (guestButtons) guestButtons.style.display = 'none';
+
+            // Check if user is student assistant
+            if (sessionData.isStudentAssistant) {
+                // Show SA workspace selector directly
+                if (authButtons) authButtons.style.display = 'none';
+                if (saSelector) saSelector.classList.add('visible');
+            } else {
+                // Show View Homepage button for regular users
+                if (authButtons) authButtons.style.display = 'grid';
+                if (saSelector) saSelector.classList.remove('visible');
+            }
+        }
+
+        function hidePreloader() {
+            if (preloader) {
+                setTimeout(() => {
+                    preloader.classList.add('hidden');
+                }, 200);
+            }
+        }
+
+        // Handle "View Homepage" click for non-SA users
+        function handleViewHomepage(event) {
+            event.preventDefault();
+
+            fetch('/api/get-redirect-path', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirectPath) {
+                    window.location.href = data.redirectPath;
+                } else {
+                    console.error('No redirect path provided');
+                }
+            })
+            .catch(error => {
+                console.error('Error getting redirect path:', error);
+            });
+        }
+
+        // ============ HELP MODE TOGGLE ============
         function setLandingHelpMode(nextState) {
             if (!landingPanel || !helpPanel) {
                 return;
@@ -1009,6 +1263,13 @@
                 setLandingHelpMode(!isHelpMode);
             });
         });
+
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeLanding);
+        } else {
+            initializeLanding();
+        }
     </script>
 </body>
 </html>

@@ -109,7 +109,11 @@ Route::post('/system-admin/emergency-login', [EmergencyAuthController::class, 'l
     ->middleware('throttle:10,1')
     ->name('system-admin.emergency-login.submit');
 Route::post('/register-action', [RegisterController::class, 'register']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout'); 
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// --- API ROUTES (For AJAX/Frontend) ---
+Route::get('/api/check-session', [LoginController::class, 'apiCheckSession']);
+Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath']);
 
 // --- PROTECTED ROUTES (Login required) ---
 Route::middleware(['auth:student', 'audit'])->group(function () {

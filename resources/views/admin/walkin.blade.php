@@ -2871,21 +2871,24 @@
 
     .applicant-ref-result {
         display: none;
-        padding: 12px 14px;
+        padding: 20px 18px;
         border-radius: 12px;
         background: #ecfdf5;
         border: 1px solid #a7f3d0;
         color: #047857;
-        font-size: 12px;
-        font-weight: 800;
-        line-height: 1.5;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.6;
     }
 
     .applicant-ref-result strong {
         display: block;
-        margin-top: 2px;
+        margin-top: 8px;
         color: #064e3b;
-        font-size: 13px;
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .applicant-lookup-details {

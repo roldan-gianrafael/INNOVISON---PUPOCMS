@@ -14,21 +14,33 @@
         height: 100%; /* Para pantay ang taas nila */
     }
     .awaiting-links-btn {
-        background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c) !important;
+        background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 55%, #b91c1c 100%) !important;
         border: 1px solid #991b1b !important;
         color: #ffffff !important;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(112, 19, 27, 0.2);
+        box-shadow: 0 4px 12px rgba(112, 19, 27, 0.2) !important;
         position: relative;
         overflow: hidden;
         height: 100%;
         width: 100%;
     }
+    .awaiting-links-btn,
+    .awaiting-links-btn * {
+        background-color: transparent !important;
+        color: #ffffff !important;
+    }
     .awaiting-links-btn .health-summary-label {
         color: #ffffff !important;
     }
+    .awaiting-links-btn .health-summary-label span {
+        color: #ffffff !important;
+    }
     .awaiting-links-btn h3 {
+        color: #ffffff !important;
+    }
+    .awaiting-links-btn svg {
+        stroke: #ffffff !important;
         color: #ffffff !important;
     }
     .awaiting-links-btn::before {

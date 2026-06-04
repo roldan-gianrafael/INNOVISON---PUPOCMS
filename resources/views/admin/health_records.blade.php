@@ -96,12 +96,12 @@
         margin: 0 0 4px 0;
         font-size: 18px;
         font-weight: 700;
-        color: #ffffff;
+        color: #ffffff !important;
     }
     .awaiting-links-modal-copy p {
         margin: 0;
         font-size: 13px;
-        color: rgba(255,255,255,0.85);
+        color: #ffffff !important;
     }
     .awaiting-links-modal-close {
         flex: 0 0 auto;

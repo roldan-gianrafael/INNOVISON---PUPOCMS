@@ -3259,6 +3259,116 @@
     @media (max-width: 640px) {
         .applicant-ref-grid { grid-template-columns: 1fr; }
     }
+
+    /* Medical Condition Section */
+    .applicant-medical-condition-section {
+        display: none;
+        width: 100%;
+        padding: 18px 20px;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border: 1px solid #0284c7;
+        border-radius: 12px;
+        gap: 14px;
+        flex-direction: column;
+    }
+
+    .applicant-medical-condition-section.show {
+        display: flex;
+    }
+
+    .applicant-condition-header {
+        display: flex;
+        align-items: center;
+    }
+
+    .applicant-condition-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .applicant-condition-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #0369a1;
+    }
+
+    .applicant-condition-toggle-text {
+        font-weight: 600;
+        color: #0369a1;
+        font-size: 14px;
+    }
+
+    .applicant-condition-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .applicant-condition-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .applicant-condition-field label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .applicant-condition-input,
+    .applicant-condition-textarea {
+        padding: 10px 12px;
+        border: 1px solid #0284c7;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+        background: #ffffff;
+        color: #1e293b;
+        transition: all 0.2s ease;
+    }
+
+    .applicant-condition-input:focus,
+    .applicant-condition-textarea:focus {
+        outline: none;
+        border-color: #0369a1;
+        box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1);
+    }
+
+    .applicant-condition-textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    html[data-theme="dark"] .applicant-medical-condition-section {
+        background: linear-gradient(135deg, rgba(3, 105, 161, 0.15) 0%, rgba(2, 132, 199, 0.15) 100%);
+        border-color: rgba(3, 105, 161, 0.3);
+    }
+
+    html[data-theme="dark"] .applicant-condition-toggle-text {
+        color: #38bdf8;
+    }
+
+    html[data-theme="dark"] .applicant-condition-field label {
+        color: #e2e8f0;
+    }
+
+    html[data-theme="dark"] .applicant-condition-input,
+    html[data-theme="dark"] .applicant-condition-textarea {
+        background: #1e293b;
+        border-color: rgba(3, 105, 161, 0.4);
+        color: #f1f5f9;
+    }
+
+    html[data-theme="dark"] .applicant-condition-input:focus,
+    html[data-theme="dark"] .applicant-condition-textarea:focus {
+        border-color: #0284c7;
+        box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.2);
+    }
 </style>
 @endpush
 
@@ -3468,6 +3578,26 @@
                                         <p class="applicant-lookup-value" id="applicantLookupEmail">-</p>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Medical Condition Section --}}
+                    <div class="applicant-medical-condition-section">
+                        <div class="applicant-condition-header">
+                            <label class="applicant-condition-toggle">
+                                <input type="checkbox" id="applicantHasMedicalCondition" class="applicant-condition-checkbox">
+                                <span class="applicant-condition-toggle-text">With Medical Condition</span>
+                            </label>
+                        </div>
+                        <div id="applicantConditionFields" class="applicant-condition-fields" style="display: none;">
+                            <div class="applicant-condition-field">
+                                <label for="applicantMedicalCondition">Medical Condition <span style="color: #dc2626;">*</span></label>
+                                <input type="text" id="applicantMedicalCondition" name="medical_condition" placeholder="e.g., Asthma, Diabetes, Hypertension..." class="applicant-condition-input">
+                            </div>
+                            <div class="applicant-condition-field">
+                                <label for="applicantConditionRemarks">Remarks <span style="color: #94a3b8;">(Optional)</span></label>
+                                <textarea id="applicantConditionRemarks" name="condition_remarks" placeholder="Additional notes about the medical condition..." class="applicant-condition-textarea" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -5045,6 +5175,24 @@
                 modalBody.style.minHeight = 'auto';
                 modalBody.scrollTop = 0;
             }
+
+            // Show medical condition section
+            const medicalConditionSection = document.querySelector('.applicant-medical-condition-section');
+            if (medicalConditionSection) {
+                medicalConditionSection.classList.add('show');
+                medicalConditionSection.style.display = 'flex';
+            }
+
+            // Reset medical condition fields
+            const medicalConditionCheckbox = document.getElementById('applicantHasMedicalCondition');
+            const conditionFields = document.getElementById('applicantConditionFields');
+            if (medicalConditionCheckbox) {
+                medicalConditionCheckbox.checked = false;
+            }
+            if (conditionFields) {
+                conditionFields.style.display = 'none';
+            }
+
             console.log('showLookupDetails completed');
         }
 
@@ -5193,7 +5341,27 @@
                 return;
             }
 
+            // Get medical condition data if enabled
+            const hasMedicalCondition = document.getElementById('applicantHasMedicalCondition');
+            const medicalConditionInput = document.getElementById('applicantMedicalCondition');
+            const conditionRemarksInput = document.getElementById('applicantConditionRemarks');
+
+            if (hasMedicalCondition && hasMedicalCondition.checked && (!medicalConditionInput.value.trim())) {
+                setStatus('error', 'Please enter the medical condition.');
+                return;
+            }
+
             setStatus('info', 'Approving applicant...');
+
+            const approvalData = {
+                reference_number: currentLookupRef
+            };
+
+            if (hasMedicalCondition && hasMedicalCondition.checked) {
+                approvalData.has_medical_condition = true;
+                approvalData.medical_condition = medicalConditionInput.value.trim();
+                approvalData.condition_remarks = conditionRemarksInput.value.trim();
+            }
 
             fetch("{{ route('admin.walkin.approve_applicant') }}", {
                 method: 'POST',
@@ -5203,9 +5371,7 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify({
-                    reference_number: currentLookupRef
-                })
+                body: JSON.stringify(approvalData)
             })
             .then(r => r.json())
             .then(data => {
@@ -5247,6 +5413,23 @@
                 }
             })
             .catch(() => setStatus('error', 'Unable to approve right now. Please try again.'));
+        }
+
+        // Medical Condition Toggle
+        const medicalConditionCheckbox = document.getElementById('applicantHasMedicalCondition');
+        const medicalConditionFields = document.getElementById('applicantConditionFields');
+
+        if (medicalConditionCheckbox) {
+            medicalConditionCheckbox.addEventListener('change', function () {
+                if (this.checked) {
+                    medicalConditionFields.style.display = 'flex';
+                } else {
+                    medicalConditionFields.style.display = 'none';
+                    // Clear fields when unchecked
+                    document.getElementById('applicantMedicalCondition').value = '';
+                    document.getElementById('applicantConditionRemarks').value = '';
+                }
+            });
         }
 
         if (openBtn) openBtn.addEventListener('click', function (e) { e.preventDefault(); openApplicantsModal(); });

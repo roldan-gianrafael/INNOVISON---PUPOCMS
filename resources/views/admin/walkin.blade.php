@@ -4882,12 +4882,22 @@
         }
 
         function showLookupDetails(data, fallbackRef) {
+            console.log('showLookupDetails called with data:', data);
+
             if (!lookupDetails) {
+                console.log('ERROR: lookupDetails element not found!');
                 return;
             }
 
             const studentNumber = data.student_number || data.student_id || fallbackRef || '-';
             const yearSection = [data.year || '', data.section || ''].filter(Boolean).join(' / ') || 'N/A';
+
+            console.log('Setting lookup values:', {
+                lookupRef: data.student_number || fallbackRef,
+                lookupStudentId: data.student_id,
+                lookupDob: data.dob,
+                lookupEmail: data.email
+            });
 
             if (lookupRef) lookupRef.textContent = data.student_number || fallbackRef || '-';
             if (lookupStudentId) lookupStudentId.textContent = data.student_id || 'N/A';
@@ -4896,18 +4906,22 @@
             if (lookupDob) lookupDob.textContent = data.dob || 'N/A';
             if (lookupEmail) lookupEmail.textContent = data.email || 'N/A';
 
+            console.log('Setting display styles...');
             lookupDetails.style.display = 'block';
+            if (foundCard) foundCard.style.display = 'block';
             if (uploadForm) uploadForm.style.display = 'grid';
             if (uploadRefInput) uploadRefInput.value = data.student_number || fallbackRef || '';
             if (uploadStudentNo) uploadStudentNo.value = data.student_id || studentNumber || '';
 
             const modalBody = document.querySelector('.applicant-modal-body');
             if (modalBody) {
+                console.log('Updating modal body layout...');
                 modalBody.style.alignItems = 'stretch';
                 modalBody.style.justifyContent = 'flex-start';
                 modalBody.style.minHeight = 'auto';
                 modalBody.scrollTop = 0;
             }
+            console.log('showLookupDetails completed');
         }
 
         function uploadAssessmentCopy(file) {

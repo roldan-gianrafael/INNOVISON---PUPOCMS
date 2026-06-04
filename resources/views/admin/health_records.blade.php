@@ -1449,8 +1449,8 @@
                 <th>ID Number</th>
                 <th>Full Name</th>
                 <th>Course / Yr / Sec</th>
-                <th>Medical Condition</th> {{-- Dating Medical Status --}}
-                <th>Clearance Status</th> {{-- BAGONG COLUMN --}}
+                <th>Medical Condition</th> 
+                <th>Clearance Status</th> 
                 <th>Submitted At</th>
                 <th style="text-align: center;">Actions</th>
             </tr>
@@ -1513,25 +1513,6 @@
                                     <x-outline-icon name="document-text" />
                                     View
                                 </a>
-                                
-                                @if($canSignHealth)
-                                    <button
-                                        type="button"
-                                        class="btn-action btn-sign js-open-verify-modal"
-                                        data-student-name="{{ e($record->user->name ?? 'N/A') }}"
-                                        data-student-number="{{ e($record->user->student_number ?: ($record->user->student_id ?? 'N/A')) }}"
-                                        data-student-course="{{ e(trim(($record->course_college ?: ($record->user->course ?? 'N/A')) . ' ' . ($record->user->year ?? '') . '-' . ($record->user->section ?? ''))) }}"
-                                        data-health-form-url="{{ !empty($record->health_form_upload) ? asset('storage/' . $record->health_form_upload) : '' }}"
-                                        data-approve-url="{{ route('admin.update_clearance', $record->id) }}"
-                                    >
-                                        <x-outline-icon name="pencil-square" />
-                                        Verify
-                                    </button>
-                                @else
-                                    <button class="btn-action btn-readonly" disabled>
-                                        View Only
-                                    </button>
-                                @endif
                             </div>
                         @endif
                     </td>

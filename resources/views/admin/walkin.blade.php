@@ -2567,6 +2567,14 @@
         100% { top: 16%; opacity: 0.9; }
     }
     @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes submittedBounce {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(0.8) translateY(40px); opacity: 0; }
+    }
+    .applicant-modal-shell.submitted-animation {
+        animation: submittedBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
 
     /* --- Applicant Reference Panel --- */
     .applicant-ref-grid {
@@ -4907,6 +4915,7 @@
     // --- Applicants Modal: Reference Number Lookup ---
     (function () {
         const backdrop        = document.getElementById('applicantRefModal');
+        const modalShell      = backdrop?.querySelector('.applicant-modal-shell');
         const openBtn         = document.getElementById('openApplicantRefModal');
         const closeBtn        = document.getElementById('closeApplicantRefModal');
         const defaultPane     = document.getElementById('applicantRefDefault');
@@ -5164,17 +5173,37 @@
             .then(data => {
                 if (data.success) {
                     setStatus('success', 'Applicant approved successfully.');
-                    // Reset to Find mode after a short delay
-                    setTimeout(() => {
-                        isApprovalMode = false;
-                        if (findBtn) {
-                            findBtn.textContent = 'Find';
-                            findBtn.removeEventListener('click', doApprove);
-                            findBtn.addEventListener('click', doLookup);
-                        }
-                        resetLookupState();
-                        if (refInput) refInput.value = '';
-                    }, 1500);
+                    // Play submitted animation and close modal
+                    if (modalShell) {
+                        modalShell.classList.add('submitted-animation');
+                        setTimeout(() => {
+                            closeApplicantsModal();
+                            isApprovalMode = false;
+                            if (findBtn) {
+                                findBtn.textContent = 'Find';
+                                findBtn.removeEventListener('click', doApprove);
+                                findBtn.addEventListener('click', doLookup);
+                            }
+                            resetLookupState();
+                            if (refInput) refInput.value = '';
+                            if (modalShell) {
+                                modalShell.classList.remove('submitted-animation');
+                            }
+                        }, 600);
+                    } else {
+                        // Fallback if shell not found
+                        setTimeout(() => {
+                            closeApplicantsModal();
+                            isApprovalMode = false;
+                            if (findBtn) {
+                                findBtn.textContent = 'Find';
+                                findBtn.removeEventListener('click', doApprove);
+                                findBtn.addEventListener('click', doLookup);
+                            }
+                            resetLookupState();
+                            if (refInput) refInput.value = '';
+                        }, 1500);
+                    }
                 } else {
                     setStatus('error', data.message || 'Failed to approve applicant.');
                 }

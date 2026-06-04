@@ -1659,14 +1659,14 @@
             </div>
         </div>
         <div class="summary-item">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 2px 24px !important; border-left: 5px solid #70131B;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
-                <div class="health-summary-row" style="display: flex; align-items: center; gap: 8px;">
-                    <div style="display: flex; align-items: center; color: #ffffff; font-size: 16px;">
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 2px 20px !important; border-left: 5px solid #70131B; width: 100%; display: flex; align-items: center; justify-content: space-between;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <div style="display: flex; align-items: center; color: #ffffff; font-size: 20px; flex-shrink: 0;">
                         <x-outline-icon name="link" />
                     </div>
-                    <div style="flex: 1;">
-                        <small class="text-muted fw-bold text-uppercase health-summary-label" style="color: #ffffff !important;"><span>Awaiting</span><span>Links</span></small>
-                        <h3 class="fw-bold mb-0" style="color: #ffffff;">{{ count($approvedApplicants) }}</h3>
+                    <div>
+                        <small style="display: block; color: #ffffff !important; font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 1px;">Awaiting Links</small>
+                        <h3 class="fw-bold" style="color: #ffffff; margin: 0; font-size: 24px; line-height: 1;">{{ count($approvedApplicants) }}</h3>
                     </div>
                 </div>
             </button>

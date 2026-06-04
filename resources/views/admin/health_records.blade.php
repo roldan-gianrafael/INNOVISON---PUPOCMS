@@ -1644,15 +1644,10 @@
             </div>
         </div>
         <div class="summary-item">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 4px 24px !important; border-left: none;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
-                <div class="health-summary-row" style="display: flex; align-items: center; gap: 12px;">
-                    <div style="font-size: 24px; color: #70131B;">
-                        <x-outline-icon name="link" />
-                    </div>
-                    <div>
-                        <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
-                        <h3 class="fw-bold mb-0" style="color: #111827;">{{ count($approvedApplicants) }}</h3>
-                    </div>
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 10px 24px !important; border-left: 5px solid #70131B;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
+                <div class="health-summary-row">
+                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
+                    <h3 class="fw-bold mb-0" style="color: #111827;">{{ count($approvedApplicants) }}</h3>
                 </div>
             </button>
         </div>

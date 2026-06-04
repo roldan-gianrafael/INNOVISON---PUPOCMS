@@ -1219,6 +1219,7 @@ class LoginController extends Controller
             Auth::shouldUse($guard);
             $request->session()->regenerate();
             $request->session()->flash('show_terms_modal', true);
+            $request->session()->save();
 
             /** @var \App\Models\User $authenticatedUser */
             $authenticatedUser = Auth::guard($guard)->user();
@@ -1398,6 +1399,10 @@ class LoginController extends Controller
         Auth::shouldUse($guard);
         $request->session()->regenerate();
         $request->session()->flash('show_terms_modal', true);
+        // CRITICAL: Explicitly save the session BEFORE redirect to ensure the
+        // laravel_session cookie is included in the response headers. Without this,
+        // the browser never receives the session cookie during the redirect.
+        $request->session()->save();
         $this->recordAuthEvent($request, 'Login', 'User logged in successfully via IDP authorization code flow.', $user);
 
         $redirectPath = $this->resolveRedirectPathForUser($user);

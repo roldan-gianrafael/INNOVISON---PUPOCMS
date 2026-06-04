@@ -1055,8 +1055,40 @@
 
     .applicant-modal-body {
         padding: 18px;
-        overflow: auto;
-        max-height: calc(100vh - 158px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height: calc(100vh - 140px);
+        scroll-behavior: smooth;
+    }
+
+    .applicant-modal-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .applicant-modal-body::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.06);
+        border-radius: 3px;
+    }
+
+    .applicant-modal-body::-webkit-scrollbar-thumb {
+        background: rgba(112, 19, 27, 0.4);
+        border-radius: 3px;
+    }
+
+    .applicant-modal-body::-webkit-scrollbar-thumb:hover {
+        background: rgba(112, 19, 27, 0.6);
+    }
+
+    html[data-theme="dark"] .applicant-modal-body::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="dark"] .applicant-modal-body::-webkit-scrollbar-thumb {
+        background: rgba(250, 204, 21, 0.3);
+    }
+
+    html[data-theme="dark"] .applicant-modal-body::-webkit-scrollbar-thumb:hover {
+        background: rgba(250, 204, 21, 0.5);
     }
 
     .applicant-modal-grid {
@@ -2998,27 +3030,28 @@
         transition: all 0.18s ease;
     }
 
-    .applicant-preview-view-btn {
+    .applicant-preview-replace-btn {
         background: #facc15;
         color: #701315;
     }
 
-    .applicant-preview-view-btn:hover {
+    .applicant-preview-replace-btn:hover {
         background: #fde68a;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
     }
 
-    .applicant-preview-replace-btn {
-        background: rgba(255, 255, 255, 0.2);
+    .applicant-preview-remove-btn {
+        background: rgba(239, 68, 68, 0.8);
         color: #ffffff;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(239, 68, 68, 0.6);
     }
 
-    .applicant-preview-replace-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255, 255, 255, 0.6);
+    .applicant-preview-remove-btn:hover {
+        background: rgba(220, 38, 38, 0.9);
+        border-color: rgba(220, 38, 38, 0.8);
         transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     }
 
     .applicant-preview-btn svg {
@@ -3091,25 +3124,26 @@
         box-shadow: 0 8px 24px rgba(250, 204, 21, 0.08);
     }
 
-    html[data-theme="dark"] .applicant-preview-view-btn {
+    html[data-theme="dark"] .applicant-preview-replace-btn {
         background: #facc15;
         color: #701315;
     }
 
-    html[data-theme="dark"] .applicant-preview-view-btn:hover {
+    html[data-theme="dark"] .applicant-preview-replace-btn:hover {
         background: #fde68a;
         box-shadow: 0 4px 12px rgba(250, 204, 21, 0.2);
     }
 
-    html[data-theme="dark"] .applicant-preview-replace-btn {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(250, 204, 21, 0.3);
+    html[data-theme="dark"] .applicant-preview-remove-btn {
+        background: rgba(220, 38, 38, 0.7);
+        border-color: rgba(220, 38, 38, 0.5);
         color: #f1f5f9;
     }
 
-    html[data-theme="dark"] .applicant-preview-replace-btn:hover {
-        background: rgba(250, 204, 21, 0.2);
-        border-color: rgba(250, 204, 21, 0.5);
+    html[data-theme="dark"] .applicant-preview-remove-btn:hover {
+        background: rgba(220, 38, 38, 0.85);
+        border-color: rgba(220, 38, 38, 0.7);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
     }
 
     @media (max-width: 640px) {
@@ -3354,13 +3388,13 @@
                             <div class="applicant-upload-preview-container">
                                 <img id="applicantUploadPreviewImage" src="" alt="Medical Assessment Preview" class="applicant-upload-preview-image">
                                 <div class="applicant-upload-preview-overlay">
-                                    <button type="button" id="btnViewAssessmentCopy" class="applicant-preview-btn applicant-preview-view-btn" aria-label="View image">
-                                        <x-outline-icon name="eye" />
-                                        <span>View</span>
-                                    </button>
                                     <button type="button" id="btnReplaceAssessmentCopy" class="applicant-preview-btn applicant-preview-replace-btn" aria-label="Replace image">
                                         <x-outline-icon name="arrow-path" />
                                         <span>Replace</span>
+                                    </button>
+                                    <button type="button" id="btnRemoveAssessmentCopy" class="applicant-preview-btn applicant-preview-remove-btn" aria-label="Remove image">
+                                        <x-outline-icon name="trash" />
+                                        <span>Remove</span>
                                     </button>
                                 </div>
                             </div>
@@ -4857,6 +4891,11 @@
             if (uploadForm) uploadForm.style.display = 'grid';
             if (uploadRefInput) uploadRefInput.value = data.student_number || fallbackRef || '';
             if (uploadStudentNo) uploadStudentNo.value = data.student_id || studentNumber || '';
+
+            const modalBody = document.querySelector('.applicant-modal-body');
+            if (modalBody) {
+                modalBody.scrollTop = 0;
+            }
         }
 
         function uploadAssessmentCopy(file) {
@@ -5032,22 +5071,28 @@
                 }
             }
 
-            const viewBtn = document.getElementById('btnViewAssessmentCopy');
-            if (viewBtn) {
-                viewBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const previewImage = document.getElementById('applicantUploadPreviewImage');
-                    if (previewImage && previewImage.src) {
-                        window.open(previewImage.src, '_blank');
-                    }
-                });
-            }
-
             const replaceBtn = document.getElementById('btnReplaceAssessmentCopy');
             if (replaceBtn) {
                 replaceBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     if (uploadInput) uploadInput.click();
+                });
+            }
+
+            const removeBtn = document.getElementById('btnRemoveAssessmentCopy');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const previewArea = document.getElementById('applicantUploadPreviewArea');
+                    const previewImage = document.getElementById('applicantUploadPreviewImage');
+                    const uploadBtn = document.getElementById('btnUploadAssessmentCopy');
+
+                    if (previewArea && previewImage && uploadBtn) {
+                        previewArea.style.display = 'none';
+                        previewImage.src = '';
+                        uploadBtn.style.display = 'flex';
+                        if (uploadInput) uploadInput.value = '';
+                    }
                 });
             }
         }

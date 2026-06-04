@@ -1629,7 +1629,7 @@
             </div>
         </div>
         <div class="summary-item">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 15px 24px !important; border-left: 5px solid #0369a1;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 8px 24px !important; border-left: 5px solid #0369a1;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
                 <div class="health-summary-row">
                     <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
                     <h3 class="fw-bold mb-0" style="color: #0369a1;">{{ count($approvedApplicants) }}</h3>

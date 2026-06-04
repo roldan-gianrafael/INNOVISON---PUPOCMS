@@ -205,6 +205,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::post('/admin/walkin/register', [WalkInController::class, 'registerStudent'])->name('walkin.registerStudent');
         Route::get('/admin/walkin/form/{student_id}', [WalkInController::class, 'showWalkinForm'])->name('walkin.form');
         Route::post('/admin/walkin/store', [WalkInController::class, 'store'])->name('walkin.store');
+        Route::post('/admin/walkin/approve-applicant', [WalkInController::class, 'approveApplicant'])->name('admin.walkin.approve_applicant');
 
         Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
         Route::get('/admin/reports/mar', [ReportsController::class, 'marReport'])->name('reports.mar');
@@ -273,6 +274,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::post('/walkin/register', [WalkInController::class, 'registerStudent'])->name('walkin.registerStudent');
         Route::get('/walkin/form/{student_id}', [WalkInController::class, 'showWalkinForm'])->name('walkin.form');
         Route::post('/walkin/store', [WalkInController::class, 'store'])->name('walkin.store');
+        Route::post('/walkin/approve-applicant', [WalkInController::class, 'approveApplicant'])->name('walkin.approve_applicant');
 
         Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
         Route::get('/reports/mar', [ReportsController::class, 'marReport'])->name('reports.mar');

@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\HealthProfile;
 use App\Models\InventoryMovement;
 use App\Models\Item;
+use App\Models\ActivityLog;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,53 @@ class WalkInController extends Controller
         $value = preg_replace('/\s+/', ' ', $value) ?? '';
 
         return trim($value);
+    }
+
+    private function logReferenceLookup(
+        Request $request,
+        string $referenceNumber,
+        bool $found = false,
+        ?string $applicantName = null,
+        ?string $errorMessage = null,
+        ?array $metadata = null
+    ): void
+    {
+        $user = auth()->user();
+        $lookupStatus = $found ? 'found' : ($errorMessage ? 'error' : 'not_found');
+        $description = match ($lookupStatus) {
+            'found' => "Reference lookup successful for: {$referenceNumber}" . ($applicantName ? " ({$applicantName})" : ''),
+            'error' => "Reference lookup error for {$referenceNumber}: {$errorMessage}",
+            'not_found' => "Reference lookup failed - no applicant found for: {$referenceNumber}",
+        };
+
+        $activityMetadata = $metadata ?? [];
+        $activityMetadata['reference_number'] = $referenceNumber;
+        $activityMetadata['lookup_status'] = $lookupStatus;
+        if ($applicantName) {
+            $activityMetadata['applicant_name'] = $applicantName;
+        }
+        if ($errorMessage) {
+            $activityMetadata['error'] = $errorMessage;
+        }
+
+        ActivityLog::create([
+            'user_id' => $user?->id,
+            'user_name' => $user?->name ?? $user?->email ?? 'System',
+            'user_role' => $user ? strtolower((string) ($user->user_role ?? '')) : null,
+            'action' => 'Reference Lookup',
+            'module' => 'Patient Intake',
+            'event_type' => 'reference_lookup',
+            'description' => $description,
+            'route_name' => optional($request->route())->getName(),
+            'http_method' => strtoupper((string) $request->method()),
+            'request_path' => '/' . ltrim((string) $request->path(), '/'),
+            'status_code' => $errorMessage ? 422 : 200,
+            'subject_type' => 'applicant',
+            'subject_id' => $referenceNumber,
+            'metadata' => $activityMetadata,
+            'ip_address' => $request->ip(),
+            'user_agent' => substr((string) $request->userAgent(), 0, 255),
+        ]);
     }
 
     private function namesRoughlyMatch(?string $extractedName, User $student): bool
@@ -137,9 +185,17 @@ class WalkInController extends Controller
 
     private function resolveLocalUserFromApplicant(array $applicant, bool $persist = true): User
     {
+        \Log::debug('PUPTAS applicant data', ['applicant' => $applicant]);
+
         $studentNumber = trim((string) data_get($applicant, 'student_number'));
         $idpUserId = trim((string) data_get($applicant, 'idp_user_id'));
         $email = trim((string) data_get($applicant, 'email'));
+
+        \Log::debug('Extracted fields', [
+            'studentNumber' => $studentNumber,
+            'idpUserId' => $idpUserId,
+            'email' => $email,
+        ]);
 
         $user = User::query()
             ->when($idpUserId !== '', fn ($query) => $query->orWhere('student_id', $idpUserId))
@@ -147,9 +203,29 @@ class WalkInController extends Controller
             ->when($email !== '', fn ($query) => $query->orWhere('email', $email))
             ->first();
 
+        // Try multiple field name variations for first and last name
         $firstName = trim((string) data_get($applicant, 'first_name'));
+        if ($firstName === '') {
+            $firstName = trim((string) data_get($applicant, 'given_name'));
+        }
+
         $lastName = trim((string) data_get($applicant, 'last_name'));
-        $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+        if ($lastName === '') {
+            $lastName = trim((string) data_get($applicant, 'family_name'));
+        }
+        if ($lastName === '') {
+            $lastName = trim((string) data_get($applicant, 'surname'));
+        }
+
+        // If no separate first/last name, try to use full name
+        $fullName = trim((string) data_get($applicant, 'full_name'));
+        if ($fullName === '') {
+            $fullName = trim((string) data_get($applicant, 'name'));
+        }
+        if ($fullName === '') {
+            $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+        }
+
         $fallbackFirstName = $firstName !== '' ? $firstName : 'Applicant';
         $fallbackLastName = $lastName !== '' ? $lastName : 'User';
         $fallbackFullName = $fullName !== '' ? $fullName : trim($fallbackFirstName . ' ' . $fallbackLastName);
@@ -169,6 +245,11 @@ class WalkInController extends Controller
         if ($idpUserId !== '' && trim((string) $user->student_id) === '') {
             $user->student_id = $this->resolveUniqueStudentId($idpUserId);
         }
+
+        \Log::debug('User fields set', [
+            'student_id' => $user->student_id,
+            'student_number' => $user->student_number,
+        ]);
 
         if ($firstName !== '') {
             $user->first_name = $firstName;
@@ -385,6 +466,25 @@ class WalkInController extends Controller
 
             if (is_array($applicant)) {
                 $student = $this->resolveLocalUserFromApplicant($applicant, !$previewOnly);
+            }
+
+            // Log the reference lookup attempt
+            if (is_array($applicant) && $student) {
+                // Successful lookup
+                $applicantName = $applicant['full_name'] ?? $applicant['name'] ?? '';
+                if (!$applicantName && isset($applicant['first_name'])) {
+                    $applicantName = $applicant['first_name'];
+                    if (isset($applicant['last_name'])) {
+                        $applicantName .= ' ' . $applicant['last_name'];
+                    }
+                }
+                $this->logReferenceLookup($request, $lookup, true, $applicantName, null, [
+                    'local_user_id' => $student->id,
+                    'local_email' => $student->email,
+                ]);
+            } elseif (!is_array($applicant) && $lookupResult['success'] === false) {
+                // Failed lookup with error
+                $this->logReferenceLookup($request, $lookup, false, null, $lookupMessage);
             }
         }
 
@@ -863,5 +963,119 @@ PROMPT;
         }
 
         return redirect()->route($this->walkinRouteName($request, 'index'))->with('consultation_done', true);
+    }
+
+    public function approveApplicant(Request $request, PuptasWebhookService $webhookService)
+    {
+        try {
+            $referenceNumber = trim((string) $request->input('reference_number', ''));
+
+            if ($referenceNumber === '') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reference number is required.'
+                ], 400);
+            }
+
+            // Fetch applicant details to get student ID
+            $applicantData = $webhookService->fetchApplicantByStudentNumber($referenceNumber);
+
+            if (!$applicantData) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Applicant not found.'
+                ], 404);
+            }
+
+            $studentId = $applicantData['idp_user_id'] ?? $referenceNumber;
+
+            // Send medical clearance webhook (approval)
+            $webhookResult = $webhookService->sendMedicalClearance($referenceNumber, $studentId, true);
+
+            if ($webhookResult['success']) {
+                Log::info('Applicant approved successfully', [
+                    'reference_number' => $referenceNumber,
+                    'student_id' => $studentId,
+                    'user_id' => auth()->id(),
+                ]);
+
+                // Log approval to audit trail
+                ActivityLog::create([
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()?->name ?? auth()->user()?->email ?? 'System',
+                    'user_role' => strtolower((string) (auth()->user()?->user_role ?? '')),
+                    'action' => 'Applicant Approval',
+                    'module' => 'Patient Intake',
+                    'event_type' => 'applicant_approval',
+                    'description' => "Applicant approved: {$referenceNumber} (Student ID: {$studentId})",
+                    'route_name' => optional($request->route())->getName(),
+                    'http_method' => 'POST',
+                    'request_path' => '/admin/walkin/approve-applicant',
+                    'status_code' => 200,
+                    'subject_type' => 'applicant',
+                    'subject_id' => $referenceNumber,
+                    'metadata' => [
+                        'reference_number' => $referenceNumber,
+                        'student_id' => $studentId,
+                        'webhook_status' => 'success',
+                    ],
+                    'ip_address' => $request->ip(),
+                    'user_agent' => substr((string) $request->userAgent(), 0, 255),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Applicant approved successfully. Webhook sent to PUPTAS.'
+                ]);
+            } else {
+                Log::warning('Applicant approval webhook failed', [
+                    'reference_number' => $referenceNumber,
+                    'student_id' => $studentId,
+                    'error' => $webhookResult['message'],
+                    'user_id' => auth()->id(),
+                ]);
+
+                // Log failed approval to audit trail
+                ActivityLog::create([
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()?->name ?? auth()->user()?->email ?? 'System',
+                    'user_role' => strtolower((string) (auth()->user()?->user_role ?? '')),
+                    'action' => 'Applicant Approval',
+                    'module' => 'Patient Intake',
+                    'event_type' => 'applicant_approval',
+                    'description' => "Applicant approval failed: {$referenceNumber} - " . $webhookResult['message'],
+                    'route_name' => optional($request->route())->getName(),
+                    'http_method' => 'POST',
+                    'request_path' => '/admin/walkin/approve-applicant',
+                    'status_code' => 422,
+                    'subject_type' => 'applicant',
+                    'subject_id' => $referenceNumber,
+                    'metadata' => [
+                        'reference_number' => $referenceNumber,
+                        'student_id' => $studentId,
+                        'webhook_status' => 'failed',
+                        'error' => $webhookResult['message'],
+                    ],
+                    'ip_address' => $request->ip(),
+                    'user_agent' => substr((string) $request->userAgent(), 0, 255),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Approval processed but webhook failed: ' . $webhookResult['message']
+                ], 422);
+            }
+        } catch (\Exception $e) {
+            Log::error('Applicant approval exception', [
+                'error' => $e->getMessage(),
+                'reference_number' => $request->input('reference_number'),
+                'user_id' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during approval: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

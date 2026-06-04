@@ -4684,6 +4684,8 @@
             });
         }
 
+        let isApprovalMode = false;
+
         function doLookup() {
             const ref = (refInput ? refInput.value : '').trim();
             if (!ref) {
@@ -4700,7 +4702,13 @@
             .then(r => r.json())
             .then(data => {
                 if (data.status === 'preview' || data.status === 'found') {
-                    const applicantName = data.student_name || '';
+                    // Try multiple field name variations for applicant name
+                    let applicantName = data.student_name || data.name || data.full_name || '';
+                    if (!applicantName && data.first_name) {
+                        const lastName = data.last_name ? ' ' + data.last_name : '';
+                        applicantName = data.first_name + lastName;
+                    }
+
                     currentLookupRef = data.student_number || ref;
                     setStatus('success', applicantName ? 'Applicant found: ' + applicantName + '.' : 'Applicant found.');
                     if (foundCard && foundName) {
@@ -4708,11 +4716,61 @@
                         foundCard.style.display = 'block';
                     }
                     showLookupDetails(data, ref);
+
+                    // Change button to Approve mode
+                    isApprovalMode = true;
+                    if (findBtn) {
+                        findBtn.textContent = 'Approve';
+                        findBtn.removeEventListener('click', doLookup);
+                        findBtn.addEventListener('click', doApprove);
+                    }
                 } else {
                     setStatus('error', data.message || 'No applicant found with that reference number.');
                 }
             })
             .catch(() => setStatus('error', 'Unable to look up right now. Please try again.'));
+        }
+
+        function doApprove() {
+            if (!currentLookupRef) {
+                setStatus('error', 'No applicant to approve.');
+                return;
+            }
+
+            setStatus('info', 'Approving applicant...');
+
+            fetch("{{ route('admin.walkin.approve_applicant') }}", {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    reference_number: currentLookupRef
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setStatus('success', 'Applicant approved successfully.');
+                    // Reset to Find mode after a short delay
+                    setTimeout(() => {
+                        isApprovalMode = false;
+                        if (findBtn) {
+                            findBtn.textContent = 'Find';
+                            findBtn.removeEventListener('click', doApprove);
+                            findBtn.addEventListener('click', doLookup);
+                        }
+                        resetLookupState();
+                        if (refInput) refInput.value = '';
+                    }, 1500);
+                } else {
+                    setStatus('error', data.message || 'Failed to approve applicant.');
+                }
+            })
+            .catch(() => setStatus('error', 'Unable to approve right now. Please try again.'));
         }
 
         if (openBtn) openBtn.addEventListener('click', function (e) { e.preventDefault(); openApplicantsModal(); });

@@ -1301,7 +1301,7 @@ class LoginController extends Controller
                     'error_description' => $request->query('error_description'),
                 ]);
 
-                return view('landing');
+                return redirect()->route('landing');
             }
 
             $errorDescription = trim((string) $request->query('error_description', ''));

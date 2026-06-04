@@ -147,6 +147,26 @@
             pointer-events: none;
         }
 
+        .info-login-swap .portal-btn,
+        .info-login-swap .help-btn {
+            height: 54px !important;
+            padding: 0 24px !important;
+            font-size: 15px !important;
+            gap: 10px !important;
+            display: inline-flex !important;
+            line-height: 1 !important;
+        }
+
+        .info-login-swap .portal-btn svg {
+            width: 18px !important;
+            height: 18px !important;
+        }
+
+        .info-login-swap .help-btn svg {
+            width: 18px !important;
+            height: 18px !important;
+        }
+
         .landing-panel.is-help .info-default {
             opacity: 0;
             transform: translateX(-22px);

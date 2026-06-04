@@ -1420,7 +1420,7 @@
                         placeholder="Search by student name or ID..."
                     >
                 </div>
-                <button type="button" class="health-records-search-toggle" id="healthRecordsSearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="recordSearch" onclick="toggleHealthSearch();">
+                <button type="button" class="health-records-search-toggle" id="healthRecordsSearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="recordSearch" onclick="document.getElementById('healthRecordsSearchShell').classList.toggle('is-open'); document.getElementById('recordSearch').focus();">
                     <x-outline-icon name="magnifying-glass" />
                 </button>
             </div>
@@ -1567,11 +1567,11 @@
 </div>
 
 {{-- Awaiting Links Modal --}}
-<div id="awaitingLinksModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+<div id="awaitingLinksModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;" onclick="if(event.target.id==='awaitingLinksModal') document.getElementById('awaitingLinksModal').style.display='none';">
     <div style="background: white; border-radius: 12px; width: min(900px, 95%); max-height: 90vh; overflow-y: auto; box-shadow: 0 26px 60px rgba(15, 23, 42, 0.24);">
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; background: white;">
             <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #111827;">Awaiting Links</h3>
-            <button type="button" id="closeAwaitingLinksModal" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #64748b;">✕</button>
+            <button type="button" id="closeAwaitingLinksModal" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #64748b;" onclick="document.getElementById('awaitingLinksModal').style.display='none';">✕</button>
         </div>
         <div style="padding: 24px;">
             @if(count($approvedApplicants) > 0)

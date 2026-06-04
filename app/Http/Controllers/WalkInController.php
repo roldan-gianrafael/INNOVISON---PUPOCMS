@@ -230,6 +230,13 @@ class WalkInController extends Controller
             $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
         }
 
+        \Log::debug('Name extraction results', [
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'fullName' => $fullName,
+            'applicantAllKeys' => array_keys($applicant),
+        ]);
+
         $fallbackFirstName = $firstName !== '' ? $firstName : 'Applicant';
         $fallbackLastName = $lastName !== '' ? $lastName : 'User';
         $fallbackFullName = $fullName !== '' ? $fullName : trim($fallbackFirstName . ' ' . $fallbackLastName);

@@ -4851,6 +4851,8 @@
             if (uploadStudentNo) uploadStudentNo.value = '';
             if (uploadInput) uploadInput.value = '';
             currentLookupRef = '';
+            if (defaultPane) defaultPane.style.display = 'flex';
+            if (entryPane) entryPane.style.display = 'none';
         }
 
         function openApplicantsModal() {
@@ -4965,6 +4967,10 @@
                         foundCard.style.display = 'block';
                     }
                     showLookupDetails(data, ref);
+
+                    // Hide input sections and show only results
+                    if (defaultPane) defaultPane.style.display = 'none';
+                    if (entryPane) entryPane.style.display = 'none';
 
                     // Change button to Approve mode
                     isApprovalMode = true;

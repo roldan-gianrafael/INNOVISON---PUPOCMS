@@ -1457,12 +1457,23 @@
             </div>
         </div>
         <div class="summary-item">
-            <button type="button" class="card p-3" id="awaitingLinksBtn" style="padding: 15px 24px !important; border-left: 5px solid #0369a1; background: none; border: none; cursor: pointer; width: 100%; text-align: left; transition: all 0.3s ease;">
-                <div class="health-summary-row">
-                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
-                    <h3 class="fw-bold mb-0" style="color: #0369a1;">{{ count($approvedApplicants) }}</h3>
+            <button type="button" id="awaitingLinksBtn" style="padding: 15px 24px !important; background: #fff; border: 1px solid #e2e8f0; border-left: 5px solid #0369a1; border-radius: 12px; cursor: pointer; width: 100%; text-align: left; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <small style="color: #64748b; font-weight: 800; text-transform: uppercase; font-size: 11px; display: block;"><span>Awaiting</span></small>
+                        <small style="color: #64748b; font-weight: 800; text-transform: uppercase; font-size: 11px; display: block;"><span>Links</span></small>
+                    </div>
+                    <h3 style="margin: 0; color: #0369a1; font-weight: 700; font-size: 24px;">{{ count($approvedApplicants) }}</h3>
                 </div>
             </button>
+            <style>
+                #awaitingLinksBtn:hover {
+                    border-left-color: #0369a1;
+                    box-shadow: 0 8px 20px rgba(3, 105, 161, 0.15);
+                    transform: translateY(-2px);
+                    background: #f0f9ff;
+                }
+            </style>
         </div>
     </div>
 

@@ -1412,9 +1412,6 @@
                     <x-outline-icon name="magnifying-glass" />
                 </button>
             </div>
-            <button type="button" class="health-filter-toggle" id="healthFilterToggle" aria-expanded="false" aria-controls="healthFilterModal">
-                Filter Health Forms
-            </button>
         </div>
     </div>
 

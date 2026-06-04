@@ -301,6 +301,9 @@ class WalkInController extends Controller
 
         if ($persist) {
             $user->save();
+
+            // Link any pending medical assessments for this applicant
+            $this->linkPendingMedicalAssessments($user, $email);
         }
 
         return $user;
@@ -1101,6 +1104,36 @@ PROMPT;
                 'success' => false,
                 'message' => 'An error occurred during approval: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    private function linkPendingMedicalAssessments(User $user, string $email): void
+    {
+        if (!class_exists('App\Models\PendingMedicalAssessment')) {
+            return;
+        }
+
+        try {
+            $pendingAssessments = \App\Models\PendingMedicalAssessment::where('email', $email)
+                ->whereNull('user_id')
+                ->get();
+
+            foreach ($pendingAssessments as $assessment) {
+                $assessment->update(['user_id' => $user->id]);
+
+                \Log::info('Linked pending medical assessment to user', [
+                    'user_id' => $user->id,
+                    'assessment_id' => $assessment->id,
+                    'reference_number' => $assessment->reference_number,
+                    'email' => $email,
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Failed to link pending medical assessments', [
+                'user_id' => $user->id,
+                'email' => $email,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

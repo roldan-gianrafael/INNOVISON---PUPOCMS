@@ -1498,6 +1498,99 @@ class LoginController extends Controller
         return view('login');
     }
 
+    public function handleWorkspaceGateway(Request $request)
+    {
+        Log::info('[WORKSPACE GATEWAY] Handling workspace gateway request');
+
+        // STEP 1: Check standard Laravel session guards (full server-side access)
+        $user = null;
+        $guard = null;
+
+        if (Auth::guard($this->adminGuardName())->check()) {
+            $user = Auth::guard($this->adminGuardName())->user();
+            $guard = $this->adminGuardName();
+            Log::info('[WORKSPACE GATEWAY] Found user in admin guard');
+        } elseif (Auth::guard($this->studentGuardName())->check()) {
+            $user = Auth::guard($this->studentGuardName())->user();
+            $guard = $this->studentGuardName();
+            Log::info('[WORKSPACE GATEWAY] Found user in student guard');
+        } elseif (Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user();
+            $guard = 'web';
+            Log::info('[WORKSPACE GATEWAY] Found user in web guard');
+        }
+
+        // STEP 2: FALLBACK - If no session detected, check for IDP access token
+        if (!$user instanceof User && (bool) config('services.idp.enabled', false)) {
+            Log::info('[WORKSPACE GATEWAY] No session found in guards, checking IDP token cookie');
+            $accessTokenCookieName = trim((string) config('services.idp.access_cookie_name', 'access_token'));
+            $accessToken = $request->cookie($accessTokenCookieName);
+
+            if ($accessToken && $accessToken !== '') {
+                Log::info('[WORKSPACE GATEWAY] Found IDP access token in cookie');
+                // Validate token by fetching user profile from IDP
+                $idpProfile = $this->fetchProfileFromIdp($accessToken);
+
+                if ($idpProfile !== null) {
+                    $email = trim((string) ($idpProfile['email'] ?? ''));
+
+                    // Look up user in local database by email
+                    if ($email !== '') {
+                        $user = User::query()->where('email', $email)->first();
+
+                        if ($user instanceof User) {
+                            // Determine which guard based on user role
+                            $guard = $this->guardForUser($user);
+                            Log::info('[WORKSPACE GATEWAY] Found user via IDP token', [
+                                'user_id' => $user->id,
+                                'guard' => $guard,
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // STEP 3: If still no user found, redirect to landing page with auth_error flag
+        if (!$user instanceof User) {
+            Log::warning('[WORKSPACE GATEWAY] No authenticated user found - redirecting to landing with auth_error');
+            return redirect('/?auth_error=true');
+        }
+
+        // STEP 4: Route based on user role
+        $normalizedRole = User::normalizeRole((string) ($user->user_role ?? ''));
+        $isStudentAssistant = $this->isStudentAssistantAccount($user);
+
+        Log::info('[WORKSPACE GATEWAY] Routing user', [
+            'user_id' => $user->id,
+            'role' => $normalizedRole,
+            'is_sa' => $isStudentAssistant,
+        ]);
+
+        // Superadmin or Admin - redirect to dashboard
+        if ($normalizedRole === User::ROLE_SUPERADMIN || $normalizedRole === User::ROLE_ADMIN) {
+            if ($isStudentAssistant) {
+                Log::info('[WORKSPACE GATEWAY] Redirecting Student Assistant to landing with workspace selector');
+                // Student Assistant - show workspace selector
+                return redirect('/?workspace=sa');
+            } else {
+                Log::info('[WORKSPACE GATEWAY] Redirecting Admin to /admin/dashboard');
+                // Regular admin - go to dashboard
+                return redirect('/admin/dashboard');
+            }
+        }
+
+        // Student - redirect to student side
+        if ($normalizedRole === User::ROLE_STUDENT) {
+            Log::info('[WORKSPACE GATEWAY] Redirecting Student to landing with student indicator');
+            return redirect('/?workspace=student');
+        }
+
+        // Unknown role - redirect to landing
+        Log::info('[WORKSPACE GATEWAY] Unknown role - redirecting to landing');
+        return redirect('/');
+    }
+
     public function apiCheckSession(Request $request)
     {
         $user = null;

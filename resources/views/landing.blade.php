@@ -1023,13 +1023,13 @@
 
                         <!-- Guest State Buttons -->
                         <div id="guestButtons" style="display: grid; gap: 12px;">
-                            <button type="button" id="viewClinicWorkspaceBtn" class="portal-btn" onclick="handleViewClinicWorkspace(event)">
+                            <a href="{{ route('workspace.gateway') }}" class="portal-btn" id="viewClinicWorkspaceBtn">
                                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                     <path d="M3 12l9-9 9 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M5 10v10a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1v-10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                                 <span>View Clinic Workspace</span>
-                            </button>
+                            </a>
 
                             <button class="help-btn" type="button" id="landingNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
                                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1141,7 +1141,7 @@
     </main>
     @include('partials.system_footer')
     <script>
-        // ============ PRELOADER & SESSION CHECK ============
+        // ============ PRELOADER & URL PARAMETER CHECK ============
         const preloader = document.getElementById('preloader');
         const guestButtons = document.getElementById('guestButtons');
         const authButtons = document.getElementById('authButtons');
@@ -1152,65 +1152,54 @@
         const helpButtons = Array.from(document.querySelectorAll('.help-btn'));
         let isHelpMode = false;
 
-        // Initialize: Show preloader, check session
+        // Initialize: Show preloader, check URL parameters from gateway
         function initializeLanding() {
             if (preloader) {
                 preloader.classList.remove('hidden');
             }
-            checkSessionStatus();
+
+            // Check URL parameters set by the workspace gateway
+            checkGatewayParameters();
+            hidePreloader();
         }
 
-        // Async session check with detailed debugging
-        function checkSessionStatus() {
-            console.log('[LANDING] Starting session check...');
-            console.log('[LANDING] Document cookies:', document.cookie);
+        // Read URL parameters set by the workspace gateway route
+        function checkGatewayParameters() {
+            console.log('[LANDING] Checking gateway parameters...');
+            const urlParams = new URLSearchParams(window.location.search);
 
-            fetch('/api/check-session', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'include'
-            })
-            .then(response => {
-                console.log('[LANDING] API response status:', response.status);
-                console.log('[LANDING] API response headers:', response.headers);
-                return response.json();
-            })
-            .then(data => {
-                console.log('[LANDING] ✅ Session check RESPONSE:', JSON.stringify(data, null, 2));
-                console.log('[LANDING] authenticated =', data.authenticated);
-                console.log('[LANDING] role =', data.role);
-                console.log('[LANDING] isStudentAssistant =', data.isStudentAssistant);
+            const workspaceParam = urlParams.get('workspace');
+            const authErrorParam = urlParams.get('auth_error');
 
-                if (data.authenticated === true) {
-                    console.log('[LANDING] ✅ User IS authenticated - showing auth UI');
-                    updateUIForAuthenticated(data);
-                } else {
-                    console.log('[LANDING] ❌ User is NOT authenticated - showing guest UI');
-                    updateUIForGuest();
-                }
-                hidePreloader();
-            })
-            .catch(error => {
-                console.error('[LANDING] ❌ Session check FAILED:', error);
-                console.error('[LANDING] Error stack:', error.stack);
+            console.log('[LANDING] URL Params - workspace:', workspaceParam, 'auth_error:', authErrorParam);
+
+            // If auth_error=true, show login prompt
+            if (authErrorParam === 'true') {
+                console.log('[LANDING] Gateway returned auth_error - showing login prompt');
+                showLoginPrompt();
+                return;
+            }
+
+            // If workspace=sa, show Student Assistant selector
+            if (workspaceParam === 'sa') {
+                console.log('[LANDING] Gateway returned workspace=sa - showing SA workspace selector');
+                showStudentAssistantSelector();
+                return;
+            }
+
+            // If workspace=student, show guest buttons (student will navigate)
+            if (workspaceParam === 'student') {
+                console.log('[LANDING] Gateway returned workspace=student - showing guest UI');
                 updateUIForGuest();
-                hidePreloader();
-            });
+                return;
+            }
+
+            // Default: show guest buttons
+            updateUIForGuest();
         }
 
         function updateUIForGuest() {
             // Show login buttons (View Clinic Workspace)
-            if (guestButtons) guestButtons.style.display = 'grid';
-            if (authButtons) authButtons.style.display = 'none';
-            if (saSelector) saSelector.classList.remove('visible');
-        }
-
-        function updateUIForAuthenticated(sessionData) {
-            // On initial page load, always show the primary button
-            // The workspace selector only appears when the user clicks the button (for SAs)
             if (guestButtons) guestButtons.style.display = 'grid';
             if (authButtons) authButtons.style.display = 'none';
             if (saSelector) saSelector.classList.remove('visible');
@@ -1222,68 +1211,6 @@
                     preloader.classList.add('hidden');
                 }, 200);
             }
-        }
-
-        // Handle "View Clinic Workspace" button click - validates session and routes based on role
-        function handleViewClinicWorkspace(event) {
-            event.preventDefault();
-            console.log('[LANDING] "View Clinic Workspace" button clicked - validating session...');
-
-            // Show a loading state
-            const btn = document.getElementById('viewClinicWorkspaceBtn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px; animation: spin 1s linear infinite;" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-linecap="round" opacity="0.3"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>Validating access...</span>';
-
-            fetch('/api/check-session', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('[LANDING] Session validation result:', data);
-                console.log('[LANDING] Role:', data.role);
-                console.log('[LANDING] Is Student Assistant:', data.isStudentAssistant);
-
-                if (data.authenticated === true) {
-                    console.log('[LANDING] ✅ User authenticated');
-
-                    // Route based on role
-                    const role = (data.role || '').toLowerCase().trim();
-
-                    if (role === 'superadmin' || role === 'admin') {
-                        console.log('[LANDING] Redirecting Admin/Superadmin to /admin/dashboard');
-                        window.location.href = 'https://clinic-ms.inaebsit2027.com/admin/dashboard';
-                    } else if (data.isStudentAssistant === true) {
-                        console.log('[LANDING] Showing Student Assistant workspace selector');
-                        btn.disabled = false;
-                        btn.innerHTML = originalText;
-                        showStudentAssistantSelector();
-                    } else if (role === 'student') {
-                        console.log('[LANDING] Redirecting Student to /student/home');
-                        window.location.href = '/student/home';
-                    } else {
-                        console.log('[LANDING] Unknown role, attempting redirect path lookup');
-                        redirectToAppropriateDestination();
-                    }
-                } else {
-                    // User not authenticated - show alert and redirect to One Portal
-                    console.log('[LANDING] ❌ User not authenticated - showing login prompt');
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                    showLoginPrompt();
-                }
-            })
-            .catch(error => {
-                console.error('[LANDING] Session validation failed:', error);
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                showLoginPrompt();
-            });
         }
 
         // Show Student Assistant workspace selector modal
@@ -1557,26 +1484,6 @@
                     modal.remove();
                 }
             });
-        }
-
-        // Fallback: redirect to appropriate destination using API
-        function redirectToAppropriateDestination() {
-            console.log('[LANDING] Using fallback redirect path lookup');
-            fetch('/api/get-redirect-path', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.redirectPath) {
-                    window.location.href = data.redirectPath;
-                }
-            })
-            .catch(err => console.error('Redirect path lookup failed:', err));
         }
 
         // Handle "View Homepage" click for non-SA users

@@ -111,6 +111,10 @@ Route::post('/system-admin/emergency-login', [EmergencyAuthController::class, 'l
 Route::post('/register-action', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// --- WORKSPACE GATEWAY (Server-side session check) ---
+// Direct page request that bypasses JavaScript cookie restrictions
+Route::get('/clinic-workspace/gateway', [LoginController::class, 'handleWorkspaceGateway'])->name('workspace.gateway');
+
 // --- API ROUTES (For AJAX/Frontend) ---
 // These routes MUST have session middleware to access Auth guards
 // Using explicit middleware stack to ensure StartSession runs

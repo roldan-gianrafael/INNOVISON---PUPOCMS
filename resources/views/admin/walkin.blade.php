@@ -4852,7 +4852,7 @@
             if (uploadInput) uploadInput.value = '';
             currentLookupRef = '';
             if (defaultPane) defaultPane.style.display = 'flex';
-            if (entryPane) entryPane.style.display = 'none';
+            if (entryPane) entryPane.classList.remove('is-visible');
         }
 
         function openApplicantsModal() {

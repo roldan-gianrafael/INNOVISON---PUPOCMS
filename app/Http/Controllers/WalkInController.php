@@ -488,7 +488,9 @@ class WalkInController extends Controller
             $applicant = $lookupResult['data'] ?? null;
 
             if (is_array($applicant)) {
-                $student = $this->resolveLocalUserFromApplicant($applicant, !$previewOnly, $lookup);
+                // Always persist the user so it can be found during upload
+                // Even in preview mode, we need the user saved for reference
+                $student = $this->resolveLocalUserFromApplicant($applicant, true, $lookup);
             }
 
             // Log the reference lookup attempt

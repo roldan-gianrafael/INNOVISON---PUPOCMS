@@ -183,13 +183,17 @@ class WalkInController extends Controller
         return $candidate;
     }
 
-    private function resolveLocalUserFromApplicant(array $applicant, bool $persist = true): User
+    private function resolveLocalUserFromApplicant(array $applicant, bool $persist = true, ?string $referenceNumber = null): User
     {
-        \Log::debug('PUPTAS applicant data', ['applicant' => $applicant]);
+        \Log::debug('PUPTAS applicant data', ['applicant' => $applicant, 'referenceNumber' => $referenceNumber]);
 
         $studentNumber = trim((string) data_get($applicant, 'student_number'));
         $idpUserId = trim((string) data_get($applicant, 'idp_user_id'));
         $email = trim((string) data_get($applicant, 'email'));
+
+        if ($studentNumber === '' && $referenceNumber !== '') {
+            $studentNumber = trim($referenceNumber);
+        }
 
         \Log::debug('Extracted fields', [
             'studentNumber' => $studentNumber,
@@ -465,7 +469,7 @@ class WalkInController extends Controller
             $applicant = $lookupResult['data'] ?? null;
 
             if (is_array($applicant)) {
-                $student = $this->resolveLocalUserFromApplicant($applicant, !$previewOnly);
+                $student = $this->resolveLocalUserFromApplicant($applicant, !$previewOnly, $lookup);
             }
 
             // Log the reference lookup attempt

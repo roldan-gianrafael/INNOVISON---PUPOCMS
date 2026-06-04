@@ -1439,7 +1439,6 @@
     </div>
 
     {{-- Main Table Card --}}
-@if($records->count() > 0)
 <div class="card health-summary-card">
     <div class="health-table-head">
         <div class="health-table-title">Health Profile Summary</div>
@@ -1450,8 +1449,8 @@
                 <th>ID Number</th>
                 <th>Full Name</th>
                 <th>Course / Yr / Sec</th>
-                <th>Medical Condition</th> 
-                <th>Clearance Status</th> 
+                <th>Medical Condition</th>
+                <th>Clearance Status</th>
                 <th>Submitted At</th>
                 <th style="text-align: center;">Actions</th>
             </tr>
@@ -1526,7 +1525,6 @@
         </tbody>
     </table>
 </div>
-@endif
 
 <div class="verify-approval-modal" id="verifyApprovalModal" aria-hidden="true">
     <div class="verify-approval-modal-card">

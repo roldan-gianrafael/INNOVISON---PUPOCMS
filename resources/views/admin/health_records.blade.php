@@ -129,25 +129,33 @@
     .awaiting-links-modal-close::before {
         content: '';
         position: absolute;
-        top: 50%;
-        left: -100%;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        background: #facc15;
-        transform: translateY(-50%);
-        transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        z-index: -1;
+        background: linear-gradient(90deg,
+            rgba(255, 248, 196, 0) 0%,
+            rgba(255, 239, 181, 0.14) 22%,
+            rgba(255, 239, 181, 0.52) 48%,
+            rgba(255, 239, 181, 0.14) 72%,
+            rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        border-radius: 50%;
+        z-index: 0;
     }
     .awaiting-links-modal-close:hover {
         color: #70131B;
+        background: #facc15;
+        border-color: #facc15;
     }
     .awaiting-links-modal-close:hover::before {
-        left: 100%;
+        transform: translateX(135%);
     }
     .awaiting-links-modal-close svg {
         width: 20px;
         height: 20px;
-        stroke-width: 2;
+        stroke-width: 2.5;
         stroke: currentColor;
         fill: none;
         position: relative;
@@ -1636,7 +1644,7 @@
             </div>
         </div>
         <div class="summary-item">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 8px 24px !important; border-left: none;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 4px 24px !important; border-left: none;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
                 <div class="health-summary-row" style="display: flex; align-items: center; gap: 12px;">
                     <div style="font-size: 24px; color: #70131B;">
                         <x-outline-icon name="link" />

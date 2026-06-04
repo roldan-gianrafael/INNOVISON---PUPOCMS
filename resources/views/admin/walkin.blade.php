@@ -4858,8 +4858,12 @@
             const lookupRow = document.querySelector('.applicant-ref-lookup-row');
             if (lookupRow) lookupRow.style.display = 'flex';
 
-            const actionButtons = document.querySelector('.applicant-ref-actions');
-            if (actionButtons) actionButtons.style.display = 'flex';
+            // Reset button text and events back to Find mode
+            if (findBtn) {
+                findBtn.textContent = 'Find';
+                findBtn.removeEventListener('click', doApprove);
+                findBtn.addEventListener('click', doLookup);
+            }
 
             const modalBody = document.querySelector('.applicant-modal-body');
             if (modalBody) {
@@ -5002,12 +5006,9 @@
                     // Hide input sections and show only results
                     if (defaultPane) defaultPane.style.display = 'none';
 
-                    // Hide only the input form row and action buttons, not the entire entryPane
+                    // Hide only the input form row, keep action buttons visible
                     const lookupRow = document.querySelector('.applicant-ref-lookup-row');
                     if (lookupRow) lookupRow.style.display = 'none';
-
-                    const actionButtons = document.querySelector('.applicant-ref-actions');
-                    if (actionButtons) actionButtons.style.display = 'none';
 
                     // Change button to Approve mode
                     isApprovalMode = true;

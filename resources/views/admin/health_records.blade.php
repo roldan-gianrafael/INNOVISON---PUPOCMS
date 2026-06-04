@@ -14,12 +14,12 @@
         height: 100%; /* Para pantay ang taas nila */
     }
     .awaiting-links-btn {
-        background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%) !important;
-        border: 1px solid #e0f2fe !important;
-        border-left: 5px solid #0369a1 !important;
+        background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c) !important;
+        border: 1px solid #991b1b !important;
+        color: #ffffff !important;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(112, 19, 27, 0.2);
         position: relative;
         overflow: hidden;
         height: 100%;
@@ -32,21 +32,28 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        transition: left 0.6s ease;
-    }
-    .awaiting-links-btn:hover::before {
-        left: 100%;
+        background: linear-gradient(90deg,
+            rgba(255, 248, 196, 0) 0%,
+            rgba(255, 239, 181, 0.14) 22%,
+            rgba(255, 239, 181, 0.52) 48%,
+            rgba(255, 239, 181, 0.14) 72%,
+            rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.5s ease;
+        z-index: -1;
     }
     .awaiting-links-btn:hover {
-        box-shadow: 0 8px 20px rgba(3, 105, 161, 0.15);
-        transform: translateY(-2px);
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
-        border-color: #0369a1 !important;
+        transform: translateY(-1px);
+        background: #facc15 !important;
+        color: #111827 !important;
+        border-color: #facc15 !important;
+        box-shadow: 0 14px 24px rgba(112, 19, 27, 0.2);
+    }
+    .awaiting-links-btn:hover::before {
+        transform: translateX(135%);
     }
     .awaiting-links-btn:active {
         transform: translateY(0);
-        box-shadow: 0 4px 12px rgba(3, 105, 161, 0.1);
     }
 
     /* Awaiting Links Modal Styling */
@@ -1629,10 +1636,15 @@
             </div>
         </div>
         <div class="summary-item">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 8px 24px !important; border-left: 5px solid #0369a1;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
-                <div class="health-summary-row">
-                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
-                    <h3 class="fw-bold mb-0" style="color: #0369a1;">{{ count($approvedApplicants) }}</h3>
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 8px 24px !important; border-left: none;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
+                <div class="health-summary-row" style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 24px; color: #70131B;">
+                        <x-outline-icon name="link" />
+                    </div>
+                    <div>
+                        <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
+                        <h3 class="fw-bold mb-0" style="color: #111827;">{{ count($approvedApplicants) }}</h3>
+                    </div>
                 </div>
             </button>
         </div>

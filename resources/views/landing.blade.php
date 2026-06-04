@@ -1023,14 +1023,13 @@
 
                         <!-- Guest State Buttons -->
                         <div id="guestButtons" style="display: grid; gap: 12px;">
-                            <a class="portal-btn" href="{{ route('login.portal') }}">
+                            <button type="button" id="viewClinicWorkspaceBtn" class="portal-btn" onclick="handleViewClinicWorkspace(event)">
                                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M3 12l9-9 9 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M5 10v10a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1v-10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
-                                <span>Login via One Portal</span>
-                            </a>
+                                <span>View Clinic Workspace</span>
+                            </button>
 
                             <button class="help-btn" type="button" id="landingNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
                                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1203,26 +1202,18 @@
         }
 
         function updateUIForGuest() {
-            // Show login buttons
+            // Show login buttons (View Clinic Workspace)
             if (guestButtons) guestButtons.style.display = 'grid';
             if (authButtons) authButtons.style.display = 'none';
             if (saSelector) saSelector.classList.remove('visible');
         }
 
         function updateUIForAuthenticated(sessionData) {
-            // Hide guest buttons
-            if (guestButtons) guestButtons.style.display = 'none';
-
-            // Check if user is student assistant (exact JSON structure check)
-            if (sessionData.isStudentAssistant === true) {
-                // Show SA workspace selector directly
-                if (authButtons) authButtons.style.display = 'none';
-                if (saSelector) saSelector.classList.add('visible');
-            } else {
-                // Show View Homepage button for regular users (superadmin, admin, student)
-                if (authButtons) authButtons.style.display = 'grid';
-                if (saSelector) saSelector.classList.remove('visible');
-            }
+            // On initial page load, always show the primary button
+            // The workspace selector only appears when the user clicks the button (for SAs)
+            if (guestButtons) guestButtons.style.display = 'grid';
+            if (authButtons) authButtons.style.display = 'none';
+            if (saSelector) saSelector.classList.remove('visible');
         }
 
         function hidePreloader() {
@@ -1231,6 +1222,361 @@
                     preloader.classList.add('hidden');
                 }, 200);
             }
+        }
+
+        // Handle "View Clinic Workspace" button click - validates session and routes based on role
+        function handleViewClinicWorkspace(event) {
+            event.preventDefault();
+            console.log('[LANDING] "View Clinic Workspace" button clicked - validating session...');
+
+            // Show a loading state
+            const btn = document.getElementById('viewClinicWorkspaceBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px; animation: spin 1s linear infinite;" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-linecap="round" opacity="0.3"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>Validating access...</span>';
+
+            fetch('/api/check-session', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('[LANDING] Session validation result:', data);
+                console.log('[LANDING] Role:', data.role);
+                console.log('[LANDING] Is Student Assistant:', data.isStudentAssistant);
+
+                if (data.authenticated === true) {
+                    console.log('[LANDING] ✅ User authenticated');
+
+                    // Route based on role
+                    const role = (data.role || '').toLowerCase().trim();
+
+                    if (role === 'superadmin' || role === 'admin') {
+                        console.log('[LANDING] Redirecting Admin/Superadmin to /admin/dashboard');
+                        window.location.href = 'https://clinic-ms.inaebsit2027.com/admin/dashboard';
+                    } else if (data.isStudentAssistant === true) {
+                        console.log('[LANDING] Showing Student Assistant workspace selector');
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        showStudentAssistantSelector();
+                    } else if (role === 'student') {
+                        console.log('[LANDING] Redirecting Student to /student/home');
+                        window.location.href = '/student/home';
+                    } else {
+                        console.log('[LANDING] Unknown role, attempting redirect path lookup');
+                        redirectToAppropriateDestination();
+                    }
+                } else {
+                    // User not authenticated - show alert and redirect to One Portal
+                    console.log('[LANDING] ❌ User not authenticated - showing login prompt');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    showLoginPrompt();
+                }
+            })
+            .catch(error => {
+                console.error('[LANDING] Session validation failed:', error);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                showLoginPrompt();
+            });
+        }
+
+        // Show Student Assistant workspace selector modal
+        function showStudentAssistantSelector() {
+            console.log('[LANDING] Creating Student Assistant workspace selector');
+
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.id = 'saWorkspaceSelectorModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 23, 42, 0.6);
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeInOverlay 0.3s ease;
+            `;
+
+            const modalBox = document.createElement('div');
+            modalBox.style.cssText = `
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 230, 0.95));
+                border-radius: 24px;
+                padding: 48px 40px;
+                max-width: 480px;
+                width: 90%;
+                box-shadow: 0 28px 68px rgba(15, 23, 42, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                border: 1px solid rgba(112, 19, 27, 0.10);
+                text-align: center;
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                animation: slideInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            `;
+
+            const headingHTML = `
+                <div style="margin-bottom: 28px;">
+                    <p style="margin: 0 0 8px 0; color: #70131b; font-size: 12px; font-weight: 950; letter-spacing: 0.18em; text-transform: uppercase;">Choose Your Portal</p>
+                    <h2 style="margin: 0 0 12px 0; color: #70131b; font-size: 32px; line-height: 1.08; font-weight: 950;">Workspace Selection</h2>
+                    <p style="margin: 0; color: #64748b; font-size: 15px; line-height: 1.6;">Select which side you want to access today.</p>
+                </div>
+            `;
+
+            const studentsideButton = document.createElement('a');
+            studentsideButton.href = '/student/home';
+            studentsideButton.style.cssText = `
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 14px;
+                width: 100%;
+                padding: 18px 24px;
+                margin-bottom: 14px;
+                border-radius: 18px;
+                border: 1.5px solid #70131b;
+                background: linear-gradient(135deg, #70131b, #8f2230);
+                color: white;
+                font-size: 16px;
+                font-weight: 950;
+                text-decoration: none;
+                cursor: pointer;
+                transition: all 0.18s ease;
+                box-shadow: 0 12px 28px rgba(112, 19, 27, 0.18);
+            `;
+            studentsideButton.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" style="width: 22px; height: 22px; flex: 0 0 auto; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Go to Student Side</span>
+            `;
+            studentsideButton.addEventListener('mouseover', function() {
+                this.style.background = 'linear-gradient(135deg, #facc15, #fff1a8)';
+                this.style.color = '#70131b';
+                this.style.borderColor = '#facc15';
+                this.style.boxShadow = '0 16px 36px rgba(112, 19, 27, 0.22)';
+            });
+            studentsideButton.addEventListener('mouseout', function() {
+                this.style.background = 'linear-gradient(135deg, #70131b, #8f2230)';
+                this.style.color = 'white';
+                this.style.borderColor = '#70131b';
+                this.style.boxShadow = '0 12px 28px rgba(112, 19, 27, 0.18)';
+            });
+
+            const adminButton = document.createElement('a');
+            adminButton.href = 'https://clinic-ms.inaebsit2027.com/admin/dashboard';
+            adminButton.style.cssText = `
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 14px;
+                width: 100%;
+                padding: 18px 24px;
+                margin-bottom: 24px;
+                border-radius: 18px;
+                border: 1.5px solid #70131b;
+                background: linear-gradient(135deg, #70131b, #8f2230);
+                color: white;
+                font-size: 16px;
+                font-weight: 950;
+                text-decoration: none;
+                cursor: pointer;
+                transition: all 0.18s ease;
+                box-shadow: 0 12px 28px rgba(112, 19, 27, 0.18);
+            `;
+            adminButton.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" style="width: 22px; height: 22px; flex: 0 0 auto; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
+                    <path d="M12 2L2 7v10a8 8 0 0 0 8 8 8 8 0 0 0 8-8V7l-10-5z"/>
+                    <path d="M12 11v5M9 14h6"/>
+                </svg>
+                <span>Go to Admin/SA Side</span>
+            `;
+            adminButton.addEventListener('mouseover', function() {
+                this.style.background = 'linear-gradient(135deg, #facc15, #fff1a8)';
+                this.style.color = '#70131b';
+                this.style.borderColor = '#facc15';
+                this.style.boxShadow = '0 16px 36px rgba(112, 19, 27, 0.22)';
+            });
+            adminButton.addEventListener('mouseout', function() {
+                this.style.background = 'linear-gradient(135deg, #70131b, #8f2230)';
+                this.style.color = 'white';
+                this.style.borderColor = '#70131b';
+                this.style.boxShadow = '0 12px 28px rgba(112, 19, 27, 0.18)';
+            });
+
+            const footerHTML = `
+                <p style="margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.6;">PUP Taguig Clinic Management System</p>
+            `;
+
+            modalBox.innerHTML = headingHTML;
+            modalBox.appendChild(studentsideButton);
+            modalBox.appendChild(adminButton);
+            modalBox.innerHTML += footerHTML;
+
+            modal.appendChild(modalBox);
+            document.body.appendChild(modal);
+
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOverlay {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            if (!document.head.querySelector('style[data-landing-animations]')) {
+                style.setAttribute('data-landing-animations', 'true');
+                document.head.appendChild(style);
+            }
+
+            // Close modal on overlay click (but not on the box)
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    console.log('[LANDING] Closing SA workspace selector');
+                    modal.remove();
+                }
+            });
+        }
+
+        // Show modal/alert prompting user to login
+        function showLoginPrompt() {
+            console.log('[LANDING] Showing login prompt modal');
+
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 23, 42, 0.6);
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeInOverlay 0.3s ease;
+            `;
+
+            const modalBox = document.createElement('div');
+            modalBox.style.cssText = `
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 230, 0.95));
+                border-radius: 24px;
+                padding: 48px 40px;
+                max-width: 420px;
+                width: 90%;
+                box-shadow: 0 28px 68px rgba(15, 23, 42, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                border: 1px solid rgba(112, 19, 27, 0.10);
+                text-align: center;
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                animation: slideInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            `;
+
+            modalBox.innerHTML = `
+                <h2 style="margin: 0 0 12px 0; color: #70131b; font-size: 28px; line-height: 1.08; font-weight: 950;">Login Required</h2>
+                <p style="margin: 0 0 28px 0; color: #64748b; font-size: 15px; line-height: 1.6;">
+                    Please login to One Portal first to access the clinic management system.
+                </p>
+                <button id="loginNowBtn" style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    padding: 16px 32px;
+                    border-radius: 999px;
+                    border: 1.5px solid #70131b;
+                    background: linear-gradient(135deg, #70131b, #8f2230);
+                    color: white;
+                    font-size: 16px;
+                    font-weight: 950;
+                    cursor: pointer;
+                    transition: all 0.18s ease;
+                    box-shadow: 0 12px 28px rgba(112, 19, 27, 0.18);
+                    font-family: inherit;
+                ">
+                    <svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px; flex: 0 0 auto; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
+                        <path d="M10 17l5-5-5-5"/>
+                        <path d="M15 12H4"/>
+                        <path d="M20 4v16"/>
+                    </svg>
+                    <span>Login via One Portal</span>
+                </button>
+            `;
+
+            modal.appendChild(modalBox);
+            document.body.appendChild(modal);
+
+            // Add hover effect
+            const button = modalBox.querySelector('#loginNowBtn');
+            button.addEventListener('mouseover', function() {
+                this.style.background = 'linear-gradient(135deg, #facc15, #fff1a8)';
+                this.style.color = '#70131b';
+                this.style.borderColor = '#facc15';
+                this.style.boxShadow = '0 16px 36px rgba(112, 19, 27, 0.22)';
+            });
+            button.addEventListener('mouseout', function() {
+                this.style.background = 'linear-gradient(135deg, #70131b, #8f2230)';
+                this.style.color = 'white';
+                this.style.borderColor = '#70131b';
+                this.style.boxShadow = '0 12px 28px rgba(112, 19, 27, 0.18)';
+            });
+
+            // Handle button click
+            button.addEventListener('click', function() {
+                modal.remove();
+                window.location.href = '{{ route('login.portal') }}';
+            });
+
+            // Close modal on overlay click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // Fallback: redirect to appropriate destination using API
+        function redirectToAppropriateDestination() {
+            console.log('[LANDING] Using fallback redirect path lookup');
+            fetch('/api/get-redirect-path', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirectPath) {
+                    window.location.href = data.redirectPath;
+                }
+            })
+            .catch(err => console.error('Redirect path lookup failed:', err));
         }
 
         // Handle "View Homepage" click for non-SA users

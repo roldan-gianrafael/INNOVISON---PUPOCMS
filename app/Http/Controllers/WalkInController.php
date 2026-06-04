@@ -210,15 +210,27 @@ class WalkInController extends Controller
         // Try multiple field name variations for first and last name
         $firstName = trim((string) data_get($applicant, 'first_name'));
         if ($firstName === '') {
+            $firstName = trim((string) data_get($applicant, 'firstname'));
+        }
+        if ($firstName === '') {
             $firstName = trim((string) data_get($applicant, 'given_name'));
         }
 
         $lastName = trim((string) data_get($applicant, 'last_name'));
         if ($lastName === '') {
+            $lastName = trim((string) data_get($applicant, 'lastname'));
+        }
+        if ($lastName === '') {
             $lastName = trim((string) data_get($applicant, 'family_name'));
         }
         if ($lastName === '') {
             $lastName = trim((string) data_get($applicant, 'surname'));
+        }
+
+        // Include middle name if available
+        $middleName = trim((string) data_get($applicant, 'middlename'));
+        if ($middleName !== '' && $firstName !== '') {
+            $firstName = $firstName . ' ' . $middleName;
         }
 
         // If no separate first/last name, try to use full name

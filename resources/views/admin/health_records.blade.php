@@ -66,7 +66,7 @@
         justify-content: space-between;
         gap: 16px;
         padding: 24px;
-        background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+        background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c);
         color: #ffffff;
         border-bottom: 1px solid rgba(255,255,255,0.1);
     }
@@ -103,25 +103,46 @@
     }
     .awaiting-links-modal-close {
         flex: 0 0 auto;
-        background: rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.15);
         border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 10px;
-        width: 40px;
-        height: 40px;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #ffffff;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .awaiting-links-modal-close::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: #facc15;
+        transform: translateY(-50%);
+        transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: -1;
     }
     .awaiting-links-modal-close:hover {
-        background: rgba(255,255,255,0.2);
-        border-color: rgba(255,255,255,0.3);
+        color: #70131B;
+    }
+    .awaiting-links-modal-close:hover::before {
+        left: 100%;
     }
     .awaiting-links-modal-close svg {
         width: 20px;
         height: 20px;
+        stroke-width: 2;
+        stroke: currentColor;
+        fill: none;
+        position: relative;
+        z-index: 1;
     }
     .awaiting-links-modal-body {
         flex: 1;

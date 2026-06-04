@@ -3851,6 +3851,13 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 </div>
                 <div class="quick-actions-divider" aria-hidden="true"></div>
                 <div class="quick-action-item">
+                    <button type="button" class="quick-action-btn" onclick="if(typeof openApplicantsRefModal==='function')openApplicantsRefModal()" aria-label="Applicants Reference Lookup">
+                        <x-outline-icon name="magnifying-glass" />
+                    </button>
+                    <span class="quick-action-tooltip">Applicants</span>
+                </div>
+                <div class="quick-actions-divider" aria-hidden="true"></div>
+                <div class="quick-action-item">
                     <button type="button" class="quick-action-btn quick-action-bell" data-medicine-alert-toggle aria-label="Notifications">
                         <x-outline-icon name="bell" />
                         @if($adminNotificationCount > 0)

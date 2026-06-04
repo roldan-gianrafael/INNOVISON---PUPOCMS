@@ -120,7 +120,7 @@ Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPat
 // DEBUG ENDPOINT - Remove this after debugging
 Route::get('/api/debug-session', function (Request $request) {
     return response()->json([
-        'session_id' => $request->session()->getId(),
+        'session_id' => session()->getId(),
         'session_data' => session()->all(),
         'admin_check' => Auth::guard('admin')->check(),
         'admin_user' => Auth::guard('admin')->user() ? Auth::guard('admin')->user()->toArray() : null,

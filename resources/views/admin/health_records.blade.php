@@ -1439,6 +1439,7 @@
     </div>
 
     {{-- Main Table Card --}}
+@if($records->count() > 0)
 <div class="card health-summary-card">
     <div class="health-table-head">
         <div class="health-table-title">Health Profile Summary</div>
@@ -1525,92 +1526,90 @@
         </tbody>
     </table>
 </div>
+@endif
+
+{{-- Build uploaded documents list --}}
+@php
+    $uploadedDocuments = [];
+
+    // Collect health form uploads
+    foreach($records as $record) {
+        if (!empty($record->health_form_upload) && $record->clearance_status === 'Issued') {
+            $uploadedDocuments[] = [
+                'type' => 'Health Form',
+                'student_name' => $record->user->name,
+                'student_id' => $record->user->student_number ?: $record->user->student_id,
+                'file_name' => basename($record->health_form_upload),
+                'file_path' => asset('storage/' . $record->health_form_upload),
+                'uploaded_at' => $record->updated_at,
+            ];
+        }
+    }
+
+    // Collect pending medical assessments
+    try {
+        $pendingAssessments = \App\Models\PendingMedicalAssessment::get();
+        foreach($pendingAssessments as $assessment) {
+            $uploadedDocuments[] = [
+                'type' => 'Medical Assessment (Reference Lookup)',
+                'student_name' => $assessment->user?->name ?? 'N/A',
+                'student_id' => $assessment->reference_number,
+                'file_name' => $assessment->file_name,
+                'file_path' => asset('storage/' . $assessment->file_path),
+                'uploaded_at' => $assessment->created_at,
+            ];
+        }
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+
+    // Sort by date descending
+    usort($uploadedDocuments, fn($a, $b) => $b['uploaded_at'] <=> $a['uploaded_at']);
+@endphp
 
 {{-- Student Health Profile: Issued health profile details and submitted documents --}}
+@if(count($uploadedDocuments) > 0)
 <div class="card health-summary-card" style="margin-top: 30px;">
     <div class="health-table-head">
         <div class="health-table-title">Student Health Profile</div>
         <p style="margin: 0; font-size: 13px; color: #64748b; margin-top: 4px;">Issued health profile details and submitted documents.</p>
     </div>
 
-    @php
-        $uploadedDocuments = [];
-
-        // Collect health form uploads
-        foreach($records as $record) {
-            if (!empty($record->health_form_upload) && $record->clearance_status === 'Issued') {
-                $uploadedDocuments[] = [
-                    'type' => 'Health Form',
-                    'student_name' => $record->user->name,
-                    'student_id' => $record->user->student_number ?: $record->user->student_id,
-                    'file_name' => basename($record->health_form_upload),
-                    'file_path' => asset('storage/' . $record->health_form_upload),
-                    'uploaded_at' => $record->updated_at,
-                ];
-            }
-        }
-
-        // Collect pending medical assessments
-        try {
-            $pendingAssessments = \App\Models\PendingMedicalAssessment::get();
-            foreach($pendingAssessments as $assessment) {
-                $uploadedDocuments[] = [
-                    'type' => 'Medical Assessment (Reference Lookup)',
-                    'student_name' => $assessment->user?->name ?? 'N/A',
-                    'student_id' => $assessment->reference_number,
-                    'file_name' => $assessment->file_name,
-                    'file_path' => asset('storage/' . $assessment->file_path),
-                    'uploaded_at' => $assessment->created_at,
-                ];
-            }
-        } catch (\Exception $e) {
-            // Table may not exist yet
-        }
-
-        // Sort by date descending
-        usort($uploadedDocuments, fn($a, $b) => $b['uploaded_at'] <=> $a['uploaded_at']);
-    @endphp
-
-    @if(count($uploadedDocuments) > 0)
-        <table id="documentsTable">
-            <thead>
+    <table id="documentsTable">
+        <thead>
+            <tr>
+                <th>Document Type</th>
+                <th>Student Name</th>
+                <th>ID / Reference</th>
+                <th>File Name</th>
+                <th>Uploaded Date</th>
+                <th style="text-align: center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($uploadedDocuments as $doc)
                 <tr>
-                    <th>Document Type</th>
-                    <th>Student Name</th>
-                    <th>ID / Reference</th>
-                    <th>File Name</th>
-                    <th>Uploaded Date</th>
-                    <th style="text-align: center;">Action</th>
+                    <td>
+                        <span style="background: {{ $doc['type'] === 'Health Form' ? '#dcfce7' : '#e0f2fe' }}; color: {{ $doc['type'] === 'Health Form' ? '#15803d' : '#0369a1' }}; padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                            {{ $doc['type'] }}
+                        </span>
+                    </td>
+                    <td>{{ $doc['student_name'] }}</td>
+                    <td class="fw-bold">{{ $doc['student_id'] }}</td>
+                    <td style="word-break: break-word; max-width: 250px;">{{ $doc['file_name'] }}</td>
+                    <td>{{ $doc['uploaded_at']->format('M d, Y h:i A') }}</td>
+                    <td style="text-align: center;">
+                        <a href="{{ $doc['file_path'] }}" target="_blank" class="btn-action btn-view" style="display: inline-block;">
+                            <x-outline-icon name="document-text" />
+                            View
+                        </a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach($uploadedDocuments as $doc)
-                    <tr>
-                        <td>
-                            <span style="background: {{ $doc['type'] === 'Health Form' ? '#dcfce7' : '#e0f2fe' }}; color: {{ $doc['type'] === 'Health Form' ? '#15803d' : '#0369a1' }}; padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
-                                {{ $doc['type'] }}
-                            </span>
-                        </td>
-                        <td>{{ $doc['student_name'] }}</td>
-                        <td class="fw-bold">{{ $doc['student_id'] }}</td>
-                        <td style="word-break: break-word; max-width: 250px;">{{ $doc['file_name'] }}</td>
-                        <td>{{ $doc['uploaded_at']->format('M d, Y h:i A') }}</td>
-                        <td style="text-align: center;">
-                            <a href="{{ $doc['file_path'] }}" target="_blank" class="btn-action btn-view" style="display: inline-block;">
-                                <x-outline-icon name="document-text" />
-                                View
-                            </a>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @else
-        <div style="text-align: center; padding: 40px; color: #94a3b8;">
-            <p>No uploaded documents found.</p>
-        </div>
-    @endif
+            @endforeach
+        </tbody>
+    </table>
 </div>
+@endif
 
 <div class="verify-approval-modal" id="verifyApprovalModal" aria-hidden="true">
     <div class="verify-approval-modal-card">

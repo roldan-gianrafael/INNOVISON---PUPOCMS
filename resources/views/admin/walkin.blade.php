@@ -4942,6 +4942,7 @@
 
         function uploadAssessmentCopy(file) {
             if (!uploadForm || !uploadRefInput || !file) {
+                console.log('Upload validation failed:', { uploadForm, uploadRefInput, file });
                 return;
             }
 
@@ -4949,6 +4950,14 @@
             formData.set('medical_assessment_copy', file);
             formData.set('reference_number', uploadRefInput.value || currentLookupRef || '');
             formData.set('student_number', uploadStudentNo ? uploadStudentNo.value : '');
+
+            console.log('Uploading file:', {
+                fileName: file.name,
+                fileType: file.type,
+                fileSize: file.size,
+                referenceNumber: uploadRefInput.value || currentLookupRef,
+                studentNumber: uploadStudentNo ? uploadStudentNo.value : ''
+            });
 
             setStatus('info', 'Uploading medical assessment copy...');
 
@@ -4962,16 +4971,19 @@
             })
             .then(async function (response) {
                 const payload = await response.json().catch(function () { return {}; });
+                console.log('Upload response:', { status: response.status, ok: response.ok, payload });
+
                 if (!response.ok) {
-                    throw new Error(payload.message || 'Upload failed.');
+                    throw new Error(payload.message || 'Upload failed with status ' + response.status);
                 }
 
                 setStatus('success', payload.message || 'Medical assessment copy uploaded successfully.');
                 if (uploadInput) uploadInput.value = '';
                 return payload;
             })
-            .catch(function () {
-                setStatus('error', 'Unable to upload right now. Please try again.');
+            .catch(function (error) {
+                console.error('Upload error:', error);
+                setStatus('error', error.message || 'Unable to upload right now. Please try again.');
             });
         }
 

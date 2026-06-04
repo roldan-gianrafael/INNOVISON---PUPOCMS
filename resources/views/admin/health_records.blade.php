@@ -60,9 +60,22 @@
     .awaiting-links-btn:hover {
         transform: translateY(-1px);
         background: #facc15 !important;
-        color: #111827 !important;
+        color: #70131B !important;
         border-color: #facc15 !important;
         box-shadow: 0 14px 24px rgba(112, 19, 27, 0.2);
+    }
+    .card.awaiting-links-btn:hover * {
+        color: #70131B !important;
+    }
+    .card.awaiting-links-btn:hover h3 {
+        color: #70131B !important;
+    }
+    .card.awaiting-links-btn:hover small {
+        color: #70131B !important;
+    }
+    .card.awaiting-links-btn:hover svg {
+        stroke: #70131B !important;
+        color: #70131B !important;
     }
     .awaiting-links-btn:hover::before {
         transform: translateX(135%);
@@ -1659,12 +1672,12 @@
             </div>
         </div>
         <div class="summary-item" style="flex: 1.2;">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 8px 24px !important; border-left: 5px solid #70131B; width: 100%; display: flex; align-items: center; justify-content: flex-start; gap: 16px; min-height: auto;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
-                <div style="display: flex; align-items: center; color: #ffffff; font-size: 22px; flex-shrink: 0;">
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 8px 24px !important; border-left: 5px solid #70131B; width: 100%; display: flex; align-items: center; justify-content: flex-start; gap: 16px; min-height: 90px;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
+                <div style="display: flex; align-items: center; color: #ffffff; font-size: 22px; flex-shrink: 0; width: 22px; height: 22px;">
                     <x-outline-icon name="link" />
                 </div>
                 <div style="flex: 1;">
-                    <small style="display: block; color: #ffffff !important; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 1.2px; line-height: 1.2;">Awaiting Links</small>
+                    <small style="display: block; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 1.2px; line-height: 1.2;">Awaiting Links</small>
                     <h3 class="fw-bold" style="color: #ffffff; margin: 4px 0 0 0; font-size: 28px; line-height: 1.1;">{{ count($approvedApplicants) }}</h3>
                 </div>
             </button>

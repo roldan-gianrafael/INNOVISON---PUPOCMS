@@ -5,321 +5,236 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choose Your Role</title>
     <style>
+        :root {
+            --maroon: #70131B;
+            --maroon-strong: #8f2230;
+            --gold: #facc15;
+            --white: #ffffff;
+            --ink: #1f2937;
+            --muted: rgba(255, 255, 255, 0.78);
+            --line: rgba(255, 255, 255, 0.18);
+        }
+
         * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+        }
+
         body {
-            margin: 0;
-            min-height: 100vh;
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            color: #111827;
+            color: var(--white);
             background:
-                radial-gradient(circle at top right, rgba(250, 204, 21, 0.20), transparent 26%),
-                radial-gradient(circle at bottom left, rgba(112, 19, 27, 0.10), transparent 30%),
-                linear-gradient(135deg, #fffdf6 0%, #fff8fb 42%, #ffffff 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+                linear-gradient(135deg, rgba(51, 8, 13, 0.92), rgba(112, 19, 27, 0.78)),
+                url('{{ asset('images/PUPBG.jpg') }}') center center / cover no-repeat fixed;
+            overflow-x: hidden;
         }
 
-        .chooser-shell {
-            width: min(980px, 100%);
-            flex: 1 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 28px;
-        }
-
-        .chooser-card {
-            position: relative;
-            overflow: hidden;
-            border-radius: 32px;
-            padding: 34px 34px 38px;
-            background: rgba(255, 255, 255, 0.90);
-            border: 1px solid rgba(112, 19, 27, 0.10);
-            box-shadow:
-                0 24px 60px rgba(15, 23, 42, 0.12),
-                0 0 0 1px rgba(255,255,255,0.72) inset;
-        }
-
-        .chooser-card::before {
+        body::before {
             content: "";
-            position: absolute;
-            top: 0;
-            left: 28px;
-            right: 28px;
-            height: 5px;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #70131B 0%, #9f1239 48%, #facc15 100%);
-        }
-
-        .chooser-card::after {
-            content: "";
-            position: absolute;
-            right: -70px;
-            top: -80px;
-            width: 240px;
-            height: 240px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(112, 19, 27, 0.12) 0%, rgba(112, 19, 27, 0) 72%);
-            pointer-events: none;
-        }
-
-        .chooser-hero-mark {
-            position: absolute;
-            top: -14px;
-            right: 10px;
-            width: 170px;
-            height: 170px;
-            color: rgba(112, 19, 27, 0.09);
-            transform: rotate(-12deg);
-            pointer-events: none;
-        }
-
-        .chooser-hero-mark svg {
-            width: 100%;
-            height: 100%;
-            stroke-width: 1.7;
-        }
-
-        .chooser-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 12px;
-            border-radius: 999px;
-            background: rgba(112, 19, 27, 0.08);
-            color: #70131B;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 12px;
-        }
-
-        .chooser-title {
-            margin: 0;
-            color: #70131B;
-            font-size: clamp(32px, 5vw, 46px);
-            font-weight: 800;
-            letter-spacing: -0.04em;
-        }
-
-        .chooser-copy {
-            margin: 12px 0 0;
-            color: #475569;
-            font-size: 16px;
-            line-height: 1.7;
-            max-width: 680px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .chooser-kicker,
-        .chooser-title {
-            position: relative;
-            z-index: 1;
-        }
-
-        .chooser-steps {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 18px;
-        }
-
-        .chooser-step {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.84);
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            color: #334155;
-            font-size: 12px;
-            font-weight: 800;
-            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
-        }
-
-        .chooser-step-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 999px;
-            background: #70131B;
-            box-shadow: 0 0 0 4px rgba(112, 19, 27, 0.12);
-        }
-
-        .chooser-grid {
-            margin-top: 34px;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 24px;
-        }
-
-        .chooser-link {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .chooser-option {
-            position: relative;
-            min-height: 280px;
-            border-radius: 28px;
-            padding: 28px 26px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-            border: 1px solid rgba(112, 19, 27, 0.12);
-            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,249,247,0.96));
-            box-shadow:
-                0 18px 36px rgba(15, 23, 42, 0.10),
-                0 0 0 1px rgba(255,255,255,0.52) inset;
-            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-        }
-
-        .chooser-option::after {
-            content: "";
-            position: absolute;
+            position: fixed;
             inset: 0;
             background:
-                linear-gradient(120deg,
-                    rgba(255, 248, 196, 0) 0%,
-                    rgba(255, 239, 181, 0.16) 22%,
-                    rgba(255, 239, 181, 0.56) 48%,
-                    rgba(255, 239, 181, 0.16) 72%,
-                    rgba(255, 248, 196, 0) 100%);
-            transform: translateX(-135%);
-            transition: transform 1.25s ease;
+                radial-gradient(circle at 18% 18%, rgba(250, 204, 21, 0.20), transparent 28%),
+                radial-gradient(circle at 88% 12%, rgba(255, 255, 255, 0.12), transparent 24%),
+                linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.32));
             pointer-events: none;
         }
 
-        .chooser-option:hover {
-            transform: translateY(-3px);
-            border-color: #facc15;
-            box-shadow:
-                0 0 0 3px rgba(250, 204, 21, 0.16),
-                0 24px 46px rgba(112, 19, 27, 0.14);
+        a {
+            color: inherit;
+            text-decoration: none;
         }
 
-        .chooser-option:hover::after {
-            transform: translateX(135%);
+        .assistant-shell {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(20px, 4vw, 48px) 18px;
         }
 
-        .chooser-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 22px;
+        .assistant-panel {
+            width: min(1040px, 100%);
+            min-height: min(620px, calc(100vh - 72px));
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 28px 68px rgba(15, 23, 42, 0.34);
+        }
+
+        .assistant-side {
+            position: relative;
+            display: grid;
+            padding: clamp(24px, 4.4vw, 48px);
+            align-content: space-between;
+            justify-items: start;
+        }
+
+        .assistant-side::after {
+            content: "";
+            position: absolute;
+            top: 34px;
+            bottom: 34px;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, rgba(250, 204, 21, 0.40), transparent);
+            right: -1px;
+        }
+
+        .student-side {
+            background:
+                linear-gradient(145deg, rgba(112, 19, 27, 0.68), rgba(77, 13, 23, 0.52)),
+                rgba(112, 19, 27, 0.34);
+            border-right: 1px solid rgba(250, 204, 21, 0.14);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+        }
+
+        .admin-side {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 230, 0.94));
+            border-left: 1px solid rgba(112, 19, 27, 0.12);
+            color: var(--ink);
+        }
+
+        .admin-side::after {
+            background: linear-gradient(180deg, transparent, rgba(112, 19, 27, 0.22), transparent);
+            right: auto;
+            left: -1px;
+        }
+
+        .side-header {
+            max-width: 520px;
+        }
+
+        .side-kicker {
+            margin: 0 0 16px;
+            color: var(--gold);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .admin-side .side-kicker {
+            color: var(--maroon);
+        }
+
+        .side-title {
+            margin: 0 0 12px;
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1.1;
+            font-weight: 950;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+        }
+
+        .admin-side .side-title {
+            color: var(--maroon);
+        }
+
+        .side-description {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.7;
+            max-width: 480px;
+        }
+
+        .admin-side .side-description {
+            color: #64748b;
+        }
+
+        .side-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #70131B, #8f2230);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: #ffffff;
-            box-shadow:
-                0 16px 28px rgba(112, 19, 27, 0.22),
-                0 0 0 1px rgba(255,255,255,0.18) inset;
-            animation: floatCard 3.8s ease-in-out infinite;
+            margin-bottom: 20px;
         }
 
-        .chooser-chip {
-            position: absolute;
-            top: 18px;
-            right: 18px;
+        .admin-side .side-icon {
+            background: linear-gradient(135deg, var(--maroon), var(--maroon-strong));
+            border: none;
+            color: #ffffff;
+        }
+
+        .side-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke-width: 1.8;
+        }
+
+        .side-cta {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            padding: 8px 11px;
-            border-radius: 999px;
-            background: rgba(112, 19, 27, 0.08);
-            color: #70131B;
-            font-size: 11px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-
-        .chooser-icon svg {
-            width: 30px;
-            height: 30px;
-            stroke-width: 1.9;
-        }
-
-        .chooser-option:nth-child(2) .chooser-icon {
-            background: linear-gradient(135deg, #8b0000, #c2410c);
-        }
-
-        .chooser-heading {
-            margin: 0 0 10px;
-            font-size: 28px;
+            gap: 10px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            background: rgba(250, 204, 21, 0.18);
+            border: 1px solid rgba(250, 204, 21, 0.30);
+            color: var(--gold);
+            font-size: 14px;
             font-weight: 800;
-            color: #111827;
-            letter-spacing: -0.03em;
+            letter-spacing: 0.01em;
+            margin-top: 28px;
         }
 
-        .chooser-description {
-            margin: 0;
-            color: #475569;
-            font-size: 15px;
-            line-height: 1.7;
-            max-width: 360px;
-        }
-
-        .chooser-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 11px 16px;
-            border-radius: 999px;
+        .admin-side .side-cta {
             background: rgba(112, 19, 27, 0.08);
-            color: #70131B;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 0.02em;
-            width: fit-content;
+            border-color: rgba(112, 19, 27, 0.12);
+            color: var(--maroon);
         }
 
-        .chooser-option:nth-child(2) .chooser-chip {
-            background: rgba(194, 65, 12, 0.10);
-            color: #9a3412;
+        .side-cta:hover {
+            opacity: 0.9;
         }
 
-        .chooser-cta svg {
+        .side-cta svg {
             width: 16px;
             height: 16px;
-            stroke-width: 2.1;
+            stroke-width: 2.2;
         }
 
-        @keyframes floatCard {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        @media (max-width: 760px) {
-            .chooser-shell {
-                padding: 18px;
-            }
-
-            .chooser-card {
-                padding: 28px 22px 30px;
-                border-radius: 24px;
-            }
-
-            .chooser-grid {
+        @media (max-width: 768px) {
+            .assistant-panel {
                 grid-template-columns: 1fr;
+                min-height: auto;
             }
 
-            .chooser-option {
-                min-height: 230px;
+            .assistant-side::after {
+                display: none;
             }
 
-            .chooser-hero-mark {
-                width: 128px;
-                height: 128px;
-                top: 6px;
-                right: -4px;
+            .admin-side::after {
+                display: none;
+            }
+
+            .student-side {
+                border-right: none;
+                border-bottom: 1px solid rgba(250, 204, 21, 0.14);
+            }
+
+            .admin-side {
+                border-left: none;
+                border-top: 1px solid rgba(112, 19, 27, 0.12);
+            }
+
+            .side-title {
+                font-size: 28px;
             }
         }
     </style>
@@ -333,78 +248,58 @@
             || in_array($rawUserRole, ['student_assistant', 'studentassistant', 'assistant'], true);
         $showStudentSide = $isStudentAssistant || $normalizedUserRole === \App\Models\User::ROLE_STUDENT;
         $showAdminSide = $isStudentAssistant || in_array($normalizedUserRole, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPERADMIN], true);
-        $showBothSides = $isStudentAssistant || (!$showStudentSide && !$showAdminSide);
     @endphp
 
-    <div class="chooser-shell">
-        <section class="chooser-card">
-            <div class="chooser-hero-mark" aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                </svg>
-            </div>
-            <div class="chooser-kicker">Student Assistant Portal</div>
-            <h1 class="chooser-title">Choose your role</h1>
-            <p class="chooser-copy">
-                Welcome back, {{ $user->name }}. Select where you want to continue today. You can enter the student side for student-facing actions or go to the admin side for clinic operations.
-            </p>
-            <div class="chooser-steps">
-                <span class="chooser-step"><span class="chooser-step-dot"></span>Student-facing access</span>
-                <span class="chooser-step"><span class="chooser-step-dot"></span>Clinic operations access</span>
-            </div>
+    <div class="assistant-shell">
+        <div class="assistant-panel">
+            {{-- Student Side (Maroon) --}}
+            @if($showStudentSide)
+                <a href="{{ route('assistant.enter-student') }}" class="assistant-side student-side">
+                    <div class="side-header">
+                        <div class="side-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                            </svg>
+                        </div>
+                        <p class="side-kicker">Student Portal</p>
+                        <h2 class="side-title">Student Side</h2>
+                        <p class="side-description">
+                            Continue into the student portal to view health record status, booking pages, and student-facing account screens.
+                        </p>
+                    </div>
+                    <span class="side-cta">
+                        Enter Student Portal
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </span>
+                </a>
+            @endif
 
-            <div class="chooser-grid">
-                @if($showStudentSide || $showBothSides)
-                    <a href="{{ route('assistant.enter-student') }}" class="chooser-link">
-                        <article class="chooser-option">
-                            <span class="chooser-chip">Portal Choice</span>
-                            <div class="chooser-icon" aria-hidden="true">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h2 class="chooser-heading">Student Side</h2>
-                                <p class="chooser-description">
-                                    Continue into the student portal to view health record status, booking pages, and student-facing account screens.
-                                </p>
-                            </div>
-                            <span class="chooser-cta">
-                                Enter Student Side
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                                </svg>
-                            </span>
-                        </article>
-                    </a>
-                @endif
-
-                @if($showAdminSide || $showBothSides)
-                    <a href="{{ route('assistant.enter-admin') }}" class="chooser-link">
-                        <article class="chooser-option">
-                            <span class="chooser-chip">Portal Choice</span>
-                            <div class="chooser-icon" aria-hidden="true">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V3.75A.75.75 0 0 1 4.5 3ZM9 21v-5.25m6 5.25v-5.25" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h2 class="chooser-heading">Admin Side</h2>
-                                <p class="chooser-description">
-                                    Open the clinic operations dashboard to handle appointments, walk-ins, reports, and inventory workflows.
-                                </p>
-                            </div>
-                            <span class="chooser-cta">
-                                Enter Admin Side
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                                </svg>
-                            </span>
-                        </article>
-                    </a>
-                @endif
-            </div>
-        </section>
+            {{-- Admin Side (White) --}}
+            @if($showAdminSide)
+                <a href="{{ route('assistant.enter-admin') }}" class="assistant-side admin-side">
+                    <div class="side-header">
+                        <div class="side-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V3.75A.75.75 0 0 1 4.5 3ZM9 21v-5.25m6 5.25v-5.25" />
+                            </svg>
+                        </div>
+                        <p class="side-kicker">Admin Portal</p>
+                        <h2 class="side-title">Admin Side</h2>
+                        <p class="side-description">
+                            Open the clinic operations dashboard to handle appointments, walk-ins, reports, and inventory workflows.
+                        </p>
+                    </div>
+                    <span class="side-cta">
+                        Enter Admin Portal
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </span>
+                </a>
+            @endif
+        </div>
     </div>
     @include('partials.system_footer')
 </body>

@@ -2945,6 +2945,8 @@
         width: 20px;
         height: 20px;
         stroke-width: 2;
+        stroke: currentColor;
+        fill: none;
     }
 
     .applicant-lookup-content {

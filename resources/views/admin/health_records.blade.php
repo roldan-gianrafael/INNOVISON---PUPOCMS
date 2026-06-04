@@ -46,6 +46,116 @@
         transform: translateY(-1px);
         box-shadow: 0 6px 12px rgba(3, 105, 161, 0.15);
     }
+
+    /* Awaiting Links Modal Styling */
+    .awaiting-links-modal-shell {
+        width: min(900px, 95%);
+        max-height: 85vh;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 26px 60px rgba(15, 23, 42, 0.24);
+        border: 1px solid rgba(255,255,255,0.5);
+        display: flex;
+        flex-direction: column;
+    }
+    .awaiting-links-modal-head {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 24px;
+        background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+        color: #ffffff;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .awaiting-links-modal-head-main {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        min-width: 0;
+    }
+    .awaiting-links-modal-badge {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.2);
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 16px;
+        color: #ffffff;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+    .awaiting-links-modal-copy h3 {
+        margin: 0 0 4px 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+    .awaiting-links-modal-copy p {
+        margin: 0;
+        font-size: 13px;
+        color: rgba(255,255,255,0.85);
+    }
+    .awaiting-links-modal-close {
+        flex: 0 0 auto;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 10px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .awaiting-links-modal-close:hover {
+        background: rgba(255,255,255,0.2);
+        border-color: rgba(255,255,255,0.3);
+    }
+    .awaiting-links-modal-close svg {
+        width: 20px;
+        height: 20px;
+    }
+    .awaiting-links-modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+    }
+    .awaiting-links-modal-body table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .awaiting-links-modal-body thead tr {
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .awaiting-links-modal-body th {
+        text-align: left;
+        padding: 14px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .awaiting-links-modal-body tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.2s ease;
+    }
+    .awaiting-links-modal-body tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    .awaiting-links-modal-body td {
+        padding: 16px;
+        color: #334155;
+        font-size: 14px;
+    }
     .health-summary-card {
         position: relative;
         overflow: hidden;
@@ -1595,12 +1705,20 @@
 
 {{-- Awaiting Links Modal --}}
 <div id="awaitingLinksModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;" onclick="if(event.target.id==='awaitingLinksModal') document.getElementById('awaitingLinksModal').style.display='none';">
-    <div style="background: white; border-radius: 12px; width: min(900px, 95%); max-height: 90vh; overflow-y: auto; box-shadow: 0 26px 60px rgba(15, 23, 42, 0.24);">
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; background: white;">
-            <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #111827;">Awaiting Links</h3>
-            <button type="button" id="closeAwaitingLinksModal" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #64748b;" onclick="document.getElementById('awaitingLinksModal').style.display='none';">✕</button>
+    <div class="awaiting-links-modal-shell">
+        <div class="awaiting-links-modal-head">
+            <div class="awaiting-links-modal-head-main">
+                <div class="awaiting-links-modal-badge">AL</div>
+                <div class="awaiting-links-modal-copy">
+                    <h3>Awaiting Links</h3>
+                    <p>Medical assessments uploaded via reference lookup, waiting to be linked to student accounts.</p>
+                </div>
+            </div>
+            <button type="button" class="awaiting-links-modal-close" id="closeAwaitingLinksModal" aria-label="Close modal" onclick="document.getElementById('awaitingLinksModal').style.display='none';">
+                <x-outline-icon name="x-mark" />
+            </button>
         </div>
-        <div style="padding: 24px;">
+        <div class="awaiting-links-modal-body">
             @if(count($approvedApplicants) > 0)
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>

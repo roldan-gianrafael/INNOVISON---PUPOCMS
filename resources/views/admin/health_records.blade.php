@@ -13,6 +13,18 @@
         border: 1px solid #f0f0f0;
         height: 100%; /* Para pantay ang taas nila */
     }
+    .awaiting-links-btn {
+        background: #fff !important;
+        border: 1px solid #f0f0f0 !important;
+        border-left: 5px solid #0369a1 !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .awaiting-links-btn:hover {
+        box-shadow: 0 8px 20px rgba(3, 105, 161, 0.15);
+        transform: translateY(-2px);
+        background: #f0f9ff !important;
+    }
     .health-summary-card {
         position: relative;
         overflow: hidden;
@@ -1408,7 +1420,7 @@
                         placeholder="Search by student name or ID..."
                     >
                 </div>
-                <button type="button" class="health-records-search-toggle" id="healthRecordsSearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="recordSearch">
+                <button type="button" class="health-records-search-toggle" id="healthRecordsSearchToggle" aria-label="Open search" aria-expanded="false" aria-controls="recordSearch" onclick="toggleHealthSearch();">
                     <x-outline-icon name="magnifying-glass" />
                 </button>
             </div>
@@ -1457,23 +1469,12 @@
             </div>
         </div>
         <div class="summary-item">
-            <button type="button" id="awaitingLinksBtn" style="padding: 15px 24px !important; background: #fff; border: 1px solid #e2e8f0; border-left: 5px solid #0369a1; border-radius: 12px; cursor: pointer; width: 100%; text-align: left; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <small style="color: #64748b; font-weight: 800; text-transform: uppercase; font-size: 11px; display: block;"><span>Awaiting</span></small>
-                        <small style="color: #64748b; font-weight: 800; text-transform: uppercase; font-size: 11px; display: block;"><span>Links</span></small>
-                    </div>
-                    <h3 style="margin: 0; color: #0369a1; font-weight: 700; font-size: 24px;">{{ count($approvedApplicants) }}</h3>
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 15px 24px !important; border-left: 5px solid #0369a1;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
+                <div class="health-summary-row">
+                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Awaiting</span><span>Links</span></small>
+                    <h3 class="fw-bold mb-0" style="color: #0369a1;">{{ count($approvedApplicants) }}</h3>
                 </div>
             </button>
-            <style>
-                #awaitingLinksBtn:hover {
-                    border-left-color: #0369a1;
-                    box-shadow: 0 8px 20px rgba(3, 105, 161, 0.15);
-                    transform: translateY(-2px);
-                    background: #f0f9ff;
-                }
-            </style>
         </div>
     </div>
 
@@ -1774,6 +1775,23 @@
 
 @push('scripts')
 <script>
+    // Simple search toggle function
+    function toggleHealthSearch() {
+        const shell = document.getElementById('healthRecordsSearchShell');
+        const toggle = document.getElementById('healthRecordsSearchToggle');
+        const input = document.getElementById('recordSearch');
+
+        if (shell && toggle) {
+            const isOpen = shell.classList.contains('is-open');
+            shell.classList.toggle('is-open', !isOpen);
+            toggle.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+
+            if (!isOpen && input) {
+                setTimeout(() => input.focus(), 100);
+            }
+        }
+    }
+
     const healthFilterToggle = document.getElementById('healthFilterToggle');
     const healthFilterModal = document.getElementById('healthFilterModal');
     const healthFilterCloseBtn = document.getElementById('healthFilterCloseBtn');

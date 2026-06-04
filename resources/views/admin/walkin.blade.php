@@ -3135,7 +3135,7 @@
 
     {{-- Applicants Modal: Reference Number Lookup --}}
     <div class="applicant-modal-backdrop" id="applicantRefModal">
-        <div class="applicant-modal-shell" style="width:min(480px,100%)">
+        <div class="applicant-modal-shell" style="width:min(680px,100%)">
             <div class="applicant-modal-head">
                 <div class="applicant-modal-head-main">
                     <div class="applicant-modal-head-badge">AP</div>

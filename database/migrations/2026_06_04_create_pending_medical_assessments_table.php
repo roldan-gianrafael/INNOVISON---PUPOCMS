@@ -19,12 +19,14 @@ return new class extends Migration
             $table->string('file_name');
             $table->string('file_type')->nullable();
             $table->unsignedBigInteger('file_size')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable()->after('file_size');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
 
             // Composite index for finding assessments by reference and email
             $table->index(['reference_number', 'email']);
+
+            // Foreign key
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

@@ -13,7 +13,7 @@
         border: 1px solid #f0f0f0;
         height: 100%; /* Para pantay ang taas nila */
     }
-    .awaiting-links-btn {
+    .card.awaiting-links-btn {
         background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 55%, #b91c1c 100%) !important;
         border: 1px solid #991b1b !important;
         color: #ffffff !important;
@@ -22,24 +22,21 @@
         box-shadow: 0 4px 12px rgba(112, 19, 27, 0.2) !important;
         position: relative;
         overflow: hidden;
-        height: 100%;
-        width: 100%;
     }
-    .awaiting-links-btn,
-    .awaiting-links-btn * {
+    .card.awaiting-links-btn * {
         background-color: transparent !important;
         color: #ffffff !important;
     }
-    .awaiting-links-btn .health-summary-label {
+    .card.awaiting-links-btn .health-summary-label {
         color: #ffffff !important;
     }
-    .awaiting-links-btn .health-summary-label span {
+    .card.awaiting-links-btn .health-summary-label span {
         color: #ffffff !important;
     }
-    .awaiting-links-btn h3 {
+    .card.awaiting-links-btn h3 {
         color: #ffffff !important;
     }
-    .awaiting-links-btn svg {
+    .card.awaiting-links-btn svg {
         stroke: #ffffff !important;
         color: #ffffff !important;
     }

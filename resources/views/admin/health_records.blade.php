@@ -1924,12 +1924,22 @@
     const awaitingLinksModal = document.getElementById('awaitingLinksModal');
     const closeAwaitingLinksModal = document.getElementById('closeAwaitingLinksModal');
 
+    console.log('Awaiting Links Debug:', {
+        btnFound: !!awaitingLinksBtn,
+        modalFound: !!awaitingLinksModal,
+        closeFound: !!closeAwaitingLinksModal
+    });
+
     if (awaitingLinksBtn) {
         awaitingLinksBtn.addEventListener('click', function () {
+            console.log('Awaiting Links button clicked');
             if (awaitingLinksModal) {
                 awaitingLinksModal.style.display = 'flex';
+                console.log('Modal opened');
             }
         });
+    } else {
+        console.warn('Awaiting Links button not found');
     }
 
     if (closeAwaitingLinksModal) {

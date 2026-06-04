@@ -2894,7 +2894,7 @@
     .applicant-lookup-details {
         display: none;
         width: 100%;
-        margin-top: 48px;
+        margin-top: 12px;
         padding: 14px;
         border-radius: 14px;
         border: 1px solid rgba(112, 19, 27, 0.14);

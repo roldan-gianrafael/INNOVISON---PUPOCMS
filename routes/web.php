@@ -112,25 +112,13 @@ Route::post('/register-action', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // --- API ROUTES (For AJAX/Frontend) ---
-// Routes in web.php automatically have 'web' middleware via RouteServiceProvider
-// These endpoints check session state via multiple authentication guards
-Route::get('/api/check-session', [LoginController::class, 'apiCheckSession'])->withoutMiddleware('csrf');
-Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath'])->withoutMiddleware('csrf');
+// These routes MUST have session middleware to access Auth guards
+// Using explicit middleware stack to ensure StartSession runs
+Route::middleware('web')->group(function () {
+    Route::get('/api/check-session', [LoginController::class, 'apiCheckSession'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+    Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+});
 
-// DEBUG ENDPOINT - Remove this after debugging
-Route::get('/api/debug-session', function (Request $request) {
-    return response()->json([
-        'session_id' => session()->getId(),
-        'session_data' => session()->all(),
-        'admin_check' => Auth::guard('admin')->check(),
-        'admin_user' => Auth::guard('admin')->user() ? Auth::guard('admin')->user()->toArray() : null,
-        'student_check' => Auth::guard('student')->check(),
-        'student_user' => Auth::guard('student')->user() ? Auth::guard('student')->user()->toArray() : null,
-        'web_check' => Auth::guard('web')->check(),
-        'web_user' => Auth::guard('web')->user() ? Auth::guard('web')->user()->toArray() : null,
-        'cookies' => $request->cookies->all(),
-    ]);
-})->withoutMiddleware('csrf');
 
 // --- PROTECTED ROUTES (Login required) ---
 Route::middleware(['auth:student', 'audit'])->group(function () {

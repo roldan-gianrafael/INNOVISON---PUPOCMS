@@ -220,8 +220,6 @@
     }
 
     .health-records-toolbar {
-        position: relative;
-        z-index: 20;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -237,8 +235,6 @@
     }
 
     .health-records-toolbar-actions {
-        position: relative;
-        z-index: 2;
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -331,8 +327,6 @@
         z-index: 1;
     }
     .health-records-toolbar-actions {
-        position: relative;
-        z-index: 2;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -340,8 +334,6 @@
     }
 
     .health-records-search-shell {
-        position: relative;
-        z-index: 3;
         display: inline-flex;
         align-items: center;
         gap: 0;
@@ -381,92 +373,75 @@
     }
 
     .health-filter-toggle {
-        position: relative;
-        z-index: 3;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
         min-height: 50px;
-        padding: 0 18px;
-        border-radius: 999px;
-        border: 1px solid #8f2230;
-        background: linear-gradient(135deg, #70131B, #8f2230);
-        color: #ffffff;
+        min-width: 140px !important;
+        padding: 0 16px !important;
+        gap: 8px !important;
+        width: auto !important;
+        border-radius: 14px !important;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #70131B;
         cursor: pointer;
-        font-weight: 800;
+        font-weight: 700;
         font-size: 13px;
-        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
-        pointer-events: auto;
-        box-shadow:
-            0 0 0 3px rgba(112, 19, 27, 0.12),
-            0 10px 22px rgba(112, 19, 27, 0.20);
+        transition: all .18s ease;
+        white-space: nowrap;
     }
 
     .health-filter-toggle svg {
-        width: 18px;
-        height: 18px;
-        stroke-width: 2.2;
+        width: 18px !important;
+        height: 18px !important;
         flex: 0 0 auto;
-    }
-
-    .health-filter-toggle svg,
-    .health-filter-toggle span,
-    .health-records-search-toggle svg {
-        pointer-events: none;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
     }
 
     .health-filter-toggle:hover,
-    .health-filter-toggle:focus,
     .health-filter-toggle.is-open {
-        background: linear-gradient(135deg, #facc15, #fde68a);
+        background: #fef3c7;
         border-color: #facc15;
-        color: #70131B;
-        transform: translateY(-1px);
-        box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.18),
-            0 14px 24px rgba(112, 19, 27, 0.16);
-        outline: none;
-    }
-
-    .health-filter-toggle:active {
-        transform: translateY(0);
+        color: #111827 !important;
+        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.18);
     }
 
     .health-records-search-toggle {
         display: inline-flex;
-        position: relative;
-        z-index: 4;
         align-items: center;
         justify-content: center;
-        min-height: 40px;
-        min-width: 40px;
-        padding: 0;
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
+        min-height: 50px;
+        min-width: 50px;
+        padding: 0 14px;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
         background: #ffffff;
-        color: #374151;
+        color: #70131B;
         cursor: pointer;
-        transition: all .15s ease;
-        pointer-events: auto;
+        transition: all .18s ease;
+        z-index: 1;
+        position: relative;
+        overflow: hidden;
     }
 
-    .health-records-search-toggle:hover {
-        background: #f3f4f6;
-        border-color: #9ca3af;
-    }
-
-    .health-records-search-toggle:active {
-        background: #e5e7eb;
+    .health-records-search-toggle:hover,
+    .health-records-search-toggle:focus {
+        background: #fef3c7;
+        border-color: #facc15;
+        color: #111827;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.18);
     }
 
     .health-records-search-toggle svg {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         stroke-width: 2;
         stroke: currentColor;
         fill: none;
-        pointer-events: none;
     }
 
     .health-filter-form {
@@ -551,15 +526,15 @@
         outline: none !important;
     }
     .health-records-search-toggle svg {
-        width: 20px !important;
-        height: 20px !important;
-        stroke-width: 2.2 !important;
+        width: 28px !important;
+        height: 28px !important;
+        stroke-width: 2 !important;
         display: block;
     }
     .health-records-search-toggle:hover,
     .health-records-search-toggle:focus {
         background: #facc15 !important;
-        color: #70131B !important;
+        color: #111827 !important;
         border-color: #facc15 !important;
         box-shadow:
             0 0 0 3px rgba(250, 204, 21, 0.18),
@@ -569,7 +544,7 @@
 
     .health-records-search-toggle:hover svg,
     .health-records-search-toggle:focus svg {
-        color: #70131B !important;
+        color: #111827 !important;
         stroke: currentColor !important;
     }
 
@@ -788,23 +763,22 @@
 
     html[data-theme="dark"] .health-records-search-toggle:hover,
     html[data-theme="dark"] .health-records-search-toggle:focus {
-        background: linear-gradient(135deg, #facc15, #fde68a) !important;
+        background: rgba(250, 204, 21, 0.18);
         border-color: #facc15;
-        color: #70131B !important;
+        color: #111827;
     }
 
     html[data-theme="dark"] .health-filter-toggle {
-        background: linear-gradient(135deg, #70131B, #8f2230);
-        border-color: rgba(250, 204, 21, 0.28);
-        color: #ffffff;
+        background: rgba(17, 24, 39, 0.96);
+        border-color: rgba(250, 204, 21, 0.16);
+        color: #facc15;
     }
 
     html[data-theme="dark"] .health-filter-toggle:hover,
-    html[data-theme="dark"] .health-filter-toggle:focus,
     html[data-theme="dark"] .health-filter-toggle.is-open {
-        background: linear-gradient(135deg, #facc15, #fde68a);
+        background: rgba(250, 204, 21, 0.18);
         border-color: #facc15;
-        color: #70131B !important;
+        color: #111827 !important;
     }
     html[data-theme="dark"] .card .text-muted,
     html[data-theme="dark"] .card th,
@@ -836,17 +810,9 @@
     html[data-theme="dark"] .health-records-search-toggle {
         background: linear-gradient(135deg, #70131B, #8f2230) !important;
         border-color: rgba(250, 204, 21, 0.28) !important;
-        color: #ffffff !important;
         box-shadow:
             0 0 0 3px rgba(112, 19, 27, 0.16),
             0 12px 22px rgba(0, 0, 0, 0.24) !important;
-    }
-
-    html[data-theme="dark"] .health-records-search-toggle:hover,
-    html[data-theme="dark"] .health-records-search-toggle:focus {
-        background: linear-gradient(135deg, #facc15, #fde68a) !important;
-        border-color: #facc15 !important;
-        color: #70131B !important;
     }
 
     html[data-theme="dark"] .health-records-toolbar {
@@ -1218,8 +1184,7 @@
 
         .health-records-search-shell:not(.is-open) .health-records-search-wrap {
             width: 0;
-            flex: 0 0 0;
-            min-width: 0;
+            flex-basis: 0;
         }
 
         .health-records-search {
@@ -1448,8 +1413,7 @@
                 </button>
             </div>
             <button type="button" class="health-filter-toggle" id="healthFilterToggle" aria-expanded="false" aria-controls="healthFilterModal">
-                <x-outline-icon name="funnel" />
-                <span>Filter</span>
+                Filter Health Forms
             </button>
         </div>
     </div>

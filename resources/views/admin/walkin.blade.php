@@ -4181,7 +4181,7 @@
                 return;
             }
 
-            $('#btnRunAiOcr').prop('disabled', true).text('Reading Text...');
+            $('#btnRunAiOcr').prop('disabled', true).text('AI Reading...');
             buildStatus(
                 isAutoAssist
                     ? 'Live OCR needs help, so we are sending the current camera image to AI to extract the student number.'

@@ -117,6 +117,21 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/api/check-session', [LoginController::class, 'apiCheckSession'])->withoutMiddleware('csrf');
 Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath'])->withoutMiddleware('csrf');
 
+// DEBUG ENDPOINT - Remove this after debugging
+Route::get('/api/debug-session', function (Request $request) {
+    return response()->json([
+        'session_id' => $request->session()->getId(),
+        'session_data' => session()->all(),
+        'admin_check' => Auth::guard('admin')->check(),
+        'admin_user' => Auth::guard('admin')->user() ? Auth::guard('admin')->user()->toArray() : null,
+        'student_check' => Auth::guard('student')->check(),
+        'student_user' => Auth::guard('student')->user() ? Auth::guard('student')->user()->toArray() : null,
+        'web_check' => Auth::guard('web')->check(),
+        'web_user' => Auth::guard('web')->user() ? Auth::guard('web')->user()->toArray() : null,
+        'cookies' => $request->cookies->all(),
+    ]);
+})->withoutMiddleware('csrf');
+
 // --- PROTECTED ROUTES (Login required) ---
 Route::middleware(['auth:student', 'audit'])->group(function () {
     Route::middleware('role:student')->group(function () {

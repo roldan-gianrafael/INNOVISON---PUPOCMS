@@ -1161,8 +1161,11 @@
             checkSessionStatus();
         }
 
-        // Async session check
+        // Async session check with detailed debugging
         function checkSessionStatus() {
+            console.log('[LANDING] Starting session check...');
+            console.log('[LANDING] Document cookies:', document.cookie);
+
             fetch('/api/check-session', {
                 method: 'GET',
                 headers: {
@@ -1171,21 +1174,29 @@
                 },
                 credentials: 'include'
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('[LANDING] API response status:', response.status);
+                console.log('[LANDING] API response headers:', response.headers);
+                return response.json();
+            })
             .then(data => {
-                console.log('Session check response:', data);
+                console.log('[LANDING] ✅ Session check RESPONSE:', JSON.stringify(data, null, 2));
+                console.log('[LANDING] authenticated =', data.authenticated);
+                console.log('[LANDING] role =', data.role);
+                console.log('[LANDING] isStudentAssistant =', data.isStudentAssistant);
 
                 if (data.authenticated === true) {
-                    // User is logged in
+                    console.log('[LANDING] ✅ User IS authenticated - showing auth UI');
                     updateUIForAuthenticated(data);
                 } else {
-                    // User is guest
+                    console.log('[LANDING] ❌ User is NOT authenticated - showing guest UI');
                     updateUIForGuest();
                 }
                 hidePreloader();
             })
             .catch(error => {
-                console.warn('Session check failed:', error);
+                console.error('[LANDING] ❌ Session check FAILED:', error);
+                console.error('[LANDING] Error stack:', error.stack);
                 updateUIForGuest();
                 hidePreloader();
             });

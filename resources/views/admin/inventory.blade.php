@@ -887,6 +887,7 @@
         -webkit-backdrop-filter: none;
     }
     #restockModal .modal-box,
+    #issueModal .modal-box,
     #historyModal .modal-box {
         width: min(100%, 860px);
         max-width: 100%;
@@ -1905,7 +1906,8 @@
     }
 
     /* --- Restock modal header — two-column layout with big frames on the right --- */
-    #restockModal .inventory-modal-head {
+    #restockModal .inventory-modal-head,
+    #issueModal .inventory-modal-head {
         align-items: stretch;
         gap: 16px;
     }
@@ -1965,7 +1967,8 @@
         color: #facc15 !important;
     }
     @media (max-width: 600px) {
-        #restockModal .inventory-modal-head {
+        #restockModal .inventory-modal-head,
+        #issueModal .inventory-modal-head {
             flex-wrap: wrap;
         }
         #historyModal .inventory-modal-head {
@@ -1983,7 +1986,8 @@
     }
 
     /* --- Restock modal — form field styling (mirrors #itemModal) --- */
-    #restockModal .form-group {
+    #restockModal .form-group,
+    #issueModal .form-group {
         margin-bottom: 14px;
         display: flex;
         flex-direction: column;
@@ -1998,7 +2002,8 @@
             0 18px 32px rgba(112, 19, 27, 0.06);
         transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
     }
-    #restockModal .form-group:focus-within {
+    #restockModal .form-group:focus-within,
+    #issueModal .form-group:focus-within {
         border-color: rgba(112, 19, 27, 0.30);
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.95),
@@ -2007,7 +2012,8 @@
             0 22px 40px rgba(112, 19, 27, 0.08);
         transform: translateY(-1px);
     }
-    #restockModal .form-group label {
+    #restockModal .form-group label,
+    #issueModal .form-group label {
         font-size: 0.74rem;
         font-weight: 700;
         color: #6b7280;
@@ -2016,7 +2022,10 @@
         margin-bottom: 4px;
     }
     #restockModal .form-control,
-    #restockModal textarea.form-control {
+    #restockModal textarea.form-control,
+    #issueModal .form-control,
+    #issueModal textarea.form-control,
+    #issueModal select.form-control {
         width: 100%;
         min-height: 38px;
         padding: 8px 0 4px;
@@ -2031,18 +2040,24 @@
         transition: color .18s ease, border-color .18s ease;
     }
     #restockModal .form-control:focus,
-    #restockModal textarea.form-control:focus {
+    #restockModal textarea.form-control:focus,
+    #issueModal .form-control:focus,
+    #issueModal textarea.form-control:focus,
+    #issueModal select.form-control:focus {
         outline: none;
         border-bottom: 1px solid #8f2230;
         background: transparent;
         box-shadow: none;
     }
     #restockModal .form-control::placeholder,
-    #restockModal textarea.form-control::placeholder {
+    #restockModal textarea.form-control::placeholder,
+    #issueModal .form-control::placeholder,
+    #issueModal textarea.form-control::placeholder {
         color: #6b7280;
         font-weight: 600;
     }
-    html[data-theme="dark"] #restockModal .form-group {
+    html[data-theme="dark"] #restockModal .form-group,
+    html[data-theme="dark"] #issueModal .form-group {
         background: rgba(31, 41, 55, 0.92);
         border-color: rgba(148, 163, 184, 0.22);
         box-shadow:
@@ -2051,7 +2066,8 @@
             0 8px 20px rgba(0, 0, 0, 0.22),
             0 18px 36px rgba(0, 0, 0, 0.16);
     }
-    html[data-theme="dark"] #restockModal .form-group:focus-within {
+    html[data-theme="dark"] #restockModal .form-group:focus-within,
+    html[data-theme="dark"] #issueModal .form-group:focus-within {
         border-color: rgba(250, 204, 21, 0.32);
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.05),
@@ -2060,24 +2076,34 @@
             0 22px 42px rgba(0, 0, 0, 0.20);
         transform: translateY(-1px);
     }
-    html[data-theme="dark"] #restockModal .form-group label {
+    html[data-theme="dark"] #restockModal .form-group label,
+    html[data-theme="dark"] #issueModal .form-group label {
         color: #ffffff !important;
     }
     html[data-theme="dark"] #restockModal .form-control,
-    html[data-theme="dark"] #restockModal textarea.form-control {
+    html[data-theme="dark"] #restockModal textarea.form-control,
+    html[data-theme="dark"] #issueModal .form-control,
+    html[data-theme="dark"] #issueModal textarea.form-control,
+    html[data-theme="dark"] #issueModal select.form-control {
         color: #ffffff;
         border-bottom-color: rgba(148, 163, 184, 0.36);
     }
     html[data-theme="dark"] #restockModal .form-control:focus,
-    html[data-theme="dark"] #restockModal textarea.form-control:focus {
+    html[data-theme="dark"] #restockModal textarea.form-control:focus,
+    html[data-theme="dark"] #issueModal .form-control:focus,
+    html[data-theme="dark"] #issueModal textarea.form-control:focus,
+    html[data-theme="dark"] #issueModal select.form-control:focus {
         border-bottom-color: #facc15;
     }
     html[data-theme="dark"] #restockModal .form-control::placeholder,
-    html[data-theme="dark"] #restockModal textarea.form-control::placeholder {
+    html[data-theme="dark"] #issueModal .form-control::placeholder,
+    html[data-theme="dark"] #restockModal textarea.form-control::placeholder,
+    html[data-theme="dark"] #issueModal textarea.form-control::placeholder {
         color: #94a3b8;
     }
     @media (max-width: 760px) {
-        #restockModal .form-group { padding: 10px; }
+        #restockModal .form-group,
+        #issueModal .form-group { padding: 10px; }
     }
 
     /* --- Restock quick-add preset buttons --- */

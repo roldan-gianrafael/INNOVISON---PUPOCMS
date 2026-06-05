@@ -88,8 +88,10 @@
     .stat-row:last-child { border-bottom: none; }
     .stat-val { font-weight: 700; color: #1e293b; }
 
-    .btn-action { display: block; width: 100%; text-align: center; background: #8B0000; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 20px; transition: 0.2s; box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2); }
-    .btn-action:hover { background: #70131B; transform: translateY(-2px); }
+    .btn-action { position: relative; overflow: hidden; display: block; width: 100%; text-align: center; background: #8B0000; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 20px; transition: background .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease; box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2); }
+    .btn-action::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.18) 28%, rgba(255,255,255,.58) 50%, rgba(255,255,255,.18) 72%, transparent 100%); transform: translateX(-135%); transition: transform .72s ease; pointer-events: none; }
+    .btn-action:hover { background: #facc15; color: #8B0000; transform: translateY(-2px); box-shadow: 0 10px 22px rgba(139, 0, 0, 0.18); }
+    .btn-action:hover::after { transform: translateX(135%); }
 
     @media (max-width: 900px) {
         .faq-layout { grid-template-columns: 1fr; }

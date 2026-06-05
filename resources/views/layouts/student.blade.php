@@ -2008,16 +2008,6 @@
                                     </a>
                                 </li>
                             @endif
-                            <!-- temporarily hide until feature is ready 
-                            <li>
-                                <a href="{{ url('/student/barcode-register') }}" class="{{ Request::is('student/barcode-register') ? 'active' : '' }}">
-                                    <span class="nav-dropdown-link-content">
-                                        <x-outline-icon name="qr-code" class="nav-dropdown-link-icon" />
-                                        <span>Scan / Bio</span>
-                                    </span>
-                                </a>
-                            </li>
-                            -->
                         </ul>
                     </li>
                     <li>

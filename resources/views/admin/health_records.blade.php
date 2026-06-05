@@ -40,6 +40,58 @@
         stroke: #ffffff !important;
         color: #ffffff !important;
     }
+    .workflow-card-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        flex: 0 0 34px;
+        width: 34px;
+        height: 34px;
+    }
+    .workflow-card-icon svg {
+        width: 30px !important;
+        height: 30px !important;
+        stroke-width: 2.1;
+    }
+    .workflow-card-divider {
+        width: 2px;
+        height: 54px;
+        align-self: center;
+        background: rgba(255, 255, 255, 0.72);
+        border-radius: 999px;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+    .workflow-card-text {
+        flex: 1;
+        min-width: 0;
+        padding-right: 10px;
+    }
+    .workflow-card-text small {
+        overflow-wrap: anywhere;
+    }
+    .workflow-card-label {
+        display: block;
+        font-size: 9px;
+        font-weight: 800;
+        line-height: 1.18;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+    .workflow-card-count {
+        margin: 3px 0 0 0;
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1;
+        color: #ffffff;
+    }
+    .card.awaiting-links-btn:hover .workflow-card-divider {
+        background: rgba(112, 19, 27, 0.72);
+        box-shadow: 0 0 0 1px rgba(112, 19, 27, 0.12);
+    }
     .awaiting-links-btn::before {
         content: '';
         position: absolute;
@@ -222,6 +274,221 @@
         color: #334155;
         font-size: 14px;
     }
+    .awaiting-info-row {
+        display: grid;
+        gap: 4px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: #fffaf7;
+    }
+    .awaiting-info-row span {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+    .awaiting-info-row strong {
+        color: #111827;
+        font-size: 14px;
+        font-weight: 900;
+        word-break: break-word;
+    }
+    .pending-approval-list {
+        display: grid;
+        gap: 12px;
+    }
+    .pending-approval-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        border-radius: 14px;
+        background: #fffaf7;
+        transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .pending-approval-card:hover {
+        background: #fff7df;
+        border-color: rgba(112, 19, 27, 0.24);
+        transform: translateY(-1px);
+    }
+    .pending-approval-name {
+        margin: 0;
+        color: #111827;
+        font-size: 14px;
+        font-weight: 900;
+    }
+    .pending-approval-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 12px;
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .pending-approval-empty {
+        padding: 28px;
+        border: 1px dashed rgba(112, 19, 27, 0.18);
+        border-radius: 16px;
+        color: #64748b;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 700;
+    }
+    .readonly-record-card {
+        display: grid;
+        gap: 14px;
+        padding: 16px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        border-radius: 16px;
+        background: #fffaf7;
+    }
+    .readonly-record-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(112, 19, 27, 0.1);
+    }
+    .readonly-record-name {
+        margin: 0;
+        color: #111827;
+        font-size: 15px;
+        font-weight: 900;
+    }
+    .readonly-record-sub {
+        margin: 4px 0 0;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .readonly-record-status {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        padding: 6px 10px;
+        background: #fef3c7;
+        color: #70131B;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+    .readonly-record-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .readonly-field {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid rgba(112, 19, 27, 0.08);
+    }
+    .readonly-field span {
+        display: block;
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+    }
+    .readonly-field strong {
+        display: block;
+        margin-top: 4px;
+        color: #111827;
+        font-size: 13px;
+        font-weight: 900;
+        word-break: break-word;
+    }
+    .readonly-docs-title {
+        margin: 2px 0 0;
+        color: #70131B;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+    .readonly-doc-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .readonly-doc-link,
+    .readonly-doc-missing {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 40px;
+        padding: 9px 11px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 900;
+        text-decoration: none;
+    }
+    .readonly-doc-link {
+        border: 1px solid rgba(112, 19, 27, 0.18);
+        background: #ffffff;
+        color: #70131B;
+        transition: background-color .2s ease, color .2s ease, transform .2s ease;
+    }
+    .readonly-doc-link:hover {
+        background: #70131B;
+        color: #facc15;
+        transform: translateY(-1px);
+    }
+    .readonly-doc-missing {
+        border: 1px dashed rgba(100, 116, 139, 0.25);
+        background: #f8fafc;
+        color: #94a3b8;
+    }
+    html[data-theme="dark"] .awaiting-info-row {
+        background: rgba(17, 24, 39, .92);
+        border-color: rgba(250, 204, 21, .18);
+    }
+    html[data-theme="dark"] .awaiting-info-row span {
+        color: #cbd5e1;
+    }
+    html[data-theme="dark"] .awaiting-info-row strong {
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .pending-approval-card,
+    html[data-theme="dark"] .pending-approval-empty,
+    html[data-theme="dark"] .readonly-record-card {
+        background: rgba(17, 24, 39, .92);
+        border-color: rgba(250, 204, 21, .18);
+    }
+    html[data-theme="dark"] .pending-approval-name,
+    html[data-theme="dark"] .readonly-record-name,
+    html[data-theme="dark"] .readonly-field strong {
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .pending-approval-meta,
+    html[data-theme="dark"] .pending-approval-empty,
+    html[data-theme="dark"] .readonly-record-sub,
+    html[data-theme="dark"] .readonly-field span {
+        color: #cbd5e1;
+    }
+    html[data-theme="dark"] .readonly-field,
+    html[data-theme="dark"] .readonly-doc-link {
+        background: rgba(15, 23, 42, .9);
+        border-color: rgba(250, 204, 21, .14);
+    }
+    html[data-theme="dark"] .readonly-doc-link {
+        color: #facc15;
+    }
+    html[data-theme="dark"] .readonly-doc-missing {
+        background: rgba(15, 23, 42, .72);
+        color: #94a3b8;
+    }
     .health-summary-card {
         position: relative;
         overflow: hidden;
@@ -399,14 +666,59 @@
 
     /* Custom Flex Grid para sa Summary Cards */
     .summary-container {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 20px;
         width: 100%;
         margin-bottom: 25px;
         align-items: stretch;
     }
     .summary-item {
-        flex: 1; /* Hahatiin ang space sa dalawa (50/50) */
+        min-width: 0;
+    }
+    .health-summary-action-card {
+        width: 100%;
+        min-height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        cursor: default;
+        transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .health-summary-metric-card {
+        background: #facc15 !important;
+        border: 1px solid #facc15 !important;
+        border-left: 5px solid #70131B !important;
+        color: #70131B !important;
+        box-shadow: 0 4px 12px rgba(112, 19, 27, 0.16) !important;
+    }
+    .health-summary-metric-card * {
+        color: #70131B !important;
+    }
+    .health-summary-metric-label {
+        display: block;
+        font-size: 9px;
+        font-weight: 800;
+        line-height: 1.18;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+    .health-summary-metric-count {
+        margin: 3px 0 0 0;
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1;
+        color: #70131B;
+    }
+    .health-summary-info-btn {
+        cursor: pointer;
+    }
+    .health-summary-info-btn:hover {
+        transform: translateY(-2px);
+        border-color: rgba(112, 19, 27, .42) !important;
+        box-shadow: 0 14px 28px rgba(112, 19, 27, .14);
+        background: #fffaf0;
     }
     .health-records-title {
         margin: 0;
@@ -944,35 +1256,6 @@
 
     .health-highlight-row td {
         background: transparent;
-    }
-
-    .health-tab-bar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin: 0 0 16px;
-        padding: 12px;
-        border-radius: 18px;
-        border: 1px solid rgba(112, 19, 27, 0.12);
-        background: #fffaf7;
-    }
-    .health-tab-btn {
-        border: 1px solid rgba(112, 19, 27, 0.16);
-        border-radius: 999px;
-        background: #ffffff;
-        color: #70131B;
-        padding: 10px 16px;
-        font-size: 12px;
-        font-weight: 900;
-        cursor: pointer;
-        transition: all 0.18s ease;
-    }
-    .health-tab-btn:hover,
-    .health-tab-btn.is-active {
-        background: #70131B;
-        border-color: #70131B;
-        color: #facc15;
-        transform: translateY(-1px);
     }
 
     .verification-doc-toggle {
@@ -1541,7 +1824,7 @@
         }
 
         .summary-container {
-            flex-direction: column;
+            grid-template-columns: 1fr;
         }
 
     }
@@ -1770,10 +2053,28 @@
             foreach($referenceNumbers as $ref) {
                 $approvalLog = $approvalLogs->where('subject_id', $ref)->last();
                 $pendingAssessment = \App\Models\PendingMedicalAssessment::where('reference_number', $ref)->first();
+                $studentIdFromDescription = null;
+                if ($approvalLog && preg_match('/Student ID:\s*([^)]+)/i', (string) $approvalLog->description, $matches)) {
+                    $studentIdFromDescription = trim($matches[1]);
+                }
+                $linkedUser = $pendingAssessment?->user;
+                if (!$linkedUser && $studentIdFromDescription) {
+                    $linkedUser = \App\Models\User::where('student_id', $studentIdFromDescription)
+                        ->orWhere('student_number', $studentIdFromDescription)
+                        ->first();
+                }
+                $displayName = $linkedUser?->name;
+                if (!$displayName && $approvalLog) {
+                    $displayName = trim(preg_replace('/^Applicant approved:\s*[^()]+(?:\s*\(Student ID:[^)]+\))?/i', '', (string) $approvalLog->description));
+                }
+                if (!$displayName) {
+                    $displayName = 'Applicant';
+                }
 
                 $approvedApplicants[] = [
                     'reference_number' => $ref,
-                    'name' => $approvalLog->description ?? 'Unknown',
+                    'name' => $displayName,
+                    'email' => $linkedUser?->email ?: $pendingAssessment?->email ?: '-',
                     'approve_date' => $approvalLog->created_at,
                     'has_uploaded' => $pendingAssessment !== null,
                 ];
@@ -1781,34 +2082,104 @@
         } catch (\Exception $e) {
             // Tables may not exist
         }
+
+        $healthSummaryStats = [
+            'total' => $records->count(),
+            'with_conditions' => 0,
+            'awaiting_uploads' => 0,
+            'pending_approval' => 0,
+            'pending_conditional' => 0,
+        ];
+        $awaitingUploadRecordIds = [];
+        $pendingApprovalRecordIds = [];
+        $pendingConditionalRecordIds = [];
+
+        foreach ($records as $summaryRecord) {
+            $summaryHasRequirements = filled($summaryRecord->medical_certificate)
+                && filled($summaryRecord->chest_xray_result)
+                && filled($summaryRecord->health_form_upload)
+                && filled($summaryRecord->student_photo);
+            $summaryStatus = trim((string) ($summaryRecord->clearance_status ?? ''));
+            $summaryIsConditional = in_array($summaryStatus, ['Pending/Conditional', 'Rejected'], true)
+                || trim((string) ($summaryRecord->pending_reason ?? '')) !== ''
+                || trim((string) ($summaryRecord->medical_condition_remarks ?? '')) !== '';
+
+            if ($summaryRecord->has_disability === 'Yes') {
+                $healthSummaryStats['with_conditions']++;
+            }
+
+            if (!$summaryHasRequirements) {
+                $healthSummaryStats['awaiting_uploads']++;
+                $awaitingUploadRecordIds[] = $summaryRecord->id;
+            }
+
+            if ($summaryHasRequirements && !$summaryIsConditional && in_array($summaryStatus, ['Pending', 'For Verification', ''], true)) {
+                $healthSummaryStats['pending_approval']++;
+                $pendingApprovalRecordIds[] = $summaryRecord->id;
+            }
+
+            if ($summaryIsConditional) {
+                $healthSummaryStats['pending_conditional']++;
+                $pendingConditionalRecordIds[] = $summaryRecord->id;
+            }
+        }
     @endphp
 
-    {{-- Summary Cards - Hardcoded Side by Side --}}
+    {{-- Summary Action Cards --}}
     <div class="summary-container">
         <div class="summary-item">
-            <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #70131B;">
+            <div class="card p-3 health-summary-action-card health-summary-metric-card" style="padding: 15px 24px !important;">
                 <div class="health-summary-row">
-                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>Total</span><span>Submissions</span></small>
-                    <h3 class="fw-bold mb-0 health-summary-value">{{ $records->count() }}</h3>
+                    <small class="health-summary-metric-label"><span>Total</span><span>Submissions</span></small>
+                    <h3 class="health-summary-metric-count">{{ $healthSummaryStats['total'] }}</h3>
                 </div>
             </div>
         </div>
         <div class="summary-item">
-            <div class="card p-3" style="padding: 15px 24px !important; border-left: 5px solid #dc3545;">
+            <div class="card p-3 health-summary-action-card health-summary-metric-card" style="padding: 15px 24px !important;">
                 <div class="health-summary-row">
-                    <small class="text-muted fw-bold text-uppercase health-summary-label"><span>With Medical</span><span>Conditions</span></small>
-                    <h3 class="fw-bold mb-0 text-danger">{{ $records->where('has_disability', 'Yes')->count() }}</h3>
+                    <small class="health-summary-metric-label"><span>With Medical</span><span>Conditions</span></small>
+                    <h3 class="health-summary-metric-count">{{ $healthSummaryStats['with_conditions'] }}</h3>
                 </div>
             </div>
         </div>
-        <div class="summary-item" style="flex: 1.2;">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingLinksBtn" style="padding: 8px 24px !important; border-left: 5px solid #70131B; width: 100%; display: flex; align-items: center; justify-content: flex-start; gap: 16px; min-height: 90px;" onclick="document.getElementById('awaitingLinksModal').style.display='flex';">
-                <div style="display: flex; align-items: center; color: #ffffff; font-size: 22px; flex-shrink: 0; width: 22px; height: 22px;">
+        <div class="summary-item">
+            <button type="button" class="card p-3 awaiting-links-btn health-summary-info-btn" id="pendingApprovalInfoBtn" style="padding: 8px 18px 8px 12px !important; border-left: 5px solid #70131B; width: 100%; display: flex; align-items: center; justify-content: flex-start; gap: 12px; min-height: 90px;" onclick="document.getElementById('pendingApprovalInfoModal').style.display='flex';">
+                <div class="workflow-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M7 4h7l4 4v12H7V4z" stroke="currentColor" stroke-linejoin="round"/>
+                        <path d="M14 4v4h4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.5 14l2 2 4-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="workflow-card-divider" aria-hidden="true"></span>
+                <div class="workflow-card-text">
+                    <small class="workflow-card-label">Pending Approval</small>
+                    <h3 class="workflow-card-count">{{ $healthSummaryStats['pending_approval'] }}</h3>
+                </div>
+            </button>
+        </div>
+        <div class="summary-item">
+            <button type="button" class="card p-3 awaiting-links-btn health-summary-info-btn" id="pendingConditionalInfoBtn" style="padding: 8px 18px 8px 12px !important; border-left: 5px solid #70131B; width: 100%; display: flex; align-items: center; justify-content: flex-start; gap: 12px; min-height: 90px;" onclick="document.getElementById('pendingConditionalInfoModal').style.display='flex';">
+                <div class="workflow-card-icon">
+                    <x-outline-icon name="exclamation-triangle" />
+                </div>
+                <span class="workflow-card-divider" aria-hidden="true"></span>
+                <div class="workflow-card-text">
+                    <small class="workflow-card-label">Pending Compliance</small>
+                    <h3 class="workflow-card-count">{{ $healthSummaryStats['pending_conditional'] }}</h3>
+                </div>
+            </button>
+        </div>
+        <div class="summary-item">
+            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingUploadsInfoBtn" style="padding: 8px 18px 8px 12px !important; border-left: 5px solid #70131B; width: 100%; display: flex; align-items: center; justify-content: flex-start; gap: 12px; min-height: 90px;" onclick="document.getElementById('awaitingUploadsInfoModal').style.display='flex';">
+                <div class="workflow-card-icon">
                     <x-outline-icon name="link" />
                 </div>
-                <div style="flex: 1;">
-                    <small style="display: block; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 1.2px; line-height: 1.2;">Awaiting Links</small>
-                    <h3 class="fw-bold" style="color: #ffffff; margin: 4px 0 0 0; font-size: 28px; line-height: 1.1;">{{ count($approvedApplicants) }}</h3>
+                <span class="workflow-card-divider" aria-hidden="true"></span>
+                <div class="workflow-card-text">
+                    <small class="workflow-card-label">Awaiting Uploads</small>
+                    <h3 class="workflow-card-count">{{ $healthSummaryStats['awaiting_uploads'] }}</h3>
                 </div>
             </button>
         </div>
@@ -1818,12 +2189,6 @@
 <div class="card health-summary-card">
     <div class="health-table-head">
         <div class="health-table-title">Health Profile Summary</div>
-    </div>
-    <div class="health-tab-bar" aria-label="Health record status filters">
-        <button type="button" class="health-tab-btn is-active" data-health-tab-btn="all">All Records</button>
-        <button type="button" class="health-tab-btn" data-health-tab-btn="awaiting_uploads">Awaiting Uploads</button>
-        <button type="button" class="health-tab-btn" data-health-tab-btn="pending_approval">Pending Approval</button>
-        <button type="button" class="health-tab-btn" data-health-tab-btn="pending_conditional">Pending Compliance / Conditional</button>
     </div>
     <table id="healthTable">
         <thead>
@@ -1905,6 +2270,7 @@
                     data-health-row
                     data-health-id="{{ $record->id }}"
                     data-health-tab="{{ $healthTabState }}"
+                    data-health-condition="{{ $record->has_disability == 'Yes' ? 'with_conditions' : 'none' }}"
                     data-record-payload="{{ e(json_encode($recordPayload)) }}"
                     data-view-url="{{ in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true) ? route('admin.show_health', $record->id) : '' }}"
                     title="{{ in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true) ? 'Click to view' : '' }}"
@@ -1974,6 +2340,48 @@
     </table>
 </div>
 
+{{-- Awaiting Uploads Modal --}}
+<div id="awaitingUploadsInfoModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target.id==='awaitingUploadsInfoModal') document.getElementById('awaitingUploadsInfoModal').style.display='none';">
+    <div class="awaiting-links-modal-shell" style="max-width: 760px;">
+        <div class="awaiting-links-modal-head">
+            <div class="awaiting-links-modal-head-main">
+                <div class="awaiting-links-modal-badge">AU</div>
+                <div class="awaiting-links-modal-copy">
+                    <h3>Awaiting Uploads</h3>
+                    <p>Read-only view of students with missing clinic requirements.</p>
+                </div>
+            </div>
+            <button type="button" class="awaiting-links-modal-close" id="closeAwaitingUploadsInfoModal" aria-label="Close awaiting uploads modal" onclick="document.getElementById('awaitingUploadsInfoModal').style.display='none';">
+                <x-outline-icon name="x-mark" />
+            </button>
+        </div>
+        <div class="awaiting-links-modal-body">
+            <div class="pending-approval-list">
+                @forelse($records->whereIn('id', $awaitingUploadRecordIds) as $readonlyRecord)
+                    <article class="readonly-record-card">
+                        <div class="readonly-record-head">
+                            <div>
+                                <h4 class="readonly-record-name">{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</h4>
+                                <p class="readonly-record-sub">{{ optional($readonlyRecord->user)->email ?: '-' }}</p>
+                            </div>
+                            <span class="readonly-record-status">Missing Requirements</span>
+                        </div>
+                        <div class="readonly-record-grid">
+                            <div class="readonly-field"><span>Status Flag</span><strong>Missing Requirements</strong></div>
+                            <div class="readonly-field"><span>Student Full Name</span><strong>{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</strong></div>
+                            <div class="readonly-field"><span>Student ID Number</span><strong>{{ $readonlyRecord->student_id ?: optional($readonlyRecord->user)->student_id ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
+                            <div class="readonly-field"><span>Email Address</span><strong>{{ optional($readonlyRecord->user)->email ?: '-' }}</strong></div>
+                            <div class="readonly-field"><span>Account Registration Date</span><strong>{{ optional(optional($readonlyRecord->user)->created_at)->format('M d, Y') ?: '-' }}</strong></div>
+                        </div>
+                    </article>
+                @empty
+                    <div class="pending-approval-empty">No students are currently awaiting uploads.</div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Awaiting Links Modal --}}
 <div id="awaitingLinksModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;" onclick="if(event.target.id==='awaitingLinksModal') document.getElementById('awaitingLinksModal').style.display='none';">
     <div class="awaiting-links-modal-shell">
@@ -2007,7 +2415,7 @@
                             <tr style="border-bottom: 1px solid #f8fafc;">
                                 <td style="padding: 16px; color: #111827; font-weight: 700;">{{ $applicant['reference_number'] }}</td>
                                 <td style="padding: 16px; color: #111827;">{{ $applicant['name'] }}</td>
-                                <td style="padding: 16px; color: #111827;">-</td>
+                                <td style="padding: 16px; color: #111827;">{{ $applicant['email'] }}</td>
                                 <td style="padding: 16px; color: #111827;">{{ $applicant['approve_date']->format('M d, Y h:i A') }}</td>
                                 <td style="text-align: center; padding: 16px;">
                                     @if($applicant['has_uploaded'])
@@ -2017,7 +2425,15 @@
                                     @endif
                                 </td>
                                 <td style="text-align: center; padding: 16px;">
-                                    <a href="#" class="link-button" style="color: #0369a1; text-decoration: none; font-weight: 600; font-size: 13px;">View</a>
+                                    <span
+                                        class="link-button awaiting-applicant-label"
+                                        style="color: #0369a1; text-decoration: none; font-weight: 600; font-size: 13px; border: 0; background: transparent; cursor: pointer;"
+                                        data-reference="{{ $applicant['reference_number'] }}"
+                                        data-name="{{ $applicant['name'] }}"
+                                        data-email="{{ $applicant['email'] }}"
+                                        data-approve-date="{{ $applicant['approve_date']->format('M d, Y h:i A') }}"
+                                        data-uploaded="{{ $applicant['has_uploaded'] ? 'Uploaded' : 'Not Uploaded' }}"
+                                    >View</span>
                                 </td>
                             </tr>
                         @endforeach
@@ -2032,61 +2448,135 @@
     </div>
 </div>
 
-{{-- Pending Medical Assessments Section --}}
-@php
-    $pendingAssessments = [];
-    try {
-        $pendingAssessments = \App\Models\PendingMedicalAssessment::all();
-    } catch (\Exception $e) {
-        // Table may not exist
-    }
-@endphp
-
-@if(count($pendingAssessments) > 0)
-<div class="card health-summary-card" style="margin-top: 30px;">
-    <div class="health-table-head">
-        <div class="health-table-title">Pending Medical Assessments</div>
-        <p style="margin: 0; font-size: 13px; color: #64748b; margin-top: 4px;">Medical assessments uploaded via reference lookup, waiting to be linked to student accounts.</p>
+<div id="pendingApprovalInfoModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target.id==='pendingApprovalInfoModal') document.getElementById('pendingApprovalInfoModal').style.display='none';">
+    <div class="awaiting-links-modal-shell" style="max-width: 760px;">
+        <div class="awaiting-links-modal-head">
+            <div class="awaiting-links-modal-head-main">
+                <div class="awaiting-links-modal-badge">PA</div>
+                <div class="awaiting-links-modal-copy">
+                    <h3>Pending Approval</h3>
+                    <p>Students in this state have uploaded clinic requirements and are waiting for nurse review.</p>
+                </div>
+            </div>
+            <button type="button" class="awaiting-links-modal-close" id="closePendingApprovalInfoModal" aria-label="Close pending approval modal" onclick="document.getElementById('pendingApprovalInfoModal').style.display='none';">
+                <x-outline-icon name="x-mark" />
+            </button>
+        </div>
+        <div class="awaiting-links-modal-body">
+            <div class="pending-approval-list" id="pendingApprovalRecordsList">
+                @forelse($records->whereIn('id', $pendingApprovalRecordIds) as $readonlyRecord)
+                    @php
+                        $readonlyDocs = [
+                            'Medical Certificate' => $readonlyRecord->medical_certificate,
+                            'Chest X-ray Result' => $readonlyRecord->chest_xray_result,
+                            'Health Form Upload' => $readonlyRecord->health_form_upload,
+                            '2x2 Photo' => $readonlyRecord->student_photo,
+                        ];
+                    @endphp
+                    <article class="readonly-record-card">
+                        <div class="readonly-record-head">
+                            <div>
+                                <h4 class="readonly-record-name">{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</h4>
+                                <p class="readonly-record-sub">{{ optional($readonlyRecord->user)->email ?: '-' }}</p>
+                            </div>
+                            <span class="readonly-record-status">Pending Verification</span>
+                        </div>
+                        <div class="readonly-record-grid">
+                            <div class="readonly-field"><span>Status Flag</span><strong>Pending Verification</strong></div>
+                            <div class="readonly-field"><span>Student Full Name</span><strong>{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</strong></div>
+                            <div class="readonly-field"><span>Student ID Number</span><strong>{{ $readonlyRecord->student_id ?: optional($readonlyRecord->user)->student_id ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
+                            <div class="readonly-field"><span>Submission Reference Number</span><strong>{{ $readonlyRecord->reference_number ?: $readonlyRecord->student_number ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
+                            <div class="readonly-field"><span>Email Address</span><strong>{{ optional($readonlyRecord->user)->email ?: '-' }}</strong></div>
+                        </div>
+                        <h5 class="readonly-docs-title">Uploaded Files Checklist</h5>
+                        <ul class="readonly-doc-list">
+                            @foreach($readonlyDocs as $docLabel => $docPath)
+                                <li>
+                                    @if($docPath)
+                                        <a class="readonly-doc-link" href="{{ asset('storage/' . $docPath) }}" target="_blank" rel="noopener noreferrer">
+                                            <span>{{ $docLabel }}</span>
+                                            <span>Open</span>
+                                        </a>
+                                    @else
+                                        <span class="readonly-doc-missing">
+                                            <span>{{ $docLabel }}</span>
+                                            <span>Missing</span>
+                                        </span>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    </article>
+                @empty
+                    <div class="pending-approval-empty">No students are currently waiting for approval.</div>
+                @endforelse
+            </div>
+        </div>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Reference Number</th>
-                <th>Email</th>
-                <th>File Name</th>
-                <th>Uploaded Date</th>
-                <th>Status</th>
-                <th>Student Name</th>
-                <th style="text-align: center;">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($pendingAssessments as $assessment)
-                <tr>
-                    <td class="fw-bold">{{ $assessment->reference_number }}</td>
-                    <td>{{ $assessment->email }}</td>
-                    <td style="word-break: break-word; max-width: 250px;">{{ $assessment->file_name }}</td>
-                    <td>{{ $assessment->created_at->format('M d, Y h:i A') }}</td>
-                    <td>
-                        @if($assessment->user_id)
-                            <span class="status issued">Linked</span>
-                        @else
-                            <span class="status pending">Pending</span>
-                        @endif
-                    </td>
-                    <td>{{ $assessment->user?->name ?? 'Not yet linked' }}</td>
-                    <td style="text-align: center;">
-                        <a href="{{ asset('storage/' . $assessment->file_path) }}" target="_blank" class="btn-action btn-view" style="display: inline-block;">
-                            <x-outline-icon name="document-text" />
-                            View
-                        </a>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
 </div>
-@endif
+
+<div id="pendingConditionalInfoModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target.id==='pendingConditionalInfoModal') document.getElementById('pendingConditionalInfoModal').style.display='none';">
+    <div class="awaiting-links-modal-shell" style="max-width: 760px;">
+        <div class="awaiting-links-modal-head">
+            <div class="awaiting-links-modal-head-main">
+                <div class="awaiting-links-modal-badge">PC</div>
+                <div class="awaiting-links-modal-copy">
+                    <h3>Pending Compliance / Conditional</h3>
+                    <p>Read-only view of students needing correction, compliance, or further medical assessment.</p>
+                </div>
+            </div>
+            <button type="button" class="awaiting-links-modal-close" id="closePendingConditionalInfoModal" aria-label="Close pending compliance modal" onclick="document.getElementById('pendingConditionalInfoModal').style.display='none';">
+                <x-outline-icon name="x-mark" />
+            </button>
+        </div>
+        <div class="awaiting-links-modal-body">
+            <div class="pending-approval-list">
+                @forelse($records->whereIn('id', $pendingConditionalRecordIds) as $readonlyRecord)
+                    <article class="readonly-record-card">
+                        <div class="readonly-record-head">
+                            <div>
+                                <h4 class="readonly-record-name">{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</h4>
+                                <p class="readonly-record-sub">{{ optional($readonlyRecord->user)->email ?: '-' }}</p>
+                            </div>
+                            <span class="readonly-record-status">Conditional / Flagged</span>
+                        </div>
+                        <div class="readonly-record-grid">
+                            <div class="readonly-field"><span>Status Flag</span><strong>Conditional / Flagged</strong></div>
+                            <div class="readonly-field"><span>Previous Nurse Disapproval Notes</span><strong>{{ $readonlyRecord->pending_reason ?: '-' }}</strong></div>
+                            <div class="readonly-field"><span>Student Full Name</span><strong>{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</strong></div>
+                            <div class="readonly-field"><span>Student ID Number</span><strong>{{ $readonlyRecord->student_id ?: optional($readonlyRecord->user)->student_id ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
+                            <div class="readonly-field"><span>Submission Reference Number</span><strong>{{ $readonlyRecord->reference_number ?: $readonlyRecord->student_number ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
+                            <div class="readonly-field"><span>Last Updated Nurse Tracking Remarks</span><strong>{{ $readonlyRecord->medical_condition_remarks ?: $readonlyRecord->pending_reason ?: '-' }}</strong></div>
+                        </div>
+                    </article>
+                @empty
+                    <div class="pending-approval-empty">No students are currently pending compliance.</div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="awaitingApplicantInfoModal" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.58); z-index: 1100; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target.id==='awaitingApplicantInfoModal') document.getElementById('awaitingApplicantInfoModal').style.display='none';">
+    <div style="width: min(460px, 100%); background: #ffffff; border-radius: 18px; border-top: 4px solid #facc15; border-bottom: 4px solid #facc15; box-shadow: 0 24px 60px rgba(0,0,0,.22); overflow: hidden;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:18px 20px; background:linear-gradient(135deg,#70131B,#8f2230); color:#fff;">
+            <div>
+                <h3 style="margin:0; color:#fff; font-size:20px; font-weight:900;">Applicant Information</h3>
+                <p style="margin:5px 0 0; color:rgba(255,255,255,.78); font-size:13px;">Approved reference awaiting student account linkage.</p>
+            </div>
+            <button type="button" id="closeAwaitingApplicantInfoModal" style="border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.12); color:#fff; border-radius:999px; width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" aria-label="Close applicant info modal">
+                <x-outline-icon name="x-mark" />
+            </button>
+        </div>
+        <div style="padding:20px; display:grid; gap:12px;">
+            <div class="awaiting-info-row"><span>Reference Number</span><strong id="awaitingInfoReference">-</strong></div>
+            <div class="awaiting-info-row"><span>Name</span><strong id="awaitingInfoName">-</strong></div>
+            <div class="awaiting-info-row"><span>Email</span><strong id="awaitingInfoEmail">-</strong></div>
+            <div class="awaiting-info-row"><span>Approve Date</span><strong id="awaitingInfoDate">-</strong></div>
+            <div class="awaiting-info-row"><span>Uploaded Requirements</span><strong id="awaitingInfoUploaded">-</strong></div>
+        </div>
+    </div>
+</div>
 
 <div class="verify-approval-modal" id="verifyApprovalModal" aria-hidden="true">
     <div class="verify-approval-modal-card">
@@ -2249,7 +2739,6 @@
     const verifyDocumentsValid = document.getElementById('verifyDocumentsValid');
     const verificationDocsToggle = document.getElementById('verificationDocsToggle');
     const verificationDocsGrid = document.getElementById('verificationDocsGrid');
-    const healthTabButtons = Array.from(document.querySelectorAll('[data-health-tab-btn]'));
 
     function setHealthFilterOpenState(isOpen) {
         if (!healthFilterToggle || !healthFilterModal) {
@@ -2312,41 +2801,23 @@
 
             healthRows.forEach(function (row) {
                 const rowText = row.innerText.toLowerCase();
-                const activeTab = document.querySelector('[data-health-tab-btn].is-active')?.dataset.healthTabBtn || 'all';
-                const tabMatch = activeTab === 'all' || row.dataset.healthTab === activeTab;
-                row.style.display = rowText.includes(searchTerm) && tabMatch ? '' : 'none';
+                row.style.display = rowText.includes(searchTerm) ? '' : 'none';
             });
         });
     }
 
-    function applyHealthTab(tabName) {
-        const tab = tabName || 'all';
-        healthTabButtons.forEach(function (button) {
-            button.classList.toggle('is-active', button.dataset.healthTabBtn === tab);
-        });
-
-        const searchTerm = healthRecordsSearchInput ? healthRecordsSearchInput.value.trim().toLowerCase() : '';
-        healthRows.forEach(function (row) {
-            const rowText = row.innerText.toLowerCase();
-            const tabMatch = tab === 'all' || row.dataset.healthTab === tab;
-            const searchMatch = searchTerm === '' || rowText.includes(searchTerm);
-            row.style.display = tabMatch && searchMatch ? '' : 'none';
-        });
-    }
-
-    healthTabButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            applyHealthTab(button.dataset.healthTabBtn || 'all');
-        });
-    });
-
     window.addEventListener('DOMContentLoaded', function () {
         const params = new URLSearchParams(window.location.search);
         const requestedTab = params.get('tab');
-        if (requestedTab === 'pending_approval') {
-            applyHealthTab('pending_approval');
-        } else {
-            applyHealthTab('all');
+        if (requestedTab === 'awaiting_uploads') {
+            const awaitingUploadsInfoModal = document.getElementById('awaitingUploadsInfoModal');
+            if (awaitingUploadsInfoModal) awaitingUploadsInfoModal.style.display = 'flex';
+        } else if (requestedTab === 'pending_approval') {
+            const pendingApprovalInfoModal = document.getElementById('pendingApprovalInfoModal');
+            if (pendingApprovalInfoModal) pendingApprovalInfoModal.style.display = 'flex';
+        } else if (requestedTab === 'pending_conditional') {
+            const pendingConditionalInfoModal = document.getElementById('pendingConditionalInfoModal');
+            if (pendingConditionalInfoModal) pendingConditionalInfoModal.style.display = 'flex';
         }
     });
 
@@ -2422,45 +2893,66 @@
         });
     }
 
-    // Awaiting Links Modal - wrapped in DOMContentLoaded to ensure elements exist
+    // Read-only clinic status modals - wrapped in DOMContentLoaded to ensure elements exist
     document.addEventListener('DOMContentLoaded', function() {
-        const awaitingLinksBtn = document.getElementById('awaitingLinksBtn');
-        const awaitingLinksModal = document.getElementById('awaitingLinksModal');
-        const closeAwaitingLinksModal = document.getElementById('closeAwaitingLinksModal');
+        const awaitingUploadsInfoBtn = document.getElementById('awaitingUploadsInfoBtn');
+        const awaitingUploadsInfoModal = document.getElementById('awaitingUploadsInfoModal');
+        const closeAwaitingUploadsInfoModal = document.getElementById('closeAwaitingUploadsInfoModal');
+        const pendingApprovalInfoBtn = document.getElementById('pendingApprovalInfoBtn');
+        const pendingApprovalInfoModal = document.getElementById('pendingApprovalInfoModal');
+        const closePendingApprovalInfoModal = document.getElementById('closePendingApprovalInfoModal');
+        const pendingConditionalInfoBtn = document.getElementById('pendingConditionalInfoBtn');
+        const pendingConditionalInfoModal = document.getElementById('pendingConditionalInfoModal');
+        const closePendingConditionalInfoModal = document.getElementById('closePendingConditionalInfoModal');
 
-        console.log('Awaiting Links Debug:', {
-            btnFound: !!awaitingLinksBtn,
-            modalFound: !!awaitingLinksModal,
-            closeFound: !!closeAwaitingLinksModal
-        });
-
-        if (awaitingLinksBtn) {
-            awaitingLinksBtn.addEventListener('click', function () {
-                console.log('Awaiting Links button clicked');
-                if (awaitingLinksModal) {
-                    awaitingLinksModal.style.display = 'flex';
-                    console.log('Modal opened');
-                }
-            });
-        } else {
-            console.warn('Awaiting Links button not found');
-        }
-
-        if (closeAwaitingLinksModal) {
-            closeAwaitingLinksModal.addEventListener('click', function () {
-                if (awaitingLinksModal) {
-                    awaitingLinksModal.style.display = 'none';
+        if (awaitingUploadsInfoBtn) {
+            awaitingUploadsInfoBtn.addEventListener('click', function () {
+                if (awaitingUploadsInfoModal) {
+                    awaitingUploadsInfoModal.style.display = 'flex';
                 }
             });
         }
 
-        if (awaitingLinksModal) {
-            awaitingLinksModal.addEventListener('click', function (event) {
-                if (event.target === awaitingLinksModal) {
-                    awaitingLinksModal.style.display = 'none';
+        if (closeAwaitingUploadsInfoModal) {
+            closeAwaitingUploadsInfoModal.addEventListener('click', function () {
+                if (awaitingUploadsInfoModal) {
+                    awaitingUploadsInfoModal.style.display = 'none';
                 }
             });
         }
+
+        if (awaitingUploadsInfoModal) {
+            awaitingUploadsInfoModal.addEventListener('click', function (event) {
+                if (event.target === awaitingUploadsInfoModal) {
+                    awaitingUploadsInfoModal.style.display = 'none';
+                }
+            });
+        }
+
+        if (pendingApprovalInfoBtn && pendingApprovalInfoModal) {
+            pendingApprovalInfoBtn.addEventListener('click', function () {
+                pendingApprovalInfoModal.style.display = 'flex';
+            });
+        }
+
+        if (closePendingApprovalInfoModal && pendingApprovalInfoModal) {
+            closePendingApprovalInfoModal.addEventListener('click', function () {
+                pendingApprovalInfoModal.style.display = 'none';
+            });
+        }
+
+        if (pendingConditionalInfoBtn && pendingConditionalInfoModal) {
+            pendingConditionalInfoBtn.addEventListener('click', function () {
+                pendingConditionalInfoModal.style.display = 'flex';
+            });
+        }
+
+        if (closePendingConditionalInfoModal && pendingConditionalInfoModal) {
+            closePendingConditionalInfoModal.addEventListener('click', function () {
+                pendingConditionalInfoModal.style.display = 'none';
+            });
+        }
+
     });
 
     function escapeHtml(value) {
@@ -2504,47 +2996,58 @@
         verifyApprovalApproveBtn.disabled = !canApprove;
     }
 
+    function getRecordPayloadFromRow(row) {
+        let payload = {};
+        try {
+            payload = JSON.parse(row?.dataset.recordPayload || '{}');
+        } catch (error) {
+            payload = {};
+        }
+
+        return payload;
+    }
+
+    function openVerificationModalFromRow(row) {
+        if (!row) return;
+        const payload = getRecordPayloadFromRow(row);
+
+        if (verifyApprovalStudentName) {
+            verifyApprovalStudentName.textContent = payload.name || '-';
+        }
+        if (verifyApprovalStudentNumber) {
+            verifyApprovalStudentNumber.textContent = payload.email || '-';
+        }
+        if (verifyApprovalStudentCourse) {
+            verifyApprovalStudentCourse.textContent = `${payload.reference_number || '-'} / ${payload.student_id || '-'}`;
+        }
+        if (verifyApprovalForm) {
+            verifyApprovalForm.setAttribute('action', payload.approve_url || '');
+        }
+        if (verifyMedicalRemarks) {
+            verifyMedicalRemarks.value = payload.medical_condition_remarks || '';
+        }
+        if (verifyPendingReason) {
+            verifyPendingReason.value = payload.pending_reason || '';
+        }
+        if (verifyAssessmentStatus) {
+            verifyAssessmentStatus.value = payload.physical_assessment_status || 'Not Yet Conducted';
+        }
+        if (verifyDocumentsValid) {
+            verifyDocumentsValid.checked = Boolean(payload.documents_valid);
+        }
+        if (verificationDocsGrid) {
+            verificationDocsGrid.classList.remove('is-open');
+        }
+        renderVerificationDocuments(payload.documents || []);
+        syncApprovalButtonState();
+
+        setVerifyApprovalModalOpenState(true);
+    }
+
     document.querySelectorAll('.js-open-verify-modal').forEach(function (button) {
         button.addEventListener('click', function () {
             const row = button.closest('[data-health-row]');
-            let payload = {};
-            try {
-                payload = JSON.parse(row?.dataset.recordPayload || '{}');
-            } catch (error) {
-                payload = {};
-            }
-
-            if (verifyApprovalStudentName) {
-                verifyApprovalStudentName.textContent = payload.name || '-';
-            }
-            if (verifyApprovalStudentNumber) {
-                verifyApprovalStudentNumber.textContent = payload.email || '-';
-            }
-            if (verifyApprovalStudentCourse) {
-                verifyApprovalStudentCourse.textContent = `${payload.reference_number || '-'} / ${payload.student_id || '-'}`;
-            }
-            if (verifyApprovalForm) {
-                verifyApprovalForm.setAttribute('action', payload.approve_url || '');
-            }
-            if (verifyMedicalRemarks) {
-                verifyMedicalRemarks.value = payload.medical_condition_remarks || '';
-            }
-            if (verifyPendingReason) {
-                verifyPendingReason.value = payload.pending_reason || '';
-            }
-            if (verifyAssessmentStatus) {
-                verifyAssessmentStatus.value = payload.physical_assessment_status || 'Not Yet Conducted';
-            }
-            if (verifyDocumentsValid) {
-                verifyDocumentsValid.checked = Boolean(payload.documents_valid);
-            }
-            if (verificationDocsGrid) {
-                verificationDocsGrid.classList.remove('is-open');
-            }
-            renderVerificationDocuments(payload.documents || []);
-            syncApprovalButtonState();
-
-            setVerifyApprovalModalOpenState(true);
+            openVerificationModalFromRow(row);
         });
     });
 

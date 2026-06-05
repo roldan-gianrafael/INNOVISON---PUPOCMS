@@ -23,10 +23,32 @@
     .PUPBG-lead { color:#bfcfd6; margin:0 auto 28px; max-width:720px; font-size:18px; }
 
     .hero-actions { display:flex; gap:16px; justify-content:center; margin-top:18px; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:700; cursor: pointer; border: none; }
+    .btn { position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:700; cursor: pointer; border: none; transition:transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease; }
+    .btn::after {
+        content:"";
+        position:absolute;
+        inset:0;
+        background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.18) 28%, rgba(255,255,255,.58) 50%, rgba(255,255,255,.18) 72%, transparent 100%);
+        transform:translateX(-135%);
+        transition:transform .72s ease;
+        pointer-events:none;
+    }
+    .btn:hover::after,
+    .btn:focus-visible::after { transform:translateX(135%); }
     .btn svg { width:18px; height:18px; flex:0 0 auto; stroke-width:1.8; }
     .btn-primary { background:#8B0000; color:#fff; border:2px solid rgba(0,0,0,0.08); box-shadow:0 6px 18px rgba(0,0,0,0.25); }
     .btn-secondary { background:#fff; color:#15222a; border:0; }
+    .btn-primary:hover,
+    .btn-primary:focus-visible,
+    .btn-secondary:hover,
+    .btn-secondary:focus-visible {
+        background:#facc15;
+        color:#8B0000;
+        border-color:#facc15;
+        transform:translateY(-2px);
+        box-shadow:0 12px 28px rgba(139,0,0,.22);
+        outline:none;
+    }
 
     /* --- WELCOME SECTION --- */
     .welcome { padding:64px 0; background:#fff; }
@@ -34,7 +56,27 @@
     .welcome-text { flex:1; }
     .welcome-text h2 { margin-top:0; font-size: 28px; color: #2d3748; }
     .welcome-text p { color:#666; line-height:1.6; }
-    .btn-outline { display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:8px; border:1px solid #8B0000; color:#8B0000; text-decoration:none; margin-top:14px; }
+    .btn-outline { position:relative; overflow:hidden; display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:8px; border:1px solid #8B0000; color:#8B0000; text-decoration:none; margin-top:14px; transition:transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease; }
+    .btn-outline::after {
+        content:"";
+        position:absolute;
+        inset:0;
+        background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.16) 28%, rgba(255,255,255,.55) 50%, rgba(255,255,255,.16) 72%, transparent 100%);
+        transform:translateX(-135%);
+        transition:transform .72s ease;
+        pointer-events:none;
+    }
+    .btn-outline:hover,
+    .btn-outline:focus-visible {
+        background:#facc15;
+        border-color:#facc15;
+        color:#8B0000;
+        transform:translateY(-2px);
+        box-shadow:0 10px 24px rgba(139,0,0,.16);
+        outline:none;
+    }
+    .btn-outline:hover::after,
+    .btn-outline:focus-visible::after { transform:translateX(135%); }
     .btn-outline svg { width:18px; height:18px; flex:0 0 auto; stroke-width:1.8; }
     .welcome-art { width:320px; flex:0 0 320px; }
 
@@ -103,6 +145,70 @@
     .contact-icon { width:20px; height:20px; stroke:#ffb3a9; fill:none; stroke-width:1.8; flex:0 0 20px; margin-top:4px; }
     .footer-bottom { border-top:1px solid rgba(255,255,255,0.04); padding-top:22px; text-align:center; color:rgba(255,255,255,0.6); font-size:14px; margin-top:18px; }
 
+    .learn-more-modal {
+        display:none;
+        position:fixed;
+        inset:0;
+        z-index:1200;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+        background:rgba(15,23,42,.58);
+        backdrop-filter:blur(5px);
+    }
+    .learn-more-modal.is-open { display:flex; }
+    .learn-more-card {
+        width:min(560px,100%);
+        overflow:hidden;
+        border-radius:18px;
+        background:#fff;
+        border-top:4px solid #facc15;
+        border-bottom:4px solid #facc15;
+        box-shadow:0 24px 60px rgba(0,0,0,.24);
+    }
+    .learn-more-head {
+        display:flex;
+        justify-content:space-between;
+        gap:16px;
+        padding:20px 22px;
+        background:linear-gradient(135deg,#70131B,#8f2230);
+        color:#fff;
+    }
+    .learn-more-head h3 { margin:0; color:#fff; font-size:22px; font-weight:900; }
+    .learn-more-head p { margin:5px 0 0; color:rgba(255,255,255,.78); font-size:13px; line-height:1.5; }
+    .learn-more-close {
+        width:38px;
+        height:38px;
+        border-radius:999px;
+        border:1px solid rgba(255,255,255,.24);
+        background:rgba(255,255,255,.12);
+        color:#fff;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
+    }
+    .learn-more-close svg { width:18px; height:18px; }
+    .learn-more-body {
+        display:grid;
+        gap:12px;
+        padding:22px;
+    }
+    .learn-more-info {
+        padding:14px 16px;
+        border-radius:14px;
+        border:1px solid rgba(112,19,27,.12);
+        background:#fffaf7;
+        color:#334155;
+        line-height:1.65;
+    }
+    html[data-theme="dark"] .learn-more-card { background:#111827; }
+    html[data-theme="dark"] .learn-more-info {
+        background:rgba(31,41,55,.92);
+        border-color:rgba(250,204,21,.18);
+        color:#f8fafc;
+    }
+
     /* Modal Animation */
     @keyframes slideUp {
         from { opacity: 0; transform: translateY(30px); }
@@ -157,7 +263,7 @@
             you can make a consultation request here online. Additionally, you can check and evaluate all the
             information and status related to your appointment.
         </p>
-        <a href="#" class="btn-outline">
+        <a href="#" class="btn-outline" id="learnMoreBtn">
             <x-outline-icon name="arrow-long-right" />
             <span>Learn More</span>
         </a>
@@ -249,7 +355,6 @@
               <li><a href="{{ url('/student/home') }}"><x-outline-icon name="home" class="footer-link-icon" /><span>Home</span></a></li>
               <li><a href="#"><x-outline-icon name="information-circle" class="footer-link-icon" /><span>About Us</span></a></li>
               <li><a href="{{ url('/student/booking') }}"><x-outline-icon name="calendar-days" class="footer-link-icon" /><span>Book Appointment</span></a></li>
-              <li><a href="{{ url('/student/barcode-register') }}"><x-outline-icon name="qr-code" class="footer-link-icon" /><span>Scan / Bio</span></a></li>
               <li><a href="{{ url('/student/faq') }}"><x-outline-icon name="question-mark-circle" class="footer-link-icon" /><span>FAQ</span></a></li>
             </ul>
           </div>
@@ -288,5 +393,58 @@
         <div class="container">© 2025 PUP Taguig Online Clinic. All rights reserved.</div>
       </div>
     </footer>
+
+    <div class="learn-more-modal" id="learnMoreModal" aria-hidden="true">
+      <section class="learn-more-card" role="dialog" aria-modal="true" aria-labelledby="learnMoreTitle">
+        <div class="learn-more-head">
+          <div>
+            <h3 id="learnMoreTitle">About PUPT Clinic</h3>
+            <p>Student-centered care through online access and campus clinic support.</p>
+          </div>
+          <button type="button" class="learn-more-close" id="learnMoreCloseBtn" aria-label="Close learn more modal">
+            <x-outline-icon name="x-mark" />
+          </button>
+        </div>
+        <div class="learn-more-body">
+          <div class="learn-more-info">The PUP Taguig Clinic supports students with consultations, medical record processing, health clearance workflows, and appointment coordination.</div>
+          <div class="learn-more-info">Public guests can explore clinic information. Students should sign in through One Portal to book appointments and access private records.</div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const learnMoreBtn = document.getElementById('learnMoreBtn');
+        const learnMoreModal = document.getElementById('learnMoreModal');
+        const learnMoreCloseBtn = document.getElementById('learnMoreCloseBtn');
+
+        function setLearnMoreOpen(isOpen) {
+          if (!learnMoreModal) return;
+          learnMoreModal.classList.toggle('is-open', isOpen);
+          learnMoreModal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        }
+
+        if (learnMoreBtn) {
+          learnMoreBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            setLearnMoreOpen(true);
+          });
+        }
+
+        if (learnMoreCloseBtn) {
+          learnMoreCloseBtn.addEventListener('click', function () {
+            setLearnMoreOpen(false);
+          });
+        }
+
+        if (learnMoreModal) {
+          learnMoreModal.addEventListener('click', function (event) {
+            if (event.target === learnMoreModal) {
+              setLearnMoreOpen(false);
+            }
+          });
+        }
+      });
+    </script>
 
 @endsection

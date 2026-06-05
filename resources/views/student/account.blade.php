@@ -1890,6 +1890,98 @@
         color: inherit;
         opacity: 0.88;
     }
+    .record-document-card {
+        min-height: 116px;
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(139, 0, 0, 0.14);
+        background: linear-gradient(180deg, #ffffff 0%, #fff9f7 100%);
+        display: grid;
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.05);
+    }
+    .record-document-preview {
+        width: 58px;
+        height: 58px;
+        border-radius: 14px;
+        border: 1px solid rgba(139, 0, 0, 0.14);
+        background:
+            linear-gradient(135deg, rgba(139, 0, 0, 0.10), rgba(250, 204, 21, 0.16)),
+            #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: #8B0000;
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+    }
+    .record-document-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .record-document-preview svg {
+        width: 25px;
+        height: 25px;
+    }
+    .record-document-body {
+        min-width: 0;
+    }
+    .record-document-title {
+        display: block;
+        color: #70131B;
+        font-size: 14px;
+        line-height: 1.3;
+        font-weight: 850;
+        margin-bottom: 4px;
+    }
+    .record-document-meta {
+        display: block;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .record-document-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .record-document-btn {
+        border: 1px solid rgba(139, 0, 0, 0.16);
+        border-radius: 999px;
+        background: #ffffff;
+        color: #70131B;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 850;
+        line-height: 1;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+    .record-document-btn:hover {
+        background: linear-gradient(135deg, #8B0000, #70131B);
+        color: #facc15;
+        border-color: transparent;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+    .record-document-replace-form {
+        margin: 0;
+    }
+    .record-document-file {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 1px;
+        height: 1px;
+    }
     html[data-theme="dark"] .record-modal {
         background: linear-gradient(180deg, #0f0f10 0%, #161618 100%) !important;
         border-color: rgba(250, 204, 21, 0.16) !important;
@@ -1935,12 +2027,36 @@
     html[data-theme="dark"] .record-modal-photo-thumb {
         border-color: rgba(250, 204, 21, 0.16) !important;
     }
+    html[data-theme="dark"] .record-document-card {
+        background: #111214 !important;
+        border-color: rgba(250, 204, 21, 0.14) !important;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24) !important;
+    }
+    html[data-theme="dark"] .record-document-title {
+        color: #f8fafc !important;
+    }
+    html[data-theme="dark"] .record-document-meta {
+        color: #cbd5e1 !important;
+    }
+    html[data-theme="dark"] .record-document-preview,
+    html[data-theme="dark"] .record-document-btn {
+        background: #161618 !important;
+        border-color: rgba(250, 204, 21, 0.16) !important;
+        color: #fef3c7 !important;
+    }
     @media (max-width: 760px) {
         .record-modal-grid {
             grid-template-columns: 1fr;
         }
         .record-modal-links {
             grid-template-columns: 1fr;
+        }
+        .record-document-card {
+            grid-template-columns: 52px minmax(0, 1fr);
+        }
+        .record-document-preview {
+            width: 52px;
+            height: 52px;
         }
     }
 </style>
@@ -2625,50 +2741,81 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <div class="record-modal-card is-full">
                             <span class="record-modal-label">Uploaded Digital Copies</span>
+                            @php
+                                $recordDocuments = [
+                                    [
+                                        'field' => 'student_photo',
+                                        'title' => '2x2 Student Photo',
+                                        'meta' => 'Image Upload',
+                                        'path' => optional($healthProfileRecord)->student_photo,
+                                        'is_image' => true,
+                                        'accept' => '.jpg,.jpeg,.png,image/jpeg,image/png',
+                                    ],
+                                    [
+                                        'field' => 'medical_certificate',
+                                        'title' => 'Medical Certificate',
+                                        'meta' => 'PDF Upload',
+                                        'path' => optional($healthProfileRecord)->medical_certificate,
+                                        'is_image' => false,
+                                        'accept' => '.pdf,application/pdf',
+                                    ],
+                                    [
+                                        'field' => 'chest_xray_result',
+                                        'title' => 'Chest X-ray Result',
+                                        'meta' => 'PDF Upload',
+                                        'path' => optional($healthProfileRecord)->chest_xray_result,
+                                        'is_image' => false,
+                                        'accept' => '.pdf,application/pdf',
+                                    ],
+                                    [
+                                        'field' => 'health_form_upload',
+                                        'title' => 'Health Form Upload',
+                                        'meta' => 'PDF Upload',
+                                        'path' => optional($healthProfileRecord)->health_form_upload,
+                                        'is_image' => false,
+                                        'accept' => '.pdf,application/pdf',
+                                    ],
+                                    [
+                                        'field' => 'pwd_id_proof',
+                                        'title' => 'PWD ID Proof',
+                                        'meta' => 'PDF Upload',
+                                        'path' => optional($healthProfileRecord)->pwd_id_proof,
+                                        'is_image' => false,
+                                        'accept' => '.pdf,application/pdf',
+                                    ],
+                                ];
+                                $visibleRecordDocuments = collect($recordDocuments)->filter(fn ($document) => filled($document['path']));
+                            @endphp
                             <div class="record-modal-links">
-                                @if(optional($healthProfileRecord)->student_photo)
-                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->student_photo) }}" target="_blank" rel="noopener noreferrer">
-                                        <img class="record-modal-photo-thumb" src="{{ asset('storage/' . $healthProfileRecord->student_photo) }}" alt="Uploaded student photo">
-                                        <span class="record-modal-link-body">
-                                            <span class="record-modal-link-title">Student Photo</span>
-                                            <span class="record-modal-link-meta">Image Upload</span>
-                                        </span>
-                                        <span class="record-modal-link-arrow">Open File</span>
-                                    </a>
-                                @endif
-                                @if(optional($healthProfileRecord)->medical_certificate)
-                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->medical_certificate) }}" target="_blank" rel="noopener noreferrer">
-                                        <span class="record-modal-link-top"><x-outline-icon name="document-text" /></span>
-                                        <span class="record-modal-link-body">
-                                            <span class="record-modal-link-title">Medical Certificate</span>
-                                            <span class="record-modal-link-meta">PDF Upload</span>
-                                        </span>
-                                        <span class="record-modal-link-arrow">Open File</span>
-                                    </a>
-                                @endif
-                                @if(optional($healthProfileRecord)->health_form_upload)
-                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->health_form_upload) }}" target="_blank" rel="noopener noreferrer">
-                                        <span class="record-modal-link-top"><x-outline-icon name="document-text" /></span>
-                                        <span class="record-modal-link-body">
-                                            <span class="record-modal-link-title">Health Form Upload</span>
-                                            <span class="record-modal-link-meta">PDF Upload</span>
-                                        </span>
-                                        <span class="record-modal-link-arrow">Open File</span>
-                                    </a>
-                                @endif
-                                @if(optional($healthProfileRecord)->medical_assessment_upload)
-                                    <a class="record-modal-link" href="{{ asset('storage/' . $healthProfileRecord->medical_assessment_upload) }}" target="_blank" rel="noopener noreferrer">
-                                        <span class="record-modal-link-top"><x-outline-icon name="document-text" /></span>
-                                        <span class="record-modal-link-body">
-                                            <span class="record-modal-link-title">Medical Assessment Copy</span>
-                                            <span class="record-modal-link-meta">PDF or Image Upload</span>
-                                        </span>
-                                        <span class="record-modal-link-arrow">Open File</span>
-                                    </a>
-                                @endif
-                                @if(!optional($healthProfileRecord)->student_photo && !optional($healthProfileRecord)->medical_certificate && !optional($healthProfileRecord)->health_form_upload && !optional($healthProfileRecord)->medical_assessment_upload)
+                                @forelse($visibleRecordDocuments as $document)
+                                    @php
+                                        $documentUrl = asset('storage/' . $document['path']);
+                                    @endphp
+                                    <div class="record-document-card">
+                                        <div class="record-document-preview" aria-hidden="true">
+                                            @if($document['is_image'])
+                                                <img src="{{ $documentUrl }}" alt="">
+                                            @else
+                                                <x-outline-icon name="document-text" />
+                                            @endif
+                                        </div>
+                                        <div class="record-document-body">
+                                            <span class="record-document-title">{{ $document['title'] }}</span>
+                                            <span class="record-document-meta">{{ $document['meta'] }}</span>
+                                            <div class="record-document-actions">
+                                                <a class="record-document-btn" href="{{ $documentUrl }}" target="_blank" rel="noopener noreferrer">View</a>
+                                                <form class="record-document-replace-form" action="{{ route('student.health_documents.replace') }}" method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <input type="hidden" name="document_type" value="{{ $document['field'] }}">
+                                                    <input class="record-document-file" type="file" name="replacement_file" accept="{{ $document['accept'] }}" required>
+                                                    <button type="button" class="record-document-btn" data-replace-document>Replace</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
                                     <div class="record-modal-empty">No digital copies uploaded yet.</div>
-                                @endif
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -2795,8 +2942,27 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
     const modalCard = modal.querySelector('.record-modal');
+    const replaceButtons = modal.querySelectorAll('[data-replace-document]');
 
     modalCard?.addEventListener('scroll', updateHealthRecordModalIndicator);
+
+    replaceButtons.forEach(function (button) {
+        const form = button.closest('.record-document-replace-form');
+        const fileInput = form?.querySelector('.record-document-file');
+        if (!form || !fileInput) {
+            return;
+        }
+
+        button.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files && fileInput.files.length > 0) {
+                form.submit();
+            }
+        });
+    });
 
     modal.addEventListener('click', function (event) {
         if (event.target === modal) {

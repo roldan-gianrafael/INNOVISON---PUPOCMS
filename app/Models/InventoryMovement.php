@@ -14,6 +14,8 @@ class InventoryMovement extends Model
         'item_id',
         'user_id',
         'type',
+        'movement_date',
+        'reason',
         'quantity',
         'stock_before',
         'stock_after',
@@ -27,6 +29,7 @@ class InventoryMovement extends Model
         'quantity' => 'decimal:2',
         'stock_before' => 'decimal:2',
         'stock_after' => 'decimal:2',
+        'movement_date' => 'date',
     ];
 
     public function item(): BelongsTo

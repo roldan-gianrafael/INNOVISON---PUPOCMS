@@ -14,9 +14,11 @@ class HealthProfile extends Model
         'age', 'sex', 'civil_status', 'course_college', 
         'blood_type', 'guardian_name', 'landline', 'cellphone',
         'chest_xray_result',
+        'xray_date',
+        'xray_findings',
         'has_disability', 'disability_type',
         'pwd_id_proof',
-        'medical_certificate', 'health_form_upload', 'medical_assessment_upload', 'clearance_status',
+        'medical_certificate', 'doctor_name', 'med_cert_date', 'med_cert_findings', 'health_form_upload', 'medical_assessment_upload', 'clearance_status',
         'assessment_date',
         'blood_pressure',
         'respiratory_rate',
@@ -28,6 +30,9 @@ class HealthProfile extends Model
         'chest_xray_date',
         'assessment_remarks',
         'pending_reason',
+        'medical_condition_remarks',
+        'physical_assessment_status',
+        'documents_valid',
         'verified_at',
         'puptas_sync_status',
         'puptas_synced_at',
@@ -37,7 +42,10 @@ class HealthProfile extends Model
 
     protected $casts = [
         'puptas_synced_at' => 'datetime',
+        'documents_valid' => 'boolean',
         'assessment_date' => 'date',
+        'xray_date' => 'date',
+        'med_cert_date' => 'date',
         'medical_certificate_issued_at' => 'date',
         'chest_xray_date' => 'date',
 

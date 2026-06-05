@@ -150,6 +150,7 @@
         <div>
             <div class="sticky-sidebar">
                 
+                @auth('student')
                 <div class="sidebar-widget">
                     <h4 class="widget-title">My Activity</h4>
                     <div class="stat-row"><span>Pending Requests</span><span class="stat-val" style="color:#b45309;">{{ $pendingCount ?? 0 }}</span></div>
@@ -158,6 +159,16 @@
                     <div class="stat-row"><span>Cancelled</span><span class="stat-val" style="color:#b91c1c;">{{ $cancelledCount ?? 0 }}</span></div>
                     <a href="{{ url('/student/history') }}" class="btn-action">View Full History ➜</a>
                 </div>
+
+                @else
+                <div class="sidebar-widget">
+                    <h4 class="widget-title">Student Portal</h4>
+                    <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin: 0;">
+                        Log in through One Portal to view your appointments, history, and health record.
+                    </p>
+                    <a href="{{ route('login.portal') }}" class="btn-action">Log In via One Portal</a>
+                </div>
+                @endauth
 
                 <div class="sidebar-widget" style="background: #20343a; color: white; border: none;">
                     <h4 class="widget-title" style="color: white;">Contact Us</h4>

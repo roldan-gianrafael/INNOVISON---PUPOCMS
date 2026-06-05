@@ -10,6 +10,7 @@ use App\Models\HealthProfile;
 use App\Models\User;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class AppointmentController extends Controller
@@ -609,16 +610,11 @@ class AppointmentController extends Controller
     {
         Appointment::expireOverduePending();
 
-        $user = Auth::user() ?? User::firstOrCreate(
-            ['email' => 'guest@pup.edu.ph'],
-            [
-                'first_name' => 'Guest',
-                'last_name' => 'Student',
-                'name' => 'Guest Student',
-                'password' => bcrypt('password'),
-                'is_admin' => 0
-            ]
-        );
+        /** @var \App\Models\User|null $user */
+        $user = Auth::guard('student')->user();
+        if (!$user) {
+            return view('student.booking-public');
+        }
 
         $appointments = Appointment::where('user_id', $user->id)
                                    ->whereIn('status', ['Pending', 'Approved'])
@@ -990,24 +986,20 @@ public function account(Request $request)
     {
         Appointment::expireOverduePending();
 
-        $user = Auth::user() ?? User::where('email', 'guest@pup.edu.ph')->first();
+        /** @var \App\Models\User|null $user */
+        $user = Auth::guard('student')->user();
+        $pendingCount = 0;
+        $upcomingCount = 0;
+        $completedCount = 0;
+        $cancelledCount = 0;
 
-        if (!$user) {
-            $user = User::create([
-                'first_name' => 'Guest',
-                'last_name' => 'Student',
-                'name' => 'Guest Student',
-                'email' => 'guest@pup.edu.ph',
-                'password' => bcrypt('password'),
-                'is_admin' => 0,
-            ]);
+        if ($user) {
+            $appointments = Appointment::where('user_id', $user->id)->get();
+            $pendingCount = $appointments->where('status', 'Pending')->count();
+            $upcomingCount = $appointments->where('status', 'Approved')->count();
+            $completedCount = $appointments->where('status', 'Completed')->count();
+            $cancelledCount = $appointments->where('status', 'Cancelled')->count();
         }
-
-        $appointments = Appointment::where('user_id', $user->id)->get();
-        $pendingCount = $appointments->where('status', 'Pending')->count();
-        $upcomingCount = $appointments->where('status', 'Approved')->count();
-        $completedCount = $appointments->where('status', 'Completed')->count();
-        $cancelledCount = $appointments->where('status', 'Cancelled')->count();
 
         return view('student.faq', compact('user', 'pendingCount', 'upcomingCount', 'completedCount', 'cancelledCount'));
     }
@@ -1259,11 +1251,17 @@ public function storeHealthForm(Request $request)
         'cellphone'         => 'required|string|max:20',
 
         'chest_xray_result' => 'required|file|mimes:pdf|max:4096',
+        'xray_date'         => 'required|date',
+        'xray_findings'     => 'required|string|in:Normal,With Findings',
         'has_disability'    => 'required|string',
         'disability_type'   => 'required_if:has_disability,Yes|nullable|string|max:255',
         'pwd_id_proof'      => 'required_if:has_disability,Yes|file|mimes:pdf|max:4096',
         'medical_certificate' => 'required|file|mimes:pdf|max:4096',
+        'doctor_name'       => 'required|string|max:255',
+        'med_cert_date'     => 'required|date',
+        'med_cert_findings' => 'required|string|in:No Findings / Normal,With Findings',
         'health_form_upload' => 'required|file|mimes:pdf|max:4096',
+        'health_form_certified' => 'accepted',
     ]);
 
     /** @var \App\Models\User $user */
@@ -1323,10 +1321,15 @@ public function storeHealthForm(Request $request)
                 'landline'           => $request->landline,
                 'cellphone'          => $request->cellphone,
                 'chest_xray_result'  => $chestXrayPath,
+                'xray_date'          => $request->input('xray_date'),
+                'xray_findings'      => $request->input('xray_findings'),
                 'has_disability'     => $request->has_disability,
                 'disability_type'    => $request->disability_type,
                 'pwd_id_proof'       => $pwdIdProofPath,
                 'medical_certificate' => $medicalCertificatePath,
+                'doctor_name'        => $request->input('doctor_name'),
+                'med_cert_date'      => $request->input('med_cert_date'),
+                'med_cert_findings'  => $request->input('med_cert_findings'),
                 'health_form_upload' => $healthFormUploadPath,
                 'clearance_status'   => 'For Verification',
                 'pending_reason'     => null,
@@ -1353,6 +1356,85 @@ public function storeHealthForm(Request $request)
    
         return back()->withInput()->with('error', 'Something went wrong: ' . $e->getMessage());
     }
+}
+
+public function replaceHealthDocument(Request $request)
+{
+    /** @var \App\Models\User|null $user */
+    $user = Auth::user();
+    if (!$user) {
+        return redirect('/login-as-student')->with('error', 'Please login first.');
+    }
+
+    $profile = $user->healthProfile;
+    if (!$profile instanceof HealthProfile) {
+        return redirect('/student/account?view=health-record')
+            ->with('error', 'Submit your health profile before replacing documents.');
+    }
+
+    $documentTypes = [
+        'student_photo' => [
+            'rules' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'directory' => 'health_profiles/photos',
+            'label' => '2x2 photo',
+        ],
+        'medical_certificate' => [
+            'rules' => 'required|file|mimes:pdf|max:4096',
+            'directory' => 'health_profiles/medical_certificates',
+            'label' => 'medical certificate',
+        ],
+        'chest_xray_result' => [
+            'rules' => 'required|file|mimes:pdf|max:4096',
+            'directory' => 'health_profiles/chest_xray_results',
+            'label' => 'chest X-ray result',
+        ],
+        'health_form_upload' => [
+            'rules' => 'required|file|mimes:pdf|max:4096',
+            'directory' => 'health_profiles/health_form_uploads',
+            'label' => 'health form upload',
+        ],
+        'pwd_id_proof' => [
+            'rules' => 'required|file|mimes:pdf|max:4096',
+            'directory' => 'health_profiles/pwd_id_proofs',
+            'label' => 'PWD ID proof',
+        ],
+    ];
+
+    $request->validate([
+        'document_type' => 'required|string|in:' . implode(',', array_keys($documentTypes)),
+    ]);
+
+    $documentType = (string) $request->input('document_type');
+    $config = $documentTypes[$documentType];
+
+    $request->validate([
+        'replacement_file' => $config['rules'],
+    ]);
+
+    $oldPath = (string) ($profile->{$documentType} ?? '');
+    $newPath = $request->file('replacement_file')->store($config['directory'], 'public');
+
+    $profile->{$documentType} = $newPath;
+    $profile->clearance_status = 'For Verification';
+    $profile->pending_reason = null;
+    $profile->verified_at = null;
+    $profile->save();
+
+    if ($oldPath !== '' && $oldPath !== $newPath) {
+        Storage::disk('public')->delete($oldPath);
+    }
+
+    \App\Models\ActivityLog::create([
+        'user_id'     => $user->id,
+        'user_name'   => $user->name,
+        'action'      => 'Health Document Replaced',
+        'description' => 'Student replaced the ' . $config['label'] . '.',
+        'ip_address'  => $request->ip(),
+        'user_agent'  => $request->userAgent(),
+    ]);
+
+    return redirect('/student/account?view=health-record')
+        ->with('success', ucfirst($config['label']) . ' replaced successfully. The clinic will review the updated file.');
 }
 
 

@@ -3741,7 +3741,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             'id' => 'health-form:' . $healthProfile->id . ':' . optional($healthProfile->updated_at)->timestamp,
             'type' => 'health-form',
             'title' => 'New health form submission',
-            'link' => $healthRecordsUrl . '?highlight_health=' . $healthProfile->id,
+            'link' => $healthRecordsUrl . '?tab=pending_approval&highlight_health=' . $healthProfile->id,
             'hover_hint' => implode(' | ', array_filter([
                 'Name: ' . $studentName,
                 'Student No: ' . $studentNumber,

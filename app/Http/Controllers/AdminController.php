@@ -38,9 +38,9 @@ class AdminController extends Controller
         return rtrim(rtrim(number_format($rounded, 2, '.', ''), '0'), '.');
     }
 
-    private function recordInventoryMovement(Item $item, string $type, float $quantity, float $stockBefore, float $stockAfter, ?string $notes = null): void
+    private function recordInventoryMovement(Item $item, string $type, float $quantity, float $stockBefore, float $stockAfter, ?string $notes = null, ?string $movementDate = null, ?string $reason = null): void
     {
-        InventoryMovement::create([
+        $movementData = [
             'item_id' => $item->id,
             'user_id' => auth()->id(),
             'type' => $type,
@@ -51,7 +51,17 @@ class AdminController extends Controller
             'batch_number' => $item->batch_number,
             'supplier_source' => $item->supplier_source,
             'notes' => $notes,
-        ]);
+        ];
+
+        if (Schema::hasColumn('inventory_movements', 'movement_date')) {
+            $movementData['movement_date'] = $movementDate ?: now()->toDateString();
+        }
+
+        if (Schema::hasColumn('inventory_movements', 'reason')) {
+            $movementData['reason'] = $reason;
+        }
+
+        InventoryMovement::create($movementData);
     }
 
     private function consumedStockQuantityForItem(Item $item, float $consumedTotal): float
@@ -1464,25 +1474,42 @@ public function updateClearance(Request $request, $id)
     }
 
     $request->validate([
-        'clearance_status' => 'required',
-        'pending_reason'   => 'nullable|string',
-        'verified_at'      => 'nullable|date',
+        'clearance_status' => ['required', Rule::in(['Fully Cleared', 'Issued', 'For Verification', 'Pending/Conditional', 'Rejected'])],
+        'pending_reason'   => ['nullable', 'string'],
+        'verified_at'      => ['nullable', 'date'],
+        'medical_condition_remarks' => ['nullable', 'string'],
+        'physical_assessment_status' => ['required', Rule::in(['Not Yet Conducted', 'Completed / Passed'])],
+        'documents_valid' => ['nullable', 'accepted'],
     ]);
 
     $record = HealthProfile::findOrFail($id);
     $previousStatus = (string) $record->clearance_status;
+    $requestedStatus = (string) $request->input('clearance_status');
+    $isApproval = in_array($requestedStatus, ['Issued', 'Fully Cleared'], true);
+    $documentsValid = $request->boolean('documents_valid');
+
+    if ($requestedStatus === 'Pending/Conditional' && trim((string) $request->input('pending_reason')) === '') {
+        return back()->withInput()->with('error', 'Nurse remarks are required when setting a student as pending or conditional.');
+    }
+
+    if ($isApproval && (!$documentsValid || $request->input('physical_assessment_status') !== 'Completed / Passed')) {
+        return back()->withInput()->with('error', 'Medical clearance can only be issued after documents are marked valid and physical assessment is Completed / Passed.');
+    }
 
     // Update Status
-    $record->clearance_status = $request->clearance_status;
-    $record->pending_reason   = ($request->clearance_status === 'Issued') ? null : $request->pending_reason;
-    $record->verified_at      = ($request->clearance_status === 'Issued') ? ($request->verified_at ?? now()) : null;
+    $record->clearance_status = $requestedStatus;
+    $record->pending_reason   = $isApproval ? null : $request->pending_reason;
+    $record->medical_condition_remarks = $request->input('medical_condition_remarks');
+    $record->physical_assessment_status = $request->input('physical_assessment_status');
+    $record->documents_valid = $documentsValid;
+    $record->verified_at      = $isApproval ? ($request->verified_at ?? now()) : null;
 
     if ($record->save()) {
         if ($record->user) {
-            $record->user->is_health_profile_completed = $record->clearance_status === 'Issued' ? 1 : 0;
+            $record->user->is_health_profile_completed = $isApproval ? 1 : 0;
             $record->user->save();
 
-            if ($record->clearance_status === 'Issued') {
+            if ($isApproval) {
                 try {
                     $puptasService = app(PuptasWebhookService::class);
                     $referenceNumber = $this->resolvePuptasReferenceNumber($record);
@@ -1718,7 +1745,7 @@ public function updateClearance(Request $request, $id)
         $isStudentAssistant = $currentRole === User::ROLE_ADMIN;
 
         $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
-        $healthRecordsUrl = route('admin.health_records');
+        $healthRecordsUrl = route('admin.health_records') . '?tab=pending_approval';
         $readMap = is_array($user->notification_read_map) ? $user->notification_read_map : [];
 
         $recentPendingAppointments = Appointment::query()
@@ -1753,7 +1780,7 @@ public function updateClearance(Request $request, $id)
                 'kind' => 'health',
                 'title' => 'New health form submission',
                 'message' => 'A student submitted a health record for verification.',
-                'link' => $healthRecordsUrl . '?highlight_health=' . $healthProfile->id,
+                'link' => $healthRecordsUrl . '&highlight_health=' . $healthProfile->id,
             ]);
         }
 
@@ -2099,6 +2126,88 @@ public function restockItem($id, Request $request)
     ]);
 
     return redirect()->back()->with('success', 'Item restocked successfully.');
+}
+
+public function issueStock($id, Request $request)
+{
+    $item = Item::find($id);
+    if (!$item) {
+        return redirect()->back()->with('error', 'Item not found.');
+    }
+
+    $validated = $request->validate([
+        'issue_quantity' => ['required', 'numeric', 'min:0.01'],
+        'date_consumed' => ['required', 'date'],
+        'issue_reason' => ['required', Rule::in(['Dispensed to Patient', 'Clinic Usage', 'Damaged/Expired', 'Other'])],
+        'issue_remarks' => ['nullable', 'string', 'max:1000'],
+    ]);
+
+    $issueQuantity = (float) $validated['issue_quantity'];
+    $stockBefore = (float) $item->quantity;
+
+    if ($issueQuantity > $stockBefore) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Quantity to issue cannot exceed the current available stock.');
+    }
+
+    DB::transaction(function () use ($item, $validated, $issueQuantity, $stockBefore) {
+        $item->quantity = max(0, $stockBefore - $issueQuantity);
+        $item->consumed = max(0, (float) ($item->consumed ?? 0)) + $issueQuantity;
+        $item->save();
+
+        $this->recordInventoryMovement(
+            $item,
+            'issued',
+            -1 * $issueQuantity,
+            $stockBefore,
+            (float) $item->quantity,
+            $validated['issue_remarks'] ?? null,
+            $validated['date_consumed'],
+            $validated['issue_reason']
+        );
+
+        if (Schema::hasTable('inventory_logs')) {
+            $legacyLog = [];
+            $legacyMap = [
+                'item_id' => $item->id,
+                'user_id' => auth()->id(),
+                'type' => 'issued',
+                'quantity' => $issueQuantity,
+                'stock_before' => $stockBefore,
+                'stock_after' => (float) $item->quantity,
+                'date_consumed' => $validated['date_consumed'],
+                'movement_date' => $validated['date_consumed'],
+                'reason' => $validated['issue_reason'],
+                'purpose' => $validated['issue_reason'],
+                'remarks' => $validated['issue_remarks'] ?? null,
+                'notes' => $validated['issue_remarks'] ?? null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            foreach ($legacyMap as $column => $value) {
+                if (Schema::hasColumn('inventory_logs', $column)) {
+                    $legacyLog[$column] = $value;
+                }
+            }
+
+            if ($legacyLog !== []) {
+                DB::table('inventory_logs')->insert($legacyLog);
+            }
+        }
+    });
+
+    ActivityLog::create([
+        'user_id' => auth()->id(),
+        'user_name' => auth()->user()->name,
+        'action' => 'Inventory Stock Issued',
+        'description' => "Issued " . $this->formatInventoryQuantity($issueQuantity) . " {$item->unit} of {$item->name}. Reason: {$validated['issue_reason']}.",
+        'ip_address' => request()->ip(),
+        'user_agent' => request()->userAgent(),
+    ]);
+
+    return redirect()->back()->with('success', 'Stock issued successfully.');
 }
 
 public function deleteItem($id)

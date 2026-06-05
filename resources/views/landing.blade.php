@@ -58,7 +58,97 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: clamp(20px, 4vw, 48px) 18px;
+            padding: clamp(92px, 12vw, 116px) 18px clamp(20px, 4vw, 48px);
+        }
+
+        .landing-topbar {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            right: 18px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            width: min(1040px, calc(100% - 36px));
+            margin: 0 auto;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.22);
+        }
+
+        .landing-topbar-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 950;
+        }
+
+        .landing-topbar-brand img {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 4px;
+            object-fit: contain;
+        }
+
+        .landing-topbar-brand span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .landing-topbar-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            flex: 0 0 auto;
+        }
+
+        .topbar-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(250, 204, 21, 0.32);
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
+        }
+
+        .topbar-btn:hover,
+        .topbar-btn:focus-visible {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+            border-color: var(--gold);
+            color: var(--maroon);
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.20);
+            outline: none;
+        }
+
+        .topbar-btn svg {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            stroke-width: 2.2;
         }
 
         .landing-panel {
@@ -491,6 +581,11 @@
             line-height: 1.7;
         }
 
+        .workspace-entry {
+            display: grid;
+            gap: 12px;
+        }
+
         .portal-btn {
             position: relative;
             overflow: hidden;
@@ -705,7 +800,32 @@
         @media (max-width: 920px) {
             .landing-shell {
                 align-items: flex-start;
-                padding: 18px;
+                padding: 104px 18px 18px;
+            }
+
+            .landing-topbar {
+                top: 12px;
+                left: 12px;
+                right: 12px;
+                width: calc(100% - 24px);
+                align-items: stretch;
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .landing-topbar-brand {
+                justify-content: center;
+            }
+
+            .landing-topbar-actions {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .topbar-btn {
+                flex: 1 1 150px;
             }
 
             .landing-panel {
@@ -883,12 +1003,94 @@
     </style>
 </head>
 <body>
+    @php
+        $landingAdminUser = Auth::guard('admin')->user();
+        $landingStudentUser = Auth::guard('student')->user();
+        $landingStudentUserType = strtolower(trim((string) ($landingStudentUser->user_type ?? '')));
+        $landingStudentRawRole = strtolower(trim((string) ($landingStudentUser->user_role ?? '')));
+        $landingIsStudentAssistant = $landingStudentUser
+            && (
+                in_array($landingStudentUserType, ['assistant', 'student assistant', 'student_assistant'], true)
+                || in_array($landingStudentRawRole, ['student_assistant', 'studentassistant', 'assistant'], true)
+            );
+
+        if ($landingAdminUser) {
+            $workspaceHref = url('/admin/dashboard');
+        } elseif ($landingIsStudentAssistant) {
+            $workspaceHref = url('/student/home?workspace=sa');
+        } else {
+            $workspaceHref = url('/student/home');
+        }
+    @endphp
+
     <!-- Full-Screen Preloader -->
     <div id="preloader">
         <div class="preloader-logo">
             <img src="{{ asset('images/clinic_logo_transparent.png') }}" alt="Clinic Logo">
         </div>
     </div>
+    <header class="landing-topbar" aria-label="Main authentication navigation">
+        <a class="landing-topbar-brand" href="{{ url('/') }}">
+            <img src="{{ asset('images/clinic_logo_transparent.png') }}" alt="Clinic Logo">
+            <span>PUP Taguig Medical Clinic</span>
+        </a>
+
+        <nav class="landing-topbar-actions" aria-label="Authentication actions">
+            @if($landingStudentUser)
+                <a class="topbar-btn" href="{{ url('/student/account?view=profile') }}">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="9" cy="7" r="4" stroke="currentColor"/>
+                        <path d="M19 8v6M22 11h-6" stroke="currentColor" stroke-linecap="round"/>
+                    </svg>
+                    <span>My Account</span>
+                </a>
+
+                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                    @csrf
+                    <input type="hidden" name="portal_guard" value="student">
+                    <button type="submit" class="topbar-btn">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M15 12H3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 7l-5 5 5 5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Log Out</span>
+                    </button>
+                </form>
+            @elseif($landingAdminUser)
+                <a class="topbar-btn" href="{{ url('/admin/dashboard') }}">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 3l7 4v5c0 4.5-2.9 7.4-7 9-4.1-1.6-7-4.5-7-9V7l7-4z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9 12l2 2 4-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>My Account</span>
+                </a>
+
+                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                    @csrf
+                    <input type="hidden" name="portal_guard" value="admin">
+                    <button type="submit" class="topbar-btn">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M15 12H3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 7l-5 5 5 5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Log Out</span>
+                    </button>
+                </form>
+            @else
+                <button type="button" class="topbar-btn" onclick="showLoginPrompt()">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Log In via One Portal</span>
+                </button>
+            @endif
+        </nav>
+    </header>
     <main class="landing-shell">
         <section class="landing-panel" aria-label="PUP medical clinic access">
             <div class="info-column">
@@ -978,13 +1180,13 @@
                         <p>Use your One Portal account to continue browsing other systems or clinic workspace.</p>
                     </div>
 
-                    <a class="portal-btn" href="{{ route('login.portal') }}">
+                    <a class="portal-btn" href="{{ $workspaceHref }}">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <span>Login via One Portal</span>
+                        <span>View Clinic Workspace</span>
                     </a>
 
                     <button class="help-btn" type="button" aria-controls="landingHelpPanel" aria-expanded="false">
@@ -1021,37 +1223,17 @@
                             <div class="notice">{{ $errors->first('idp') }}</div>
                         @endif
 
-                        <!-- Guest State Buttons -->
-                        <div id="guestButtons" style="display: grid; gap: 12px;">
-                            <a href="{{ route('workspace.gateway') }}" class="portal-btn" id="viewClinicWorkspaceBtn">
+                        <div class="workspace-entry">
+                            <a href="{{ $workspaceHref }}" class="portal-btn" id="viewClinicWorkspaceBtn">
                                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M3 12l9-9 9 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M5 10v10a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1v-10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                                 <span>View Clinic Workspace</span>
                             </a>
 
                             <button class="help-btn" type="button" id="landingNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
-                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span>Need Help</span>
-                            </button>
-                        </div>
-
-                        <!-- Authenticated State Buttons -->
-                        <div id="authButtons" style="display: none; grid-column: 1; grid-row: 1; gap: 12px;">
-                            <a class="portal-btn" id="viewHomepageBtn" href="#" onclick="handleViewHomepage(event)">
-                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M3 12l9-9 9 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M5 10v10a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1v-10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span>View Homepage</span>
-                            </a>
-
-                            <button class="help-btn" type="button" id="authNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
                                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                     <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1143,8 +1325,6 @@
     <script>
         // ============ PRELOADER & URL PARAMETER CHECK ============
         const preloader = document.getElementById('preloader');
-        const guestButtons = document.getElementById('guestButtons');
-        const authButtons = document.getElementById('authButtons');
         const saSelector = document.getElementById('saWorkspaceSelector');
         const landingPanel = document.querySelector('.landing-panel');
         const helpPanel = document.getElementById('landingHelpPanel');
@@ -1187,21 +1367,21 @@
                 return;
             }
 
-            // If workspace=student, show guest buttons (student will navigate)
+            // If workspace=student, keep the public workspace entry visible.
             if (workspaceParam === 'student') {
-                console.log('[LANDING] Gateway returned workspace=student - showing guest UI');
+                console.log('[LANDING] Gateway returned workspace=student - showing public workspace UI');
                 updateUIForGuest();
                 return;
             }
 
-            // Default: show guest buttons
             updateUIForGuest();
         }
 
         function updateUIForGuest() {
-            // Show login buttons (View Clinic Workspace)
-            if (guestButtons) guestButtons.style.display = 'grid';
-            if (authButtons) authButtons.style.display = 'none';
+            if (saSelector) saSelector.classList.remove('visible');
+        }
+
+        function updateUIForAuthenticated() {
             if (saSelector) saSelector.classList.remove('visible');
         }
 
@@ -1300,7 +1480,7 @@
             });
 
             const adminButton = document.createElement('a');
-            adminButton.href = 'https://clinic-ms.inaebsit2027.com/admin/dashboard';
+            adminButton.href = '{{ url('/assistant/dashboard') }}';
             adminButton.style.cssText = `
                 display: flex;
                 align-items: center;

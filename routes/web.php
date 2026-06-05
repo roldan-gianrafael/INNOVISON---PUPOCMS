@@ -123,6 +123,10 @@ Route::middleware('web')->group(function () {
     Route::get('/api/get-redirect-path', [LoginController::class, 'apiGetRedirectPath'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
 });
 
+// --- PUBLIC STUDENT PAGES (Guest Mode) ---
+Route::get('/student/home', [AppointmentController::class, 'home'])->name('student.home');
+Route::get('/student/faq', [AppointmentController::class, 'faq'])->name('student.faq');
+Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
 
 // --- PROTECTED ROUTES (Login required) ---
 Route::middleware(['auth:student', 'audit'])->group(function () {
@@ -132,7 +136,6 @@ Route::middleware(['auth:student', 'audit'])->group(function () {
             return response()->json(['status' => 'success']);
         });
 
-        Route::get('/student/home', [AppointmentController::class, 'home']);
         Route::get('/student/feedbacks', [AppointmentController::class, 'feedbackIndex'])->name('student.feedback.index');
 
         // 1. Route para ipakita ang blankong form
@@ -143,10 +146,9 @@ Route::middleware(['auth:student', 'audit'])->group(function () {
 
         // 2. Route para i-save ang data (Dito galing ang form submit)
         Route::post('/student/store-health-form', [AppointmentController::class, 'storeHealthForm'])->name('store.health.form');
+        Route::post('/student/health-documents/replace', [AppointmentController::class, 'replaceHealthDocument'])->name('student.health_documents.replace');
 
-        Route::get('/student/booking', [AppointmentController::class, 'create'])->name('student.booking');
         Route::get('/student/account', [AppointmentController::class, 'account']);
-        Route::get('/student/faq', [AppointmentController::class, 'faq']);
         Route::get('/student/history', [AppointmentController::class, 'history']);
         Route::post('/student/appointments/store', [AppointmentController::class, 'store']);
         Route::get('/student/appointments/availability', [AppointmentController::class, 'availability'])->name('student.appointments.availability');
@@ -256,6 +258,7 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
 
         Route::post('/admin/inventory/store', [AdminController::class, 'storeItem'])->name('admin.inventory.store');
         Route::post('/admin/inventory/{id}/restock', [AdminController::class, 'restockItem'])->name('admin.inventory.restock');
+        Route::post('/admin/inventory/{id}/issue', [AdminController::class, 'issueStock'])->name('admin.inventory.issue');
         Route::put('/admin/inventory/{id}', [AdminController::class, 'updateItem'])->name('admin.inventory.update');
         Route::delete('/admin/inventory/{id}', [AdminController::class, 'deleteItem'])->name('admin.inventory.delete');
 
@@ -352,4 +355,3 @@ Route::get('/dev-login/{id}', function ($id) {
 
     return 'User not found!';
 });
-

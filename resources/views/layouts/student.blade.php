@@ -1948,6 +1948,7 @@
                         </a>
                     </li>
                     <li class="nav-list-divider" aria-hidden="true"></li>
+                    @auth('student')
                     <li class="nav-dropdown {{ $isMyAccountSection ? 'is-open-on-route' : '' }}" data-nav-dropdown>
                         <button
                             type="button"
@@ -2031,6 +2032,18 @@
                             <input type="hidden" name="portal_guard" value="student">
                         </form>
                     </li>
+                    @else
+                    <li>
+                        <a href="{{ route('login.portal') }}" class="logout-btn">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Log In via One Portal</span>
+                        </a>
+                    </li>
+                    @endauth
                     
                 </ul>
             </nav>
@@ -2634,12 +2647,13 @@
     </script>
 
     {{-- HEALTH PROFILE PROMPT MODAL --}}
+    @auth('student')
     @php
         $showHealthFormModal = false;
-        if (Auth::check() && session('show_health_profile_prompt')) {
-            $user = Auth::user();
-            $user->loadMissing('healthProfile');
-            $showHealthFormModal = is_null($user->healthProfile) || empty($user->healthProfile);
+        if (session('show_health_profile_prompt')) {
+            $studentUser = Auth::guard('student')->user();
+            $studentUser?->loadMissing('healthProfile');
+            $showHealthFormModal = $studentUser && (is_null($studentUser->healthProfile) || empty($studentUser->healthProfile));
         }
     @endphp
 
@@ -2659,7 +2673,7 @@
             </div>
             <h2 style="color: #1f2937; font-size: 24px; font-weight: 800; margin: 0 0 16px;">Complete Your Health Profile</h2>
             <p style="color: #4b5563; font-size: 16px; line-height: 1.7; margin: 0 0 28px;">
-                Hello <strong>{{ Auth::user()->first_name ?? 'Student' }}</strong>! Good day!<br>
+                Hello <strong>{{ $studentUser->first_name ?? 'Student' }}</strong>! Good day!<br>
                 Please fill up your <strong>Health Profile</strong> to complete your clinic record.<br>
                 <span style="color: #6b7280; font-size: 14px;">You can skip this for now, but this prompt will show again on your next login until submitted.</span>
             </p>
@@ -2693,5 +2707,6 @@
         }
     </style>
     @endif
+    @endauth
 </body>
 </html>

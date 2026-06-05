@@ -1672,6 +1672,7 @@
     }
 
     html[data-theme="dark"] #restockModal .modal-box,
+    html[data-theme="dark"] #issueModal .modal-box,
     html[data-theme="dark"] #historyModal .modal-box {
         background: rgba(17, 24, 39, 0.96) !important;
         border-left: 1px solid rgba(143, 34, 48, 0.36) !important;
@@ -2470,18 +2471,12 @@
                                             <button type="button" class="inventory-actions-menu-item" onclick='closeInventoryActionMenus(); openRestockModal(@json($editItemPayload));'>
                                                 <span>Restock</span>
                                             </button>
+                                            <button type="button" class="inventory-actions-menu-item" onclick='closeInventoryActionMenus(); openIssueModal(@json($editItemPayload));'>
+                                                <span>Issue Stock</span>
+                                            </button>
                                             <button type="button" class="inventory-actions-menu-item" onclick='closeInventoryActionMenus(); editItem(@json($editItemPayload));'>
                                                 <span>Edit</span>
                                             </button>
-                                            <button type="button" class="inventory-actions-menu-item" onclick='closeInventoryActionMenus(); openHistoryModal(@json($editItemPayload));'>
-                                                <span>History</span>
-                                            </button>
-                                            <form action="{{ url('/admin/inventory/'.$item->id) }}" method="POST" style="margin:0;">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="inventory-actions-menu-item btn-delete" onclick="return confirm('Delete this item?')">
-                                                    <span>Delete</span>
-                                                </button>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -2741,6 +2736,68 @@
             </div>
         </div>
 
+        <div id="issueModal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="inventory-modal-head">
+                    <div class="inventory-modal-head-main">
+                        <h3 class="inventory-modal-title">Issue Stock</h3>
+                        <p class="inventory-modal-copy" id="issueItemName">Record consumed or dispensed stock without editing the item record.</p>
+                    </div>
+                    <div class="restock-head-right">
+                        <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeIssueModal()" aria-label="Close issue stock modal">
+                            <x-outline-icon name="x-mark" />
+                        </button>
+                        <div class="restock-stock-frames">
+                            <div class="restock-stock-frame">
+                                <span class="restock-frame-label">Available</span>
+                                <strong class="restock-frame-value" id="issueCurrentStock">-</strong>
+                            </div>
+                            <div class="restock-stock-frame restock-stock-frame-after">
+                                <span class="restock-frame-label">After Issue</span>
+                                <strong class="restock-frame-value" id="issuePreviewLine">-</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form id="issueForm" method="POST" action="#">
+                    @csrf
+                    <div class="inventory-modal-body">
+                        <div class="form-group">
+                            <label>Item Name</label>
+                            <input type="text" id="issueItemReadonly" class="form-control" readonly>
+                        </div>
+                        <div class="inventory-inline-grid">
+                            <div class="form-group">
+                                <label>Quantity to Issue &mdash; <span id="issueUnitLabel" style="font-weight:800;color:#70131B;text-transform:none;">pcs</span></label>
+                                <input type="number" name="issue_quantity" id="issueQuantity" class="form-control" min="0.01" step="0.01" required placeholder="e.g. 1">
+                                <small class="form-note" id="issueQuantityNote">Cannot exceed available stock.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Date Consumed</label>
+                                <input type="date" name="date_consumed" id="issueDateConsumed" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Reason / Purpose</label>
+                            <select name="issue_reason" id="issueReason" class="form-control" required>
+                                <option value="Dispensed to Patient">Dispensed to Patient</option>
+                                <option value="Clinic Usage">Clinic Usage</option>
+                                <option value="Damaged/Expired">Damaged/Expired</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Remarks</label>
+                            <textarea name="issue_remarks" id="issueRemarks" class="form-control" rows="3" placeholder="Optional note for the inventory log"></textarea>
+                        </div>
+                        <div class="modal-actions-row">
+                            <button type="submit" class="btn-add" id="issueSubmitBtn">Save Issuance</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div id="historyModal" class="modal-overlay">
             <div class="modal-box">
                 <div class="inventory-modal-head">
@@ -2829,11 +2886,20 @@
     const restockQuantityInput = document.getElementById('restockQuantity');
     const restockCurrentStockDisplay = document.getElementById('restockCurrentStock');
     const restockPreviewLine = document.getElementById('restockPreviewLine');
+    const issueModal = document.getElementById('issueModal');
+    const issueForm = document.getElementById('issueForm');
+    const issueQuantityInput = document.getElementById('issueQuantity');
+    const issueCurrentStockDisplay = document.getElementById('issueCurrentStock');
+    const issuePreviewLine = document.getElementById('issuePreviewLine');
+    const issueSubmitBtn = document.getElementById('issueSubmitBtn');
+    const issueQuantityNote = document.getElementById('issueQuantityNote');
     const historyMovementCount = document.getElementById('historyMovementCount');
     const historyNetChange = document.getElementById('historyNetChange');
     const historyList = document.getElementById('historyList');
     let restockCurrentQuantity = 0;
     let restockCurrentUnit = 'pcs';
+    let issueCurrentQuantity = 0;
+    let issueCurrentUnit = 'pcs';
 
     function updateRestockPreview() {
         if (!restockCurrentStockDisplay || !restockPreviewLine || !restockQuantityInput) return;
@@ -2847,6 +2913,33 @@
 
     if (restockQuantityInput) {
         restockQuantityInput.addEventListener('input', updateRestockPreview);
+    }
+
+    function updateIssuePreview() {
+        if (!issueCurrentStockDisplay || !issuePreviewLine || !issueQuantityInput) return;
+        const requested = Number(issueQuantityInput.value) || 0;
+        const isTooHigh = requested > issueCurrentQuantity;
+        const newQty = Math.max(0, issueCurrentQuantity - requested);
+
+        issueCurrentStockDisplay.textContent = `${issueCurrentQuantity} ${issueCurrentUnit}`;
+        issuePreviewLine.textContent = requested > 0 && !isTooHigh
+            ? `${newQty} ${issueCurrentUnit}`
+            : '-';
+
+        issueQuantityInput.setCustomValidity(isTooHigh ? 'Quantity to issue cannot exceed available stock.' : '');
+        if (issueQuantityNote) {
+            issueQuantityNote.textContent = isTooHigh
+                ? `Only ${issueCurrentQuantity} ${issueCurrentUnit} available.`
+                : 'Cannot exceed available stock.';
+            issueQuantityNote.style.color = isTooHigh ? '#b91c1c' : '';
+        }
+        if (issueSubmitBtn) {
+            issueSubmitBtn.disabled = isTooHigh || requested <= 0;
+        }
+    }
+
+    if (issueQuantityInput) {
+        issueQuantityInput.addEventListener('input', updateIssuePreview);
     }
 
     function syncCategoryDisplay() {
@@ -3172,6 +3265,41 @@
     function closeRestockModal() {
         if (!restockModal) return;
         restockModal.style.display = 'none';
+    }
+
+    function openIssueModal(item) {
+        closeInventoryActionMenus();
+        if (!issueModal || !issueForm) return;
+        issueModal.style.display = 'flex';
+        issueForm.action = `/admin/inventory/${item.id}/issue`;
+        issueCurrentQuantity = Number(item.quantity || 0);
+        issueCurrentUnit = item.unit || 'pcs';
+
+        const itemNameInput = document.getElementById('issueItemReadonly');
+        const itemNameCopy = document.getElementById('issueItemName');
+        const unitLabel = document.getElementById('issueUnitLabel');
+        const dateInput = document.getElementById('issueDateConsumed');
+        const reasonInput = document.getElementById('issueReason');
+        const remarksInput = document.getElementById('issueRemarks');
+
+        if (itemNameInput) itemNameInput.value = item.name || '';
+        if (itemNameCopy) itemNameCopy.textContent = `Record consumed stock for ${item.name || 'this item'}.`;
+        if (unitLabel) unitLabel.textContent = issueCurrentUnit;
+        if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+        if (reasonInput) reasonInput.value = 'Dispensed to Patient';
+        if (remarksInput) remarksInput.value = '';
+        if (issueQuantityInput) {
+            issueQuantityInput.value = '';
+            issueQuantityInput.max = issueCurrentQuantity;
+            issueQuantityInput.focus();
+        }
+
+        updateIssuePreview();
+    }
+
+    function closeIssueModal() {
+        if (!issueModal) return;
+        issueModal.style.display = 'none';
     }
 
     const MOVEMENT_TYPE_META = {

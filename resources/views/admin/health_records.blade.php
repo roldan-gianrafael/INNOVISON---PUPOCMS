@@ -946,6 +946,133 @@
         background: transparent;
     }
 
+    .health-tab-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 0 0 16px;
+        padding: 12px;
+        border-radius: 18px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: #fffaf7;
+    }
+    .health-tab-btn {
+        border: 1px solid rgba(112, 19, 27, 0.16);
+        border-radius: 999px;
+        background: #ffffff;
+        color: #70131B;
+        padding: 10px 16px;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+    .health-tab-btn:hover,
+    .health-tab-btn.is-active {
+        background: #70131B;
+        border-color: #70131B;
+        color: #facc15;
+        transform: translateY(-1px);
+    }
+
+    .verification-doc-toggle {
+        border: 1px solid rgba(112, 19, 27, 0.16);
+        border-radius: 999px;
+        background: #70131B;
+        color: #ffffff;
+        padding: 10px 14px;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+    }
+    .verification-doc-grid {
+        display: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .verification-doc-grid.is-open {
+        display: grid;
+    }
+    .verification-doc-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: #ffffff;
+        padding: 12px;
+    }
+    .verification-doc-card strong {
+        display: block;
+        color: #70131B;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+    .verification-doc-card a {
+        display: inline-flex;
+        margin-bottom: 8px;
+        color: #0369a1;
+        font-size: 12px;
+        font-weight: 900;
+        text-decoration: none;
+    }
+    .verification-doc-card dl {
+        margin: 0;
+        display: grid;
+        gap: 4px;
+        font-size: 12px;
+    }
+    .verification-doc-card dt {
+        color: #64748b;
+        font-weight: 800;
+    }
+    .verification-doc-card dd {
+        margin: 0 0 4px;
+        color: #111827;
+        font-weight: 700;
+    }
+    .verify-screening-grid {
+        display: grid;
+        gap: 12px;
+    }
+    .verify-screening-field label {
+        display: block;
+        margin-bottom: 5px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+    .verify-screening-control {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        background: #ffffff;
+        color: #111827;
+        padding: 10px 12px;
+        font-weight: 700;
+    }
+    .verify-check-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+        color: #111827;
+        font-size: 13px;
+        font-weight: 800;
+    }
+    .verify-check-row input {
+        margin-top: 2px;
+        accent-color: #70131B;
+    }
+    .verify-approval-btn-pending {
+        background: #fff7ed;
+        border-color: #fdba74;
+        color: #9a3412;
+    }
+
     @keyframes healthHighlightPulse {
         0%, 100% {
             box-shadow: inset 4px 0 0 #7c3aed, 0 0 0 rgba(124, 58, 237, 0);
@@ -1409,6 +1536,9 @@
         .verify-approval-student {
             grid-template-columns: 1fr;
         }
+        .verification-doc-grid {
+            grid-template-columns: 1fr;
+        }
 
         .summary-container {
             flex-direction: column;
@@ -1689,6 +1819,12 @@
     <div class="health-table-head">
         <div class="health-table-title">Health Profile Summary</div>
     </div>
+    <div class="health-tab-bar" aria-label="Health record status filters">
+        <button type="button" class="health-tab-btn is-active" data-health-tab-btn="all">All Records</button>
+        <button type="button" class="health-tab-btn" data-health-tab-btn="awaiting_uploads">Awaiting Uploads</button>
+        <button type="button" class="health-tab-btn" data-health-tab-btn="pending_approval">Pending Approval</button>
+        <button type="button" class="health-tab-btn" data-health-tab-btn="pending_conditional">Pending Compliance / Conditional</button>
+    </div>
     <table id="healthTable">
         <thead>
             <tr>
@@ -1703,14 +1839,78 @@
         </thead>
         <tbody>
             @forelse($records as $record)
+                @php
+                    $hasClinicRequirements = filled($record->medical_certificate)
+                        && filled($record->chest_xray_result)
+                        && filled($record->health_form_upload)
+                        && filled($record->student_photo);
+                    $recordStatus = trim((string) ($record->clearance_status ?? ''));
+                    $recordStatusNormalized = strtolower($recordStatus);
+                    $isConditional = in_array($recordStatus, ['Pending/Conditional', 'Rejected'], true)
+                        || trim((string) ($record->pending_reason ?? '')) !== ''
+                        || trim((string) ($record->medical_condition_remarks ?? '')) !== '';
+                    $healthTabState = !$hasClinicRequirements
+                        ? 'awaiting_uploads'
+                        : ($isConditional ? 'pending_conditional' : (in_array($recordStatus, ['Pending', 'For Verification', ''], true) ? 'pending_approval' : 'cleared'));
+                    $recordPayload = [
+                        'id' => $record->id,
+                        'name' => optional($record->user)->name ?: '-',
+                        'email' => optional($record->user)->email ?: '-',
+                        'reference_number' => $record->reference_number ?: $record->student_number ?: optional($record->user)->student_number ?: '-',
+                        'student_id' => $record->student_id ?: optional($record->user)->student_id ?: '-',
+                        'student_number' => optional($record->user)->student_number ?: optional($record->user)->student_id ?: '-',
+                        'course' => trim((string) (($record->course_college ?: optional($record->user)->course) . ' ' . optional($record->user)->year . '-' . optional($record->user)->section)),
+                        'status' => $recordStatus ?: 'For Verification',
+                        'pending_reason' => $record->pending_reason ?: '',
+                        'medical_condition_remarks' => $record->medical_condition_remarks ?: '',
+                        'physical_assessment_status' => $record->physical_assessment_status ?: 'Not Yet Conducted',
+                        'documents_valid' => (bool) $record->documents_valid,
+                        'approve_url' => route('admin.update_clearance', $record->id),
+                        'documents' => [
+                            [
+                                'title' => 'Medical Certificate',
+                                'url' => $record->medical_certificate ? asset('storage/' . $record->medical_certificate) : '',
+                                'meta' => [
+                                    'Doctor' => $record->doctor_name ?: '-',
+                                    'Certificate Date' => optional($record->med_cert_date)->format('M d, Y') ?: '-',
+                                    'Findings' => $record->med_cert_findings ?: '-',
+                                ],
+                            ],
+                            [
+                                'title' => 'Chest X-ray Result',
+                                'url' => $record->chest_xray_result ? asset('storage/' . $record->chest_xray_result) : '',
+                                'meta' => [
+                                    'Exam Date' => optional($record->xray_date)->format('M d, Y') ?: '-',
+                                    'Findings' => $record->xray_findings ?: '-',
+                                ],
+                            ],
+                            [
+                                'title' => 'Health Form Upload',
+                                'url' => $record->health_form_upload ? asset('storage/' . $record->health_form_upload) : '',
+                                'meta' => [
+                                    'Certification' => 'Student certified completed and signed form.',
+                                ],
+                            ],
+                            [
+                                'title' => '2x2 Photo',
+                                'url' => $record->student_photo ? asset('storage/' . $record->student_photo) : '',
+                                'meta' => [
+                                    'Guideline' => 'Formal white-background photo.',
+                                ],
+                            ],
+                        ],
+                    ];
+                @endphp
                 <tr
                     data-health-row
                     data-health-id="{{ $record->id }}"
-                    data-view-url="{{ $record->clearance_status == 'Issued' ? route('admin.show_health', $record->id) : '' }}"
-                    title="{{ $record->clearance_status == 'Issued' ? 'Click to view' : '' }}"
+                    data-health-tab="{{ $healthTabState }}"
+                    data-record-payload="{{ e(json_encode($recordPayload)) }}"
+                    data-view-url="{{ in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true) ? route('admin.show_health', $record->id) : '' }}"
+                    title="{{ in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true) ? 'Click to view' : '' }}"
                     class="{{ implode(' ', array_filter([
                         $highlightHealthId !== '' && $highlightHealthId === (string) $record->id ? 'health-highlight-row' : '',
-                        $record->clearance_status == 'Issued' ? 'health-row-clickable' : '',
+                        in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true) ? 'health-row-clickable' : '',
                     ])) }}"
                 >
                     <td class="fw-bold">{{ $record->user->student_number ?: $record->user->student_id }}</td>
@@ -1730,8 +1930,10 @@
 
                     {{-- Column 2: Clearance Issuance Status --}}
                     <td>
-                        @if($record->clearance_status == 'Issued')
+                        @if(in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true))
                             <span class="status issued"><i class="fas fa-check-circle me-1"></i> Issued</span>
+                        @elseif($record->clearance_status == 'Pending/Conditional')
+                            <span class="status review">Pending/Conditional</span>
                         @elseif($record->clearance_status == 'Rejected')
                             <span class="status review">Rejected</span>
                         @elseif(in_array($record->clearance_status, ['Pending', 'For Verification'], true))
@@ -1746,7 +1948,7 @@
                     </td>
 
                     <td style="text-align: center;">
-                        @if($record->clearance_status == 'Issued')
+                        @if(in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true))
                             <div class="d-flex justify-content-center">
                                 <span class="health-issued-badge" aria-hidden="true">
                                     <x-outline-icon name="check" />
@@ -1755,10 +1957,10 @@
                             </div>
                         @else
                             <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-view">
+                                <button type="button" class="btn-action btn-view js-open-verify-modal">
                                     <x-outline-icon name="document-text" />
-                                    View
-                                </a>
+                                    Verify
+                                </button>
                             </div>
                         @endif
                     </td>
@@ -1890,8 +2092,8 @@
     <div class="verify-approval-modal-card">
         <div class="verify-approval-modal-head">
             <div>
-                <h3 class="verify-approval-modal-title">Verify Health Form Upload</h3>
-                <p class="verify-approval-modal-copy">Review the uploaded Health Form PDF, then approve to sync to student side and Admission webhook.</p>
+                <h3 class="verify-approval-modal-title">Verify Clinic Requirements</h3>
+                <p class="verify-approval-modal-copy">Review uploaded requirements, record nurse screening notes, then set conditional status or issue medical clearance.</p>
             </div>
             <button type="button" class="verify-approval-modal-close" id="verifyApprovalCloseBtn" aria-label="Close verification popup">
                 <x-outline-icon name="x-mark" />
@@ -1904,33 +2106,49 @@
                     <div class="verify-approval-meta-v" id="verifyApprovalStudentName">-</div>
                 </div>
                 <div class="verify-approval-meta">
-                    <div class="verify-approval-meta-k">Student Number</div>
+                    <div class="verify-approval-meta-k">Email</div>
                     <div class="verify-approval-meta-v" id="verifyApprovalStudentNumber">-</div>
                 </div>
                 <div class="verify-approval-meta">
-                    <div class="verify-approval-meta-k">Course</div>
+                    <div class="verify-approval-meta-k">Reference / Student ID</div>
                     <div class="verify-approval-meta-v" id="verifyApprovalStudentCourse">-</div>
                 </div>
             </div>
 
             <div class="verify-approval-doc-wrap">
-                <p class="verify-approval-doc-title">Uploaded Health Form (PDF)</p>
-                <div id="verifyApprovalDocMissing" class="verify-approval-doc-missing" style="display:none;">
-                    No uploaded Health Form PDF found.
-                </div>
-                <div id="verifyApprovalDocFrame" class="verify-approval-doc-frame" style="display:none;">
-                    <iframe id="verifyApprovalDocViewer" src=""></iframe>
-                </div>
+                <button type="button" class="verification-doc-toggle" id="verificationDocsToggle">View Uploaded Requirements</button>
+                <div class="verification-doc-grid" id="verificationDocsGrid"></div>
             </div>
 
             <form id="verifyApprovalForm" method="POST" action="">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="clearance_status" value="Issued">
-                <input type="hidden" name="pending_reason" value="">
+                <input type="hidden" name="clearance_status" id="verifyClearanceStatus" value="Fully Cleared">
+                <div class="verify-screening-grid">
+                    <div class="verify-screening-field">
+                        <label for="verifyMedicalRemarks">Medical Condition / Nurse Remarks</label>
+                        <textarea id="verifyMedicalRemarks" name="medical_condition_remarks" class="verify-screening-control" rows="3" placeholder="Document medical condition, document issues, or screening notes."></textarea>
+                    </div>
+                    <div class="verify-screening-field">
+                        <label for="verifyPendingReason">Pending / Conditional Reason</label>
+                        <textarea id="verifyPendingReason" name="pending_reason" class="verify-screening-control" rows="3" placeholder="Required when setting this record as pending or conditional."></textarea>
+                    </div>
+                    <div class="verify-screening-field">
+                        <label for="verifyAssessmentStatus">Physical Examination / Assessment Status</label>
+                        <select id="verifyAssessmentStatus" name="physical_assessment_status" class="verify-screening-control" required>
+                            <option value="Not Yet Conducted">Not Yet Conducted</option>
+                            <option value="Completed / Passed">Completed / Passed</option>
+                        </select>
+                    </div>
+                    <label class="verify-check-row" for="verifyDocumentsValid">
+                        <input type="checkbox" id="verifyDocumentsValid" name="documents_valid" value="1">
+                        Documents are complete, readable, and valid for medical clearance.
+                    </label>
+                </div>
                 <div class="verify-approval-actions">
                     <button type="button" class="verify-approval-btn verify-approval-btn-cancel" id="verifyApprovalCancelBtn">Cancel</button>
-                    <button type="submit" class="verify-approval-btn verify-approval-btn-approve" id="verifyApprovalApproveBtn">Approve</button>
+                    <button type="submit" class="verify-approval-btn verify-approval-btn-pending" id="verifyPendingBtn">Set as Pending/Conditional</button>
+                    <button type="submit" class="verify-approval-btn verify-approval-btn-approve" id="verifyApprovalApproveBtn">Approve & Issue Medical Clearance</button>
                 </div>
             </form>
         </div>
@@ -2021,11 +2239,17 @@
     const verifyApprovalStudentName = document.getElementById('verifyApprovalStudentName');
     const verifyApprovalStudentNumber = document.getElementById('verifyApprovalStudentNumber');
     const verifyApprovalStudentCourse = document.getElementById('verifyApprovalStudentCourse');
-    const verifyApprovalDocViewer = document.getElementById('verifyApprovalDocViewer');
-    const verifyApprovalDocFrame = document.getElementById('verifyApprovalDocFrame');
-    const verifyApprovalDocMissing = document.getElementById('verifyApprovalDocMissing');
     const verifyApprovalForm = document.getElementById('verifyApprovalForm');
     const verifyApprovalApproveBtn = document.getElementById('verifyApprovalApproveBtn');
+    const verifyPendingBtn = document.getElementById('verifyPendingBtn');
+    const verifyClearanceStatus = document.getElementById('verifyClearanceStatus');
+    const verifyMedicalRemarks = document.getElementById('verifyMedicalRemarks');
+    const verifyPendingReason = document.getElementById('verifyPendingReason');
+    const verifyAssessmentStatus = document.getElementById('verifyAssessmentStatus');
+    const verifyDocumentsValid = document.getElementById('verifyDocumentsValid');
+    const verificationDocsToggle = document.getElementById('verificationDocsToggle');
+    const verificationDocsGrid = document.getElementById('verificationDocsGrid');
+    const healthTabButtons = Array.from(document.querySelectorAll('[data-health-tab-btn]'));
 
     function setHealthFilterOpenState(isOpen) {
         if (!healthFilterToggle || !healthFilterModal) {
@@ -2088,10 +2312,43 @@
 
             healthRows.forEach(function (row) {
                 const rowText = row.innerText.toLowerCase();
-                row.style.display = rowText.includes(searchTerm) ? '' : 'none';
+                const activeTab = document.querySelector('[data-health-tab-btn].is-active')?.dataset.healthTabBtn || 'all';
+                const tabMatch = activeTab === 'all' || row.dataset.healthTab === activeTab;
+                row.style.display = rowText.includes(searchTerm) && tabMatch ? '' : 'none';
             });
         });
     }
+
+    function applyHealthTab(tabName) {
+        const tab = tabName || 'all';
+        healthTabButtons.forEach(function (button) {
+            button.classList.toggle('is-active', button.dataset.healthTabBtn === tab);
+        });
+
+        const searchTerm = healthRecordsSearchInput ? healthRecordsSearchInput.value.trim().toLowerCase() : '';
+        healthRows.forEach(function (row) {
+            const rowText = row.innerText.toLowerCase();
+            const tabMatch = tab === 'all' || row.dataset.healthTab === tab;
+            const searchMatch = searchTerm === '' || rowText.includes(searchTerm);
+            row.style.display = tabMatch && searchMatch ? '' : 'none';
+        });
+    }
+
+    healthTabButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            applyHealthTab(button.dataset.healthTabBtn || 'all');
+        });
+    });
+
+    window.addEventListener('DOMContentLoaded', function () {
+        const params = new URLSearchParams(window.location.search);
+        const requestedTab = params.get('tab');
+        if (requestedTab === 'pending_approval') {
+            applyHealthTab('pending_approval');
+        } else {
+            applyHealthTab('all');
+        }
+    });
 
     document.addEventListener('DOMContentLoaded', function () {
         const healthRecordsSearchShell = document.getElementById('healthRecordsSearchShell');
@@ -2206,58 +2463,124 @@
         }
     });
 
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, function (char) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char];
+        });
+    }
+
+    function renderVerificationDocuments(documents) {
+        if (!verificationDocsGrid) return;
+        const docs = Array.isArray(documents) ? documents : [];
+        verificationDocsGrid.innerHTML = docs.map(function (doc) {
+            const meta = doc && doc.meta ? doc.meta : {};
+            const metaMarkup = Object.keys(meta).map(function (key) {
+                return `<dt>${escapeHtml(key)}</dt><dd>${escapeHtml(meta[key] || '-')}</dd>`;
+            }).join('');
+            const linkMarkup = doc.url
+                ? `<a href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Open file</a>`
+                : '<span class="verify-approval-doc-missing">Missing upload</span>';
+            return `
+                <div class="verification-doc-card">
+                    <strong>${escapeHtml(doc.title || 'Requirement')}</strong>
+                    ${linkMarkup}
+                    <dl>${metaMarkup}</dl>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function syncApprovalButtonState() {
+        if (!verifyApprovalApproveBtn) return;
+        const canApprove = Boolean(verifyDocumentsValid && verifyDocumentsValid.checked)
+            && verifyAssessmentStatus
+            && verifyAssessmentStatus.value === 'Completed / Passed';
+        verifyApprovalApproveBtn.disabled = !canApprove;
+    }
+
     document.querySelectorAll('.js-open-verify-modal').forEach(function (button) {
         button.addEventListener('click', function () {
-            const studentName = button.getAttribute('data-student-name') || '-';
-            const studentNumber = button.getAttribute('data-student-number') || '-';
-            const studentCourse = button.getAttribute('data-student-course') || '-';
-            const healthFormUrl = button.getAttribute('data-health-form-url') || '';
-            const approveUrl = button.getAttribute('data-approve-url') || '';
+            const row = button.closest('[data-health-row]');
+            let payload = {};
+            try {
+                payload = JSON.parse(row?.dataset.recordPayload || '{}');
+            } catch (error) {
+                payload = {};
+            }
 
             if (verifyApprovalStudentName) {
-                verifyApprovalStudentName.textContent = studentName;
+                verifyApprovalStudentName.textContent = payload.name || '-';
             }
             if (verifyApprovalStudentNumber) {
-                verifyApprovalStudentNumber.textContent = studentNumber;
+                verifyApprovalStudentNumber.textContent = payload.email || '-';
             }
             if (verifyApprovalStudentCourse) {
-                verifyApprovalStudentCourse.textContent = studentCourse;
+                verifyApprovalStudentCourse.textContent = `${payload.reference_number || '-'} / ${payload.student_id || '-'}`;
             }
             if (verifyApprovalForm) {
-                verifyApprovalForm.setAttribute('action', approveUrl);
+                verifyApprovalForm.setAttribute('action', payload.approve_url || '');
             }
-
-            if (healthFormUrl.trim() !== '') {
-                if (verifyApprovalDocViewer) {
-                    verifyApprovalDocViewer.setAttribute('src', healthFormUrl);
-                }
-                if (verifyApprovalDocFrame) {
-                    verifyApprovalDocFrame.style.display = '';
-                }
-                if (verifyApprovalDocMissing) {
-                    verifyApprovalDocMissing.style.display = 'none';
-                }
-                if (verifyApprovalApproveBtn) {
-                    verifyApprovalApproveBtn.disabled = false;
-                }
-            } else {
-                if (verifyApprovalDocViewer) {
-                    verifyApprovalDocViewer.setAttribute('src', '');
-                }
-                if (verifyApprovalDocFrame) {
-                    verifyApprovalDocFrame.style.display = 'none';
-                }
-                if (verifyApprovalDocMissing) {
-                    verifyApprovalDocMissing.style.display = '';
-                }
-                if (verifyApprovalApproveBtn) {
-                    verifyApprovalApproveBtn.disabled = true;
-                }
+            if (verifyMedicalRemarks) {
+                verifyMedicalRemarks.value = payload.medical_condition_remarks || '';
             }
+            if (verifyPendingReason) {
+                verifyPendingReason.value = payload.pending_reason || '';
+            }
+            if (verifyAssessmentStatus) {
+                verifyAssessmentStatus.value = payload.physical_assessment_status || 'Not Yet Conducted';
+            }
+            if (verifyDocumentsValid) {
+                verifyDocumentsValid.checked = Boolean(payload.documents_valid);
+            }
+            if (verificationDocsGrid) {
+                verificationDocsGrid.classList.remove('is-open');
+            }
+            renderVerificationDocuments(payload.documents || []);
+            syncApprovalButtonState();
 
             setVerifyApprovalModalOpenState(true);
         });
     });
+
+    if (verificationDocsToggle && verificationDocsGrid) {
+        verificationDocsToggle.addEventListener('click', function () {
+            verificationDocsGrid.classList.toggle('is-open');
+        });
+    }
+
+    [verifyDocumentsValid, verifyAssessmentStatus].forEach(function (input) {
+        if (input) {
+            input.addEventListener('change', syncApprovalButtonState);
+        }
+    });
+
+    if (verifyPendingBtn && verifyClearanceStatus && verifyApprovalForm) {
+        verifyPendingBtn.addEventListener('click', function (event) {
+            verifyClearanceStatus.value = 'Pending/Conditional';
+            if (verifyPendingReason && verifyPendingReason.value.trim() === '') {
+                event.preventDefault();
+                verifyPendingReason.setCustomValidity('Nurse remarks are required for pending or conditional records.');
+                verifyPendingReason.reportValidity();
+                verifyPendingReason.setCustomValidity('');
+            }
+        });
+    }
+
+    if (verifyApprovalApproveBtn && verifyClearanceStatus) {
+        verifyApprovalApproveBtn.addEventListener('click', function (event) {
+            verifyClearanceStatus.value = 'Fully Cleared';
+            syncApprovalButtonState();
+            if (verifyApprovalApproveBtn.disabled) {
+                event.preventDefault();
+            }
+        });
+    }
 
     (function initHealthSummaryLiveSync() {
         const liveFeedNode = document.getElementById('adminLiveAlertFeedUrl');

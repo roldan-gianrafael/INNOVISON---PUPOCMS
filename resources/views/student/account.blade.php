@@ -2768,14 +2768,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                         'accept' => '.pdf,application/pdf',
                                     ],
                                     [
-                                        'field' => 'health_form_upload',
-                                        'title' => 'Health Form Upload',
-                                        'meta' => 'PDF Upload',
-                                        'path' => optional($healthProfileRecord)->health_form_upload,
-                                        'is_image' => false,
-                                        'accept' => '.pdf,application/pdf',
-                                    ],
-                                    [
                                         'field' => 'pwd_id_proof',
                                         'title' => 'PWD ID Proof',
                                         'meta' => 'PDF Upload',

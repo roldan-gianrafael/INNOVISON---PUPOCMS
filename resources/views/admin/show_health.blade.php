@@ -298,20 +298,6 @@
     <div class="profile-card profile-panel" id="docsPanel">
         <div class="doc-grid">
             <div class="doc-file">
-                <h4>Health Form Upload (PDF)</h4>
-                @if(!empty($profile->health_form_upload))
-                    <div class="doc-actions">
-                        <a class="doc-link" href="{{ asset('storage/' . $profile->health_form_upload) }}" target="_blank" rel="noopener">
-                            <x-outline-icon name="document-text" /> Open
-                        </a>
-                    </div>
-                    <div class="doc-preview"><iframe src="{{ asset('storage/' . $profile->health_form_upload) }}"></iframe></div>
-                @else
-                    <div class="doc-missing">No health form upload found.</div>
-                @endif
-            </div>
-
-            <div class="doc-file">
                 <h4>Medical Certificate (PDF)</h4>
                 @if(!empty($profile->medical_certificate))
                     <div class="doc-actions">

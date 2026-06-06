@@ -86,20 +86,6 @@
     <div class="verify-card">
         <div class="verify-grid">
             <div class="verify-doc">
-                <h4>Health Form Upload (PDF)</h4>
-                @if(!empty($record->health_form_upload))
-                    <a class="verify-link" href="{{ asset('storage/' . $record->health_form_upload) }}" target="_blank" rel="noopener">
-                        <x-outline-icon name="document-text" /> Open
-                    </a>
-                    <div class="verify-doc-preview">
-                        <iframe src="{{ asset('storage/' . $record->health_form_upload) }}"></iframe>
-                    </div>
-                @else
-                    <div class="verify-missing">No health form PDF uploaded.</div>
-                @endif
-            </div>
-
-            <div class="verify-doc">
                 <h4>Medical Certificate (PDF)</h4>
                 @if(!empty($record->medical_certificate))
                     <a class="verify-link" href="{{ asset('storage/' . $record->medical_certificate) }}" target="_blank" rel="noopener">

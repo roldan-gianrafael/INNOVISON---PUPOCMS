@@ -1248,7 +1248,23 @@ public function storeHealthForm(Request $request)
         'blood_type'        => 'required|string|max:20',
         'contact_no'        => 'required|string|max:20',
         'guardian_name'     => 'required|string|max:255',
+        'landline'          => 'nullable|string|max:20',
         'cellphone'         => 'required|string|max:20',
+        'has_illness'       => 'required|string|in:Yes,No',
+        'medical_history'   => 'nullable|array',
+        'medical_history.*' => 'string|max:100',
+        'other_illness'     => 'nullable|string|max:1000',
+        'food_allergies'    => 'nullable|string|max:255',
+        'no_allergies'      => 'nullable|boolean',
+        'medicine_allergies' => 'nullable|array',
+        'medicine_allergies.*' => 'string|max:100',
+        'other_med_allergies' => 'nullable|string|max:255',
+        'is_smoker'         => 'required|string|in:Yes,No',
+        'is_drinker'        => 'required|string|in:Yes,No',
+        'covid_vaccinated'  => 'required|string|in:Yes,No',
+        'vaccine_history'   => 'nullable|array',
+        'vaccine_history.*.date' => 'nullable|date',
+        'vaccine_history.*.brand' => 'nullable|string|max:100',
 
         'chest_xray_result' => 'required|file|mimes:pdf|max:4096',
         'xray_date'         => 'required|date',
@@ -1260,8 +1276,7 @@ public function storeHealthForm(Request $request)
         'doctor_name'       => 'required|string|max:255',
         'med_cert_date'     => 'required|date',
         'med_cert_findings' => 'required|string|in:No Findings / Normal,With Findings',
-        'health_form_upload' => 'required|file|mimes:pdf|max:4096',
-        'health_form_certified' => 'accepted',
+        'health_profile_certified' => 'accepted',
     ]);
 
     /** @var \App\Models\User $user */
@@ -1295,10 +1310,6 @@ public function storeHealthForm(Request $request)
         $medicalCertificatePath = $request->hasFile('medical_certificate')
             ? $request->file('medical_certificate')->store('health_profiles/medical_certificates', 'public')
             : null;
-        $healthFormUploadPath = $request->hasFile('health_form_upload')
-            ? $request->file('health_form_upload')->store('health_profiles/health_form_uploads', 'public')
-            : null;
-
         \App\Models\HealthProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -1320,6 +1331,23 @@ public function storeHealthForm(Request $request)
                 'guardian_name'      => $request->guardian_name,
                 'landline'           => $request->landline,
                 'cellphone'          => $request->cellphone,
+                'has_illness'        => $request->input('has_illness'),
+                'medical_history'    => $request->input('has_illness') === 'Yes'
+                    ? array_values($request->input('medical_history', []))
+                    : [],
+                'other_illness'      => $request->input('has_illness') === 'Yes'
+                    ? $request->input('other_illness')
+                    : null,
+                'food_allergies'     => $request->boolean('no_allergies') ? null : $request->input('food_allergies'),
+                'no_allergies'       => $request->boolean('no_allergies'),
+                'medicine_allergies' => $request->boolean('no_allergies') ? [] : array_values($request->input('medicine_allergies', [])),
+                'other_med_allergies' => $request->boolean('no_allergies') ? null : $request->input('other_med_allergies'),
+                'is_smoker'          => $request->input('is_smoker'),
+                'is_drinker'         => $request->input('is_drinker'),
+                'covid_vaccinated'   => $request->input('covid_vaccinated'),
+                'vaccine_history'    => $request->input('covid_vaccinated') === 'Yes'
+                    ? $request->input('vaccine_history', [])
+                    : [],
                 'chest_xray_result'  => $chestXrayPath,
                 'xray_date'          => $request->input('xray_date'),
                 'xray_findings'      => $request->input('xray_findings'),
@@ -1330,7 +1358,6 @@ public function storeHealthForm(Request $request)
                 'doctor_name'        => $request->input('doctor_name'),
                 'med_cert_date'      => $request->input('med_cert_date'),
                 'med_cert_findings'  => $request->input('med_cert_findings'),
-                'health_form_upload' => $healthFormUploadPath,
                 'clearance_status'   => 'For Verification',
                 'pending_reason'     => null,
                 'verified_at'        => null,
@@ -1387,11 +1414,6 @@ public function replaceHealthDocument(Request $request)
             'rules' => 'required|file|mimes:pdf|max:4096',
             'directory' => 'health_profiles/chest_xray_results',
             'label' => 'chest X-ray result',
-        ],
-        'health_form_upload' => [
-            'rules' => 'required|file|mimes:pdf|max:4096',
-            'directory' => 'health_profiles/health_form_uploads',
-            'label' => 'health form upload',
         ],
         'pwd_id_proof' => [
             'rules' => 'required|file|mimes:pdf|max:4096',

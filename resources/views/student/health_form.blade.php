@@ -88,7 +88,7 @@
 
         .stepper-shell {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 10px;
             min-height: 91px;
             position: fixed;
@@ -98,11 +98,15 @@
             width: min(972px, calc(100vw - 10px));
             box-sizing: border-box;
             z-index: 50;
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.32);
             padding: 10px;
             border-radius: 16px;
-            border: 1px solid rgba(127, 29, 45, 0.12);
-            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.62);
+            box-shadow:
+                0 10px 30px rgba(74, 15, 26, 0.14),
+                inset 0 1px 0 rgba(255, 255, 255, 0.72);
+            -webkit-backdrop-filter: blur(18px) saturate(145%);
+            backdrop-filter: blur(18px) saturate(145%);
         }
 
         :where(.asw-menu-btn),
@@ -458,6 +462,24 @@
             font-size: 0.84rem;
             line-height: 1.45;
             font-weight: 700;
+        }
+
+        .final-certification {
+            width: min(680px, 100%);
+            margin: 22px auto 0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 16px 18px;
+        }
+
+        .final-certification input {
+            flex: 0 0 auto;
+            margin-top: 0;
+        }
+
+        .final-certification label {
+            max-width: 590px;
         }
 
         .upload-preview-card {
@@ -826,13 +848,123 @@
             gap: 12px;
         }
 
+        .choice-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .personal-identity-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .personal-email-field {
+            margin-bottom: 18px;
+        }
+
+        .identity-readonly {
+            background: #f4f1f1;
+            color: #4b5563;
+            cursor: default;
+        }
+
+        .choice-card {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid rgba(127, 29, 45, 0.14);
+            border-radius: 12px;
+            background: #fffaf2;
+            color: #334155;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .choice-card input {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            accent-color: var(--clinic-maroon);
+        }
+
+        .dose-grid {
+            display: grid;
+            grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1fr);
+            gap: 10px;
+            align-items: center;
+        }
+
+        .dose-row {
+            display: contents;
+        }
+
+        .dose-label {
+            color: #70131b;
+            font-size: 0.84rem;
+            font-weight: 800;
+        }
+
+        .conditional-section.is-hidden {
+            display: none;
+        }
+
         .form-field {
             display: flex;
             flex-direction: column;
+            position: relative;
             border: 1px solid rgba(127, 29, 45, 0.12);
             background: #fff;
             border-radius: 12px;
             padding: 10px 12px;
+        }
+
+        .validation-anchor {
+            position: relative;
+        }
+
+        .validation-bubble {
+            position: absolute;
+            left: 12px;
+            bottom: calc(100% + 9px);
+            z-index: 30;
+            width: max-content;
+            max-width: min(250px, calc(100vw - 48px));
+            padding: 9px 12px;
+            border: 1px solid #f1c40f;
+            border-radius: 8px;
+            background: #fff4b8;
+            box-shadow: 0 8px 20px rgba(76, 15, 25, 0.2);
+            color: #57111c;
+            font-size: 0.78rem;
+            font-weight: 800;
+            line-height: 1.3;
+            animation: validationBubbleIn 0.18s ease-out;
+        }
+
+        .validation-bubble::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 18px;
+            border: 7px solid transparent;
+            border-top-color: #fff4b8;
+        }
+
+        @keyframes validationBubbleIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .form-field.span-2 {
@@ -1003,7 +1135,10 @@
             .requirement-grid,
             .profile-readonly-grid,
             .identity-name-grid,
-            .step-one-grid {
+            .step-one-grid,
+            .choice-grid,
+            .dose-grid,
+            .personal-identity-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -1051,7 +1186,7 @@
             }
 
             .step-chip.is-active small::after {
-                content: " of 2";
+                content: " of 5";
             }
 
             .step-chip.is-active strong {
@@ -1079,8 +1214,18 @@
             @endif
             @php
                 $selectedPwd = old('has_disability', $prefill['has_disability'] ?? 'No');
-                $stepTwoErrorFields = ['has_disability', 'disability_type', 'medical_certificate', 'doctor_name', 'med_cert_date', 'med_cert_findings', 'chest_xray_result', 'xray_date', 'xray_findings', 'pwd_id_proof', 'health_form_upload', 'health_form_certified', 'student_photo'];
-                $startStep = $errors->any() ? 2 : (collect($stepTwoErrorFields)->contains(fn ($field) => $errors->has($field)) ? 2 : 1);
+                $personalErrorFields = ['school_year', 'home_address', 'zipcode', 'birthday', 'age', 'sex', 'civil_status', 'height', 'weight', 'blood_type', 'contact_no', 'guardian_name', 'landline', 'cellphone'];
+                $medicalErrorFields = ['has_illness', 'medical_history', 'other_illness', 'has_disability', 'disability_type', 'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies', 'is_smoker', 'is_drinker'];
+                $covidErrorFields = ['covid_vaccinated', 'vaccine_history'];
+                $uploadErrorFields = ['medical_certificate', 'doctor_name', 'med_cert_date', 'med_cert_findings', 'chest_xray_result', 'xray_date', 'xray_findings', 'pwd_id_proof', 'student_photo', 'health_profile_certified'];
+                $startStep = collect($uploadErrorFields)->contains(fn ($field) => $errors->has($field)) ? 5
+                    : (collect($covidErrorFields)->contains(fn ($field) => $errors->has($field)) ? 4
+                    : (collect($medicalErrorFields)->contains(fn ($field) => $errors->has($field)) ? 3
+                    : (collect($personalErrorFields)->contains(fn ($field) => $errors->has($field)) ? 2 : 1)));
+                $selectedMedicalHistory = old('medical_history', []);
+                $selectedMedicineAllergies = old('medicine_allergies', []);
+                $selectedHasIllness = old('has_illness', 'No');
+                $selectedCovidVaccinated = old('covid_vaccinated', 'No');
                 $displayFullName = trim((string) old('full_name', $prefill['full_name'] ?? $user->name));
                 $nameParts = preg_split('/\s+/', $displayFullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
                 $displayFirstName = trim((string) old('first_name', $prefill['first_name'] ?? ''));
@@ -1104,11 +1249,23 @@
 
             <div class="stepper-shell">
                 <div class="step-chip {{ $startStep === 1 ? 'is-active' : '' }}" id="chipStep1">
-                    <small>Part 1</small>
+                    <small>Step 1</small>
                     <strong>Admission Reference</strong>
                 </div>
                 <div class="step-chip {{ $startStep === 2 ? 'is-active' : '' }}" id="chipStep2">
-                    <small>Part 2</small>
+                    <small>Step 2</small>
+                    <strong>Personal Information</strong>
+                </div>
+                <div class="step-chip {{ $startStep === 3 ? 'is-active' : '' }}" id="chipStep3">
+                    <small>Step 3</small>
+                    <strong>Medical History</strong>
+                </div>
+                <div class="step-chip {{ $startStep === 4 ? 'is-active' : '' }}" id="chipStep4">
+                    <small>Step 4</small>
+                    <strong>COVID-19</strong>
+                </div>
+                <div class="step-chip {{ $startStep === 5 ? 'is-active' : '' }}" id="chipStep5">
+                    <small>Step 5</small>
                     <strong>Clinic Requirements</strong>
                 </div>
             </div>
@@ -1119,10 +1276,10 @@
                 <input type="hidden" name="course_college" value="{{ old('course_college', $prefill['course_college'] ?? $user->course) }}">
                 <input type="hidden" name="student_number" value="{{ old('student_number', $prefill['student_number'] ?? $user->student_number) }}">
 
-                <div class="step-panel {{ $startStep === 2 ? 'is-hidden' : '' }}" id="stepPanel1">
+                <div class="step-panel {{ $startStep === 1 ? '' : 'is-hidden' }}" id="stepPanel1">
                     <div class="form-intro">
                         <h1>Admission Reference</h1>
-                        <p>Confirm your admission reference details, then proceed with the required clinic document uploads.</p>
+                        <p>Confirm your admission reference, complete your health information, then upload the required clinic documents.</p>
                     </div>
 
                     <div class="identity-overview">
@@ -1147,65 +1304,245 @@
                     </div>
 
                     <div class="upload-instruction-card">
-                        <strong>Instructions for Uploading Documents</strong>
+                        <strong>Instructions for Completing Your Health Profile</strong>
                         <ol>
-                            <li>Prepare clear PDF copies of your medical certificate, chest X-ray result, and completed health form.</li>
-                            <li>If you are a PWD, upload your PWD ID in Step 2.</li>
-                            <li>Upload your 2x2 photo as JPG or PNG only.</li>
+                            <li>Review your admission reference and name before proceeding.</li>
+                            <li>Complete every required field in Personal Information using accurate and current details.</li>
+                            <li>Answer the Medical History, allergy, disability, smoking, and alcohol questions truthfully.</li>
+                            <li>Provide your COVID-19 vaccination status and dose details, when applicable.</li>
+                            <li>Prepare clear PDF copies of your medical certificate and official chest X-ray report.</li>
+                            <li>If you are a PWD, upload your PWD ID in Step 5. Upload your formal 2x2 photo as JPG or PNG.</li>
                         </ol>
                     </div>
-
-                    {{--
-                        Legacy profile fields hidden for the simplified health form flow.
-                        Restore the old visible field grid here if the clinic decides to collect these details again.
-                    --}}
-                    <input type="hidden" name="school_year" value="{{ old('school_year', $prefill['school_year'] ?? '2025-2026') }}">
-                    <input type="hidden" name="home_address" value="{{ old('home_address', $prefill['home_address'] ?? 'NONE') }}">
-                    <input type="hidden" name="zipcode" value="{{ old('zipcode', $prefill['zipcode'] ?? 'NONE') }}">
-                    <input type="hidden" name="birthday" id="birthday" value="{{ old('birthday', $prefill['birthday'] ?? '2000-01-01') }}">
-                    <input type="hidden" name="age" id="age" value="{{ old('age', $prefill['age'] ?? 18) }}">
-                    <input type="hidden" name="sex" value="{{ old('sex', $prefill['sex'] ?? 'NONE') }}">
-                    <input type="hidden" name="civil_status" value="{{ old('civil_status', $prefill['civil_status'] ?? 'Single') }}">
-                    <input type="hidden" name="height" value="{{ old('height', $prefill['height'] ?? 0) }}">
-                    <input type="hidden" name="weight" value="{{ old('weight', $prefill['weight'] ?? 0) }}">
-                    <input type="hidden" name="blood_type" value="{{ old('blood_type', $prefill['blood_type'] ?? 'Unknown') }}">
-                    <input type="hidden" name="contact_no" value="{{ old('contact_no', $prefill['contact_number'] ?? $user->contact_no ?? 'NONE') }}">
-                    <input type="hidden" name="guardian_name" value="{{ old('guardian_name', $prefill['guardian_name'] ?? 'NONE') }}">
-                    <input type="hidden" name="cellphone" value="{{ old('cellphone', $prefill['cellphone'] ?? 'NONE') }}">
-                    <input type="hidden" name="landline" value="{{ old('landline', $prefill['landline'] ?? 'NONE') }}">
 
                     <div class="btn-row">
                         <a href="{{ url('/student/account') }}" class="btn btn-health btn-health-back">Back</a>
                         <button type="button" class="btn btn-health btn-health-next" id="nextToStep2">Next</button>
                     </div>
-                    <p class="privacy-note">
-                        Data Privacy Notice: The information you provide is collected for school clinic documentation and health clearance processing only, in compliance with school data privacy requirements.
-                    </p>
                 </div>
 
-                <div class="step-panel {{ $startStep === 1 ? 'is-hidden' : '' }}" id="stepPanel2">
-                    <h2 class="section-title">Clinic Requirements</h2>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="form-field">
-                                <label class="form-label">Are you a PWD? <span class="required">*</span></label>
-                                <div class="pwd-toggle" id="pwdToggle">
-                                    <input class="pwd-radio" type="radio" name="has_disability" id="pwd_no" value="No" required {{ $selectedPwd !== 'Yes' ? 'checked' : '' }}>
-                                    <label class="pwd-option" for="pwd_no">No</label>
-                                    <input class="pwd-radio" type="radio" name="has_disability" id="pwd_yes" value="Yes" {{ $selectedPwd === 'Yes' ? 'checked' : '' }}>
-                                    <label class="pwd-option" for="pwd_yes">Yes</label>
-                                </div>
-                            </div>
+                <div class="step-panel {{ $startStep === 2 ? '' : 'is-hidden' }}" id="stepPanel2">
+                    <h2 class="section-title">Personal Information</h2>
+                    <p class="step-fill-note">Complete the student and emergency contact details from the official PUP Health Information Form.</p>
+                    <div class="personal-identity-grid">
+                        <div class="form-field">
+                            <label class="form-label" for="profile_first_name">First Name</label>
+                            <input id="profile_first_name" class="form-control identity-readonly" value="{{ $displayFirstName !== '' ? $displayFirstName : 'N/A' }}" readonly>
                         </div>
-                        <div class="col-md-8" id="disabilityTypeWrap">
-                            <div class="form-field">
-                                <label class="form-label">Disability Type <span class="required">*</span></label>
-                                <input id="disability_type" type="text" name="disability_type" class="form-control" value="{{ old('disability_type', $prefill['disability_type'] ?? '') }}">
-                            </div>
+                        <div class="form-field">
+                            <label class="form-label" for="profile_middle_name">Middle Name</label>
+                            <input id="profile_middle_name" class="form-control identity-readonly" value="{{ $displayMiddleName !== '' ? $displayMiddleName : 'N/A' }}" readonly>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="profile_last_name">Last Name</label>
+                            <input id="profile_last_name" class="form-control identity-readonly" value="{{ $displayLastName !== '' ? $displayLastName : 'N/A' }}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-field personal-email-field">
+                        <label class="form-label" for="profile_email">Email Address</label>
+                        <input id="profile_email" type="email" class="form-control identity-readonly" value="{{ $user->email }}" readonly>
+                    </div>
+                    <div class="step-one-grid">
+                        <div class="form-field">
+                            <label class="form-label" for="school_year">School Year <span class="required">*</span></label>
+                            <input id="school_year" class="form-control field-maroon" name="school_year" value="{{ old('school_year', $prefill['school_year'] ?? '2026-2027') }}" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="birthday">Birthday <span class="required">*</span></label>
+                            <input id="birthday" type="date" class="form-control field-maroon" name="birthday" value="{{ old('birthday', $prefill['birthday'] ?? '') }}" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="age">Age <span class="required">*</span></label>
+                            <input id="age" type="number" class="form-control field-maroon" name="age" value="{{ old('age', $prefill['age'] ?? '') }}" min="15" max="100" required readonly>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="sex">Sex <span class="required">*</span></label>
+                            <select id="sex" class="form-select field-maroon" name="sex" required>
+                                <option value="">Select sex</option>
+                                @foreach(['Male', 'Female'] as $option)
+                                    <option value="{{ $option }}" {{ old('sex', $prefill['sex'] ?? '') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="civil_status">Civil Status <span class="required">*</span></label>
+                            <select id="civil_status" class="form-select field-maroon" name="civil_status" required>
+                                @foreach(['Single', 'Married', 'Widowed', 'Separated'] as $option)
+                                    <option value="{{ $option }}" {{ old('civil_status', $prefill['civil_status'] ?? 'Single') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="blood_type">Blood Type <span class="required">*</span></label>
+                            <select id="blood_type" class="form-select field-maroon" name="blood_type" required>
+                                @foreach(['Unknown', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $option)
+                                    <option value="{{ $option }}" {{ old('blood_type', $prefill['blood_type'] ?? 'Unknown') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="height">Height (cm) <span class="required">*</span></label>
+                            <input id="height" type="number" step="0.01" class="form-control field-maroon" name="height" value="{{ old('height', $prefill['height'] ?? '') }}" min="1" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="weight">Weight (kg) <span class="required">*</span></label>
+                            <input id="weight" type="number" step="0.01" class="form-control field-maroon" name="weight" value="{{ old('weight', $prefill['weight'] ?? '') }}" min="1" required>
+                        </div>
+                        <div class="form-field span-2">
+                            <label class="form-label" for="home_address">Home Address <span class="required">*</span></label>
+                            <input id="home_address" class="form-control field-maroon" name="home_address" value="{{ old('home_address', $prefill['home_address'] ?? '') }}" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="zipcode">ZIP Code <span class="required">*</span></label>
+                            <input id="zipcode" class="form-control field-maroon" name="zipcode" value="{{ old('zipcode', $prefill['zipcode'] ?? '') }}" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="contact_no">Student Contact Number <span class="required">*</span></label>
+                            <input id="contact_no" class="form-control field-maroon" name="contact_no" value="{{ old('contact_no', $prefill['contact_number'] ?? $user->contact_no ?? '') }}" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="guardian_name">Parent / Guardian Name <span class="required">*</span></label>
+                            <input id="guardian_name" class="form-control field-maroon" name="guardian_name" value="{{ old('guardian_name', $prefill['guardian_name'] ?? '') }}" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="cellphone">Parent / Guardian Cellphone <span class="required">*</span></label>
+                            <input id="cellphone" class="form-control field-maroon" name="cellphone" value="{{ old('cellphone', $prefill['cellphone'] ?? '') }}" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="landline">Landline</label>
+                            <input id="landline" class="form-control field-maroon" name="landline" value="{{ old('landline', $prefill['landline'] ?? '') }}">
+                        </div>
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-health btn-health-back" data-step-back="1">Back</button>
+                        <button type="button" class="btn btn-health btn-health-next" data-step-next="3">Next</button>
+                    </div>
+                </div>
+
+                <div class="step-panel {{ $startStep === 3 ? '' : 'is-hidden' }}" id="stepPanel3">
+                    <h2 class="section-title">Medical History</h2>
+                    <div class="form-field mb-3">
+                        <label class="form-label">Do you need medical attention or have a known medical illness? <span class="required">*</span></label>
+                        <div class="pwd-toggle">
+                            @foreach(['No', 'Yes'] as $option)
+                                <input class="pwd-radio" type="radio" name="has_illness" id="illness_{{ strtolower($option) }}" value="{{ $option }}" required {{ $selectedHasIllness === $option ? 'checked' : '' }}>
+                                <label class="pwd-option" for="illness_{{ strtolower($option) }}">{{ $option }}</label>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div id="medicalHistoryDetails" class="conditional-section">
+                        <h2 class="section-title">Known Conditions</h2>
+                        <div class="choice-grid">
+                            @foreach(['Asthma', 'Loss of Consciousness', 'Eye Disease / Defect', 'Accident Injuries', 'Diabetes', 'Heart Disease', 'Kidney Disease', 'Tuberculosis / Primary Complex', 'Convulsion / Epilepsy', 'Migraine', 'Hyperventilation', 'High Blood Pressure', 'Hemophilia'] as $condition)
+                                <label class="choice-card">
+                                    <input type="checkbox" name="medical_history[]" value="{{ $condition }}" {{ in_array($condition, $selectedMedicalHistory, true) ? 'checked' : '' }}>
+                                    <span>{{ $condition }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <div class="form-field mt-3">
+                            <label class="form-label" for="other_illness">Other Illness / Medical Notes</label>
+                            <textarea id="other_illness" name="other_illness" class="form-control field-maroon" rows="3">{{ old('other_illness') }}</textarea>
                         </div>
                     </div>
 
-                    <h2 class="section-title mt-4">Required Documents</h2>
+                    <h2 class="section-title mt-4">Disability Information</h2>
+                    <div class="step-one-grid">
+                        <div class="form-field">
+                            <label class="form-label">Do you have a disability? <span class="required">*</span></label>
+                            <div class="pwd-toggle" id="pwdToggle">
+                                <input class="pwd-radio" type="radio" name="has_disability" id="pwd_no" value="No" required {{ $selectedPwd !== 'Yes' ? 'checked' : '' }}>
+                                <label class="pwd-option" for="pwd_no">No</label>
+                                <input class="pwd-radio" type="radio" name="has_disability" id="pwd_yes" value="Yes" {{ $selectedPwd === 'Yes' ? 'checked' : '' }}>
+                                <label class="pwd-option" for="pwd_yes">Yes</label>
+                            </div>
+                        </div>
+                        <div class="form-field" id="disabilityTypeWrap">
+                            <label class="form-label" for="disability_type">Disability Type <span class="required">*</span></label>
+                            <input id="disability_type" name="disability_type" class="form-control field-maroon" value="{{ old('disability_type', $prefill['disability_type'] ?? '') }}">
+                        </div>
+                    </div>
+
+                    <h2 class="section-title mt-4">Allergies</h2>
+                    <label class="choice-card mb-3">
+                        <input id="no_allergies" type="checkbox" name="no_allergies" value="1" {{ old('no_allergies') ? 'checked' : '' }}>
+                        <span>No Known Allergies</span>
+                    </label>
+                    <div id="allergyDetails" class="conditional-section">
+                        <div class="form-field mb-3">
+                            <label class="form-label" for="food_allergies">Food Allergies</label>
+                            <input id="food_allergies" name="food_allergies" class="form-control field-maroon" value="{{ old('food_allergies') }}" placeholder="Specify food allergies">
+                        </div>
+                        <div class="choice-grid">
+                            @foreach(['Aspirin', 'Ibuprofen', 'Amoxicillin', 'Mefenamic Acid', 'Penicillin'] as $medicine)
+                                <label class="choice-card">
+                                    <input type="checkbox" name="medicine_allergies[]" value="{{ $medicine }}" {{ in_array($medicine, $selectedMedicineAllergies, true) ? 'checked' : '' }}>
+                                    <span>{{ $medicine }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <div class="form-field mt-3">
+                            <label class="form-label" for="other_med_allergies">Other Medicine Allergies</label>
+                            <input id="other_med_allergies" name="other_med_allergies" class="form-control field-maroon" value="{{ old('other_med_allergies') }}">
+                        </div>
+                    </div>
+
+                    <h2 class="section-title mt-4">Personal Social History</h2>
+                    <div class="step-one-grid">
+                        @foreach(['is_smoker' => 'Cigarette Smoking', 'is_drinker' => 'Alcohol Drinking'] as $field => $label)
+                            <div class="form-field">
+                                <label class="form-label">{{ $label }} <span class="required">*</span></label>
+                                <div class="pwd-toggle">
+                                    @foreach(['No', 'Yes'] as $option)
+                                        <input class="pwd-radio" type="radio" name="{{ $field }}" id="{{ $field }}_{{ strtolower($option) }}" value="{{ $option }}" required {{ old($field, 'No') === $option ? 'checked' : '' }}>
+                                        <label class="pwd-option" for="{{ $field }}_{{ strtolower($option) }}">{{ $option }}</label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-health btn-health-back" data-step-back="2">Back</button>
+                        <button type="button" class="btn btn-health btn-health-next" data-step-next="4">Next</button>
+                    </div>
+                </div>
+
+                <div class="step-panel {{ $startStep === 4 ? '' : 'is-hidden' }}" id="stepPanel4">
+                    <h2 class="section-title">COVID-19 Vaccination History</h2>
+                    <div class="form-field mb-3">
+                        <label class="form-label">Vaccinated against COVID-19? <span class="required">*</span></label>
+                        <div class="pwd-toggle">
+                            @foreach(['No', 'Yes'] as $option)
+                                <input class="pwd-radio" type="radio" name="covid_vaccinated" id="covid_{{ strtolower($option) }}" value="{{ $option }}" required {{ $selectedCovidVaccinated === $option ? 'checked' : '' }}>
+                                <label class="pwd-option" for="covid_{{ strtolower($option) }}">{{ $option }}</label>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div id="vaccineHistoryDetails" class="conditional-section">
+                        <div class="dose-grid">
+                            @foreach(['first_dose' => '1st Dose', 'second_dose' => '2nd Dose', 'booster_1' => 'Booster 1', 'booster_2' => 'Booster 2'] as $doseKey => $doseLabel)
+                                <div class="dose-row">
+                                    <div class="dose-label">{{ $doseLabel }}</div>
+                                    <div class="form-field">
+                                        <label class="form-label" for="{{ $doseKey }}_date">Date Received</label>
+                                        <input id="{{ $doseKey }}_date" type="date" name="vaccine_history[{{ $doseKey }}][date]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.date") }}">
+                                    </div>
+                                    <div class="form-field">
+                                        <label class="form-label" for="{{ $doseKey }}_brand">Vaccine Brand</label>
+                                        <input id="{{ $doseKey }}_brand" name="vaccine_history[{{ $doseKey }}][brand]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.brand") }}" placeholder="e.g. Pfizer, Moderna">
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-health btn-health-back" data-step-back="3">Back</button>
+                        <button type="button" class="btn btn-health btn-health-next" data-step-next="5">Next</button>
+                    </div>
+                </div>
+
+                <div class="step-panel {{ $startStep === 5 ? '' : 'is-hidden' }}" id="stepPanel5">
+                    <h2 class="section-title">Clinic Requirements</h2>
                     <div class="requirement-grid">
                         <div class="requirement-card" id="pwdUploadWrap">
                             <div class="upload-card">
@@ -1283,19 +1620,6 @@
                         </div>
                         <div class="requirement-card">
                             <div class="requirement-card-header">
-                                <strong>Health Form Upload (PDF) <span class="required">*</span></strong>
-                                <span class="requirement-badge">PDF</span>
-                            </div>
-                            <input type="file" name="health_form_upload" class="form-control" accept=".pdf,application/pdf" required data-upload-input data-preview-kind="pdf">
-                            <div class="upload-preview-card" data-upload-preview aria-live="polite"></div>
-                            <small>Allowed: PDF only, max 4MB.</small>
-                            <div class="certify-row">
-                                <input id="health_form_certified" type="checkbox" name="health_form_certified" value="1" required {{ old('health_form_certified') ? 'checked' : '' }}>
-                                <label for="health_form_certified">I certify that I have completely filled out and signed all sections of the official PUP Health Form.</label>
-                            </div>
-                        </div>
-                        <div class="requirement-card">
-                            <div class="requirement-card-header">
                                 <strong>2x2 Photo (Image) <span class="required">*</span></strong>
                                 <span class="requirement-badge">JPG/PNG</span>
                             </div>
@@ -1305,8 +1629,14 @@
                             <small>Allowed: JPG/PNG only, max 2MB.</small>
                         </div>
                     </div>
+                    <div class="certify-row final-certification">
+                        <input id="health_profile_certified" type="checkbox" name="health_profile_certified" value="1" required {{ old('health_profile_certified') ? 'checked' : '' }}>
+                        <label for="health_profile_certified">
+                            I certify that I have completely filled out all required sections of the official PUP Health Profile and that all information I provided is true and correct.
+                        </label>
+                    </div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-health btn-health-back" id="backToStep1">Back</button>
+                        <button type="button" class="btn btn-health btn-health-back" data-step-back="4">Back</button>
                         <button type="submit" class="btn btn-health btn-health-submit">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path>
@@ -1317,6 +1647,10 @@
                         </button>
                     </div>
                 </div>
+
+                <p class="privacy-note">
+                    Data Privacy Notice: The information you provide is collected for school clinic documentation and health clearance processing only, in compliance with school data privacy requirements.
+                </p>
             </form>
         </div>
     </div>
@@ -1335,19 +1669,23 @@
     <script>
         (function () {
             const form = document.querySelector('form[action="{{ route('store.health.form') }}"]');
-            const stepPanel1 = document.getElementById('stepPanel1');
-            const stepPanel2 = document.getElementById('stepPanel2');
-            const chipStep1 = document.getElementById('chipStep1');
-            const chipStep2 = document.getElementById('chipStep2');
+            const stepPanels = Array.from({ length: 5 }, (_, index) => document.getElementById(`stepPanel${index + 1}`));
+            const stepChips = Array.from({ length: 5 }, (_, index) => document.getElementById(`chipStep${index + 1}`));
             const nextToStep2Btn = document.getElementById('nextToStep2');
-            const backToStep1Btn = document.getElementById('backToStep1');
+            const stepNavigationButtons = Array.from(document.querySelectorAll('[data-step-next], [data-step-back]'));
             const birthdayInput = document.getElementById('birthday');
             const ageInput = document.getElementById('age');
+            const illnessRadios = document.querySelectorAll('input[name="has_illness"]');
+            const medicalHistoryDetails = document.getElementById('medicalHistoryDetails');
             const disabilityRadios = document.querySelectorAll('input[name="has_disability"]');
             const disabilityTypeInput = document.getElementById('disability_type');
             const disabilityTypeWrap = document.getElementById('disabilityTypeWrap');
             const pwdProofInput = document.getElementById('pwd_id_proof');
             const pwdUploadWrap = document.getElementById('pwdUploadWrap');
+            const noAllergiesInput = document.getElementById('no_allergies');
+            const allergyDetails = document.getElementById('allergyDetails');
+            const covidRadios = document.querySelectorAll('input[name="covid_vaccinated"]');
+            const vaccineHistoryDetails = document.getElementById('vaccineHistoryDetails');
             const submitOverlay = document.getElementById('submitOverlay');
             const requirementFiles = document.querySelectorAll('[data-requirement-file]');
             const clinicSelects = Array.from(document.querySelectorAll('[data-clinic-select]'));
@@ -1356,35 +1694,52 @@
             let isSubmitting = false;
 
             function setStep(step) {
-                currentStep = step;
-                const showStep1 = step === 1;
-                stepPanel1?.classList.toggle('is-hidden', !showStep1);
-                stepPanel2?.classList.toggle('is-hidden', showStep1);
-                chipStep1?.classList.toggle('is-active', showStep1);
-                chipStep2?.classList.toggle('is-active', !showStep1);
+                const normalizedStep = Math.min(5, Math.max(1, Number(step) || 1));
+                currentStep = normalizedStep;
+                stepPanels.forEach((panel, index) => {
+                    panel?.classList.toggle('is-hidden', index + 1 !== normalizedStep);
+                });
+                stepChips.forEach((chip, index) => {
+                    chip?.classList.toggle('is-active', index + 1 === normalizedStep);
+                });
             }
 
-            function validateStepOne() {
-                if (!stepPanel1) return true;
-                const requiredFields = Array.from(stepPanel1.querySelectorAll('input[required], select[required], textarea[required]'));
-                let isValid = true;
+            function validateStep(step) {
+                const panel = stepPanels[step - 1];
+                if (!panel) return true;
+                clearValidationBubble();
+                const fields = Array.from(panel.querySelectorAll('input, select, textarea'))
+                    .filter((field) => !field.disabled);
+                const firstInvalid = fields.find((field) => !field.checkValidity());
 
-                requiredFields.forEach((field) => {
-                    if (typeof field.reportValidity === 'function') {
-                        const valid = field.reportValidity();
-                        if (!valid && isValid) {
-                            field.focus();
-                            isValid = false;
-                        }
-                    } else if (!field.checkValidity()) {
-                        if (isValid) {
-                            field.focus();
-                            isValid = false;
-                        }
-                    }
+                if (!firstInvalid) {
+                    return true;
+                }
+
+                showValidationBubble(firstInvalid);
+                firstInvalid.focus({ preventScroll: true });
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+
+            function clearValidationBubble() {
+                document.querySelectorAll('.validation-bubble').forEach((bubble) => bubble.remove());
+                document.querySelectorAll('.validation-anchor').forEach((anchor) => {
+                    anchor.classList.remove('validation-anchor');
                 });
+            }
 
-                return isValid;
+            function showValidationBubble(field) {
+                const anchor = field.closest('.form-field, .requirement-card, .certify-row, .upload-card')
+                    || field.parentElement;
+                if (!anchor) return;
+
+                anchor.classList.add('validation-anchor');
+                const bubble = document.createElement('div');
+                bubble.className = 'validation-bubble';
+                bubble.setAttribute('role', 'alert');
+                bubble.textContent = 'Please fill this field.';
+                anchor.appendChild(bubble);
             }
 
             function updateAgeFromBirthday() {
@@ -1421,6 +1776,47 @@
                     disabilityTypeInput.value = '';
                     pwdProofInput.value = '';
                 }
+            }
+
+            function toggleIllnessDetails() {
+                const hasIllness = document.querySelector('input[name="has_illness"]:checked')?.value === 'Yes';
+                medicalHistoryDetails?.classList.toggle('is-hidden', !hasIllness);
+                medicalHistoryDetails?.querySelectorAll('input, textarea').forEach((field) => {
+                    field.disabled = !hasIllness;
+                    if (!hasIllness) {
+                        if (field.type === 'checkbox') {
+                            field.checked = false;
+                        } else {
+                            field.value = '';
+                        }
+                    }
+                });
+            }
+
+            function toggleAllergyDetails() {
+                const hasNoKnownAllergies = Boolean(noAllergiesInput?.checked);
+                allergyDetails?.classList.toggle('is-hidden', hasNoKnownAllergies);
+                allergyDetails?.querySelectorAll('input, textarea').forEach((field) => {
+                    field.disabled = hasNoKnownAllergies;
+                    if (hasNoKnownAllergies) {
+                        if (field.type === 'checkbox') {
+                            field.checked = false;
+                        } else {
+                            field.value = '';
+                        }
+                    }
+                });
+            }
+
+            function toggleVaccineHistory() {
+                const isVaccinated = document.querySelector('input[name="covid_vaccinated"]:checked')?.value === 'Yes';
+                vaccineHistoryDetails?.classList.toggle('is-hidden', !isVaccinated);
+                vaccineHistoryDetails?.querySelectorAll('input').forEach((field) => {
+                    field.disabled = !isVaccinated;
+                    if (!isVaccinated) {
+                        field.value = '';
+                    }
+                });
             }
 
             function syncRequirementCard(fileInput) {
@@ -1557,8 +1953,17 @@
             }
 
             birthdayInput?.addEventListener('change', updateAgeFromBirthday);
+            form?.addEventListener('input', clearValidationBubble);
+            form?.addEventListener('change', clearValidationBubble);
+            illnessRadios.forEach((radio) => {
+                radio.addEventListener('change', toggleIllnessDetails);
+            });
             disabilityRadios.forEach((radio) => {
                 radio.addEventListener('change', togglePwdRequirements);
+            });
+            noAllergiesInput?.addEventListener('change', toggleAllergyDetails);
+            covidRadios.forEach((radio) => {
+                radio.addEventListener('change', toggleVaccineHistory);
             });
             requirementFiles.forEach((fileInput) => {
                 syncRequirementCard(fileInput);
@@ -1593,27 +1998,39 @@
             });
 
             nextToStep2Btn?.addEventListener('click', () => {
-                if (!validateStepOne()) {
+                if (!validateStep(1)) {
                     return;
                 }
                 setStep(2);
-                stepPanel2?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                stepPanels[1]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
-            backToStep1Btn?.addEventListener('click', () => {
-                setStep(1);
-                stepPanel1?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            stepNavigationButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const nextStep = button.dataset.stepNext ? Number(button.dataset.stepNext) : null;
+                    const backStep = button.dataset.stepBack ? Number(button.dataset.stepBack) : null;
+
+                    if (nextStep && !validateStep(currentStep)) {
+                        return;
+                    }
+
+                    const targetStep = nextStep || backStep;
+                    if (!targetStep) return;
+                    setStep(targetStep);
+                    stepPanels[targetStep - 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
             });
             form?.addEventListener('submit', (event) => {
                 if (isSubmitting) {
                     return;
                 }
 
-                if (currentStep === 1) {
+                if (currentStep < 5) {
                     event.preventDefault();
-                    if (!validateStepOne()) {
+                    if (!validateStep(currentStep)) {
                         return;
                     }
-                    setStep(2);
+                    setStep(currentStep + 1);
+                    stepPanels[currentStep - 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     return;
                 }
 
@@ -1637,7 +2054,10 @@
             });
 
             updateAgeFromBirthday();
+            toggleIllnessDetails();
             togglePwdRequirements();
+            toggleAllergyDetails();
+            toggleVaccineHistory();
             setStep(currentStep);
         })();
     </script>

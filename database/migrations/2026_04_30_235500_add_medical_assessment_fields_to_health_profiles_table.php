@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('health_profiles', function (Blueprint $table) {
             if (!Schema::hasColumn('health_profiles', 'assessment_date')) {
-                $table->date('assessment_date')->nullable()->after('health_form_upload');
+                $table->date('assessment_date')->nullable()->after('medical_certificate');
             }
             if (!Schema::hasColumn('health_profiles', 'blood_pressure')) {
                 $table->string('blood_pressure', 30)->nullable()->after('weight');

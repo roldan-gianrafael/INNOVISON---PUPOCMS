@@ -2097,7 +2097,6 @@
         foreach ($records as $summaryRecord) {
             $summaryHasRequirements = filled($summaryRecord->medical_certificate)
                 && filled($summaryRecord->chest_xray_result)
-                && filled($summaryRecord->health_form_upload)
                 && filled($summaryRecord->student_photo);
             $summaryStatus = trim((string) ($summaryRecord->clearance_status ?? ''));
             $summaryIsConditional = in_array($summaryStatus, ['Pending/Conditional', 'Rejected'], true)
@@ -2207,7 +2206,6 @@
                 @php
                     $hasClinicRequirements = filled($record->medical_certificate)
                         && filled($record->chest_xray_result)
-                        && filled($record->health_form_upload)
                         && filled($record->student_photo);
                     $recordStatus = trim((string) ($record->clearance_status ?? ''));
                     $recordStatusNormalized = strtolower($recordStatus);
@@ -2247,13 +2245,6 @@
                                 'meta' => [
                                     'Exam Date' => optional($record->xray_date)->format('M d, Y') ?: '-',
                                     'Findings' => $record->xray_findings ?: '-',
-                                ],
-                            ],
-                            [
-                                'title' => 'Health Form Upload',
-                                'url' => $record->health_form_upload ? asset('storage/' . $record->health_form_upload) : '',
-                                'meta' => [
-                                    'Certification' => 'Student certified completed and signed form.',
                                 ],
                             ],
                             [
@@ -2469,7 +2460,6 @@
                         $readonlyDocs = [
                             'Medical Certificate' => $readonlyRecord->medical_certificate,
                             'Chest X-ray Result' => $readonlyRecord->chest_xray_result,
-                            'Health Form Upload' => $readonlyRecord->health_form_upload,
                             '2x2 Photo' => $readonlyRecord->student_photo,
                         ];
                     @endphp

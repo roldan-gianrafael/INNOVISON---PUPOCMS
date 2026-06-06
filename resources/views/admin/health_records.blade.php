@@ -136,7 +136,7 @@
         transform: translateY(0);
     }
 
-    /* Awaiting Links Modal Styling */
+    /* Read-only workflow modal styling */
     .awaiting-links-modal-shell {
         width: min(900px, 95%);
         max-height: 85vh;
@@ -667,7 +667,7 @@
     /* Custom Flex Grid para sa Summary Cards */
     .summary-container {
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 20px;
         width: 100%;
         margin-bottom: 25px;
@@ -1380,6 +1380,12 @@
         color: #ffffff !important;
     }
 
+    html[data-theme="dark"] .health-summary-metric-card .health-summary-metric-label,
+    html[data-theme="dark"] .health-summary-metric-card .health-summary-metric-label span,
+    html[data-theme="dark"] .health-summary-metric-card .health-summary-metric-count {
+        color: #ffffff !important;
+    }
+
     html[data-theme="dark"] .health-records-search-toggle {
         background: rgba(17, 24, 39, 0.96);
         border-color: rgba(250, 204, 21, 0.16);
@@ -2043,54 +2049,13 @@
         </div>
     </div>
 
-    {{-- Get approved applicants data --}}
     @php
-        $approvedApplicants = [];
-        try {
-            $approvalLogs = \App\Models\ActivityLog::where('event_type', 'applicant_approval')->get();
-            $referenceNumbers = $approvalLogs->pluck('subject_id')->unique();
-
-            foreach($referenceNumbers as $ref) {
-                $approvalLog = $approvalLogs->where('subject_id', $ref)->last();
-                $pendingAssessment = \App\Models\PendingMedicalAssessment::where('reference_number', $ref)->first();
-                $studentIdFromDescription = null;
-                if ($approvalLog && preg_match('/Student ID:\s*([^)]+)/i', (string) $approvalLog->description, $matches)) {
-                    $studentIdFromDescription = trim($matches[1]);
-                }
-                $linkedUser = $pendingAssessment?->user;
-                if (!$linkedUser && $studentIdFromDescription) {
-                    $linkedUser = \App\Models\User::where('student_id', $studentIdFromDescription)
-                        ->orWhere('student_number', $studentIdFromDescription)
-                        ->first();
-                }
-                $displayName = $linkedUser?->name;
-                if (!$displayName && $approvalLog) {
-                    $displayName = trim(preg_replace('/^Applicant approved:\s*[^()]+(?:\s*\(Student ID:[^)]+\))?/i', '', (string) $approvalLog->description));
-                }
-                if (!$displayName) {
-                    $displayName = 'Applicant';
-                }
-
-                $approvedApplicants[] = [
-                    'reference_number' => $ref,
-                    'name' => $displayName,
-                    'email' => $linkedUser?->email ?: $pendingAssessment?->email ?: '-',
-                    'approve_date' => $approvalLog->created_at,
-                    'has_uploaded' => $pendingAssessment !== null,
-                ];
-            }
-        } catch (\Exception $e) {
-            // Tables may not exist
-        }
-
         $healthSummaryStats = [
             'total' => $records->count(),
             'with_conditions' => 0,
-            'awaiting_uploads' => 0,
             'pending_approval' => 0,
             'pending_conditional' => 0,
         ];
-        $awaitingUploadRecordIds = [];
         $pendingApprovalRecordIds = [];
         $pendingConditionalRecordIds = [];
 
@@ -2103,13 +2068,12 @@
                 || trim((string) ($summaryRecord->pending_reason ?? '')) !== ''
                 || trim((string) ($summaryRecord->medical_condition_remarks ?? '')) !== '';
 
-            if ($summaryRecord->has_disability === 'Yes') {
+            if (
+                $summaryRecord->has_disability === 'Yes'
+                || $summaryRecord->has_illness === 'Yes'
+                || trim((string) ($summaryRecord->medical_condition_remarks ?? '')) !== ''
+            ) {
                 $healthSummaryStats['with_conditions']++;
-            }
-
-            if (!$summaryHasRequirements) {
-                $healthSummaryStats['awaiting_uploads']++;
-                $awaitingUploadRecordIds[] = $summaryRecord->id;
             }
 
             if ($summaryHasRequirements && !$summaryIsConditional && in_array($summaryStatus, ['Pending', 'For Verification', ''], true)) {
@@ -2122,6 +2086,10 @@
                 $pendingConditionalRecordIds[] = $summaryRecord->id;
             }
         }
+
+        $healthProfileSummaryRecords = $records
+            ->filter(fn ($record) => in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true))
+            ->values();
     @endphp
 
     {{-- Summary Action Cards --}}
@@ -2170,18 +2138,6 @@
                 </div>
             </button>
         </div>
-        <div class="summary-item">
-            <button type="button" class="card p-3 awaiting-links-btn" id="awaitingUploadsInfoBtn" style="padding: 8px 18px 8px 12px !important; border-left: 5px solid #70131B; width: 100%; display: flex; align-items: center; justify-content: flex-start; gap: 12px; min-height: 90px;" onclick="document.getElementById('awaitingUploadsInfoModal').style.display='flex';">
-                <div class="workflow-card-icon">
-                    <x-outline-icon name="link" />
-                </div>
-                <span class="workflow-card-divider" aria-hidden="true"></span>
-                <div class="workflow-card-text">
-                    <small class="workflow-card-label">Awaiting Uploads</small>
-                    <h3 class="workflow-card-count">{{ $healthSummaryStats['awaiting_uploads'] }}</h3>
-                </div>
-            </button>
-        </div>
     </div>
 
     {{-- Main Table Card --}}
@@ -2202,7 +2158,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($records as $record)
+            @forelse($healthProfileSummaryRecords as $record)
                 @php
                     $hasClinicRequirements = filled($record->medical_certificate)
                         && filled($record->chest_xray_result)
@@ -2212,9 +2168,9 @@
                     $isConditional = in_array($recordStatus, ['Pending/Conditional', 'Rejected'], true)
                         || trim((string) ($record->pending_reason ?? '')) !== ''
                         || trim((string) ($record->medical_condition_remarks ?? '')) !== '';
-                    $healthTabState = !$hasClinicRequirements
-                        ? 'awaiting_uploads'
-                        : ($isConditional ? 'pending_conditional' : (in_array($recordStatus, ['Pending', 'For Verification', ''], true) ? 'pending_approval' : 'cleared'));
+                    $healthTabState = $isConditional
+                        ? 'pending_conditional'
+                        : (in_array($recordStatus, ['Pending', 'For Verification', ''], true) ? 'pending_approval' : 'cleared');
                     $recordPayload = [
                         'id' => $record->id,
                         'name' => optional($record->user)->name ?: '-',
@@ -2278,7 +2234,11 @@
                     
                     {{-- Column 1: Medical Condition Status --}}
                     <td>
-                        @if($record->has_disability == 'Yes')
+                        @if(
+                            $record->has_disability === 'Yes'
+                            || $record->has_illness === 'Yes'
+                            || trim((string) ($record->medical_condition_remarks ?? '')) !== ''
+                        )
                             <span class="status review">With Condition</span>
                         @else
                             <span class="status submitted">No Condition</span>
@@ -2305,138 +2265,21 @@
                     </td>
 
                     <td style="text-align: center;">
-                        @if(in_array($record->clearance_status, ['Issued', 'Fully Cleared'], true))
-                            <div class="d-flex justify-content-center">
-                                <span class="health-issued-badge" aria-hidden="true">
-                                    <x-outline-icon name="check" />
-                                    Issued
-                                </span>
-                            </div>
-                        @else
-                            <div class="d-flex justify-content-center gap-2">
-                                <button type="button" class="btn-action btn-view js-open-verify-modal">
-                                    <x-outline-icon name="document-text" />
-                                    Verify
-                                </button>
-                            </div>
-                        @endif
+                        <div class="d-flex justify-content-center">
+                            <a href="{{ route('admin.show_health', $record->id) }}" class="btn-action btn-view">
+                                <x-outline-icon name="eye" />
+                                View
+                            </a>
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">No health records found.</td>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">No issued health profiles found.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
-</div>
-
-{{-- Awaiting Uploads Modal --}}
-<div id="awaitingUploadsInfoModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target.id==='awaitingUploadsInfoModal') document.getElementById('awaitingUploadsInfoModal').style.display='none';">
-    <div class="awaiting-links-modal-shell" style="max-width: 760px;">
-        <div class="awaiting-links-modal-head">
-            <div class="awaiting-links-modal-head-main">
-                <div class="awaiting-links-modal-badge">AU</div>
-                <div class="awaiting-links-modal-copy">
-                    <h3>Awaiting Uploads</h3>
-                    <p>Read-only view of students with missing clinic requirements.</p>
-                </div>
-            </div>
-            <button type="button" class="awaiting-links-modal-close" id="closeAwaitingUploadsInfoModal" aria-label="Close awaiting uploads modal" onclick="document.getElementById('awaitingUploadsInfoModal').style.display='none';">
-                <x-outline-icon name="x-mark" />
-            </button>
-        </div>
-        <div class="awaiting-links-modal-body">
-            <div class="pending-approval-list">
-                @forelse($records->whereIn('id', $awaitingUploadRecordIds) as $readonlyRecord)
-                    <article class="readonly-record-card">
-                        <div class="readonly-record-head">
-                            <div>
-                                <h4 class="readonly-record-name">{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</h4>
-                                <p class="readonly-record-sub">{{ optional($readonlyRecord->user)->email ?: '-' }}</p>
-                            </div>
-                            <span class="readonly-record-status">Missing Requirements</span>
-                        </div>
-                        <div class="readonly-record-grid">
-                            <div class="readonly-field"><span>Status Flag</span><strong>Missing Requirements</strong></div>
-                            <div class="readonly-field"><span>Student Full Name</span><strong>{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</strong></div>
-                            <div class="readonly-field"><span>Student ID Number</span><strong>{{ $readonlyRecord->student_id ?: optional($readonlyRecord->user)->student_id ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
-                            <div class="readonly-field"><span>Email Address</span><strong>{{ optional($readonlyRecord->user)->email ?: '-' }}</strong></div>
-                            <div class="readonly-field"><span>Account Registration Date</span><strong>{{ optional(optional($readonlyRecord->user)->created_at)->format('M d, Y') ?: '-' }}</strong></div>
-                        </div>
-                    </article>
-                @empty
-                    <div class="pending-approval-empty">No students are currently awaiting uploads.</div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Awaiting Links Modal --}}
-<div id="awaitingLinksModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;" onclick="if(event.target.id==='awaitingLinksModal') document.getElementById('awaitingLinksModal').style.display='none';">
-    <div class="awaiting-links-modal-shell">
-        <div class="awaiting-links-modal-head">
-            <div class="awaiting-links-modal-head-main">
-                <div class="awaiting-links-modal-badge">AL</div>
-                <div class="awaiting-links-modal-copy">
-                    <h3>Awaiting Links</h3>
-                    <p>Medical assessments uploaded via reference lookup, waiting to be linked to student accounts.</p>
-                </div>
-            </div>
-            <button type="button" class="awaiting-links-modal-close" id="closeAwaitingLinksModal" aria-label="Close modal" onclick="document.getElementById('awaitingLinksModal').style.display='none';">
-                <x-outline-icon name="x-mark" />
-            </button>
-        </div>
-        <div class="awaiting-links-modal-body">
-            @if(count($approvedApplicants) > 0)
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid #f1f5f9;">
-                            <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Reference Number</th>
-                            <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Name</th>
-                            <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Email</th>
-                            <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Approve Date</th>
-                            <th style="text-align: center; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Uploaded Requirements</th>
-                            <th style="text-align: center; padding: 12px 16px; font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($approvedApplicants as $applicant)
-                            <tr style="border-bottom: 1px solid #f8fafc;">
-                                <td style="padding: 16px; color: #111827; font-weight: 700;">{{ $applicant['reference_number'] }}</td>
-                                <td style="padding: 16px; color: #111827;">{{ $applicant['name'] }}</td>
-                                <td style="padding: 16px; color: #111827;">{{ $applicant['email'] }}</td>
-                                <td style="padding: 16px; color: #111827;">{{ $applicant['approve_date']->format('M d, Y h:i A') }}</td>
-                                <td style="text-align: center; padding: 16px;">
-                                    @if($applicant['has_uploaded'])
-                                        <span style="background: #dcfce7; color: #15803d; padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase;">✓ Uploaded</span>
-                                    @else
-                                        <span style="background: #fee2e2; color: #b91c1c; padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase;">✗ Not Uploaded</span>
-                                    @endif
-                                </td>
-                                <td style="text-align: center; padding: 16px;">
-                                    <span
-                                        class="link-button awaiting-applicant-label"
-                                        style="color: #0369a1; text-decoration: none; font-weight: 600; font-size: 13px; border: 0; background: transparent; cursor: pointer;"
-                                        data-reference="{{ $applicant['reference_number'] }}"
-                                        data-name="{{ $applicant['name'] }}"
-                                        data-email="{{ $applicant['email'] }}"
-                                        data-approve-date="{{ $applicant['approve_date']->format('M d, Y h:i A') }}"
-                                        data-uploaded="{{ $applicant['has_uploaded'] ? 'Uploaded' : 'Not Uploaded' }}"
-                                    >View</span>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <div style="text-align: center; padding: 40px; color: #94a3b8;">
-                    <p>No approved applicants yet.</p>
-                </div>
-            @endif
-        </div>
-    </div>
 </div>
 
 <div id="pendingApprovalInfoModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target.id==='pendingApprovalInfoModal') document.getElementById('pendingApprovalInfoModal').style.display='none';">
@@ -2543,27 +2386,6 @@
                     <div class="pending-approval-empty">No students are currently pending compliance.</div>
                 @endforelse
             </div>
-        </div>
-    </div>
-</div>
-
-<div id="awaitingApplicantInfoModal" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.58); z-index: 1100; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target.id==='awaitingApplicantInfoModal') document.getElementById('awaitingApplicantInfoModal').style.display='none';">
-    <div style="width: min(460px, 100%); background: #ffffff; border-radius: 18px; border-top: 4px solid #facc15; border-bottom: 4px solid #facc15; box-shadow: 0 24px 60px rgba(0,0,0,.22); overflow: hidden;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:18px 20px; background:linear-gradient(135deg,#70131B,#8f2230); color:#fff;">
-            <div>
-                <h3 style="margin:0; color:#fff; font-size:20px; font-weight:900;">Applicant Information</h3>
-                <p style="margin:5px 0 0; color:rgba(255,255,255,.78); font-size:13px;">Approved reference awaiting student account linkage.</p>
-            </div>
-            <button type="button" id="closeAwaitingApplicantInfoModal" style="border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.12); color:#fff; border-radius:999px; width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" aria-label="Close applicant info modal">
-                <x-outline-icon name="x-mark" />
-            </button>
-        </div>
-        <div style="padding:20px; display:grid; gap:12px;">
-            <div class="awaiting-info-row"><span>Reference Number</span><strong id="awaitingInfoReference">-</strong></div>
-            <div class="awaiting-info-row"><span>Name</span><strong id="awaitingInfoName">-</strong></div>
-            <div class="awaiting-info-row"><span>Email</span><strong id="awaitingInfoEmail">-</strong></div>
-            <div class="awaiting-info-row"><span>Approve Date</span><strong id="awaitingInfoDate">-</strong></div>
-            <div class="awaiting-info-row"><span>Uploaded Requirements</span><strong id="awaitingInfoUploaded">-</strong></div>
         </div>
     </div>
 </div>
@@ -2799,10 +2621,7 @@
     window.addEventListener('DOMContentLoaded', function () {
         const params = new URLSearchParams(window.location.search);
         const requestedTab = params.get('tab');
-        if (requestedTab === 'awaiting_uploads') {
-            const awaitingUploadsInfoModal = document.getElementById('awaitingUploadsInfoModal');
-            if (awaitingUploadsInfoModal) awaitingUploadsInfoModal.style.display = 'flex';
-        } else if (requestedTab === 'pending_approval') {
+        if (requestedTab === 'pending_approval') {
             const pendingApprovalInfoModal = document.getElementById('pendingApprovalInfoModal');
             if (pendingApprovalInfoModal) pendingApprovalInfoModal.style.display = 'flex';
         } else if (requestedTab === 'pending_conditional') {
@@ -2885,39 +2704,12 @@
 
     // Read-only clinic status modals - wrapped in DOMContentLoaded to ensure elements exist
     document.addEventListener('DOMContentLoaded', function() {
-        const awaitingUploadsInfoBtn = document.getElementById('awaitingUploadsInfoBtn');
-        const awaitingUploadsInfoModal = document.getElementById('awaitingUploadsInfoModal');
-        const closeAwaitingUploadsInfoModal = document.getElementById('closeAwaitingUploadsInfoModal');
         const pendingApprovalInfoBtn = document.getElementById('pendingApprovalInfoBtn');
         const pendingApprovalInfoModal = document.getElementById('pendingApprovalInfoModal');
         const closePendingApprovalInfoModal = document.getElementById('closePendingApprovalInfoModal');
         const pendingConditionalInfoBtn = document.getElementById('pendingConditionalInfoBtn');
         const pendingConditionalInfoModal = document.getElementById('pendingConditionalInfoModal');
         const closePendingConditionalInfoModal = document.getElementById('closePendingConditionalInfoModal');
-
-        if (awaitingUploadsInfoBtn) {
-            awaitingUploadsInfoBtn.addEventListener('click', function () {
-                if (awaitingUploadsInfoModal) {
-                    awaitingUploadsInfoModal.style.display = 'flex';
-                }
-            });
-        }
-
-        if (closeAwaitingUploadsInfoModal) {
-            closeAwaitingUploadsInfoModal.addEventListener('click', function () {
-                if (awaitingUploadsInfoModal) {
-                    awaitingUploadsInfoModal.style.display = 'none';
-                }
-            });
-        }
-
-        if (awaitingUploadsInfoModal) {
-            awaitingUploadsInfoModal.addEventListener('click', function (event) {
-                if (event.target === awaitingUploadsInfoModal) {
-                    awaitingUploadsInfoModal.style.display = 'none';
-                }
-            });
-        }
 
         if (pendingApprovalInfoBtn && pendingApprovalInfoModal) {
             pendingApprovalInfoBtn.addEventListener('click', function () {

@@ -416,6 +416,78 @@
             font-weight: 650;
         }
 
+        .upload-example-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .requirement-card.has-upload-preview .upload-example-grid,
+        .requirement-card.has-upload-preview .requirement-guideline {
+            display: none;
+        }
+
+        .upload-example {
+            overflow: hidden;
+            border: 1px solid #d8dee7;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .upload-example.is-wrong {
+            border-color: #efb3b3;
+        }
+
+        .upload-example.is-correct {
+            border-color: #9bcdae;
+        }
+
+        .upload-example-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 34px;
+            padding: 7px 8px;
+            color: #ffffff;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .upload-example.is-wrong .upload-example-status {
+            background: #9f2531;
+        }
+
+        .upload-example.is-correct .upload-example-status {
+            background: #267447;
+        }
+
+        .upload-example-status span:first-child {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .upload-example img {
+            display: block;
+            width: 100%;
+            height: 148px;
+            object-fit: cover;
+            background: #eef1f4;
+        }
+
+        .upload-example-caption {
+            min-height: 48px;
+            margin: 0;
+            padding: 8px 9px;
+            color: #4b5563;
+            font-size: 0.72rem;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: center;
+        }
+
         .requirement-extra {
             display: none;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1195,6 +1267,16 @@
                 line-height: 1.2;
             }
         }
+
+        @media (max-width: 430px) {
+            .upload-example-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-example img {
+                height: 180px;
+            }
+        }
     </style>
 </head>
 <body class="health-form-page">
@@ -1216,7 +1298,7 @@
                 $selectedPwd = old('has_disability', $prefill['has_disability'] ?? 'No');
                 $personalErrorFields = ['school_year', 'home_address', 'zipcode', 'birthday', 'age', 'sex', 'civil_status', 'height', 'weight', 'blood_type', 'contact_no', 'guardian_name', 'landline', 'cellphone'];
                 $medicalErrorFields = ['has_illness', 'medical_history', 'other_illness', 'has_disability', 'disability_type', 'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies', 'is_smoker', 'is_drinker'];
-                $covidErrorFields = ['covid_vaccinated', 'vaccine_history'];
+                $covidErrorFields = ['vaccine_history'];
                 $uploadErrorFields = ['medical_certificate', 'doctor_name', 'med_cert_date', 'med_cert_findings', 'chest_xray_result', 'xray_date', 'xray_findings', 'pwd_id_proof', 'student_photo', 'health_profile_certified'];
                 $startStep = collect($uploadErrorFields)->contains(fn ($field) => $errors->has($field)) ? 5
                     : (collect($covidErrorFields)->contains(fn ($field) => $errors->has($field)) ? 4
@@ -1225,7 +1307,6 @@
                 $selectedMedicalHistory = old('medical_history', []);
                 $selectedMedicineAllergies = old('medicine_allergies', []);
                 $selectedHasIllness = old('has_illness', 'No');
-                $selectedCovidVaccinated = old('covid_vaccinated', 'No');
                 $displayFullName = trim((string) old('full_name', $prefill['full_name'] ?? $user->name));
                 $nameParts = preg_split('/\s+/', $displayFullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
                 $displayFirstName = trim((string) old('first_name', $prefill['first_name'] ?? ''));
@@ -1317,6 +1398,18 @@
 
                     <div class="btn-row">
                         <a href="{{ url('/student/account') }}" class="btn btn-health btn-health-back">Back</a>
+                        @env('local')
+                            <button
+                                type="submit"
+                                class="btn btn-health btn-health-back"
+                                formaction="{{ route('student.health_form.testing_skip') }}"
+                                formmethod="POST"
+                                formnovalidate
+                                data-testing-skip
+                            >
+                                Skip to Print (Testing)
+                            </button>
+                        @endenv
                         <button type="button" class="btn btn-health btn-health-next" id="nextToStep2">Next</button>
                     </div>
                 </div>
@@ -1509,27 +1602,20 @@
 
                 <div class="step-panel {{ $startStep === 4 ? '' : 'is-hidden' }}" id="stepPanel4">
                     <h2 class="section-title">COVID-19 Vaccination History</h2>
-                    <div class="form-field mb-3">
-                        <label class="form-label">Vaccinated against COVID-19? <span class="required">*</span></label>
-                        <div class="pwd-toggle">
-                            @foreach(['No', 'Yes'] as $option)
-                                <input class="pwd-radio" type="radio" name="covid_vaccinated" id="covid_{{ strtolower($option) }}" value="{{ $option }}" required {{ $selectedCovidVaccinated === $option ? 'checked' : '' }}>
-                                <label class="pwd-option" for="covid_{{ strtolower($option) }}">{{ $option }}</label>
-                            @endforeach
-                        </div>
-                    </div>
-                    <div id="vaccineHistoryDetails" class="conditional-section">
+                    <p class="step-fill-note">Enter the date received and vaccine brand for every COVID-19 dose. All fields are required.</p>
+                    <input type="hidden" name="covid_vaccinated" value="Yes">
+                    <div id="vaccineHistoryDetails">
                         <div class="dose-grid">
                             @foreach(['first_dose' => '1st Dose', 'second_dose' => '2nd Dose', 'booster_1' => 'Booster 1', 'booster_2' => 'Booster 2'] as $doseKey => $doseLabel)
                                 <div class="dose-row">
                                     <div class="dose-label">{{ $doseLabel }}</div>
                                     <div class="form-field">
-                                        <label class="form-label" for="{{ $doseKey }}_date">Date Received</label>
-                                        <input id="{{ $doseKey }}_date" type="date" name="vaccine_history[{{ $doseKey }}][date]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.date") }}">
+                                        <label class="form-label" for="{{ $doseKey }}_date">Date Received <span class="required">*</span></label>
+                                        <input id="{{ $doseKey }}_date" type="date" name="vaccine_history[{{ $doseKey }}][date]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.date") }}" min="2020-01-01" max="2025-12-31" required>
                                     </div>
                                     <div class="form-field">
-                                        <label class="form-label" for="{{ $doseKey }}_brand">Vaccine Brand</label>
-                                        <input id="{{ $doseKey }}_brand" name="vaccine_history[{{ $doseKey }}][brand]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.brand") }}" placeholder="e.g. Pfizer, Moderna">
+                                        <label class="form-label" for="{{ $doseKey }}_brand">Vaccine Brand <span class="required">*</span></label>
+                                        <input id="{{ $doseKey }}_brand" name="vaccine_history[{{ $doseKey }}][brand]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.brand") }}" placeholder="e.g. Pfizer, Moderna" required>
                                     </div>
                                 </div>
                             @endforeach
@@ -1544,23 +1630,37 @@
                 <div class="step-panel {{ $startStep === 5 ? '' : 'is-hidden' }}" id="stepPanel5">
                     <h2 class="section-title">Clinic Requirements</h2>
                     <div class="requirement-grid">
-                        <div class="requirement-card" id="pwdUploadWrap">
-                            <div class="upload-card">
-                                <strong>PWD ID (PDF, if PWD is Yes)</strong>
-                                <input id="pwd_id_proof" type="file" name="pwd_id_proof" class="form-control" accept=".pdf,application/pdf" data-upload-input data-preview-kind="pdf">
-                                <div class="upload-preview-card" data-upload-preview aria-live="polite"></div>
-                                <small>Required only when PWD.</small>
+                        <div class="requirement-card" id="pwdUploadWrap" data-requirement-card>
+                            <div class="requirement-card-header">
+                                <strong>PWD ID <span class="required">*</span></strong>
+                                <span class="requirement-badge">PDF</span>
                             </div>
+                            <p class="requirement-guideline">Please upload a clear and readable scanned copy of the front of your valid PWD ID.</p>
+                            <input id="pwd_id_proof" type="file" name="pwd_id_proof" class="form-control" accept=".pdf,application/pdf" data-requirement-file data-upload-input data-preview-kind="pdf">
+                            <div class="upload-preview-card" data-upload-preview aria-live="polite"></div>
+                            <small>Required only when PWD. Allowed: PDF only, max 4MB.</small>
                         </div>
                         <div class="requirement-card {{ old('doctor_name') || old('med_cert_date') || old('med_cert_findings') ? 'has-old-data' : '' }}" data-requirement-card>
                             <div class="requirement-card-header">
-                                <strong>Medical Certificate (PDF) <span class="required">*</span></strong>
-                                <span class="requirement-badge">PDF</span>
+                                <strong>Medical Certificate <span class="required">*</span></strong>
+                                <span class="requirement-badge">PDF/IMG</span>
                             </div>
                             <p class="requirement-guideline">Please ensure the doctor's signature and PRC License Number are clearly visible.</p>
-                            <input type="file" name="medical_certificate" class="form-control" accept=".pdf,application/pdf" required data-requirement-file data-upload-input data-preview-kind="pdf">
+                            <div class="upload-example-grid" aria-label="Medical certificate upload examples">
+                                <div class="upload-example is-wrong">
+                                    <div class="upload-example-status"><span aria-hidden="true">&times;</span> Do Not Upload</div>
+                                    <img src="{{ asset('images/upload-guides/medical-certificate-incomplete.jpg') }}" alt="Incomplete medical certificate without a physician signature or license number">
+                                    <p class="upload-example-caption">Incomplete certificate without visible signature and PRC License Number.</p>
+                                </div>
+                                <div class="upload-example is-correct">
+                                    <div class="upload-example-status"><span aria-hidden="true">&#10003;</span> Upload This</div>
+                                    <img src="{{ asset('images/upload-guides/medical-certificate-complete.jpg') }}" alt="Complete medical certificate with physician signature and license number">
+                                    <p class="upload-example-caption">Complete certificate with the doctor's signature and PRC License Number.</p>
+                                </div>
+                            </div>
+                            <input type="file" name="medical_certificate" class="form-control" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required data-requirement-file data-upload-input>
                             <div class="upload-preview-card" data-upload-preview aria-live="polite"></div>
-                            <small>Allowed: PDF only, max 4MB.</small>
+                            <small>Allowed: PDF, JPG, JPEG, or PNG, max 4MB.</small>
                             <div class="requirement-extra">
                                 <div class="form-field span-2">
                                     <label class="form-label" for="doctor_name">Doctor's Full Name <span class="required">*</span></label>
@@ -1577,11 +1677,13 @@
                                             <option value="">Select findings</option>
                                             <option value="No Findings / Normal" {{ old('med_cert_findings') === 'No Findings / Normal' ? 'selected' : '' }}>No Findings / Normal</option>
                                             <option value="With Findings" {{ old('med_cert_findings') === 'With Findings' ? 'selected' : '' }}>With Findings</option>
+                                            <option value="Not Sure / For Clinic Review" {{ old('med_cert_findings') === 'Not Sure / For Clinic Review' ? 'selected' : '' }}>Not Sure / For Clinic Review</option>
                                         </select>
                                         <button type="button" class="clinic-select-display" aria-haspopup="listbox" aria-expanded="false">Select findings</button>
                                         <div class="clinic-select-menu" role="listbox" aria-label="Medical certificate findings options">
                                             <button type="button" class="clinic-select-option" data-select-value="No Findings / Normal">No Findings / Normal</button>
                                             <button type="button" class="clinic-select-option" data-select-value="With Findings">With Findings</button>
+                                            <button type="button" class="clinic-select-option" data-select-value="Not Sure / For Clinic Review">Not Sure / For Clinic Review</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1589,13 +1691,25 @@
                         </div>
                         <div class="requirement-card {{ old('xray_date') || old('xray_findings') ? 'has-old-data' : '' }}" data-requirement-card>
                             <div class="requirement-card-header">
-                                <strong>Chest X-ray Result (PDF) <span class="required">*</span></strong>
-                                <span class="requirement-badge">PDF</span>
+                                <strong>Chest X-ray Result <span class="required">*</span></strong>
+                                <span class="requirement-badge">PDF/IMG</span>
                             </div>
                             <p class="requirement-guideline">Please upload the official radiologist's written report, not the actual film scanning image.</p>
-                            <input type="file" name="chest_xray_result" class="form-control" accept=".pdf,application/pdf" required data-requirement-file data-upload-input data-preview-kind="pdf">
+                            <div class="upload-example-grid" aria-label="Chest X-ray upload examples">
+                                <div class="upload-example is-wrong">
+                                    <div class="upload-example-status"><span aria-hidden="true">&times;</span> Do Not Upload</div>
+                                    <img src="{{ asset('images/upload-guides/xray-film-do-not-upload.jpg') }}" alt="Physical chest X-ray film that should not be uploaded">
+                                    <p class="upload-example-caption">Do not upload a scan or photograph of the X-ray film.</p>
+                                </div>
+                                <div class="upload-example is-correct">
+                                    <div class="upload-example-status"><span aria-hidden="true">&#10003;</span> Upload This</div>
+                                    <img src="{{ asset('images/upload-guides/xray-written-report-upload.jpg') }}" alt="Official written radiologist report that should be uploaded">
+                                    <p class="upload-example-caption">Upload the official written report containing findings and impression.</p>
+                                </div>
+                            </div>
+                            <input type="file" name="chest_xray_result" class="form-control" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required data-requirement-file data-upload-input>
                             <div class="upload-preview-card" data-upload-preview aria-live="polite"></div>
-                            <small>Allowed: PDF only, max 4MB.</small>
+                            <small>Allowed: PDF, JPG, JPEG, or PNG, max 4MB.</small>
                             <div class="requirement-extra">
                                 <div class="form-field">
                                     <label class="form-label" for="xray_date">Date of Examination <span class="required">*</span></label>
@@ -1608,11 +1722,13 @@
                                             <option value="">Select findings</option>
                                             <option value="Normal" {{ old('xray_findings') === 'Normal' ? 'selected' : '' }}>Normal</option>
                                             <option value="With Findings" {{ old('xray_findings') === 'With Findings' ? 'selected' : '' }}>With Findings</option>
+                                            <option value="Not Sure / For Clinic Review" {{ old('xray_findings') === 'Not Sure / For Clinic Review' ? 'selected' : '' }}>Not Sure / For Clinic Review</option>
                                         </select>
                                         <button type="button" class="clinic-select-display" aria-haspopup="listbox" aria-expanded="false">Select findings</button>
                                         <div class="clinic-select-menu" role="listbox" aria-label="Chest X-ray findings options">
                                             <button type="button" class="clinic-select-option" data-select-value="Normal">Normal</button>
                                             <button type="button" class="clinic-select-option" data-select-value="With Findings">With Findings</button>
+                                            <button type="button" class="clinic-select-option" data-select-value="Not Sure / For Clinic Review">Not Sure / For Clinic Review</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1624,6 +1740,22 @@
                                 <span class="requirement-badge">JPG/PNG</span>
                             </div>
                             <p class="requirement-guideline">Must be a formal photo on a plain white background, taken within the last 6 months.</p>
+                            {{--
+                            Temporary 2x2 photo examples. Replace these assets with the clinic-approved
+                            images before restoring this block.
+                            <div class="upload-example-grid" aria-label="2x2 photo upload examples">
+                                <div class="upload-example is-wrong">
+                                    <div class="upload-example-status"><span aria-hidden="true">&times;</span> Do Not Upload</div>
+                                    <img src="{{ asset('images/upload-guides/photo-casual-do-not-upload.jpg') }}" alt="Casual outdoor selfie that should not be uploaded">
+                                    <p class="upload-example-caption">No selfies, casual poses, scenery, filters, or distracting backgrounds.</p>
+                                </div>
+                                <div class="upload-example is-correct">
+                                    <div class="upload-example-status"><span aria-hidden="true">&#10003;</span> Upload This</div>
+                                    <img src="{{ asset('images/upload-guides/photo-formal-upload.jpg') }}" alt="Formal front-facing ID photo on a plain white background">
+                                    <p class="upload-example-caption">Formal, front-facing photo with even lighting and a plain white background.</p>
+                                </div>
+                            </div>
+                            --}}
                             <input type="file" name="student_photo" class="form-control" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required data-upload-input data-preview-kind="image">
                             <div class="upload-preview-card" data-upload-preview aria-live="polite"></div>
                             <small>Allowed: JPG/PNG only, max 2MB.</small>
@@ -1684,8 +1816,6 @@
             const pwdUploadWrap = document.getElementById('pwdUploadWrap');
             const noAllergiesInput = document.getElementById('no_allergies');
             const allergyDetails = document.getElementById('allergyDetails');
-            const covidRadios = document.querySelectorAll('input[name="covid_vaccinated"]');
-            const vaccineHistoryDetails = document.getElementById('vaccineHistoryDetails');
             const submitOverlay = document.getElementById('submitOverlay');
             const requirementFiles = document.querySelectorAll('[data-requirement-file]');
             const clinicSelects = Array.from(document.querySelectorAll('[data-clinic-select]'));
@@ -1738,7 +1868,13 @@
                 const bubble = document.createElement('div');
                 bubble.className = 'validation-bubble';
                 bubble.setAttribute('role', 'alert');
-                bubble.textContent = 'Please fill this field.';
+                if (field.validity?.rangeUnderflow) {
+                    bubble.textContent = 'Date must be January 1, 2020 or later.';
+                } else if (field.validity?.rangeOverflow) {
+                    bubble.textContent = 'Date must not be later than December 31, 2025.';
+                } else {
+                    bubble.textContent = 'Please fill this field.';
+                }
                 anchor.appendChild(bubble);
             }
 
@@ -1804,17 +1940,6 @@
                         } else {
                             field.value = '';
                         }
-                    }
-                });
-            }
-
-            function toggleVaccineHistory() {
-                const isVaccinated = document.querySelector('input[name="covid_vaccinated"]:checked')?.value === 'Yes';
-                vaccineHistoryDetails?.classList.toggle('is-hidden', !isVaccinated);
-                vaccineHistoryDetails?.querySelectorAll('input').forEach((field) => {
-                    field.disabled = !isVaccinated;
-                    if (!isVaccinated) {
-                        field.value = '';
                     }
                 });
             }
@@ -1962,9 +2087,6 @@
                 radio.addEventListener('change', togglePwdRequirements);
             });
             noAllergiesInput?.addEventListener('change', toggleAllergyDetails);
-            covidRadios.forEach((radio) => {
-                radio.addEventListener('change', toggleVaccineHistory);
-            });
             requirementFiles.forEach((fileInput) => {
                 syncRequirementCard(fileInput);
                 fileInput.addEventListener('change', () => syncRequirementCard(fileInput));
@@ -2020,6 +2142,10 @@
                 });
             });
             form?.addEventListener('submit', (event) => {
+                if (event.submitter?.hasAttribute('data-testing-skip')) {
+                    return;
+                }
+
                 if (isSubmitting) {
                     return;
                 }
@@ -2057,7 +2183,6 @@
             toggleIllnessDetails();
             togglePwdRequirements();
             toggleAllergyDetails();
-            toggleVaccineHistory();
             setStep(currentStep);
         })();
     </script>

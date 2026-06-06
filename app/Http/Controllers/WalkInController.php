@@ -996,14 +996,19 @@ PROMPT;
     public function approveApplicant(Request $request, PuptasWebhookService $webhookService)
     {
         try {
-            $referenceNumber = trim((string) $request->input('reference_number', ''));
-
-            if ($referenceNumber === '') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Reference number is required.'
-                ], 400);
-            }
+            $validated = $request->validate([
+                'reference_number' => ['required', 'string', 'max:120'],
+                'findings_status' => ['required', 'string', 'in:No Findings / Normal,With Findings'],
+                'has_medical_condition' => ['nullable', 'boolean'],
+                'medical_condition' => ['required_if:has_medical_condition,true', 'nullable', 'string', 'max:1000'],
+                'condition_remarks' => ['nullable', 'string', 'max:2000'],
+            ]);
+            $referenceNumber = trim((string) $validated['reference_number']);
+            $findingsStatus = (string) $validated['findings_status'];
+            $hasMedicalCondition = $request->boolean('has_medical_condition')
+                || $findingsStatus === 'With Findings';
+            $medicalCondition = trim((string) $request->input('medical_condition', ''));
+            $conditionRemarks = trim((string) $request->input('condition_remarks', ''));
 
             // Fetch applicant details to get student ID
             $applicantData = $webhookService->fetchApplicantByStudentNumber($referenceNumber);
@@ -1016,83 +1021,135 @@ PROMPT;
             }
 
             $studentId = $applicantData['idp_user_id'] ?? $referenceNumber;
+            $student = $this->resolveLocalUserFromApplicant($applicantData, true, $referenceNumber);
+            $clearanceStatus = $hasMedicalCondition ? 'Pending/Conditional' : 'Fully Cleared';
 
-            // Send medical clearance webhook (approval)
-            $webhookResult = $webhookService->sendMedicalClearance($referenceNumber, $studentId, true);
+            // Conditional applicants remain uncleared in PUPTAS until compliance is resolved.
+            $webhookResult = $webhookService->sendMedicalClearance(
+                $referenceNumber,
+                $studentId,
+                !$hasMedicalCondition
+            );
 
-            if ($webhookResult['success']) {
-                Log::info('Applicant approved successfully', [
+            $profile = DB::transaction(function () use (
+                $student,
+                $studentId,
+                $referenceNumber,
+                $clearanceStatus,
+                $hasMedicalCondition,
+                $medicalCondition,
+                $conditionRemarks,
+                $findingsStatus,
+                $webhookResult
+            ) {
+                $pendingAssessment = \Schema::hasTable('pending_medical_assessments')
+                    ? \App\Models\PendingMedicalAssessment::query()
+                        ->where('reference_number', $referenceNumber)
+                        ->latest()
+                        ->first()
+                    : null;
+
+                if ($pendingAssessment && !$pendingAssessment->user_id) {
+                    $pendingAssessment->user_id = $student->id;
+                    $pendingAssessment->save();
+                }
+
+                $profile = HealthProfile::firstOrNew(['user_id' => $student->id]);
+                $profile->student_id = (string) ($student->student_id ?: $studentId);
+                $profile->student_number = (string) ($student->student_number ?: $referenceNumber);
+                $profile->reference_number = $referenceNumber;
+                $profile->course_college = (string) ($profile->course_college ?: $student->course);
+                $profile->birthday = $profile->birthday ?: $student->DOB;
+                $profile->sex = (string) ($profile->sex ?: $student->gender);
+                $profile->med_cert_findings = $findingsStatus;
+                $profile->xray_findings = $findingsStatus === 'No Findings / Normal'
+                    ? 'Normal'
+                    : 'With Findings';
+                $profile->clearance_status = $clearanceStatus;
+                $profile->pending_reason = $hasMedicalCondition
+                    ? ($conditionRemarks !== ''
+                        ? $conditionRemarks
+                        : ($medicalCondition !== '' ? $medicalCondition : 'With findings noted during nurse review.'))
+                    : null;
+                $profile->medical_condition_remarks = $hasMedicalCondition
+                    ? trim(($medicalCondition !== '' ? $medicalCondition : 'With findings')
+                        . ($conditionRemarks !== '' ? "\n" . $conditionRemarks : ''))
+                    : null;
+                $profile->has_illness = $hasMedicalCondition ? 'Yes' : ($profile->has_illness ?: 'No');
+                $profile->other_illness = $hasMedicalCondition ? $medicalCondition : $profile->other_illness;
+                $profile->physical_assessment_status = $hasMedicalCondition
+                    ? 'Not Yet Conducted'
+                    : 'Completed / Passed';
+                $profile->documents_valid = !$hasMedicalCondition;
+                $profile->verified_at = $hasMedicalCondition ? null : now();
+                $profile->puptas_sync_status = ($webhookResult['success'] ?? false) ? 'synced' : 'failed';
+                $profile->puptas_synced_at = ($webhookResult['success'] ?? false) ? now() : null;
+                $profile->puptas_sync_message = $webhookResult['message'] ?? null;
+
+                if (!$profile->medical_assessment_upload && $pendingAssessment) {
+                    $profile->medical_assessment_upload = $pendingAssessment->file_path;
+                }
+
+                $profile->save();
+
+                $student->is_health_profile_completed = $hasMedicalCondition ? 0 : 1;
+                $student->save();
+
+                return $profile;
+            });
+
+            Log::info('Applicant reference decision saved', [
+                'reference_number' => $referenceNumber,
+                'student_id' => $studentId,
+                'health_profile_id' => $profile->id,
+                'clearance_status' => $clearanceStatus,
+                'webhook_success' => (bool) ($webhookResult['success'] ?? false),
+                'user_id' => auth()->id(),
+            ]);
+
+            ActivityLog::create([
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()?->name ?? auth()->user()?->email ?? 'System',
+                'user_role' => strtolower((string) (auth()->user()?->user_role ?? '')),
+                'action' => $hasMedicalCondition ? 'Applicant Pending Compliance' : 'Applicant Approval',
+                'module' => 'Patient Intake',
+                'event_type' => $hasMedicalCondition ? 'applicant_pending_compliance' : 'applicant_approval',
+                'description' => $hasMedicalCondition
+                    ? "Applicant set to pending compliance: {$referenceNumber} (Student ID: {$studentId})"
+                    : "Applicant approved: {$referenceNumber} (Student ID: {$studentId})",
+                'route_name' => optional($request->route())->getName(),
+                'http_method' => 'POST',
+                'request_path' => '/' . ltrim((string) $request->path(), '/'),
+                'status_code' => 200,
+                'subject_type' => HealthProfile::class,
+                'subject_id' => (string) $profile->id,
+                'metadata' => [
                     'reference_number' => $referenceNumber,
                     'student_id' => $studentId,
-                    'user_id' => auth()->id(),
-                ]);
+                    'health_profile_id' => $profile->id,
+                    'clearance_status' => $clearanceStatus,
+                    'findings_status' => $findingsStatus,
+                    'webhook_status' => ($webhookResult['success'] ?? false) ? 'success' : 'failed',
+                    'webhook_message' => $webhookResult['message'] ?? null,
+                ],
+                'ip_address' => $request->ip(),
+                'user_agent' => substr((string) $request->userAgent(), 0, 255),
+            ]);
 
-                // Log approval to audit trail
-                ActivityLog::create([
-                    'user_id' => auth()->id(),
-                    'user_name' => auth()->user()?->name ?? auth()->user()?->email ?? 'System',
-                    'user_role' => strtolower((string) (auth()->user()?->user_role ?? '')),
-                    'action' => 'Applicant Approval',
-                    'module' => 'Patient Intake',
-                    'event_type' => 'applicant_approval',
-                    'description' => "Applicant approved: {$referenceNumber} (Student ID: {$studentId})",
-                    'route_name' => optional($request->route())->getName(),
-                    'http_method' => 'POST',
-                    'request_path' => '/admin/walkin/approve-applicant',
-                    'status_code' => 200,
-                    'subject_type' => 'applicant',
-                    'subject_id' => $referenceNumber,
-                    'metadata' => [
-                        'reference_number' => $referenceNumber,
-                        'student_id' => $studentId,
-                        'webhook_status' => 'success',
-                    ],
-                    'ip_address' => $request->ip(),
-                    'user_agent' => substr((string) $request->userAgent(), 0, 255),
-                ]);
+            $redirectUrl = route('admin.health_records')
+                . ($hasMedicalCondition
+                    ? '?tab=pending_conditional&highlight_health=' . $profile->id
+                    : '?highlight_health=' . $profile->id);
 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Applicant approved successfully. Webhook sent to PUPTAS.'
-                ]);
-            } else {
-                Log::warning('Applicant approval webhook failed', [
-                    'reference_number' => $referenceNumber,
-                    'student_id' => $studentId,
-                    'error' => $webhookResult['message'],
-                    'user_id' => auth()->id(),
-                ]);
-
-                // Log failed approval to audit trail
-                ActivityLog::create([
-                    'user_id' => auth()->id(),
-                    'user_name' => auth()->user()?->name ?? auth()->user()?->email ?? 'System',
-                    'user_role' => strtolower((string) (auth()->user()?->user_role ?? '')),
-                    'action' => 'Applicant Approval',
-                    'module' => 'Patient Intake',
-                    'event_type' => 'applicant_approval',
-                    'description' => "Applicant approval failed: {$referenceNumber} - " . $webhookResult['message'],
-                    'route_name' => optional($request->route())->getName(),
-                    'http_method' => 'POST',
-                    'request_path' => '/admin/walkin/approve-applicant',
-                    'status_code' => 422,
-                    'subject_type' => 'applicant',
-                    'subject_id' => $referenceNumber,
-                    'metadata' => [
-                        'reference_number' => $referenceNumber,
-                        'student_id' => $studentId,
-                        'webhook_status' => 'failed',
-                        'error' => $webhookResult['message'],
-                    ],
-                    'ip_address' => $request->ip(),
-                    'user_agent' => substr((string) $request->userAgent(), 0, 255),
-                ]);
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Approval processed but webhook failed: ' . $webhookResult['message']
-                ], 422);
-            }
+            return response()->json([
+                'success' => true,
+                'status' => $clearanceStatus,
+                'message' => $hasMedicalCondition
+                    ? 'Applicant saved under Pending Compliance.'
+                    : 'Applicant approved and added to Health Profile Summary.',
+                'redirect_url' => $redirectUrl,
+                'webhook_synced' => (bool) ($webhookResult['success'] ?? false),
+            ]);
         } catch (\Exception $e) {
             Log::error('Applicant approval exception', [
                 'error' => $e->getMessage(),

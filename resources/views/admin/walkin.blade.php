@@ -3281,6 +3281,58 @@
         align-items: center;
     }
 
+    .applicant-findings-review {
+        display: grid;
+        gap: 8px;
+        padding-bottom: 13px;
+        border-bottom: 1px solid rgba(3, 105, 161, 0.18);
+    }
+
+    .applicant-findings-label {
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .applicant-findings-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .applicant-findings-option {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .applicant-findings-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .applicant-findings-option span {
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 12px;
+        border: 1px solid rgba(3, 105, 161, 0.28);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 750;
+        text-align: center;
+        transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+    }
+
+    .applicant-findings-option input:checked + span {
+        border-color: #70131b;
+        background: #70131b;
+        color: #facc15;
+    }
+
     .applicant-condition-toggle {
         display: flex;
         align-items: center;
@@ -3351,6 +3403,22 @@
 
     html[data-theme="dark"] .applicant-condition-toggle-text {
         color: #38bdf8;
+    }
+
+    html[data-theme="dark"] .applicant-findings-label {
+        color: #e2e8f0;
+    }
+
+    html[data-theme="dark"] .applicant-findings-option span {
+        background: #1e293b;
+        border-color: rgba(56, 189, 248, 0.3);
+        color: #f1f5f9;
+    }
+
+    html[data-theme="dark"] .applicant-findings-option input:checked + span {
+        background: #facc15;
+        border-color: #facc15;
+        color: #111827;
     }
 
     html[data-theme="dark"] .applicant-condition-field label {
@@ -3584,6 +3652,19 @@
 
                     {{-- Medical Condition Section --}}
                     <div class="applicant-medical-condition-section">
+                        <div class="applicant-findings-review">
+                            <div class="applicant-findings-label">Nurse Findings Review <span style="color:#dc2626;">*</span></div>
+                            <div class="applicant-findings-options">
+                                <label class="applicant-findings-option">
+                                    <input type="radio" name="applicant_findings_status" value="No Findings / Normal">
+                                    <span>No Findings / Normal</span>
+                                </label>
+                                <label class="applicant-findings-option">
+                                    <input type="radio" name="applicant_findings_status" value="With Findings">
+                                    <span>With Findings</span>
+                                </label>
+                            </div>
+                        </div>
                         <div class="applicant-condition-header">
                             <label class="applicant-condition-toggle">
                                 <input type="checkbox" id="applicantHasMedicalCondition" class="applicant-condition-checkbox">
@@ -5186,6 +5267,9 @@
             // Reset medical condition fields
             const medicalConditionCheckbox = document.getElementById('applicantHasMedicalCondition');
             const conditionFields = document.getElementById('applicantConditionFields');
+            document.querySelectorAll('input[name="applicant_findings_status"]').forEach(function (input) {
+                input.checked = false;
+            });
             if (medicalConditionCheckbox) {
                 medicalConditionCheckbox.checked = false;
             }
@@ -5345,6 +5429,12 @@
             const hasMedicalCondition = document.getElementById('applicantHasMedicalCondition');
             const medicalConditionInput = document.getElementById('applicantMedicalCondition');
             const conditionRemarksInput = document.getElementById('applicantConditionRemarks');
+            const findingsStatusInput = document.querySelector('input[name="applicant_findings_status"]:checked');
+
+            if (!findingsStatusInput) {
+                setStatus('error', 'Please select the nurse findings review result.');
+                return;
+            }
 
             if (hasMedicalCondition && hasMedicalCondition.checked && (!medicalConditionInput.value.trim())) {
                 setStatus('error', 'Please enter the medical condition.');
@@ -5354,7 +5444,8 @@
             setStatus('info', 'Approving applicant...');
 
             const approvalData = {
-                reference_number: currentLookupRef
+                reference_number: currentLookupRef,
+                findings_status: findingsStatusInput.value
             };
 
             if (hasMedicalCondition && hasMedicalCondition.checked) {
@@ -5376,11 +5467,15 @@
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    setStatus('success', 'Applicant approved successfully.');
+                    setStatus('success', data.message || 'Applicant decision saved successfully.');
                     // Play submitted animation and close modal
                     if (modalShell) {
                         modalShell.classList.add('submitted-animation');
                         setTimeout(() => {
+                            if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                                return;
+                            }
                             closeApplicantsModal();
                             isApprovalMode = false;
                             if (findBtn) {
@@ -5397,6 +5492,10 @@
                     } else {
                         // Fallback if shell not found
                         setTimeout(() => {
+                            if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                                return;
+                            }
                             closeApplicantsModal();
                             isApprovalMode = false;
                             if (findBtn) {

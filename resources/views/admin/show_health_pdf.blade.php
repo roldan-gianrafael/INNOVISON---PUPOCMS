@@ -72,6 +72,11 @@
             object-fit: cover;
         }
 
+        .header-divider {
+            border: 0;
+            border-top: 1px solid #000;
+        }
+
         .form-title {
             text-align: center;
             font-weight: bold;
@@ -113,6 +118,33 @@
 
         .label {
             font-weight: bold;
+        }
+
+        .medical-subsection-title {
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1.25;
+        }
+
+        .medical-subsection-heading {
+            margin: 8px 0 5px;
+            text-transform: uppercase;
+        }
+
+        .allergy-declaration {
+            margin: 0 0 5px;
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .medicine-other-field {
+            grid-column: span 2;
+        }
+
+        .medical-history-instruction {
+            margin: 0 0 5px 5px;
+            font-size: 11px;
+            font-style: italic;
         }
 
         .checkbox-grid {
@@ -157,8 +189,12 @@
             font-style: italic;
             font-size: 11px;
             text-align: justify;
-            margin-top: 15px;
+            margin-top: 10px;
             line-height: 1.3;
+        }
+
+        .cert-text-first {
+            margin-top: 26px;
         }
 
         .signature-row {

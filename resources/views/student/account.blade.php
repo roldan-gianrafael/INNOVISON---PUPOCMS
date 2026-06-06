@@ -993,6 +993,62 @@
         color: rgba(255, 255, 255, 0.84);
         margin: 0;
     }
+    .health-print-reminder {
+        position: fixed;
+        inset: 0;
+        z-index: 1210;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.66);
+        backdrop-filter: blur(10px);
+    }
+    .health-print-reminder.is-open {
+        display: flex;
+        animation: overlayFadeIn 0.24s ease;
+    }
+    .health-print-reminder-card {
+        width: min(480px, 100%);
+        border: 1px solid rgba(127, 29, 45, 0.18);
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+        padding: 28px 24px 24px;
+        text-align: center;
+    }
+    .health-print-reminder-card h2 {
+        margin: 0 0 12px;
+        color: #741421;
+        font-size: 1.35rem;
+        font-weight: 800;
+    }
+    .health-print-reminder-card p {
+        margin: 0;
+        color: #374151;
+        font-size: 0.95rem;
+        line-height: 1.65;
+    }
+    .health-print-reminder-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 150px;
+        margin-top: 22px;
+        padding: 11px 22px;
+        border: 1px solid #6f101c;
+        border-radius: 8px;
+        background: #800000;
+        color: #ffffff;
+        font-size: 0.9rem;
+        font-weight: 800;
+        text-decoration: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .health-print-reminder-button:hover {
+        background: #facc15;
+        color: #111827;
+    }
     @keyframes overlayFadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
@@ -1527,7 +1583,30 @@
         background: #facc15;
         color: #70131B;
     }
-    .btn-print-form.pending { background: #8f2724; }
+    .btn-print-form.pending {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        background: #8f2724;
+        border: 0;
+        cursor: pointer;
+    }
+    .btn-print-form.pending::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: #facc15;
+        transform: translateX(-101%);
+        transition: transform 0.38s ease;
+    }
+    .btn-print-form.pending:hover {
+        background: #8f2724;
+        color: #70131B;
+    }
+    .btn-print-form.pending:hover::before {
+        transform: translateX(0);
+    }
     .btn-print-form.incomplete { background: #800000; }
     .btn-print-form.disabled {
         background: #dd4b4b;
@@ -1638,9 +1717,7 @@
     .record-modal {
         width: min(860px, 100%);
         max-height: min(88vh, 900px);
-        background: rgba(255, 255, 255, 0.42);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: #ffffff;
         border-radius: 18px;
         border-left: 1px solid rgba(112, 19, 27, 0.12);
         border-right: 1px solid rgba(112, 19, 27, 0.12);
@@ -1741,7 +1818,7 @@
     }
     .record-modal-summary {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
         margin-bottom: 14px;
     }
@@ -1749,7 +1826,7 @@
         border: 1px solid rgba(112, 19, 27, 0.10);
         border-radius: 14px;
         padding: 14px 16px;
-        background: rgba(255, 255, 255, 0.84);
+        background: #ffffff;
         box-shadow:
             0 10px 18px rgba(15, 23, 42, 0.06),
             inset 0 1px 0 rgba(255,255,255,0.82);
@@ -1767,7 +1844,7 @@
         border: 1px solid rgba(112, 19, 27, 0.10);
         border-radius: 14px;
         padding: 14px 16px;
-        background: rgba(255, 255, 255, 0.78);
+        background: #ffffff;
         box-shadow:
             0 10px 18px rgba(15, 23, 42, 0.06),
             inset 0 1px 0 rgba(255,255,255,0.82);
@@ -2103,6 +2180,19 @@
         </div>
     @endif
 
+    @if(session('show_health_print_reminder'))
+        <div class="health-print-reminder" id="healthPrintReminder" aria-hidden="true">
+            <section class="health-print-reminder-card" role="dialog" aria-modal="true" aria-labelledby="healthPrintReminderTitle">
+                <h2 id="healthPrintReminderTitle">Print Your Health Form</h2>
+                <p>
+                    Please print your Health Form before proceeding to the Medical Clinic to submit the physical copy.
+                    Do not forget to bring a hard copy of your 2x2 photo.
+                </p>
+                <a class="health-print-reminder-button" href="{{ route('student.health_form.print') }}">Print</a>
+            </section>
+        </div>
+    @endif
+
     @if(session('success') && !session('health_profile_submitted'))
         <div class="alert-success">
             {{ session('success') }}
@@ -2169,13 +2259,24 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const overlay = document.getElementById('healthSubmitOverlay');
+    const printReminder = document.getElementById('healthPrintReminder');
     if (!overlay) {
+        if (printReminder) {
+            printReminder.classList.add('is-open');
+            printReminder.setAttribute('aria-hidden', 'false');
+        }
         return;
     }
 
     window.setTimeout(() => {
         overlay.classList.add('is-hiding');
-        window.setTimeout(() => overlay.remove(), 320);
+        window.setTimeout(() => {
+            overlay.remove();
+            if (printReminder) {
+                printReminder.classList.add('is-open');
+                printReminder.setAttribute('aria-hidden', 'false');
+            }
+        }, 320);
     }, 3500);
 });
 </script>
@@ -2439,8 +2540,8 @@ document.addEventListener('DOMContentLoaded', function () {
         $recordBirthday = trim((string) optional($healthProfileRecord)->birthday);
         $recordBirthday = $recordBirthday !== '' ? optional(\Carbon\Carbon::parse($recordBirthday))->format('M d, Y') : '-';
         $recordAssessmentDate = optional(optional($healthProfileRecord)->assessment_date)->format('M d, Y');
-        $recordChestXrayDate = optional(optional($healthProfileRecord)->chest_xray_date)->format('M d, Y');
-        $recordMedicalIssuedAt = optional(optional($healthProfileRecord)->medical_certificate_issued_at)->format('M d, Y');
+        $recordChestXrayDate = optional(optional($healthProfileRecord)->xray_date)->format('M d, Y');
+        $recordMedicalIssuedAt = optional(optional($healthProfileRecord)->med_cert_date)->format('M d, Y');
     @endphp
     <div class="page-hero">
         <div class="page-hero-icon" aria-hidden="true">
@@ -2585,8 +2686,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <span class="health-status-note">Valid for Academic Year 2025-2026</span>
             @else
                 <div class="health-status-summary">
-                    <span class="health-status-state pending"><x-outline-icon name="clock" /> For Verification</span>
-                    <p class="health-status-message">Your profile has been submitted and is currently <strong>awaiting medical review</strong>.</p>
+                    <p class="health-status-message">Your health profile has been submitted. Please proceed to the Medical Clinic on your designated schedule for medical review.</p>
                 </div>
 
                 <div class="health-status-meta-grid">
@@ -2636,7 +2736,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <x-outline-icon name="x-mark" />
                     </button>
                     <h2 class="record-modal-title" id="healthRecordModalTitle">Health Record Details</h2>
-                    <p class="record-modal-subtitle">Review your submitted health profile, admission reference, clinic status, and uploaded digital copies in one place.</p>
+                    <p class="record-modal-subtitle">Review the information and uploaded digital copies submitted through your Student Health Profile.</p>
                 </div>
                 <div class="record-modal-body" id="healthRecordModalBody">
                     <div class="record-modal-summary">
@@ -2648,16 +2748,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             <span class="record-modal-label">Reference Number</span>
                             <div class="record-modal-value">{{ $recordReferenceNumber !== '' ? $recordReferenceNumber : '-' }}</div>
                         </div>
-                        <div class="record-modal-summary-card">
-                            <span class="record-modal-label">Assessment Date</span>
-                            <div class="record-modal-value">{{ $recordAssessmentDate ?: '-' }}</div>
-                        </div>
                     </div>
 
                     <div class="record-modal-grid">
                         <div class="record-modal-card">
                             <span class="record-modal-label">Student ID</span>
-                            <div class="record-modal-value">{{ $user->student_id ?: '-' }}</div>
+                            <div class="record-modal-value">{{ optional($healthProfileRecord)->student_id ?: ($user->student_id ?: '-') }}</div>
                         </div>
                         <div class="record-modal-card">
                             <span class="record-modal-label">Admission Reference</span>
@@ -2692,18 +2788,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="record-modal-value">{{ optional($healthProfileRecord)->blood_type ?: '-' }}</div>
                         </div>
                         <div class="record-modal-card">
-                            <span class="record-modal-label">Blood Pressure</span>
-                            <div class="record-modal-value">{{ optional($healthProfileRecord)->blood_pressure ?: '-' }}</div>
-                        </div>
-                        <div class="record-modal-card">
-                            <span class="record-modal-label">Temperature</span>
-                            <div class="record-modal-value">{{ optional($healthProfileRecord)->temperature ?: '-' }}</div>
-                        </div>
-                        <div class="record-modal-card">
-                            <span class="record-modal-label">Respiratory Rate</span>
-                            <div class="record-modal-value">{{ optional($healthProfileRecord)->respiratory_rate ?: '-' }}</div>
-                        </div>
-                        <div class="record-modal-card">
                             <span class="record-modal-label">Guardian Name</span>
                             <div class="record-modal-value">{{ optional($healthProfileRecord)->guardian_name ?: '-' }}</div>
                         </div>
@@ -2716,29 +2800,23 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="record-modal-value">{{ optional($healthProfileRecord)->home_address ?: '-' }}</div>
                         </div>
                         <div class="record-modal-card">
-                            <span class="record-modal-label">Assessment Date</span>
-                            <div class="record-modal-value">{{ $recordAssessmentDate ?: '-' }}</div>
-                        </div>
-                        <div class="record-modal-card">
-                            <span class="record-modal-label">Verified At</span>
-                            <div class="record-modal-value">{{ $recordVerifiedAt ?: '-' }}</div>
-                        </div>
-                        <div class="record-modal-card">
-                            <span class="record-modal-label">Chest X-Ray Date</span>
+                            <span class="record-modal-label">Chest X-Ray Examination Date</span>
                             <div class="record-modal-value">{{ $recordChestXrayDate ?: '-' }}</div>
                         </div>
                         <div class="record-modal-card">
-                            <span class="record-modal-label">Medical Certificate Issued</span>
+                            <span class="record-modal-label">Medical Certificate Date</span>
                             <div class="record-modal-value">{{ $recordMedicalIssuedAt ?: '-' }}</div>
                         </div>
                         <div class="record-modal-card is-full">
                             <span class="record-modal-label">Assessment Remarks</span>
                             <div class="record-modal-value">{{ optional($healthProfileRecord)->assessment_remarks ?: '-' }}</div>
                         </div>
-                        <div class="record-modal-card is-full">
-                            <span class="record-modal-label">Pending Reason</span>
-                            <div class="record-modal-value">{{ optional($healthProfileRecord)->pending_reason ?: '-' }}</div>
-                        </div>
+                        @if($isPendingStatus)
+                            <div class="record-modal-card is-full">
+                                <span class="record-modal-label">Pending Reason</span>
+                                <div class="record-modal-value">{{ optional($healthProfileRecord)->pending_reason ?: '-' }}</div>
+                            </div>
+                        @endif
                         <div class="record-modal-card is-full">
                             <span class="record-modal-label">Uploaded Digital Copies</span>
                             @php
@@ -2754,18 +2832,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                     [
                                         'field' => 'medical_certificate',
                                         'title' => 'Medical Certificate',
-                                        'meta' => 'PDF Upload',
+                                        'meta' => 'PDF or Image Upload',
                                         'path' => optional($healthProfileRecord)->medical_certificate,
                                         'is_image' => false,
-                                        'accept' => '.pdf,application/pdf',
+                                        'accept' => '.pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png',
                                     ],
                                     [
                                         'field' => 'chest_xray_result',
                                         'title' => 'Chest X-ray Result',
-                                        'meta' => 'PDF Upload',
+                                        'meta' => 'PDF or Image Upload',
                                         'path' => optional($healthProfileRecord)->chest_xray_result,
                                         'is_image' => false,
-                                        'accept' => '.pdf,application/pdf',
+                                        'accept' => '.pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png',
                                     ],
                                     [
                                         'field' => 'pwd_id_proof',
@@ -2776,7 +2854,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                         'accept' => '.pdf,application/pdf',
                                     ],
                                 ];
-                                $visibleRecordDocuments = collect($recordDocuments)->filter(fn ($document) => filled($document['path']));
+                                $visibleRecordDocuments = collect($recordDocuments)
+                                    ->filter(fn ($document) => filled($document['path']))
+                                    ->map(function ($document) {
+                                        $extension = strtolower(pathinfo((string) $document['path'], PATHINFO_EXTENSION));
+                                        $document['is_image'] = $document['is_image'] || in_array($extension, ['jpg', 'jpeg', 'png'], true);
+
+                                        return $document;
+                                    });
                             @endphp
                             <div class="record-modal-links">
                                 @forelse($visibleRecordDocuments as $document)

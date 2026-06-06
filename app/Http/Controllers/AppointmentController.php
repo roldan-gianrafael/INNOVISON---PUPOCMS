@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 class AppointmentController extends Controller
@@ -1261,21 +1262,27 @@ public function storeHealthForm(Request $request)
         'other_med_allergies' => 'nullable|string|max:255',
         'is_smoker'         => 'required|string|in:Yes,No',
         'is_drinker'        => 'required|string|in:Yes,No',
-        'covid_vaccinated'  => 'required|string|in:Yes,No',
-        'vaccine_history'   => 'nullable|array',
-        'vaccine_history.*.date' => 'nullable|date',
-        'vaccine_history.*.brand' => 'nullable|string|max:100',
+        'covid_vaccinated'  => 'required|string|in:Yes',
+        'vaccine_history'   => 'required|array',
+        'vaccine_history.first_dose.date' => 'required|date|after_or_equal:2020-01-01|before_or_equal:2025-12-31',
+        'vaccine_history.first_dose.brand' => 'required|string|max:100',
+        'vaccine_history.second_dose.date' => 'required|date|after_or_equal:2020-01-01|before_or_equal:2025-12-31',
+        'vaccine_history.second_dose.brand' => 'required|string|max:100',
+        'vaccine_history.booster_1.date' => 'required|date|after_or_equal:2020-01-01|before_or_equal:2025-12-31',
+        'vaccine_history.booster_1.brand' => 'required|string|max:100',
+        'vaccine_history.booster_2.date' => 'required|date|after_or_equal:2020-01-01|before_or_equal:2025-12-31',
+        'vaccine_history.booster_2.brand' => 'required|string|max:100',
 
-        'chest_xray_result' => 'required|file|mimes:pdf|max:4096',
+        'chest_xray_result' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
         'xray_date'         => 'required|date',
-        'xray_findings'     => 'required|string|in:Normal,With Findings',
+        'xray_findings'     => 'required|string|in:Normal,With Findings,Not Sure / For Clinic Review',
         'has_disability'    => 'required|string',
         'disability_type'   => 'required_if:has_disability,Yes|nullable|string|max:255',
         'pwd_id_proof'      => 'required_if:has_disability,Yes|file|mimes:pdf|max:4096',
-        'medical_certificate' => 'required|file|mimes:pdf|max:4096',
+        'medical_certificate' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
         'doctor_name'       => 'required|string|max:255',
         'med_cert_date'     => 'required|date',
-        'med_cert_findings' => 'required|string|in:No Findings / Normal,With Findings',
+        'med_cert_findings' => 'required|string|in:No Findings / Normal,With Findings,Not Sure / For Clinic Review',
         'health_profile_certified' => 'accepted',
     ]);
 
@@ -1344,10 +1351,8 @@ public function storeHealthForm(Request $request)
                 'other_med_allergies' => $request->boolean('no_allergies') ? null : $request->input('other_med_allergies'),
                 'is_smoker'          => $request->input('is_smoker'),
                 'is_drinker'         => $request->input('is_drinker'),
-                'covid_vaccinated'   => $request->input('covid_vaccinated'),
-                'vaccine_history'    => $request->input('covid_vaccinated') === 'Yes'
-                    ? $request->input('vaccine_history', [])
-                    : [],
+                'covid_vaccinated'   => 'Yes',
+                'vaccine_history'    => $request->input('vaccine_history', []),
                 'chest_xray_result'  => $chestXrayPath,
                 'xray_date'          => $request->input('xray_date'),
                 'xray_findings'      => $request->input('xray_findings'),
@@ -1376,13 +1381,125 @@ public function storeHealthForm(Request $request)
             'user_agent'  => $request->userAgent(),
         ]);
 
-        return redirect('/student/home')
-            ->with('success', 'Health Profile saved successfully.');
+        return redirect('/student/account?view=health-record')
+            ->with('success', 'Health Profile saved successfully.')
+            ->with('health_profile_submitted', true)
+            ->with('show_health_print_reminder', true);
 
     } catch (\Exception $e) {
    
         return back()->withInput()->with('error', 'Something went wrong: ' . $e->getMessage());
     }
+}
+
+public function printHealthForm()
+{
+    /** @var \App\Models\User|null $user */
+    $user = Auth::guard('student')->user();
+    if (!$user) {
+        return redirect('/login-as-student')->with('error', 'Please login first.');
+    }
+
+    $profile = HealthProfile::query()
+        ->with('user')
+        ->where('user_id', $user->id)
+        ->first();
+
+    if (!$profile) {
+        return redirect('/student/account')
+            ->with('error', 'Submit your health profile before printing the form.');
+    }
+
+    return view('student.print_health_form', compact('profile'));
+}
+
+public function downloadHealthForm()
+{
+    /** @var \App\Models\User|null $user */
+    $user = Auth::guard('student')->user();
+    if (!$user) {
+        return redirect('/login-as-student')->with('error', 'Please login first.');
+    }
+
+    $profile = HealthProfile::query()
+        ->with('user')
+        ->where('user_id', $user->id)
+        ->first();
+
+    if (!$profile) {
+        return redirect('/student/account')
+            ->with('error', 'Submit your health profile before downloading the form.');
+    }
+
+    $pdf = Pdf::loadView('student.print_health_form', [
+        'profile' => $profile,
+        'pdfMode' => true,
+    ]);
+    $pdf->setPaper([0, 0, 612, 936]);
+
+    $studentNumber = trim((string) ($profile->student_number ?: $user->student_number ?: $user->student_id ?: $profile->id));
+    $fileName = 'health-form-' . preg_replace('/[^A-Za-z0-9\-_]+/', '-', $studentNumber) . '.pdf';
+
+    return $pdf->download($fileName);
+}
+
+public function testingSkipHealthForm()
+{
+    abort_unless(app()->environment('local'), 404);
+
+    /** @var \App\Models\User|null $user */
+    $user = Auth::guard('student')->user();
+    if (!$user) {
+        return redirect('/login-as-student')->with('error', 'Please login first.');
+    }
+
+    $birthday = $user->DOB ?: '2000-01-01';
+    try {
+        $age = \Carbon\Carbon::parse($birthday)->age;
+    } catch (\Throwable $exception) {
+        $birthday = '2000-01-01';
+        $age = 25;
+    }
+
+    HealthProfile::query()->firstOrCreate(
+        ['user_id' => $user->id],
+        [
+            'student_id' => $user->student_id,
+            'student_number' => $user->student_number ?: $user->student_id ?: 'TEST-STUDENT',
+            'reference_number' => $user->student_number ?: $user->student_id ?: 'TEST-REFERENCE',
+            'school_year' => '2025-2026',
+            'home_address' => 'Testing Address',
+            'zipcode' => '0000',
+            'birthday' => $birthday,
+            'height' => $user->height ?: '165 cm',
+            'weight' => $user->weight ?: '60 kg',
+            'age' => $age,
+            'sex' => $user->gender ?: 'Male',
+            'civil_status' => 'Single',
+            'course_college' => $user->course ?: 'Testing Course',
+            'blood_type' => 'Unknown',
+            'guardian_name' => 'Testing Guardian',
+            'landline' => null,
+            'cellphone' => $user->contact_no ?: '09000000000',
+            'has_illness' => 'No',
+            'medical_history' => [],
+            'has_disability' => 'No',
+            'no_allergies' => true,
+            'medicine_allergies' => [],
+            'is_smoker' => 'No',
+            'is_drinker' => 'No',
+            'covid_vaccinated' => 'Yes',
+            'vaccine_history' => [
+                'first_dose' => ['date' => '2021-06-01', 'brand' => 'Testing Brand'],
+                'second_dose' => ['date' => '2021-07-01', 'brand' => 'Testing Brand'],
+                'booster_1' => ['date' => '2022-03-01', 'brand' => 'Testing Brand'],
+                'booster_2' => ['date' => '2023-03-01', 'brand' => 'Testing Brand'],
+            ],
+            'clearance_status' => 'For Verification',
+        ]
+    );
+
+    return redirect()->route('student.health_form.print');
 }
 
 public function replaceHealthDocument(Request $request)
@@ -1406,12 +1523,12 @@ public function replaceHealthDocument(Request $request)
             'label' => '2x2 photo',
         ],
         'medical_certificate' => [
-            'rules' => 'required|file|mimes:pdf|max:4096',
+            'rules' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
             'directory' => 'health_profiles/medical_certificates',
             'label' => 'medical certificate',
         ],
         'chest_xray_result' => [
-            'rules' => 'required|file|mimes:pdf|max:4096',
+            'rules' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
             'directory' => 'health_profiles/chest_xray_results',
             'label' => 'chest X-ray result',
         ],

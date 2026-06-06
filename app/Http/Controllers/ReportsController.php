@@ -37,30 +37,33 @@ class ReportsController extends Controller
 
     public function appointmentStatistics(Request $request)
     {
-        Appointment::expireOverduePending();
-
         $monthFilter = trim((string) $request->query('month', now()->format('Y-m')));
-        $monthStart = Carbon::parse($monthFilter . '-01')->startOfMonth();
+        if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $monthFilter)) {
+            $monthFilter = now()->format('Y-m');
+        }
+
+        $monthStart = Carbon::createFromFormat('Y-m-d', $monthFilter . '-01')->startOfMonth();
         $monthEnd = (clone $monthStart)->endOfMonth();
 
-        $appointments = Appointment::query()
-            ->whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-            ->orderBy('date')
-            ->orderBy('time')
+        $consultations = Consultation::query()
+            ->with([
+                'user.healthProfile',
+                'medicalCondition.category',
+                'medicineItem',
+                'attendingStaff.adminProfile',
+            ])
+            ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+            ->orderBy('consultation_date')
+            ->orderBy('time_in')
+            ->orderBy('created_at')
             ->get();
 
-        $totalAppointments = $appointments->count();
-        $pendingCount = $appointments->where('status', 'Pending')->count();
-        $approvedCount = $appointments->where('status', 'Approved')->count();
-        $completedCount = $appointments->where('status', 'Completed')->count();
-        $cancelledCount = $appointments->where('status', 'Cancelled')->count();
-        $onlineCount = $appointments->filter(fn ($appt) => strtolower((string) $appt->type) === 'online')->count();
-        $walkInCount = $appointments->filter(fn ($appt) => strtolower((string) $appt->type) === 'walkin')->count();
+        $totalPatientsTreated = $consultations->count();
+        $totalMedicinesDispensed = (float) $consultations->sum(function (Consultation $consultation) {
+            return max(0, (float) $consultation->medicine_quantity);
+        });
 
-        $monthlyDiseaseBreakdown = Consultation::query()
-            ->with('medicalCondition.category')
-            ->whereBetween('consultation_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-            ->get()
+        $monthlyDiseaseBreakdown = $consultations
             ->groupBy(function ($consultation) {
                 $conditionName = trim((string) optional($consultation->medicalCondition)->name);
                 return $conditionName !== '' ? $conditionName : 'Unspecified illness / condition';
@@ -80,39 +83,12 @@ class ReportsController extends Controller
 
         $topDisease = $monthlyDiseaseBreakdown->first();
 
-        $serviceBreakdown = $appointments
-            ->groupBy(fn ($appt) => trim((string) ($appt->service ?: 'Unspecified')))
-            ->map(function ($items, $service) {
-                return (object) [
-                    'service' => $service,
-                    'count' => $items->count(),
-                    'pending' => $items->where('status', 'Pending')->count(),
-                    'approved' => $items->where('status', 'Approved')->count(),
-                    'completed' => $items->where('status', 'Completed')->count(),
-                    'cancelled' => $items->where('status', 'Cancelled')->count(),
-                ];
-            })
-            ->sortByDesc('count')
-            ->values();
-
-        $dailyTrend = $appointments
-            ->groupBy(fn ($appt) => Carbon::parse($appt->date)->format('M d'))
-            ->map(fn ($items, $day) => (object) ['day' => $day, 'count' => $items->count()])
-            ->values();
-
         return view('admin.reports.appointment-statistics', compact(
             'monthFilter',
-            'totalAppointments',
-            'pendingCount',
-            'approvedCount',
-            'completedCount',
-            'cancelledCount',
-            'onlineCount',
-            'walkInCount',
-            'monthlyDiseaseBreakdown',
+            'consultations',
+            'totalPatientsTreated',
+            'totalMedicinesDispensed',
             'topDisease',
-            'serviceBreakdown',
-            'dailyTrend'
         ));
     }
 

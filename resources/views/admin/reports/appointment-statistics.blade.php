@@ -1,255 +1,377 @@
 @extends('layouts.admin')
 
-@section('title', 'Appointment Statistics')
+@section('title', 'Daily Treatment Record')
 
 @push('styles')
 <style>
-    .appt-stats-shell {
-        max-width: 1380px;
+    .treatment-record-shell {
+        max-width: 1600px;
         margin: 0 auto;
         padding: 22px;
     }
-    .appt-stats-head {
+    .treatment-record-header {
         display: flex;
-        justify-content: space-between;
         align-items: flex-start;
-        gap: 18px;
-        margin-bottom: 24px;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 22px;
     }
-    .appt-stats-title {
+    .treatment-record-title {
         margin: 0;
+        color: #111827;
         font-size: 30px;
         font-weight: 900;
-        color: #111827;
     }
-    .appt-stats-copy {
-        margin: 8px 0 0;
+    .treatment-record-subtitle {
+        max-width: 780px;
+        margin: 7px 0 0;
         color: #64748b;
         font-size: 14px;
         line-height: 1.6;
-        max-width: 760px;
     }
-    .appt-stats-back {
-        color: #64748b;
-        text-decoration: none;
+    .treatment-record-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: #70131b;
+        font-size: 13px;
         font-weight: 800;
+        text-decoration: none;
         white-space: nowrap;
     }
-    .appt-stats-filter {
-        display: flex;
-        gap: 10px;
-        align-items: end;
-        margin-bottom: 22px;
-        flex-wrap: wrap;
+    .treatment-record-back svg {
+        width: 18px;
+        height: 18px;
+        transform: rotate(180deg);
     }
-    .appt-stats-filter label {
+    .treatment-filter {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+    }
+    .treatment-field {
+        min-width: 230px;
+    }
+    .treatment-field label,
+    .logbook-search label {
         display: block;
         margin-bottom: 6px;
-        font-size: 12px;
-        font-weight: 800;
         color: #475569;
+        font-size: 11px;
+        font-weight: 900;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
     }
-    .appt-stats-filter input {
-        min-width: 220px;
-        height: 46px;
-        border: 1px solid #cbd5e1;
-        border-radius: 12px;
-        padding: 0 14px;
+    .treatment-control {
+        width: 100%;
+        min-height: 43px;
+        padding: 9px 12px;
+        border: 1px solid #94a3b8;
+        border-radius: 6px;
+        background: #fff;
         color: #111827;
-        background: #ffffff;
+        font-size: 14px;
     }
-    .appt-stats-btn {
+    .treatment-control:focus {
+        border-color: #70131b;
+        outline: 3px solid rgba(112, 19, 27, .12);
+    }
+    .treatment-filter-button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        position: relative;
-        overflow: hidden;
-        min-height: 46px;
-        padding: 0 18px;
-        border-radius: 999px;
-        border: 1px solid #8f2230;
-        background: linear-gradient(135deg, #70131B, #8f2230);
-        color: #ffffff;
+        gap: 7px;
+        min-height: 43px;
+        padding: 9px 17px;
+        border: 1px solid #70131b;
+        border-radius: 6px;
+        background: #70131b;
+        color: #fff;
+        font-size: 13px;
         font-weight: 800;
-        text-decoration: none;
         cursor: pointer;
-        box-shadow:
-            0 0 0 3px rgba(112, 19, 27, 0.12),
-            0 10px 22px rgba(112, 19, 27, 0.20);
-        transition: color .08s linear, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-        z-index: 0;
+        transition: background-color .18s ease, color .18s ease;
     }
-    .appt-stats-btn::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-            linear-gradient(120deg,
-                rgba(255, 248, 196, 0) 0%,
-                rgba(255, 239, 181, 0.14) 22%,
-                rgba(255, 239, 181, 0.52) 48%,
-                rgba(255, 239, 181, 0.14) 72%,
-                rgba(255, 248, 196, 0) 100%);
-        transform: translateX(-135%);
-        transition: transform 1.5s ease;
-        z-index: -1;
-    }
-    .appt-stats-btn:hover {
-        transform: translateY(-1px);
+    .treatment-filter-button:hover {
         border-color: #facc15;
-        box-shadow:
-            0 0 0 3px rgba(250, 204, 21, 0.18),
-            0 14px 24px rgba(112, 19, 27, 0.16);
+        background: #facc15;
+        color: #111827;
     }
-    .appt-stats-btn:hover::after {
-        transform: translateX(135%);
+    .treatment-filter-button svg {
+        width: 17px;
+        height: 17px;
     }
-    .appt-stats-grid {
+    .treatment-metrics {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
         margin-bottom: 22px;
     }
-    .appt-stat-card {
-        background: #ffffff;
-        border-radius: 18px;
-        padding: 20px 22px;
-        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
-        border-top: 5px solid #7f1d2d;
-    }
-    .appt-stat-card span {
-        display: block;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: #64748b;
-    }
-    .appt-stat-card strong {
-        display: block;
-        margin-top: 8px;
-        font-size: 28px;
-        line-height: 1.1;
-        font-weight: 900;
-        color: #111827;
-    }
-    .appt-stats-layout {
+    .treatment-metric {
         display: grid;
-        grid-template-columns: 1.2fr .9fr;
-        gap: 22px;
-        align-items: start;
-    }
-    .appt-panel {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 22px;
-        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
-    }
-    .appt-panel h3 {
-        margin: 0 0 14px;
-        font-size: 18px;
-        font-weight: 900;
-        color: #70131B;
-    }
-    .appt-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .appt-table th,
-    .appt-table td {
-        padding: 12px 10px;
-        border-bottom: 1px solid #e5e7eb;
-        text-align: left;
-        font-size: 14px;
-        color: #111827;
-    }
-    .appt-table th {
-        font-size: 12px;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-    .appt-empty {
-        color: #64748b;
-        font-size: 14px;
-        padding: 10px 0 2px;
-    }
-    .appt-trend-list {
-        display: grid;
-        gap: 10px;
-    }
-    .appt-trend-item {
-        display: flex;
+        grid-template-columns: 46px minmax(0, 1fr);
+        gap: 13px;
         align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 12px 14px;
-        border-radius: 14px;
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
+        min-height: 112px;
+        padding: 18px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, .06);
     }
-    .appt-trend-item span {
-        color: #475569;
-        font-size: 14px;
+    .treatment-metric-icon {
+        display: grid;
+        place-items: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 7px;
+        background: #70131b;
+        color: #fff;
+    }
+    .treatment-metric-icon.yellow {
+        background: #facc15;
+        color: #111827;
+    }
+    .treatment-metric-icon.green {
+        background: #166534;
+    }
+    .treatment-metric-icon svg {
+        width: 23px;
+        height: 23px;
+    }
+    .treatment-metric-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+    .treatment-metric-value {
+        display: block;
+        overflow-wrap: anywhere;
+        color: #111827;
+        font-size: 25px;
+        font-weight: 900;
+        line-height: 1.15;
+    }
+    .treatment-metric-value.text-value {
+        font-size: 18px;
+    }
+    .form-b-panel {
+        overflow: hidden;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, .07);
+    }
+    .form-b-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px;
+        border-bottom: 1px solid #cbd5e1;
+        background: #f8fafc;
+    }
+    .form-b-kicker {
+        margin: 0 0 3px;
+        color: #70131b;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+    .form-b-title {
+        margin: 0;
+        color: #111827;
+        font-size: 20px;
+        font-weight: 900;
+    }
+    .form-b-month {
+        margin: 4px 0 0;
+        color: #64748b;
+        font-size: 12px;
         font-weight: 700;
     }
-    .appt-trend-item strong {
-        color: #70131B;
-        font-size: 15px;
-        font-weight: 900;
+    .logbook-search {
+        width: min(100%, 330px);
     }
-    .appt-disease-list {
-        display: grid;
-        gap: 10px;
+    .logbook-search-wrap {
+        position: relative;
     }
-    .appt-disease-item {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        gap: 12px;
-        align-items: center;
-        padding: 12px 14px;
-        border-radius: 14px;
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
-    }
-    .appt-disease-rank {
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: #70131B;
-        color: #ffffff;
-        font-size: 12px;
-        font-weight: 900;
-    }
-    .appt-disease-name {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 800;
-        color: #111827;
-    }
-    .appt-disease-category {
-        margin: 3px 0 0;
-        font-size: 12px;
+    .logbook-search-wrap svg {
+        position: absolute;
+        top: 50%;
+        left: 11px;
+        width: 17px;
+        height: 17px;
         color: #64748b;
+        transform: translateY(-50%);
+        pointer-events: none;
     }
-    .appt-disease-count {
-        color: #70131B;
-        font-size: 15px;
+    .logbook-search .treatment-control {
+        padding-left: 36px;
+    }
+    .form-b-table-wrap {
+        overflow-x: auto;
+    }
+    .form-b-table {
+        width: 100%;
+        min-width: 1450px;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+    .form-b-table th,
+    .form-b-table td {
+        border-right: 1px solid #cbd5e1;
+        border-bottom: 1px solid #cbd5e1;
+        vertical-align: top;
+    }
+    .form-b-table th:last-child,
+    .form-b-table td:last-child {
+        border-right: 0;
+    }
+    .form-b-table th {
+        padding: 10px 8px;
+        background: #70131b;
+        color: #fff;
+        font-size: 11px;
         font-weight: 900;
+        line-height: 1.35;
+        text-align: center;
+        text-transform: uppercase;
+    }
+    .form-b-table td {
+        padding: 10px 9px;
+        color: #1f2937;
+        font-size: 12px;
+        line-height: 1.45;
+    }
+    .form-b-table tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+    .form-b-table tbody tr:hover {
+        background: #fffbea;
+    }
+    .form-b-table .col-date { width: 92px; }
+    .form-b-table .col-time { width: 76px; }
+    .form-b-table .col-patient { width: 175px; }
+    .form-b-table .col-course { width: 165px; }
+    .form-b-table .col-complaint { width: 260px; }
+    .form-b-table .col-treatment { width: 190px; }
+    .form-b-table .col-qty { width: 65px; }
+    .form-b-table .col-staff { width: 175px; }
+    .patient-name {
+        display: block;
+        color: #111827;
+        font-weight: 800;
+    }
+    .patient-number,
+    .cell-secondary {
+        display: block;
+        margin-top: 3px;
+        color: #64748b;
+        font-size: 10px;
+    }
+    .diagnosis-label {
+        display: inline-block;
+        margin-top: 5px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #fef3c7;
+        color: #92400e;
+        font-size: 10px;
+        font-weight: 800;
+    }
+    .quantity-cell,
+    .time-cell,
+    .date-cell {
+        text-align: center;
         white-space: nowrap;
     }
-    @media (max-width: 1024px) {
-        .appt-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .appt-stats-layout { grid-template-columns: 1fr; }
+    .form-b-empty {
+        padding: 38px 20px !important;
+        color: #64748b !important;
+        text-align: center;
     }
-    @media (max-width: 640px) {
-        .appt-stats-grid { grid-template-columns: 1fr; }
-        .appt-stats-head { flex-direction: column; }
+    .form-b-no-results {
+        display: none;
+        padding: 24px;
+        color: #64748b;
+        font-size: 13px;
+        text-align: center;
+    }
+    .form-b-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 18px;
+        color: #64748b;
+        font-size: 11px;
+    }
+    html[data-theme="dark"] .treatment-filter,
+    html[data-theme="dark"] .treatment-metric,
+    html[data-theme="dark"] .form-b-panel {
+        border-color: #374151;
+        background: #111827;
+    }
+    html[data-theme="dark"] .form-b-heading,
+    html[data-theme="dark"] .form-b-table tbody tr:nth-child(even) {
+        background: #1f2937;
+    }
+    html[data-theme="dark"] .treatment-record-title,
+    html[data-theme="dark"] .treatment-metric-value,
+    html[data-theme="dark"] .form-b-title,
+    html[data-theme="dark"] .patient-name {
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .treatment-control {
+        border-color: #4b5563;
+        background: #0f172a;
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .form-b-table td {
+        border-color: #374151;
+        color: #e5e7eb;
+    }
+    html[data-theme="dark"] .form-b-table tbody tr:hover {
+        background: #332d19;
+    }
+    @media (max-width: 900px) {
+        .treatment-metrics {
+            grid-template-columns: 1fr;
+        }
+        .form-b-heading {
+            align-items: stretch;
+            flex-direction: column;
+        }
+        .logbook-search {
+            width: 100%;
+        }
+    }
+    @media (max-width: 620px) {
+        .treatment-record-shell {
+            padding: 14px;
+        }
+        .treatment-record-header,
+        .treatment-filter {
+            align-items: stretch;
+            flex-direction: column;
+        }
+        .treatment-field,
+        .treatment-filter-button {
+            width: 100%;
+        }
+        .treatment-record-title {
+            font-size: 25px;
+        }
+        .form-b-footer {
+            flex-direction: column;
+        }
     }
 </style>
 @endpush
@@ -258,94 +380,191 @@
 @php
     $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
     $reportsHomeUrl = $role === \App\Models\User::ROLE_ADMIN ? url('/assistant/reports') : url('/admin/reports');
+    $selectedMonthLabel = \Carbon\Carbon::createFromFormat('Y-m-d', $monthFilter . '-01')->format('F Y');
+    $quantityDisplay = rtrim(rtrim(number_format((float) $totalMedicinesDispensed, 2, '.', ','), '0'), '.');
 @endphp
-<div class="appt-stats-shell">
-    <div class="appt-stats-head">
-        <div>
-            <h1 class="appt-stats-title">Appointment Statistics</h1>
-            <p class="appt-stats-copy">Review monthly appointment volume, status distribution, service demand, and daily activity from one report view.</p>
-        </div>
-        <a href="{{ $reportsHomeUrl }}" class="appt-stats-back">&larr; Back to Reports</a>
-    </div>
 
-    <form method="GET" class="appt-stats-filter">
+<div class="treatment-record-shell">
+    <header class="treatment-record-header">
         <div>
-            <label for="apptStatsMonth">Month</label>
-            <input id="apptStatsMonth" type="month" name="month" value="{{ $monthFilter }}">
+            <h1 class="treatment-record-title">Daily Treatment Record</h1>
+            <p class="treatment-record-subtitle">Official digital Form B logbook for clinic consultations, treatment provided, medicines dispensed, and attending personnel.</p>
         </div>
-        <button type="submit" class="appt-stats-btn">Open Statistics</button>
+        <a href="{{ $reportsHomeUrl }}" class="treatment-record-back">
+            <x-outline-icon name="arrow-long-right" />
+            Back to Reports
+        </a>
+    </header>
+
+    <form method="GET" class="treatment-filter">
+        <div class="treatment-field">
+            <label for="treatmentMonth">Reporting Month</label>
+            <input id="treatmentMonth" class="treatment-control" type="month" name="month" value="{{ $monthFilter }}">
+        </div>
+        <button type="submit" class="treatment-filter-button">
+            <x-outline-icon name="calendar-days" />
+            Apply Month
+        </button>
     </form>
 
-    <div class="appt-stats-grid">
-        <div class="appt-stat-card"><span>Total Appointments</span><strong>{{ $totalAppointments }}</strong></div>
-        <div class="appt-stat-card"><span>Approved / Scheduled</span><strong>{{ $approvedCount }}</strong></div>
-        <div class="appt-stat-card"><span>Completed</span><strong>{{ $completedCount }}</strong></div>
-        <div class="appt-stat-card"><span>Cancelled</span><strong>{{ $cancelledCount }}</strong></div>
-        <div class="appt-stat-card"><span>Online</span><strong>{{ $onlineCount }}</strong></div>
-        <div class="appt-stat-card"><span>Walk-in</span><strong>{{ $walkInCount }}</strong></div>
-        <div class="appt-stat-card"><span>Month</span><strong>{{ \Carbon\Carbon::parse($monthFilter . '-01')->format('F Y') }}</strong></div>
-        <div class="appt-stat-card"><span>Most Common Illness</span><strong>{{ $topDisease->condition ?? 'No data yet' }}</strong></div>
-    </div>
+    <section class="treatment-metrics" aria-label="Treatment record summary">
+        <article class="treatment-metric">
+            <span class="treatment-metric-icon">
+                <x-outline-icon name="users" />
+            </span>
+            <div>
+                <span class="treatment-metric-label">Total Patients Treated</span>
+                <strong class="treatment-metric-value">{{ number_format($totalPatientsTreated) }}</strong>
+            </div>
+        </article>
+        <article class="treatment-metric">
+            <span class="treatment-metric-icon yellow">
+                <x-outline-icon name="cube" />
+            </span>
+            <div>
+                <span class="treatment-metric-label">Total Medicines Dispensed</span>
+                <strong class="treatment-metric-value">{{ $quantityDisplay ?: '0' }}</strong>
+            </div>
+        </article>
+        <article class="treatment-metric">
+            <span class="treatment-metric-icon green">
+                <x-outline-icon name="clipboard-document-list" />
+            </span>
+            <div>
+                <span class="treatment-metric-label">Most Common Illness</span>
+                <strong class="treatment-metric-value text-value">{{ $topDisease->condition ?? 'No data recorded' }}</strong>
+            </div>
+        </article>
+    </section>
 
-    <section class="appt-panel" style="margin-top: 22px;">
-        <h3>Daily Appointment Trend</h3>
-        @if($dailyTrend->count() > 0)
-            <canvas id="appointmentTrendChart" height="80"></canvas>
-        @else
-            <div class="appt-empty">No appointment data available for the selected month.</div>
-        @endif
+    <section class="form-b-panel">
+        <div class="form-b-heading">
+            <div>
+                <p class="form-b-kicker">PUP Taguig Medical Clinic · Form B</p>
+                <h2 class="form-b-title">Digital Treatment Logbook</h2>
+                <p class="form-b-month">{{ $selectedMonthLabel }}</p>
+            </div>
+            <div class="logbook-search">
+                <label for="treatmentRecordSearch">Search Patient</label>
+                <div class="logbook-search-wrap">
+                    <x-outline-icon name="magnifying-glass" />
+                    <input id="treatmentRecordSearch" class="treatment-control" type="search" placeholder="Name or student number" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-b-table-wrap">
+            <table class="form-b-table">
+                <thead>
+                    <tr>
+                        <th class="col-date">Date</th>
+                        <th class="col-time">Time In</th>
+                        <th class="col-time">Time Out</th>
+                        <th class="col-patient">Patient Name</th>
+                        <th class="col-course">Course-Yr &amp; Sec / Dept</th>
+                        <th class="col-complaint">Complaints / Impression</th>
+                        <th class="col-treatment">Treatment / Medicines</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-staff">Physician / Attending Staff</th>
+                    </tr>
+                </thead>
+                <tbody id="treatmentRecordBody">
+                    @forelse($consultations as $consultation)
+                        @php
+                            $patient = $consultation->user;
+                            $patientName = trim((string) ($patient?->name ?: $consultation->name)) ?: 'Unnamed Patient';
+                            $studentNumber = trim((string) ($patient?->student_number ?: $patient?->student_id));
+                            $course = trim((string) ($patient?->course ?: optional($patient?->healthProfile)->course_college));
+                            $yearSection = trim(implode(' - ', array_filter([
+                                trim((string) $patient?->year),
+                                trim((string) $patient?->section),
+                            ])));
+                            $courseDepartment = trim(implode(' / ', array_filter([$course, $yearSection])));
+                            $reason = trim((string) ($consultation->reason_for_visit ?: $consultation->comments));
+                            $diagnosis = trim((string) optional($consultation->medicalCondition)->name);
+                            $medicineName = trim((string) (optional($consultation->medicineItem)->name ?: $consultation->medicine));
+                            $medicineQuantity = (float) $consultation->medicine_quantity;
+                            $staffName = trim((string) ($consultation->attending_staff_name ?: optional($consultation->attendingStaff)->name));
+                            $timeIn = $consultation->time_in ?: optional($consultation->created_at)->format('H:i:s');
+                            $timeOut = $consultation->time_out ?: optional($consultation->updated_at)->format('H:i:s');
+                        @endphp
+                        <tr
+                            class="treatment-record-row"
+                            data-patient-name="{{ \Illuminate\Support\Str::lower($patientName) }}"
+                            data-student-number="{{ \Illuminate\Support\Str::lower($studentNumber) }}"
+                        >
+                            <td class="date-cell">{{ optional($consultation->consultation_date)->format('m/d/Y') ?: '-' }}</td>
+                            <td class="time-cell">{{ $timeIn ? \Carbon\Carbon::parse($timeIn)->format('g:i A') : '-' }}</td>
+                            <td class="time-cell">{{ $timeOut ? \Carbon\Carbon::parse($timeOut)->format('g:i A') : '-' }}</td>
+                            <td>
+                                <span class="patient-name">{{ $patientName }}</span>
+                                <span class="patient-number">{{ $studentNumber ?: 'No student number' }}</span>
+                            </td>
+                            <td>{{ $courseDepartment ?: ($consultation->user_role ?: '-') }}</td>
+                            <td>
+                                {{ $reason ?: 'No complaint recorded' }}
+                                @if($diagnosis !== '')
+                                    <span class="diagnosis-label">{{ $diagnosis }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                {{ $medicineName !== '' && strtolower($medicineName) !== 'none' ? $medicineName : 'No medicine issued' }}
+                                @if($consultation->service)
+                                    <span class="cell-secondary">{{ $consultation->service }}</span>
+                                @endif
+                            </td>
+                            <td class="quantity-cell">
+                                {{ $medicineQuantity > 0 ? rtrim(rtrim(number_format($medicineQuantity, 2, '.', ''), '0'), '.') : '-' }}
+                            </td>
+                            <td>{{ $staffName ?: 'Clinic Staff' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="9" class="form-b-empty">No treatment records were logged for {{ $selectedMonthLabel }}.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-b-no-results" id="treatmentNoResults">No patient matched your search.</div>
+        <footer class="form-b-footer">
+            <span id="treatmentVisibleCount">{{ $consultations->count() }} record{{ $consultations->count() === 1 ? '' : 's' }}</span>
+            <span>Generated from finalized clinic consultations</span>
+        </footer>
     </section>
 </div>
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const canvasEl = document.getElementById('appointmentTrendChart');
-        if (!canvasEl) return;
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('treatmentRecordSearch');
+        const rows = Array.from(document.querySelectorAll('.treatment-record-row'));
+        const noResults = document.getElementById('treatmentNoResults');
+        const visibleCount = document.getElementById('treatmentVisibleCount');
 
-        const chartData = @json($dailyTrend);
-        if (!chartData || chartData.length === 0) return;
+        if (!searchInput || !noResults || !visibleCount) {
+            return;
+        }
 
-        const ctx = canvasEl.getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartData.map(d => d.day),
-                datasets: [{
-                    label: 'Appointments',
-                    data: chartData.map(d => d.count),
-                    borderColor: '#70131B',
-                    backgroundColor: 'rgba(112, 19, 27, 0.1)',
-                    borderWidth: 2.5,
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#70131B',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 7
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
+        const updateSearch = function () {
+            const query = searchInput.value.trim().toLowerCase();
+            let shown = 0;
+
+            rows.forEach(function (row) {
+                const patientName = row.dataset.patientName || '';
+                const studentNumber = row.dataset.studentNumber || '';
+                const matches = query === '' || patientName.includes(query) || studentNumber.includes(query);
+                row.hidden = !matches;
+                if (matches) {
+                    shown += 1;
                 }
-            }
-        });
+            });
+
+            noResults.style.display = rows.length > 0 && shown === 0 ? 'block' : 'none';
+            visibleCount.textContent = shown + ' record' + (shown === 1 ? '' : 's');
+        };
+
+        searchInput.addEventListener('input', updateSearch);
     });
 </script>
-@endpush
-
 @endsection

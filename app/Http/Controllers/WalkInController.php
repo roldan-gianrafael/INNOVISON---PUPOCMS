@@ -355,6 +355,7 @@ class WalkInController extends Controller
             ['key' => 'chest_xray_result', 'label' => 'Chest X-Ray Result', 'path' => $profile->chest_xray_result],
             ['key' => 'student_photo', 'label' => '2x2 Photo', 'path' => $profile->student_photo],
             ['key' => 'pwd_id_proof', 'label' => 'PWD ID Proof', 'path' => $profile->pwd_id_proof],
+            ['key' => 'medical_assessment_upload', 'label' => 'Compliance / Assessment Copy', 'path' => $profile->medical_assessment_upload],
         ])->filter(fn (array $document) => filled($document['path']))
             ->map(function (array $document) {
                 $extension = strtolower(pathinfo((string) $document['path'], PATHINFO_EXTENSION));
@@ -479,9 +480,11 @@ class WalkInController extends Controller
 
         $items = \App\Models\Item::where('category', 'Medicine')
                                  ->where('quantity', '>', 0)
+                                 ->orderBy('name')
                                  ->get();
 
         $conditions = \App\Models\MedicalConditions::with('category')->get();
+        $studentDocuments = $this->healthProfileDocuments($request, $student->healthProfile);
 
         $consultationDob = (string) ($student->healthProfile->birthday ?? $student->DOB ?? '');
         if ($consultationDob !== '') {
@@ -503,7 +506,8 @@ class WalkInController extends Controller
             'user_source',
             'consultationDob',
             'consultationHeight',
-            'consultationWeight'
+            'consultationWeight',
+            'studentDocuments'
         ));
     }
 
@@ -857,6 +861,7 @@ PROMPT;
             'certificate_type' => 'nullable|in:none,excused_letter,coc_ijt,coc_ladderized',
             'item_id' => 'nullable|exists:items,id',
             'issued_quantity' => 'nullable|numeric|min:0.01',
+            'consultation_started_at' => 'nullable|date_format:H:i:s',
         ]);
 
         $student = $this->findUserByIdentifier((string) $request->student_number);
@@ -991,8 +996,8 @@ PROMPT;
 
                     $stockDeduction = $item->convertDispensingQuantityToStockQuantity($issuedQuantity);
                     $stockBefore = (float) $item->quantity;
-                    $item->quantity = max(0, round((float) $item->quantity - $stockDeduction, 2));
-                    $item->save();
+                    $item->decrement('quantity', $stockDeduction);
+                    $item->refresh();
 
                     InventoryMovement::create([
                         'item_id' => $item->id,
@@ -1012,8 +1017,12 @@ PROMPT;
             // --- SAVE TO CONSULTATIONS TABLE ---
             \App\Models\Consultation::create([
                 'user_id'              => $student->id,
+                'attending_staff_id'   => auth()->id(),
+                'attending_staff_name' => auth()->user()?->name ?? auth()->user()?->email ?? 'Clinic Staff',
                 'name'                 => $student->first_name . ' ' . $student->last_name,
                 'consultation_date'    => now()->format('Y-m-d'),
+                'time_in'              => $request->input('consultation_started_at') ?: now()->format('H:i:s'),
+                'time_out'             => now()->format('H:i:s'),
                 'user_role'            => $patientType,
                 'user_type'            => $patientType,
                 'consultation_source'  => $finalSource,
@@ -1027,6 +1036,7 @@ PROMPT;
                 'reason_for_visit'     => $request->input('reason_for_visit'),
                 'certificate_type'     => $request->input('certificate_type') ?: 'none',
                 'medicine'             => $medicineName,
+                'item_id'              => $dispensedItem?->id,
                 'medicine_quantity'    => $issuedQuantity > 0 ? $issuedQuantity : 0,
                 'comments'             => $request->remarks,
             ]);

@@ -1018,6 +1018,65 @@
             height: 20px;
         }
 
+        .quick-action-scan {
+            position: relative;
+        }
+
+        .quick-scan-menu {
+            position: absolute;
+            right: calc(100% + 14px);
+            top: 50%;
+            width: 190px;
+            display: grid;
+            gap: 8px;
+            padding: 10px;
+            border: 1px solid rgba(250, 204, 21, 0.45);
+            border-radius: 12px;
+            background: #70131b;
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.28);
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(8px, -50%) scale(0.96);
+            transition: opacity 0.18s ease, visibility 0.18s ease, transform 0.18s ease;
+            z-index: 1010;
+        }
+
+        .quick-action-scan.is-open .quick-scan-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(0, -50%) scale(1);
+        }
+
+        .quick-scan-choice {
+            width: 100%;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 11px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.09);
+            color: #ffffff;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            text-align: left;
+            cursor: default;
+        }
+
+        .quick-scan-choice svg {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+        }
+
+        .quick-scan-choice:hover {
+            background: #facc15;
+            border-color: #facc15;
+            color: #70131b;
+        }
+
         .quick-actions-wrap.is-open .quick-actions-toggle svg {
             transform: rotate(135deg) scale(1.04);
         }
@@ -3850,11 +3909,21 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                     </span>
                 </div>
                 <div class="quick-actions-divider" aria-hidden="true"></div>
-                <div class="quick-action-item">
-                    <button type="button" class="quick-action-btn" onclick="if(typeof openApplicantsRefModal==='function')openApplicantsRefModal()" aria-label="Applicants Reference Lookup">
-                        <x-outline-icon name="magnifying-glass" />
+                <div class="quick-action-item quick-action-scan" id="headerQuickScan">
+                    <button type="button" class="quick-action-btn" onclick="toggleQuickScanMenu(event)" aria-label="Scan options" aria-expanded="false">
+                        <x-outline-icon name="qr-code" />
                     </button>
-                    <span class="quick-action-tooltip">Applicants</span>
+                    <span class="quick-action-tooltip">Scan</span>
+                    <div class="quick-scan-menu" id="headerQuickScanMenu">
+                        <button type="button" class="quick-scan-choice">
+                            <x-outline-icon name="document-text" />
+                            <span>Applicants</span>
+                        </button>
+                        <button type="button" class="quick-scan-choice">
+                            <x-outline-icon name="user-plus" />
+                            <span>Walk-in</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="quick-actions-divider" aria-hidden="true"></div>
                 <div class="quick-action-item">
@@ -4951,6 +5020,27 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !wrap.classList.contains('is-open');
         wrap.classList.toggle('is-open', shouldOpen);
         toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+        if (!shouldOpen) {
+            const scan = document.getElementById('headerQuickScan');
+            const scanToggle = scan ? scan.querySelector('.quick-action-btn') : null;
+            scan?.classList.remove('is-open');
+            scanToggle?.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    function toggleQuickScanMenu(event) {
+        event?.preventDefault();
+        event?.stopPropagation();
+
+        const scan = document.getElementById('headerQuickScan');
+        const toggle = scan ? scan.querySelector('.quick-action-btn') : null;
+        if (!scan || !toggle) {
+            return;
+        }
+
+        const shouldOpen = !scan.classList.contains('is-open');
+        scan.classList.toggle('is-open', shouldOpen);
+        toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
     }
 
     function toggleAssistantPanel() {
@@ -5064,6 +5154,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         const panel = document.getElementById('assistantPanel');
         const assistantLaunch = document.getElementById('assistantLaunchBtn');
         const quickActions = document.getElementById('headerQuickActions');
+        const quickScan = document.getElementById('headerQuickScan');
 
         if (menu.style.display === 'block' && trigger && !menu.contains(event.target) && !trigger.contains(event.target)) {
             menu.style.display = 'none';
@@ -5071,6 +5162,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 
         if (quickActions && quickActions.classList.contains('is-open') && !quickActions.contains(event.target)) {
             toggleHeaderQuickActions(false);
+        }
+
+        if (quickScan && quickScan.classList.contains('is-open') && !quickScan.contains(event.target)) {
+            quickScan.classList.remove('is-open');
+            quickScan.querySelector('.quick-action-btn')?.setAttribute('aria-expanded', 'false');
         }
 
         if (

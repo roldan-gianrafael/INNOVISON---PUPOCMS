@@ -357,12 +357,12 @@
 
         <a href="{{ $appointmentStatisticsUrl }}" class="report-card report-card-primary">
             <div>
-                <div class="report-label">Consultations</div>
-                <div class="report-main-title">Appointment Statistics</div>
+                <div class="report-label">Form B</div>
+                <div class="report-main-title">Daily Treatment Record</div>
             </div>
             <div class="report-card-footer">
-                <div class="report-badge">Scheduled</div>
-                <span class="report-card-icon"><x-outline-icon name="calendar-days" /></span>
+                <div class="report-badge">Treatment Log</div>
+                <span class="report-card-icon"><x-outline-icon name="clipboard-document-list" /></span>
             </div>
         </a>
 

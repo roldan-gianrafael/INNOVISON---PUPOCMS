@@ -12,14 +12,31 @@ class Consultation extends Model
     use SoftDeletes;
 
     protected $fillable = [
-    'user_id', 'name', 'consultation_date', 'user_type', 'user_role', 'consultation_source', 'service', 
+    'user_id', 'attending_staff_id', 'attending_staff_name', 'name', 'consultation_date',
+    'time_in', 'time_out', 'user_type', 'user_role', 'consultation_source', 'service',
     'medical_condition_id', 'temperature', 'blood_pressure', 'pulse_rate',
-    'respiratory_rate', 'covid_status', 'reason_for_visit', 'certificate_type', 'medicine', 
+    'respiratory_rate', 'covid_status', 'reason_for_visit', 'certificate_type', 'medicine', 'item_id',
     'medicine_quantity', 'comments'
 ];
+
+    protected $casts = [
+        'consultation_date' => 'date',
+        'medicine_quantity' => 'decimal:2',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function attendingStaff(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'attending_staff_id');
+    }
+
+    public function medicineItem(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'item_id');
     }
 
     public function medicalCondition(): BelongsTo

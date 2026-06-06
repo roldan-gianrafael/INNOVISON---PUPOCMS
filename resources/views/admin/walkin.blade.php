@@ -701,6 +701,43 @@
         filter: none;
     }
 
+    .ocr-camera-controls {
+        display: flex;
+        gap: 10px;
+        margin: 14px 0;
+    }
+
+    .ocr-camera-controls .btn-ocr {
+        flex: 1 1 180px;
+    }
+
+    .ocr-camera-idle {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: #0f172a;
+        color: #e2e8f0;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.6;
+    }
+
+    .ocr-camera-shell {
+        position: relative;
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    .ocr-camera-idle.is-hidden {
+        display: none;
+    }
+
     .ocr-result-panel {
         margin-top: 18px;
         padding: 16px;
@@ -1130,8 +1167,11 @@
 
     .applicant-modal-panel .manual-input-stack {
         margin-top: 16px;
-        padding-top: 14px;
-        border-top: 1px dashed #cbd5e1;
+        padding: 18px;
+        border: 1px solid rgba(112, 19, 27, 0.15);
+        border-radius: 14px;
+        background: linear-gradient(180deg, #ffffff, #fff8f6);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
     }
 
     .applicant-modal-panel .manual-input-stack .manual-find-btn {
@@ -1139,10 +1179,56 @@
     }
 
     .applicant-modal-panel .manual-toggle-label {
-        margin: 0 0 10px;
-        font-size: 12px;
+        margin: 0 0 5px;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: #8b0000;
+    }
+
+    .manual-lookup-title {
+        margin: 0;
+        color: #111827;
+        font-size: 18px;
+        font-weight: 900;
+    }
+
+    .manual-lookup-copy {
+        margin: 7px 0 14px;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .manual-lookup-form {
+        display: grid;
+        gap: 10px;
+    }
+
+    .manual-lookup-form .form-control {
+        width: 100%;
+        min-height: 50px;
+        margin: 0 !important;
+        padding: 13px 15px;
+        border: 1px solid rgba(112, 19, 27, 0.22);
+        border-radius: 10px;
+        background: #ffffff;
+        color: #111827;
+        font-size: 14px;
         font-weight: 700;
-        color: #7f1d1d;
+    }
+
+    .manual-lookup-form .manual-find-btn {
+        display: inline-flex !important;
+        min-height: 50px;
+        border-radius: 10px;
+        background: #800000;
+    }
+
+    .manual-lookup-form .manual-find-btn:hover {
+        background: #facc15;
+        color: #70131b;
     }
 
     html[data-theme="dark"] .applicant-modal-shell {
@@ -1211,11 +1297,17 @@
     }
 
     html[data-theme="dark"] .applicant-modal-panel .manual-input-stack {
-        border-top-color: rgba(148, 163, 184, 0.18);
+        border-color: rgba(250, 204, 21, 0.16);
+        background: #111827;
     }
 
     html[data-theme="dark"] .applicant-modal-panel .manual-toggle-label {
         color: #facc15;
+    }
+
+    html[data-theme="dark"] .manual-lookup-title,
+    html[data-theme="dark"] .manual-lookup-copy {
+        color: #f8fafc;
     }
 
     .registration-hub {
@@ -3437,6 +3529,10 @@
         transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
+    .applicant-documents-trigger.is-visible {
+        display: inline-flex;
+    }
+
     .applicant-documents-trigger:hover {
         background: #facc15;
         color: #70131b;
@@ -3516,6 +3612,13 @@
         font-size: 12px;
     }
 
+    .applicant-document-actions {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 7px;
+    }
+
     .applicant-document-view {
         flex: 0 0 auto;
         padding: 9px 13px;
@@ -3527,6 +3630,7 @@
         font-weight: 800;
         text-decoration: none;
         transition: background-color 0.2s ease, color 0.2s ease;
+        cursor: pointer;
     }
 
     .applicant-document-view:hover {
@@ -3543,6 +3647,61 @@
         text-align: center;
         font-size: 14px;
         font-weight: 700;
+    }
+
+    .applicant-document-preview-panel {
+        display: none;
+        margin-top: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f8fafc;
+    }
+
+    .applicant-document-preview-panel.is-visible {
+        display: block;
+    }
+
+    .applicant-document-preview-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border-bottom: 1px solid #e2e8f0;
+        background: #ffffff;
+    }
+
+    .applicant-document-preview-head strong {
+        color: #111827;
+        font-size: 14px;
+    }
+
+    .applicant-document-preview-close {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #800000;
+        cursor: pointer;
+    }
+
+    .applicant-document-preview-frame,
+    .applicant-document-preview-image {
+        width: 100%;
+        height: min(62vh, 620px);
+        border: 0;
+        background: #ffffff;
+    }
+
+    .applicant-document-preview-image {
+        display: none;
+        object-fit: contain;
+        padding: 14px;
     }
 
     html[data-theme="dark"] .applicant-document-card {
@@ -3566,6 +3725,16 @@
         color: #fde68a;
     }
 
+    html[data-theme="dark"] .applicant-document-preview-panel,
+    html[data-theme="dark"] .applicant-document-preview-head {
+        background: #111827;
+        border-color: rgba(250, 204, 21, 0.16);
+    }
+
+    html[data-theme="dark"] .applicant-document-preview-head strong {
+        color: #f8fafc;
+    }
+
     @media (max-width: 760px) {
         #applicantRefModal .applicant-modal-shell,
         #applicantRefModal .applicant-modal-shell.has-lookup-result {
@@ -3574,6 +3743,20 @@
 
         .applicant-documents-grid {
             grid-template-columns: 1fr;
+        }
+
+        .applicant-document-card {
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .applicant-document-actions {
+            width: 100%;
+        }
+
+        .applicant-document-view {
+            flex: 1;
+            text-align: center;
         }
     }
 
@@ -3941,6 +4124,16 @@
                 <div class="applicant-documents-grid" id="applicantDocumentsGrid">
                     <div class="applicant-documents-empty">No uploaded documents are available for this applicant.</div>
                 </div>
+                <section class="applicant-document-preview-panel" id="applicantDocumentPreviewPanel" aria-live="polite">
+                    <div class="applicant-document-preview-head">
+                        <strong id="applicantDocumentPreviewTitle">Document Preview</strong>
+                        <button type="button" class="applicant-document-preview-close" id="closeApplicantDocumentPreview" aria-label="Close document preview">
+                            <x-outline-icon name="x-mark" />
+                        </button>
+                    </div>
+                    <iframe class="applicant-document-preview-frame" id="applicantDocumentPreviewFrame" title="Applicant document preview"></iframe>
+                    <img class="applicant-document-preview-image" id="applicantDocumentPreviewImage" src="" alt="">
+                </section>
             </div>
         </div>
     </div>
@@ -3981,12 +4174,19 @@
                                         <div class="spinner"></div>
                                         <p style="margin-top:10px;color:#8B0000;font-weight:bold;font-size:12px;">Verifying...</p>
                                     </div>
-                                    <div id="readerScan" class="scanner-box">
-                                        <div class="scan-line-overlay"></div>
-                                        <div class="ocr-guide"></div>
-                                        <div class="ocr-guide-label">Align Student Number and Name</div>
+                                    <div class="ocr-camera-shell">
+                                        <div id="readerScan" class="scanner-box">
+                                            <div class="scan-line-overlay"></div>
+                                            <div class="ocr-guide"></div>
+                                            <div class="ocr-guide-label">Align Student Number and Name</div>
+                                        </div>
+                                        <div id="ocrCameraIdle" class="ocr-camera-idle">Camera is Closed. Select Start Camera when you are ready to scan the student ID.</div>
                                     </div>
-                                    <div class="ocr-actions">
+                                    <div class="ocr-camera-controls">
+                                        <button type="button" id="btnStartOcrCamera" class="btn-ocr btn-ocr-primary">Start Camera</button>
+                                        <button type="button" id="btnCloseOcrCamera" class="btn-ocr btn-ocr-secondary" disabled>Close Camera</button>
+                                    </div>
+                                    <div class="ocr-actions" id="ocrScanActions" style="display:none;">
                                         <button type="button" id="btnRunAiOcr" class="btn-ocr btn-ocr-primary" style="background:linear-gradient(135deg,#1d4ed8,#2563eb 55%,#3b82f6);box-shadow:0 12px 24px rgba(37,99,235,0.22);">Reading ID Number</button>
                                         <button type="button" id="btnRetryOcr" class="btn-ocr btn-ocr-secondary">Clear OCR Result</button>
                                     </div>
@@ -3998,6 +4198,7 @@
                     {{-- Right Column: Detected Data & Manual Entry --}}
                     <div class="applicant-modal-panel">
                         <div id="applicantOcrReviewPanel">
+                            <div id="applicantOcrDetectedContent" style="display:none;">
                             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;">
                                 <div style="display:flex;align-items:flex-start;gap:12px;">
                                     <span style="width:42px;height:42px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7f1d1d,#991b1b 58%,#b91c1c);color:#ffffff;box-shadow:0 12px 24px rgba(127,29,29,0.18);flex-shrink:0;">
@@ -4030,11 +4231,14 @@
                             <div class="ocr-actions" style="margin-top:14px;">
                                 <button type="button" id="btnConfirmOcr" class="btn-ocr btn-ocr-secondary" disabled>Confirm &amp; Continue</button>
                             </div>
+                            </div>
                             <div class="manual-input-stack">
-                                <p class="manual-toggle-label">Type Student Number Manually</p>
-                                <form id="walkinFormManual">
-                                    <input type="text" id="student_id_manual" placeholder="Enter student number" class="form-control" style="margin-bottom:10px;" required>
-                                    <button type="submit" id="manualFindBtn" class="manual-find-btn" style="display:none;">Find</button>
+                                <p class="manual-toggle-label">Alternative Lookup</p>
+                                <h4 class="manual-lookup-title">Student Number Lookup</h4>
+                                <p class="manual-lookup-copy">Use the student number when OCR cannot read the physical ID clearly.</p>
+                                <form id="walkinFormManual" class="manual-lookup-form">
+                                    <input type="text" id="student_id_manual" placeholder="Enter student number" class="form-control" required>
+                                    <button type="submit" id="manualFindBtn" class="manual-find-btn" disabled>Find Student</button>
                                 </form>
                             </div>
                         </div>
@@ -4396,6 +4600,11 @@
         const openScanLookupModalBtn = document.getElementById('openScanLookupModal');
         const openApplicantScanModalBtn = document.getElementById('openApplicantScanModal');
         const closeApplicantScanModalBtn = document.getElementById('closeApplicantScanModal');
+        const startOcrCameraBtn = document.getElementById('btnStartOcrCamera');
+        const closeOcrCameraBtn = document.getElementById('btnCloseOcrCamera');
+        const ocrCameraIdle = document.getElementById('ocrCameraIdle');
+        const ocrScanActions = document.getElementById('ocrScanActions');
+        const applicantOcrDetectedContent = document.getElementById('applicantOcrDetectedContent');
         const assistedRoleSelect = document.getElementById('reg_user_type');
         const assistedRoleDisplay = document.getElementById('assistedRoleDisplay');
         const assistedRoleMenu = document.getElementById('assistedRoleMenu');
@@ -4500,10 +4709,30 @@
             }, liveOcrIntervalMs);
         }
 
-        function startMainScanner() {
-            if (!mainScanner) {
-                mainScanner = createScanner("readerScan");
-                mainScanner.start(
+        function setOcrCameraState(isActive, isStarting = false) {
+            if (startOcrCameraBtn) {
+                startOcrCameraBtn.disabled = isActive || isStarting;
+                startOcrCameraBtn.textContent = isStarting ? 'Opening Camera...' : 'Start Camera';
+            }
+            if (closeOcrCameraBtn) closeOcrCameraBtn.disabled = !isActive;
+            if (ocrCameraIdle) ocrCameraIdle.classList.toggle('is-hidden', isActive);
+            if (ocrCameraIdle && !isActive && !isStarting) {
+                ocrCameraIdle.textContent = 'Camera is Closed. Select Start Camera when you are ready to scan the student ID.';
+            }
+            if (ocrScanActions) ocrScanActions.style.display = isActive ? 'flex' : 'none';
+            if (applicantOcrDetectedContent) applicantOcrDetectedContent.style.display = isActive ? 'block' : 'none';
+        }
+
+        async function startMainScanner() {
+            if (mainScanner) {
+                return;
+            }
+
+            setOcrCameraState(false, true);
+            mainScanner = createScanner("readerScan");
+
+            try {
+                await mainScanner.start(
                     { facingMode: "environment" },
                     scannerConfig,
                     (decodedText) => {
@@ -4513,22 +4742,41 @@
 
                         verifyUser(decodedText);
                     }
-                ).then(() => {
-                    attachVideoTrack();
-                    startLiveOcr();
-                }).catch(err => console.warn(err));
+                );
+                attachVideoTrack();
+                setOcrCameraState(true);
+                buildStatus('Live OCR is scanning. Hold the student ID steady inside the frame.', 'info');
+                $('#ocrConfidenceText').text('Student number confidence will appear after scanning.');
+                startLiveOcr();
+            } catch (error) {
+                mainScanner = null;
+                currentVideoTrack = null;
+                setOcrCameraState(false);
+                if (ocrCameraIdle) {
+                    ocrCameraIdle.textContent = 'The camera could not be opened. Check browser camera permission, then try again.';
+                }
+                console.warn(error);
             }
         }
 
         function stopMainScanner() {
             stopLiveOcr();
             if (mainScanner) {
+                if (startOcrCameraBtn) {
+                    startOcrCameraBtn.disabled = true;
+                    startOcrCameraBtn.textContent = 'Closing Camera...';
+                }
+                if (closeOcrCameraBtn) closeOcrCameraBtn.disabled = true;
+                if (ocrScanActions) ocrScanActions.style.display = 'none';
+                if (applicantOcrDetectedContent) applicantOcrDetectedContent.style.display = 'none';
                 mainScanner.stop().catch(() => {}).finally(() => {
                     mainScanner = null;
                     currentVideoTrack = null;
+                    setOcrCameraState(false);
                 });
             } else {
                 currentVideoTrack = null;
+                setOcrCameraState(false);
             }
         }
 
@@ -5091,8 +5339,6 @@
             $('#barcodeScanPanel').show();
             $('#btnShowManual').show();
             $('#manualInputArea').toggle($('#manualInputArea').is(':visible'));
-            const keepResultPanelVisible = intakeTarget === 'assessment';
-            $('#ocrResultPanel').toggle($('#ocrResultPanel').is(':visible') || keepResultPanelVisible);
             $('#applicantOcrReviewPanel').show();
         }
 
@@ -5102,22 +5348,20 @@
             manualStudentNumberEdited = false;
             manualStudentNameEdited = false;
             $('#student_id_manual').val('');
+            $('#manualFindBtn').prop('disabled', true);
             $('#ocr_student_number').val('');
             $('#ocr_student_name').val('');
             $('#ocrLockBadge').hide();
             $('#btnConfirmOcr').prop('disabled', true);
             $('#manualInputArea').show();
-            buildStatus('AI verification could not finish right now.', 'info');
-            $('#ocrConfidenceText').text('Student no. confidence: 10%');
-        updateScanModeUI();
-        syncAssistedRoleDisplay();
-        syncAssistedGenderDisplay();
+            $('#ocrStatus').removeClass('success error').addClass('info').text('');
+            $('#ocrConfidenceText').text('');
+            setOcrCameraState(false);
+            updateScanModeUI();
+            syncAssistedRoleDisplay();
+            syncAssistedGenderDisplay();
             if (applicantScanModal) {
                 applicantScanModal.classList.add('show');
-                // Start camera AFTER modal is visible
-                setTimeout(() => {
-                    startMainScanner();
-                }, 100);
             }
         }
 
@@ -5144,6 +5388,14 @@
 
         if (closeApplicantScanModalBtn) {
             closeApplicantScanModalBtn.addEventListener('click', closeApplicantScanModal);
+        }
+
+        if (startOcrCameraBtn) {
+            startOcrCameraBtn.addEventListener('click', startMainScanner);
+        }
+
+        if (closeOcrCameraBtn) {
+            closeOcrCameraBtn.addEventListener('click', stopMainScanner);
         }
 
         if (applicantScanModal) {
@@ -5203,8 +5455,7 @@
         });
 
         $('#student_id_manual').on('input', function() {
-            const hasValue = $(this).val().trim() !== '';
-            $('#manualFindBtn').toggle(hasValue);
+            $('#manualFindBtn').prop('disabled', $(this).val().trim() === '');
         });
 
         $('#btnSwitchScanMode').on('click', function() {
@@ -5360,6 +5611,11 @@
         const documentsModal  = document.getElementById('applicantDocumentsModal');
         const documentsGrid   = document.getElementById('applicantDocumentsGrid');
         const closeDocuments  = document.getElementById('closeApplicantDocumentsModal');
+        const previewPanel    = document.getElementById('applicantDocumentPreviewPanel');
+        const previewTitle    = document.getElementById('applicantDocumentPreviewTitle');
+        const previewFrame    = document.getElementById('applicantDocumentPreviewFrame');
+        const previewImage    = document.getElementById('applicantDocumentPreviewImage');
+        const closePreview    = document.getElementById('closeApplicantDocumentPreview');
         const uploadForm      = document.getElementById('applicantAssessmentUploadForm');
         const uploadInput     = document.getElementById('applicantAssessmentUploadInput');
         const uploadButton    = document.getElementById('btnUploadAssessmentCopy');
@@ -5369,20 +5625,50 @@
         let currentDocuments  = [];
         const getStudentUrl   = '{{ url($basePrefix . '/walkin/get-student') }}';
 
+        function closeDocumentPreview() {
+            if (previewPanel) previewPanel.classList.remove('is-visible');
+            if (previewFrame) {
+                previewFrame.removeAttribute('src');
+                previewFrame.style.display = 'none';
+            }
+            if (previewImage) {
+                previewImage.removeAttribute('src');
+                previewImage.style.display = 'none';
+            }
+        }
+
+        function previewDocument(documentItem) {
+            if (!documentItem || !documentItem.url || !previewPanel) return;
+
+            closeDocumentPreview();
+            if (previewTitle) previewTitle.textContent = documentItem.label || 'Document Preview';
+
+            if (documentItem.type === 'image' && previewImage) {
+                previewImage.src = documentItem.url;
+                previewImage.alt = (documentItem.label || 'Applicant document') + ' preview';
+                previewImage.style.display = 'block';
+            } else if (previewFrame) {
+                previewFrame.src = documentItem.url;
+                previewFrame.style.display = 'block';
+            }
+
+            previewPanel.classList.add('is-visible');
+            previewPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
         function closeDocumentsModal() {
             if (documentsModal) documentsModal.classList.remove('show');
+            closeDocumentPreview();
         }
 
         function renderDocuments(documents) {
             currentDocuments = Array.isArray(documents) ? documents : [];
 
             if (documentsCount) documentsCount.textContent = String(currentDocuments.length);
-            if (documentsButton) {
-                documentsButton.style.display = currentDocuments.length ? 'inline-flex' : 'none';
-            }
             if (!documentsGrid) return;
 
             documentsGrid.replaceChildren();
+            closeDocumentPreview();
 
             if (!currentDocuments.length) {
                 const empty = document.createElement('div');
@@ -5410,14 +5696,26 @@
                     : (documentItem.type === 'image' ? 'Uploaded image' : 'Uploaded document');
                 copy.append(title, type);
 
-                const viewLink = document.createElement('a');
-                viewLink.className = 'applicant-document-view';
-                viewLink.href = documentItem.url || '#';
-                viewLink.target = '_blank';
-                viewLink.rel = 'noopener noreferrer';
-                viewLink.textContent = 'View';
+                const actions = document.createElement('div');
+                actions.className = 'applicant-document-actions';
 
-                card.append(icon, copy, viewLink);
+                const previewButton = document.createElement('button');
+                previewButton.type = 'button';
+                previewButton.className = 'applicant-document-view';
+                previewButton.textContent = 'Preview';
+                previewButton.addEventListener('click', function () {
+                    previewDocument(documentItem);
+                });
+
+                const openLink = document.createElement('a');
+                openLink.className = 'applicant-document-view';
+                openLink.href = documentItem.url || '#';
+                openLink.target = '_blank';
+                openLink.rel = 'noopener noreferrer';
+                openLink.textContent = 'Open in New Tab';
+
+                actions.append(previewButton, openLink);
+                card.append(icon, copy, actions);
                 documentsGrid.appendChild(card);
             });
         }
@@ -5439,6 +5737,7 @@
             if (foundCard) foundCard.style.display = 'none';
             if (foundName) foundName.textContent = '';
             if (lookupDetails) lookupDetails.style.display = 'none';
+            if (documentsButton) documentsButton.classList.remove('is-visible');
             if (uploadForm) uploadForm.style.display = 'none';
             if (uploadRefInput) uploadRefInput.value = '';
             if (uploadStudentNo) uploadStudentNo.value = '';
@@ -5514,6 +5813,7 @@
             lookupDetails.style.display = 'block';
             if (modalShell) modalShell.classList.add('has-lookup-result');
             renderDocuments(data.documents);
+            if (documentsButton) documentsButton.classList.add('is-visible');
             if (foundCard) foundCard.style.display = 'block';
             if (uploadForm) uploadForm.style.display = 'grid';
             if (uploadRefInput) uploadRefInput.value = data.student_number || fallbackRef || '';
@@ -5612,6 +5912,7 @@
 
             setStatus('info', 'Looking up applicant...');
             if (foundCard) foundCard.style.display = 'none';
+            if (documentsButton) documentsButton.classList.remove('is-visible');
 
             fetch(getStudentUrl + '?student_id=' + encodeURIComponent(ref) + '&preview_only=true', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
@@ -5809,9 +6110,10 @@
         if (closeBtn) closeBtn.addEventListener('click', closeApplicantsModal);
         if (backdrop) backdrop.addEventListener('click', function (e) { if (e.target === backdrop) closeApplicantsModal(); });
         if (documentsButton) documentsButton.addEventListener('click', function () {
-            if (currentDocuments.length && documentsModal) documentsModal.classList.add('show');
+            if (documentsModal) documentsModal.classList.add('show');
         });
         if (closeDocuments) closeDocuments.addEventListener('click', closeDocumentsModal);
+        if (closePreview) closePreview.addEventListener('click', closeDocumentPreview);
         if (documentsModal) documentsModal.addEventListener('click', function (event) {
             if (event.target === documentsModal) closeDocumentsModal();
         });

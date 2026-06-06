@@ -151,6 +151,20 @@
             stroke-width: 2.2;
         }
 
+        .topbar-btn-adaptive > span,
+        .topbar-btn-adaptive > svg {
+            color: #ffffff;
+            mix-blend-mode: difference;
+        }
+
+        .topbar-btn-adaptive:hover > span,
+        .topbar-btn-adaptive:hover > svg,
+        .topbar-btn-adaptive:focus-visible > span,
+        .topbar-btn-adaptive:focus-visible > svg {
+            color: var(--maroon);
+            mix-blend-mode: normal;
+        }
+
         .landing-panel {
             width: min(1040px, 100%);
             min-height: min(620px, calc(100vh - 72px));
@@ -1080,7 +1094,7 @@
                     </button>
                 </form>
             @else
-                <button type="button" class="topbar-btn" onclick="showLoginPrompt()">
+                <button type="button" class="topbar-btn topbar-btn-adaptive" onclick="showLoginPrompt()">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>

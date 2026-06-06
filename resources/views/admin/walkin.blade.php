@@ -2577,6 +2577,15 @@
     }
 
     /* --- Applicant Reference Panel --- */
+    #applicantRefModal .applicant-modal-shell {
+        width: min(680px, 100%);
+        transition: width 0.3s ease;
+    }
+
+    #applicantRefModal .applicant-modal-shell.has-lookup-result {
+        width: min(1040px, 100%);
+    }
+
     .applicant-ref-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -2814,6 +2823,10 @@
 
     .applicant-ref-panel.is-visible {
         display: flex;
+    }
+
+    #applicantRefModal .has-lookup-result .applicant-ref-panel {
+        max-width: 960px;
     }
 
     .applicant-ref-field label {
@@ -3358,12 +3371,14 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
+        width: 100%;
     }
 
     .applicant-condition-field {
         display: flex;
         flex-direction: column;
         gap: 6px;
+        width: 100%;
     }
 
     .applicant-condition-field label {
@@ -3374,6 +3389,8 @@
 
     .applicant-condition-input,
     .applicant-condition-textarea {
+        width: 100%;
+        box-sizing: border-box;
         padding: 10px 12px;
         border: 1px solid #0284c7;
         border-radius: 8px;
@@ -3393,7 +3410,171 @@
 
     .applicant-condition-textarea {
         resize: vertical;
-        min-height: 80px;
+        min-height: 120px;
+    }
+
+    #applicantRefModal .has-lookup-result .applicant-condition-input {
+        min-height: 48px;
+        padding: 12px 14px;
+    }
+
+    .applicant-documents-trigger {
+        display: none;
+        width: 100%;
+        min-height: 50px;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 12px 16px;
+        border: 1px solid #70131b;
+        border-radius: 10px;
+        background: #800000;
+        color: #ffffff;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .applicant-documents-trigger:hover {
+        background: #facc15;
+        color: #70131b;
+        transform: translateY(-1px);
+    }
+
+    .applicant-documents-trigger svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .applicant-documents-count {
+        min-width: 24px;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        color: inherit;
+        font-size: 11px;
+    }
+
+    .applicant-documents-modal {
+        width: min(900px, 100%);
+    }
+
+    .applicant-documents-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .applicant-document-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #ffffff;
+    }
+
+    .applicant-document-icon {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #fff7ed;
+        color: #800000;
+    }
+
+    .applicant-document-icon svg {
+        width: 23px;
+        height: 23px;
+    }
+
+    .applicant-document-copy {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .applicant-document-copy strong,
+    .applicant-document-copy span {
+        display: block;
+    }
+
+    .applicant-document-copy strong {
+        color: #111827;
+        font-size: 14px;
+    }
+
+    .applicant-document-copy span {
+        margin-top: 3px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .applicant-document-view {
+        flex: 0 0 auto;
+        padding: 9px 13px;
+        border: 1px solid #800000;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #800000;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .applicant-document-view:hover {
+        background: #800000;
+        color: #facc15;
+    }
+
+    .applicant-documents-empty {
+        grid-column: 1 / -1;
+        padding: 24px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        color: #64748b;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    html[data-theme="dark"] .applicant-document-card {
+        background: #111827;
+        border-color: rgba(250, 204, 21, 0.16);
+    }
+
+    html[data-theme="dark"] .applicant-document-copy strong {
+        color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .applicant-document-copy span,
+    html[data-theme="dark"] .applicant-documents-empty {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .applicant-document-icon,
+    html[data-theme="dark"] .applicant-document-view {
+        background: #1f2937;
+        border-color: rgba(250, 204, 21, 0.24);
+        color: #fde68a;
+    }
+
+    @media (max-width: 760px) {
+        #applicantRefModal .applicant-modal-shell,
+        #applicantRefModal .applicant-modal-shell.has-lookup-result {
+            width: 100%;
+        }
+
+        .applicant-documents-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     html[data-theme="dark"] .applicant-medical-condition-section {
@@ -3554,7 +3735,7 @@
 
     {{-- Applicants Modal: Reference Number Lookup --}}
     <div class="applicant-modal-backdrop" id="applicantRefModal">
-        <div class="applicant-modal-shell" style="width:min(680px,100%)">
+        <div class="applicant-modal-shell">
             <div class="applicant-modal-head">
                 <div class="applicant-modal-head-main">
                     <div class="applicant-modal-head-badge">AP</div>
@@ -3650,6 +3831,12 @@
                         </div>
                     </div>
 
+                    <button type="button" id="btnViewApplicantDocuments" class="applicant-documents-trigger">
+                        <x-outline-icon name="document-text" />
+                        <span>Uploaded Documents</span>
+                        <span class="applicant-documents-count" id="applicantDocumentsCount">0</span>
+                    </button>
+
                     {{-- Medical Condition Section --}}
                     <div class="applicant-medical-condition-section">
                         <div class="applicant-findings-review">
@@ -3735,6 +3922,29 @@
             </div>
         </div>
     </div>
+
+    <div class="applicant-modal-backdrop" id="applicantDocumentsModal">
+        <div class="applicant-modal-shell applicant-documents-modal">
+            <div class="applicant-modal-head">
+                <div class="applicant-modal-head-main">
+                    <div class="applicant-modal-head-badge">FILE</div>
+                    <div class="applicant-modal-head-copy">
+                        <h3>Uploaded Documents</h3>
+                        <p>View the applicant's submitted clinic requirements and Health Information Form.</p>
+                    </div>
+                </div>
+                <button type="button" class="applicant-modal-close" id="closeApplicantDocumentsModal" aria-label="Close uploaded documents">
+                    <x-outline-icon name="x-mark" />
+                </button>
+            </div>
+            <div class="applicant-modal-body">
+                <div class="applicant-documents-grid" id="applicantDocumentsGrid">
+                    <div class="applicant-documents-empty">No uploaded documents are available for this applicant.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- OCR / Manual ID shared modal (used by OCR/Manual ID card and legacy assessment flow) --}}
     <div class="applicant-modal-backdrop" id="applicantScanModal">
         <div class="applicant-modal-shell">
@@ -5145,13 +5355,72 @@
         const lookupYearSec   = document.getElementById('applicantLookupYearSection');
         const lookupDob       = document.getElementById('applicantLookupDob');
         const lookupEmail     = document.getElementById('applicantLookupEmail');
+        const documentsButton = document.getElementById('btnViewApplicantDocuments');
+        const documentsCount  = document.getElementById('applicantDocumentsCount');
+        const documentsModal  = document.getElementById('applicantDocumentsModal');
+        const documentsGrid   = document.getElementById('applicantDocumentsGrid');
+        const closeDocuments  = document.getElementById('closeApplicantDocumentsModal');
         const uploadForm      = document.getElementById('applicantAssessmentUploadForm');
         const uploadInput     = document.getElementById('applicantAssessmentUploadInput');
         const uploadButton    = document.getElementById('btnUploadAssessmentCopy');
         const uploadRefInput  = document.getElementById('applicantAssessmentReferenceNumber');
         const uploadStudentNo = document.getElementById('applicantAssessmentStudentNumber');
         let currentLookupRef  = '';
+        let currentDocuments  = [];
         const getStudentUrl   = '{{ url($basePrefix . '/walkin/get-student') }}';
+
+        function closeDocumentsModal() {
+            if (documentsModal) documentsModal.classList.remove('show');
+        }
+
+        function renderDocuments(documents) {
+            currentDocuments = Array.isArray(documents) ? documents : [];
+
+            if (documentsCount) documentsCount.textContent = String(currentDocuments.length);
+            if (documentsButton) {
+                documentsButton.style.display = currentDocuments.length ? 'inline-flex' : 'none';
+            }
+            if (!documentsGrid) return;
+
+            documentsGrid.replaceChildren();
+
+            if (!currentDocuments.length) {
+                const empty = document.createElement('div');
+                empty.className = 'applicant-documents-empty';
+                empty.textContent = 'No uploaded documents are available for this applicant.';
+                documentsGrid.appendChild(empty);
+                return;
+            }
+
+            currentDocuments.forEach(function (documentItem) {
+                const card = document.createElement('article');
+                card.className = 'applicant-document-card';
+
+                const icon = document.createElement('span');
+                icon.className = 'applicant-document-icon';
+                icon.textContent = documentItem.type === 'image' ? 'IMG' : (documentItem.type === 'form' ? 'FORM' : 'FILE');
+
+                const copy = document.createElement('div');
+                copy.className = 'applicant-document-copy';
+                const title = document.createElement('strong');
+                title.textContent = documentItem.label || 'Clinic Document';
+                const type = document.createElement('span');
+                type.textContent = documentItem.type === 'form'
+                    ? 'Official health form layout'
+                    : (documentItem.type === 'image' ? 'Uploaded image' : 'Uploaded document');
+                copy.append(title, type);
+
+                const viewLink = document.createElement('a');
+                viewLink.className = 'applicant-document-view';
+                viewLink.href = documentItem.url || '#';
+                viewLink.target = '_blank';
+                viewLink.rel = 'noopener noreferrer';
+                viewLink.textContent = 'View';
+
+                card.append(icon, copy, viewLink);
+                documentsGrid.appendChild(card);
+            });
+        }
 
         function setEntryMode(isActive) {
             if (defaultPane) defaultPane.style.display = isActive ? 'none' : 'flex';
@@ -5163,6 +5432,9 @@
         }
 
         function resetLookupState() {
+            if (modalShell) modalShell.classList.remove('has-lookup-result');
+            renderDocuments([]);
+            closeDocumentsModal();
             if (refStatus) { refStatus.className = 'ocr-status'; refStatus.textContent = ''; }
             if (foundCard) foundCard.style.display = 'none';
             if (foundName) foundName.textContent = '';
@@ -5240,6 +5512,8 @@
 
             console.log('Setting display styles...');
             lookupDetails.style.display = 'block';
+            if (modalShell) modalShell.classList.add('has-lookup-result');
+            renderDocuments(data.documents);
             if (foundCard) foundCard.style.display = 'block';
             if (uploadForm) uploadForm.style.display = 'grid';
             if (uploadRefInput) uploadRefInput.value = data.student_number || fallbackRef || '';
@@ -5534,6 +5808,13 @@
         if (openBtn) openBtn.addEventListener('click', function (e) { e.preventDefault(); openApplicantsModal(); });
         if (closeBtn) closeBtn.addEventListener('click', closeApplicantsModal);
         if (backdrop) backdrop.addEventListener('click', function (e) { if (e.target === backdrop) closeApplicantsModal(); });
+        if (documentsButton) documentsButton.addEventListener('click', function () {
+            if (currentDocuments.length && documentsModal) documentsModal.classList.add('show');
+        });
+        if (closeDocuments) closeDocuments.addEventListener('click', closeDocumentsModal);
+        if (documentsModal) documentsModal.addEventListener('click', function (event) {
+            if (event.target === documentsModal) closeDocumentsModal();
+        });
         if (showEntryBtn) showEntryBtn.addEventListener('click', function () { setEntryMode(true); });
         if (cancelEntryBtn) cancelEntryBtn.addEventListener('click', function () {
             if (refInput) refInput.value = '';

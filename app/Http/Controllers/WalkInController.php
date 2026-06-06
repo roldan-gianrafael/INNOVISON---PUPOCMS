@@ -344,6 +344,41 @@ class WalkInController extends Controller
         return $this->inAssistantWorkspace($request) ? '/assistant' : '/admin';
     }
 
+    private function healthProfileDocuments(Request $request, ?HealthProfile $profile): array
+    {
+        if (!$profile) {
+            return [];
+        }
+
+        $documents = collect([
+            ['key' => 'medical_certificate', 'label' => 'Medical Certificate', 'path' => $profile->medical_certificate],
+            ['key' => 'chest_xray_result', 'label' => 'Chest X-Ray Result', 'path' => $profile->chest_xray_result],
+            ['key' => 'student_photo', 'label' => '2x2 Photo', 'path' => $profile->student_photo],
+            ['key' => 'pwd_id_proof', 'label' => 'PWD ID Proof', 'path' => $profile->pwd_id_proof],
+        ])->filter(fn (array $document) => filled($document['path']))
+            ->map(function (array $document) {
+                $extension = strtolower(pathinfo((string) $document['path'], PATHINFO_EXTENSION));
+
+                return [
+                    'key' => $document['key'],
+                    'label' => $document['label'],
+                    'url' => asset('storage/' . ltrim((string) $document['path'], '/')),
+                    'type' => in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true) ? 'image' : 'file',
+                ];
+            })
+            ->values()
+            ->all();
+
+        $documents[] = [
+            'key' => 'health_form',
+            'label' => 'Health Information Form',
+            'url' => route($this->walkinRouteName($request, 'healthForm'), ['healthProfile' => $profile->id]),
+            'type' => 'form',
+        ];
+
+        return $documents;
+    }
+
     private function formatQuantityNumber(float $value): string
     {
         $rounded = round($value, 2);
@@ -545,6 +580,7 @@ class WalkInController extends Controller
                     'email' => $resolvedEmail,
                     'health_profile_id' => optional($healthProfile)->id,
                     'medical_assessment_upload' => optional($healthProfile)->medical_assessment_upload,
+                    'documents' => $this->healthProfileDocuments($request, $healthProfile),
                     'name_matches' => $lookupName !== '' ? $this->namesRoughlyMatch($lookupName, $student) : null,
                     'lookup_status' => $lookupStatus,
                 ]);
@@ -574,6 +610,7 @@ class WalkInController extends Controller
                 'email' => $resolvedEmail,
                 'health_profile_id' => optional($healthProfile)->id,
                 'medical_assessment_upload' => optional($healthProfile)->medical_assessment_upload,
+                'documents' => $this->healthProfileDocuments($request, $healthProfile),
                 'redirect_url' => $intakeTarget === 'assessment'
                     ? (function () use ($student) {
                         $profile = HealthProfile::firstOrCreate(
@@ -620,6 +657,17 @@ class WalkInController extends Controller
             'scanned_barcode' => $lookup,
             'lookup_status' => $lookupStatus,
             'message' => $lookupMessage,
+        ]);
+    }
+
+    public function showApplicantHealthForm(Request $request, HealthProfile $healthProfile)
+    {
+        $healthProfile->loadMissing('user');
+        abort_unless($healthProfile->user, 404);
+
+        return view('student.print_health_form', [
+            'profile' => $healthProfile,
+            'adminViewer' => true,
         ]);
     }
 

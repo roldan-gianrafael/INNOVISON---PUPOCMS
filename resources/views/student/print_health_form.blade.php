@@ -77,18 +77,23 @@
 <body>
     @unless($pdfMode ?? false)
         <div class="print-action-bar no-print">
-            <a class="print-action-button is-download" href="{{ route('student.health_form.download') }}">Download PDF</a>
-            <a class="print-action-button" href="{{ url('/student/account?view=health-record') }}">Close</a>
+            @if($adminViewer ?? false)
+                <button class="print-action-button is-download" type="button" onclick="window.print()">Print</button>
+                <button class="print-action-button" type="button" onclick="window.close()">Close View</button>
+            @else
+                <a class="print-action-button is-download" href="{{ route('student.health_form.download') }}">Download PDF</a>
+                <a class="print-action-button" href="{{ url('/student/account?view=health-record') }}">Close</a>
+            @endif
         </div>
     @endunless
     @php
-        $studentPrintCopy = true;
+        $studentPrintCopy = !($adminViewer ?? false);
         $healthFormLogo = ($pdfMode ?? false)
             ? public_path('images/pup_logo_print.jpg')
             : asset('images/pup_logo_print.jpg');
     @endphp
     @include('admin.partials.health_form_body')
-    @unless($pdfMode ?? false)
+    @if(!($pdfMode ?? false) && !($adminViewer ?? false))
         <script>
             window.addEventListener('load', function () {
                 window.setTimeout(function () {
@@ -96,6 +101,6 @@
                 }, 250);
             });
         </script>
-    @endunless
+    @endif
 </body>
 </html>

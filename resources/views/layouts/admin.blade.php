@@ -1160,10 +1160,7 @@
         }
 
         .quick-actions-divider {
-            width: 100%;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.12);
-            margin: 2px 0;
+            display: none;
         }
 
         .quick-action-item {
@@ -1193,6 +1190,11 @@
 
         .quick-actions-wrap.is-open .quick-action-item:nth-child(5) {
             transition-delay: 0.04s;
+        }
+
+        .quick-actions-wrap.is-open .quick-action-item:nth-child(6),
+        .quick-actions-wrap.is-open .quick-action-item:nth-child(7) {
+            transition-delay: 0.02s;
         }
 
 
@@ -3632,9 +3634,240 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 max-width: calc(100vw - 24px);
             }
         }
+
+        .treatment-record-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 499996;
+            display: block;
+            pointer-events: none;
+        }
+
+        .treatment-record-modal-dialog {
+            position: absolute;
+            right: 96px;
+            bottom: 82px;
+            width: min(820px, calc(100vw - 128px));
+            height: min(680px, calc(100vh - 118px));
+            overflow: visible;
+            border: 1px solid rgba(250, 204, 21, 0.48);
+            border-radius: 20px;
+            background: rgba(255, 248, 249, 0.96);
+            box-shadow: 0 22px 48px rgba(15, 23, 42, 0.22);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(16px) scale(0.96);
+            transform-origin: bottom right;
+            transition:
+                width 0.28s ease,
+                height 0.28s ease,
+                opacity 0.22s ease,
+                transform 0.24s ease,
+                visibility 0s linear 0.24s;
+        }
+
+        .treatment-record-modal.is-open .treatment-record-modal-dialog {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+            transition:
+                width 0.28s ease,
+                height 0.28s ease,
+                opacity 0.22s ease,
+                transform 0.24s ease,
+                visibility 0s linear 0s;
+        }
+
+        .treatment-record-modal.is-expanded .treatment-record-modal-dialog {
+            right: 24px;
+            bottom: 24px;
+            width: calc(100vw - 48px);
+            height: calc(100vh - 48px);
+        }
+
+        .treatment-record-modal-head {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            min-height: 64px;
+            padding: 14px 18px;
+            border-radius: 19px 19px 0 0;
+            background: #70131b;
+            color: #ffffff;
+        }
+
+        .treatment-record-modal-head > svg {
+            width: 24px;
+            height: 24px;
+            flex: 0 0 auto;
+            color: #ffffff;
+        }
+
+        .treatment-record-modal-copy {
+            min-width: 0;
+        }
+
+        .treatment-record-modal-title {
+            margin: 0;
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .treatment-record-modal-subtitle {
+            margin: 3px 0 0;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .treatment-record-modal-close {
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            flex: 0 0 30px;
+            margin-left: auto;
+            padding: 0;
+            border: 1px solid #facc15;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #8f2230 0 50%, #70131b 50% 100%);
+            background-size: 205% 100%;
+            background-position: 100% 0;
+            color: #ffffff;
+            font-size: 19px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-position 0.32s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .treatment-record-modal-close:hover,
+        .treatment-record-modal-close:focus {
+            border-color: #facc15;
+            background-position: 0 0;
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
+            outline: none;
+        }
+
+        .treatment-record-modal-expand {
+            position: absolute;
+            top: 50%;
+            left: -28px;
+            z-index: 2;
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 56px;
+            padding: 0;
+            overflow: hidden;
+            border: 2px solid #facc15;
+            border-right: 0;
+            border-radius: 30px 0 0 30px;
+            background: linear-gradient(90deg, #fff2f4 0 50%, rgba(255, 248, 249, 0.96) 50% 100%);
+            background-size: 205% 100%;
+            background-position: 100% 0;
+            color: #70131b;
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1;
+            cursor: pointer;
+            transform: translateY(-50%);
+            box-shadow: -5px 5px 14px rgba(15, 23, 42, 0.2);
+            transition: background-position 0.3s ease, border-color 0.18s ease, color 0.18s ease;
+        }
+
+        .treatment-record-modal-expand:hover,
+        .treatment-record-modal-expand:focus {
+            border-color: #facc15;
+            background-position: 0 0;
+            color: #70131b;
+            outline: none;
+        }
+
+        .treatment-record-modal-frame {
+            display: block;
+            width: 100%;
+            height: calc(100% - 64px);
+            border: 0;
+            border-radius: 0 0 19px 19px;
+            background: #f8fafc;
+        }
+
+        body.admin-embedded-view {
+            background: #f8fafc;
+        }
+
+        body.admin-embedded-view .admin-header,
+        body.admin-embedded-view .sidebar,
+        body.admin-embedded-view .assistant-panel,
+        body.admin-embedded-view .medicine-alert-panel,
+        body.admin-embedded-view .admin-live-alert-stack,
+        body.admin-embedded-view .quick-actions-wrap {
+            display: none !important;
+        }
+
+        body.admin-embedded-view .admin-layout,
+        body.admin-embedded-view .main {
+            display: block;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        body.admin-embedded-view .treatment-record-shell {
+            max-width: none;
+            padding: 14px;
+        }
+
+        body.admin-embedded-view .treatment-record-header {
+            display: none;
+        }
+
+        body.admin-embedded-view .form-b-title-row {
+            align-items: center;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        body.admin-embedded-view .logbook-search {
+            width: min(100%, 330px);
+            flex: 0 1 330px;
+        }
+
+        @media (max-width: 700px) {
+            .treatment-record-modal-dialog,
+            .treatment-record-modal.is-expanded .treatment-record-modal-dialog {
+                right: 12px;
+                bottom: 82px;
+                width: calc(100vw - 24px);
+                height: calc(100vh - 106px);
+            }
+
+            .treatment-record-modal-expand {
+                display: none;
+            }
+
+            .treatment-record-modal-subtitle {
+                display: none;
+            }
+
+            body.admin-embedded-view .form-b-title-row {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            body.admin-embedded-view .logbook-search {
+                width: 100%;
+                flex-basis: auto;
+            }
+        }
     </style>
 </head>
-<body class="{{ (request()->routeIs('admin.inventory*') || request()->routeIs('assistant.inventory*')) ? 'admin-inventory-page' : '' }}">
+<body class="{{ (request()->routeIs('admin.inventory*') || request()->routeIs('assistant.inventory*')) ? 'admin-inventory-page' : '' }} {{ request()->boolean('embed') ? 'admin-embedded-view' : '' }}">
 @php
     $authUser = auth()->user();
     $currentRole = \App\Models\User::normalizeRole(optional($authUser)->user_role ?? '');
@@ -3907,9 +4140,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             </button>
             <div class="quick-actions-panel" id="headerQuickActionsPanel">
                 <div class="quick-action-item">
-                    <a href="{{ $dailyTreatmentRecordUrl }}" class="quick-action-btn" aria-label="Daily Treatment Record">
+                    <button type="button" class="quick-action-btn" id="openTreatmentRecordModal" aria-label="Daily Treatment Record">
                         <x-outline-icon name="clipboard-document-list" />
-                    </a>
+                    </button>
                     <span class="quick-action-tooltip">Daily Treatment Record</span>
                 </div>
                 <div class="quick-actions-divider" aria-hidden="true"></div>
@@ -4056,6 +4289,33 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     <input type="hidden" name="portal_guard" value="admin">
     <input type="hidden" name="logout_all" value="1">
 </form>
+
+<div class="treatment-record-modal" id="treatmentRecordModal" aria-hidden="true">
+    <section class="treatment-record-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="treatmentRecordModalTitle">
+        <button
+            type="button"
+            class="treatment-record-modal-expand"
+            id="expandTreatmentRecordModal"
+            aria-label="Expand Daily Treatment Record"
+            aria-expanded="false"
+            title="Expand Daily Treatment Record"
+        >&lt;</button>
+        <header class="treatment-record-modal-head">
+            <x-outline-icon name="clipboard-document-list" />
+            <div class="treatment-record-modal-copy">
+                <h2 class="treatment-record-modal-title" id="treatmentRecordModalTitle">Daily Treatment Record</h2>
+                <p class="treatment-record-modal-subtitle">View the clinic's current digital Form B treatment logbook.</p>
+            </div>
+            <button type="button" class="treatment-record-modal-close" id="closeTreatmentRecordModal" aria-label="Close Daily Treatment Record">&times;</button>
+        </header>
+        <iframe
+            class="treatment-record-modal-frame"
+            id="treatmentRecordModalFrame"
+            title="Daily Treatment Record"
+            data-src="{{ $dailyTreatmentRecordUrl }}?embed=1"
+        ></iframe>
+    </section>
+</div>
 
 <section class="medicine-alert-panel" id="medicineAlertPanel" aria-live="polite">
     <div class="medicine-alert-head">
@@ -4421,6 +4681,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             panel.classList.remove('is-closing');
             window.requestAnimationFrame(function () {
                 panel.classList.add('is-open');
+                toggleHeaderQuickActions(true);
             });
         };
 
@@ -4446,6 +4707,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             closeActionsMenu();
             panel.classList.remove('is-open');
             panel.classList.add('is-closing');
+            releaseHeaderQuickActionsWhenIdle();
 
             if (closeTimer) {
                 window.clearTimeout(closeTimer);
@@ -4456,6 +4718,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 closeTimer = null;
             }, 240);
         };
+
+        document.addEventListener('admin:close-quick-action-popups', closePanel);
 
         toggles.forEach(function (toggle) {
             toggle.addEventListener('click', function (event) {
@@ -5021,7 +5285,23 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             return;
         }
 
-        const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !wrap.classList.contains('is-open');
+        const isDirectToggleClick = typeof forceOpen !== 'boolean';
+        if (isDirectToggleClick && wrap.classList.contains('is-open') && hasOpenQuickActionPopup()) {
+            document.dispatchEvent(new CustomEvent('admin:close-quick-action-popups'));
+            wrap.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+
+            const scan = document.getElementById('headerQuickScan');
+            const scanToggle = scan ? scan.querySelector('.quick-action-btn') : null;
+            scan?.classList.remove('is-open');
+            scanToggle?.setAttribute('aria-expanded', 'false');
+            return;
+        }
+
+        let shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !wrap.classList.contains('is-open');
+        if (!shouldOpen && hasOpenQuickActionPopup()) {
+            shouldOpen = true;
+        }
         wrap.classList.toggle('is-open', shouldOpen);
         toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
         if (!shouldOpen) {
@@ -5030,6 +5310,80 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             scan?.classList.remove('is-open');
             scanToggle?.setAttribute('aria-expanded', 'false');
         }
+    }
+
+    function hasOpenQuickActionPopup() {
+        return Boolean(
+            document.getElementById('medicineAlertPanel')?.classList.contains('is-open')
+            || document.getElementById('treatmentRecordModal')?.classList.contains('is-open')
+        );
+    }
+
+    function releaseHeaderQuickActionsWhenIdle() {
+        if (!hasOpenQuickActionPopup()) {
+            toggleHeaderQuickActions(false);
+        }
+    }
+
+    function initTreatmentRecordModal() {
+        const openButton = document.getElementById('openTreatmentRecordModal');
+        const modal = document.getElementById('treatmentRecordModal');
+        const dialog = modal ? modal.querySelector('.treatment-record-modal-dialog') : null;
+        const closeButton = document.getElementById('closeTreatmentRecordModal');
+        const expandButton = document.getElementById('expandTreatmentRecordModal');
+        const frame = document.getElementById('treatmentRecordModalFrame');
+
+        if (!openButton || !modal || !dialog || !closeButton || !expandButton || !frame) {
+            return;
+        }
+
+        const setExpanded = function (expanded) {
+            modal.classList.toggle('is-expanded', expanded);
+            expandButton.textContent = expanded ? '>' : '<';
+            expandButton.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            expandButton.setAttribute(
+                'aria-label',
+                expanded ? 'Restore Daily Treatment Record modal' : 'Expand Daily Treatment Record modal'
+            );
+            expandButton.setAttribute(
+                'title',
+                expanded ? 'Restore Daily Treatment Record' : 'Expand Daily Treatment Record'
+            );
+        };
+
+        const closeModal = function () {
+            if (!modal.classList.contains('is-open')) {
+                return;
+            }
+
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            setExpanded(false);
+            releaseHeaderQuickActionsWhenIdle();
+            openButton.focus();
+        };
+
+        const openModal = function () {
+            if (!frame.getAttribute('src')) {
+                frame.setAttribute('src', frame.dataset.src);
+            }
+
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            toggleHeaderQuickActions(true);
+        };
+
+        openButton.addEventListener('click', openModal);
+        closeButton.addEventListener('click', closeModal);
+        document.addEventListener('admin:close-quick-action-popups', closeModal);
+        expandButton.addEventListener('click', function () {
+            setExpanded(!modal.classList.contains('is-expanded'));
+        });
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+                closeModal();
+            }
+        });
     }
 
     function toggleQuickScanMenu(event) {
@@ -5164,7 +5518,12 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
             menu.style.display = 'none';
         }
 
-        if (quickActions && quickActions.classList.contains('is-open') && !quickActions.contains(event.target)) {
+        if (
+            quickActions
+            && quickActions.classList.contains('is-open')
+            && !quickActions.contains(event.target)
+            && !hasOpenQuickActionPopup()
+        ) {
             toggleHeaderQuickActions(false);
         }
 
@@ -5198,7 +5557,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         if (window.innerWidth > 860) {
             document.body.classList.remove('sidebar-open');
         }
-        toggleHeaderQuickActions(false);
+        if (hasOpenQuickActionPopup()) {
+            toggleHeaderQuickActions(true);
+        } else {
+            toggleHeaderQuickActions(false);
+        }
     });
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -5206,6 +5569,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
         initThemeToggle();
         initSidebarScrollIndicator();
         initMedicineAlerts();
+        initTreatmentRecordModal();
         initAdminLiveAlerts();
         initAccessibilityLaunch();
     });

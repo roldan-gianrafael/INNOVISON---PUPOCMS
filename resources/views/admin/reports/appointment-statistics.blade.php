@@ -178,15 +178,15 @@
         min-width: 0;
         flex: 1;
     }
-    .treatment-filter-head h2 {
+    .treatment-filter-head .treatment-filter-head-copy h2 {
         margin: 0;
-        color: #ffffff;
+        color: #ffffff !important;
         font-size: 19px;
         font-weight: 900;
     }
-    .treatment-filter-head p {
+    .treatment-filter-head .treatment-filter-head-copy p {
         margin: 4px 0 0;
-        color: rgba(255, 255, 255, .88);
+        color: #ffffff !important;
         font-size: 12px;
         line-height: 1.5;
     }
@@ -202,19 +202,19 @@
         padding: 0;
         border: 1px solid rgba(250, 204, 21, .58);
         border-radius: 999px;
-        background: linear-gradient(90deg, #facc15 0 50%, rgba(255, 255, 255, .12) 50% 100%);
+        background: linear-gradient(90deg, #8f2230 0 50%, #70131b 50% 100%);
         background-size: 205% 100%;
         background-position: 100% 0;
         color: #ffffff;
         font-size: 23px;
         cursor: pointer;
-        transition: background-position .32s ease, color .18s ease, transform .18s ease, box-shadow .18s ease;
+        transition: background-position .32s ease, border-color .18s ease, box-shadow .18s ease;
     }
     .treatment-filter-close:hover,
     .treatment-filter-close:focus {
+        border-color: #facc15;
         background-position: 0 0;
-        color: #70131b;
-        transform: rotate(90deg);
+        color: #ffffff;
         box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
         outline: none;
     }
@@ -339,13 +339,18 @@
         box-shadow: 0 8px 22px rgba(15, 23, 42, .07);
     }
     .form-b-heading {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 16px;
         padding: 18px;
         border-bottom: 1px solid #cbd5e1;
         background: #f8fafc;
+    }
+    .form-b-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+    .form-b-title-copy {
+        min-width: 0;
     }
     .form-b-kicker {
         margin: 0 0 3px;
@@ -367,6 +372,7 @@
         font-weight: 700;
     }
     .logbook-search {
+        flex: 0 1 330px;
         width: min(100%, 330px);
     }
     .logbook-search-wrap {
@@ -447,14 +453,17 @@
         font-size: 10px;
     }
     .diagnosis-label {
-        display: inline-block;
-        margin-top: 5px;
+        display: table;
+        margin-bottom: 5px;
         padding: 2px 6px;
         border-radius: 4px;
         background: #fef3c7;
         color: #92400e;
         font-size: 10px;
         font-weight: 800;
+    }
+    .complaint-remarks {
+        display: block;
     }
     .quantity-cell,
     .time-cell,
@@ -498,27 +507,28 @@
         background: #111827;
         color: #f8fafc;
     }
-    html[data-theme="dark"] .treatment-filter-head h2 {
-        color: #f8fafc;
+    html[data-theme="dark"] .treatment-filter-head .treatment-filter-head-copy h2 {
+        color: #ffffff !important;
     }
     html[data-theme="dark"] .treatment-filter-head {
         border-color: rgba(250, 204, 21, .2);
         background: linear-gradient(135deg, #70131b 0%, #8f2230 100%);
     }
-    html[data-theme="dark"] .treatment-filter-head p {
-        color: rgba(255, 255, 255, .88);
+    html[data-theme="dark"] .treatment-filter-head .treatment-filter-head-copy p {
+        color: #ffffff !important;
     }
     html[data-theme="dark"] .treatment-filter-close {
         border-color: rgba(250, 204, 21, .58);
-        background: linear-gradient(90deg, #facc15 0 50%, rgba(255, 255, 255, .12) 50% 100%);
+        background: linear-gradient(90deg, #8f2230 0 50%, #70131b 50% 100%);
         background-size: 205% 100%;
         background-position: 100% 0;
         color: #ffffff;
     }
     html[data-theme="dark"] .treatment-filter-close:hover,
     html[data-theme="dark"] .treatment-filter-close:focus {
+        border-color: #facc15;
         background-position: 0 0;
-        color: #70131b;
+        color: #ffffff;
     }
     html[data-theme="dark"] .treatment-record-back {
         border-color: #70131b;
@@ -551,12 +561,13 @@
         .treatment-metrics {
             grid-template-columns: 1fr;
         }
-        .form-b-heading {
+        .form-b-title-row {
             align-items: stretch;
             flex-direction: column;
         }
         .logbook-search {
             width: 100%;
+            flex-basis: auto;
         }
     }
     @media (max-width: 620px) {
@@ -622,14 +633,18 @@
         <div class="form-b-heading">
             <div>
                 <p class="form-b-kicker">PUP Taguig Medical Clinic · Form B</p>
-                <h2 class="form-b-title">Digital Treatment Logbook</h2>
-                <p class="form-b-month">{{ $selectedMonthLabel }}</p>
-            </div>
-            <div class="logbook-search">
-                <label for="treatmentRecordSearch">Search Patient</label>
-                <div class="logbook-search-wrap">
-                    <x-outline-icon name="magnifying-glass" />
-                    <input id="treatmentRecordSearch" class="treatment-control" type="search" placeholder="Name or student number" autocomplete="off">
+                <div class="form-b-title-row">
+                    <div class="form-b-title-copy">
+                        <h2 class="form-b-title">Digital Treatment Logbook</h2>
+                        <p class="form-b-month">{{ $selectedMonthLabel }}</p>
+                    </div>
+                    <div class="logbook-search">
+                        <label for="treatmentRecordSearch">Search Patient</label>
+                        <div class="logbook-search-wrap">
+                            <x-outline-icon name="magnifying-glass" />
+                            <input id="treatmentRecordSearch" class="treatment-control" type="search" placeholder="Name or student number" autocomplete="off">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -683,10 +698,10 @@
                             </td>
                             <td>{{ $courseDepartment ?: ($consultation->user_role ?: '-') }}</td>
                             <td>
-                                {{ $reason ?: 'No complaint recorded' }}
                                 @if($diagnosis !== '')
                                     <span class="diagnosis-label">{{ $diagnosis }}</span>
                                 @endif
+                                <span class="complaint-remarks">{{ $reason ?: 'No complaint recorded' }}</span>
                             </td>
                             <td>
                                 {{ $medicineName !== '' && strtolower($medicineName) !== 'none' ? $medicineName : 'No medicine issued' }}

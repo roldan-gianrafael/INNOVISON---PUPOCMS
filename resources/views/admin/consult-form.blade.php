@@ -837,14 +837,17 @@
     .consultation-treatment-table .treatment-quantity-col { width: 62px; text-align: center; }
     .consultation-treatment-table .treatment-staff-col { width: 145px; }
     .treatment-table-diagnosis {
-        display: inline-block;
-        margin-top: 5px;
+        display: table;
+        margin-bottom: 5px;
         padding: 2px 6px;
         border-radius: 4px;
         background: #fef3c7;
         color: #92400e;
         font-size: 9px;
         font-weight: 800;
+    }
+    .treatment-table-remarks {
+        display: block;
     }
     .consultation-treatment-empty {
         padding: 28px !important;
@@ -1358,7 +1361,7 @@
             <input type="hidden" name="student_number" value="{{ $student->student_number ?: $student->student_id }}">
             <input type="hidden" name="user_role" value="{{ $studentDisplayRole }}">
             <input type="hidden" name="user_type" value="{{ $user_source ?? 'walkin' }}">
-            <input type="hidden" name="consultation_started_at" value="{{ old('consultation_started_at', now()->format('H:i:s')) }}">
+            <input type="hidden" name="consultation_started_at" value="{{ old('consultation_started_at', $consultationStartedAt ?? now()->format('H:i:s')) }}">
 
             <section class="consult-card">
                 <h3>Physical Assessment</h3>
@@ -1637,10 +1640,10 @@
                             <td>{{ $treatmentTimeOut ? \Carbon\Carbon::parse($treatmentTimeOut)->format('g:i A') : '-' }}</td>
                             <td>{{ $treatment->service ?: 'Consultation' }}</td>
                             <td>
-                                {{ $treatment->reason_for_visit ?: $treatment->comments ?: 'No complaint recorded.' }}
                                 @if($treatmentDiagnosis !== '')
                                     <span class="treatment-table-diagnosis">{{ $treatmentDiagnosis }}</span>
                                 @endif
+                                <span class="treatment-table-remarks">{{ $treatment->reason_for_visit ?: $treatment->comments ?: 'No complaint recorded.' }}</span>
                             </td>
                             <td>{{ $treatmentMedicine !== '' && strtolower($treatmentMedicine) !== 'none' ? $treatmentMedicine : 'No medicine issued' }}</td>
                             <td class="treatment-quantity-col">{{ $treatmentQuantity > 0 ? rtrim(rtrim(number_format($treatmentQuantity, 2, '.', ''), '0'), '.') : '-' }}</td>

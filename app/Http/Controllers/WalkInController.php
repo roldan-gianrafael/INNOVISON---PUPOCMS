@@ -20,6 +20,26 @@ use Illuminate\Support\Str;
 
 class WalkInController extends Controller
 {
+    private function normalizeConsultationSource(?string $source): string
+    {
+        $source = strtolower(trim((string) $source));
+
+        return in_array($source, ['online', 'walkin', 'assisted'], true)
+            ? $source
+            : 'walkin';
+    }
+
+    private function consultationStartSessionKey($staffId, $studentId, string $source): string
+    {
+        $identity = implode('|', [
+            (string) ($staffId ?: 'guest'),
+            (string) $studentId,
+            $this->normalizeConsultationSource($source),
+        ]);
+
+        return 'consultation_started_at.' . hash('sha256', $identity);
+    }
+
     private function normalizeLookupName(?string $value): string
     {
         $value = Str::upper((string) $value);
@@ -451,7 +471,18 @@ class WalkInController extends Controller
     {
         $student = $this->findUserByIdentifier((string) $student_id);
         abort_if(!$student, 404);
-        $user_source = $request->query('source', 'walkin');
+        $user_source = $this->normalizeConsultationSource($request->query('source', 'walkin'));
+        $consultationSessionKey = $this->consultationStartSessionKey(
+            auth()->id(),
+            $student->id,
+            $user_source
+        );
+        $consultationStartedAt = (string) $request->session()->get($consultationSessionKey, '');
+
+        if (!preg_match('/^\d{2}:\d{2}:\d{2}$/', $consultationStartedAt)) {
+            $consultationStartedAt = now()->format('H:i:s');
+            $request->session()->put($consultationSessionKey, $consultationStartedAt);
+        }
 
         $latestAppointment = null;
 
@@ -516,7 +547,8 @@ class WalkInController extends Controller
             'consultationHeight',
             'consultationWeight',
             'studentDocuments',
-            'studentTreatments'
+            'studentTreatments',
+            'consultationStartedAt'
         ));
     }
 
@@ -879,6 +911,22 @@ PROMPT;
             return redirect()->back()->with('error', 'Student not found.');
         }
 
+        $requestedSource = $this->normalizeConsultationSource($request->input('user_type', 'walkin'));
+        $consultationSessionKey = $this->consultationStartSessionKey(
+            auth()->id(),
+            $student->id,
+            $requestedSource
+        );
+        $consultationStartedAt = (string) $request->session()->get($consultationSessionKey, '');
+
+        if (!preg_match('/^\d{2}:\d{2}:\d{2}$/', $consultationStartedAt)) {
+            $submittedStartedAt = (string) $request->input('consultation_started_at', '');
+            $consultationStartedAt = preg_match('/^\d{2}:\d{2}:\d{2}$/', $submittedStartedAt)
+                ? $submittedStartedAt
+                : now()->format('H:i:s');
+            $request->session()->put($consultationSessionKey, $consultationStartedAt);
+        }
+
         if ($request->filled('dob')) {
             $student->DOB = $request->input('dob');
         }
@@ -945,8 +993,7 @@ PROMPT;
             return redirect()->back()->withInput()->with('error', 'Select a medicine before entering a quantity to issue.');
         }
 
-        DB::transaction(function () use ($request, $student, $dispensedItem, $issuedQuantity) {
-            $requestedSource = trim((string) $request->input('user_type', 'walkin'));
+        DB::transaction(function () use ($request, $student, $dispensedItem, $issuedQuantity, $requestedSource, $consultationStartedAt) {
             $isOnlineSource = $requestedSource === 'online';
             $finalSource = 'walkin';
             $patientType = Appointment::normalizeUserType($student->user_role ?? $student->user_type);
@@ -1030,7 +1077,7 @@ PROMPT;
                 'attending_staff_name' => auth()->user()?->name ?? auth()->user()?->email ?? 'Clinic Staff',
                 'name'                 => $student->first_name . ' ' . $student->last_name,
                 'consultation_date'    => now()->format('Y-m-d'),
-                'time_in'              => $request->input('consultation_started_at') ?: now()->format('H:i:s'),
+                'time_in'              => $consultationStartedAt,
                 'time_out'             => now()->format('H:i:s'),
                 'user_role'            => $patientType,
                 'user_type'            => $patientType,
@@ -1051,8 +1098,10 @@ PROMPT;
             ]);
         });
 
+        $request->session()->forget($consultationSessionKey);
+
         // Redirect logic
-        if ($request->input('user_type') === 'online') {
+        if ($requestedSource === 'online') {
             return redirect($this->adminBasePrefix($request) . '/appointments')
                 ->with('success', 'Online consultation completed!');
         }

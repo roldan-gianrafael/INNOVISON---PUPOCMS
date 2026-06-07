@@ -3666,6 +3666,9 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $appointmentsUrl = $isStudentAssistant ? url('/assistant/appointments') : url('/admin/appointments');
     $inventoryUrl = $isStudentAssistant ? url('/assistant/inventory') : url('/admin/inventory');
     $reportsUrl = $isStudentAssistant ? url('/assistant/reports') : url('/admin/reports');
+    $dailyTreatmentRecordUrl = $isStudentAssistant
+        ? url('/assistant/reports/appointment-statistics')
+        : url('/admin/reports/appointment-statistics');
     $healthRecordsUrl = route('admin.health_records');
     $adminNotificationsFeedUrl = $isStudentAssistant
         ? route('assistant.notifications.feed')
@@ -3903,10 +3906,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 @endif
             </button>
             <div class="quick-actions-panel" id="headerQuickActionsPanel">
-                <div class="quick-action-item is-logo">
-                    <span class="quick-action-logo" aria-hidden="true">
-                        <img src="{{ $brandLogo }}" alt="Clinic Logo">
-                    </span>
+                <div class="quick-action-item">
+                    <a href="{{ $dailyTreatmentRecordUrl }}" class="quick-action-btn" aria-label="Daily Treatment Record">
+                        <x-outline-icon name="clipboard-document-list" />
+                    </a>
+                    <span class="quick-action-tooltip">Daily Treatment Record</span>
                 </div>
                 <div class="quick-actions-divider" aria-hidden="true"></div>
                 <div class="quick-action-item quick-action-scan" id="headerQuickScan">

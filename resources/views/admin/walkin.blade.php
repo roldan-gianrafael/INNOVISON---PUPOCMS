@@ -4009,19 +4009,6 @@
     $idpRegistrationLink = 'https://identity-provider.isaxbsit2027.com/register?client_id=7112646b-c785-4306-b00f-87d29ad54fb2';
 @endphp
 
-@if(session('consultation_done'))
-<div id="successToast" class="notification-toast">
-    <div class="toast-copy">
-        <span class="toast-badge">Done</span>
-        <div>
-            <strong class="toast-title">Consultation Done!</strong>
-            <span class="toast-subtitle">Record saved successfully.</span>
-        </div>
-    </div>
-    <button onclick="location.href='{{ url($basePrefix . '/walkin') }}?mode=scan'" class="btn-toast-action">Open OCR / Manual ID</button>
-</div>
-@endif
-
 <div style="max-width: 980px; margin: 20px auto;">
     @if($currentMode === '')
     <div class="card p-4 shadow-sm walkin-strip-card" style="border-radius: 18px; border: none; margin-bottom: 20px;">

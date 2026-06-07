@@ -391,6 +391,12 @@
         background: #fff7ed;
         color: #c2410c;
     }
+    .medicine-quantity-group {
+        display: none;
+    }
+    .medicine-quantity-group.is-visible {
+        display: block;
+    }
     .form-actions {
         display: flex;
         align-items: center;
@@ -661,10 +667,18 @@
         background: #fff;
         color: #111827;
         box-shadow: -2px 0 8px rgba(0, 0, 0, .18);
-        transition: right .3s ease;
+        transition: right .3s ease, width .3s ease;
     }
     #right-utility-panel.open {
         right: 0;
+    }
+    #right-utility-panel.is-expanded {
+        width: min(1100px, calc(100vw - 72px));
+    }
+    .consultation-utility-rail.panel-expanded {
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
     }
     .utility-panel-header {
         display: flex;
@@ -724,6 +738,38 @@
         box-shadow: 0 8px 18px rgba(15, 23, 42, .2);
         outline: none;
     }
+    #expand-utility-panel {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        z-index: 2;
+        display: none;
+        place-items: center;
+        width: 24px;
+        height: 36px;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: #70131b;
+        font: inherit;
+        font-size: 24px;
+        font-weight: 900;
+        line-height: 1;
+        cursor: pointer;
+        transform: translateY(-50%);
+        transition: color .18s ease, transform .18s ease;
+    }
+    #expand-utility-panel.is-visible {
+        display: grid;
+    }
+    #expand-utility-panel:hover,
+    #expand-utility-panel:focus {
+        background: transparent;
+        color: #facc15;
+        transform: translateY(-50%) scale(1.12);
+        outline: none;
+    }
     .utility-panel-pane {
         display: none;
     }
@@ -736,52 +782,74 @@
         font-size: 12px;
         line-height: 1.5;
     }
-    .treatment-history-list {
-        display: grid;
-        gap: 11px;
-    }
-    .treatment-history-card {
-        padding: 12px;
-        border: 1px solid #e2e8f0;
+    .consultation-treatment-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #cbd5e1;
         border-radius: 8px;
+        background: #ffffff;
+    }
+    .consultation-treatment-table {
+        width: 100%;
+        min-width: 920px;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+    .consultation-treatment-table th,
+    .consultation-treatment-table td {
+        padding: 10px 9px;
+        border-right: 1px solid #cbd5e1;
+        border-bottom: 1px solid #cbd5e1;
+        vertical-align: top;
+    }
+    .consultation-treatment-table th:last-child,
+    .consultation-treatment-table td:last-child {
+        border-right: 0;
+    }
+    .consultation-treatment-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+    .consultation-treatment-table th {
+        background: #70131b;
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 900;
+        line-height: 1.35;
+        text-align: center;
+        text-transform: uppercase;
+    }
+    .consultation-treatment-table td {
+        color: #1f2937;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+    .consultation-treatment-table tbody tr:nth-child(even) {
         background: #f8fafc;
     }
-    .treatment-history-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 8px;
+    .consultation-treatment-table tbody tr:hover {
+        background: #fffbea;
     }
-    .treatment-history-date {
-        color: #800000;
-        font-size: 12px;
-        font-weight: 900;
-    }
-    .treatment-history-service {
-        color: #64748b;
-        font-size: 10px;
+    .consultation-treatment-table .treatment-date-col { width: 92px; }
+    .consultation-treatment-table .treatment-time-col { width: 76px; }
+    .consultation-treatment-table .treatment-service-col { width: 120px; }
+    .consultation-treatment-table .treatment-complaint-col { width: 220px; }
+    .consultation-treatment-table .treatment-medicine-col { width: 165px; }
+    .consultation-treatment-table .treatment-quantity-col { width: 62px; text-align: center; }
+    .consultation-treatment-table .treatment-staff-col { width: 145px; }
+    .treatment-table-diagnosis {
+        display: inline-block;
+        margin-top: 5px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #fef3c7;
+        color: #92400e;
+        font-size: 9px;
         font-weight: 800;
-        text-align: right;
     }
-    .treatment-history-card strong {
-        display: block;
-        margin-bottom: 3px;
-        color: #111827;
-        font-size: 12px;
-    }
-    .treatment-history-card p {
-        margin: 0 0 8px;
-        color: #475569;
-        font-size: 11px;
-        line-height: 1.5;
-    }
-    .treatment-history-meta {
-        display: grid;
-        gap: 3px;
-        padding-top: 8px;
-        border-top: 1px solid #e2e8f0;
-        color: #64748b;
-        font-size: 10px;
+    .consultation-treatment-empty {
+        padding: 28px !important;
+        color: #64748b !important;
+        text-align: center;
     }
     html[data-theme="dark"] #right-utility-panel,
     html[data-theme="dark"] .utility-rail-button,
@@ -790,8 +858,7 @@
         background: #111827;
         color: #f8fafc;
     }
-    html[data-theme="dark"] .utility-panel-title,
-    html[data-theme="dark"] .treatment-history-card strong {
+    html[data-theme="dark"] .utility-panel-title {
         color: #f8fafc;
     }
     html[data-theme="dark"] .utility-panel-header {
@@ -815,9 +882,22 @@
         background-position: 0 0;
         color: #70131b;
     }
-    html[data-theme="dark"] .treatment-history-card {
+    html[data-theme="dark"] .consultation-treatment-table-wrap {
         border-color: #374151;
+        background: #111827;
+    }
+    html[data-theme="dark"] .consultation-treatment-table th,
+    html[data-theme="dark"] .consultation-treatment-table td {
+        border-color: #374151;
+    }
+    html[data-theme="dark"] .consultation-treatment-table td {
+        color: #e5e7eb;
+    }
+    html[data-theme="dark"] .consultation-treatment-table tbody tr:nth-child(even) {
         background: #1f2937;
+    }
+    html[data-theme="dark"] .consultation-treatment-table tbody tr:hover {
+        background: #332d19;
     }
     @media (max-width: 760px) {
         .consultation-workspace {
@@ -829,6 +909,9 @@
         }
         .consultation-utility-rail.panel-open {
             right: 327px;
+        }
+        #right-utility-panel.is-expanded {
+            width: 100vw;
         }
         .utility-rail-button {
             justify-content: center;
@@ -1403,7 +1486,7 @@
                     </div>
                     <div class="selected-stock" id="selectedMedicineStock" aria-live="polite"></div>
                 </div>
-                <div class="form-group">
+                <div class="form-group medicine-quantity-group" id="consultMedicineQuantityGroup">
                     <label id="consultIssuedQuantityLabel" for="consultIssuedQuantityInput">Quantity to Issue</label>
                     <input type="number" name="issued_quantity" id="consultIssuedQuantityInput" class="form-control" min="0" step="0.01" placeholder="Enter amount" value="{{ old('issued_quantity') }}">
                     <div class="form-help" id="consultIssuedQuantityHelp">Select a medicine to see the dispensing unit and available stock.</div>
@@ -1460,6 +1543,7 @@
         <h2 class="utility-panel-title" id="utilityPanelTitle">Uploaded Documents</h2>
         <button type="button" id="close-utility-panel" aria-label="Close utility panel">&times;</button>
     </header>
+    <button type="button" id="expand-utility-panel" aria-label="Expand treatment record panel" title="Expand treatment record">&lt;</button>
 
     <section class="utility-panel-pane" data-utility-pane="documents">
         <p class="utility-pane-note">Submitted clinic files and the generated Health Information Form.</p>
@@ -1523,29 +1607,52 @@
 
     <section class="utility-panel-pane" data-utility-pane="treatments">
         <p class="utility-pane-note">The 20 most recent finalized consultations for this patient.</p>
-        <div class="treatment-history-list">
-            @forelse($studentTreatments as $treatment)
-                @php
-                    $treatmentDiagnosis = trim((string) optional($treatment->medicalCondition)->name);
-                    $treatmentMedicine = trim((string) (optional($treatment->medicineItem)->name ?: $treatment->medicine));
-                    $treatmentStaff = trim((string) ($treatment->attending_staff_name ?: optional($treatment->attendingStaff)->name));
-                    $treatmentQuantity = (float) $treatment->medicine_quantity;
-                @endphp
-                <article class="treatment-history-card">
-                    <div class="treatment-history-head">
-                        <span class="treatment-history-date">{{ optional($treatment->consultation_date)->format('M d, Y') ?: '-' }}</span>
-                        <span class="treatment-history-service">{{ $treatment->service ?: 'Consultation' }}</span>
-                    </div>
-                    <strong>{{ $treatmentDiagnosis ?: 'No diagnosis recorded' }}</strong>
-                    <p>{{ $treatment->reason_for_visit ?: $treatment->comments ?: 'No complaint recorded.' }}</p>
-                    <div class="treatment-history-meta">
-                        <span>Medicine: {{ $treatmentMedicine !== '' && strtolower($treatmentMedicine) !== 'none' ? $treatmentMedicine : 'None issued' }}@if($treatmentQuantity > 0) ({{ rtrim(rtrim(number_format($treatmentQuantity, 2, '.', ''), '0'), '.') }})@endif</span>
-                        <span>Attending: {{ $treatmentStaff ?: 'Clinic Staff' }}</span>
-                    </div>
-                </article>
-            @empty
-                <div class="documents-empty">No previous treatment records are available for this student.</div>
-            @endforelse
+        <div class="consultation-treatment-table-wrap">
+            <table class="consultation-treatment-table">
+                <thead>
+                    <tr>
+                        <th class="treatment-date-col">Date</th>
+                        <th class="treatment-time-col">Time In</th>
+                        <th class="treatment-time-col">Time Out</th>
+                        <th class="treatment-service-col">Service</th>
+                        <th class="treatment-complaint-col">Complaints / Impression</th>
+                        <th class="treatment-medicine-col">Treatment / Medicines</th>
+                        <th class="treatment-quantity-col">Qty</th>
+                        <th class="treatment-staff-col">Attending Staff</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($studentTreatments as $treatment)
+                        @php
+                            $treatmentDiagnosis = trim((string) optional($treatment->medicalCondition)->name);
+                            $treatmentMedicine = trim((string) (optional($treatment->medicineItem)->name ?: $treatment->medicine));
+                            $treatmentStaff = trim((string) ($treatment->attending_staff_name ?: optional($treatment->attendingStaff)->name));
+                            $treatmentQuantity = (float) $treatment->medicine_quantity;
+                            $treatmentTimeIn = $treatment->time_in ?: optional($treatment->created_at)->format('H:i:s');
+                            $treatmentTimeOut = $treatment->time_out ?: optional($treatment->updated_at)->format('H:i:s');
+                        @endphp
+                        <tr>
+                            <td>{{ optional($treatment->consultation_date)->format('m/d/Y') ?: '-' }}</td>
+                            <td>{{ $treatmentTimeIn ? \Carbon\Carbon::parse($treatmentTimeIn)->format('g:i A') : '-' }}</td>
+                            <td>{{ $treatmentTimeOut ? \Carbon\Carbon::parse($treatmentTimeOut)->format('g:i A') : '-' }}</td>
+                            <td>{{ $treatment->service ?: 'Consultation' }}</td>
+                            <td>
+                                {{ $treatment->reason_for_visit ?: $treatment->comments ?: 'No complaint recorded.' }}
+                                @if($treatmentDiagnosis !== '')
+                                    <span class="treatment-table-diagnosis">{{ $treatmentDiagnosis }}</span>
+                                @endif
+                            </td>
+                            <td>{{ $treatmentMedicine !== '' && strtolower($treatmentMedicine) !== 'none' ? $treatmentMedicine : 'No medicine issued' }}</td>
+                            <td class="treatment-quantity-col">{{ $treatmentQuantity > 0 ? rtrim(rtrim(number_format($treatmentQuantity, 2, '.', ''), '0'), '.') : '-' }}</td>
+                            <td>{{ $treatmentStaff ?: 'Clinic Staff' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="consultation-treatment-empty">No previous treatment records are available for this student.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </section>
 </aside>
@@ -1556,12 +1663,14 @@
         const quantityLabel = document.getElementById('consultIssuedQuantityLabel');
         const quantityHelp = document.getElementById('consultIssuedQuantityHelp');
         const quantityInput = document.getElementById('consultIssuedQuantityInput');
+        const quantityGroup = document.getElementById('consultMedicineQuantityGroup');
         const selectedStock = document.getElementById('selectedMedicineStock');
         const utilityPanel = document.getElementById('right-utility-panel');
         const utilityRail = document.getElementById('consultationUtilityRail');
         const utilityButtons = Array.from(document.querySelectorAll('[data-utility-target]'));
         const utilityPanes = Array.from(document.querySelectorAll('[data-utility-pane]'));
         const utilityTitle = document.getElementById('utilityPanelTitle');
+        const expandUtilityPanel = document.getElementById('expand-utility-panel');
         const closeUtilityPanel = document.getElementById('close-utility-panel');
         const headerQuickActions = document.getElementById('headerQuickActions');
         const inventoryCards = Array.from(document.querySelectorAll('[data-inventory-item]'));
@@ -1588,8 +1697,13 @@
 
         const closeUtility = function () {
             utilityPanel.classList.remove('open');
+            utilityPanel.classList.remove('is-expanded');
             utilityRail.classList.remove('panel-open');
+            utilityRail.classList.remove('panel-expanded');
             utilityPanel.setAttribute('aria-hidden', 'true');
+            expandUtilityPanel?.classList.remove('is-visible');
+            expandUtilityPanel?.setAttribute('aria-expanded', 'false');
+            if (expandUtilityPanel) expandUtilityPanel.textContent = '<';
             utilityButtons.forEach(function (button) {
                 button.classList.remove('active');
                 button.setAttribute('aria-expanded', 'false');
@@ -1605,6 +1719,14 @@
 
             activeUtility = target;
             utilityTitle.textContent = utilityLabels[target] || 'Consultation Tools';
+            const isTreatmentPanel = target === 'treatments';
+            expandUtilityPanel?.classList.toggle('is-visible', isTreatmentPanel);
+            if (!isTreatmentPanel) {
+                utilityPanel.classList.remove('is-expanded');
+                utilityRail.classList.remove('panel-expanded');
+                expandUtilityPanel?.setAttribute('aria-expanded', 'false');
+                if (expandUtilityPanel) expandUtilityPanel.textContent = '<';
+            }
             utilityPanes.forEach(function (pane) {
                 pane.classList.toggle('active', pane.dataset.utilityPane === target);
             });
@@ -1616,6 +1738,24 @@
             utilityPanel.classList.add('open');
             utilityRail.classList.add('panel-open');
             utilityPanel.setAttribute('aria-hidden', 'false');
+        };
+
+        const toggleUtilityExpansion = function () {
+            if (activeUtility !== 'treatments') return;
+            const isExpanded = utilityPanel.classList.toggle('is-expanded');
+            utilityRail.classList.toggle('panel-expanded', isExpanded);
+            expandUtilityPanel?.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+            expandUtilityPanel?.setAttribute(
+                'aria-label',
+                isExpanded ? 'Collapse treatment record panel' : 'Expand treatment record panel'
+            );
+            expandUtilityPanel?.setAttribute(
+                'title',
+                isExpanded ? 'Collapse treatment record' : 'Expand treatment record'
+            );
+            if (expandUtilityPanel) {
+                expandUtilityPanel.textContent = isExpanded ? '>' : '<';
+            }
         };
 
         const syncQuickActionsState = function () {
@@ -1635,9 +1775,11 @@
 
             quantityInput.setCustomValidity('');
             if (!selected || !selected.value) {
+                quantityGroup?.classList.remove('is-visible');
                 quantityLabel.textContent = 'Quantity to Issue';
                 quantityHelp.textContent = 'Select a medicine to see the dispensing unit and available stock.';
                 quantityInput.placeholder = 'Enter amount';
+                quantityInput.value = '';
                 quantityInput.removeAttribute('max');
                 selectedStock.className = 'selected-stock';
                 selectedStock.textContent = '';
@@ -1645,6 +1787,7 @@
             }
 
             const dispensingUnit = selected.dataset.dispensingUnit || selected.dataset.stockUnit || 'unit';
+            quantityGroup?.classList.add('is-visible');
             const stockUnit = selected.dataset.stockUnit || 'pcs';
             const availableValue = Number(selected.dataset.availableDispensing || 0);
             const available = formatQty(availableValue);
@@ -1776,6 +1919,7 @@
             });
         });
         closeUtilityPanel.addEventListener('click', closeUtility);
+        expandUtilityPanel?.addEventListener('click', toggleUtilityExpansion);
         if (headerQuickActions) {
             new MutationObserver(syncQuickActionsState).observe(headerQuickActions, {
                 attributes: true,

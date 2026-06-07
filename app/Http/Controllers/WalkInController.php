@@ -9,6 +9,7 @@ use App\Models\HealthProfile;
 use App\Models\InventoryMovement;
 use App\Models\Item;
 use App\Models\ActivityLog;
+use App\Models\Consultation;
 use App\Services\PuptasWebhookService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -485,6 +486,13 @@ class WalkInController extends Controller
 
         $conditions = \App\Models\MedicalConditions::with('category')->get();
         $studentDocuments = $this->healthProfileDocuments($request, $student->healthProfile);
+        $studentTreatments = Consultation::query()
+            ->with(['medicalCondition.category', 'medicineItem', 'attendingStaff'])
+            ->where('user_id', $student->id)
+            ->latest('consultation_date')
+            ->latest('time_out')
+            ->limit(20)
+            ->get();
 
         $consultationDob = (string) ($student->healthProfile->birthday ?? $student->DOB ?? '');
         if ($consultationDob !== '') {
@@ -507,7 +515,8 @@ class WalkInController extends Controller
             'consultationDob',
             'consultationHeight',
             'consultationWeight',
-            'studentDocuments'
+            'studentDocuments',
+            'studentTreatments'
         ));
     }
 
@@ -1060,6 +1069,9 @@ PROMPT;
                 'has_medical_condition' => ['nullable', 'boolean'],
                 'medical_condition' => ['required_if:has_medical_condition,true', 'nullable', 'string', 'max:1000'],
                 'condition_remarks' => ['nullable', 'string', 'max:2000'],
+                'blood_pressure' => ['required', 'string', 'max:20', 'regex:/^\d{2,3}\s*\/\s*\d{2,3}$/'],
+                'respiratory_rate' => ['required', 'integer', 'min:1', 'max:120'],
+                'temperature' => ['required', 'numeric', 'min:30', 'max:45'],
             ]);
             $referenceNumber = trim((string) $validated['reference_number']);
             $findingsStatus = (string) $validated['findings_status'];
@@ -1067,6 +1079,9 @@ PROMPT;
                 || $findingsStatus === 'With Findings';
             $medicalCondition = trim((string) $request->input('medical_condition', ''));
             $conditionRemarks = trim((string) $request->input('condition_remarks', ''));
+            $bloodPressure = preg_replace('/\s+/', '', (string) $validated['blood_pressure']);
+            $respiratoryRate = (int) $validated['respiratory_rate'];
+            $temperature = (float) $validated['temperature'];
 
             // Fetch applicant details to get student ID
             $applicantData = $webhookService->fetchApplicantByStudentNumber($referenceNumber);
@@ -1098,6 +1113,9 @@ PROMPT;
                 $medicalCondition,
                 $conditionRemarks,
                 $findingsStatus,
+                $bloodPressure,
+                $respiratoryRate,
+                $temperature,
                 $webhookResult
             ) {
                 $pendingAssessment = \Schema::hasTable('pending_medical_assessments')
@@ -1123,6 +1141,9 @@ PROMPT;
                 $profile->xray_findings = $findingsStatus === 'No Findings / Normal'
                     ? 'Normal'
                     : 'With Findings';
+                $profile->blood_pressure = $bloodPressure;
+                $profile->respiratory_rate = $respiratoryRate;
+                $profile->temperature = $temperature;
                 $profile->clearance_status = $clearanceStatus;
                 $profile->pending_reason = $hasMedicalCondition
                     ? ($conditionRemarks !== ''

@@ -1740,9 +1740,6 @@
                                 <span class="requirement-badge">JPG/PNG</span>
                             </div>
                             <p class="requirement-guideline">Must be a formal photo on a plain white background, taken within the last 6 months.</p>
-                            {{--
-                            Temporary 2x2 photo examples. Replace these assets with the clinic-approved
-                            images before restoring this block.
                             <div class="upload-example-grid" aria-label="2x2 photo upload examples">
                                 <div class="upload-example is-wrong">
                                     <div class="upload-example-status"><span aria-hidden="true">&times;</span> Do Not Upload</div>
@@ -1755,7 +1752,6 @@
                                     <p class="upload-example-caption">Formal, front-facing photo with even lighting and a plain white background.</p>
                                 </div>
                             </div>
-                            --}}
                             <input type="file" name="student_photo" class="form-control" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required data-upload-input data-preview-kind="image">
                             <div class="upload-preview-card" data-upload-preview aria-live="polite"></div>
                             <small>Allowed: JPG/PNG only, max 2MB.</small>

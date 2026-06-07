@@ -37,13 +37,28 @@ class ReportsController extends Controller
 
     public function appointmentStatistics(Request $request)
     {
-        $monthFilter = trim((string) $request->query('month', now()->format('Y-m')));
-        if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $monthFilter)) {
-            $monthFilter = now()->format('Y-m');
+        $legacyMonth = trim((string) $request->query('month', ''));
+        $monthFrom = trim((string) $request->query('month_from', $legacyMonth ?: now()->format('Y-m')));
+        $monthTo = trim((string) $request->query('month_to', $legacyMonth ?: $monthFrom));
+
+        if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $monthFrom)) {
+            $monthFrom = now()->format('Y-m');
         }
 
-        $monthStart = Carbon::createFromFormat('Y-m-d', $monthFilter . '-01')->startOfMonth();
-        $monthEnd = (clone $monthStart)->endOfMonth();
+        if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $monthTo)) {
+            $monthTo = $monthFrom;
+        }
+
+        $monthStart = Carbon::createFromFormat('Y-m-d', $monthFrom . '-01')->startOfMonth();
+        $monthEnd = Carbon::createFromFormat('Y-m-d', $monthTo . '-01')->endOfMonth();
+
+        if ($monthStart->gt($monthEnd)) {
+            [$monthStart, $monthEnd] = [
+                Carbon::createFromFormat('Y-m-d', $monthTo . '-01')->startOfMonth(),
+                Carbon::createFromFormat('Y-m-d', $monthFrom . '-01')->endOfMonth(),
+            ];
+            [$monthFrom, $monthTo] = [$monthTo, $monthFrom];
+        }
 
         $consultations = Consultation::query()
             ->with([
@@ -58,37 +73,10 @@ class ReportsController extends Controller
             ->orderBy('created_at')
             ->get();
 
-        $totalPatientsTreated = $consultations->count();
-        $totalMedicinesDispensed = (float) $consultations->sum(function (Consultation $consultation) {
-            return max(0, (float) $consultation->medicine_quantity);
-        });
-
-        $monthlyDiseaseBreakdown = $consultations
-            ->groupBy(function ($consultation) {
-                $conditionName = trim((string) optional($consultation->medicalCondition)->name);
-                return $conditionName !== '' ? $conditionName : 'Unspecified illness / condition';
-            })
-            ->map(function ($items, $condition) {
-                $firstConsultation = $items->first();
-                $categoryName = trim((string) optional(optional($firstConsultation)->medicalCondition)->category->name);
-
-                return (object) [
-                    'condition' => $condition,
-                    'category' => $categoryName !== '' ? $categoryName : 'General',
-                    'count' => $items->count(),
-                ];
-            })
-            ->sortByDesc('count')
-            ->values();
-
-        $topDisease = $monthlyDiseaseBreakdown->first();
-
         return view('admin.reports.appointment-statistics', compact(
-            'monthFilter',
+            'monthFrom',
+            'monthTo',
             'consultations',
-            'totalPatientsTreated',
-            'totalMedicinesDispensed',
-            'topDisease',
         ));
     }
 

@@ -2659,15 +2659,6 @@
         100% { top: 16%; opacity: 0.9; }
     }
     @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes submittedBounce {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(0.8) translateY(40px); opacity: 0; }
-    }
-    .applicant-modal-shell.submitted-animation {
-        animation: submittedBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-
     /* --- Applicant Reference Panel --- */
     #applicantRefModal .applicant-modal-shell {
         width: min(680px, 100%);
@@ -2970,15 +2961,23 @@
     }
 
     .applicant-ref-find-btn {
-        background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c);
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(90deg, #facc15 0 50%, #7f1d1d 50% 100%);
+        background-size: 205% 100%;
+        background-position: 100% 0;
         color: #ffffff;
         box-shadow: 0 12px 24px rgba(127, 29, 29, 0.24);
+        isolation: isolate;
+        transition: background-position .34s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
     }
 
     .applicant-ref-find-btn:hover,
     .applicant-ref-find-btn:focus {
+        background-position: 0 0;
         transform: translateY(-1px);
         box-shadow: 0 16px 28px rgba(127, 29, 29, 0.3);
+        color: #70131b;
         outline: none;
     }
 
@@ -3052,14 +3051,9 @@
         border-radius: 8px;
         background: linear-gradient(135deg, #facc15, #fde68a);
         color: #701315;
-    }
-
-    .applicant-lookup-icon svg {
-        width: 20px;
-        height: 20px;
-        stroke-width: 2;
-        stroke: currentColor;
-        fill: none;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0;
     }
 
     .applicant-lookup-content {
@@ -3090,6 +3084,43 @@
         width: 100%;
         gap: 12px;
         flex-direction: column;
+    }
+
+    .applicant-file-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        align-items: start;
+        width: 100%;
+    }
+
+    .applicant-file-actions .applicant-upload-wrap {
+        min-width: 0;
+    }
+
+    .applicant-file-action {
+        position: relative;
+        z-index: 0;
+        overflow: hidden;
+        min-height: 50px;
+        border: 1px solid #d6a900 !important;
+        border-radius: 10px !important;
+        background: linear-gradient(90deg, #fde047 0 50%, #facc15 50% 100%) !important;
+        background-size: 205% 100% !important;
+        background-position: 100% 0 !important;
+        color: #70131b !important;
+        box-shadow: 0 8px 18px rgba(202, 138, 4, .16);
+        isolation: isolate;
+        transition: background-position .34s ease, color .2s ease, transform .2s ease, box-shadow .2s ease !important;
+    }
+
+    .applicant-file-action:hover,
+    .applicant-file-action:focus {
+        background-position: 0 0 !important;
+        color: #70131b !important;
+        transform: translateY(-1px);
+        box-shadow: 0 12px 22px rgba(202, 138, 4, .24);
+        outline: none;
     }
 
     .applicant-upload-preview-area {
@@ -3369,16 +3400,45 @@
     .applicant-medical-condition-section {
         display: none;
         width: 100%;
+        grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+        gap: 14px;
+    }
+
+    .applicant-medical-condition-section.show {
+        display: grid;
+    }
+
+    .applicant-screening-panel {
+        min-width: 0;
         padding: 18px 20px;
         background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
         border: 1px solid #0284c7;
         border-radius: 12px;
-        gap: 14px;
-        flex-direction: column;
     }
 
-    .applicant-medical-condition-section.show {
+    .applicant-screening-panel-title {
+        margin: 0 0 13px;
+        color: #0f172a;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .applicant-screening-panel-copy {
+        margin: -7px 0 15px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .applicant-review-panel {
         display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .applicant-vitals-grid {
+        display: grid;
+        gap: 12px;
     }
 
     .applicant-condition-header {
@@ -3518,10 +3578,10 @@
         justify-content: center;
         gap: 9px;
         padding: 12px 16px;
-        border: 1px solid #70131b;
+        border: 1px solid #d6a900;
         border-radius: 10px;
-        background: #800000;
-        color: #ffffff;
+        background: #facc15;
+        color: #70131b;
         font: inherit;
         font-size: 14px;
         font-weight: 800;
@@ -3548,47 +3608,71 @@
         min-width: 24px;
         padding: 3px 7px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.18);
+        background: rgba(112, 19, 27, 0.12);
         color: inherit;
         font-size: 11px;
     }
 
     .applicant-documents-modal {
-        width: min(900px, 100%);
+        width: min(1180px, 96vw);
+    }
+
+    .applicant-documents-workspace {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        gap: 16px;
+        height: min(74vh, 760px);
+        min-height: 520px;
+    }
+
+    .applicant-documents-sidebar {
+        min-width: 0;
+        padding-right: 12px;
+        border-right: 1px solid #e2e8f0;
+        overflow-y: auto;
     }
 
     .applicant-documents-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        grid-template-columns: 1fr;
+        gap: 9px;
     }
 
     .applicant-document-card {
-        display: flex;
+        display: grid;
+        grid-template-columns: 36px minmax(0, 1fr);
         align-items: center;
-        gap: 14px;
+        gap: 9px;
         min-width: 0;
-        padding: 16px;
+        padding: 10px;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border-radius: 9px;
         background: #ffffff;
+        transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+    }
+
+    .applicant-document-card.is-active {
+        border-color: #800000;
+        background: #fff7ed;
+        box-shadow: 0 0 0 2px rgba(128, 0, 0, 0.08);
     }
 
     .applicant-document-icon {
-        width: 46px;
-        height: 46px;
-        flex: 0 0 46px;
+        width: 36px;
+        height: 36px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 10px;
+        border-radius: 8px;
         background: #fff7ed;
         color: #800000;
+        font-size: 9px;
+        font-weight: 900;
     }
 
     .applicant-document-icon svg {
-        width: 23px;
-        height: 23px;
+        width: 18px;
+        height: 18px;
     }
 
     .applicant-document-copy {
@@ -3603,32 +3687,35 @@
 
     .applicant-document-copy strong {
         color: #111827;
-        font-size: 14px;
+        font-size: 12px;
+        line-height: 1.35;
     }
 
     .applicant-document-copy span {
-        margin-top: 3px;
+        margin-top: 2px;
         color: #64748b;
-        font-size: 12px;
+        font-size: 10px;
     }
 
     .applicant-document-actions {
         display: flex;
+        grid-column: 1 / -1;
         flex: 0 0 auto;
         align-items: center;
         gap: 7px;
     }
 
     .applicant-document-view {
-        flex: 0 0 auto;
-        padding: 9px 13px;
+        flex: 1;
+        padding: 7px 8px;
         border: 1px solid #800000;
-        border-radius: 8px;
+        border-radius: 7px;
         background: #ffffff;
         color: #800000;
-        font-size: 12px;
+        font-size: 10px;
         font-weight: 800;
         text-decoration: none;
+        text-align: center;
         transition: background-color 0.2s ease, color 0.2s ease;
         cursor: pointer;
     }
@@ -3650,8 +3737,10 @@
     }
 
     .applicant-document-preview-panel {
-        display: none;
-        margin-top: 16px;
+        display: flex;
+        min-width: 0;
+        min-height: 0;
+        flex-direction: column;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
         overflow: hidden;
@@ -3659,7 +3748,7 @@
     }
 
     .applicant-document-preview-panel.is-visible {
-        display: block;
+        display: flex;
     }
 
     .applicant-document-preview-head {
@@ -3678,22 +3767,27 @@
     }
 
     .applicant-document-preview-close {
-        width: 34px;
-        height: 34px;
+        min-height: 34px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        padding: 7px 11px;
         border: 1px solid #cbd5e1;
         border-radius: 8px;
         background: #ffffff;
         color: #800000;
+        font-size: 11px;
+        font-weight: 800;
+        text-decoration: none;
         cursor: pointer;
     }
 
     .applicant-document-preview-frame,
     .applicant-document-preview-image {
         width: 100%;
-        height: min(62vh, 620px);
+        height: 100%;
+        min-height: 0;
+        flex: 1;
         border: 0;
         background: #ffffff;
     }
@@ -3702,6 +3796,18 @@
         display: none;
         object-fit: contain;
         padding: 14px;
+    }
+
+    .applicant-document-preview-empty {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
     }
 
     html[data-theme="dark"] .applicant-document-card {
@@ -3741,28 +3847,114 @@
             width: 100%;
         }
 
-        .applicant-documents-grid {
+        .applicant-medical-condition-section.show {
             grid-template-columns: 1fr;
         }
 
+        .applicant-file-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .applicant-documents-workspace {
+            grid-template-columns: 1fr;
+            height: auto;
+            min-height: 0;
+        }
+
+        .applicant-documents-sidebar {
+            max-height: 230px;
+            padding-right: 0;
+            padding-bottom: 12px;
+            border-right: 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
         .applicant-document-card {
-            align-items: flex-start;
-            flex-wrap: wrap;
+            align-items: center;
         }
 
-        .applicant-document-actions {
-            width: 100%;
-        }
-
-        .applicant-document-view {
-            flex: 1;
-            text-align: center;
+        .applicant-document-preview-panel {
+            min-height: 520px;
         }
     }
 
-    html[data-theme="dark"] .applicant-medical-condition-section {
+    html[data-theme="dark"] .applicant-screening-panel {
         background: linear-gradient(135deg, rgba(3, 105, 161, 0.15) 0%, rgba(2, 132, 199, 0.15) 100%);
         border-color: rgba(3, 105, 161, 0.3);
+    }
+
+    html[data-theme="dark"] .applicant-screening-panel-title {
+        color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .applicant-screening-panel-copy {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .applicant-documents-sidebar {
+        border-color: rgba(250, 204, 21, 0.16);
+    }
+
+    html[data-theme="dark"] .applicant-document-card.is-active {
+        border-color: #facc15;
+        background: rgba(250, 204, 21, 0.1);
+    }
+
+    .clinic-success-overlay {
+        position: fixed;
+        z-index: 9999;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, .58);
+        backdrop-filter: blur(5px);
+    }
+
+    .clinic-success-overlay.is-open {
+        display: flex;
+    }
+
+    .clinic-success-card {
+        width: min(360px, calc(100vw - 30px));
+        padding: 28px 22px;
+        border: 1px solid rgba(250, 204, 21, .48);
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 24px 54px rgba(15, 23, 42, .3);
+        text-align: center;
+        animation: clinicSuccessPop .38s cubic-bezier(.2, .9, .25, 1.2);
+    }
+
+    .clinic-success-check {
+        width: 76px;
+        height: 76px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 14px;
+        border-radius: 999px;
+        background: #70131b;
+        color: #facc15;
+        box-shadow: 0 12px 26px rgba(112, 19, 27, .24);
+    }
+
+    .clinic-success-check svg {
+        width: 39px;
+        height: 39px;
+        stroke-width: 2.8;
+    }
+
+    .clinic-success-card strong {
+        display: block;
+        color: #70131b;
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    @keyframes clinicSuccessPop {
+        from { opacity: 0; transform: scale(.72) translateY(18px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     html[data-theme="dark"] .applicant-condition-toggle-text {
@@ -3969,7 +4161,7 @@
                             <div class="applicant-lookup-item">
                                 <div class="applicant-lookup-card">
                                     <div class="applicant-lookup-icon">
-                                        <x-outline-icon name="document-text" />
+                                        RN
                                     </div>
                                     <div class="applicant-lookup-content">
                                         <p class="applicant-lookup-label">Reference Number</p>
@@ -3980,7 +4172,7 @@
                             <div class="applicant-lookup-item">
                                 <div class="applicant-lookup-card">
                                     <div class="applicant-lookup-icon">
-                                        <x-outline-icon name="identification" />
+                                        ID
                                     </div>
                                     <div class="applicant-lookup-content">
                                         <p class="applicant-lookup-label">Student ID</p>
@@ -3992,7 +4184,7 @@
                             <div class="applicant-lookup-item">
                                 <div class="applicant-lookup-card">
                                     <div class="applicant-lookup-icon">
-                                        <x-outline-icon name="calendar" />
+                                        DOB
                                     </div>
                                     <div class="applicant-lookup-content">
                                         <p class="applicant-lookup-label">Date of Birth</p>
@@ -4003,7 +4195,7 @@
                             <div class="applicant-lookup-item">
                                 <div class="applicant-lookup-card">
                                     <div class="applicant-lookup-icon">
-                                        <x-outline-icon name="envelope" />
+                                        E
                                     </div>
                                     <div class="applicant-lookup-content">
                                         <p class="applicant-lookup-label">Email</p>
@@ -4014,43 +4206,67 @@
                         </div>
                     </div>
 
-                    <button type="button" id="btnViewApplicantDocuments" class="applicant-documents-trigger">
-                        <x-outline-icon name="document-text" />
-                        <span>Uploaded Documents</span>
-                        <span class="applicant-documents-count" id="applicantDocumentsCount">0</span>
-                    </button>
+                    <div class="applicant-file-actions" id="applicantFileActions">
+                        <button type="button" id="btnViewApplicantDocuments" class="applicant-documents-trigger applicant-file-action">
+                            <x-outline-icon name="document-text" />
+                            <span>Uploaded Documents</span>
+                            <span class="applicant-documents-count" id="applicantDocumentsCount">0</span>
+                        </button>
+                    </div>
 
                     {{-- Medical Condition Section --}}
                     <div class="applicant-medical-condition-section">
-                        <div class="applicant-findings-review">
-                            <div class="applicant-findings-label">Nurse Findings Review <span style="color:#dc2626;">*</span></div>
-                            <div class="applicant-findings-options">
-                                <label class="applicant-findings-option">
-                                    <input type="radio" name="applicant_findings_status" value="No Findings / Normal">
-                                    <span>No Findings / Normal</span>
+                        <section class="applicant-screening-panel applicant-review-panel">
+                            <h4 class="applicant-screening-panel-title">Nurse Findings Review</h4>
+                            <div class="applicant-findings-review">
+                                <div class="applicant-findings-label">Review Result <span style="color:#dc2626;">*</span></div>
+                                <div class="applicant-findings-options">
+                                    <label class="applicant-findings-option">
+                                        <input type="radio" name="applicant_findings_status" value="No Findings / Normal">
+                                        <span>No Findings / Normal</span>
+                                    </label>
+                                    <label class="applicant-findings-option">
+                                        <input type="radio" name="applicant_findings_status" value="With Findings">
+                                        <span>With Findings</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="applicant-condition-header">
+                                <label class="applicant-condition-toggle">
+                                    <input type="checkbox" id="applicantHasMedicalCondition" class="applicant-condition-checkbox">
+                                    <span class="applicant-condition-toggle-text">With Medical Condition</span>
                                 </label>
-                                <label class="applicant-findings-option">
-                                    <input type="radio" name="applicant_findings_status" value="With Findings">
-                                    <span>With Findings</span>
-                                </label>
                             </div>
-                        </div>
-                        <div class="applicant-condition-header">
-                            <label class="applicant-condition-toggle">
-                                <input type="checkbox" id="applicantHasMedicalCondition" class="applicant-condition-checkbox">
-                                <span class="applicant-condition-toggle-text">With Medical Condition</span>
-                            </label>
-                        </div>
-                        <div id="applicantConditionFields" class="applicant-condition-fields" style="display: none;">
-                            <div class="applicant-condition-field">
-                                <label for="applicantMedicalCondition">Medical Condition <span style="color: #dc2626;">*</span></label>
-                                <input type="text" id="applicantMedicalCondition" name="medical_condition" placeholder="e.g., Asthma, Diabetes, Hypertension..." class="applicant-condition-input">
+                            <div id="applicantConditionFields" class="applicant-condition-fields" style="display: none;">
+                                <div class="applicant-condition-field">
+                                    <label for="applicantMedicalCondition">Medical Condition <span style="color: #dc2626;">*</span></label>
+                                    <input type="text" id="applicantMedicalCondition" name="medical_condition" placeholder="e.g., Asthma, Diabetes, Hypertension..." class="applicant-condition-input">
+                                </div>
+                                <div class="applicant-condition-field">
+                                    <label for="applicantConditionRemarks">Remarks <span style="color: #94a3b8;">(Optional)</span></label>
+                                    <textarea id="applicantConditionRemarks" name="condition_remarks" placeholder="Additional notes about the medical condition..." class="applicant-condition-textarea" rows="3"></textarea>
+                                </div>
                             </div>
-                            <div class="applicant-condition-field">
-                                <label for="applicantConditionRemarks">Remarks <span style="color: #94a3b8;">(Optional)</span></label>
-                                <textarea id="applicantConditionRemarks" name="condition_remarks" placeholder="Additional notes about the medical condition..." class="applicant-condition-textarea" rows="3"></textarea>
+                        </section>
+
+                        <section class="applicant-screening-panel">
+                            <h4 class="applicant-screening-panel-title">Physical Assessment</h4>
+                            <p class="applicant-screening-panel-copy">Record the applicant's current vital signs during the nurse review.</p>
+                            <div class="applicant-vitals-grid">
+                                <div class="applicant-condition-field">
+                                    <label for="applicantBloodPressure">Blood Pressure <span style="color:#dc2626;">*</span></label>
+                                    <input type="text" id="applicantBloodPressure" name="blood_pressure" class="applicant-condition-input" placeholder="e.g., 120/80" inputmode="numeric">
+                                </div>
+                                <div class="applicant-condition-field">
+                                    <label for="applicantRespiratoryRate">Respiratory Rate (cpm) <span style="color:#dc2626;">*</span></label>
+                                    <input type="number" id="applicantRespiratoryRate" name="respiratory_rate" class="applicant-condition-input" placeholder="e.g., 18" min="1" max="120">
+                                </div>
+                                <div class="applicant-condition-field">
+                                    <label for="applicantTemperature">Temperature (&deg;C) <span style="color:#dc2626;">*</span></label>
+                                    <input type="number" id="applicantTemperature" name="temperature" class="applicant-condition-input" placeholder="e.g., 36.5" min="30" max="45" step="0.1">
+                                </div>
                             </div>
-                        </div>
+                        </section>
                     </div>
 
                     <form id="applicantAssessmentUploadForm" class="applicant-upload-wrap" enctype="multipart/form-data">
@@ -4077,7 +4293,7 @@
                         </div>
 
                         <div class="applicant-upload-dropdown-wrapper">
-                            <button type="button" id="btnUploadAssessmentCopy" class="applicant-upload-btn applicant-upload-dropdown-toggle">
+                            <button type="button" id="btnUploadAssessmentCopy" class="applicant-upload-btn applicant-upload-dropdown-toggle applicant-file-action">
                                 <x-outline-icon name="arrow-up-tray" />
                                 Upload Medical Assessment Copy
                                 <x-outline-icon name="chevron-down" style="width: 16px; height: 16px; margin-left: 8px;" />
@@ -4106,6 +4322,15 @@
         </div>
     </div>
 
+    <div class="clinic-success-overlay" id="applicantApprovalOverlay" aria-live="assertive" aria-hidden="true">
+        <div class="clinic-success-card">
+            <div class="clinic-success-check" aria-hidden="true">
+                <x-outline-icon name="check" />
+            </div>
+            <strong>Approved!</strong>
+        </div>
+    </div>
+
     <div class="applicant-modal-backdrop" id="applicantDocumentsModal">
         <div class="applicant-modal-shell applicant-documents-modal">
             <div class="applicant-modal-head">
@@ -4121,19 +4346,22 @@
                 </button>
             </div>
             <div class="applicant-modal-body">
-                <div class="applicant-documents-grid" id="applicantDocumentsGrid">
-                    <div class="applicant-documents-empty">No uploaded documents are available for this applicant.</div>
+                <div class="applicant-documents-workspace">
+                    <aside class="applicant-documents-sidebar" aria-label="Uploaded document list">
+                        <div class="applicant-documents-grid" id="applicantDocumentsGrid">
+                            <div class="applicant-documents-empty">No uploaded documents are available for this applicant.</div>
+                        </div>
+                    </aside>
+                    <section class="applicant-document-preview-panel" id="applicantDocumentPreviewPanel" aria-live="polite">
+                        <div class="applicant-document-preview-head">
+                            <strong id="applicantDocumentPreviewTitle">Document Preview</strong>
+                            <a class="applicant-document-preview-close" id="applicantDocumentPreviewOpen" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">Open in New Tab</a>
+                        </div>
+                        <div class="applicant-document-preview-empty" id="applicantDocumentPreviewEmpty">Select a file from the left to display its full-page preview.</div>
+                        <iframe class="applicant-document-preview-frame" id="applicantDocumentPreviewFrame" title="Applicant document preview" style="display:none;"></iframe>
+                        <img class="applicant-document-preview-image" id="applicantDocumentPreviewImage" src="" alt="">
+                    </section>
                 </div>
-                <section class="applicant-document-preview-panel" id="applicantDocumentPreviewPanel" aria-live="polite">
-                    <div class="applicant-document-preview-head">
-                        <strong id="applicantDocumentPreviewTitle">Document Preview</strong>
-                        <button type="button" class="applicant-document-preview-close" id="closeApplicantDocumentPreview" aria-label="Close document preview">
-                            <x-outline-icon name="x-mark" />
-                        </button>
-                    </div>
-                    <iframe class="applicant-document-preview-frame" id="applicantDocumentPreviewFrame" title="Applicant document preview"></iframe>
-                    <img class="applicant-document-preview-image" id="applicantDocumentPreviewImage" src="" alt="">
-                </section>
             </div>
         </div>
     </div>
@@ -5615,8 +5843,11 @@
         const previewTitle    = document.getElementById('applicantDocumentPreviewTitle');
         const previewFrame    = document.getElementById('applicantDocumentPreviewFrame');
         const previewImage    = document.getElementById('applicantDocumentPreviewImage');
-        const closePreview    = document.getElementById('closeApplicantDocumentPreview');
+        const previewEmpty    = document.getElementById('applicantDocumentPreviewEmpty');
+        const previewOpen     = document.getElementById('applicantDocumentPreviewOpen');
         const uploadForm      = document.getElementById('applicantAssessmentUploadForm');
+        const fileActions     = document.getElementById('applicantFileActions');
+        const approvalOverlay = document.getElementById('applicantApprovalOverlay');
         const uploadInput     = document.getElementById('applicantAssessmentUploadInput');
         const uploadButton    = document.getElementById('btnUploadAssessmentCopy');
         const uploadRefInput  = document.getElementById('applicantAssessmentReferenceNumber');
@@ -5625,8 +5856,11 @@
         let currentDocuments  = [];
         const getStudentUrl   = '{{ url($basePrefix . '/walkin/get-student') }}';
 
+        if (fileActions && uploadForm) {
+            fileActions.appendChild(uploadForm);
+        }
+
         function closeDocumentPreview() {
-            if (previewPanel) previewPanel.classList.remove('is-visible');
             if (previewFrame) {
                 previewFrame.removeAttribute('src');
                 previewFrame.style.display = 'none';
@@ -5635,13 +5869,30 @@
                 previewImage.removeAttribute('src');
                 previewImage.style.display = 'none';
             }
+            if (previewTitle) previewTitle.textContent = 'Document Preview';
+            if (previewEmpty) previewEmpty.style.display = 'flex';
+            if (previewOpen) {
+                previewOpen.removeAttribute('href');
+                previewOpen.style.display = 'none';
+            }
+            if (documentsGrid) {
+                documentsGrid.querySelectorAll('.applicant-document-card').forEach(function (card) {
+                    card.classList.remove('is-active');
+                });
+            }
         }
 
-        function previewDocument(documentItem) {
+        function previewDocument(documentItem, activeCard) {
             if (!documentItem || !documentItem.url || !previewPanel) return;
 
             closeDocumentPreview();
             if (previewTitle) previewTitle.textContent = documentItem.label || 'Document Preview';
+            if (previewEmpty) previewEmpty.style.display = 'none';
+            if (previewOpen) {
+                previewOpen.href = documentItem.url;
+                previewOpen.style.display = 'inline-flex';
+            }
+            if (activeCard) activeCard.classList.add('is-active');
 
             if (documentItem.type === 'image' && previewImage) {
                 previewImage.src = documentItem.url;
@@ -5653,7 +5904,6 @@
             }
 
             previewPanel.classList.add('is-visible');
-            previewPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function closeDocumentsModal() {
@@ -5704,7 +5954,7 @@
                 previewButton.className = 'applicant-document-view';
                 previewButton.textContent = 'Preview';
                 previewButton.addEventListener('click', function () {
-                    previewDocument(documentItem);
+                    previewDocument(documentItem, card);
                 });
 
                 const openLink = document.createElement('a');
@@ -5718,6 +5968,9 @@
                 card.append(icon, copy, actions);
                 documentsGrid.appendChild(card);
             });
+
+            const firstCard = documentsGrid.querySelector('.applicant-document-card');
+            if (firstCard) previewDocument(currentDocuments[0], firstCard);
         }
 
         function setEntryMode(isActive) {
@@ -5745,6 +5998,22 @@
             currentLookupRef = '';
             if (defaultPane) defaultPane.style.display = 'flex';
             if (entryPane) entryPane.classList.remove('is-visible');
+            const medicalConditionSection = document.querySelector('.applicant-medical-condition-section');
+            if (medicalConditionSection) {
+                medicalConditionSection.classList.remove('show');
+                medicalConditionSection.style.removeProperty('display');
+            }
+            document.querySelectorAll('input[name="applicant_findings_status"]').forEach(function (input) {
+                input.checked = false;
+            });
+            const conditionToggle = document.getElementById('applicantHasMedicalCondition');
+            const conditionFields = document.getElementById('applicantConditionFields');
+            if (conditionToggle) conditionToggle.checked = false;
+            if (conditionFields) conditionFields.style.display = 'none';
+            ['applicantMedicalCondition', 'applicantConditionRemarks', 'applicantBloodPressure', 'applicantRespiratoryRate', 'applicantTemperature'].forEach(function (id) {
+                const field = document.getElementById(id);
+                if (field) field.value = '';
+            });
 
             // Show input form elements again
             const lookupRow = document.querySelector('.applicant-ref-lookup-row');
@@ -5835,7 +6104,7 @@
             const medicalConditionSection = document.querySelector('.applicant-medical-condition-section');
             if (medicalConditionSection) {
                 medicalConditionSection.classList.add('show');
-                medicalConditionSection.style.display = 'flex';
+                medicalConditionSection.style.display = 'grid';
             }
 
             // Reset medical condition fields
@@ -5850,6 +6119,10 @@
             if (conditionFields) {
                 conditionFields.style.display = 'none';
             }
+            ['applicantBloodPressure', 'applicantRespiratoryRate', 'applicantTemperature'].forEach(function (id) {
+                const field = document.getElementById(id);
+                if (field) field.value = '';
+            });
 
             console.log('showLookupDetails completed');
         }
@@ -6005,6 +6278,9 @@
             const medicalConditionInput = document.getElementById('applicantMedicalCondition');
             const conditionRemarksInput = document.getElementById('applicantConditionRemarks');
             const findingsStatusInput = document.querySelector('input[name="applicant_findings_status"]:checked');
+            const bloodPressureInput = document.getElementById('applicantBloodPressure');
+            const respiratoryRateInput = document.getElementById('applicantRespiratoryRate');
+            const temperatureInput = document.getElementById('applicantTemperature');
 
             if (!findingsStatusInput) {
                 setStatus('error', 'Please select the nurse findings review result.');
@@ -6016,11 +6292,19 @@
                 return;
             }
 
+            if (!bloodPressureInput?.value.trim() || !respiratoryRateInput?.value || !temperatureInput?.value) {
+                setStatus('error', 'Please complete the blood pressure, respiratory rate, and temperature fields.');
+                return;
+            }
+
             setStatus('info', 'Approving applicant...');
 
             const approvalData = {
                 reference_number: currentLookupRef,
-                findings_status: findingsStatusInput.value
+                findings_status: findingsStatusInput.value,
+                blood_pressure: bloodPressureInput.value.trim(),
+                respiratory_rate: respiratoryRateInput.value,
+                temperature: temperatureInput.value
             };
 
             if (hasMedicalCondition && hasMedicalCondition.checked) {
@@ -6043,45 +6327,25 @@
             .then(data => {
                 if (data.success) {
                     setStatus('success', data.message || 'Applicant decision saved successfully.');
-                    // Play submitted animation and close modal
-                    if (modalShell) {
-                        modalShell.classList.add('submitted-animation');
-                        setTimeout(() => {
-                            if (data.redirect_url) {
-                                window.location.href = data.redirect_url;
-                                return;
-                            }
-                            closeApplicantsModal();
-                            isApprovalMode = false;
-                            if (findBtn) {
-                                findBtn.textContent = 'Find';
-                                findBtn.removeEventListener('click', doApprove);
-                                findBtn.addEventListener('click', doLookup);
-                            }
-                            resetLookupState();
-                            if (refInput) refInput.value = '';
-                            if (modalShell) {
-                                modalShell.classList.remove('submitted-animation');
-                            }
-                        }, 600);
-                    } else {
-                        // Fallback if shell not found
-                        setTimeout(() => {
-                            if (data.redirect_url) {
-                                window.location.href = data.redirect_url;
-                                return;
-                            }
-                            closeApplicantsModal();
-                            isApprovalMode = false;
-                            if (findBtn) {
-                                findBtn.textContent = 'Find';
-                                findBtn.removeEventListener('click', doApprove);
-                                findBtn.addEventListener('click', doLookup);
-                            }
-                            resetLookupState();
-                            if (refInput) refInput.value = '';
-                        }, 1500);
-                    }
+                    approvalOverlay?.classList.add('is-open');
+                    approvalOverlay?.setAttribute('aria-hidden', 'false');
+                    setTimeout(() => {
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                            return;
+                        }
+                        approvalOverlay?.classList.remove('is-open');
+                        approvalOverlay?.setAttribute('aria-hidden', 'true');
+                        closeApplicantsModal();
+                        isApprovalMode = false;
+                        if (findBtn) {
+                            findBtn.textContent = 'Find';
+                            findBtn.removeEventListener('click', doApprove);
+                            findBtn.addEventListener('click', doLookup);
+                        }
+                        resetLookupState();
+                        if (refInput) refInput.value = '';
+                    }, 1250);
                 } else {
                     setStatus('error', data.message || 'Failed to approve applicant.');
                 }
@@ -6113,7 +6377,6 @@
             if (documentsModal) documentsModal.classList.add('show');
         });
         if (closeDocuments) closeDocuments.addEventListener('click', closeDocumentsModal);
-        if (closePreview) closePreview.addEventListener('click', closeDocumentPreview);
         if (documentsModal) documentsModal.addEventListener('click', function (event) {
             if (event.target === documentsModal) closeDocumentsModal();
         });

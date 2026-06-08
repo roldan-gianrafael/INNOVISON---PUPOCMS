@@ -456,7 +456,7 @@
     }
     .modal-box > .modal-row:first-of-type,
     .modal-box form > .modal-row:first-of-type {
-        margin-top: clamp(20px, 2.4vw, 30px);
+        margin-top: calc(clamp(20px, 2.4vw, 30px) + 1.5px);
     }
     .modal-box form {
         display: flex;
@@ -481,9 +481,14 @@
     }
     .modal-header .modal-subtitle {
         margin: 6px 0 0;
-        color: #ffffff;
+        color: #ffffff !important;
         font-size: 13px;
         line-height: 1.5;
+    }
+    .modal-header p,
+    .modal-header .modal-header-main p,
+    #statusActionSubtitle {
+        color: #ffffff !important;
     }
     .modal-subtitle {
         font-size: 14px;
@@ -1310,6 +1315,52 @@
     html[data-theme="dark"] .appointment-action-menu-item.is-reject {
         background: rgba(127, 29, 29, 0.88);
         border-color: rgba(248, 113, 113, 0.22);
+    }
+    html[data-theme="dark"] .appointment-action-menu-item.is-view,
+    html[data-theme="dark"] .appointment-action-menu-item.is-approve,
+    html[data-theme="dark"] .appointment-action-menu-item.is-reschedule,
+    html[data-theme="dark"] .appointment-action-menu-item.is-reject,
+    html[data-theme="dark"] .appointment-action-menu-item.is-view span,
+    html[data-theme="dark"] .appointment-action-menu-item.is-approve span,
+    html[data-theme="dark"] .appointment-action-menu-item.is-reschedule span,
+    html[data-theme="dark"] .appointment-action-menu-item.is-reject span {
+        color: #ffffff !important;
+    }
+    html[data-theme="dark"] .appointment-action-menu-item.is-view svg,
+    html[data-theme="dark"] .appointment-action-menu-item.is-approve svg,
+    html[data-theme="dark"] .appointment-action-menu-item.is-reschedule svg,
+    html[data-theme="dark"] .appointment-action-menu-item.is-reject svg,
+    html[data-theme="dark"] .appointment-action-menu-item.is-view svg *,
+    html[data-theme="dark"] .appointment-action-menu-item.is-approve svg *,
+    html[data-theme="dark"] .appointment-action-menu-item.is-reschedule svg *,
+    html[data-theme="dark"] .appointment-action-menu-item.is-reject svg * {
+        color: #ffffff !important;
+        stroke: #ffffff !important;
+    }
+    html[data-theme="dark"] .btn-view,
+    html[data-theme="dark"] .btn-approve,
+    html[data-theme="dark"] .btn-reschedule,
+    html[data-theme="dark"] .btn-reject,
+    html[data-theme="dark"] .btn-cancel,
+    html[data-theme="dark"] .btn-view span,
+    html[data-theme="dark"] .btn-approve span,
+    html[data-theme="dark"] .btn-reschedule span,
+    html[data-theme="dark"] .btn-reject span,
+    html[data-theme="dark"] .btn-cancel span {
+        color: #ffffff !important;
+    }
+    html[data-theme="dark"] .btn-view svg,
+    html[data-theme="dark"] .btn-approve svg,
+    html[data-theme="dark"] .btn-reschedule svg,
+    html[data-theme="dark"] .btn-reject svg,
+    html[data-theme="dark"] .btn-cancel svg,
+    html[data-theme="dark"] .btn-view svg *,
+    html[data-theme="dark"] .btn-approve svg *,
+    html[data-theme="dark"] .btn-reschedule svg *,
+    html[data-theme="dark"] .btn-reject svg *,
+    html[data-theme="dark"] .btn-cancel svg * {
+        color: #ffffff !important;
+        stroke: #ffffff !important;
     }
     html[data-theme="dark"] .appointment-action-menu-state {
         background: rgba(71, 85, 105, 0.86);

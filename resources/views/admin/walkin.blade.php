@@ -3233,71 +3233,6 @@
         transform: translateY(-1px);
     }
 
-    .applicant-upload-dropdown-wrapper {
-        position: relative;
-        display: inline-block;
-        width: 100%;
-    }
-
-    .applicant-upload-dropdown-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .applicant-upload-dropdown-menu {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        display: none;
-        flex-direction: column;
-        gap: 0;
-        background: #ffffff;
-        border: 1px solid rgba(112, 19, 27, 0.2);
-        border-top: none;
-        border-radius: 0 0 14px 14px;
-        overflow: hidden;
-        z-index: 100;
-        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
-        margin-top: -1px;
-    }
-
-    .applicant-upload-dropdown-wrapper.is-open .applicant-upload-dropdown-menu {
-        display: flex;
-    }
-
-    .applicant-upload-dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-        padding: 12px 16px;
-        border: none;
-        background: #ffffff;
-        color: #1e293b;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s ease, color 0.2s ease;
-        border-bottom: 1px solid rgba(112, 19, 27, 0.08);
-    }
-
-    .applicant-upload-dropdown-item:last-child {
-        border-bottom: none;
-    }
-
-    .applicant-upload-dropdown-item:hover {
-        background: #fef3c7;
-        color: #701315;
-    }
-
-    .applicant-upload-dropdown-item svg {
-        width: 18px;
-        height: 18px;
-        flex-shrink: 0;
-    }
-
     .applicant-upload-note {
         font-size: 11px;
         line-height: 1.45;
@@ -3330,22 +3265,6 @@
 
     html[data-theme="dark"] .applicant-upload-note {
         color: #cbd5e1;
-    }
-
-    html[data-theme="dark"] .applicant-upload-dropdown-menu {
-        background: #1e293b;
-        border-color: rgba(250, 204, 21, 0.2);
-    }
-
-    html[data-theme="dark"] .applicant-upload-dropdown-item {
-        background: #1e293b;
-        color: #f1f5f9;
-        border-bottom-color: rgba(250, 204, 21, 0.1);
-    }
-
-    html[data-theme="dark"] .applicant-upload-dropdown-item:hover {
-        background: rgba(250, 204, 21, 0.15);
-        color: #fde68a;
     }
 
     html[data-theme="dark"] .applicant-upload-preview-container {
@@ -4279,24 +4198,10 @@
                             </div>
                         </div>
 
-                        <div class="applicant-upload-dropdown-wrapper">
-                            <button type="button" id="btnUploadAssessmentCopy" class="applicant-upload-btn applicant-upload-dropdown-toggle applicant-file-action">
-                                <x-outline-icon name="arrow-up-tray" />
-                                Upload Medical Assessment Copy
-                                <x-outline-icon name="chevron-down" style="width: 16px; height: 16px; margin-left: 8px;" />
-                            </button>
-                            <div id="applicantUploadDropdown" class="applicant-upload-dropdown-menu">
-                                <button type="button" id="btnUploadFile" class="applicant-upload-dropdown-item">
-                                    <x-outline-icon name="document-arrow-up" />
-                                    <span>Upload File</span>
-                                </button>
-                                <button type="button" id="btnCaptureCamera" class="applicant-upload-dropdown-item">
-                                    <x-outline-icon name="camera" />
-                                    <span>Capture Camera</span>
-                                </button>
-                            </div>
-                        </div>
-                        <input type="file" id="applicantCameraCaptureInput" accept="image/*" capture="environment" style="display:none;">
+                        <button type="button" id="btnUploadAssessmentCopy" class="applicant-upload-btn applicant-file-action">
+                            <x-outline-icon name="arrow-up-tray" />
+                            Upload Medical Assessment Copy
+                        </button>
                         <div class="applicant-upload-note">Optional digital copy for clinic records only.</div>
                     </form>
 
@@ -6373,58 +6278,15 @@
             setEntryMode(false);
         });
         if (findBtn) findBtn.addEventListener('click', doLookup);
-        const uploadDropdownWrapper = document.querySelector('.applicant-upload-dropdown-wrapper');
-        const uploadDropdownMenu = document.getElementById('applicantUploadDropdown');
-        const uploadFileBtn = document.getElementById('btnUploadFile');
-        const uploadCameraBtn = document.getElementById('btnCaptureCamera');
-        const cameraCaptureInput = document.getElementById('applicantCameraCaptureInput');
-
         if (uploadButton) {
             uploadButton.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (uploadDropdownWrapper) {
-                    uploadDropdownWrapper.classList.toggle('is-open');
-                }
-            });
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function (e) {
-            if (uploadDropdownWrapper && !uploadDropdownWrapper.contains(e.target)) {
-                uploadDropdownWrapper.classList.remove('is-open');
-            }
-        });
-
-        if (uploadFileBtn) {
-            uploadFileBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 if (!currentLookupRef) {
                     setStatus('error', 'Find the applicant first before uploading a copy.');
                     return;
                 }
-                uploadDropdownWrapper.classList.remove('is-open');
-                uploadInput.click();
-            });
-        }
-
-        if (uploadCameraBtn) {
-            uploadCameraBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (!currentLookupRef) {
-                    setStatus('error', 'Find the applicant first before capturing an image.');
-                    return;
-                }
-                uploadDropdownWrapper.classList.remove('is-open');
-                cameraCaptureInput.click();
-            });
-        }
-
-        if (cameraCaptureInput) {
-            cameraCaptureInput.addEventListener('change', function () {
-                const file = this.files && this.files[0] ? this.files[0] : null;
-                if (file) {
-                    showAssessmentPreview(file);
-                    uploadAssessmentCopy(file);
+                if (uploadInput) {
+                    uploadInput.click();
                 }
             });
         }

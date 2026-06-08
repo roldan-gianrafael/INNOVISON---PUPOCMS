@@ -2339,6 +2339,13 @@
     #inventoryImportReviewModal .inventory-modal-head {
         flex: 0 0 auto;
     }
+    #inventoryImportReviewModal form {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+    }
     #inventoryImportReviewModal .inventory-modal-body {
         flex: 1 1 auto;
         min-height: 0;
@@ -2450,11 +2457,15 @@
     .inventory-import-table th {
         position: sticky;
         top: 0;
-        z-index: 2;
+        z-index: 4;
         background: #70131B;
         color: #ffffff;
         border-bottom: 0;
         white-space: nowrap;
+    }
+    .inventory-import-table td {
+        position: relative;
+        z-index: 1;
     }
     .inventory-import-table tbody tr {
         background: #ffffff;
@@ -2467,6 +2478,8 @@
     }
     .inventory-import-input,
     .inventory-import-select {
+        position: relative;
+        z-index: 5;
         width: 100%;
         min-height: 36px;
         padding: 7px 9px;
@@ -2476,6 +2489,7 @@
         color: #111827;
         font-size: 12px;
         font-weight: 800;
+        pointer-events: auto;
     }
     .inventory-import-input.is-missing {
         border-color: rgba(220, 38, 38, 0.5);
@@ -2524,9 +2538,9 @@
         min-width: 240px;
     }
     .inventory-import-sticky-actions {
-        position: sticky;
-        bottom: 0;
-        z-index: 3;
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 6;
         background: rgba(255, 255, 255, 0.96);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);

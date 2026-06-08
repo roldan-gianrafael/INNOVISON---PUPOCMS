@@ -273,6 +273,7 @@ PROMPT;
 
         $rows = [];
         $headers = null;
+        $currentCategory = null;
         $lineNumber = 0;
 
         while (($line = fgetcsv($handle, 0, $delimiter)) !== false) {
@@ -300,6 +301,19 @@ PROMPT;
                 if ($field !== '') {
                     $record[$field] = $line[$index] ?? '';
                 }
+            }
+
+            $nonEmptyValues = array_values(array_filter(array_map(static fn ($value) => trim((string) $value), $record), static fn ($value) => $value !== ''));
+            if (count($nonEmptyValues) === 1) {
+                $sectionCategory = $this->categorySectionMarker($nonEmptyValues[0]);
+                if ($sectionCategory !== null) {
+                    $currentCategory = $sectionCategory;
+                    continue;
+                }
+            }
+
+            if ($currentCategory !== null && trim((string) ($record['category'] ?? '')) === '') {
+                $record['category'] = $currentCategory;
             }
 
             $rows[] = $record;
@@ -532,12 +546,16 @@ PROMPT;
                 'stock_on_hand_beginning',
             ]));
 
-            $hasMeaningfulInventoryData = $name !== ''
-                || $quantity > 0
+            $hasMeaningfulInventoryValues = $quantity > 0
                 || $consumed > 0
                 || $startingStock > 0
                 || $this->firstString($row, ['stock_number', 'stock_no', 'stock_num', 'stock_code', 'inventory_number', 'property_number']) !== ''
                 || $this->firstString($row, ['unit', 'uom', 'stock_unit']) !== '';
+            $hasMeaningfulInventoryData = $name !== '' || $hasMeaningfulInventoryValues;
+
+            if ($name !== '' && $this->categorySectionMarker($name) !== null && !$hasMeaningfulInventoryValues) {
+                continue;
+            }
 
             if (!$hasMeaningfulInventoryData) {
                 continue;
@@ -680,6 +698,20 @@ PROMPT;
         }
 
         return 'Medicine';
+    }
+
+    private function categorySectionMarker(string $value): ?string
+    {
+        $value = strtolower(trim($value));
+        $value = preg_replace('/[^a-z]+/', ' ', $value) ?? $value;
+        $value = trim(preg_replace('/\s+/', ' ', $value) ?? $value);
+
+        return match ($value) {
+            'medicine', 'medicines', 'drug', 'drugs', 'medication', 'medications' => 'Medicine',
+            'supply', 'supplies', 'medical supply', 'medical supplies', 'clinic supply', 'clinic supplies' => 'Supplies',
+            'equipment', 'equipments', 'clinic equipment', 'medical equipment' => 'Equipment',
+            default => null,
+        };
     }
 
     private function normalizeDate(string $value): ?string

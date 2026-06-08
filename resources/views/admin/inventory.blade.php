@@ -2331,6 +2331,34 @@
         border-radius: 18px !important;
         background: #ffffff;
     }
+    #inventoryImportReviewModal .modal-box {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    #inventoryImportReviewModal .inventory-modal-head {
+        flex: 0 0 auto;
+    }
+    #inventoryImportReviewModal .inventory-modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: #8f2230 rgba(112, 19, 27, 0.08);
+    }
+    #inventoryImportReviewModal .inventory-modal-body::-webkit-scrollbar {
+        width: 10px;
+    }
+    #inventoryImportReviewModal .inventory-modal-body::-webkit-scrollbar-track {
+        background: rgba(112, 19, 27, 0.08);
+        border-radius: 999px;
+    }
+    #inventoryImportReviewModal .inventory-modal-body::-webkit-scrollbar-thumb {
+        background: #8f2230;
+        border-radius: 999px;
+        border: 2px solid rgba(255, 255, 255, 0.7);
+    }
     .inventory-import-drop {
         display: grid;
         gap: 12px;
@@ -2877,6 +2905,20 @@
                             <p class="inventory-import-help">
                                 Only checked rows will be imported. Rows marked <strong>Needs Review</strong> must have an item name before they can be selected. Existing matches will update the current inventory item; new rows will create a new item.
                             </p>
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 12px;">
+                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    <select id="inventoryImportBulkCategory" class="inventory-import-select" style="width:180px;">
+                                        <option value="Medicine">Medicine</option>
+                                        <option value="Supplies">Supplies</option>
+                                        <option value="Equipment">Equipment</option>
+                                    </select>
+                                    <button type="button" class="inventory-btn-cancel" id="inventoryImportApplyCategoryBtn">Apply Category to All</button>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                <button type="button" class="inventory-btn-cancel" id="inventoryImportSelectAllBtn">Select All Valid Rows</button>
+                                <button type="button" class="inventory-btn-cancel" id="inventoryImportUnselectAllBtn">Unselect All</button>
+                                </div>
+                            </div>
 
                             <div class="inventory-import-table-wrap">
                                 <table class="inventory-import-table">
@@ -3737,6 +3779,10 @@
 
     const inventoryImportCommitForm = document.getElementById('inventoryImportCommitForm');
     const inventoryImportCommitBtn = document.getElementById('inventoryImportCommitBtn');
+    const inventoryImportSelectAllBtn = document.getElementById('inventoryImportSelectAllBtn');
+    const inventoryImportUnselectAllBtn = document.getElementById('inventoryImportUnselectAllBtn');
+    const inventoryImportBulkCategory = document.getElementById('inventoryImportBulkCategory');
+    const inventoryImportApplyCategoryBtn = document.getElementById('inventoryImportApplyCategoryBtn');
 
     if (inventoryImportCommitForm) {
         const refreshImportRowState = function (row) {
@@ -3790,6 +3836,33 @@
                 });
             }
         });
+
+        if (inventoryImportSelectAllBtn) {
+            inventoryImportSelectAllBtn.addEventListener('click', function () {
+                inventoryImportCommitForm.querySelectorAll('.inventory-import-row-select').forEach(function (checkbox) {
+                    if (!checkbox.disabled) {
+                        checkbox.checked = true;
+                    }
+                });
+            });
+        }
+
+        if (inventoryImportUnselectAllBtn) {
+            inventoryImportUnselectAllBtn.addEventListener('click', function () {
+                inventoryImportCommitForm.querySelectorAll('.inventory-import-row-select').forEach(function (checkbox) {
+                    checkbox.checked = false;
+                });
+            });
+        }
+
+        if (inventoryImportApplyCategoryBtn && inventoryImportBulkCategory) {
+            inventoryImportApplyCategoryBtn.addEventListener('click', function () {
+                const category = inventoryImportBulkCategory.value;
+                inventoryImportCommitForm.querySelectorAll('select[name$="[category]"]').forEach(function (select) {
+                    select.value = category;
+                });
+            });
+        }
 
         inventoryImportCommitForm.addEventListener('submit', function (event) {
             const submitter = event.submitter;

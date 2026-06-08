@@ -550,7 +550,7 @@ PROMPT;
                 || $consumed > 0
                 || $startingStock > 0
                 || $this->firstString($row, ['stock_number', 'stock_no', 'stock_num', 'stock_code', 'inventory_number', 'property_number']) !== ''
-                || $this->firstString($row, ['unit', 'uom', 'stock_unit']) !== '';
+                || $this->firstString($row, ['unit', 'units', 'uom', 'u_m', 'um', 'unit_of_measure', 'unit_measure', 'measure', 'stock_unit']) !== '';
             $hasMeaningfulInventoryData = $name !== '' || $hasMeaningfulInventoryValues;
 
             if ($name !== '' && $this->categorySectionMarker($name) !== null && !$hasMeaningfulInventoryValues) {
@@ -573,7 +573,7 @@ PROMPT;
                 'name' => $this->limitText($name, 255),
                 'category' => $category,
                 'stock_number' => $this->limitText($this->firstString($row, ['stock_number', 'stock_no', 'stock_num', 'stock_code', 'inventory_number', 'property_number']), 50),
-                'unit' => $this->limitText($this->firstString($row, ['unit', 'uom', 'stock_unit']) ?: 'pcs', 50),
+                'unit' => $this->limitText($this->firstString($row, ['unit', 'units', 'uom', 'u_m', 'um', 'unit_of_measure', 'unit_measure', 'measure', 'stock_unit']) ?: 'pcs', 50),
                 'quantity' => max(0, $quantity),
                 'consumed' => max(0, $consumed),
                 'starting_stock' => max(0, $startingStock),
@@ -637,7 +637,7 @@ PROMPT;
                 'consumed_qty', 'used_qty', 'issued_qty', 'used', 'issued', 'dispensed' => 'consumed',
                 'starting', 'beginning', 'beginning_balance', 'initial_stock', 'start_stock', 'stock_on_hand_beginning' => 'starting_stock',
                 'minimum', 'minimum_qty', 'minimum_stock', 'reorder_level', 'reorder_point' => 'minimum_stock',
-                'uom', 'stock_unit' => 'unit',
+                'units', 'uom', 'u_m', 'um', 'unit_of_measure', 'unit_measure', 'measure', 'stock_unit' => 'unit',
                 'date', 'date_received', 'received_date', 'inventory_date' => 'date_added',
                 'expiry', 'expiry_date', 'expiration', 'expiration_date', 'expiry_expiration_date' => 'expiration_date',
                 'medicine_class', 'drug_class', 'medicine_category' => 'medicine_type',

@@ -2393,9 +2393,6 @@ private function buildInventoryImportPreview(array $analysis): array
         if ($data['name'] === '') {
             $rowIssues[] = 'Missing item name';
         }
-        if (($data['unit'] ?? '') === '') {
-            $rowIssues[] = 'Missing unit';
-        }
 
         $rows[] = array_merge($data, [
             'row_key' => $index,

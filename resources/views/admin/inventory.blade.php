@@ -2999,7 +2999,7 @@
                                                     </select>
                                                 </td>
                                                 <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][stock_number]" value="{{ $row['stock_number'] ?? '' }}"></td>
-                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][unit]" value="{{ $row['unit'] ?? 'pcs' }}" required></td>
+                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][unit]" value="{{ $row['unit'] ?? 'pcs' }}" placeholder="pcs"></td>
                                                 <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][starting_stock]" value="{{ $row['starting_stock'] ?? 0 }}"></td>
                                                 <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][consumed]" value="{{ $row['consumed'] ?? 0 }}"></td>
                                                 <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][quantity]" value="{{ $row['quantity'] ?? 0 }}" required></td>

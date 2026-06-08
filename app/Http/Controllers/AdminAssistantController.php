@@ -218,7 +218,10 @@ class AdminAssistantController extends Controller
         $gemini = app(GeminiClient::class);
 
         if ($provider === 'gemini' || ($provider === 'auto' && $gemini->configured())) {
-            return $this->askGemini($text, $gemini);
+            $reply = $this->askGemini($text, $gemini);
+            if ($reply !== null || $provider === 'gemini') {
+                return $reply;
+            }
         }
 
         return $this->askOpenAi($text);
@@ -240,7 +243,12 @@ User question:
 {$text}
 PROMPT;
 
-        return $gemini->generateText($prompt, 512, 0.2);
+        $reply = $gemini->generateText($prompt, 512, 0.2);
+        if ($reply !== null) {
+            return $reply;
+        }
+
+        return 'Gemini is configured but the API request failed. ' . ($gemini->lastError() ?: 'Check GEMINI_API_KEY and GEMINI_MODEL in .env.');
     }
 
     private function askOpenAi(string $text): ?string

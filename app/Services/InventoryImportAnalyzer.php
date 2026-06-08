@@ -133,7 +133,7 @@ PROMPT;
             if ($text === null) {
                 return [
                     'ok' => false,
-                    'message' => 'The Gemini analyzer could not process this image right now.',
+                    'message' => 'The Gemini analyzer could not process this image right now. ' . ($this->gemini->lastError() ?: 'Check the API key and model.'),
                 ];
             }
 
@@ -392,7 +392,7 @@ PROMPT;
                 if ($output === null) {
                     return [
                         'ok' => false,
-                        'message' => 'The Gemini text analyzer could not process this file right now.',
+                        'message' => 'The Gemini text analyzer could not process this file right now. ' . ($this->gemini->lastError() ?: 'Check the API key and model.'),
                     ];
                 }
 

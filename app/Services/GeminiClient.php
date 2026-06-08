@@ -7,9 +7,16 @@ use Illuminate\Support\Facades\Http;
 
 class GeminiClient
 {
+    private ?string $lastError = null;
+
     public function configured(): bool
     {
         return trim((string) config('services.gemini.api_key')) !== '';
+    }
+
+    public function lastError(): ?string
+    {
+        return $this->lastError;
     }
 
     public function generateText(string $prompt, int $maxOutputTokens = 512, float $temperature = 0.2): ?string
@@ -42,8 +49,11 @@ class GeminiClient
 
     private function generate(array $parts, int $maxOutputTokens, float $temperature): ?string
     {
+        $this->lastError = null;
+
         $apiKey = trim((string) config('services.gemini.api_key'));
         if ($apiKey === '') {
+            $this->lastError = 'GEMINI_API_KEY is missing.';
             return null;
         }
 
@@ -70,11 +80,19 @@ class GeminiClient
                 ]);
 
             if (!$response->successful()) {
+                $message = trim((string) data_get($response->json() ?: [], 'error.message', ''));
+                $this->lastError = 'Gemini API returned HTTP ' . $response->status() . ($message !== '' ? ': ' . $message : '.');
                 return null;
             }
 
-            return $this->extractText($response->json() ?: []);
+            $text = $this->extractText($response->json() ?: []);
+            if ($text === null) {
+                $this->lastError = 'Gemini API returned no text output.';
+            }
+
+            return $text;
         } catch (\Throwable $exception) {
+            $this->lastError = 'Gemini request failed: ' . $exception->getMessage();
             return null;
         }
     }

@@ -140,17 +140,19 @@ class AdminAssistantController extends Controller
 
     private function answerClinicInfo(string $text): ?string
     {
-        $settings = Setting::first();
-        $clinicName = $settings?->clinic_name ?: 'PUP Clinic';
-        $location = $settings?->clinic_location ?: 'clinic office';
-        $open = $settings?->open_time ?: '08:00';
-        $close = $settings?->close_time ?: '17:00';
-
         if ($this->containsAny($text, ['clinic hours', 'open time', 'closing time', 'what time are you open', 'what time do you close'])) {
+            $settings = $this->clinicSettings();
+            $clinicName = $settings?->clinic_name ?: 'PUP Clinic';
+            $open = $settings?->open_time ?: '08:00';
+            $close = $settings?->close_time ?: '17:00';
+
             return "Clinic hours for {$clinicName}: {$open} to {$close}. Please confirm holidays or special schedules at the front desk.";
         }
 
         if ($this->containsAny($text, ['clinic location', 'where is the clinic', 'where is clinic'])) {
+            $settings = $this->clinicSettings();
+            $location = $settings?->clinic_location ?: 'clinic office';
+
             return "Clinic location: {$location}.";
         }
 
@@ -159,6 +161,15 @@ class AdminAssistantController extends Controller
         }
 
         return null;
+    }
+
+    private function clinicSettings(): ?Setting
+    {
+        try {
+            return Setting::first();
+        } catch (\Throwable $exception) {
+            return null;
+        }
     }
 
     private function answerMedicalGuidance(string $text): ?string

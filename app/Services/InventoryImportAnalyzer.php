@@ -75,41 +75,33 @@ class InventoryImportAnalyzer
         }
 
         $prompt = <<<'PROMPT'
-You are extracting a clinic inventory table from an uploaded photo.
+Read this clinic inventory image.
 
-Return strict JSON only with this shape:
+Return only JSON with this shape:
 {
-  "quality": {
-    "status": "clear|blurry|corrupt|not_inventory",
-    "confidence": 0-100,
-    "issues": ["short issue"]
-  },
+  "visible_title": "document title",
+  "quality": {"status": "clear", "confidence": 0-100, "issues": []},
   "rows": [
     {
-      "name": "item name",
+      "date": "DATE column text",
+      "stock_number": "Stock Number column text",
+      "name": "MEDICINES & MATERIALS item name",
       "category": "Medicine|Supplies|Equipment",
-      "stock_number": "optional stock number",
-      "unit": "pcs|box|bottle|vial|pack|etc",
-      "quantity": 0,
-      "consumed": 0,
-      "starting_stock": 0,
-      "minimum_stock": 10,
-      "date_added": "YYYY-MM-DD or empty",
-      "expiration_date": "YYYY-MM-DD or empty",
-      "medicine_type": "optional medicine type",
+      "unit": "UNIT column text",
+      "quantity": "QUANTITY column value",
+      "consumed": "CONSUMED column value",
+      "balance": "BALANCE column value",
+      "expiration_date": "EXPIRATION DATE column text",
       "confidence": 0-100,
-      "notes": "short note if any field is uncertain"
+      "notes": ""
     }
   ]
 }
 
-Rules:
-- Extract only visible inventory rows. Do not invent missing items.
-- Use Balance/Current Stock as quantity when both quantity and balance exist.
-- Use consumed only when a consumed/used/out column is visible.
-- If the image is blurry, cropped, glare-heavy, unreadable, or not an inventory list, return no rows and quality.status accordingly.
-- If a field is not visible, use an empty string for text/date fields and 0 only for numeric fields that are genuinely absent.
-- Keep dates in YYYY-MM-DD when readable; otherwise empty.
+Extract all visible table rows that have an item name. Do not invent rows.
+If the document title or section says SUPPLIES, use category "Supplies".
+Use the BALANCE column as the current inventory quantity.
+Return no rows only if the image is truly unreadable, corrupted, or not an inventory list.
 PROMPT;
 
         if ($this->shouldUseGemini()) {
@@ -214,9 +206,21 @@ PROMPT;
             ];
         }
 
+        $rowSource = $decoded['rows']
+            ?? $decoded['items']
+            ?? $decoded['inventory']
+            ?? ($this->isListArray($decoded) ? $decoded : []);
+        $rows = $this->normalizeRows((array) $rowSource);
+
         $quality = is_array($decoded['quality'] ?? null) ? $decoded['quality'] : [];
         $status = strtolower(trim((string) ($quality['status'] ?? '')));
-        $confidence = (int) ($quality['confidence'] ?? 0);
+        if ($status === '' && $rows !== []) {
+            $status = 'clear';
+        }
+
+        $confidence = array_key_exists('confidence', $quality)
+            ? (int) ($quality['confidence'] ?? 0)
+            : ($rows !== [] ? 90 : 0);
 
         if (!in_array($status, ['clear', 'ok'], true) || $confidence < 85) {
             return [
@@ -233,7 +237,6 @@ PROMPT;
             ];
         }
 
-        $rows = $this->normalizeRows((array) ($decoded['rows'] ?? []));
         if ($rows === []) {
             return [
                 'ok' => false,
@@ -534,6 +537,15 @@ PROMPT;
         return $this->gemini->configured();
     }
 
+    private function isListArray(array $value): bool
+    {
+        if ($value === []) {
+            return true;
+        }
+
+        return array_keys($value) === range(0, count($value) - 1);
+    }
+
     private function normalizeHeaders(array $headers): array
     {
         return array_map(function ($header) {
@@ -673,7 +685,29 @@ PROMPT;
         $text = preg_replace('/\s*```$/', '', $text) ?? $text;
 
         $decoded = json_decode($text, true);
-        return is_array($decoded) ? $decoded : null;
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        $objectStart = strpos($text, '{');
+        $objectEnd = strrpos($text, '}');
+        if ($objectStart !== false && $objectEnd !== false && $objectEnd > $objectStart) {
+            $decoded = json_decode(substr($text, $objectStart, $objectEnd - $objectStart + 1), true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        $arrayStart = strpos($text, '[');
+        $arrayEnd = strrpos($text, ']');
+        if ($arrayStart !== false && $arrayEnd !== false && $arrayEnd > $arrayStart) {
+            $decoded = json_decode(substr($text, $arrayStart, $arrayEnd - $arrayStart + 1), true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return null;
     }
 
     private function estimateImageSharpness(UploadedFile $file): ?float

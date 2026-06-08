@@ -2277,7 +2277,9 @@ public function commitInventoryImport(Request $request)
 {
     $rows = (array) $request->input('import_items', []);
     $selectedRows = collect($rows)
-        ->filter(fn ($row) => is_array($row) && !empty($row['selected']))
+        ->filter(function ($row) {
+            return is_array($row) && !empty($row['selected']);
+        })
         ->values();
 
     if ($selectedRows->isEmpty()) {
@@ -2393,8 +2395,8 @@ private function buildInventoryImportPreview(array $analysis): array
         $rows[] = array_merge($data, [
             'row_key' => $index,
             'action' => $match ? 'update' : 'create',
-            'matched_item_id' => $match?->id,
-            'matched_item_name' => $match?->name,
+            'matched_item_id' => $match ? $match->id : null,
+            'matched_item_name' => $match ? $match->name : null,
             'match_status' => $match ? 'Existing item' : 'New item',
             'confidence' => (int) ($row['confidence'] ?? 100),
             'notes' => trim((string) ($row['notes'] ?? '')),
@@ -2443,8 +2445,8 @@ private function sanitizeInventoryImportRow(array $row, bool $persistMedicineTyp
         'name' => $text($row['name'] ?? '', 255),
         'category' => $category,
         'stock_number' => $text($row['stock_number'] ?? '', 50) ?: null,
-        'medicine_type_id' => $category === 'Medicine' ? $medicineType?->id : null,
-        'medicine_type' => $category === 'Medicine' ? ($medicineType?->name ?: ($medicineTypeName ?: null)) : null,
+        'medicine_type_id' => $category === 'Medicine' && $medicineType ? $medicineType->id : null,
+        'medicine_type' => $category === 'Medicine' ? ($medicineType ? $medicineType->name : ($medicineTypeName ?: null)) : null,
         'quantity' => $quantity,
         'starting_stock' => $startingStock,
         'consumed' => $consumed,

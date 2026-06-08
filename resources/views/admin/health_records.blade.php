@@ -2304,6 +2304,7 @@
                             'Medical Certificate' => $readonlyRecord->medical_certificate,
                             'Chest X-ray Result' => $readonlyRecord->chest_xray_result,
                             '2x2 Photo' => $readonlyRecord->student_photo,
+                            'PWD ID Proof' => $readonlyRecord->pwd_id_proof,
                         ];
                     @endphp
                     <article class="readonly-record-card">
@@ -2312,12 +2313,10 @@
                                 <h4 class="readonly-record-name">{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</h4>
                                 <p class="readonly-record-sub">{{ optional($readonlyRecord->user)->email ?: '-' }}</p>
                             </div>
-                            <span class="readonly-record-status">Pending Verification</span>
                         </div>
                         <div class="readonly-record-grid">
                             <div class="readonly-field"><span>Status Flag</span><strong>Pending Verification</strong></div>
                             <div class="readonly-field"><span>Student Full Name</span><strong>{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</strong></div>
-                            <div class="readonly-field"><span>Student ID Number</span><strong>{{ $readonlyRecord->student_id ?: optional($readonlyRecord->user)->student_id ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
                             <div class="readonly-field"><span>Submission Reference Number</span><strong>{{ $readonlyRecord->reference_number ?: $readonlyRecord->student_number ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
                             <div class="readonly-field"><span>Email Address</span><strong>{{ optional($readonlyRecord->user)->email ?: '-' }}</strong></div>
                         </div>
@@ -2333,7 +2332,7 @@
                                     @else
                                         <span class="readonly-doc-missing">
                                             <span>{{ $docLabel }}</span>
-                                            <span>Missing</span>
+                                            <span>No document uploaded</span>
                                         </span>
                                     @endif
                                 </li>

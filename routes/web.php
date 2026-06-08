@@ -264,6 +264,9 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::delete('/admin/api-testing/database/{table}/{id}', [AdminController::class, 'deleteApiTestingDatabaseRecord'])->name('admin.api-testing.database.delete');
 
         Route::post('/admin/inventory/store', [AdminController::class, 'storeItem'])->name('admin.inventory.store');
+        Route::post('/admin/inventory/import/analyze', [AdminController::class, 'analyzeInventoryImport'])->name('admin.inventory.import.analyze');
+        Route::post('/admin/inventory/import/commit', [AdminController::class, 'commitInventoryImport'])->name('admin.inventory.import.commit');
+        Route::post('/admin/inventory/import/clear', [AdminController::class, 'clearInventoryImportPreview'])->name('admin.inventory.import.clear');
         Route::post('/admin/inventory/{id}/restock', [AdminController::class, 'restockItem'])->name('admin.inventory.restock');
         Route::post('/admin/inventory/{id}/issue', [AdminController::class, 'issueStock'])->name('admin.inventory.issue');
         Route::put('/admin/inventory/{id}', [AdminController::class, 'updateItem'])->name('admin.inventory.update');

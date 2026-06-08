@@ -35,6 +35,15 @@ return [
         'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
     ],
 
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.5-flash'),
+    ],
+
+    'ai' => [
+        'provider' => env('AI_PROVIDER', 'auto'),
+    ],
+
     'idp' => [
         'enabled' => filter_var(env('IDP_ENABLED', false), FILTER_VALIDATE_BOOL),
         'base_url' => rtrim((string) env('IDP_BASE_URL', ''), '/'),

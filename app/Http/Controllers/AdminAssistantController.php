@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Setting;
+use App\Services\GeminiClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -43,7 +44,7 @@ class AdminAssistantController extends Controller
             ]);
         }
 
-        $aiReply = $this->askOpenAi($text);
+        $aiReply = $this->askAi($text);
         if ($aiReply !== null) {
             return response()->json([
                 'type' => 'answer',
@@ -139,17 +140,19 @@ class AdminAssistantController extends Controller
 
     private function answerClinicInfo(string $text): ?string
     {
-        $settings = Setting::first();
-        $clinicName = $settings?->clinic_name ?: 'PUP Clinic';
-        $location = $settings?->clinic_location ?: 'clinic office';
-        $open = $settings?->open_time ?: '08:00';
-        $close = $settings?->close_time ?: '17:00';
-
         if ($this->containsAny($text, ['clinic hours', 'open time', 'closing time', 'what time are you open', 'what time do you close'])) {
+            $settings = $this->clinicSettings();
+            $clinicName = $settings?->clinic_name ?: 'PUP Clinic';
+            $open = $settings?->open_time ?: '08:00';
+            $close = $settings?->close_time ?: '17:00';
+
             return "Clinic hours for {$clinicName}: {$open} to {$close}. Please confirm holidays or special schedules at the front desk.";
         }
 
         if ($this->containsAny($text, ['clinic location', 'where is the clinic', 'where is clinic'])) {
+            $settings = $this->clinicSettings();
+            $location = $settings?->clinic_location ?: 'clinic office';
+
             return "Clinic location: {$location}.";
         }
 
@@ -158,6 +161,15 @@ class AdminAssistantController extends Controller
         }
 
         return null;
+    }
+
+    private function clinicSettings(): ?Setting
+    {
+        try {
+            return Setting::first();
+        } catch (\Throwable $exception) {
+            return null;
+        }
     }
 
     private function answerMedicalGuidance(string $text): ?string
@@ -209,6 +221,45 @@ class AdminAssistantController extends Controller
         }
 
         return null;
+    }
+
+    private function askAi(string $text): ?string
+    {
+        $provider = strtolower(trim((string) config('services.ai.provider', 'auto')));
+        $gemini = app(GeminiClient::class);
+
+        if ($provider === 'gemini' || ($provider === 'auto' && $gemini->configured())) {
+            $reply = $this->askGemini($text, $gemini);
+            if ($reply !== null || $provider === 'gemini') {
+                return $reply;
+            }
+        }
+
+        return $this->askOpenAi($text);
+    }
+
+    private function askGemini(string $text, GeminiClient $gemini): ?string
+    {
+        if (!$gemini->configured()) {
+            return null;
+        }
+
+        $prompt = <<<PROMPT
+You are a campus clinic triage assistant for admin use.
+Give concise, safe triage guidance.
+Do not provide a definitive diagnosis.
+Always mention urgent red flags and when to escalate to emergency care.
+
+User question:
+{$text}
+PROMPT;
+
+        $reply = $gemini->generateText($prompt, 512, 0.2);
+        if ($reply !== null) {
+            return $reply;
+        }
+
+        return 'Gemini is configured but the API request failed. ' . ($gemini->lastError() ?: 'Check GEMINI_API_KEY and GEMINI_MODEL in .env.');
     }
 
     private function askOpenAi(string $text): ?string

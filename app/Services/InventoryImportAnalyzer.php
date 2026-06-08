@@ -1,0 +1,640 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
+
+class InventoryImportAnalyzer
+{
+    private const MAX_ROWS = 120;
+
+    public function analyze(UploadedFile $file): array
+    {
+        $extension = strtolower((string) $file->getClientOriginalExtension());
+        $mimeType = strtolower((string) $file->getMimeType());
+
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+            return $this->analyzeImage($file);
+        }
+
+        if (in_array($extension, ['csv', 'tsv'], true)) {
+            return $this->analyzeDelimitedFile($file, $extension === 'tsv' ? "\t" : ',');
+        }
+
+        if ($extension === 'json') {
+            return $this->analyzeJsonFile($file);
+        }
+
+        if ($extension === 'txt' || str_starts_with($mimeType, 'text/')) {
+            return $this->analyzeTextFile($file);
+        }
+
+        return [
+            'ok' => false,
+            'message' => 'Unsupported inventory file. Upload a clear image, CSV, TSV, TXT, or JSON file.',
+        ];
+    }
+
+    private function analyzeImage(UploadedFile $file): array
+    {
+        $path = (string) $file->getRealPath();
+        $imageInfo = @getimagesize($path);
+
+        if ($imageInfo === false) {
+            return [
+                'ok' => false,
+                'message' => 'The uploaded image appears corrupted or unreadable.',
+            ];
+        }
+
+        [$width, $height] = $imageInfo;
+        if ($width < 900 || $height < 600) {
+            return [
+                'ok' => false,
+                'message' => 'The inventory image is too small to analyze reliably. Upload a clearer, higher-resolution photo.',
+            ];
+        }
+
+        $blurScore = $this->estimateImageSharpness($file);
+        if ($blurScore !== null && $blurScore < 22) {
+            return [
+                'ok' => false,
+                'message' => 'The inventory image is too blurry to import safely. Retake it with better focus and lighting.',
+                'quality' => [
+                    'status' => 'blurry',
+                    'score' => (int) round($blurScore),
+                    'width' => $width,
+                    'height' => $height,
+                ],
+            ];
+        }
+
+        $apiKey = trim((string) config('services.openai.api_key'));
+        if ($apiKey === '') {
+            return [
+                'ok' => false,
+                'message' => 'Image inventory import requires OPENAI_API_KEY to be configured.',
+            ];
+        }
+
+        $model = trim((string) config('services.openai.model', ''));
+        if ($model === '') {
+            $model = 'gpt-4.1-mini';
+        }
+
+        $base64 = base64_encode((string) file_get_contents($path));
+        $mimeType = $file->getMimeType() ?: 'image/jpeg';
+        $imageData = 'data:' . $mimeType . ';base64,' . $base64;
+
+        $prompt = <<<'PROMPT'
+You are extracting a clinic inventory table from an uploaded photo.
+
+Return strict JSON only with this shape:
+{
+  "quality": {
+    "status": "clear|blurry|corrupt|not_inventory",
+    "confidence": 0-100,
+    "issues": ["short issue"]
+  },
+  "rows": [
+    {
+      "name": "item name",
+      "category": "Medicine|Supplies|Equipment",
+      "stock_number": "optional stock number",
+      "unit": "pcs|box|bottle|vial|pack|etc",
+      "quantity": 0,
+      "consumed": 0,
+      "starting_stock": 0,
+      "minimum_stock": 10,
+      "date_added": "YYYY-MM-DD or empty",
+      "expiration_date": "YYYY-MM-DD or empty",
+      "medicine_type": "optional medicine type",
+      "confidence": 0-100,
+      "notes": "short note if any field is uncertain"
+    }
+  ]
+}
+
+Rules:
+- Extract only visible inventory rows. Do not invent missing items.
+- Use Balance/Current Stock as quantity when both quantity and balance exist.
+- Use consumed only when a consumed/used/out column is visible.
+- If the image is blurry, cropped, glare-heavy, unreadable, or not an inventory list, return no rows and quality.status accordingly.
+- If a field is not visible, use an empty string for text/date fields and 0 only for numeric fields that are genuinely absent.
+- Keep dates in YYYY-MM-DD when readable; otherwise empty.
+PROMPT;
+
+        try {
+            $response = Http::withToken($apiKey)
+                ->acceptJson()
+                ->timeout(45)
+                ->post('https://api.openai.com/v1/responses', [
+                    'model' => $model,
+                    'input' => [[
+                        'role' => 'user',
+                        'content' => [
+                            ['type' => 'input_text', 'text' => $prompt],
+                            ['type' => 'input_image', 'image_url' => $imageData, 'detail' => 'high'],
+                        ],
+                    ]],
+                ]);
+
+            if (!$response->successful()) {
+                return [
+                    'ok' => false,
+                    'message' => 'The AI analyzer could not process this image right now.',
+                ];
+            }
+
+            $decoded = $this->decodeJsonText($this->extractOpenAiOutputText($response->json() ?: []));
+            if (!is_array($decoded)) {
+                return [
+                    'ok' => false,
+                    'message' => 'The AI analyzer returned an unreadable response. Upload a clearer inventory image or use CSV.',
+                ];
+            }
+
+            $quality = is_array($decoded['quality'] ?? null) ? $decoded['quality'] : [];
+            $status = strtolower(trim((string) ($quality['status'] ?? '')));
+            $confidence = (int) ($quality['confidence'] ?? 0);
+
+            if (!in_array($status, ['clear', 'ok'], true) || $confidence < 85) {
+                return [
+                    'ok' => false,
+                    'message' => 'The uploaded image was not clear enough for safe import. Please retake it or upload a CSV file.',
+                    'quality' => [
+                        'status' => $status ?: 'uncertain',
+                        'confidence' => $confidence,
+                        'issues' => array_values((array) ($quality['issues'] ?? [])),
+                        'blur_score' => $blurScore,
+                        'width' => $width,
+                        'height' => $height,
+                    ],
+                ];
+            }
+
+            $rows = $this->normalizeRows((array) ($decoded['rows'] ?? []));
+            if ($rows === []) {
+                return [
+                    'ok' => false,
+                    'message' => 'No inventory rows were detected in the uploaded image.',
+                ];
+            }
+
+            return [
+                'ok' => true,
+                'source_type' => 'image',
+                'source_name' => $file->getClientOriginalName(),
+                'quality' => [
+                    'status' => 'clear',
+                    'confidence' => $confidence,
+                    'issues' => array_values((array) ($quality['issues'] ?? [])),
+                    'blur_score' => $blurScore,
+                    'width' => $width,
+                    'height' => $height,
+                ],
+                'rows' => $rows,
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'ok' => false,
+                'message' => 'The image analyzer failed. Please try a clearer image or upload CSV.',
+            ];
+        }
+    }
+
+    private function analyzeDelimitedFile(UploadedFile $file, string $delimiter): array
+    {
+        $path = (string) $file->getRealPath();
+        $handle = @fopen($path, 'r');
+        if (!$handle) {
+            return [
+                'ok' => false,
+                'message' => 'The uploaded inventory file appears corrupted or unreadable.',
+            ];
+        }
+
+        $rows = [];
+        $headers = null;
+        $lineNumber = 0;
+
+        while (($line = fgetcsv($handle, 0, $delimiter)) !== false) {
+            $lineNumber++;
+            $line = array_map(static fn ($value) => trim((string) $value), $line);
+
+            if ($this->isEmptyRow($line)) {
+                continue;
+            }
+
+            if ($headers === null) {
+                $headers = $this->normalizeHeaders($line);
+                if (!$this->hasRecognizedHeaders($headers)) {
+                    fclose($handle);
+                    return [
+                        'ok' => false,
+                        'message' => 'The file needs a header row with item/name and quantity/balance columns.',
+                    ];
+                }
+                continue;
+            }
+
+            $record = [];
+            foreach ($headers as $index => $field) {
+                if ($field !== '') {
+                    $record[$field] = $line[$index] ?? '';
+                }
+            }
+
+            $rows[] = $record;
+            if (count($rows) >= self::MAX_ROWS) {
+                break;
+            }
+        }
+
+        fclose($handle);
+
+        $normalizedRows = $this->normalizeRows($rows);
+        if ($normalizedRows === []) {
+            return [
+                'ok' => false,
+                'message' => 'No valid inventory rows were found in the uploaded file.',
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'source_type' => $delimiter === "\t" ? 'tsv' : 'csv',
+            'source_name' => $file->getClientOriginalName(),
+            'quality' => [
+                'status' => 'parsed',
+                'confidence' => 100,
+                'issues' => [],
+            ],
+            'rows' => $normalizedRows,
+        ];
+    }
+
+    private function analyzeJsonFile(UploadedFile $file): array
+    {
+        $decoded = json_decode((string) file_get_contents((string) $file->getRealPath()), true);
+        if (!is_array($decoded)) {
+            return [
+                'ok' => false,
+                'message' => 'The uploaded JSON file is corrupted or invalid.',
+            ];
+        }
+
+        $rows = isset($decoded['rows']) && is_array($decoded['rows'])
+            ? $decoded['rows']
+            : $decoded;
+
+        $normalizedRows = $this->normalizeRows((array) $rows);
+        if ($normalizedRows === []) {
+            return [
+                'ok' => false,
+                'message' => 'No valid inventory rows were found in the JSON file.',
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'source_type' => 'json',
+            'source_name' => $file->getClientOriginalName(),
+            'quality' => [
+                'status' => 'parsed',
+                'confidence' => 100,
+                'issues' => [],
+            ],
+            'rows' => $normalizedRows,
+        ];
+    }
+
+    private function analyzeTextFile(UploadedFile $file): array
+    {
+        $text = trim((string) file_get_contents((string) $file->getRealPath()));
+        if ($text === '') {
+            return [
+                'ok' => false,
+                'message' => 'The uploaded text file is empty or unreadable.',
+            ];
+        }
+
+        if (str_contains($text, "\t")) {
+            return $this->analyzeDelimitedFile($file, "\t");
+        }
+
+        $apiKey = trim((string) config('services.openai.api_key'));
+        if ($apiKey === '') {
+            return [
+                'ok' => false,
+                'message' => 'Plain text inventory import requires OPENAI_API_KEY. Use CSV/TSV for local parsing.',
+            ];
+        }
+
+        $model = trim((string) config('services.openai.model', '')) ?: 'gpt-4.1-mini';
+        $prompt = "Extract clinic inventory rows from the text below. Return strict JSON with a rows array using fields: name, category, stock_number, unit, quantity, consumed, starting_stock, minimum_stock, date_added, expiration_date, medicine_type, confidence, notes. Do not invent rows.\n\n" . $this->limitText($text, 12000);
+
+        try {
+            $response = Http::withToken($apiKey)
+                ->acceptJson()
+                ->timeout(35)
+                ->post('https://api.openai.com/v1/responses', [
+                    'model' => $model,
+                    'input' => [[
+                        'role' => 'user',
+                        'content' => [
+                            ['type' => 'input_text', 'text' => $prompt],
+                        ],
+                    ]],
+                ]);
+
+            if (!$response->successful()) {
+                return [
+                    'ok' => false,
+                    'message' => 'The text analyzer could not process this file right now.',
+                ];
+            }
+
+            $decoded = $this->decodeJsonText($this->extractOpenAiOutputText($response->json() ?: []));
+            $rows = $this->normalizeRows((array) ($decoded['rows'] ?? []));
+
+            if ($rows === []) {
+                return [
+                    'ok' => false,
+                    'message' => 'No valid inventory rows were detected in the text file.',
+                ];
+            }
+
+            return [
+                'ok' => true,
+                'source_type' => 'text',
+                'source_name' => $file->getClientOriginalName(),
+                'quality' => [
+                    'status' => 'parsed',
+                    'confidence' => 90,
+                    'issues' => [],
+                ],
+                'rows' => $rows,
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'ok' => false,
+                'message' => 'The text analyzer failed. Please upload CSV/TSV or try again.',
+            ];
+        }
+    }
+
+    private function normalizeRows(array $rows): array
+    {
+        $normalized = [];
+
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $name = $this->firstString($row, ['name', 'item', 'medicine', 'material', 'description', 'medicines_materials']);
+            if ($name === '') {
+                continue;
+            }
+
+            $category = $this->normalizeCategory($this->firstString($row, ['category', 'type', 'classification']));
+            $quantity = $this->parseNumber($this->firstValue($row, ['quantity', 'balance', 'current_stock', 'stock', 'on_hand']));
+            $consumed = $this->parseNumber($this->firstValue($row, ['consumed', 'used', 'issued', 'out']));
+            $startingStock = $this->parseNumber($this->firstValue($row, ['starting_stock', 'beginning_balance', 'beginning', 'initial_stock']));
+
+            if ($startingStock <= 0 && $consumed > 0) {
+                $startingStock = $quantity + $consumed;
+            } elseif ($startingStock <= 0) {
+                $startingStock = $quantity;
+            }
+
+            $normalized[] = [
+                'name' => $this->limitText($name, 255),
+                'category' => $category,
+                'stock_number' => $this->limitText($this->firstString($row, ['stock_number', 'stock_no', 'stock_num', 'stock']), 50),
+                'unit' => $this->limitText($this->firstString($row, ['unit', 'uom']) ?: 'pcs', 50),
+                'quantity' => max(0, $quantity),
+                'consumed' => max(0, $consumed),
+                'starting_stock' => max(0, $startingStock),
+                'minimum_stock' => max(0, $this->parseNumber($this->firstValue($row, ['minimum_stock', 'minimum', 'reorder_level']), 10)),
+                'date_added' => $this->normalizeDate($this->firstString($row, ['date_added', 'date', 'received_date', 'restock_date'])),
+                'expiration_date' => $this->normalizeDate($this->firstString($row, ['expiration_date', 'expiry', 'expiry_date', 'expiration'])),
+                'medicine_type' => $this->limitText($this->firstString($row, ['medicine_type', 'medicine_class', 'drug_class']), 255),
+                'confidence' => min(100, max(0, (int) $this->parseNumber($this->firstValue($row, ['confidence']), 100))),
+                'notes' => $this->limitText($this->firstString($row, ['notes', 'note', 'remarks']), 500),
+            ];
+
+            if (count($normalized) >= self::MAX_ROWS) {
+                break;
+            }
+        }
+
+        return $normalized;
+    }
+
+    private function normalizeHeaders(array $headers): array
+    {
+        return array_map(function ($header) {
+            $value = strtolower(trim((string) $header));
+            $value = preg_replace('/^\xEF\xBB\xBF/', '', $value) ?? $value;
+            $value = preg_replace('/[^a-z0-9]+/', '_', $value) ?? $value;
+            $value = trim($value, '_');
+
+            return match ($value) {
+                'item', 'item_name', 'medicine', 'medicine_name', 'material', 'materials', 'medicines_materials', 'medicines_and_materials' => 'name',
+                'stock_no', 'stock_num', 'stock_number', 'stock_code' => 'stock_number',
+                'qty', 'quantity_on_hand', 'current_stock', 'balance', 'current_balance', 'on_hand' => 'quantity',
+                'consumed_qty', 'used_qty', 'issued_qty', 'used', 'issued' => 'consumed',
+                'beginning', 'beginning_balance', 'initial_stock', 'start_stock' => 'starting_stock',
+                'minimum', 'minimum_qty', 'minimum_stock', 'reorder_level' => 'minimum_stock',
+                'uom' => 'unit',
+                'date', 'date_received', 'received_date' => 'date_added',
+                'expiry', 'expiry_date', 'expiration', 'expiration_date' => 'expiration_date',
+                'medicine_class', 'drug_class' => 'medicine_type',
+                default => $value,
+            };
+        }, $headers);
+    }
+
+    private function hasRecognizedHeaders(array $headers): bool
+    {
+        return in_array('name', $headers, true) && count(array_intersect($headers, ['quantity', 'starting_stock', 'consumed'])) > 0;
+    }
+
+    private function firstString(array $row, array $keys): string
+    {
+        $value = $this->firstValue($row, $keys);
+        return trim((string) $value);
+    }
+
+    private function firstValue(array $row, array $keys): mixed
+    {
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $row) && $row[$key] !== null && trim((string) $row[$key]) !== '') {
+                return $row[$key];
+            }
+        }
+
+        return null;
+    }
+
+    private function parseNumber(mixed $value, float $default = 0): float
+    {
+        if ($value === null || trim((string) $value) === '') {
+            return $default;
+        }
+
+        $clean = preg_replace('/[^0-9.\-]/', '', (string) $value) ?? '';
+        if ($clean === '' || !is_numeric($clean)) {
+            return $default;
+        }
+
+        return (float) $clean;
+    }
+
+    private function normalizeCategory(string $value): string
+    {
+        $value = strtolower(trim($value));
+
+        if (str_contains($value, 'equip')) {
+            return 'Equipment';
+        }
+
+        if (str_contains($value, 'suppl') || str_contains($value, 'material')) {
+            return 'Supplies';
+        }
+
+        return 'Medicine';
+    }
+
+    private function normalizeDate(string $value): ?string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->format('Y-m-d');
+        } catch (\Throwable $exception) {
+            return null;
+        }
+    }
+
+    private function limitText(string $value, int $maxLength): string
+    {
+        $value = trim($value);
+
+        if (function_exists('mb_substr')) {
+            return mb_substr($value, 0, $maxLength);
+        }
+
+        return substr($value, 0, $maxLength);
+    }
+
+    private function isEmptyRow(array $row): bool
+    {
+        foreach ($row as $value) {
+            if (trim((string) $value) !== '') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function extractOpenAiOutputText(array $payload): string
+    {
+        $outputText = trim((string) data_get($payload, 'output_text', ''));
+        if ($outputText !== '') {
+            return $outputText;
+        }
+
+        $parts = [];
+        foreach ((array) data_get($payload, 'output', []) as $output) {
+            foreach ((array) data_get($output, 'content', []) as $content) {
+                $text = trim((string) data_get($content, 'text', ''));
+                if ($text !== '') {
+                    $parts[] = $text;
+                }
+            }
+        }
+
+        return trim(implode("\n", $parts));
+    }
+
+    private function decodeJsonText(string $text): ?array
+    {
+        $text = trim($text);
+        $text = preg_replace('/^```json\s*/i', '', $text) ?? $text;
+        $text = preg_replace('/^```\s*/', '', $text) ?? $text;
+        $text = preg_replace('/\s*```$/', '', $text) ?? $text;
+
+        $decoded = json_decode($text, true);
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    private function estimateImageSharpness(UploadedFile $file): ?float
+    {
+        if (!extension_loaded('gd')) {
+            return null;
+        }
+
+        $path = (string) $file->getRealPath();
+        $extension = strtolower((string) $file->getClientOriginalExtension());
+
+        $image = match ($extension) {
+            'jpg', 'jpeg' => @imagecreatefromjpeg($path),
+            'png' => @imagecreatefrompng($path),
+            'webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : false,
+            default => false,
+        };
+
+        if (!$image) {
+            return null;
+        }
+
+        $sourceWidth = imagesx($image);
+        $sourceHeight = imagesy($image);
+        if ($sourceWidth < 2 || $sourceHeight < 2) {
+            imagedestroy($image);
+            return 0;
+        }
+
+        $width = min(180, $sourceWidth);
+        $height = max(2, (int) round($sourceHeight * ($width / $sourceWidth)));
+        $sample = imagecreatetruecolor($width, $height);
+        imagecopyresampled($sample, $image, 0, 0, 0, 0, $width, $height, $sourceWidth, $sourceHeight);
+        imagefilter($sample, IMG_FILTER_GRAYSCALE);
+
+        $values = [];
+        for ($y = 1; $y < $height - 1; $y++) {
+            for ($x = 1; $x < $width - 1; $x++) {
+                $center = imagecolorat($sample, $x, $y) & 0xFF;
+                $laplacian = (4 * $center)
+                    - (imagecolorat($sample, $x - 1, $y) & 0xFF)
+                    - (imagecolorat($sample, $x + 1, $y) & 0xFF)
+                    - (imagecolorat($sample, $x, $y - 1) & 0xFF)
+                    - (imagecolorat($sample, $x, $y + 1) & 0xFF);
+                $values[] = $laplacian;
+            }
+        }
+
+        imagedestroy($sample);
+        imagedestroy($image);
+
+        if ($values === []) {
+            return 0;
+        }
+
+        $mean = array_sum($values) / count($values);
+        $variance = 0;
+        foreach ($values as $value) {
+            $variance += ($value - $mean) ** 2;
+        }
+
+        return $variance / count($values);
+    }
+}

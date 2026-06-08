@@ -2285,6 +2285,97 @@
     .badge-adjustment{ background: #fef3c7; color: #b45309; }
     .badge-default   { background: #f1f5f9; color: #475569; }
 
+    #inventoryImportModal .modal-box,
+    #inventoryImportReviewModal .modal-box {
+        width: min(100%, 1080px);
+        height: min(820px, calc(100dvh - clamp(18px, 3vw, 40px)));
+        max-height: min(820px, calc(100dvh - clamp(18px, 3vw, 40px)));
+        border-left: 1px solid rgba(112, 19, 27, 0.12) !important;
+        border-right: 1px solid rgba(112, 19, 27, 0.12) !important;
+        border-top: 4px solid #facc15 !important;
+        border-bottom: 4px solid #facc15 !important;
+        border-radius: 18px !important;
+        background: #ffffff;
+    }
+    .inventory-import-drop {
+        display: grid;
+        gap: 12px;
+        padding: 22px;
+        border: 2px dashed rgba(112, 19, 27, 0.28);
+        border-radius: 18px;
+        background: linear-gradient(180deg, #fffdfb 0%, #fff8f2 100%);
+    }
+    .inventory-import-drop input[type="file"] {
+        min-height: 48px;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(112, 19, 27, 0.18);
+        background: #ffffff;
+        font-weight: 800;
+    }
+    .inventory-import-note {
+        color: #475569;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+    .inventory-import-quality {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+    .inventory-import-chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 34px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #f8fafc;
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        color: #334155;
+        font-size: 12px;
+        font-weight: 900;
+    }
+    .inventory-import-table-wrap {
+        overflow: auto;
+        border-radius: 16px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: #ffffff;
+    }
+    .inventory-import-table {
+        min-width: 1180px;
+        margin: 0;
+    }
+    .inventory-import-table th,
+    .inventory-import-table td {
+        padding: 10px;
+        vertical-align: top;
+    }
+    .inventory-import-input,
+    .inventory-import-select {
+        width: 100%;
+        min-height: 36px;
+        padding: 7px 9px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: #ffffff;
+        color: #111827;
+        font-size: 12px;
+        font-weight: 800;
+    }
+    .inventory-import-input[type="number"] {
+        min-width: 88px;
+    }
+    .inventory-import-row-note {
+        display: block;
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.35;
+    }
+
     html[data-theme="dark"] .badge-restock    { background: rgba(21,128,61,0.22);  color: #86efac; }
     html[data-theme="dark"] .badge-dispensed,
     html[data-theme="dark"] .badge-dispense,
@@ -2302,6 +2393,7 @@
         $role = \App\Models\User::normalizeRole(optional(auth()->user())->user_role ?? '');
         $canManageInventory = $role === \App\Models\User::ROLE_SUPERADMIN;
         $highlightItemId = (string) request()->query('highlight_item', '');
+        $inventoryImportPreview = session('inventory_import_preview');
     @endphp
 
     <div class="controls">
@@ -2316,6 +2408,7 @@
                 </button>
             </div>
             @if($canManageInventory)
+                <button type="button" class="btn-add" onclick="openInventoryImportModal()">Import Inventory</button>
                 <button class="btn-add" onclick="openModal()">+ Add New Item</button>
             @endif
         </div>
@@ -2519,6 +2612,140 @@
     </div>
 
     @if($canManageInventory)
+        <div id="inventoryImportModal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="inventory-modal-head">
+                    <div class="inventory-modal-head-main">
+                        <h3 class="inventory-modal-title" style="font-size:clamp(17px,1.6vw,22px); margin:0; font-weight:900;">Import Latest Inventory</h3>
+                        <p class="inventory-modal-copy">Upload a clear inventory photo or structured file. The system analyzes it first and waits for your confirmation.</p>
+                    </div>
+                    <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeInventoryImportModal()" aria-label="Close import modal">
+                        <x-outline-icon name="x-mark" />
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ route('admin.inventory.import.analyze') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="inventory-modal-body">
+                        <div class="inventory-import-drop">
+                            <label for="inventoryImportFile" style="font-size:15px;font-weight:900;color:#70131B;">Inventory photo or file</label>
+                            <input type="file" name="inventory_import_file" id="inventoryImportFile" accept=".jpg,.jpeg,.png,.webp,.csv,.tsv,.txt,.json,image/jpeg,image/png,image/webp,text/csv,text/plain,application/json" required>
+                            <div class="inventory-import-note">
+                                Image uploads are checked for corruption, low resolution, and blur before AI extraction. CSV, TSV, and JSON files are parsed directly for higher reliability.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-actions-row">
+                        <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportModal()">Cancel</button>
+                        <button type="submit" class="btn-add">Analyze Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @if(is_array($inventoryImportPreview) && !empty($inventoryImportPreview['rows']))
+            @php
+                $quality = (array) ($inventoryImportPreview['quality'] ?? []);
+                $previewRows = (array) ($inventoryImportPreview['rows'] ?? []);
+            @endphp
+            <div id="inventoryImportReviewModal" class="modal-overlay" data-open-on-load="true">
+                <div class="modal-box">
+                    <div class="inventory-modal-head">
+                        <div class="inventory-modal-head-main">
+                            <h3 class="inventory-modal-title" style="font-size:clamp(17px,1.6vw,22px); margin:0; font-weight:900;">Review Inventory Import</h3>
+                            <p class="inventory-modal-copy">Check each extracted row before committing it to clinic inventory.</p>
+                        </div>
+                        <button type="button" class="inventory-btn-cancel inventory-modal-close" onclick="closeInventoryImportReviewModal()" aria-label="Close review modal">
+                            <x-outline-icon name="x-mark" />
+                        </button>
+                    </div>
+
+                    <form method="POST" action="{{ route('admin.inventory.import.commit') }}">
+                        @csrf
+                        <div class="inventory-modal-body">
+                            <div class="inventory-import-quality">
+                                <span class="inventory-import-chip">Source: {{ $inventoryImportPreview['source_name'] ?? 'Inventory upload' }}</span>
+                                <span class="inventory-import-chip">Type: {{ strtoupper((string) ($inventoryImportPreview['source_type'] ?? 'upload')) }}</span>
+                                <span class="inventory-import-chip">Confidence: {{ (int) ($quality['confidence'] ?? 0) }}%</span>
+                                <span class="inventory-import-chip">Rows: {{ count($previewRows) }}</span>
+                            </div>
+
+                            <div class="inventory-import-table-wrap">
+                                <table class="inventory-import-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Use</th>
+                                            <th>Action</th>
+                                            <th>Match</th>
+                                            <th>Item</th>
+                                            <th>Category</th>
+                                            <th>Stock No.</th>
+                                            <th>Unit</th>
+                                            <th>Starting</th>
+                                            <th>Consumed</th>
+                                            <th>Balance</th>
+                                            <th>Minimum</th>
+                                            <th>Date</th>
+                                            <th>Expiration</th>
+                                            <th>Medicine Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($previewRows as $rowIndex => $row)
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" name="import_items[{{ $rowIndex }}][selected]" value="1" checked>
+                                                    <input type="hidden" name="import_items[{{ $rowIndex }}][matched_item_id]" value="{{ $row['matched_item_id'] ?? '' }}">
+                                                </td>
+                                                <td>
+                                                    <select name="import_items[{{ $rowIndex }}][action]" class="inventory-import-select">
+                                                        <option value="create" @selected(($row['action'] ?? '') === 'create')>Create</option>
+                                                        <option value="update" @selected(($row['action'] ?? '') === 'update')>Update</option>
+                                                        <option value="skip">Skip</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <strong>{{ $row['match_status'] ?? 'New item' }}</strong>
+                                                    @if(!empty($row['matched_item_name']))
+                                                        <span class="inventory-import-row-note">{{ $row['matched_item_name'] }}</span>
+                                                    @endif
+                                                    @if(!empty($row['notes']))
+                                                        <span class="inventory-import-row-note">{{ $row['notes'] }}</span>
+                                                    @endif
+                                                </td>
+                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][name]" value="{{ $row['name'] ?? '' }}" required></td>
+                                                <td>
+                                                    <select name="import_items[{{ $rowIndex }}][category]" class="inventory-import-select">
+                                                        <option value="Medicine" @selected(($row['category'] ?? '') === 'Medicine')>Medicine</option>
+                                                        <option value="Supplies" @selected(($row['category'] ?? '') === 'Supplies')>Supplies</option>
+                                                        <option value="Equipment" @selected(($row['category'] ?? '') === 'Equipment')>Equipment</option>
+                                                    </select>
+                                                </td>
+                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][stock_number]" value="{{ $row['stock_number'] ?? '' }}"></td>
+                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][unit]" value="{{ $row['unit'] ?? 'pcs' }}" required></td>
+                                                <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][starting_stock]" value="{{ $row['starting_stock'] ?? 0 }}"></td>
+                                                <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][consumed]" value="{{ $row['consumed'] ?? 0 }}"></td>
+                                                <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][quantity]" value="{{ $row['quantity'] ?? 0 }}" required></td>
+                                                <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][minimum_stock]" value="{{ $row['minimum_stock'] ?? 10 }}"></td>
+                                                <td><input class="inventory-import-input" type="date" name="import_items[{{ $rowIndex }}][date_added]" value="{{ $row['date_added'] ?? now()->toDateString() }}"></td>
+                                                <td><input class="inventory-import-input" type="date" name="import_items[{{ $rowIndex }}][expiration_date]" value="{{ $row['expiration_date'] ?? '' }}"></td>
+                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][medicine_type]" value="{{ $row['medicine_type'] ?? '' }}"></td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-actions-row">
+                            <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate>Clear Preview</button>
+                            <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()">Review Later</button>
+                            <button type="submit" class="btn-add">Import Selected Rows</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endif
+
         <div id="itemModal" class="modal-overlay">
             <div class="modal-box">
                 <div class="inventory-modal-head">
@@ -2868,6 +3095,8 @@
 @push('scripts')
 <script>
     const itemModal = document.getElementById('itemModal');
+    const inventoryImportModal = document.getElementById('inventoryImportModal');
+    const inventoryImportReviewModal = document.getElementById('inventoryImportReviewModal');
     const restockModal = document.getElementById('restockModal');
     const historyModal = document.getElementById('historyModal');
     const itemForm = document.getElementById('itemForm');
@@ -3259,6 +3488,23 @@
         setMedicineTypeOpenState(false);
     }
 
+    function openInventoryImportModal() {
+        if (!inventoryImportModal) return;
+        inventoryImportModal.style.display = 'flex';
+        const fileInput = document.getElementById('inventoryImportFile');
+        if (fileInput) fileInput.focus();
+    }
+
+    function closeInventoryImportModal() {
+        if (!inventoryImportModal) return;
+        inventoryImportModal.style.display = 'none';
+    }
+
+    function closeInventoryImportReviewModal() {
+        if (!inventoryImportReviewModal) return;
+        inventoryImportReviewModal.style.display = 'none';
+    }
+
     function openRestockModal(item) {
         closeInventoryActionMenus();
         if (!restockModal || !restockForm) return;
@@ -3570,6 +3816,16 @@
         if (itemModal && event.target == itemModal) {
             closeModal();
         }
+        if (inventoryImportModal && event.target == inventoryImportModal) {
+            closeInventoryImportModal();
+        }
+        if (inventoryImportReviewModal && event.target == inventoryImportReviewModal) {
+            closeInventoryImportReviewModal();
+        }
+    }
+
+    if (inventoryImportReviewModal && inventoryImportReviewModal.dataset.openOnLoad === 'true') {
+        inventoryImportReviewModal.style.display = 'flex';
     }
 
     if (highlightedRow) {

@@ -13,6 +13,7 @@ use App\Models\Setting;
 use App\Models\Admin;
 use App\Services\FacultySyncService;
 use App\Services\GuisisApiService;
+use App\Services\InventoryImportAnalyzer;
 use App\Services\PuptasWebhookService;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Auth;
@@ -2208,6 +2209,271 @@ public function issueStock($id, Request $request)
     ]);
 
     return redirect()->back()->with('success', 'Stock issued successfully.');
+}
+
+public function analyzeInventoryImport(Request $request, InventoryImportAnalyzer $analyzer)
+{
+    $validated = $request->validate([
+        'inventory_import_file' => ['required', 'file', 'max:10240'],
+    ]);
+
+    $file = $request->file('inventory_import_file');
+    $extension = strtolower((string) $file->getClientOriginalExtension());
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'csv', 'tsv', 'txt', 'json'];
+
+    if (!in_array($extension, $allowedExtensions, true)) {
+        return redirect()->back()
+            ->with('error', 'Upload a clear inventory image or a CSV, TSV, TXT, or JSON file.');
+    }
+
+    $analysis = $analyzer->analyze($file);
+    if (!($analysis['ok'] ?? false)) {
+        return redirect()->back()
+            ->with('error', (string) ($analysis['message'] ?? 'Inventory import analysis failed.'));
+    }
+
+    $preview = $this->buildInventoryImportPreview($analysis);
+    if (empty($preview['rows'])) {
+        return redirect()->back()
+            ->with('error', 'No usable inventory rows were found in the uploaded file.');
+    }
+
+    $request->session()->put('inventory_import_preview', $preview);
+
+    ActivityLog::create([
+        'user_id' => auth()->id(),
+        'user_name' => auth()->user()->name,
+        'action' => 'Inventory Import Analyzed',
+        'description' => "Analyzed uploaded inventory file {$preview['source_name']} and prepared " . count($preview['rows']) . ' rows for review.',
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+    ]);
+
+    return redirect()->route('admin.inventory')
+        ->with('success', 'Inventory file analyzed. Review every row before importing.');
+}
+
+public function commitInventoryImport(Request $request)
+{
+    $rows = (array) $request->input('import_items', []);
+    $selectedRows = collect($rows)
+        ->filter(fn ($row) => is_array($row) && !empty($row['selected']))
+        ->values();
+
+    if ($selectedRows->isEmpty()) {
+        return redirect()->route('admin.inventory')
+            ->with('error', 'Select at least one analyzed inventory row to import.');
+    }
+
+    $created = 0;
+    $updated = 0;
+    $skipped = 0;
+    $errors = [];
+
+    DB::transaction(function () use ($selectedRows, &$created, &$updated, &$skipped, &$errors) {
+        foreach ($selectedRows as $index => $row) {
+            $action = strtolower(trim((string) ($row['action'] ?? '')));
+            if ($action === 'skip') {
+                $skipped++;
+                continue;
+            }
+
+            $data = $this->sanitizeInventoryImportRow($row);
+            if (($data['name'] ?? '') === '') {
+                $errors[] = 'Row ' . ($index + 1) . ' was skipped because the item name is missing.';
+                continue;
+            }
+
+            $existingItem = null;
+            $matchedItemId = (int) ($row['matched_item_id'] ?? 0);
+            if ($matchedItemId > 0) {
+                $existingItem = Item::find($matchedItemId);
+            }
+            if (!$existingItem) {
+                $existingItem = $this->findInventoryImportMatch($data);
+            }
+
+            if ($action === 'update' && $existingItem) {
+                $oldQuantity = (float) $existingItem->quantity;
+                $existingItem->fill($data);
+                $existingItem->save();
+                $newQuantity = (float) $existingItem->quantity;
+
+                $this->recordInventoryMovement(
+                    $existingItem,
+                    abs($newQuantity - $oldQuantity) > 0.00001 ? 'adjusted' : 'edited',
+                    $newQuantity - $oldQuantity,
+                    $oldQuantity,
+                    $newQuantity,
+                    'Updated from reviewed inventory import.',
+                    $data['date_added'] ?? null
+                );
+
+                $updated++;
+                continue;
+            }
+
+            $item = Item::create($data);
+            $this->recordInventoryMovement(
+                $item,
+                'created',
+                (float) $item->quantity,
+                0,
+                (float) $item->quantity,
+                'Created from reviewed inventory import.',
+                $data['date_added'] ?? null
+            );
+
+            $created++;
+        }
+    });
+
+    $request->session()->forget('inventory_import_preview');
+
+    ActivityLog::create([
+        'user_id' => auth()->id(),
+        'user_name' => auth()->user()->name,
+        'action' => 'Inventory Import Committed',
+        'description' => "Imported inventory rows. Created: {$created}, Updated: {$updated}, Skipped: {$skipped}.",
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+    ]);
+
+    $message = "Inventory import complete. Created: {$created}. Updated: {$updated}. Skipped: {$skipped}.";
+    if ($errors !== []) {
+        $message .= ' ' . implode(' ', array_slice($errors, 0, 3));
+    }
+
+    return redirect()->route('admin.inventory')->with('success', $message);
+}
+
+public function clearInventoryImportPreview(Request $request)
+{
+    $request->session()->forget('inventory_import_preview');
+
+    return redirect()->route('admin.inventory')
+        ->with('success', 'Inventory import preview cleared.');
+}
+
+private function buildInventoryImportPreview(array $analysis): array
+{
+    $rows = [];
+
+    foreach ((array) ($analysis['rows'] ?? []) as $index => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+
+        $data = $this->sanitizeInventoryImportRow($row, false);
+        if ($data['name'] === '') {
+            continue;
+        }
+
+        $match = $this->findInventoryImportMatch($data);
+        $rows[] = array_merge($data, [
+            'row_key' => $index,
+            'action' => $match ? 'update' : 'create',
+            'matched_item_id' => $match?->id,
+            'matched_item_name' => $match?->name,
+            'match_status' => $match ? 'Existing item' : 'New item',
+            'confidence' => (int) ($row['confidence'] ?? 100),
+            'notes' => trim((string) ($row['notes'] ?? '')),
+        ]);
+    }
+
+    return [
+        'source_name' => (string) ($analysis['source_name'] ?? 'inventory upload'),
+        'source_type' => (string) ($analysis['source_type'] ?? 'upload'),
+        'quality' => (array) ($analysis['quality'] ?? []),
+        'rows' => $rows,
+    ];
+}
+
+private function sanitizeInventoryImportRow(array $row, bool $persistMedicineType = true): array
+{
+    $text = static function ($value, int $maxLength): string {
+        $value = trim((string) $value);
+
+        if (function_exists('mb_substr')) {
+            return mb_substr($value, 0, $maxLength);
+        }
+
+        return substr($value, 0, $maxLength);
+    };
+
+    $category = trim((string) ($row['category'] ?? 'Medicine'));
+    if (!in_array($category, ['Medicine', 'Supplies', 'Equipment'], true)) {
+        $category = 'Medicine';
+    }
+
+    $quantity = max(0, (float) ($row['quantity'] ?? 0));
+    $consumed = max(0, (float) ($row['consumed'] ?? 0));
+    $startingStock = max(0, (float) ($row['starting_stock'] ?? 0));
+    if ($startingStock <= 0) {
+        $startingStock = $quantity + $consumed;
+    }
+
+    $medicineTypeName = $text($row['medicine_type'] ?? '', 255);
+    $medicineType = null;
+    if ($persistMedicineType && $category === 'Medicine' && $medicineTypeName !== '') {
+        $medicineType = MedicineType::firstOrCreate(['name' => $medicineTypeName]);
+    }
+
+    return [
+        'name' => $text($row['name'] ?? '', 255),
+        'category' => $category,
+        'stock_number' => $text($row['stock_number'] ?? '', 50) ?: null,
+        'medicine_type_id' => $category === 'Medicine' ? $medicineType?->id : null,
+        'medicine_type' => $category === 'Medicine' ? ($medicineType?->name ?: ($medicineTypeName ?: null)) : null,
+        'quantity' => $quantity,
+        'starting_stock' => $startingStock,
+        'consumed' => $consumed,
+        'minimum_stock' => max(0, (float) ($row['minimum_stock'] ?? 10)),
+        'unit' => $text($row['unit'] ?? 'pcs', 50) ?: 'pcs',
+        'dispensing_unit' => null,
+        'units_per_stock_unit' => null,
+        'date_added' => $this->parseInventoryImportDate($row['date_added'] ?? null) ?: now()->toDateString(),
+        'expiration_date' => $category === 'Medicine' ? $this->parseInventoryImportDate($row['expiration_date'] ?? null) : null,
+        'description' => 'Imported from reviewed inventory upload.',
+    ];
+}
+
+private function parseInventoryImportDate($value): ?string
+{
+    $value = trim((string) $value);
+    if ($value === '') {
+        return null;
+    }
+
+    try {
+        return Carbon::parse($value)->format('Y-m-d');
+    } catch (\Throwable $exception) {
+        return null;
+    }
+}
+
+private function findInventoryImportMatch(array $row): ?Item
+{
+    $stockNumber = trim((string) ($row['stock_number'] ?? ''));
+    if ($stockNumber !== '') {
+        $match = Item::query()
+            ->where('stock_number', $stockNumber)
+            ->first();
+
+        if ($match) {
+            return $match;
+        }
+    }
+
+    $name = trim((string) ($row['name'] ?? ''));
+    if ($name === '') {
+        return null;
+    }
+
+    return Item::query()
+        ->whereRaw('LOWER(name) = ?', [strtolower($name)])
+        ->where('category', $row['category'] ?? 'Medicine')
+        ->first();
 }
 
 public function deleteItem($id)

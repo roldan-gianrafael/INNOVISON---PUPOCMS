@@ -2401,7 +2401,12 @@
                                     <span>Status Flag</span>
                                     <strong>Pending Verification</strong>
                                 </div>
-                                <button type="button" class="readonly-expand-btn js-readonly-expand" aria-expanded="false">
+                                <button
+                                    type="button"
+                                    class="readonly-expand-btn"
+                                    aria-expanded="false"
+                                    onclick="event.stopPropagation(); const card = this.closest('.readonly-record-card'); if (card) { const expanded = !card.classList.contains('is-expanded'); card.classList.toggle('is-expanded', expanded); this.setAttribute('aria-expanded', expanded ? 'true' : 'false'); const label = this.querySelector('span'); if (label) label.textContent = expanded ? 'Hide' : 'View'; }"
+                                >
                                     <span>View</span>
                                 </button>
                             </div>
@@ -2747,23 +2752,6 @@
                 }
             });
         }
-
-        document.querySelectorAll('.js-readonly-expand').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const card = button.closest('.readonly-record-card');
-                if (!card) {
-                    return;
-                }
-
-                const expanded = !card.classList.contains('is-expanded');
-                card.classList.toggle('is-expanded', expanded);
-                button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-                const label = button.querySelector('span');
-                if (label) {
-                    label.textContent = expanded ? 'Hide' : 'View';
-                }
-            });
-        });
     });
 
     window.addEventListener('DOMContentLoaded', function () {

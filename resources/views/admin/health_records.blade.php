@@ -2412,12 +2412,6 @@
                             </div>
                         </div>
                         <div class="readonly-record-details">
-                            <div class="readonly-record-grid">
-                                <div class="readonly-field"><span>Status Flag</span><strong>Pending Verification</strong></div>
-                                <div class="readonly-field"><span>Student Full Name</span><strong>{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</strong></div>
-                                <div class="readonly-field"><span>Submission Reference Number</span><strong>{{ $readonlyRecord->reference_number ?: $readonlyRecord->student_number ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
-                                <div class="readonly-field"><span>Email Address</span><strong>{{ optional($readonlyRecord->user)->email ?: '-' }}</strong></div>
-                            </div>
                             <h5 class="readonly-docs-title">Uploaded Files Checklist</h5>
                             <ul class="readonly-doc-list">
                                 @foreach($readonlyDocs as $docLabel => $docPath)

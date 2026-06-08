@@ -2285,6 +2285,40 @@
     .badge-adjustment{ background: #fef3c7; color: #b45309; }
     .badge-default   { background: #f1f5f9; color: #475569; }
 
+    .inventory-import-feedback {
+        margin: 0 0 16px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(112, 19, 27, 0.16);
+        background: #fff7ed;
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .inventory-import-feedback.is-success {
+        background: #ecfdf5;
+        border-color: rgba(22, 163, 74, 0.22);
+    }
+
+    .inventory-import-feedback.is-error {
+        background: #fef2f2;
+        border-color: rgba(220, 38, 38, 0.24);
+    }
+
+    .inventory-import-feedback-title {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 900;
+        color: #70131B;
+    }
+
+    .inventory-import-feedback-copy {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #374151;
+    }
+
     #inventoryImportModal .modal-box,
     #inventoryImportReviewModal .modal-box {
         width: min(100%, 1080px);
@@ -2394,6 +2428,8 @@
         $canManageInventory = $role === \App\Models\User::ROLE_SUPERADMIN;
         $highlightItemId = (string) request()->query('highlight_item', '');
         $inventoryImportPreview = session('inventory_import_preview');
+        $inventoryImportFeedback = session('inventory_import_feedback');
+        $inventoryImportValidationError = $errors->first('inventory_import_file');
     @endphp
 
     <div class="controls">
@@ -2612,7 +2648,7 @@
     </div>
 
     @if($canManageInventory)
-        <div id="inventoryImportModal" class="modal-overlay">
+        <div id="inventoryImportModal" class="modal-overlay" data-open-on-load="{{ ((is_array($inventoryImportFeedback ?? null) || $inventoryImportValidationError) && empty($inventoryImportPreview['rows'] ?? [])) ? 'true' : 'false' }}">
             <div class="modal-box">
                 <div class="inventory-modal-head">
                     <div class="inventory-modal-head-main">
@@ -2624,9 +2660,20 @@
                     </button>
                 </div>
 
-                <form method="POST" action="{{ route('admin.inventory.import.analyze') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('admin.inventory.import.analyze') }}" enctype="multipart/form-data" id="inventoryImportAnalyzeForm">
                     @csrf
                     <div class="inventory-modal-body">
+                        @if($inventoryImportValidationError)
+                            <div class="inventory-import-feedback is-error">
+                                <p class="inventory-import-feedback-title">Upload could not be analyzed</p>
+                                <p class="inventory-import-feedback-copy">{{ $inventoryImportValidationError }}</p>
+                            </div>
+                        @elseif(is_array($inventoryImportFeedback ?? null))
+                            <div class="inventory-import-feedback is-{{ ($inventoryImportFeedback['status'] ?? '') === 'success' ? 'success' : 'error' }}">
+                                <p class="inventory-import-feedback-title">{{ $inventoryImportFeedback['title'] ?? 'Inventory import status' }}</p>
+                                <p class="inventory-import-feedback-copy">{{ $inventoryImportFeedback['message'] ?? 'Check the uploaded file and try again.' }}</p>
+                            </div>
+                        @endif
                         <div class="inventory-import-drop">
                             <label for="inventoryImportFile" style="font-size:15px;font-weight:900;color:#70131B;">Inventory photo or file</label>
                             <input type="file" name="inventory_import_file" id="inventoryImportFile" accept=".jpg,.jpeg,.png,.webp,.csv,.tsv,.txt,.json,image/jpeg,image/png,image/webp,text/csv,text/plain,application/json" required>
@@ -2637,7 +2684,7 @@
                     </div>
                     <div class="modal-actions-row">
                         <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportModal()">Cancel</button>
-                        <button type="submit" class="btn-add">Analyze Upload</button>
+                        <button type="submit" class="btn-add" id="inventoryImportAnalyzeBtn">Analyze Upload</button>
                     </div>
                 </form>
             </div>
@@ -3097,6 +3144,8 @@
     const itemModal = document.getElementById('itemModal');
     const inventoryImportModal = document.getElementById('inventoryImportModal');
     const inventoryImportReviewModal = document.getElementById('inventoryImportReviewModal');
+    const inventoryImportAnalyzeForm = document.getElementById('inventoryImportAnalyzeForm');
+    const inventoryImportAnalyzeBtn = document.getElementById('inventoryImportAnalyzeBtn');
     const restockModal = document.getElementById('restockModal');
     const historyModal = document.getElementById('historyModal');
     const itemForm = document.getElementById('itemForm');
@@ -3505,6 +3554,13 @@
         inventoryImportReviewModal.style.display = 'none';
     }
 
+    if (inventoryImportAnalyzeForm && inventoryImportAnalyzeBtn) {
+        inventoryImportAnalyzeForm.addEventListener('submit', function() {
+            inventoryImportAnalyzeBtn.disabled = true;
+            inventoryImportAnalyzeBtn.textContent = 'Analyzing...';
+        });
+    }
+
     function openRestockModal(item) {
         closeInventoryActionMenus();
         if (!restockModal || !restockForm) return;
@@ -3822,6 +3878,10 @@
         if (inventoryImportReviewModal && event.target == inventoryImportReviewModal) {
             closeInventoryImportReviewModal();
         }
+    }
+
+    if (inventoryImportModal && inventoryImportModal.dataset.openOnLoad === 'true') {
+        inventoryImportModal.style.display = 'flex';
     }
 
     if (inventoryImportReviewModal && inventoryImportReviewModal.dataset.openOnLoad === 'true') {

@@ -2223,18 +2223,33 @@ public function analyzeInventoryImport(Request $request, InventoryImportAnalyzer
 
     if (!in_array($extension, $allowedExtensions, true)) {
         return redirect()->back()
+            ->with('inventory_import_feedback', [
+                'status' => 'error',
+                'title' => 'Unsupported inventory file',
+                'message' => 'Upload a clear inventory image or a CSV, TSV, TXT, or JSON file.',
+            ])
             ->with('error', 'Upload a clear inventory image or a CSV, TSV, TXT, or JSON file.');
     }
 
     $analysis = $analyzer->analyze($file);
     if (!($analysis['ok'] ?? false)) {
         return redirect()->back()
+            ->with('inventory_import_feedback', [
+                'status' => 'error',
+                'title' => 'Inventory scan needs attention',
+                'message' => (string) ($analysis['message'] ?? 'Inventory import analysis failed.'),
+            ])
             ->with('error', (string) ($analysis['message'] ?? 'Inventory import analysis failed.'));
     }
 
     $preview = $this->buildInventoryImportPreview($analysis);
     if (empty($preview['rows'])) {
         return redirect()->back()
+            ->with('inventory_import_feedback', [
+                'status' => 'error',
+                'title' => 'No inventory rows found',
+                'message' => 'No usable inventory rows were found in the uploaded file. Try a clearer image or a CSV/TSV export.',
+            ])
             ->with('error', 'No usable inventory rows were found in the uploaded file.');
     }
 
@@ -2250,6 +2265,11 @@ public function analyzeInventoryImport(Request $request, InventoryImportAnalyzer
     ]);
 
     return redirect()->route('admin.inventory')
+        ->with('inventory_import_feedback', [
+            'status' => 'success',
+            'title' => 'Inventory scan ready',
+            'message' => 'Review the extracted rows below, edit anything that looks wrong, then import the selected rows.',
+        ])
         ->with('success', 'Inventory file analyzed. Review every row before importing.');
 }
 

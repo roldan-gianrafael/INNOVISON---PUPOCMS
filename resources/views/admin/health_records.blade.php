@@ -385,6 +385,17 @@
         font-weight: 900;
         word-break: break-word;
     }
+    .readonly-record-pill.status-flag-pill {
+        background: #fef3c7;
+        border-color: #facc15;
+        box-shadow: 0 8px 18px rgba(250, 204, 21, 0.18);
+    }
+    .readonly-record-pill.status-flag-pill span {
+        color: #70131B;
+    }
+    .readonly-record-pill.status-flag-pill strong {
+        color: #70131B;
+    }
     .readonly-expand-btn {
         position: relative;
         overflow: hidden;
@@ -517,14 +528,21 @@
         transition: background-color .2s ease, color .2s ease, transform .2s ease;
     }
     .readonly-doc-link:hover {
-        background: #70131B;
-        color: #facc15;
+        background: #facc15;
+        color: #70131B;
+        border-color: #facc15;
         transform: translateY(-1px);
     }
     .readonly-doc-missing {
         border: 1px dashed rgba(100, 116, 139, 0.25);
         background: #f8fafc;
         color: #94a3b8;
+        transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+    }
+    .readonly-doc-missing:hover {
+        background: #facc15;
+        border-color: #facc15;
+        color: #70131B;
     }
     html[data-theme="dark"] .awaiting-info-row {
         background: rgba(17, 24, 39, .92);
@@ -2397,7 +2415,7 @@
                                     <span>Reference Number</span>
                                     <strong>{{ $readonlyRecord->reference_number ?: $readonlyRecord->student_number ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong>
                                 </div>
-                                <div class="readonly-record-pill">
+                                <div class="readonly-record-pill status-flag-pill">
                                     <span>Status Flag</span>
                                     <strong>Pending Verification</strong>
                                 </div>

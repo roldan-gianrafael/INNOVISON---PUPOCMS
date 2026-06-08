@@ -355,6 +355,82 @@
         padding-bottom: 12px;
         border-bottom: 1px solid rgba(112, 19, 27, 0.1);
     }
+    .readonly-record-meta {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+        text-align: right;
+    }
+    .readonly-record-pill {
+        display: grid;
+        gap: 3px;
+        min-width: 128px;
+        padding: 7px 10px;
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid rgba(112, 19, 27, 0.1);
+    }
+    .readonly-record-pill span {
+        color: #64748b;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+    }
+    .readonly-record-pill strong {
+        color: #111827;
+        font-size: 11px;
+        font-weight: 900;
+        word-break: break-word;
+    }
+    .readonly-expand-btn {
+        position: relative;
+        overflow: hidden;
+        align-self: stretch;
+        min-width: 76px;
+        border: 1px solid #70131B;
+        border-radius: 12px;
+        background: #70131B;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: color .25s ease, background-color .25s ease, transform .25s ease;
+    }
+    .readonly-expand-btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg,
+            rgba(255, 248, 196, 0) 0%,
+            rgba(255, 239, 181, 0.18) 22%,
+            rgba(255, 239, 181, 0.62) 48%,
+            rgba(255, 239, 181, 0.18) 72%,
+            rgba(255, 248, 196, 0) 100%);
+        transform: translateX(-135%);
+        transition: transform 1.2s ease;
+    }
+    .readonly-expand-btn span {
+        position: relative;
+        z-index: 1;
+    }
+    .readonly-expand-btn:hover {
+        background: #facc15;
+        color: #70131B;
+        transform: translateY(-1px);
+    }
+    .readonly-expand-btn:hover::before {
+        transform: translateX(135%);
+    }
+    .readonly-record-details {
+        display: none;
+        gap: 14px;
+    }
+    .readonly-record-card.is-expanded .readonly-record-details {
+        display: grid;
+    }
     .readonly-record-name {
         margin: 0;
         color: #111827;
@@ -468,16 +544,19 @@
     }
     html[data-theme="dark"] .pending-approval-name,
     html[data-theme="dark"] .readonly-record-name,
-    html[data-theme="dark"] .readonly-field strong {
+    html[data-theme="dark"] .readonly-field strong,
+    html[data-theme="dark"] .readonly-record-pill strong {
         color: #ffffff;
     }
     html[data-theme="dark"] .pending-approval-meta,
     html[data-theme="dark"] .pending-approval-empty,
     html[data-theme="dark"] .readonly-record-sub,
-    html[data-theme="dark"] .readonly-field span {
+    html[data-theme="dark"] .readonly-field span,
+    html[data-theme="dark"] .readonly-record-pill span {
         color: #cbd5e1;
     }
     html[data-theme="dark"] .readonly-field,
+    html[data-theme="dark"] .readonly-record-pill,
     html[data-theme="dark"] .readonly-doc-link {
         background: rgba(15, 23, 42, .9);
         border-color: rgba(250, 204, 21, .14);
@@ -2313,31 +2392,46 @@
                                 <h4 class="readonly-record-name">{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</h4>
                                 <p class="readonly-record-sub">{{ optional($readonlyRecord->user)->email ?: '-' }}</p>
                             </div>
+                            <div class="readonly-record-meta">
+                                <div class="readonly-record-pill">
+                                    <span>Reference Number</span>
+                                    <strong>{{ $readonlyRecord->reference_number ?: $readonlyRecord->student_number ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong>
+                                </div>
+                                <div class="readonly-record-pill">
+                                    <span>Status Flag</span>
+                                    <strong>Pending Verification</strong>
+                                </div>
+                                <button type="button" class="readonly-expand-btn js-readonly-expand" aria-expanded="false">
+                                    <span>View</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="readonly-record-grid">
-                            <div class="readonly-field"><span>Status Flag</span><strong>Pending Verification</strong></div>
-                            <div class="readonly-field"><span>Student Full Name</span><strong>{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</strong></div>
-                            <div class="readonly-field"><span>Submission Reference Number</span><strong>{{ $readonlyRecord->reference_number ?: $readonlyRecord->student_number ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
-                            <div class="readonly-field"><span>Email Address</span><strong>{{ optional($readonlyRecord->user)->email ?: '-' }}</strong></div>
+                        <div class="readonly-record-details">
+                            <div class="readonly-record-grid">
+                                <div class="readonly-field"><span>Status Flag</span><strong>Pending Verification</strong></div>
+                                <div class="readonly-field"><span>Student Full Name</span><strong>{{ optional($readonlyRecord->user)->name ?: 'Unnamed Student' }}</strong></div>
+                                <div class="readonly-field"><span>Submission Reference Number</span><strong>{{ $readonlyRecord->reference_number ?: $readonlyRecord->student_number ?: optional($readonlyRecord->user)->student_number ?: '-' }}</strong></div>
+                                <div class="readonly-field"><span>Email Address</span><strong>{{ optional($readonlyRecord->user)->email ?: '-' }}</strong></div>
+                            </div>
+                            <h5 class="readonly-docs-title">Uploaded Files Checklist</h5>
+                            <ul class="readonly-doc-list">
+                                @foreach($readonlyDocs as $docLabel => $docPath)
+                                    <li>
+                                        @if($docPath)
+                                            <a class="readonly-doc-link" href="{{ asset('storage/' . $docPath) }}" target="_blank" rel="noopener noreferrer">
+                                                <span>{{ $docLabel }}</span>
+                                                <span>Open</span>
+                                            </a>
+                                        @else
+                                            <span class="readonly-doc-missing">
+                                                <span>{{ $docLabel }}</span>
+                                                <span>No document uploaded</span>
+                                            </span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
-                        <h5 class="readonly-docs-title">Uploaded Files Checklist</h5>
-                        <ul class="readonly-doc-list">
-                            @foreach($readonlyDocs as $docLabel => $docPath)
-                                <li>
-                                    @if($docPath)
-                                        <a class="readonly-doc-link" href="{{ asset('storage/' . $docPath) }}" target="_blank" rel="noopener noreferrer">
-                                            <span>{{ $docLabel }}</span>
-                                            <span>Open</span>
-                                        </a>
-                                    @else
-                                        <span class="readonly-doc-missing">
-                                            <span>{{ $docLabel }}</span>
-                                            <span>No document uploaded</span>
-                                        </span>
-                                    @endif
-                                </li>
-                            @endforeach
-                        </ul>
                     </article>
                 @empty
                     <div class="pending-approval-empty">No students are currently waiting for approval.</div>
@@ -2653,6 +2747,23 @@
                 }
             });
         }
+
+        document.querySelectorAll('.js-readonly-expand').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const card = button.closest('.readonly-record-card');
+                if (!card) {
+                    return;
+                }
+
+                const expanded = !card.classList.contains('is-expanded');
+                card.classList.toggle('is-expanded', expanded);
+                button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                const label = button.querySelector('span');
+                if (label) {
+                    label.textContent = expanded ? 'Hide' : 'View';
+                }
+            });
+        });
     });
 
     window.addEventListener('DOMContentLoaded', function () {

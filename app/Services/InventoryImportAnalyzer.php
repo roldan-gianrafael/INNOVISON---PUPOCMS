@@ -9,6 +9,10 @@ class InventoryImportAnalyzer
 {
     private const MAX_ROWS = 120;
 
+    public function __construct(private GeminiClient $gemini)
+    {
+    }
+
     public function analyze(UploadedFile $file): array
     {
         $extension = strtolower((string) $file->getClientOriginalExtension());
@@ -70,23 +74,6 @@ class InventoryImportAnalyzer
             ];
         }
 
-        $apiKey = trim((string) config('services.openai.api_key'));
-        if ($apiKey === '') {
-            return [
-                'ok' => false,
-                'message' => 'Image inventory import requires OPENAI_API_KEY to be configured.',
-            ];
-        }
-
-        $model = trim((string) config('services.openai.model', ''));
-        if ($model === '') {
-            $model = 'gpt-4.1-mini';
-        }
-
-        $base64 = base64_encode((string) file_get_contents($path));
-        $mimeType = $file->getMimeType() ?: 'image/jpeg';
-        $imageData = 'data:' . $mimeType . ';base64,' . $base64;
-
         $prompt = <<<'PROMPT'
 You are extracting a clinic inventory table from an uploaded photo.
 
@@ -125,6 +112,60 @@ Rules:
 - Keep dates in YYYY-MM-DD when readable; otherwise empty.
 PROMPT;
 
+        if ($this->shouldUseGemini()) {
+            return $this->analyzeImageWithGemini($file, $prompt, $blurScore, $width, $height);
+        }
+
+        return $this->analyzeImageWithOpenAi($file, $prompt, $blurScore, $width, $height);
+    }
+
+    private function analyzeImageWithGemini(UploadedFile $file, string $prompt, ?float $blurScore, int $width, int $height): array
+    {
+        if (!$this->gemini->configured()) {
+            return [
+                'ok' => false,
+                'message' => 'Image inventory import requires GEMINI_API_KEY to be configured.',
+            ];
+        }
+
+        try {
+            $text = $this->gemini->generateImageText($prompt, $file, 8192, 0.0);
+            if ($text === null) {
+                return [
+                    'ok' => false,
+                    'message' => 'The Gemini analyzer could not process this image right now.',
+                ];
+            }
+
+            return $this->buildImageAnalysisResult($text, 'gemini-image', $file->getClientOriginalName(), $blurScore, $width, $height);
+        } catch (\Throwable $exception) {
+            return [
+                'ok' => false,
+                'message' => 'The Gemini analyzer failed. Please try a clearer image or upload CSV.',
+            ];
+        }
+    }
+
+    private function analyzeImageWithOpenAi(UploadedFile $file, string $prompt, ?float $blurScore, int $width, int $height): array
+    {
+        $apiKey = trim((string) config('services.openai.api_key'));
+        if ($apiKey === '') {
+            return [
+                'ok' => false,
+                'message' => 'Image inventory import requires an AI API key. Configure GEMINI_API_KEY or OPENAI_API_KEY.',
+            ];
+        }
+
+        $model = trim((string) config('services.openai.model', ''));
+        if ($model === '') {
+            $model = 'gpt-4.1-mini';
+        }
+
+        $path = (string) $file->getRealPath();
+        $base64 = base64_encode((string) file_get_contents($path));
+        $mimeType = $file->getMimeType() ?: 'image/jpeg';
+        $imageData = 'data:' . $mimeType . ';base64,' . $base64;
+
         try {
             $response = Http::withToken($apiKey)
                 ->acceptJson()
@@ -147,61 +188,73 @@ PROMPT;
                 ];
             }
 
-            $decoded = $this->decodeJsonText($this->extractOpenAiOutputText($response->json() ?: []));
-            if (!is_array($decoded)) {
-                return [
-                    'ok' => false,
-                    'message' => 'The AI analyzer returned an unreadable response. Upload a clearer inventory image or use CSV.',
-                ];
-            }
-
-            $quality = is_array($decoded['quality'] ?? null) ? $decoded['quality'] : [];
-            $status = strtolower(trim((string) ($quality['status'] ?? '')));
-            $confidence = (int) ($quality['confidence'] ?? 0);
-
-            if (!in_array($status, ['clear', 'ok'], true) || $confidence < 85) {
-                return [
-                    'ok' => false,
-                    'message' => 'The uploaded image was not clear enough for safe import. Please retake it or upload a CSV file.',
-                    'quality' => [
-                        'status' => $status ?: 'uncertain',
-                        'confidence' => $confidence,
-                        'issues' => array_values((array) ($quality['issues'] ?? [])),
-                        'blur_score' => $blurScore,
-                        'width' => $width,
-                        'height' => $height,
-                    ],
-                ];
-            }
-
-            $rows = $this->normalizeRows((array) ($decoded['rows'] ?? []));
-            if ($rows === []) {
-                return [
-                    'ok' => false,
-                    'message' => 'No inventory rows were detected in the uploaded image.',
-                ];
-            }
-
-            return [
-                'ok' => true,
-                'source_type' => 'image',
-                'source_name' => $file->getClientOriginalName(),
-                'quality' => [
-                    'status' => 'clear',
-                    'confidence' => $confidence,
-                    'issues' => array_values((array) ($quality['issues'] ?? [])),
-                    'blur_score' => $blurScore,
-                    'width' => $width,
-                    'height' => $height,
-                ],
-                'rows' => $rows,
-            ];
+            return $this->buildImageAnalysisResult(
+                $this->extractOpenAiOutputText($response->json() ?: []),
+                'openai-image',
+                $file->getClientOriginalName(),
+                $blurScore,
+                $width,
+                $height
+            );
         } catch (\Throwable $exception) {
             return [
                 'ok' => false,
                 'message' => 'The image analyzer failed. Please try a clearer image or upload CSV.',
             ];
         }
+    }
+
+    private function buildImageAnalysisResult(string $jsonText, string $sourceType, string $sourceName, ?float $blurScore, int $width, int $height): array
+    {
+        $decoded = $this->decodeJsonText($jsonText);
+        if (!is_array($decoded)) {
+            return [
+                'ok' => false,
+                'message' => 'The AI analyzer returned an unreadable response. Upload a clearer inventory image or use CSV.',
+            ];
+        }
+
+        $quality = is_array($decoded['quality'] ?? null) ? $decoded['quality'] : [];
+        $status = strtolower(trim((string) ($quality['status'] ?? '')));
+        $confidence = (int) ($quality['confidence'] ?? 0);
+
+        if (!in_array($status, ['clear', 'ok'], true) || $confidence < 85) {
+            return [
+                'ok' => false,
+                'message' => 'The uploaded image was not clear enough for safe import. Please retake it or upload a CSV file.',
+                'quality' => [
+                    'status' => $status ?: 'uncertain',
+                    'confidence' => $confidence,
+                    'issues' => array_values((array) ($quality['issues'] ?? [])),
+                    'blur_score' => $blurScore,
+                    'width' => $width,
+                    'height' => $height,
+                ],
+            ];
+        }
+
+        $rows = $this->normalizeRows((array) ($decoded['rows'] ?? []));
+        if ($rows === []) {
+            return [
+                'ok' => false,
+                'message' => 'No inventory rows were detected in the uploaded image.',
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'source_type' => $sourceType,
+            'source_name' => $sourceName,
+            'quality' => [
+                'status' => 'clear',
+                'confidence' => $confidence,
+                'issues' => array_values((array) ($quality['issues'] ?? [])),
+                'blur_score' => $blurScore,
+                'width' => $width,
+                'height' => $height,
+            ],
+            'rows' => $rows,
+        ];
     }
 
     private function analyzeDelimitedFile(UploadedFile $file, string $delimiter): array
@@ -324,16 +377,43 @@ PROMPT;
             return $this->analyzeDelimitedFile($file, "\t");
         }
 
+        $prompt = "Extract clinic inventory rows from the text below. Return strict JSON with a rows array using fields: name, category, stock_number, unit, quantity, consumed, starting_stock, minimum_stock, date_added, expiration_date, medicine_type, confidence, notes. Do not invent rows.\n\n" . $this->limitText($text, 12000);
+
+        if ($this->shouldUseGemini()) {
+            if (!$this->gemini->configured()) {
+                return [
+                    'ok' => false,
+                    'message' => 'Plain text inventory import requires GEMINI_API_KEY. Use CSV/TSV for local parsing.',
+                ];
+            }
+
+            try {
+                $output = $this->gemini->generateText($prompt, 8192, 0.0);
+                if ($output === null) {
+                    return [
+                        'ok' => false,
+                        'message' => 'The Gemini text analyzer could not process this file right now.',
+                    ];
+                }
+
+                return $this->buildTextAnalysisResult($output, 'gemini-text', $file->getClientOriginalName());
+            } catch (\Throwable $exception) {
+                return [
+                    'ok' => false,
+                    'message' => 'The Gemini text analyzer failed. Please upload CSV/TSV or try again.',
+                ];
+            }
+        }
+
         $apiKey = trim((string) config('services.openai.api_key'));
         if ($apiKey === '') {
             return [
                 'ok' => false,
-                'message' => 'Plain text inventory import requires OPENAI_API_KEY. Use CSV/TSV for local parsing.',
+                'message' => 'Plain text inventory import requires an AI API key. Configure GEMINI_API_KEY or OPENAI_API_KEY, or use CSV/TSV.',
             ];
         }
 
         $model = trim((string) config('services.openai.model', '')) ?: 'gpt-4.1-mini';
-        $prompt = "Extract clinic inventory rows from the text below. Return strict JSON with a rows array using fields: name, category, stock_number, unit, quantity, consumed, starting_stock, minimum_stock, date_added, expiration_date, medicine_type, confidence, notes. Do not invent rows.\n\n" . $this->limitText($text, 12000);
 
         try {
             $response = Http::withToken($apiKey)
@@ -356,33 +436,38 @@ PROMPT;
                 ];
             }
 
-            $decoded = $this->decodeJsonText($this->extractOpenAiOutputText($response->json() ?: []));
-            $rows = $this->normalizeRows((array) ($decoded['rows'] ?? []));
-
-            if ($rows === []) {
-                return [
-                    'ok' => false,
-                    'message' => 'No valid inventory rows were detected in the text file.',
-                ];
-            }
-
-            return [
-                'ok' => true,
-                'source_type' => 'text',
-                'source_name' => $file->getClientOriginalName(),
-                'quality' => [
-                    'status' => 'parsed',
-                    'confidence' => 90,
-                    'issues' => [],
-                ],
-                'rows' => $rows,
-            ];
+            return $this->buildTextAnalysisResult($this->extractOpenAiOutputText($response->json() ?: []), 'openai-text', $file->getClientOriginalName());
         } catch (\Throwable $exception) {
             return [
                 'ok' => false,
                 'message' => 'The text analyzer failed. Please upload CSV/TSV or try again.',
             ];
         }
+    }
+
+    private function buildTextAnalysisResult(string $jsonText, string $sourceType, string $sourceName): array
+    {
+        $decoded = $this->decodeJsonText($jsonText);
+        $rows = $this->normalizeRows((array) ($decoded['rows'] ?? []));
+
+        if ($rows === []) {
+            return [
+                'ok' => false,
+                'message' => 'No valid inventory rows were detected in the text file.',
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'source_type' => $sourceType,
+            'source_name' => $sourceName,
+            'quality' => [
+                'status' => 'parsed',
+                'confidence' => 90,
+                'issues' => [],
+            ],
+            'rows' => $rows,
+        ];
     }
 
     private function normalizeRows(array $rows): array
@@ -432,6 +517,21 @@ PROMPT;
         }
 
         return $normalized;
+    }
+
+    private function shouldUseGemini(): bool
+    {
+        $provider = strtolower(trim((string) config('services.ai.provider', 'auto')));
+
+        if ($provider === 'gemini') {
+            return true;
+        }
+
+        if ($provider === 'openai') {
+            return false;
+        }
+
+        return $this->gemini->configured();
     }
 
     private function normalizeHeaders(array $headers): array

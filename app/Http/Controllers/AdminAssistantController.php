@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Setting;
+use App\Services\GeminiClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -43,7 +44,7 @@ class AdminAssistantController extends Controller
             ]);
         }
 
-        $aiReply = $this->askOpenAi($text);
+        $aiReply = $this->askAi($text);
         if ($aiReply !== null) {
             return response()->json([
                 'type' => 'answer',
@@ -209,6 +210,37 @@ class AdminAssistantController extends Controller
         }
 
         return null;
+    }
+
+    private function askAi(string $text): ?string
+    {
+        $provider = strtolower(trim((string) config('services.ai.provider', 'auto')));
+        $gemini = app(GeminiClient::class);
+
+        if ($provider === 'gemini' || ($provider === 'auto' && $gemini->configured())) {
+            return $this->askGemini($text, $gemini);
+        }
+
+        return $this->askOpenAi($text);
+    }
+
+    private function askGemini(string $text, GeminiClient $gemini): ?string
+    {
+        if (!$gemini->configured()) {
+            return null;
+        }
+
+        $prompt = <<<PROMPT
+You are a campus clinic triage assistant for admin use.
+Give concise, safe triage guidance.
+Do not provide a definitive diagnosis.
+Always mention urgent red flags and when to escalate to emergency care.
+
+User question:
+{$text}
+PROMPT;
+
+        return $gemini->generateText($prompt, 512, 0.2);
     }
 
     private function askOpenAi(string $text): ?string

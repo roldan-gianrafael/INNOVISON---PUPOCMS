@@ -2387,17 +2387,24 @@ private function buildInventoryImportPreview(array $analysis): array
         }
 
         $data = $this->sanitizeInventoryImportRow($row, false);
-        if ($data['name'] === '') {
-            continue;
-        }
 
         $match = $this->findInventoryImportMatch($data);
+        $rowIssues = [];
+        if ($data['name'] === '') {
+            $rowIssues[] = 'Missing item name';
+        }
+        if (($data['unit'] ?? '') === '') {
+            $rowIssues[] = 'Missing unit';
+        }
+
         $rows[] = array_merge($data, [
             'row_key' => $index,
-            'action' => $match ? 'update' : 'create',
+            'action' => $data['name'] === '' ? 'skip' : ($match ? 'update' : 'create'),
             'matched_item_id' => $match ? $match->id : null,
             'matched_item_name' => $match ? $match->name : null,
-            'match_status' => $match ? 'Existing item' : 'New item',
+            'match_status' => $data['name'] === '' ? 'Needs review' : ($match ? 'Existing item' : 'New item'),
+            'ready_to_import' => $data['name'] !== '',
+            'issues' => $rowIssues,
             'confidence' => (int) ($row['confidence'] ?? 100),
             'notes' => trim((string) ($row['notes'] ?? '')),
         ]);

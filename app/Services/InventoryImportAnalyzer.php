@@ -482,15 +482,68 @@ PROMPT;
                 continue;
             }
 
-            $name = $this->firstString($row, ['name', 'item', 'medicine', 'material', 'description', 'medicines_materials']);
-            if ($name === '') {
+            $name = $this->firstString($row, [
+                'name',
+                'item',
+                'item_name',
+                'item_description',
+                'description',
+                'description_of_items',
+                'particulars',
+                'product',
+                'article',
+                'medicine',
+                'medicines',
+                'medicine_name',
+                'medicine_material',
+                'medicine_materials',
+                'medicine_and_materials',
+                'medicines_materials',
+                'medicines_and_materials',
+                'medical_supplies',
+                'supplies',
+                'supply',
+                'supplies_materials',
+                'materials',
+            ]);
+
+            $quantity = $this->parseNumber($this->firstValue($row, [
+                'quantity',
+                'qty',
+                'balance',
+                'ending_balance',
+                'current_balance',
+                'remaining_balance',
+                'balance_on_hand',
+                'current_stock',
+                'stock',
+                'on_hand',
+                'available',
+                'remaining',
+            ]));
+            $consumed = $this->parseNumber($this->firstValue($row, ['consumed', 'consumed_qty', 'used', 'used_qty', 'issued', 'issued_qty', 'out', 'dispensed']));
+            $startingStock = $this->parseNumber($this->firstValue($row, [
+                'starting_stock',
+                'starting',
+                'beginning_balance',
+                'beginning',
+                'initial_stock',
+                'start_stock',
+                'stock_on_hand_beginning',
+            ]));
+
+            $hasMeaningfulInventoryData = $name !== ''
+                || $quantity > 0
+                || $consumed > 0
+                || $startingStock > 0
+                || $this->firstString($row, ['stock_number', 'stock_no', 'stock_num', 'stock_code', 'inventory_number', 'property_number']) !== ''
+                || $this->firstString($row, ['unit', 'uom', 'stock_unit']) !== '';
+
+            if (!$hasMeaningfulInventoryData) {
                 continue;
             }
 
             $category = $this->normalizeCategory($this->firstString($row, ['category', 'type', 'classification']));
-            $quantity = $this->parseNumber($this->firstValue($row, ['quantity', 'balance', 'current_stock', 'stock', 'on_hand']));
-            $consumed = $this->parseNumber($this->firstValue($row, ['consumed', 'used', 'issued', 'out']));
-            $startingStock = $this->parseNumber($this->firstValue($row, ['starting_stock', 'beginning_balance', 'beginning', 'initial_stock']));
 
             if ($startingStock <= 0 && $consumed > 0) {
                 $startingStock = $quantity + $consumed;
@@ -501,17 +554,17 @@ PROMPT;
             $normalized[] = [
                 'name' => $this->limitText($name, 255),
                 'category' => $category,
-                'stock_number' => $this->limitText($this->firstString($row, ['stock_number', 'stock_no', 'stock_num', 'stock']), 50),
-                'unit' => $this->limitText($this->firstString($row, ['unit', 'uom']) ?: 'pcs', 50),
+                'stock_number' => $this->limitText($this->firstString($row, ['stock_number', 'stock_no', 'stock_num', 'stock_code', 'inventory_number', 'property_number']), 50),
+                'unit' => $this->limitText($this->firstString($row, ['unit', 'uom', 'stock_unit']) ?: 'pcs', 50),
                 'quantity' => max(0, $quantity),
                 'consumed' => max(0, $consumed),
                 'starting_stock' => max(0, $startingStock),
-                'minimum_stock' => max(0, $this->parseNumber($this->firstValue($row, ['minimum_stock', 'minimum', 'reorder_level']), 10)),
-                'date_added' => $this->normalizeDate($this->firstString($row, ['date_added', 'date', 'received_date', 'restock_date'])),
-                'expiration_date' => $this->normalizeDate($this->firstString($row, ['expiration_date', 'expiry', 'expiry_date', 'expiration'])),
-                'medicine_type' => $this->limitText($this->firstString($row, ['medicine_type', 'medicine_class', 'drug_class']), 255),
+                'minimum_stock' => max(0, $this->parseNumber($this->firstValue($row, ['minimum_stock', 'minimum', 'minimum_qty', 'reorder_level', 'reorder_point']), 10)),
+                'date_added' => $this->normalizeDate($this->firstString($row, ['date_added', 'date', 'received_date', 'restock_date', 'inventory_date'])),
+                'expiration_date' => $this->normalizeDate($this->firstString($row, ['expiration_date', 'expiry', 'expiry_date', 'expiration', 'expiry_expiration_date'])),
+                'medicine_type' => $this->limitText($this->firstString($row, ['medicine_type', 'medicine_class', 'drug_class', 'medicine_category']), 255),
                 'confidence' => min(100, max(0, (int) $this->parseNumber($this->firstValue($row, ['confidence']), 100))),
-                'notes' => $this->limitText($this->firstString($row, ['notes', 'note', 'remarks']), 500),
+                'notes' => $this->limitText($this->firstString($row, ['notes', 'note', 'remarks']) ?: ($name === '' ? 'Item name was not detected. Type the item name before importing this row.' : ''), 500),
             ];
 
             if (count($normalized) >= self::MAX_ROWS) {
@@ -555,16 +608,21 @@ PROMPT;
             $value = trim($value, '_');
 
             return match ($value) {
-                'item', 'item_name', 'medicine', 'medicine_name', 'material', 'materials', 'medicines_materials', 'medicines_and_materials' => 'name',
-                'stock_no', 'stock_num', 'stock_number', 'stock_code' => 'stock_number',
-                'qty', 'quantity_on_hand', 'current_stock', 'balance', 'current_balance', 'on_hand' => 'quantity',
-                'consumed_qty', 'used_qty', 'issued_qty', 'used', 'issued' => 'consumed',
-                'beginning', 'beginning_balance', 'initial_stock', 'start_stock' => 'starting_stock',
-                'minimum', 'minimum_qty', 'minimum_stock', 'reorder_level' => 'minimum_stock',
-                'uom' => 'unit',
-                'date', 'date_received', 'received_date' => 'date_added',
-                'expiry', 'expiry_date', 'expiration', 'expiration_date' => 'expiration_date',
-                'medicine_class', 'drug_class' => 'medicine_type',
+                'item', 'item_name', 'medicine', 'medicines', 'medicine_name', 'material', 'materials',
+                'description', 'item_description', 'description_of_items', 'particulars', 'product', 'article',
+                'supplies', 'supply', 'medical_supplies', 'supplies_materials', 'medicine_material',
+                'medicine_materials', 'medicine_and_materials', 'medicines_materials', 'medicines_and_materials',
+                'medicines_materials_supplies', 'medicines_and_materials_supplies' => 'name',
+                'stock_no', 'stock_num', 'stock_number', 'stock_code', 'inventory_number', 'property_number' => 'stock_number',
+                'qty', 'quantity_on_hand', 'current_stock', 'balance', 'ending_balance', 'current_balance',
+                'remaining_balance', 'balance_on_hand', 'on_hand', 'available', 'remaining' => 'quantity',
+                'consumed_qty', 'used_qty', 'issued_qty', 'used', 'issued', 'dispensed' => 'consumed',
+                'starting', 'beginning', 'beginning_balance', 'initial_stock', 'start_stock', 'stock_on_hand_beginning' => 'starting_stock',
+                'minimum', 'minimum_qty', 'minimum_stock', 'reorder_level', 'reorder_point' => 'minimum_stock',
+                'uom', 'stock_unit' => 'unit',
+                'date', 'date_received', 'received_date', 'inventory_date' => 'date_added',
+                'expiry', 'expiry_date', 'expiration', 'expiration_date', 'expiry_expiration_date' => 'expiration_date',
+                'medicine_class', 'drug_class', 'medicine_category' => 'medicine_type',
                 default => $value,
             };
         }, $headers);
@@ -572,7 +630,10 @@ PROMPT;
 
     private function hasRecognizedHeaders(array $headers): bool
     {
-        return in_array('name', $headers, true) && count(array_intersect($headers, ['quantity', 'starting_stock', 'consumed'])) > 0;
+        $hasItemLikeColumn = count(array_intersect($headers, ['name', 'stock_number'])) > 0;
+        $hasInventoryQuantityColumn = count(array_intersect($headers, ['quantity', 'starting_stock', 'consumed'])) > 0;
+
+        return $hasItemLikeColumn && $hasInventoryQuantityColumn;
     }
 
     private function firstString(array $row, array $keys): string

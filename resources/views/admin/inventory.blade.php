@@ -2354,22 +2354,53 @@
         line-height: 1.5;
     }
     .inventory-import-quality {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 14px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
     }
     .inventory-import-chip {
-        display: inline-flex;
-        align-items: center;
-        min-height: 34px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: #f8fafc;
-        border: 1px solid rgba(148, 163, 184, 0.28);
-        color: #334155;
-        font-size: 12px;
+        display: grid;
+        gap: 4px;
+        min-height: 74px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f2 100%);
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        color: #111827;
+        box-shadow: 0 10px 20px rgba(112, 19, 27, 0.05);
+    }
+    .inventory-import-chip-label {
+        color: #70131B;
+        font-size: 10px;
         font-weight: 900;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+    .inventory-import-chip-value {
+        color: #111827;
+        font-size: 13px;
+        font-weight: 900;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+    }
+    .inventory-import-chip.is-ready {
+        border-color: rgba(22, 163, 74, 0.24);
+    }
+    .inventory-import-chip.is-warning {
+        border-color: rgba(220, 38, 38, 0.24);
+        background: linear-gradient(180deg, #fff 0%, #fff1f2 100%);
+    }
+    .inventory-import-help {
+        margin: 0 0 14px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(112, 19, 27, 0.12);
+        background: #fffaf0;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.5;
     }
     .inventory-import-table-wrap {
         overflow: auto;
@@ -2378,13 +2409,33 @@
         background: #ffffff;
     }
     .inventory-import-table {
-        min-width: 1180px;
+        min-width: 1320px;
         margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
     }
     .inventory-import-table th,
     .inventory-import-table td {
-        padding: 10px;
+        padding: 11px 10px;
         vertical-align: top;
+    }
+    .inventory-import-table th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #70131B;
+        color: #ffffff;
+        border-bottom: 0;
+        white-space: nowrap;
+    }
+    .inventory-import-table tbody tr {
+        background: #ffffff;
+    }
+    .inventory-import-table tbody tr:nth-child(even) {
+        background: #fffaf7;
+    }
+    .inventory-import-table tbody tr.import-row-needs-review {
+        background: #fff1f2;
     }
     .inventory-import-input,
     .inventory-import-select {
@@ -2398,8 +2449,60 @@
         font-size: 12px;
         font-weight: 800;
     }
+    .inventory-import-input.is-missing {
+        border-color: rgba(220, 38, 38, 0.5);
+        background: #fff1f2;
+    }
+    .inventory-import-input::placeholder {
+        color: #b91c1c;
+        font-weight: 900;
+    }
     .inventory-import-input[type="number"] {
         min-width: 88px;
+    }
+    .inventory-import-row-select {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        accent-color: #70131B;
+    }
+    .inventory-import-status-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        white-space: nowrap;
+    }
+    .inventory-import-status-badge.is-ready {
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .inventory-import-status-badge.is-review {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+    .inventory-import-status-badge.is-match {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    .inventory-import-item-cell {
+        min-width: 240px;
+    }
+    .inventory-import-sticky-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-top: 1px solid rgba(112, 19, 27, 0.12);
     }
     .inventory-import-row-note {
         display: block;
@@ -2408,6 +2511,16 @@
         font-size: 11px;
         font-weight: 700;
         line-height: 1.35;
+    }
+    @media (max-width: 920px) {
+        .inventory-import-quality {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    @media (max-width: 560px) {
+        .inventory-import-quality {
+            grid-template-columns: 1fr;
+        }
     }
 
     html[data-theme="dark"] .badge-restock    { background: rgba(21,128,61,0.22);  color: #86efac; }
@@ -2419,6 +2532,36 @@
     html[data-theme="dark"] .badge-adjusted,
     html[data-theme="dark"] .badge-adjustment { background: rgba(180,83,9,0.22);   color: #fcd34d; }
     html[data-theme="dark"] .badge-default    { background: rgba(71,85,105,0.22);  color: #94a3b8; }
+    html[data-theme="dark"] .inventory-import-chip,
+    html[data-theme="dark"] .inventory-import-table-wrap,
+    html[data-theme="dark"] .inventory-import-table tbody tr,
+    html[data-theme="dark"] .inventory-import-sticky-actions {
+        background: rgba(17, 24, 39, 0.96);
+        border-color: rgba(250, 204, 21, 0.14);
+    }
+    html[data-theme="dark"] .inventory-import-table tbody tr:nth-child(even) {
+        background: rgba(15, 23, 42, 0.96);
+    }
+    html[data-theme="dark"] .inventory-import-table tbody tr.import-row-needs-review {
+        background: rgba(127, 29, 29, 0.30);
+    }
+    html[data-theme="dark"] .inventory-import-chip-label,
+    html[data-theme="dark"] .inventory-import-chip-value,
+    html[data-theme="dark"] .inventory-import-help,
+    html[data-theme="dark"] .inventory-import-input,
+    html[data-theme="dark"] .inventory-import-select {
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .inventory-import-help,
+    html[data-theme="dark"] .inventory-import-input,
+    html[data-theme="dark"] .inventory-import-select {
+        background: rgba(15, 23, 42, 0.94);
+        border-color: rgba(250, 204, 21, 0.14);
+    }
+    html[data-theme="dark"] .inventory-import-input.is-missing {
+        background: rgba(127, 29, 29, 0.32);
+        border-color: rgba(248, 113, 113, 0.46);
+    }
 </style>
 @endpush
 
@@ -2694,6 +2837,9 @@
             @php
                 $quality = (array) ($inventoryImportPreview['quality'] ?? []);
                 $previewRows = (array) ($inventoryImportPreview['rows'] ?? []);
+                $readyPreviewRows = collect($previewRows)->filter(fn ($row) => !empty($row['ready_to_import']) && empty($row['issues'] ?? []))->count();
+                $missingPreviewRows = collect($previewRows)->filter(fn ($row) => empty($row['ready_to_import']) || !empty($row['issues'] ?? []))->count();
+                $matchedPreviewRows = collect($previewRows)->filter(fn ($row) => !empty($row['matched_item_id']))->count();
             @endphp
             <div id="inventoryImportReviewModal" class="modal-overlay" data-open-on-load="true">
                 <div class="modal-box">
@@ -2707,15 +2853,30 @@
                         </button>
                     </div>
 
-                    <form method="POST" action="{{ route('admin.inventory.import.commit') }}">
+                    <form method="POST" action="{{ route('admin.inventory.import.commit') }}" id="inventoryImportCommitForm">
                         @csrf
                         <div class="inventory-modal-body">
                             <div class="inventory-import-quality">
-                                <span class="inventory-import-chip">Source: {{ $inventoryImportPreview['source_name'] ?? 'Inventory upload' }}</span>
-                                <span class="inventory-import-chip">Type: {{ strtoupper((string) ($inventoryImportPreview['source_type'] ?? 'upload')) }}</span>
-                                <span class="inventory-import-chip">Confidence: {{ (int) ($quality['confidence'] ?? 0) }}%</span>
-                                <span class="inventory-import-chip">Rows: {{ count($previewRows) }}</span>
+                                <span class="inventory-import-chip">
+                                    <span class="inventory-import-chip-label">Source</span>
+                                    <span class="inventory-import-chip-value">{{ $inventoryImportPreview['source_name'] ?? 'Inventory upload' }}</span>
+                                </span>
+                                <span class="inventory-import-chip">
+                                    <span class="inventory-import-chip-label">Type / Confidence</span>
+                                    <span class="inventory-import-chip-value">{{ strtoupper((string) ($inventoryImportPreview['source_type'] ?? 'upload')) }} &bull; {{ (int) ($quality['confidence'] ?? 0) }}%</span>
+                                </span>
+                                <span class="inventory-import-chip is-ready">
+                                    <span class="inventory-import-chip-label">Ready Rows</span>
+                                    <span class="inventory-import-chip-value">{{ $readyPreviewRows }} of {{ count($previewRows) }}</span>
+                                </span>
+                                <span class="inventory-import-chip {{ $missingPreviewRows > 0 ? 'is-warning' : '' }}">
+                                    <span class="inventory-import-chip-label">Needs Review / Matches</span>
+                                    <span class="inventory-import-chip-value">{{ $missingPreviewRows }} review &bull; {{ $matchedPreviewRows }} matched</span>
+                                </span>
                             </div>
+                            <p class="inventory-import-help">
+                                Only checked rows will be imported. Rows marked <strong>Needs Review</strong> must have an item name before they can be selected. Existing matches will update the current inventory item; new rows will create a new item.
+                            </p>
 
                             <div class="inventory-import-table-wrap">
                                 <table class="inventory-import-table">
@@ -2739,9 +2900,15 @@
                                     </thead>
                                     <tbody>
                                         @foreach($previewRows as $rowIndex => $row)
-                                            <tr>
+                                            @php
+                                                $rowIssues = (array) ($row['issues'] ?? []);
+                                                $rowReady = !empty($row['ready_to_import']) && empty($rowIssues);
+                                                $rowMatched = !empty($row['matched_item_id']);
+                                                $rowName = trim((string) ($row['name'] ?? ''));
+                                            @endphp
+                                            <tr class="{{ $rowReady ? '' : 'import-row-needs-review' }}">
                                                 <td>
-                                                    <input type="checkbox" name="import_items[{{ $rowIndex }}][selected]" value="1" checked>
+                                                    <input type="checkbox" class="inventory-import-row-select" name="import_items[{{ $rowIndex }}][selected]" value="1" {{ $rowReady ? 'checked' : 'disabled' }}>
                                                     <input type="hidden" name="import_items[{{ $rowIndex }}][matched_item_id]" value="{{ $row['matched_item_id'] ?? '' }}">
                                                 </td>
                                                 <td>
@@ -2752,15 +2919,22 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <strong>{{ $row['match_status'] ?? 'New item' }}</strong>
+                                                    <span class="inventory-import-status-badge {{ $rowReady ? ($rowMatched ? 'is-match' : 'is-ready') : 'is-review' }}">
+                                                        {{ $rowReady ? ($rowMatched ? 'Matched' : 'Ready') : 'Needs Review' }}
+                                                    </span>
+                                                    <span class="inventory-import-row-note">{{ $row['match_status'] ?? 'New item' }}</span>
                                                     @if(!empty($row['matched_item_name']))
                                                         <span class="inventory-import-row-note">{{ $row['matched_item_name'] }}</span>
                                                     @endif
-                                                    @if(!empty($row['notes']))
+                                                    @if(!empty($rowIssues))
+                                                        <span class="inventory-import-row-note">{{ implode(', ', $rowIssues) }}</span>
+                                                    @elseif(!empty($row['notes']))
                                                         <span class="inventory-import-row-note">{{ $row['notes'] }}</span>
                                                     @endif
                                                 </td>
-                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][name]" value="{{ $row['name'] ?? '' }}" required></td>
+                                                <td class="inventory-import-item-cell">
+                                                    <input class="inventory-import-input {{ $rowName === '' ? 'is-missing' : '' }}" name="import_items[{{ $rowIndex }}][name]" value="{{ $rowName }}" placeholder="Missing item name">
+                                                </td>
                                                 <td>
                                                     <select name="import_items[{{ $rowIndex }}][category]" class="inventory-import-select">
                                                         <option value="Medicine" @selected(($row['category'] ?? '') === 'Medicine')>Medicine</option>
@@ -2783,10 +2957,10 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="modal-actions-row">
+                        <div class="modal-actions-row inventory-import-sticky-actions">
                             <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate>Clear Preview</button>
                             <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()">Review Later</button>
-                            <button type="submit" class="btn-add">Import Selected Rows</button>
+                            <button type="submit" class="btn-add" id="inventoryImportCommitBtn">Import Selected Rows</button>
                         </div>
                     </form>
                 </div>
@@ -3558,6 +3732,82 @@
         inventoryImportAnalyzeForm.addEventListener('submit', function() {
             inventoryImportAnalyzeBtn.disabled = true;
             inventoryImportAnalyzeBtn.textContent = 'Analyzing...';
+        });
+    }
+
+    const inventoryImportCommitForm = document.getElementById('inventoryImportCommitForm');
+    const inventoryImportCommitBtn = document.getElementById('inventoryImportCommitBtn');
+
+    if (inventoryImportCommitForm) {
+        const refreshImportRowState = function (row) {
+            const nameInput = row.querySelector('input[name$="[name]"]');
+            const checkbox = row.querySelector('.inventory-import-row-select');
+            const actionSelect = row.querySelector('select[name$="[action]"]');
+            const statusBadge = row.querySelector('.inventory-import-status-badge');
+            const hasName = nameInput && nameInput.value.trim() !== '';
+            const hasMatch = Boolean(row.querySelector('input[name$="[matched_item_id]"]')?.value);
+            if (hasName && actionSelect && actionSelect.value === 'skip') {
+                actionSelect.value = hasMatch ? 'update' : 'create';
+            }
+            const isSkip = actionSelect && actionSelect.value === 'skip';
+
+            if (nameInput) {
+                nameInput.classList.toggle('is-missing', !hasName);
+            }
+
+            if (checkbox) {
+                checkbox.disabled = !hasName || isSkip;
+                if (!hasName || isSkip) {
+                    checkbox.checked = false;
+                } else if (!checkbox.checked) {
+                    checkbox.checked = true;
+                }
+            }
+
+            row.classList.toggle('import-row-needs-review', !hasName);
+
+            if (statusBadge) {
+                statusBadge.classList.toggle('is-review', !hasName);
+                statusBadge.classList.toggle('is-match', hasName && hasMatch);
+                statusBadge.classList.toggle('is-ready', hasName && !statusBadge.classList.contains('is-match'));
+                statusBadge.textContent = hasName ? (statusBadge.classList.contains('is-match') ? 'Matched' : 'Ready') : 'Needs Review';
+            }
+        };
+
+        inventoryImportCommitForm.querySelectorAll('tbody tr').forEach(function (row) {
+            const nameInput = row.querySelector('input[name$="[name]"]');
+            const actionSelect = row.querySelector('select[name$="[action]"]');
+
+            if (nameInput) {
+                nameInput.addEventListener('input', function () {
+                    refreshImportRowState(row);
+                });
+            }
+
+            if (actionSelect) {
+                actionSelect.addEventListener('change', function () {
+                    refreshImportRowState(row);
+                });
+            }
+        });
+
+        inventoryImportCommitForm.addEventListener('submit', function (event) {
+            const submitter = event.submitter;
+            if (submitter && submitter.hasAttribute('formnovalidate')) {
+                return;
+            }
+
+            const selectedRows = Array.from(inventoryImportCommitForm.querySelectorAll('.inventory-import-row-select:checked'));
+            if (selectedRows.length === 0) {
+                event.preventDefault();
+                alert('Select at least one valid inventory row before importing.');
+                return;
+            }
+
+            if (inventoryImportCommitBtn) {
+                inventoryImportCommitBtn.disabled = true;
+                inventoryImportCommitBtn.textContent = 'Importing...';
+            }
         });
     }
 

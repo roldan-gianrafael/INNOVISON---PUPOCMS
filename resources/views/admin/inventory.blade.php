@@ -2440,9 +2440,11 @@
     .inventory-import-table-wrap {
         overflow-y: auto;
         overflow-x: scroll;
+        max-height: 600px;
         border-radius: 16px;
         border: 1px solid rgba(112, 19, 27, 0.12);
         background: #ffffff;
+        scroll-behavior: smooth;
     }
     .inventory-import-table {
         width: 100%;

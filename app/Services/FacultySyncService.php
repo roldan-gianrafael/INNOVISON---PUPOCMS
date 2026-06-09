@@ -45,7 +45,17 @@ class FacultySyncService
 
     public function fetchFaculties(?string $search = null): array
     {
-        $baseUrl = trim((string) config('services.pupt_flss.faculty_profiles_url'));
+        $rawConfig = config('services.pupt_flss.faculty_profiles_url');
+        $baseUrl = trim((string) $rawConfig);
+
+        \Log::error('DEBUG PUPT CONFIG', [
+            'raw_config' => $rawConfig,
+            'raw_config_type' => gettype($rawConfig),
+            'raw_config_length' => strlen((string)$rawConfig),
+            'raw_config_bytes' => bin2hex((string)$rawConfig),
+            'trimmed_url' => $baseUrl,
+            'trimmed_length' => strlen($baseUrl),
+        ]);
 
         if ($baseUrl === '') {
             throw new RuntimeException('PUPT-FLSS faculty profiles URL is not configured.');
@@ -60,13 +70,6 @@ class FacultySyncService
         $requestUrl = $queryParams === []
             ? $baseUrl
             : $baseUrl . (str_contains($baseUrl, '?') ? '&' : '?') . http_build_query($queryParams);
-
-        \Log::info('FLSS Request', [
-            'url' => $requestUrl,
-            'url_length' => strlen($requestUrl),
-            'base_url' => $baseUrl,
-            'base_url_length' => strlen($baseUrl),
-        ]);
 
         $timeout = (int) config('services.pupt_flss.timeout', 30);
         $response = Http::acceptJson()

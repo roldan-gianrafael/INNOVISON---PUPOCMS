@@ -250,6 +250,9 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::delete('/admin/user-management/admin-hub/{admin}/delete-record', [AdminUserController::class, 'deleteAdminHubRecord'])->name('admin.user-management.admin-hub.delete-record');
         Route::get('/admin/developer-tools', [AdminController::class, 'developerTools'])->name('admin.developer-tools');
         Route::get('/admin/api-testing', [AdminController::class, 'apiTesting'])->name('admin.api-testing');
+        Route::get('/admin/api/health-monitor', [AdminController::class, 'apiHealthMonitor'])->name('admin.api.health-monitor');
+        Route::get('/admin/api/error-logs', [AdminController::class, 'apiErrorLogs'])->name('admin.api.error-logs');
+        Route::get('/admin/api/system-status', [AdminController::class, 'apiSystemStatus'])->name('admin.api.system-status');
         Route::get('/admin/activity-logs', [AdminController::class, 'indexLogs'])
             ->middleware('role:superadmin')
             ->name('admin.logs');
@@ -262,9 +265,6 @@ Route::middleware(['auth:admin', 'audit'])->group(function () {
         Route::put('/admin/profile/update', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
         Route::put('/admin/api-testing/database/{table}/{id}', [AdminController::class, 'updateApiTestingDatabaseRecord'])->name('admin.api-testing.database.update');
         Route::delete('/admin/api-testing/database/{table}/{id}', [AdminController::class, 'deleteApiTestingDatabaseRecord'])->name('admin.api-testing.database.delete');
-        Route::get('/admin/api/health-monitor', [AdminController::class, 'apiHealthMonitor'])->name('admin.api.health-monitor');
-        Route::get('/admin/api/error-logs', [AdminController::class, 'apiErrorLogs'])->name('admin.api.error-logs');
-        Route::get('/admin/api/system-status', [AdminController::class, 'apiSystemStatus'])->name('admin.api.system-status');
 
         Route::post('/admin/inventory/store', [AdminController::class, 'storeItem'])->name('admin.inventory.store');
         Route::post('/admin/inventory/import/analyze', [AdminController::class, 'analyzeInventoryImport'])->name('admin.inventory.import.analyze');

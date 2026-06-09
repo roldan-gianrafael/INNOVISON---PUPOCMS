@@ -3938,12 +3938,18 @@
         });
     }
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function (e) {
-        if (!e.target.closest('#inventoryImportCategoryDropdownBtn') && !e.target.closest('#inventoryImportCategoryMenu')) {
-            inventoryImportCategoryMenu.style.display = 'none';
-        }
-    });
+    // Close dropdown when clicking outside (only if modal is visible)
+    if (inventoryImportCategoryMenu) {
+        document.addEventListener('click', function (e) {
+            // Only close if the import modal is visible and click is outside dropdown
+            const importModal = document.querySelector('[id*="inventoryImportReview"]') || inventoryImportCommitForm?.closest('.modal-overlay');
+            if (importModal && importModal.style.display !== 'none') {
+                if (!e.target.closest('#inventoryImportCategoryDropdownBtn') && !e.target.closest('#inventoryImportCategoryMenu')) {
+                    inventoryImportCategoryMenu.style.display = 'none';
+                }
+            }
+        });
+    }
 
     if (inventoryImportCommitForm) {
         const refreshImportRowState = function (row) {

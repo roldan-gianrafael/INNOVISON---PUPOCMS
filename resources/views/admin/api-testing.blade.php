@@ -1369,7 +1369,7 @@
             const grid = document.getElementById('healthGrid');
             grid.innerHTML = '<div class="api-loading"><div class="api-loading-spinner"></div><p>Checking system health...</p></div>';
 
-            fetch('{{ route("admin.api.health-monitor") }}')
+            fetch('/admin/api/health-monitor')
                 .then(r => r.json())
                 .then(data => {
                     grid.innerHTML = '';
@@ -1410,7 +1410,7 @@
 
             body.innerHTML = '<tr><td colspan="6"><div class="api-loading"><div class="api-loading-spinner"></div>Loading errors...</div></td></tr>';
 
-            const url = new URL('{{ route("admin.api.error-logs") }}', window.location.origin);
+            const url = new URL('/admin/api/error-logs', window.location.origin);
             url.searchParams.append('hours', hours);
             if (system) url.searchParams.append('system', system);
 
@@ -1468,7 +1468,7 @@ Response: ${err.response_payload || 'N/A'}</pre>
             const grid = document.getElementById('systemsGrid');
             grid.innerHTML = '<div class="api-loading"><div class="api-loading-spinner"></div><p>Loading system status...</p></div>';
 
-            fetch('{{ route("admin.api.system-status") }}')
+            fetch('/admin/api/system-status')
                 .then(r => r.json())
                 .then(data => {
                     grid.innerHTML = '';

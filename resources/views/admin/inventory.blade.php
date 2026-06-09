@@ -3097,9 +3097,9 @@
                             <span style="color: #ccc;">|</span>
 
                             <!-- Category Dropdown -->
-                            <div style="position: relative; display: flex; align-items: center;">
+                            <div style="position: relative; display: flex; align-items: center; z-index: 50;">
                                 <button type="button" class="inventory-import-select" id="inventoryImportCategoryDropdownBtn" style="padding: 8px 10px; white-space: nowrap; min-width: fit-content; cursor: pointer; border: none; background: none; font-size: 12px; font-weight: 700;">Category ▼</button>
-                                <div id="inventoryImportCategoryMenu" style="position: absolute; bottom: 100%; left: 0; width: 140px; background: #ffffff; border: 1px solid rgba(112, 19, 27, 0.12); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; display: none; margin-bottom: 4px;">
+                                <div id="inventoryImportCategoryMenu" style="position: fixed; bottom: auto; left: 0; width: 140px; background: #ffffff; border: 1px solid rgba(112, 19, 27, 0.12); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10000; display: none; margin-bottom: 4px;">
                                     <button type="button" class="inventory-category-option" data-category="Medicine" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(112, 19, 27, 0.12);">Medicine</button>
                                     <button type="button" class="inventory-category-option" data-category="Supplies" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(112, 19, 27, 0.12);">Supplies</button>
                                     <button type="button" class="inventory-category-option" data-category="Equipment" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px;">Equipment</button>
@@ -3934,7 +3934,15 @@
             if (inventoryImportCategoryDropdownBtn && inventoryImportCategoryMenu) {
                 inventoryImportCategoryDropdownBtn.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    inventoryImportCategoryMenu.style.display = inventoryImportCategoryMenu.style.display === 'none' ? 'block' : 'none';
+                    if (inventoryImportCategoryMenu.style.display === 'none') {
+                        // Position dropdown above the button
+                        const rect = inventoryImportCategoryDropdownBtn.getBoundingClientRect();
+                        inventoryImportCategoryMenu.style.left = rect.left + 'px';
+                        inventoryImportCategoryMenu.style.top = (rect.top - 140) + 'px';
+                        inventoryImportCategoryMenu.style.display = 'block';
+                    } else {
+                        inventoryImportCategoryMenu.style.display = 'none';
+                    }
                 });
 
                 // Category Selection

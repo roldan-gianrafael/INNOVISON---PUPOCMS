@@ -57,44 +57,61 @@ class GeminiClient
             return null;
         }
 
-        $model = trim((string) config('services.gemini.model', ''));
-        if ($model === '') {
-            $model = 'gemini-3.5-flash';
+        $models = $this->modelsToTry();
+        $errors = [];
+
+        foreach ($models as $model) {
+            try {
+                $response = Http::withHeaders([
+                    'x-goog-api-key' => $apiKey,
+                ])
+                    ->acceptJson()
+                    ->timeout(45)
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
+                        'contents' => [[
+                            'role' => 'user',
+                            'parts' => $parts,
+                        ]],
+                        'generationConfig' => [
+                            'temperature' => $temperature,
+                            'maxOutputTokens' => $maxOutputTokens,
+                        ],
+                    ]);
+
+                if (!$response->successful()) {
+                    $message = trim((string) data_get($response->json() ?: [], 'error.message', ''));
+                    $errors[] = $model . ' returned HTTP ' . $response->status() . ($message !== '' ? ': ' . $message : '.');
+                    continue;
+                }
+
+                $text = $this->extractText($response->json() ?: []);
+                if ($text !== null) {
+                    return $text;
+                }
+
+                $errors[] = $model . ' returned no text output.';
+            } catch (\Throwable $exception) {
+                $errors[] = $model . ' request failed: ' . $exception->getMessage();
+            }
         }
 
-        try {
-            $response = Http::withHeaders([
-                'x-goog-api-key' => $apiKey,
-            ])
-                ->acceptJson()
-                ->timeout(45)
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
-                    'contents' => [[
-                        'role' => 'user',
-                        'parts' => $parts,
-                    ]],
-                    'generationConfig' => [
-                        'temperature' => $temperature,
-                        'maxOutputTokens' => $maxOutputTokens,
-                    ],
-                ]);
+        $this->lastError = 'Gemini request failed for all configured models. ' . implode(' ', array_slice($errors, 0, 3));
+        return null;
+    }
 
-            if (!$response->successful()) {
-                $message = trim((string) data_get($response->json() ?: [], 'error.message', ''));
-                $this->lastError = 'Gemini API returned HTTP ' . $response->status() . ($message !== '' ? ': ' . $message : '.');
-                return null;
-            }
-
-            $text = $this->extractText($response->json() ?: []);
-            if ($text === null) {
-                $this->lastError = 'Gemini API returned no text output.';
-            }
-
-            return $text;
-        } catch (\Throwable $exception) {
-            $this->lastError = 'Gemini request failed: ' . $exception->getMessage();
-            return null;
+    private function modelsToTry(): array
+    {
+        $primary = trim((string) config('services.gemini.model', ''));
+        if ($primary === '') {
+            $primary = 'gemini-2.5-flash';
         }
+
+        $fallbacks = (array) config('services.gemini.fallback_models', []);
+        $models = array_merge([$primary], $fallbacks);
+
+        return array_values(array_unique(array_filter(array_map(function ($model) {
+            return trim((string) $model);
+        }, $models))));
     }
 
     private function extractText(array $payload): ?string

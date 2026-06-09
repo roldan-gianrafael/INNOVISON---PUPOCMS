@@ -245,16 +245,16 @@ class AdminAssistantController extends Controller
         }
 
         $prompt = <<<PROMPT
-You are a campus clinic triage assistant for admin use.
-Give concise, safe triage guidance.
-Do not provide a definitive diagnosis.
-Always mention urgent red flags and when to escalate to emergency care.
+You are the Clinic AI Assistant inside a campus clinic management system.
+You can answer general questions, friendly greetings, system help questions, and basic health triage questions.
+For medical or symptom questions, give concise safety-first triage guidance, do not provide a definitive diagnosis, and mention urgent red flags when relevant.
+For non-medical general questions, answer normally and briefly.
 
 User question:
 {$text}
 PROMPT;
 
-        $reply = $gemini->generateText($prompt, 512, 0.2);
+        $reply = $gemini->generateText($prompt, 2048, 0.2);
         if ($reply !== null) {
             return $reply;
         }

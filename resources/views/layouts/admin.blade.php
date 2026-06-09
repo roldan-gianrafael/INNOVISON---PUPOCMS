@@ -4504,7 +4504,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     </div>
 
     <div id="assistantMessages" class="assistant-messages">
-        <div class="assistant-bubble assistant">Try: "generate MAR", "open appointments", or ask a symptom question.</div>
+        <div class="assistant-bubble assistant">Try: "generate MAR", "open appointments", ask a symptom question, or ask a general question.</div>
     </div>
 
     <div class="assistant-controls">

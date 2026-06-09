@@ -2998,8 +2998,36 @@
                                                         <option value="Equipment" @selected(($row['category'] ?? '') === 'Equipment')>Equipment</option>
                                                     </select>
                                                 </td>
-                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][stock_number]" value="{{ $row['stock_number'] ?? '' }}"></td>
-                                                <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][unit]" value="{{ $row['unit'] ?? 'pcs' }}" placeholder="pcs"></td>
+                                                <td><input class="inventory-import-input" type="text" name="import_items[{{ $rowIndex }}][stock_number]" value="{{ $row['stock_number'] ?? '' }}" placeholder="e.g. 01-001"></td>
+                                                <td>
+                                                    <select name="import_items[{{ $rowIndex }}][unit]" class="inventory-import-select">
+                                                        <option value="pcs" @selected(($row['unit'] ?? 'pcs') === 'pcs')>pcs</option>
+                                                        <option value="box" @selected(($row['unit'] ?? '') === 'box')>box</option>
+                                                        <option value="bottle" @selected(($row['unit'] ?? '') === 'bottle')>bottle</option>
+                                                        <option value="gallon" @selected(($row['unit'] ?? '') === 'gallon')>gallon</option>
+                                                        <option value="liter" @selected(($row['unit'] ?? '') === 'liter')>liter</option>
+                                                        <option value="roll" @selected(($row['unit'] ?? '') === 'roll')>roll</option>
+                                                        <option value="pack" @selected(($row['unit'] ?? '') === 'pack')>pack</option>
+                                                        <option value="tube" @selected(($row['unit'] ?? '') === 'tube')>tube</option>
+                                                        <option value="vial" @selected(($row['unit'] ?? '') === 'vial')>vial</option>
+                                                        <option value="strip" @selected(($row['unit'] ?? '') === 'strip')>strip</option>
+                                                        <option value="tablet" @selected(($row['unit'] ?? '') === 'tablet')>tablet</option>
+                                                        <option value="capsule" @selected(($row['unit'] ?? '') === 'capsule')>capsule</option>
+                                                        <option value="ml" @selected(($row['unit'] ?? '') === 'ml')>ml</option>
+                                                        <option value="mg" @selected(($row['unit'] ?? '') === 'mg')>mg</option>
+                                                        <option value="g" @selected(($row['unit'] ?? '') === 'g')>g</option>
+                                                        <option value="kg" @selected(($row['unit'] ?? '') === 'kg')>kg</option>
+                                                        <option value="meter" @selected(($row['unit'] ?? '') === 'meter')>meter</option>
+                                                        <option value="cm" @selected(($row['unit'] ?? '') === 'cm')>cm</option>
+                                                        <option value="inch" @selected(($row['unit'] ?? '') === 'inch')>inch</option>
+                                                        <option value="yard" @selected(($row['unit'] ?? '') === 'yard')>yard</option>
+                                                        <option value="dozen" @selected(($row['unit'] ?? '') === 'dozen')>dozen</option>
+                                                        <option value="pair" @selected(($row['unit'] ?? '') === 'pair')>pair</option>
+                                                        <option value="set" @selected(($row['unit'] ?? '') === 'set')>set</option>
+                                                        <option value="unit" @selected(($row['unit'] ?? '') === 'unit')>unit</option>
+                                                        <option value="piece" @selected(($row['unit'] ?? '') === 'piece')>piece</option>
+                                                    </select>
+                                                </td>
                                                 <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][starting_stock]" value="{{ $row['starting_stock'] ?? 0 }}"></td>
                                                 <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][consumed]" value="{{ $row['consumed'] ?? 0 }}"></td>
                                                 <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][quantity]" value="{{ $row['quantity'] ?? 0 }}" required></td>

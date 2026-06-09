@@ -35,7 +35,7 @@ class AdminAssistantController extends Controller
             ]);
         }
 
-        $medicalReply = $this->answerMedicalGuidance($normalized);
+        $medicalReply = $this->answerEmergencyGuidance($normalized);
         if ($medicalReply !== null) {
             return response()->json([
                 'type' => 'answer',
@@ -172,7 +172,7 @@ class AdminAssistantController extends Controller
         }
     }
 
-    private function answerMedicalGuidance(string $text): ?string
+    private function answerEmergencyGuidance(string $text): ?string
     {
         $emergencyKeywords = [
             'chest pain',
@@ -190,34 +190,6 @@ class AdminAssistantController extends Controller
 
         if ($this->containsAny($text, $emergencyKeywords)) {
             return 'This may be an emergency. Call emergency services now (911 in the US) or go to the nearest ER immediately. Do not wait for online guidance.';
-        }
-
-        if ($this->containsAny($text, ['fever', 'lagnat', 'cough', 'sore throat', 'flu', 'cold'])) {
-            return 'Possible causes include viral respiratory infection. Initial care: rest, hydration, monitor temperature, and use age-appropriate fever medicine if needed. Seek clinic assessment today if fever lasts more than 48 hours, breathing worsens, oxygen is low, or there is chest pain. This is triage guidance only, not a diagnosis.';
-        }
-
-        if ($this->containsAny($text, ['headache', 'migraine', 'dizziness'])) {
-            return 'Common causes include tension headache, dehydration, lack of sleep, or migraine. Initial care: hydrate, rest in a quiet room, and monitor blood pressure if available. Seek urgent care if severe sudden headache, vision/speech changes, confusion, weakness, or repeated vomiting occurs. This is triage guidance only, not a diagnosis.';
-        }
-
-        if ($this->containsAny($text, ['stomach pain', 'abdominal pain', 'diarrhea', 'vomiting', 'food poisoning'])) {
-            return 'Possible causes include gastroenteritis or food-related irritation. Initial care: oral rehydration, light meals, and avoid oily/spicy food. Seek clinic or ER if severe abdominal pain, bloody stool/vomit, persistent vomiting, high fever, or signs of dehydration occur. This is triage guidance only, not a diagnosis.';
-        }
-
-        if ($this->containsAny($text, ['high blood pressure', 'hypertension', 'bp', 'blood pressure'])) {
-            return 'Repeat blood pressure after 5 to 10 minutes rest with proper cuff size. Limit caffeine/smoking before reading. Seek urgent care if BP is very high with chest pain, severe headache, shortness of breath, or neurologic symptoms. This is triage guidance only, not a diagnosis.';
-        }
-
-        if ($this->containsAny($text, ['urine pain', 'painful urination', 'uti', 'frequent urination'])) {
-            return 'Possible urinary infection should be assessed in clinic for urine testing and treatment plan. Hydrate well and avoid delaying urination. Seek urgent care if fever, flank pain, vomiting, pregnancy, or blood in urine occurs. This is triage guidance only, not a diagnosis.';
-        }
-
-        if ($this->containsAny($text, ['wound', 'cut', 'burn', 'injury'])) {
-            return 'For minor wounds: clean with running water, apply gentle pressure if bleeding, and cover with clean dressing. For burns: cool with running water for 20 minutes, no ice. Seek urgent care for deep wounds, uncontrolled bleeding, electrical/chemical burns, or signs of infection. This is triage guidance only, not a diagnosis.';
-        }
-
-        if ($this->containsAny($text, ['diagnosis', 'what illness', 'what disease', 'what do i have'])) {
-            return 'I can provide symptom triage but not a definitive diagnosis. For a better assessment, share age, main symptoms, duration, temperature, blood pressure, current medicines, and red-flag symptoms. A clinician should confirm diagnosis in person.';
         }
 
         return null;

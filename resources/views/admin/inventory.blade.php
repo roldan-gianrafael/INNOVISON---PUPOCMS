@@ -3094,21 +3094,6 @@
                             <button type="button" class="inventory-btn-cancel" id="inventoryImportToggleSelectBtn" style="white-space: nowrap; min-width: fit-content;">↑ Select All</button>
 
                             <!-- Separator -->
-                            <span style="color: #ccc;">|</span>
-
-                            <!-- Category Dropdown -->
-                            <div style="position: relative; display: flex; align-items: center; z-index: 50;">
-                                <button type="button" class="inventory-import-select" id="inventoryImportCategoryDropdownBtn" style="padding: 8px 10px; white-space: nowrap; min-width: fit-content; cursor: pointer; border: none; background: none; font-size: 12px; font-weight: 700;">Category ▼</button>
-                                <div id="inventoryImportCategoryMenu" style="position: fixed; bottom: auto; left: 0; width: 140px; background: #ffffff; border: 1px solid rgba(112, 19, 27, 0.12); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10000; display: none; margin-bottom: 4px;">
-                                    <button type="button" class="inventory-category-option" data-category="Medicine" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(112, 19, 27, 0.12);">Medicine</button>
-                                    <button type="button" class="inventory-category-option" data-category="Supplies" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(112, 19, 27, 0.12);">Supplies</button>
-                                    <button type="button" class="inventory-category-option" data-category="Equipment" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px;">Equipment</button>
-                                </div>
-                            </div>
-                            <button type="button" class="inventory-btn-cancel" id="inventoryImportApplyCategoryBtn" style="white-space: nowrap; display: none; min-width: fit-content;">Apply</button>
-                            <input type="hidden" id="inventoryImportSelectedCategory" value="">
-
-                            <!-- Separator -->
                             <span style="color: #ccc; margin-left: auto;">|</span>
 
                             <!-- Main Actions (Right side) -->
@@ -3914,10 +3899,6 @@
                 });
             }
             const inventoryImportToggleSelectBtn = document.getElementById('inventoryImportToggleSelectBtn');
-            const inventoryImportCategoryDropdownBtn = document.getElementById('inventoryImportCategoryDropdownBtn');
-            const inventoryImportCategoryMenu = document.getElementById('inventoryImportCategoryMenu');
-            const inventoryImportApplyCategoryBtn = document.getElementById('inventoryImportApplyCategoryBtn');
-            const inventoryImportSelectedCategory = document.getElementById('inventoryImportSelectedCategory');
 
             // Toggle Select All / Unselect All Button
             if (inventoryImportToggleSelectBtn) {
@@ -3926,59 +3907,6 @@
                     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                     checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
                     inventoryImportToggleSelectBtn.textContent = allChecked ? 'Select All' : 'Unselect All';
-                });
-            }
-
-            // Category Dropdown Toggle
-            if (inventoryImportCategoryDropdownBtn && inventoryImportCategoryMenu) {
-                inventoryImportCategoryDropdownBtn.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    if (inventoryImportCategoryMenu.style.display === 'none') {
-                        // Position dropdown above the button
-                        const rect = inventoryImportCategoryDropdownBtn.getBoundingClientRect();
-                        inventoryImportCategoryMenu.style.left = rect.left + 'px';
-                        inventoryImportCategoryMenu.style.top = (rect.top - 140) + 'px';
-                        inventoryImportCategoryMenu.style.display = 'block';
-                    } else {
-                        inventoryImportCategoryMenu.style.display = 'none';
-                    }
-                });
-
-                // Category Selection
-                const inventoryImportCategoryOptions = document.querySelectorAll('.inventory-category-option');
-                inventoryImportCategoryOptions.forEach(option => {
-                    option.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const category = this.getAttribute('data-category');
-                        inventoryImportSelectedCategory.value = category;
-                        inventoryImportCategoryDropdownBtn.style.display = 'none';
-                        inventoryImportApplyCategoryBtn.style.display = 'block';
-                        inventoryImportApplyCategoryBtn.textContent = 'Apply ' + category;
-                        inventoryImportCategoryMenu.style.display = 'none';
-                    });
-                });
-
-                // Apply Category
-                if (inventoryImportApplyCategoryBtn) {
-                    inventoryImportApplyCategoryBtn.addEventListener('click', function () {
-                        const category = inventoryImportSelectedCategory.value;
-                        inventoryImportCommitForm.querySelectorAll('select[name$="[category]"]').forEach(select => {
-                            select.value = category;
-                        });
-                        inventoryImportApplyCategoryBtn.style.display = 'none';
-                        inventoryImportCategoryDropdownBtn.style.display = 'block';
-                        inventoryImportCategoryDropdownBtn.textContent = 'Category ▼';
-                        inventoryImportSelectedCategory.value = '';
-                    });
-                }
-
-                // Close dropdown on outside click
-                document.addEventListener('click', function (e) {
-                    if (inventoryImportCategoryMenu.style.display === 'block') {
-                        if (!e.target.closest('#inventoryImportCategoryDropdownBtn') && !e.target.closest('#inventoryImportCategoryMenu')) {
-                            inventoryImportCategoryMenu.style.display = 'none';
-                        }
-                    }
                 });
             }
         }, 100);

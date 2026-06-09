@@ -2438,7 +2438,8 @@
         line-height: 1.5;
     }
     .inventory-import-table-wrap {
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: scroll;
         border-radius: 16px;
         border: 1px solid rgba(112, 19, 27, 0.12);
         background: #ffffff;
@@ -2451,7 +2452,7 @@
     }
     .inventory-import-table th,
     .inventory-import-table td {
-        padding: 11px 10px;
+        padding: 14px 12px;
         vertical-align: top;
     }
     .inventory-import-table th {
@@ -2481,13 +2482,13 @@
         position: relative;
         z-index: 5;
         width: 100%;
-        min-height: 36px;
-        padding: 7px 9px;
+        min-height: 44px;
+        padding: 10px 12px;
         border-radius: 10px;
         border: 1px solid rgba(148, 163, 184, 0.35);
         background: #ffffff;
         color: #111827;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 800;
         pointer-events: auto;
     }
@@ -2958,13 +2959,14 @@
                                         @foreach($previewRows as $rowIndex => $row)
                                             @php
                                                 $rowIssues = (array) ($row['issues'] ?? []);
-                                                $rowReady = !empty($row['ready_to_import']) && empty($rowIssues);
-                                                $rowMatched = !empty($row['matched_item_id']);
                                                 $rowName = trim((string) ($row['name'] ?? ''));
+                                                $rowCanSelect = !empty($rowName);
+                                                $rowReady = $rowCanSelect && empty($rowIssues);
+                                                $rowMatched = !empty($row['matched_item_id']);
                                             @endphp
                                             <tr class="{{ $rowReady ? '' : 'import-row-needs-review' }}">
                                                 <td>
-                                                    <input type="checkbox" class="inventory-import-row-select" name="import_items[{{ $rowIndex }}][selected]" value="1" {{ $rowReady ? 'checked' : 'disabled' }}>
+                                                    <input type="checkbox" class="inventory-import-row-select" name="import_items[{{ $rowIndex }}][selected]" value="1" {{ $rowCanSelect ? 'checked' : 'disabled' }}>
                                                     <input type="hidden" name="import_items[{{ $rowIndex }}][matched_item_id]" value="{{ $row['matched_item_id'] ?? '' }}">
                                                 </td>
                                                 <td>

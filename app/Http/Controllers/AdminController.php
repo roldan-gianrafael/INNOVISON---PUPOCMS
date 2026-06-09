@@ -14,6 +14,7 @@ use App\Models\Admin;
 use App\Services\FacultySyncService;
 use App\Services\GuisisApiService;
 use App\Services\InventoryImportAnalyzer;
+use App\Services\InventoryDataNormalizer;
 use App\Services\PuptasWebhookService;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Auth;
@@ -2380,6 +2381,7 @@ public function clearInventoryImportPreview(Request $request)
 private function buildInventoryImportPreview(array $analysis): array
 {
     $rows = [];
+    $normalizer = new InventoryDataNormalizer();
 
     foreach ((array) ($analysis['rows'] ?? []) as $index => $row) {
         if (!is_array($row)) {
@@ -2392,6 +2394,21 @@ private function buildInventoryImportPreview(array $analysis): array
         $rowIssues = [];
         if ($data['name'] === '') {
             $rowIssues[] = 'Missing item name';
+        }
+
+        $dataIssues = $normalizer->getDataIssues($row);
+        foreach ($dataIssues as $issueKey => $isPresent) {
+            if (!$isPresent) {
+                continue;
+            }
+
+            if ($issueKey === 'date_unparseable') {
+                $rowIssues[] = 'Date format not recognized';
+            } elseif ($issueKey === 'missing_stock_number') {
+                $rowIssues[] = 'Stock number missing';
+            } elseif ($issueKey === 'non_standard_unit') {
+                $rowIssues[] = 'Non-standard unit (will be standardized)';
+            }
         }
 
         $rows[] = array_merge($data, [
@@ -2417,6 +2434,8 @@ private function buildInventoryImportPreview(array $analysis): array
 
 private function sanitizeInventoryImportRow(array $row, bool $persistMedicineType = true): array
 {
+    $normalizer = new InventoryDataNormalizer();
+
     $text = static function ($value, int $maxLength): string {
         $value = trim((string) $value);
 
@@ -2445,37 +2464,27 @@ private function sanitizeInventoryImportRow(array $row, bool $persistMedicineTyp
         $medicineType = MedicineType::firstOrCreate(['name' => $medicineTypeName]);
     }
 
+    $normalizedUnit = $normalizer->normalizeUnit($row['unit'] ?? 'pcs');
+    $normalizedDate = $normalizer->normalizeDate($row['date_added'] ?? '');
+    $normalizedExpiryDate = $normalizer->normalizeDate($row['expiration_date'] ?? '');
+
     return [
         'name' => $text($row['name'] ?? '', 255),
         'category' => $category,
-        'stock_number' => $text($row['stock_number'] ?? '', 50) ?: null,
+        'stock_number' => $normalizer->normalizeStockNumber($row['stock_number'] ?? '') ?: null,
         'medicine_type_id' => $category === 'Medicine' && $medicineType ? $medicineType->id : null,
         'medicine_type' => $category === 'Medicine' ? ($medicineType ? $medicineType->name : ($medicineTypeName ?: null)) : null,
         'quantity' => $quantity,
         'starting_stock' => $startingStock,
         'consumed' => $consumed,
         'minimum_stock' => max(0, (float) ($row['minimum_stock'] ?? 10)),
-        'unit' => $text($row['unit'] ?? 'pcs', 50) ?: 'pcs',
+        'unit' => $text($normalizedUnit, 50),
         'dispensing_unit' => null,
         'units_per_stock_unit' => null,
-        'date_added' => $this->parseInventoryImportDate($row['date_added'] ?? null) ?: now()->toDateString(),
-        'expiration_date' => $category === 'Medicine' ? $this->parseInventoryImportDate($row['expiration_date'] ?? null) : null,
+        'date_added' => $normalizedDate ?: now()->toDateString(),
+        'expiration_date' => $category === 'Medicine' ? $normalizedExpiryDate : null,
         'description' => 'Imported from reviewed inventory upload.',
     ];
-}
-
-private function parseInventoryImportDate($value): ?string
-{
-    $value = trim((string) $value);
-    if ($value === '') {
-        return null;
-    }
-
-    try {
-        return Carbon::parse($value)->format('Y-m-d');
-    } catch (\Throwable $exception) {
-        return null;
-    }
 }
 
 private function findInventoryImportMatch(array $row): ?Item

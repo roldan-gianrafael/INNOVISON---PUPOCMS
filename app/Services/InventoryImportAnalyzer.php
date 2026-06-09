@@ -490,6 +490,7 @@ PROMPT;
     private function normalizeRows(array $rows): array
     {
         $normalized = [];
+        $normalizer = new InventoryDataNormalizer();
 
         foreach ($rows as $row) {
             if (!is_array($row)) {
@@ -573,13 +574,13 @@ PROMPT;
                 'name' => $this->limitText($name, 255),
                 'category' => $category,
                 'stock_number' => $this->limitText($this->firstString($row, ['stock_number', 'stock_no', 'stock_num', 'stock_code', 'inventory_number', 'property_number']), 50),
-                'unit' => $this->limitText($this->firstString($row, ['unit', 'units', 'uom', 'u_m', 'um', 'unit_of_measure', 'unit_measure', 'measure', 'stock_unit']) ?: 'pcs', 50),
+                'unit' => $this->limitText($normalizer->normalizeUnit($this->firstString($row, ['unit', 'units', 'uom', 'u_m', 'um', 'unit_of_measure', 'unit_measure', 'measure', 'stock_unit']) ?: 'pcs'), 50),
                 'quantity' => max(0, $quantity),
                 'consumed' => max(0, $consumed),
                 'starting_stock' => max(0, $startingStock),
                 'minimum_stock' => max(0, $this->parseNumber($this->firstValue($row, ['minimum_stock', 'minimum', 'minimum_qty', 'reorder_level', 'reorder_point']), 10)),
-                'date_added' => $this->normalizeDate($this->firstString($row, ['date_added', 'date', 'received_date', 'restock_date', 'inventory_date'])),
-                'expiration_date' => $this->normalizeDate($this->firstString($row, ['expiration_date', 'expiry', 'expiry_date', 'expiration', 'expiry_expiration_date'])),
+                'date_added' => $normalizer->normalizeDate($this->firstString($row, ['date_added', 'date', 'received_date', 'restock_date', 'inventory_date'])),
+                'expiration_date' => $normalizer->normalizeDate($this->firstString($row, ['expiration_date', 'expiry', 'expiry_date', 'expiration', 'expiry_expiration_date'])),
                 'medicine_type' => $this->limitText($this->firstString($row, ['medicine_type', 'medicine_class', 'drug_class', 'medicine_category']), 255),
                 'confidence' => min(100, max(0, (int) $this->parseNumber($this->firstValue($row, ['confidence']), 100))),
                 'notes' => $this->limitText($this->firstString($row, ['notes', 'note', 'remarks']) ?: ($name === '' ? 'Item name was not detected. Type the item name before importing this row.' : ''), 500),
@@ -714,19 +715,6 @@ PROMPT;
         };
     }
 
-    private function normalizeDate(string $value): ?string
-    {
-        $value = trim($value);
-        if ($value === '') {
-            return null;
-        }
-
-        try {
-            return \Carbon\Carbon::parse($value)->format('Y-m-d');
-        } catch (\Throwable $exception) {
-            return null;
-        }
-    }
 
     private function limitText(string $value, int $maxLength): string
     {

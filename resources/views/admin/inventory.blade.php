@@ -3057,21 +3057,21 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="modal-actions-row inventory-import-sticky-actions" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                <select id="inventoryImportBulkCategory" class="inventory-import-select" style="width:180px;">
+                        <div class="modal-actions-row inventory-import-sticky-actions" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 10px;">
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap: nowrap;">
+                                <select id="inventoryImportBulkCategory" class="inventory-import-select" style="width:160px;">
                                     <option value="Medicine">Medicine</option>
                                     <option value="Supplies">Supplies</option>
                                     <option value="Equipment">Equipment</option>
                                 </select>
-                                <button type="button" class="inventory-btn-cancel" id="inventoryImportApplyCategoryBtn">Apply Category to All</button>
-                                <button type="button" class="inventory-btn-cancel" id="inventoryImportSelectAllBtn">Select All Valid Rows</button>
-                                <button type="button" class="inventory-btn-cancel" id="inventoryImportUnselectAllBtn">Unselect All</button>
+                                <button type="button" class="inventory-btn-cancel" id="inventoryImportApplyCategoryBtn" style="white-space: nowrap;">Apply Category</button>
+                                <button type="button" class="inventory-btn-cancel" id="inventoryImportSelectAllBtn" style="white-space: nowrap;">Select All</button>
+                                <button type="button" class="inventory-btn-cancel" id="inventoryImportUnselectAllBtn" style="white-space: nowrap;">Unselect All</button>
                             </div>
-                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                                <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate>Clear Preview</button>
-                                <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()">Review Later</button>
-                                <button type="submit" class="btn-add" id="inventoryImportCommitBtn">Import Selected Rows</button>
+                            <div style="display:flex; align-items:center; gap:10px; flex-wrap: nowrap;">
+                                <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate style="white-space: nowrap;">Clear Preview</button>
+                                <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()" style="white-space: nowrap;">Review Later</button>
+                                <button type="submit" class="btn-add" id="inventoryImportCommitBtn" style="white-space: nowrap;">Import Selected</button>
                             </div>
                         </div>
                     </form>

@@ -3896,24 +3896,23 @@
     const inventoryImportBulkCategory = document.getElementById('inventoryImportBulkCategory');
     const inventoryImportApplyCategoryBtn = document.getElementById('inventoryImportApplyCategoryBtn');
 
-    // Sync top and bottom scrollbars
-    const inventoryImportTableScrollTop = document.getElementById('inventoryImportTableScrollTop');
-    const inventoryImportTableWrap = document.getElementById('inventoryImportTableWrap');
-
-    if (inventoryImportTableScrollTop && inventoryImportTableWrap) {
-        inventoryImportTableScrollTop.addEventListener('scroll', function () {
-            inventoryImportTableWrap.scrollLeft = inventoryImportTableScrollTop.scrollLeft;
-        });
-
-        inventoryImportTableWrap.addEventListener('scroll', function () {
-            inventoryImportTableScrollTop.scrollLeft = inventoryImportTableWrap.scrollLeft;
-        });
-    }
-
     // Inventory Import Modal Functions
     if (inventoryImportCommitForm) {
         // Wait for elements to be available
         setTimeout(function() {
+            // Sync top and bottom scrollbars
+            const inventoryImportTableScrollTop = document.getElementById('inventoryImportTableScrollTop');
+            const inventoryImportTableWrap = document.getElementById('inventoryImportTableWrap');
+
+            if (inventoryImportTableScrollTop && inventoryImportTableWrap) {
+                inventoryImportTableScrollTop.addEventListener('scroll', function () {
+                    inventoryImportTableWrap.scrollLeft = inventoryImportTableScrollTop.scrollLeft;
+                });
+
+                inventoryImportTableWrap.addEventListener('scroll', function () {
+                    inventoryImportTableScrollTop.scrollLeft = inventoryImportTableScrollTop.scrollLeft;
+                });
+            }
             const inventoryImportToggleSelectBtn = document.getElementById('inventoryImportToggleSelectBtn');
             const inventoryImportCategoryDropdownBtn = document.getElementById('inventoryImportCategoryDropdownBtn');
             const inventoryImportCategoryMenu = document.getElementById('inventoryImportCategoryMenu');

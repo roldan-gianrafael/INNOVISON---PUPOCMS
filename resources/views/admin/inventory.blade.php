@@ -3881,74 +3881,71 @@
         });
     }
 
-    // Toggle Select All / Unselect All Button
-    const inventoryImportToggleSelectBtn = document.getElementById('inventoryImportToggleSelectBtn');
-    const inventoryImportCategoryDropdownBtn = document.getElementById('inventoryImportCategoryDropdownBtn');
-    const inventoryImportCategoryMenu = document.getElementById('inventoryImportCategoryMenu');
-    const inventoryImportCategoryOptions = document.querySelectorAll('.inventory-category-option');
-    const inventoryImportApplyCategoryBtn = document.getElementById('inventoryImportApplyCategoryBtn');
-    const inventoryImportSelectedCategory = document.getElementById('inventoryImportSelectedCategory');
+    // Inventory Import Modal Functions
+    if (inventoryImportCommitForm) {
+        // Wait for elements to be available
+        setTimeout(function() {
+            const inventoryImportToggleSelectBtn = document.getElementById('inventoryImportToggleSelectBtn');
+            const inventoryImportCategoryDropdownBtn = document.getElementById('inventoryImportCategoryDropdownBtn');
+            const inventoryImportCategoryMenu = document.getElementById('inventoryImportCategoryMenu');
+            const inventoryImportApplyCategoryBtn = document.getElementById('inventoryImportApplyCategoryBtn');
+            const inventoryImportSelectedCategory = document.getElementById('inventoryImportSelectedCategory');
 
-    if (inventoryImportToggleSelectBtn) {
-        inventoryImportToggleSelectBtn.addEventListener('click', function () {
-            const checkboxes = inventoryImportCommitForm.querySelectorAll('.inventory-import-row-select:not(:disabled)');
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = !allChecked;
-            });
-
-            inventoryImportToggleSelectBtn.textContent = allChecked ? 'Select All' : 'Unselect All';
-        });
-    }
-
-    // Category Dropdown Toggle
-    if (inventoryImportCategoryDropdownBtn) {
-        inventoryImportCategoryDropdownBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            inventoryImportCategoryMenu.style.display = inventoryImportCategoryMenu.style.display === 'none' ? 'block' : 'none';
-        });
-    }
-
-    // Category Selection
-    inventoryImportCategoryOptions.forEach(option => {
-        option.addEventListener('click', function (e) {
-            e.preventDefault();
-            const category = this.getAttribute('data-category');
-            inventoryImportSelectedCategory.value = category;
-            inventoryImportCategoryDropdownBtn.style.display = 'none';
-            inventoryImportApplyCategoryBtn.style.display = 'block';
-            inventoryImportApplyCategoryBtn.textContent = 'Apply ' + category;
-            inventoryImportCategoryMenu.style.display = 'none';
-        });
-    });
-
-    // Apply Category
-    if (inventoryImportApplyCategoryBtn) {
-        inventoryImportApplyCategoryBtn.addEventListener('click', function () {
-            const category = inventoryImportSelectedCategory.value;
-            inventoryImportCommitForm.querySelectorAll('select[name$="[category]"]').forEach(select => {
-                select.value = category;
-            });
-
-            inventoryImportApplyCategoryBtn.style.display = 'none';
-            inventoryImportCategoryDropdownBtn.style.display = 'block';
-            inventoryImportCategoryDropdownBtn.textContent = 'Category ▼';
-            inventoryImportSelectedCategory.value = '';
-        });
-    }
-
-    // Close dropdown when clicking outside (only if modal is visible)
-    if (inventoryImportCategoryMenu) {
-        document.addEventListener('click', function (e) {
-            // Only close if the import modal is visible and click is outside dropdown
-            const importModal = document.querySelector('[id*="inventoryImportReview"]') || inventoryImportCommitForm?.closest('.modal-overlay');
-            if (importModal && importModal.style.display !== 'none') {
-                if (!e.target.closest('#inventoryImportCategoryDropdownBtn') && !e.target.closest('#inventoryImportCategoryMenu')) {
-                    inventoryImportCategoryMenu.style.display = 'none';
-                }
+            // Toggle Select All / Unselect All Button
+            if (inventoryImportToggleSelectBtn) {
+                inventoryImportToggleSelectBtn.addEventListener('click', function () {
+                    const checkboxes = inventoryImportCommitForm.querySelectorAll('.inventory-import-row-select:not(:disabled)');
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
+                    inventoryImportToggleSelectBtn.textContent = allChecked ? 'Select All' : 'Unselect All';
+                });
             }
-        });
+
+            // Category Dropdown Toggle
+            if (inventoryImportCategoryDropdownBtn && inventoryImportCategoryMenu) {
+                inventoryImportCategoryDropdownBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    inventoryImportCategoryMenu.style.display = inventoryImportCategoryMenu.style.display === 'none' ? 'block' : 'none';
+                });
+
+                // Category Selection
+                const inventoryImportCategoryOptions = document.querySelectorAll('.inventory-category-option');
+                inventoryImportCategoryOptions.forEach(option => {
+                    option.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const category = this.getAttribute('data-category');
+                        inventoryImportSelectedCategory.value = category;
+                        inventoryImportCategoryDropdownBtn.style.display = 'none';
+                        inventoryImportApplyCategoryBtn.style.display = 'block';
+                        inventoryImportApplyCategoryBtn.textContent = 'Apply ' + category;
+                        inventoryImportCategoryMenu.style.display = 'none';
+                    });
+                });
+
+                // Apply Category
+                if (inventoryImportApplyCategoryBtn) {
+                    inventoryImportApplyCategoryBtn.addEventListener('click', function () {
+                        const category = inventoryImportSelectedCategory.value;
+                        inventoryImportCommitForm.querySelectorAll('select[name$="[category]"]').forEach(select => {
+                            select.value = category;
+                        });
+                        inventoryImportApplyCategoryBtn.style.display = 'none';
+                        inventoryImportCategoryDropdownBtn.style.display = 'block';
+                        inventoryImportCategoryDropdownBtn.textContent = 'Category ▼';
+                        inventoryImportSelectedCategory.value = '';
+                    });
+                }
+
+                // Close dropdown on outside click
+                document.addEventListener('click', function (e) {
+                    if (inventoryImportCategoryMenu.style.display === 'block') {
+                        if (!e.target.closest('#inventoryImportCategoryDropdownBtn') && !e.target.closest('#inventoryImportCategoryMenu')) {
+                            inventoryImportCategoryMenu.style.display = 'none';
+                        }
+                    }
+                });
+            }
+        }, 100);
     }
 
     if (inventoryImportCommitForm) {

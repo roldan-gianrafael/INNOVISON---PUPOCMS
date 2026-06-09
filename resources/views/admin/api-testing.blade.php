@@ -10,6 +10,179 @@
         gap: 20px;
     }
 
+    .api-tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 2px solid rgba(127, 29, 45, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .api-tab-button {
+        flex: 1;
+        padding: 16px 20px;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 700;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+        position: relative;
+        bottom: -2px;
+    }
+
+    .api-tab-button:hover {
+        background: rgba(127, 29, 45, 0.04);
+        color: #7f1d2d;
+    }
+
+    .api-tab-button.is-active {
+        color: #7f1d2d;
+        border-bottom-color: #7f1d2d;
+    }
+
+    html[data-theme="dark"] .api-tab-button {
+        color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .api-tab-button:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #f3d6da;
+    }
+
+    html[data-theme="dark"] .api-tab-button.is-active {
+        color: #f3d6da;
+        border-bottom-color: #f3d6da;
+    }
+
+    .api-tab-content {
+        display: none;
+    }
+
+    .api-tab-content.is-active {
+        display: block;
+    }
+
+    .api-health-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .api-health-card {
+        border-radius: 16px;
+        padding: 18px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 244, 245, 0.98));
+        border: 1px solid rgba(127, 29, 45, 0.12);
+    }
+
+    html[data-theme="dark"] .api-health-card {
+        background: linear-gradient(180deg, rgba(59, 24, 33, 0.96), rgba(35, 17, 25, 0.98));
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .api-health-card h4 {
+        margin: 0 0 12px;
+        color: #7f1d2d;
+        font-size: 15px;
+    }
+
+    html[data-theme="dark"] .api-health-card h4 {
+        color: #f3d6da;
+    }
+
+    .api-health-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .api-health-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .api-health-badge.healthy {
+        background: rgba(34, 197, 94, 0.1);
+        color: #166534;
+    }
+
+    .api-health-badge.unhealthy {
+        background: rgba(239, 68, 68, 0.1);
+        color: #991b1b;
+    }
+
+    .api-health-badge.down {
+        background: rgba(156, 163, 175, 0.1);
+        color: #374151;
+    }
+
+    .api-health-badge.unconfigured {
+        background: rgba(234, 179, 8, 0.1);
+        color: #7c2d12;
+    }
+
+    .api-error-log-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .api-error-log-table th,
+    .api-error-log-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(127, 29, 45, 0.08);
+    }
+
+    .api-error-log-table th {
+        background: rgba(127, 29, 45, 0.04);
+        font-weight: 700;
+        color: #7f1d2d;
+    }
+
+    html[data-theme="dark"] .api-error-log-table th {
+        background: rgba(255, 255, 255, 0.05);
+        color: #f3d6da;
+    }
+
+    .api-error-log-table small {
+        display: block;
+        color: #6b7280;
+        margin-top: 4px;
+    }
+
+    html[data-theme="dark"] .api-error-log-table small {
+        color: #cbd5e1;
+    }
+
+    .api-loading {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6b7280;
+    }
+
+    .api-loading-spinner {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(127, 29, 45, 0.1);
+        border-top-color: #7f1d2d;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
     .api-testing-card {
         position: relative;
         overflow: hidden;
@@ -627,9 +800,27 @@
 <div class="api-testing-shell">
     <section class="api-testing-card">
         <div class="api-testing-head">
-            <h2>API Testing Page</h2>
-            <p>Validate integration responses and local developer data from one protected workspace.</p>
+            <h2>API Dashboard</h2>
+            <p>Monitor, test, and troubleshoot external system integrations.</p>
         </div>
+
+        <div class="api-tabs">
+            <button class="api-tab-button is-active" data-tab="tests">
+                🔍 API Tests
+            </button>
+            <button class="api-tab-button" data-tab="health">
+                💚 Health Monitor
+            </button>
+            <button class="api-tab-button" data-tab="errors">
+                📋 Error Log
+            </button>
+            <button class="api-tab-button" data-tab="systems">
+                🔗 System Status
+            </button>
+        </div>
+
+        <!-- TAB 1: API TESTS (Original Content) -->
+        <div class="api-tab-content is-active" id="tab-tests">
 
         @php
             $apiTestingCurrentSource = $source ?? 'faculty';
@@ -1052,7 +1243,81 @@
     @else
         <p class="api-empty">Search results will appear here once you choose a source and enter a name, email, or ID.</p>
     @endif
-</section>
+        </div>
+        <!-- End Tab 1: API Tests -->
+
+        <!-- TAB 2: Health Monitor -->
+        <div class="api-tab-content" id="tab-health">
+            <button type="button" class="api-db-action-btn" id="refreshHealthBtn" style="margin-bottom: 20px;">
+                🔄 Refresh Health Status
+            </button>
+            <div class="api-health-grid" id="healthGrid">
+                <div class="api-loading">
+                    <div class="api-loading-spinner"></div>
+                    <p>Checking system health...</p>
+                </div>
+            </div>
+        </div>
+        <!-- End Tab 2: Health Monitor -->
+
+        <!-- TAB 3: Error Log -->
+        <div class="api-tab-content" id="tab-errors">
+            <div style="display: grid; grid-template-columns: auto auto auto 1fr auto; gap: 12px; margin-bottom: 20px; align-items: end;">
+                <div>
+                    <label for="errorHours" style="display: block; margin-bottom: 6px; font-weight: 700; color: #374151;">Hours</label>
+                    <select id="errorHours" style="border-radius: 12px; border: 1px solid rgba(127, 29, 45, 0.16); padding: 8px 12px;">
+                        <option value="1">Last 1 Hour</option>
+                        <option value="6">Last 6 Hours</option>
+                        <option value="24" selected>Last 24 Hours</option>
+                        <option value="168">Last 7 Days</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="errorSystem" style="display: block; margin-bottom: 6px; font-weight: 700; color: #374151;">System</label>
+                    <select id="errorSystem" style="border-radius: 12px; border: 1px solid rgba(127, 29, 45, 0.16); padding: 8px 12px;">
+                        <option value="">All Systems</option>
+                        <option value="pupt">PUPT</option>
+                        <option value="dental">Dental</option>
+                        <option value="sis">SIS</option>
+                        <option value="puptas">PUPTAS</option>
+                        <option value="guisis">GuiSIS</option>
+                        <option value="one_portal">One Portal</option>
+                    </select>
+                </div>
+                <button type="button" class="api-db-action-btn" id="loadErrorsBtn">
+                    Load Errors
+                </button>
+                <div id="errorStats" style="text-align: right; color: #6b7280; font-size: 13px;"></div>
+            </div>
+            <table class="api-error-log-table" id="errorTable">
+                <thead>
+                    <tr>
+                        <th>System</th>
+                        <th>Endpoint</th>
+                        <th>Error Code</th>
+                        <th>Message</th>
+                        <th>Response Time</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody id="errorBody">
+                    <tr><td colspan="6" style="text-align: center; color: #6b7280;">Click "Load Errors" to fetch error logs</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- End Tab 3: Error Log -->
+
+        <!-- TAB 4: System Status -->
+        <div class="api-tab-content" id="tab-systems">
+            <div class="api-health-grid" id="systemsGrid">
+                <div class="api-loading">
+                    <div class="api-loading-spinner"></div>
+                    <p>Loading system status...</p>
+                </div>
+            </div>
+        </div>
+        <!-- End Tab 4: System Status -->
+    </section>
 </div>
 
 <div class="api-edit-modal" id="databaseEditModal">
@@ -1077,6 +1342,170 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // ===== TAB SWITCHING =====
+        const tabButtons = document.querySelectorAll('.api-tab-button');
+        const tabContents = document.querySelectorAll('.api-tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.dataset.tab;
+
+                tabButtons.forEach(b => b.classList.remove('is-active'));
+                tabContents.forEach(c => c.classList.remove('is-active'));
+
+                button.classList.add('is-active');
+                document.getElementById(`tab-${tabName}`).classList.add('is-active');
+
+                if (tabName === 'health') {
+                    loadHealthMonitor();
+                } else if (tabName === 'systems') {
+                    loadSystemStatus();
+                }
+            });
+        });
+
+        // ===== HEALTH MONITOR =====
+        function loadHealthMonitor() {
+            const grid = document.getElementById('healthGrid');
+            grid.innerHTML = '<div class="api-loading"><div class="api-loading-spinner"></div><p>Checking system health...</p></div>';
+
+            fetch('{{ route("admin.api.health-monitor") }}')
+                .then(r => r.json())
+                .then(data => {
+                    grid.innerHTML = '';
+                    Object.entries(data).forEach(([key, status]) => {
+                        const statusClass = status.status.toLowerCase();
+                        const statusEmoji = {
+                            'healthy': '✅',
+                            'unhealthy': '⚠️',
+                            'down': '❌',
+                            'unconfigured': '⚙️'
+                        }[statusClass] || '❓';
+
+                        const card = document.createElement('div');
+                        card.className = 'api-health-card';
+                        card.innerHTML = `
+                            <h4>${key.toUpperCase()}</h4>
+                            <div class="api-health-status">
+                                <span class="api-health-badge ${statusClass}">${statusEmoji} ${status.status}</span>
+                            </div>
+                            <small>${status.message}</small>
+                            <small style="margin-top: 8px; color: #9ca3af;">Response: ${status.response_time}ms</small>
+                            <small style="margin-top: 4px; color: #9ca3af;">Last check: ${status.last_check || 'N/A'}</small>
+                        `;
+                        grid.appendChild(card);
+                    });
+                })
+                .catch(e => {
+                    grid.innerHTML = `<div class="api-alert">Failed to load health status: ${e.message}</div>`;
+                });
+        }
+
+        // ===== ERROR LOG =====
+        document.getElementById('loadErrorsBtn')?.addEventListener('click', function () {
+            const hours = document.getElementById('errorHours').value;
+            const system = document.getElementById('errorSystem').value;
+            const body = document.getElementById('errorBody');
+            const stats = document.getElementById('errorStats');
+
+            body.innerHTML = '<tr><td colspan="6"><div class="api-loading"><div class="api-loading-spinner"></div>Loading errors...</div></td></tr>';
+
+            const url = new URL('{{ route("admin.api.error-logs") }}', window.location.origin);
+            url.searchParams.append('hours', hours);
+            if (system) url.searchParams.append('system', system);
+
+            fetch(url)
+                .then(r => r.json())
+                .then(data => {
+                    const errors = data.errors || [];
+                    const errorStats = data.stats || {};
+
+                    if (errors.length === 0) {
+                        body.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6b7280;">No errors found</td></tr>';
+                        stats.innerHTML = '';
+                        return;
+                    }
+
+                    body.innerHTML = '';
+                    errors.forEach(err => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><strong>${err.system_name}</strong></td>
+                            <td><code style="font-size: 11px; color: #7f1d2d;">${err.endpoint || 'N/A'}</code></td>
+                            <td><code style="font-size: 11px;">${err.error_code || 'N/A'}</code></td>
+                            <td>
+                                ${err.error_message}
+                                <details style="margin-top: 6px;">
+                                    <summary style="cursor: pointer; color: #7f1d2d; font-size: 12px;">Details</summary>
+                                    <pre style="font-size: 11px; background: #f3f4f6; padding: 8px; border-radius: 6px; overflow: auto; max-height: 150px;">Error Type: ${err.error_type || 'N/A'}
+HTTP Status: ${err.http_status || 'N/A'}
+Request: ${err.request_payload || 'N/A'}
+Response: ${err.response_payload || 'N/A'}</pre>
+                                </details>
+                            </td>
+                            <td>${err.response_time_ms ? err.response_time_ms + 'ms' : 'N/A'}</td>
+                            <td><small>${new Date(err.created_at).toLocaleString()}</small></td>
+                        `;
+                        body.appendChild(row);
+                    });
+
+                    let statsHtml = `Total: ${errors.length} errors`;
+                    if (Object.keys(errorStats).length > 0) {
+                        statsHtml += '<br>';
+                        Object.entries(errorStats).forEach(([sys, stat]) => {
+                            statsHtml += `${sys}: ${stat.error_count} | `;
+                        });
+                    }
+                    stats.innerHTML = statsHtml;
+                })
+                .catch(e => {
+                    body.innerHTML = `<tr><td colspan="6"><div class="api-alert">Failed to load errors: ${e.message}</div></td></tr>`;
+                });
+        });
+
+        // ===== SYSTEM STATUS =====
+        function loadSystemStatus() {
+            const grid = document.getElementById('systemsGrid');
+            grid.innerHTML = '<div class="api-loading"><div class="api-loading-spinner"></div><p>Loading system status...</p></div>';
+
+            fetch('{{ route("admin.api.system-status") }}')
+                .then(r => r.json())
+                .then(data => {
+                    grid.innerHTML = '';
+                    Object.entries(data).forEach(([key, status]) => {
+                        const isConfigured = status === 'configured';
+                        const statusEmoji = isConfigured ? '✅' : '⚙️';
+                        const statusClass = isConfigured ? 'healthy' : 'unconfigured';
+
+                        const card = document.createElement('div');
+                        card.className = 'api-health-card';
+                        card.innerHTML = `
+                            <h4>${key.toUpperCase()}</h4>
+                            <div class="api-health-status">
+                                <span class="api-health-badge ${statusClass}">${statusEmoji} ${status}</span>
+                            </div>
+                            <small>${isConfigured ? 'API endpoint configured' : 'Endpoint not configured'}</small>
+                        `;
+                        grid.appendChild(card);
+                    });
+                })
+                .catch(e => {
+                    grid.innerHTML = `<div class="api-alert">Failed to load system status: ${e.message}</div>`;
+                });
+        }
+
+        // ===== REFRESH HEALTH BUTTON =====
+        document.getElementById('refreshHealthBtn')?.addEventListener('click', function () {
+            this.disabled = true;
+            this.textContent = '🔄 Refreshing...';
+            loadHealthMonitor();
+            setTimeout(() => {
+                this.disabled = false;
+                this.textContent = '🔄 Refresh Health Status';
+            }, 2000);
+        });
+
+        // ===== ORIGINAL API TESTS CODE =====
         const form = document.getElementById('apiTestingForm');
         const sourceField = document.getElementById('source');
         const searchField = document.getElementById('search');

@@ -3093,6 +3093,61 @@ public function inventorySummary()
             'moduleOptions'
         ));
     }
-    
+
+    public function apiHealthMonitor()
+    {
+        $user = Auth::user();
+        abort_unless($user instanceof User && $this->canAccessApiTesting($user), 403);
+
+        $healthStatus = \App\Services\ApiHealthMonitor::checkAllSystems();
+
+        return response()->json($healthStatus);
+    }
+
+    public function apiErrorLogs(Request $request)
+    {
+        $user = Auth::user();
+        abort_unless($user instanceof User && $this->canAccessApiTesting($user), 403);
+
+        $hours = $request->query('hours', 24);
+        $system = $request->query('system');
+        $limit = $request->query('limit', 100);
+
+        $query = \App\Models\ApiErrorLog::query()
+            ->where('created_at', '>=', now()->subHours($hours))
+            ->orderByDesc('created_at')
+            ->limit($limit);
+
+        if ($system) {
+            $query->where('system_name', $system);
+        }
+
+        $errors = $query->get();
+        $stats = \App\Models\ApiErrorLog::getErrorStats($hours);
+
+        return response()->json([
+            'errors' => $errors,
+            'stats' => $stats,
+            'hours' => $hours,
+            'system' => $system,
+        ]);
+    }
+
+    public function apiSystemStatus(Request $request)
+    {
+        $user = Auth::user();
+        abort_unless($user instanceof User && $this->canAccessApiTesting($user), 403);
+
+        $systems = [
+            'pupt' => config('services.pupt.api_url') ? 'configured' : 'unconfigured',
+            'dental' => config('services.dental.api_url') ? 'configured' : 'unconfigured',
+            'sis' => config('services.sis.api_url') ? 'configured' : 'unconfigured',
+            'puptas' => config('services.puptas.api_url') ? 'configured' : 'unconfigured',
+            'guisis' => config('services.guisis.api_url') ? 'configured' : 'unconfigured',
+            'one_portal' => config('services.idp.url') ? 'configured' : 'unconfigured',
+        ];
+
+        return response()->json($systems);
+    }
 
 }

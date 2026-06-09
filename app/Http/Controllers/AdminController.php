@@ -3139,12 +3139,40 @@ public function inventorySummary()
         abort_unless($user instanceof User && $this->canAccessApiTesting($user), 403);
 
         $systems = [
-            'pupt' => config('services.pupt.api_url') ? 'configured' : 'unconfigured',
-            'dental' => config('services.dental.api_url') ? 'configured' : 'unconfigured',
-            'sis' => config('services.sis.api_url') ? 'configured' : 'unconfigured',
-            'puptas' => config('services.puptas.api_url') ? 'configured' : 'unconfigured',
-            'guisis' => config('services.guisis.api_url') ? 'configured' : 'unconfigured',
-            'one_portal' => config('services.idp.url') ? 'configured' : 'unconfigured',
+            'pupt' => [
+                'name' => 'PUPT (Faculty)',
+                'configured' => !!config('services.pupt_flss.faculty_profiles_url'),
+                'endpoint' => config('services.pupt_flss.faculty_profiles_url'),
+                'timeout' => config('services.pupt_flss.timeout'),
+                'system_id' => config('services.pupt_flss.system_id'),
+            ],
+            'guisis' => [
+                'name' => 'GuiSIS',
+                'configured' => !!config('services.guisis.api_base_url'),
+                'endpoint' => config('services.guisis.api_base_url'),
+                'timeout' => config('services.guisis.timeout'),
+                'client_id' => config('services.guisis.m2m_client_id'),
+            ],
+            'puptas' => [
+                'name' => 'PUPTAS',
+                'configured' => !!config('services.puptas.api_url'),
+                'endpoint' => config('services.puptas.api_url'),
+                'timeout' => config('services.puptas.timeout'),
+                'client_id' => config('services.puptas.client_id'),
+            ],
+            'one_portal' => [
+                'name' => 'One Portal (IdP)',
+                'configured' => !!config('services.idp.url'),
+                'endpoint' => config('services.idp.url'),
+                'auth_method' => config('services.idp.token_auth_method'),
+            ],
+            'external_admin' => [
+                'name' => 'External Admin APIs',
+                'configured' => !!config('services.external_admin_profile.system_keys'),
+                'systems' => array_keys(json_decode(config('services.external_admin_profile.system_keys', '{}'), true)),
+                'header' => config('services.external_admin_profile.header'),
+                'system_header' => config('services.external_admin_profile.system_header'),
+            ],
         ];
 
         return response()->json($systems);

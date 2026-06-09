@@ -9,85 +9,75 @@ class ApiHealthMonitor
 {
     protected static $systems = [
         'pupt' => [
-            'name' => 'PUPT',
-            'endpoint' => 'api_url',
-            'health_path' => '/api/health',
+            'name' => 'PUPT (Faculty)',
+            'config_key' => 'services.pupt_flss.faculty_profiles_url',
             'timeout' => 30,
-            'type' => 'internal',
-        ],
-        'dental' => [
-            'name' => 'Dental',
-            'endpoint' => 'api_url',
-            'health_path' => '/api/status',
-            'timeout' => 30,
-            'type' => 'internal',
-        ],
-        'sis' => [
-            'name' => 'SIS',
-            'endpoint' => 'api_url',
-            'health_path' => '/api/ping',
-            'timeout' => 45,
-            'type' => 'internal',
-        ],
-        'puptas' => [
-            'name' => 'PUPTAS',
-            'endpoint' => 'api_url',
-            'health_path' => '/api/health',
-            'timeout' => 30,
-            'type' => 'external',
+            'description' => 'PUPT Faculty Profile Service',
         ],
         'guisis' => [
             'name' => 'GuiSIS',
-            'endpoint' => 'api_url',
-            'health_path' => '/api/health',
-            'timeout' => 30,
-            'type' => 'external',
+            'config_key' => 'services.guisis.api_base_url',
+            'timeout' => 20,
+            'description' => 'GuiSIS Student Information System',
+        ],
+        'puptas' => [
+            'name' => 'PUPTAS',
+            'config_key' => 'services.puptas.api_url',
+            'timeout' => 20,
+            'description' => 'PUPTAS Medical Assessment System',
         ],
         'one_portal' => [
             'name' => 'One Portal (IdP)',
-            'endpoint' => 'url',
-            'health_path' => '/.well-known/openid-configuration',
+            'config_key' => 'services.idp.url',
             'timeout' => 20,
-            'type' => 'idp',
+            'description' => 'Authentication & Identity Provider',
         ],
     ];
+
+    public static function getSystemsList(): array
+    {
+        return static::$systems;
+    }
 
     public static function checkAllSystems(): array
     {
         return Cache::remember('api_health_check', 60, function () {
             $results = [];
             foreach (static::$systems as $key => $system) {
-                $results[$key] = static::checkSystem($key, $system);
+                $results[$key] = static::checkSystem($key);
             }
             return $results;
         });
     }
 
-    public static function checkSystem(string $key, ?array $system = null): array
+    public static function checkSystem(string $key): array
     {
-        $system = $system ?? static::$systems[$key] ?? null;
+        $system = static::$systems[$key] ?? null;
         if (!$system) {
             return [
                 'status' => 'unknown',
-                'message' => 'System not found',
+                'message' => 'System not configured',
                 'response_time' => 0,
+                'name' => 'Unknown',
             ];
         }
 
         $startTime = microtime(true);
-        $url = config("services.{$key}.{$system['endpoint']}") ?? null;
+        $baseUrl = config($system['config_key']);
 
-        if (!$url) {
+        if (!$baseUrl) {
             return [
                 'status' => 'unconfigured',
                 'message' => 'No endpoint configured',
                 'response_time' => 0,
+                'name' => $system['name'],
+                'description' => $system['description'] ?? '',
             ];
         }
 
         try {
-            $fullUrl = rtrim($url, '/') . $system['health_path'];
-            $response = Http::timeout($system['timeout'])->get($fullUrl);
+            $testUrl = rtrim($baseUrl, '/');
+            $response = Http::timeout($system['timeout'])->get($testUrl);
             $responseTime = round((microtime(true) - $startTime) * 1000, 2);
 
             return [
@@ -95,15 +85,19 @@ class ApiHealthMonitor
                 'message' => "HTTP {$response->status()}",
                 'response_time' => $responseTime,
                 'http_status' => $response->status(),
+                'name' => $system['name'],
+                'description' => $system['description'] ?? '',
                 'last_check' => now()->toDateTimeString(),
             ];
         } catch (\Exception $e) {
             $responseTime = round((microtime(true) - $startTime) * 1000, 2);
             return [
                 'status' => 'down',
-                'message' => $e->getMessage(),
+                'message' => substr($e->getMessage(), 0, 100),
                 'response_time' => $responseTime,
                 'http_status' => null,
+                'name' => $system['name'],
+                'description' => $system['description'] ?? '',
                 'last_check' => now()->toDateTimeString(),
             ];
         }

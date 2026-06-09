@@ -1472,20 +1472,50 @@ Response: ${err.response_payload || 'N/A'}</pre>
                 .then(r => r.json())
                 .then(data => {
                     grid.innerHTML = '';
-                    Object.entries(data).forEach(([key, status]) => {
-                        const isConfigured = status === 'configured';
+                    Object.entries(data).forEach(([key, sys]) => {
+                        const isConfigured = sys.configured;
                         const statusEmoji = isConfigured ? '✅' : '⚙️';
                         const statusClass = isConfigured ? 'healthy' : 'unconfigured';
 
                         const card = document.createElement('div');
                         card.className = 'api-health-card';
-                        card.innerHTML = `
-                            <h4>${key.toUpperCase()}</h4>
+
+                        let content = `
+                            <h4>${sys.name}</h4>
                             <div class="api-health-status">
-                                <span class="api-health-badge ${statusClass}">${statusEmoji} ${status}</span>
+                                <span class="api-health-badge ${statusClass}">${statusEmoji} ${isConfigured ? 'Configured' : 'Not Configured'}</span>
                             </div>
-                            <small>${isConfigured ? 'API endpoint configured' : 'Endpoint not configured'}</small>
                         `;
+
+                        if (sys.endpoint) {
+                            content += `<small><strong>Endpoint:</strong><br><code style="font-size: 10px; word-break: break-all;">${sys.endpoint}</code></small>`;
+                        }
+
+                        if (sys.timeout) {
+                            content += `<small style="margin-top: 6px;"><strong>Timeout:</strong> ${sys.timeout}s</small>`;
+                        }
+
+                        if (sys.system_id) {
+                            content += `<small style="margin-top: 6px;"><strong>System ID:</strong> ${sys.system_id}</small>`;
+                        }
+
+                        if (sys.client_id) {
+                            content += `<small style="margin-top: 6px;"><strong>Client ID:</strong> <code style="font-size: 10px;">${sys.client_id}</code></small>`;
+                        }
+
+                        if (sys.auth_method) {
+                            content += `<small style="margin-top: 6px;"><strong>Auth:</strong> ${sys.auth_method}</small>`;
+                        }
+
+                        if (sys.systems && sys.systems.length > 0) {
+                            content += `<small style="margin-top: 6px;"><strong>External Systems:</strong> ${sys.systems.join(', ')}</small>`;
+                        }
+
+                        if (sys.header) {
+                            content += `<small style="margin-top: 6px;"><strong>Header:</strong> ${sys.header}</small>`;
+                        }
+
+                        card.innerHTML = content;
                         grid.appendChild(card);
                     });
                 })

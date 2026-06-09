@@ -2949,7 +2949,10 @@
                             <p class="inventory-import-help">
                                 Only checked rows will be imported. Rows marked <strong>Needs Review</strong> must have an item name before they can be selected. Existing matches will update the current inventory item; new rows will create a new item.
                             </p>
-                            <div class="inventory-import-table-wrap">
+                            <div class="inventory-import-table-scroll-top" id="inventoryImportTableScrollTop" style="overflow-x: scroll; overflow-y: hidden; width: 100%; height: 12px; margin-bottom: 0; border-radius: 16px 16px 0 0; border: 1px solid rgba(112, 19, 27, 0.12); border-bottom: none; background: #ffffff;">
+                                <div style="width: 1800px; height: 1px;"></div>
+                            </div>
+                            <div class="inventory-import-table-wrap" id="inventoryImportTableWrap">
                                 <table class="inventory-import-table">
                                     <thead>
                                         <tr>
@@ -3853,6 +3856,20 @@
     const inventoryImportUnselectAllBtn = document.getElementById('inventoryImportUnselectAllBtn');
     const inventoryImportBulkCategory = document.getElementById('inventoryImportBulkCategory');
     const inventoryImportApplyCategoryBtn = document.getElementById('inventoryImportApplyCategoryBtn');
+
+    // Sync top and bottom scrollbars
+    const inventoryImportTableScrollTop = document.getElementById('inventoryImportTableScrollTop');
+    const inventoryImportTableWrap = document.getElementById('inventoryImportTableWrap');
+
+    if (inventoryImportTableScrollTop && inventoryImportTableWrap) {
+        inventoryImportTableScrollTop.addEventListener('scroll', function () {
+            inventoryImportTableWrap.scrollLeft = inventoryImportTableScrollTop.scrollLeft;
+        });
+
+        inventoryImportTableWrap.addEventListener('scroll', function () {
+            inventoryImportTableScrollTop.scrollLeft = inventoryImportTableWrap.scrollLeft;
+        });
+    }
 
     if (inventoryImportCommitForm) {
         const refreshImportRowState = function (row) {

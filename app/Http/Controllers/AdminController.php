@@ -901,7 +901,16 @@ class AdminController extends Controller
 
     private function externalApiTestingSystems(): array
     {
-        return collect(config('services.external_admin_profile.system_keys', []))
+        $systemKeys = config('services.external_admin_profile.system_keys', []);
+
+        \Log::debug('External Admin Systems Debug', [
+            'system_keys_type' => gettype($systemKeys),
+            'system_keys_count' => count($systemKeys),
+            'system_keys' => $systemKeys,
+            'raw_env' => env('EXTERNAL_ADMIN_PROFILE_SYSTEM_KEYS'),
+        ]);
+
+        return collect($systemKeys)
             ->keys()
             ->filter(fn ($value) => trim((string) $value) !== '')
             ->values()

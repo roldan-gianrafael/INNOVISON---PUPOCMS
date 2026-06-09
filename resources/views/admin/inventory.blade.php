@@ -2439,12 +2439,27 @@
     }
     .inventory-import-table-wrap {
         overflow-y: auto;
-        overflow-x: scroll;
+        overflow-x: auto;
         max-height: 600px;
         border-radius: 16px;
         border: 1px solid rgba(112, 19, 27, 0.12);
         background: #ffffff;
         scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+    .inventory-import-table-wrap::-webkit-scrollbar {
+        height: 8px;
+    }
+    .inventory-import-table-wrap::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .inventory-import-table-wrap::-webkit-scrollbar-thumb {
+        background: transparent;
+        border-radius: 4px;
+    }
+    .inventory-import-table-wrap:hover::-webkit-scrollbar-thumb {
+        background: #8b0000;
     }
     .inventory-import-table-wrap::-webkit-scrollbar {
         height: 12px;
@@ -2459,6 +2474,20 @@
     }
     .inventory-import-table-wrap::-webkit-scrollbar-thumb:hover {
         background: #a61b1b;
+    }
+    /* Top Scrollbar - Auto-hide styling */
+    .inventory-import-table-scroll-top::-webkit-scrollbar {
+        height: 8px;
+    }
+    .inventory-import-table-scroll-top::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .inventory-import-table-scroll-top::-webkit-scrollbar-thumb {
+        background: transparent;
+        border-radius: 4px;
+    }
+    .inventory-import-table-scroll-top:hover::-webkit-scrollbar-thumb {
+        background: #8b0000;
     }
     .inventory-import-table {
         width: 100%;
@@ -2949,7 +2978,7 @@
                             <p class="inventory-import-help">
                                 Only checked rows will be imported. Rows marked <strong>Needs Review</strong> must have an item name before they can be selected. Existing matches will update the current inventory item; new rows will create a new item.
                             </p>
-                            <div class="inventory-import-table-scroll-top" id="inventoryImportTableScrollTop" style="position: sticky; top: 0; z-index: 20; overflow-x: scroll; overflow-y: hidden; width: 100%; height: 12px; margin-bottom: 0; border-radius: 16px 16px 0 0; border: 1px solid rgba(112, 19, 27, 0.12); border-bottom: none; background: #ffffff;">
+                            <div class="inventory-import-table-scroll-top" id="inventoryImportTableScrollTop" style="position: sticky; top: -2px; z-index: 20; overflow-x: auto; overflow-y: hidden; width: 100%; height: 8px; margin-bottom: 0; border-radius: 16px 16px 0 0; border: 1px solid rgba(112, 19, 27, 0.12); border-bottom: none; background: #ffffff; scrollbar-width: thin; scrollbar-color: #8b0000 transparent;">
                                 <div style="width: 1800px; height: 1px;"></div>
                             </div>
                             <div class="inventory-import-table-wrap" id="inventoryImportTableWrap">
@@ -3070,7 +3099,7 @@
                             <!-- Category Dropdown -->
                             <div style="position: relative; display: flex; align-items: center;">
                                 <button type="button" class="inventory-import-select" id="inventoryImportCategoryDropdownBtn" style="padding: 8px 10px; white-space: nowrap; min-width: fit-content; cursor: pointer; border: none; background: none; font-size: 12px; font-weight: 700;">Category ▼</button>
-                                <div id="inventoryImportCategoryMenu" style="position: absolute; top: 100%; left: 0; width: 140px; background: #ffffff; border: 1px solid rgba(112, 19, 27, 0.12); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; display: none; margin-top: 4px;">
+                                <div id="inventoryImportCategoryMenu" style="position: absolute; bottom: 100%; left: 0; width: 140px; background: #ffffff; border: 1px solid rgba(112, 19, 27, 0.12); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; display: none; margin-bottom: 4px;">
                                     <button type="button" class="inventory-category-option" data-category="Medicine" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(112, 19, 27, 0.12);">Medicine</button>
                                     <button type="button" class="inventory-category-option" data-category="Supplies" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(112, 19, 27, 0.12);">Supplies</button>
                                     <button type="button" class="inventory-category-option" data-category="Equipment" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px;">Equipment</button>

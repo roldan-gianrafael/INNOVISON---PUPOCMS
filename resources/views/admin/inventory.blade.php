@@ -3060,29 +3060,32 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="modal-actions-row inventory-import-sticky-actions" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: nowrap; gap: 30px;">
-                            <!-- Left: Row Selection Tools -->
-                            <div style="display:flex; flex-direction: column; gap:8px;">
-                                <button type="button" class="inventory-btn-cancel" id="inventoryImportSelectAllBtn" style="white-space: nowrap;">Select All</button>
-                                <button type="button" class="inventory-btn-cancel" id="inventoryImportUnselectAllBtn" style="white-space: nowrap;">Unselect All</button>
-                            </div>
+                        <div class="modal-actions-row inventory-import-sticky-actions" style="display: flex; justify-content: flex-start; align-items: center; flex-wrap: nowrap; gap: 12px; overflow-x: auto;">
+                            <!-- Toggle Select Button -->
+                            <button type="button" class="inventory-btn-cancel" id="inventoryImportToggleSelectBtn" style="white-space: nowrap; min-width: fit-content;">↑ Select All</button>
 
-                            <!-- Middle: Bulk Edit Tools -->
-                            <div style="display:flex; flex-direction: column; gap:8px;">
-                                <select id="inventoryImportBulkCategory" class="inventory-import-select" style="width:160px;">
-                                    <option value="Medicine">Medicine</option>
-                                    <option value="Supplies">Supplies</option>
-                                    <option value="Equipment">Equipment</option>
-                                </select>
-                                <button type="button" class="inventory-btn-cancel" id="inventoryImportApplyCategoryBtn" style="white-space: nowrap;">Apply Category</button>
-                            </div>
+                            <!-- Separator -->
+                            <span style="color: #ccc;">|</span>
 
-                            <!-- Right: Main Actions -->
-                            <div style="display:flex; flex-direction: column; gap:8px; margin-left: auto;">
-                                <button type="submit" class="btn-add" id="inventoryImportCommitBtn" style="white-space: nowrap;">Import Selected</button>
-                                <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate style="white-space: nowrap;">Clear Preview</button>
-                                <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()" style="white-space: nowrap;">Review Later</button>
+                            <!-- Category Dropdown -->
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <button type="button" class="inventory-import-select" id="inventoryImportCategoryDropdownBtn" style="padding: 8px 10px; white-space: nowrap; min-width: fit-content; cursor: pointer; border: none; background: none; font-size: 12px; font-weight: 700;">Category ▼</button>
+                                <div id="inventoryImportCategoryMenu" style="position: absolute; top: 100%; left: 0; width: 140px; background: #ffffff; border: 1px solid rgba(112, 19, 27, 0.12); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; display: none; margin-top: 4px;">
+                                    <button type="button" class="inventory-category-option" data-category="Medicine" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(112, 19, 27, 0.12);">Medicine</button>
+                                    <button type="button" class="inventory-category-option" data-category="Supplies" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(112, 19, 27, 0.12);">Supplies</button>
+                                    <button type="button" class="inventory-category-option" data-category="Equipment" style="width: 100%; padding: 10px 12px; text-align: left; border: none; background: none; cursor: pointer; font-size: 12px;">Equipment</button>
+                                </div>
                             </div>
+                            <button type="button" class="inventory-btn-cancel" id="inventoryImportApplyCategoryBtn" style="white-space: nowrap; display: none; min-width: fit-content;">Apply</button>
+                            <input type="hidden" id="inventoryImportSelectedCategory" value="">
+
+                            <!-- Separator -->
+                            <span style="color: #ccc; margin-left: auto;">|</span>
+
+                            <!-- Main Actions (Right side) -->
+                            <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate style="white-space: nowrap; min-width: fit-content;">Clear</button>
+                            <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()" style="white-space: nowrap; min-width: fit-content;">Review</button>
+                            <button type="submit" class="btn-add" id="inventoryImportCommitBtn" style="white-space: nowrap; min-width: fit-content;">✓ Import</button>
                         </div>
                     </form>
                 </div>
@@ -3877,6 +3880,70 @@
             inventoryImportTableScrollTop.scrollLeft = inventoryImportTableWrap.scrollLeft;
         });
     }
+
+    // Toggle Select All / Unselect All Button
+    const inventoryImportToggleSelectBtn = document.getElementById('inventoryImportToggleSelectBtn');
+    const inventoryImportCategoryDropdownBtn = document.getElementById('inventoryImportCategoryDropdownBtn');
+    const inventoryImportCategoryMenu = document.getElementById('inventoryImportCategoryMenu');
+    const inventoryImportCategoryOptions = document.querySelectorAll('.inventory-category-option');
+    const inventoryImportApplyCategoryBtn = document.getElementById('inventoryImportApplyCategoryBtn');
+    const inventoryImportSelectedCategory = document.getElementById('inventoryImportSelectedCategory');
+
+    if (inventoryImportToggleSelectBtn) {
+        inventoryImportToggleSelectBtn.addEventListener('click', function () {
+            const checkboxes = inventoryImportCommitForm.querySelectorAll('.inventory-import-row-select:not(:disabled)');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allChecked;
+            });
+
+            inventoryImportToggleSelectBtn.textContent = allChecked ? 'Select All' : 'Unselect All';
+        });
+    }
+
+    // Category Dropdown Toggle
+    if (inventoryImportCategoryDropdownBtn) {
+        inventoryImportCategoryDropdownBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            inventoryImportCategoryMenu.style.display = inventoryImportCategoryMenu.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+
+    // Category Selection
+    inventoryImportCategoryOptions.forEach(option => {
+        option.addEventListener('click', function (e) {
+            e.preventDefault();
+            const category = this.getAttribute('data-category');
+            inventoryImportSelectedCategory.value = category;
+            inventoryImportCategoryDropdownBtn.style.display = 'none';
+            inventoryImportApplyCategoryBtn.style.display = 'block';
+            inventoryImportApplyCategoryBtn.textContent = 'Apply ' + category;
+            inventoryImportCategoryMenu.style.display = 'none';
+        });
+    });
+
+    // Apply Category
+    if (inventoryImportApplyCategoryBtn) {
+        inventoryImportApplyCategoryBtn.addEventListener('click', function () {
+            const category = inventoryImportSelectedCategory.value;
+            inventoryImportCommitForm.querySelectorAll('select[name$="[category]"]').forEach(select => {
+                select.value = category;
+            });
+
+            inventoryImportApplyCategoryBtn.style.display = 'none';
+            inventoryImportCategoryDropdownBtn.style.display = 'block';
+            inventoryImportCategoryDropdownBtn.textContent = 'Category ▼';
+            inventoryImportSelectedCategory.value = '';
+        });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('#inventoryImportCategoryDropdownBtn') && !e.target.closest('#inventoryImportCategoryMenu')) {
+            inventoryImportCategoryMenu.style.display = 'none';
+        }
+    });
 
     if (inventoryImportCommitForm) {
         const refreshImportRowState = function (row) {

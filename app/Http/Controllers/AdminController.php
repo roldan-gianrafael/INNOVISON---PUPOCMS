@@ -1907,14 +1907,17 @@ public function storeItem(Request $request)
         'minimum_stock' => ['nullable', 'numeric', 'min:0'],
         'dispensing_unit' => ['nullable', 'string', 'max:50'],
         'units_per_stock_unit' => ['nullable', 'integer', 'min:1'],
-        'date_added' => ['required', 'date'],
+        'date_added' => ['required', 'string'],
         'medicine_type_id' => ['nullable', 'string', 'max:255'],
         'medicine_type_custom' => ['nullable', 'string', 'max:255'],
-        'expiration_date' => ['nullable', 'date'],
+        'expiration_date' => ['nullable', 'string'],
     ]);
 
     // 1. Prepare data and sanitize medicine-specific fields
+    $normalizer = new InventoryDataNormalizer();
     $data = $request->all();
+    $data['date_added'] = $normalizer->normalizeDate($request->input('date_added')) ?: now()->toDateString();
+    $data['expiration_date'] = $normalizer->normalizeDate($request->input('expiration_date', ''));
     $data['unit'] = trim((string) $request->input('unit', 'pcs')) ?: 'pcs';
     if (Schema::hasColumn('items', 'stock_number')) {
         $data['stock_number'] = trim((string) $request->input('stock_number', '')) ?: null;

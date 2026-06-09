@@ -2663,6 +2663,32 @@
         background: rgba(127, 29, 29, 0.32);
         border-color: rgba(248, 113, 113, 0.46);
     }
+
+    /* Category Button Animation */
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    #inventoryImportCategoryOptions {
+        display: flex !important;
+    }
+
+    .inventory-category-option {
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .inventory-category-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 </style>
 @endpush
 
@@ -2811,12 +2837,23 @@
                             @endif
                         </td>
                         <td>
-                            @if($item->expiration_date)
-                                <small style="display:block; color: {{ \Carbon\Carbon::parse($item->expiration_date)->isPast() ? '#b91c1c' : '#c2410c' }}; font-weight:600;">
-                                    {{ \Carbon\Carbon::parse($item->expiration_date)->format('M d, Y') }}
+                            @if($item->expiration_date && $item->expiration_date !== '0000-00-00')
+                                @php
+                                    $expDate = \Carbon\Carbon::parse($item->expiration_date);
+                                    $isPast = $expDate->isPast();
+                                    $dateColor = $isPast ? '#b91c1c' : '#c2410c';
+                                @endphp
+                                <small style="display:block; color: {{ $dateColor }}; font-weight:600;">
+                                    {{ $expDate->format('M d, Y') }}
+                                </small>
+                            @elseif($item->category === 'Medicine')
+                                <small style="display:block; color: #94a3b8; font-style: italic;">
+                                    Not set
                                 </small>
                             @else
-                                N/A
+                                <small style="display:block; color: #94a3b8;">
+                                    —
+                                </small>
                             @endif
                         </td>
                         <td>
@@ -3081,7 +3118,7 @@
                                                 <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][quantity]" value="{{ $row['quantity'] ?? 0 }}" required></td>
                                                 <td><input class="inventory-import-input" type="number" step="0.01" min="0" name="import_items[{{ $rowIndex }}][minimum_stock]" value="{{ $row['minimum_stock'] ?? 10 }}"></td>
                                                 <td><input class="inventory-import-input" type="date" name="import_items[{{ $rowIndex }}][date_added]" value="{{ $row['date_added'] ?? now()->toDateString() }}"></td>
-                                                <td><input class="inventory-import-input" type="date" name="import_items[{{ $rowIndex }}][expiration_date]" value="{{ $row['expiration_date'] ?? '' }}"></td>
+                                                <td><input class="inventory-import-input" type="text" name="import_items[{{ $rowIndex }}][expiration_date]" value="{{ $row['expiration_date'] ?? '' }}" placeholder="YYYY-MM-DD, MM/YYYY, or YYYY"></td>
                                                 <td><input class="inventory-import-input" name="import_items[{{ $rowIndex }}][medicine_type]" value="{{ $row['medicine_type'] ?? '' }}"></td>
                                             </tr>
                                         @endforeach
@@ -3092,6 +3129,16 @@
                         <div class="modal-actions-row inventory-import-sticky-actions" style="display: flex; justify-content: flex-start; align-items: center; flex-wrap: nowrap; gap: 12px; overflow-x: auto;">
                             <!-- Toggle Select Button -->
                             <button type="button" class="inventory-btn-cancel" id="inventoryImportToggleSelectBtn" style="white-space: nowrap; min-width: fit-content;">↑ Select All</button>
+
+                            <!-- Category Button -->
+                            <button type="button" class="inventory-btn-cancel" id="inventoryImportCategoryBtn" style="white-space: nowrap; min-width: fit-content;">Category▼</button>
+
+                            <!-- Category Options (Hidden by default, slides in) -->
+                            <div id="inventoryImportCategoryOptions" style="display: none; flex-wrap: nowrap; gap: 6px; animation: slideInFromLeft 0.3s ease-out;">
+                                <button type="button" class="inventory-btn-cancel inventory-category-option" data-category="Medicine" style="white-space: nowrap; min-width: fit-content; background: #e8f5e9; border-color: #4caf50;">Medicine</button>
+                                <button type="button" class="inventory-btn-cancel inventory-category-option" data-category="Supplies" style="white-space: nowrap; min-width: fit-content; background: #e3f2fd; border-color: #2196f3;">Supplies</button>
+                                <button type="button" class="inventory-btn-cancel inventory-category-option" data-category="Equipment" style="white-space: nowrap; min-width: fit-content; background: #fff3e0; border-color: #ff9800;">Equipment</button>
+                            </div>
 
                             <!-- Separator -->
                             <span style="color: #ccc; margin-left: auto;">|</span>
@@ -3273,12 +3320,12 @@
                                 <div class="inventory-date-grid">
                                     <div class="form-group">
                                         <label>Date Added</label>
-                                        <input type="date" name="date_added" id="iDateAdded" class="form-control" required placeholder="mm/dd/yyyy">
+                                        <input type="text" name="date_added" id="iDateAdded" class="form-control" required placeholder="YYYY-MM-DD, MM/YYYY, or YYYY (e.g., 2025-10-22, 10/2025, 2025)">
                                     </div>
 
                                     <div id="medicineExpiryField" class="form-group">
                                         <label>Expiration Date</label>
-                                        <input type="date" name="expiration_date" id="iExpDate" class="form-control" placeholder="mm/dd/yyyy">
+                                        <input type="text" name="expiration_date" id="iExpDate" class="form-control" placeholder="YYYY-MM-DD, MM/YYYY, or YYYY (e.g., 2025-12-31, 12/2025, 2025)">
                                     </div>
                                 </div>
                             </div>
@@ -3907,6 +3954,54 @@
                     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                     checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
                     inventoryImportToggleSelectBtn.textContent = allChecked ? 'Select All' : 'Unselect All';
+                });
+            }
+
+            // Category Button - Show/Hide Options
+            const inventoryImportCategoryBtn = document.getElementById('inventoryImportCategoryBtn');
+            const inventoryImportCategoryOptions = document.getElementById('inventoryImportCategoryOptions');
+            let categoryOptionsVisible = false;
+
+            if (inventoryImportCategoryBtn && inventoryImportCategoryOptions) {
+                inventoryImportCategoryBtn.addEventListener('click', function () {
+                    categoryOptionsVisible = !categoryOptionsVisible;
+                    if (categoryOptionsVisible) {
+                        inventoryImportCategoryOptions.style.display = 'flex';
+                    } else {
+                        inventoryImportCategoryOptions.style.display = 'none';
+                    }
+                });
+
+                // Apply Category to All Selected Items
+                const categoryOptions = inventoryImportCategoryOptions.querySelectorAll('.inventory-category-option');
+                categoryOptions.forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const category = this.getAttribute('data-category');
+                        const checkboxes = inventoryImportCommitForm.querySelectorAll('.inventory-import-row-select:checked');
+
+                        checkboxes.forEach(checkbox => {
+                            const row = checkbox.closest('.inventory-import-row');
+                            if (row) {
+                                const categorySelect = row.querySelector('select[name$="[category]"]');
+                                if (categorySelect) {
+                                    categorySelect.value = category;
+                                }
+                            }
+                        });
+
+                        // Hide category options after selection
+                        categoryOptionsVisible = false;
+                        inventoryImportCategoryOptions.style.display = 'none';
+                    });
+                });
+
+                // Close category options when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!inventoryImportCategoryBtn.contains(e.target) && !inventoryImportCategoryOptions.contains(e.target)) {
+                        categoryOptionsVisible = false;
+                        inventoryImportCategoryOptions.style.display = 'none';
+                    }
                 });
             }
         }, 100);

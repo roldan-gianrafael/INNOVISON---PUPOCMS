@@ -2445,10 +2445,11 @@
         background: #ffffff;
     }
     .inventory-import-table {
-        min-width: 1320px;
+        width: 100%;
         margin: 0;
         border-collapse: separate;
         border-spacing: 0;
+        table-layout: auto;
     }
     .inventory-import-table th,
     .inventory-import-table td {

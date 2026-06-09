@@ -3148,10 +3148,10 @@ public function inventorySummary()
             ],
             'guisis' => [
                 'name' => 'GuiSIS',
-                'configured' => !!config('services.guisis.api_base_url'),
-                'endpoint' => config('services.guisis.api_base_url'),
+                'configured' => !!config('services.guisis.base_url'),
+                'endpoint' => config('services.guisis.base_url'),
                 'timeout' => config('services.guisis.timeout'),
-                'client_id' => config('services.guisis.m2m_client_id'),
+                'client_id' => config('services.guisis.client_id'),
             ],
             'puptas' => [
                 'name' => 'PUPTAS',

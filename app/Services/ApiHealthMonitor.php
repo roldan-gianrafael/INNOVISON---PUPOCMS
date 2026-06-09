@@ -16,7 +16,7 @@ class ApiHealthMonitor
         ],
         'guisis' => [
             'name' => 'GuiSIS',
-            'config_key' => 'services.guisis.api_base_url',
+            'config_key' => 'services.guisis.base_url',
             'timeout' => 20,
             'description' => 'GuiSIS Student Information System',
         ],

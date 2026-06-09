@@ -61,6 +61,13 @@ class FacultySyncService
             ? $baseUrl
             : $baseUrl . (str_contains($baseUrl, '?') ? '&' : '?') . http_build_query($queryParams);
 
+        \Log::info('FLSS Request', [
+            'url' => $requestUrl,
+            'url_length' => strlen($requestUrl),
+            'base_url' => $baseUrl,
+            'base_url_length' => strlen($baseUrl),
+        ]);
+
         $timeout = (int) config('services.pupt_flss.timeout', 30);
         $response = Http::acceptJson()
             ->timeout($timeout)

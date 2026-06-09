@@ -893,7 +893,7 @@
 
         @if($apiResponseMeta)
             <p class="api-testing-meta" style="margin-top: 16px;">
-                Endpoint: <strong>{{ $apiResponseMeta['endpoint'] }}</strong>
+                Endpoint: <strong><code style="font-size: 12px; color: #7f1d2d; word-break: break-all;">{{ htmlspecialchars($apiResponseMeta['endpoint'], ENT_QUOTES, 'UTF-8') }}</code></strong>
                 | Status: <strong>{{ $apiResponseMeta['status'] }}</strong>
                 | Matches: <strong>{{ $apiResponseMeta['result_count'] }}</strong>
                 @if(!empty($apiResponseMeta['auth_mode']))

@@ -2446,6 +2446,20 @@
         background: #ffffff;
         scroll-behavior: smooth;
     }
+    .inventory-import-table-wrap::-webkit-scrollbar {
+        height: 12px;
+        width: 12px;
+    }
+    .inventory-import-table-wrap::-webkit-scrollbar-track {
+        background: #f0f0f0;
+    }
+    .inventory-import-table-wrap::-webkit-scrollbar-thumb {
+        background: #8b0000;
+        border-radius: 6px;
+    }
+    .inventory-import-table-wrap::-webkit-scrollbar-thumb:hover {
+        background: #a61b1b;
+    }
     .inventory-import-table {
         width: 100%;
         min-width: 1800px;
@@ -2935,21 +2949,6 @@
                             <p class="inventory-import-help">
                                 Only checked rows will be imported. Rows marked <strong>Needs Review</strong> must have an item name before they can be selected. Existing matches will update the current inventory item; new rows will create a new item.
                             </p>
-                            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 12px;">
-                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                    <select id="inventoryImportBulkCategory" class="inventory-import-select" style="width:180px;">
-                                        <option value="Medicine">Medicine</option>
-                                        <option value="Supplies">Supplies</option>
-                                        <option value="Equipment">Equipment</option>
-                                    </select>
-                                    <button type="button" class="inventory-btn-cancel" id="inventoryImportApplyCategoryBtn">Apply Category to All</button>
-                                </div>
-                                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                                <button type="button" class="inventory-btn-cancel" id="inventoryImportSelectAllBtn">Select All Valid Rows</button>
-                                <button type="button" class="inventory-btn-cancel" id="inventoryImportUnselectAllBtn">Unselect All</button>
-                                </div>
-                            </div>
-
                             <div class="inventory-import-table-wrap">
                                 <table class="inventory-import-table">
                                     <thead>
@@ -3058,10 +3057,22 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="modal-actions-row inventory-import-sticky-actions">
-                            <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate>Clear Preview</button>
-                            <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()">Review Later</button>
-                            <button type="submit" class="btn-add" id="inventoryImportCommitBtn">Import Selected Rows</button>
+                        <div class="modal-actions-row inventory-import-sticky-actions" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <select id="inventoryImportBulkCategory" class="inventory-import-select" style="width:180px;">
+                                    <option value="Medicine">Medicine</option>
+                                    <option value="Supplies">Supplies</option>
+                                    <option value="Equipment">Equipment</option>
+                                </select>
+                                <button type="button" class="inventory-btn-cancel" id="inventoryImportApplyCategoryBtn">Apply Category to All</button>
+                                <button type="button" class="inventory-btn-cancel" id="inventoryImportSelectAllBtn">Select All Valid Rows</button>
+                                <button type="button" class="inventory-btn-cancel" id="inventoryImportUnselectAllBtn">Unselect All</button>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate>Clear Preview</button>
+                                <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()">Review Later</button>
+                                <button type="submit" class="btn-add" id="inventoryImportCommitBtn">Import Selected Rows</button>
+                            </div>
                         </div>
                     </form>
                 </div>

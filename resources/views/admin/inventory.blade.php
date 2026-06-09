@@ -2949,7 +2949,7 @@
                             <p class="inventory-import-help">
                                 Only checked rows will be imported. Rows marked <strong>Needs Review</strong> must have an item name before they can be selected. Existing matches will update the current inventory item; new rows will create a new item.
                             </p>
-                            <div class="inventory-import-table-scroll-top" id="inventoryImportTableScrollTop" style="overflow-x: scroll; overflow-y: hidden; width: 100%; height: 12px; margin-bottom: 0; border-radius: 16px 16px 0 0; border: 1px solid rgba(112, 19, 27, 0.12); border-bottom: none; background: #ffffff;">
+                            <div class="inventory-import-table-scroll-top" id="inventoryImportTableScrollTop" style="position: sticky; top: 0; z-index: 20; overflow-x: scroll; overflow-y: hidden; width: 100%; height: 12px; margin-bottom: 0; border-radius: 16px 16px 0 0; border: 1px solid rgba(112, 19, 27, 0.12); border-bottom: none; background: #ffffff;">
                                 <div style="width: 1800px; height: 1px;"></div>
                             </div>
                             <div class="inventory-import-table-wrap" id="inventoryImportTableWrap">
@@ -3079,7 +3079,7 @@
 
                             <!-- Right: Main Actions -->
                             <div style="display:flex; flex-direction: column; gap:8px; margin-left: auto;">
-                                <button type="submit" class="btn-add" id="inventoryImportCommitBtn" style="white-space: nowrap; font-weight: 900;">⭐ Import Selected</button>
+                                <button type="submit" class="btn-add" id="inventoryImportCommitBtn" style="white-space: nowrap;">Import Selected</button>
                                 <button type="submit" class="inventory-btn-cancel" formaction="{{ route('admin.inventory.import.clear') }}" formnovalidate style="white-space: nowrap;">Clear Preview</button>
                                 <button type="button" class="inventory-btn-cancel" onclick="closeInventoryImportReviewModal()" style="white-space: nowrap;">Review Later</button>
                             </div>

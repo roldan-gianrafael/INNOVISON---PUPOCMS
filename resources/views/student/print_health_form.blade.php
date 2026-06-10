@@ -8,14 +8,14 @@
         @page { size: 8.5in 13in; margin: 0; }
         * { box-sizing: border-box; }
         body { margin: 0; padding: 0; background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif; }
-        .print-container { width: 100%; padding: 0.28in 0.42in 0.2in; line-height: 1.18; }
+        .print-container { width: auto; margin: 0; padding: 0.28in 0.42in 0.2in; line-height: 1.18; }
         .print-page { position: relative; }
         .document-code { position: absolute; top: -9px; right: 0; z-index: 2; width: 125px; font-family: Arial, sans-serif; font-size: 7px; line-height: 1.15; text-align: left; }
         .official-header-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .official-header-table td { padding: 0; border: 0; vertical-align: middle; }
-        .official-logo-cell { width: 20%; text-align: center; }
-        .official-heading-cell { width: 60%; padding-top: 8px !important; }
-        .official-photo-cell { width: 20%; padding: 8px 0 0 8px !important; text-align: right; vertical-align: top !important; }
+        .official-header-table td { padding: 0; border: 0; vertical-align: top; }
+        .official-logo-cell { width: 20%; padding-top: 4px !important; text-align: center; }
+        .official-heading-cell { width: 60%; padding-top: 15px !important; }
+        .official-photo-cell { width: 20%; padding: 8px 2px 0 8px !important; text-align: right; vertical-align: top !important; }
         .logo { width: 88px; height: 88px; object-fit: contain; }
         .official-heading-cell { font-family: "Times New Roman", Times, serif; }
         .official-heading-cell p { margin: 0; font-size: 10px; line-height: 1.17; }
@@ -25,7 +25,7 @@
         .official-title-table { width: 80%; margin-top: -58px; border-collapse: collapse; table-layout: fixed; }
         .official-title-table td { padding: 9px 0 5px; border-top: 1px solid #000; font-family: "Times New Roman", Times, serif; font-size: 14px; font-weight: bold; font-style: italic; text-align: center; }
         .section-header { width: 80%; margin-top: 8px; padding: 3px 0 4px; border: 0; font-family: "Times New Roman", Times, serif; font-size: 11px; font-weight: bold; font-style: italic; text-transform: uppercase; }
-        .official-title-table + .section-header { margin-top: 34px; }
+        .official-title-table + .section-header { margin-top: 10px; }
         .student-information-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; table-layout: fixed; }
         .student-information-table td { padding: 0; border: 0; vertical-align: bottom; font-size: 10px; }
         .student-name-cell { width: 62% !important; padding-right: 8px !important; }
@@ -49,7 +49,7 @@
         .civil-label { width: 11%; padding-left: 7px !important; }
         .civil-value { width: 14%; }
         .course-label { width: 17%; padding-left: 7px !important; }
-        .course-value { width: 24%; padding-bottom: 1px !important; font-size: 8.5px !important; line-height: 1.05; white-space: normal; }
+        .course-value { width: 24%; padding-bottom: 2px !important; font-size: 8px !important; line-height: 1.08; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; }
         .row { display: block; width: 100%; margin: 5px 0; }
         .field { display: inline-block; min-height: 13px; min-width: 90px; padding: 0 4px; border-bottom: 1px solid #000; color: #000; font-size: 10px; font-weight: bold; vertical-align: bottom; }
         .label, .labels { white-space: nowrap; font-size: 10px; }

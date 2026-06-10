@@ -460,18 +460,37 @@
 </div>
 
     <div class="report-main-title">
-        Accomplishment Report as of {{ date('F d, Y') }}
+        @if($type == 'inventory')
+            INVENTORY OF SUPPLIES
+        @elseif($type == 'mar')
+            MEDICAL ACCOMPLISHMENT REPORT
+        @elseif($type == 'appointment')
+            APPOINTMENT REPORT
+        @else
+            ACCOMPLISHMENT REPORT as of {{ date('F d, Y') }}
+        @endif
     </div>
 
     <div class="info-section">
-        <div class="info-left">
-            <div class="info-row"><span class="label">Name:</span> <span class="value">Nurse Joyce</span></div>
-            <div class="info-row"><span class="label">Position:</span> <span class="value">Nurse</span></div>
-        </div>
-        <div class="info-right">
-            <div class="info-row"><span class="label">Date of Submission:</span> <span class="value">{{ date('m/d/Y') }}</span></div>
-            <div class="info-row"><span class="label">Unit/Department:</span> <span class="value">Medical Services Unit</span></div>
-        </div>
+        @if($type == 'inventory')
+            <div class="info-left">
+                <div class="info-row"><span class="label">Department:</span> <span class="value">Medical Services</span></div>
+                <div class="info-row"><span class="label">Prepared by:</span> <span class="value">{{ Auth::user()->name ?? 'Clinic Staff' }}</span></div>
+            </div>
+            <div class="info-right">
+                <div class="info-row"><span class="label">Date of Report:</span> <span class="value">{{ date('F d, Y') }}</span></div>
+                <div class="info-row"><span class="label">Period Covered:</span> <span class="value">As of {{ date('F d, Y') }}</span></div>
+            </div>
+        @else
+            <div class="info-left">
+                <div class="info-row"><span class="label">Name:</span> <span class="value">Nurse Joyce</span></div>
+                <div class="info-row"><span class="label">Position:</span> <span class="value">Nurse</span></div>
+            </div>
+            <div class="info-right">
+                <div class="info-row"><span class="label">Date of Submission:</span> <span class="value">{{ date('m/d/Y') }}</span></div>
+                <div class="info-row"><span class="label">Unit/Department:</span> <span class="value">Medical Services Unit</span></div>
+            </div>
+        @endif
     </div>
 
     @if($type == 'mar')
@@ -793,17 +812,22 @@
 
 
     @elseif($type == 'inventory')
-    <table>
+    <div style="margin: 20px 0; padding: 15px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px;">
+        <p style="margin: 0; font-size: 12px; font-weight: bold;">MEDICAL SERVICES DEPARTMENT</p>
+        <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">Report Period: As of {{ date('F d, Y') }}</p>
+    </div>
+
+    <table style="margin-top: 15px; border-collapse: collapse; width: 100%; font-size: 11px;">
         <thead>
-            <tr>
-                <th>DATE</th>
-                <th>STOCK NUMBER</th>
-                <th>MEDICINES AND MATERIALS</th>
-                <th>UNIT</th>
-                <th>QUANTITY</th>
-                <th>CONSUMED</th>
-                <th>BALANCE</th>
-                <th>EXPIRATION DATE</th>
+            <tr style="background-color: #800000; color: white;">
+                <th style="border: 1px solid #999; padding: 8px; text-align: left; width: 8%;">DATE</th>
+                <th style="border: 1px solid #999; padding: 8px; text-align: left; width: 10%;">STOCK NO.</th>
+                <th style="border: 1px solid #999; padding: 8px; text-align: left; width: 28%;">ITEM DESCRIPTION</th>
+                <th style="border: 1px solid #999; padding: 8px; text-align: center; width: 8%;">UNIT</th>
+                <th style="border: 1px solid #999; padding: 8px; text-align: right; width: 10%;">BEGINNING BALANCE</th>
+                <th style="border: 1px solid #999; padding: 8px; text-align: right; width: 10%;">CONSUMED</th>
+                <th style="border: 1px solid #999; padding: 8px; text-align: right; width: 10%;">ENDING BALANCE</th>
+                <th style="border: 1px solid #999; padding: 8px; text-align: center; width: 12%;">EXPIRATION DATE</th>
             </tr>
         </thead>
         <tbody>
@@ -827,32 +851,31 @@
             @endphp
 
             @forelse($inventoryGroups as $groupName => $items)
-                <tr class="inventory-group-row">
-                    <td></td>
-                    <td></td>
-                    <td class="inventory-group-label">{{ $groupName }}</td>
-                    <td colspan="5" class="inventory-group-spacer"></td>
+                <tr style="background-color: #e8e8e8;">
+                    <td colspan="8" style="border: 1px solid #999; padding: 8px; font-weight: bold; color: #800000; text-transform: uppercase; font-size: 10px;">
+                        {{ $groupName }}
+                    </td>
                 </tr>
                 @foreach($items as $item)
-                <tr>
-                    <td>{{ optional($item->date_added)->format('m/d/Y') ?? 'N/A' }}</td>
-                    <td>{{ $item->stock_number ?: 'N/A' }}</td>
-                    <td class="text-left">{{ $item->name }}</td>
-                    <td>
-                        {{ $item->unit }}
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="border: 1px solid #ddd; padding: 6px; text-align: left;">{{ optional($item->date_added)->format('m/d/Y') ?? '-' }}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px; text-align: left;">{{ $item->stock_number ?: '-' }}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px; text-align: left;">
+                        {{ $item->name }}
                         @if($item->hasDispensingConversion())
-                            <div style="font-size: 11px;">{{ $item->dispensing_unit }} ({{ $item->units_per_stock_unit }} per {{ $item->unit }})</div>
+                            <div style="font-size: 10px; color: #666; margin-top: 2px;">{{ $item->dispensing_unit }} ({{ $item->units_per_stock_unit }}/{{ $item->unit }})</div>
                         @endif
                     </td>
-                    <td>{{ rtrim(rtrim(number_format((float) $item->starting_stock, 2, '.', ''), '0'), '.') }}</td>
-                    <td>{{ rtrim(rtrim(number_format((float) $item->consumed, 2, '.', ''), '0'), '.') }}</td>
-                    <td style="font-weight: bold;">{{ rtrim(rtrim(number_format((float) $item->current_balance, 2, '.', ''), '0'), '.') }}</td>
-                    <td>{{ optional($item->expiration_date)->format('m/d/Y') ?? 'N/A' }}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">{{ $item->unit }}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px; text-align: right;">{{ rtrim(rtrim(number_format((float) $item->starting_stock, 2, '.', ''), '0'), '.') }}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px; text-align: right;">{{ rtrim(rtrim(number_format((float) $item->consumed, 2, '.', ''), '0'), '.') }}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px; text-align: right; font-weight: bold;">{{ rtrim(rtrim(number_format((float) $item->current_balance, 2, '.', ''), '0'), '.') }}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">{{ optional($item->expiration_date)->format('m/d/Y') ?? '-' }}</td>
                 </tr>
                 @endforeach
             @empty
             <tr>
-                <td colspan="8">
+                <td colspan="8" style="border: 1px solid #999; padding: 15px; text-align: center; color: #666;">
                     @if($inventoryScope === 'medicines')
                         No medicines found in the inventory.
                     @elseif($inventoryScope === 'supplies')
@@ -865,6 +888,17 @@
             @endforelse
         </tbody>
     </table>
+
+    <div style="margin-top: 30px; padding: 15px; border: 1px solid #ddd; background: #f9f9f9; font-size: 10px; line-height: 1.5;">
+        <p style="margin: 0 0 10px 0; font-weight: bold;">NOTES:</p>
+        <ul style="margin: 0; padding-left: 20px;">
+            <li>This inventory report reflects the current stock status as of the date prepared.</li>
+            <li>Beginning Balance represents the opening inventory for the period.</li>
+            <li>Consumed indicates items dispensed or used during the period.</li>
+            <li>Ending Balance shows the remaining stock available.</li>
+            <li>Items with approaching expiration dates should be noted for review.</li>
+        </ul>
+    </div>
 
 
 
@@ -921,15 +955,28 @@
         </table>
     @endif
 
-    <div class="footer-signatures">
-        <div class="sig-box">
-            <p>Prepared by:</p>
-            <div class="sig-line">NURSE / MEDICAL STAFF</div>
-        </div>
-        <div class="sig-box">
-            <p>Noted by:</p>
-            <div class="sig-line">BRANCH DIRECTOR</div>
-        </div>
+    <div class="footer-signatures" style="margin-top: 40px;">
+        @if($type == 'inventory')
+            <div class="sig-box">
+                <p style="margin-bottom: 50px;">Prepared by:</p>
+                <div class="sig-line">{{ Auth::user()->name ?? 'CLINIC STAFF' }}</div>
+                <p style="font-size: 10px; margin-top: 5px;">Medical Services Department</p>
+            </div>
+            <div class="sig-box">
+                <p style="margin-bottom: 50px;">Reviewed by:</p>
+                <div class="sig-line">CLINIC HEAD / SUPERVISOR</div>
+                <p style="font-size: 10px; margin-top: 5px;">Medical Services</p>
+            </div>
+        @else
+            <div class="sig-box">
+                <p>Prepared by:</p>
+                <div class="sig-line">NURSE / MEDICAL STAFF</div>
+            </div>
+            <div class="sig-box">
+                <p>Noted by:</p>
+                <div class="sig-line">BRANCH DIRECTOR</div>
+            </div>
+        @endif
     </div>
 
     <div class="official-footer">

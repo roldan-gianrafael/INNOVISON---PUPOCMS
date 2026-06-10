@@ -303,8 +303,155 @@
     }
 
     /* MODAL */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-    .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 100%; max-width: 500px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-box { background: #fff; padding: 24px; border-radius: 12px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+
+    /* MOBILE RESPONSIVE */
+    @media (max-width: 768px) {
+        .modal-box {
+            width: 95vw !important;
+            max-width: 95vw !important;
+            padding: 16px !important;
+            margin: 10px !important;
+        }
+
+        /* Category/Condition Controls - Mobile Stack */
+        .category-controls,
+        .condition-controls,
+        .manage-controls {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            align-items: center !important;
+            margin: 10px 0 !important;
+        }
+
+        .category-controls button,
+        .category-controls select,
+        .category-controls input,
+        .condition-controls button,
+        .condition-controls select,
+        .manage-controls button,
+        .manage-controls select {
+            flex: 1 1 auto !important;
+            min-width: 100px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            white-space: normal !important;
+        }
+
+        /* Add Button */
+        .add-button,
+        .btn-add-category,
+        .btn-add-condition {
+            flex: 1 1 100% !important;
+            min-height: 40px !important;
+        }
+
+        /* Tables - Horizontal Scroll */
+        .table-container,
+        .table-wrapper {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -8px !important;
+            padding: 0 8px !important;
+        }
+
+        table {
+            min-width: 100% !important;
+        }
+    }
+
+    /* DARK MODE FIXES */
+    html[data-theme="dark"] .modal-box {
+        background: rgba(35, 17, 25, 0.96) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .modal-box h3,
+    html[data-theme="dark"] .modal-box label {
+        color: #f8fafc !important;
+    }
+
+    /* MAR Date Field - Dark Mode (Primary Fix) */
+    html[data-theme="dark"] input[type="date"],
+    html[data-theme="dark"] input[type="datetime-local"],
+    html[data-theme="dark"] .date-field {
+        background: rgba(18, 18, 18, 0.7) !important;
+        color: #f8fafc !important;
+        border: 2px solid rgba(255, 255, 255, 0.16) !important;
+        padding: 10px 12px !important;
+        font-size: 14px !important;
+    }
+
+    html[data-theme="dark"] input[type="date"]:focus,
+    html[data-theme="dark"] input[type="datetime-local"]:focus {
+        border-color: #facc15 !important;
+        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.1) !important;
+        outline: none !important;
+    }
+
+    html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1) brightness(1.3) !important;
+        cursor: pointer !important;
+        opacity: 0.8 !important;
+    }
+
+    html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        opacity: 1 !important;
+    }
+
+    /* Form Fields - Dark Mode */
+    html[data-theme="dark"] input[type="text"],
+    html[data-theme="dark"] input[type="email"],
+    html[data-theme="dark"] input[type="number"],
+    html[data-theme="dark"] input[type="search"],
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] textarea {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] input::placeholder,
+    html[data-theme="dark"] textarea::placeholder {
+        color: rgba(248, 250, 252, 0.5) !important;
+    }
+
+    /* Buttons - Dark Mode */
+    html[data-theme="dark"] .btn-add,
+    html[data-theme="dark"] button[type="button"],
+    html[data-theme="dark"] button[type="submit"] {
+        background: rgba(112, 19, 27, 0.96) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] .btn-add:hover {
+        background: #facc15 !important;
+        color: #111827 !important;
+    }
+
+    /* Tables - Dark Mode */
+    html[data-theme="dark"] table {
+        background: rgba(18, 18, 18, 0.4) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] table th {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] table td {
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] table tbody tr:hover {
+        background: rgba(59, 24, 33, 0.5) !important;
+    }
 
 </style>
 

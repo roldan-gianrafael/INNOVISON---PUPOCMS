@@ -1536,6 +1536,124 @@
             grid-template-columns: 1fr;
             gap: 6px;
         }
+
+        /* MOBILE: Filter Modal */
+        .appointments-filter-panel {
+            position: fixed !important;
+            right: 16px !important;
+            left: 16px !important;
+            top: auto !important;
+            bottom: auto !important;
+            width: auto !important;
+            max-height: 70vh !important;
+            overflow-y: auto !important;
+        }
+
+        .appointments-filter-shell.is-open .appointments-filter-panel {
+            display: block !important;
+        }
+
+        /* MOBILE: Appointment Summary Table - Horizontal Scroll */
+        .appointments-table-wrap {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .appointments-table-wrap::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .appointments-table-wrap::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 3px;
+        }
+
+        .appointments-table-wrap::-webkit-scrollbar-thumb {
+            background: #70131B;
+            border-radius: 3px;
+        }
+
+        .appointments-table {
+            min-width: 900px;
+        }
+
+        /* MOBILE: Modal Responsive */
+        .modal-box {
+            max-height: 90vh !important;
+            width: 95vw !important;
+            max-width: 95vw !important;
+            overflow-y: auto !important;
+        }
+
+        .modal-content {
+            max-height: 80vh !important;
+            overflow-y: auto !important;
+        }
+
+        .modal-form-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        .modal-actions {
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+        }
+
+        .modal-actions button {
+            flex: 1 1 45% !important;
+            min-width: 100px !important;
+        }
+    }
+
+    /* DARK MODE FIXES */
+    html[data-theme="dark"] .appointments-filter-panel {
+        background: rgba(35, 17, 25, 0.96) !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] .appointments-filter-panel-title {
+        color: #f3d6da !important;
+    }
+
+    html[data-theme="dark"] .appointments-status-display {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .modal-box {
+        background: rgba(35, 17, 25, 0.96) !important;
+    }
+
+    html[data-theme="dark"] .modal-header {
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] .modal-form-label {
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .modal-form-input,
+    html[data-theme="dark"] .modal-form-select {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .appointments-table {
+        background: rgba(18, 18, 18, 0.4) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .appointments-table th {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .appointments-table td {
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f8fafc !important;
     }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

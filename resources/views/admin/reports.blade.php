@@ -309,6 +309,202 @@
     html[data-theme="dark"] .reports-frame::before {
         background: #facc15;
     }
+
+    /* MOBILE RESPONSIVE FIXES */
+    @media (max-width: 768px) {
+        /* Reports Page Buttons - Responsive Layout */
+        .reports-actions,
+        .action-buttons,
+        .control-buttons {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            margin: 10px 0 !important;
+        }
+
+        .reports-actions button,
+        .action-buttons button,
+        .control-buttons button {
+            flex: 1 1 calc(50% - 4px) !important;
+            min-width: 80px !important;
+            padding: 8px 10px !important;
+            font-size: 12px !important;
+            min-height: 36px !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+        }
+
+        /* Make buttons full width on extra small screens */
+        .reports-actions button:only-child,
+        .action-buttons button:only-child {
+            flex: 1 1 100% !important;
+        }
+
+        /* Manage MAR Buttons - Mobile Wrap */
+        .manage-mar-controls,
+        .category-controls,
+        .filter-controls {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            align-items: center !important;
+        }
+
+        .manage-mar-controls button,
+        .manage-mar-controls select,
+        .manage-mar-controls input,
+        .category-controls button,
+        .category-controls select,
+        .filter-controls button,
+        .filter-controls select {
+            flex: 1 1 auto !important;
+            min-width: 100px !important;
+            max-width: 100% !important;
+            font-size: 12px !important;
+        }
+
+        /* Table Horizontal Scroll */
+        .table-responsive,
+        .table-wrapper,
+        .inventory-table-container {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -8px !important;
+            padding: 0 8px !important;
+        }
+
+        table {
+            min-width: 100% !important;
+        }
+
+        /* Scrollbar Styling */
+        .table-responsive::-webkit-scrollbar,
+        .table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track,
+        .table-wrapper::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb,
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #70131B;
+            border-radius: 3px;
+        }
+
+        /* Modal Responsiveness */
+        .modal-box {
+            max-height: 95vh !important;
+            width: 95vw !important;
+            max-width: 95vw !important;
+            overflow-y: auto !important;
+        }
+    }
+
+    /* DARK MODE FIXES */
+
+    /* MAR Date Field - Dark Mode */
+    html[data-theme="dark"] input[type="date"],
+    html[data-theme="dark"] .date-field,
+    html[data-theme="dark"] input[type="datetime-local"] {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1) brightness(1.2) !important;
+        cursor: pointer !important;
+    }
+
+    /* Inventory Summary Cards - Dark Mode */
+    html[data-theme="dark"] .inventory-summary-card,
+    html[data-theme="dark"] .summary-card,
+    html[data-theme="dark"] .total-card {
+        background: rgba(35, 17, 25, 0.96) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .inventory-summary-card h3,
+    html[data-theme="dark"] .summary-card h3,
+    html[data-theme="dark"] .total-card h3 {
+        color: #f3d6da !important;
+    }
+
+    html[data-theme="dark"] .inventory-summary-card .value,
+    html[data-theme="dark"] .summary-card .value {
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .inventory-summary-card .label,
+    html[data-theme="dark"] .summary-card .label {
+        color: rgba(248, 250, 252, 0.7) !important;
+    }
+
+    /* Inventory Performance Table - Dark Mode */
+    html[data-theme="dark"] .inventory-performance-table,
+    html[data-theme="dark"] .performance-table {
+        background: rgba(18, 18, 18, 0.4) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .inventory-performance-table thead,
+    html[data-theme="dark"] .performance-table thead {
+        background: rgba(18, 18, 18, 0.55) !important;
+    }
+
+    html[data-theme="dark"] .inventory-performance-table th,
+    html[data-theme="dark"] .performance-table th {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .inventory-performance-table td,
+    html[data-theme="dark"] .performance-table td {
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .inventory-performance-table tbody tr:hover,
+    html[data-theme="dark"] .performance-table tbody tr:hover {
+        background: rgba(59, 24, 33, 0.5) !important;
+    }
+
+    /* Form Controls - Dark Mode */
+    html[data-theme="dark"] input[type="text"],
+    html[data-theme="dark"] input[type="number"],
+    html[data-theme="dark"] input[type="email"],
+    html[data-theme="dark"] input[type="search"],
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] textarea {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] input::placeholder,
+    html[data-theme="dark"] textarea::placeholder {
+        color: rgba(248, 250, 252, 0.5) !important;
+    }
+
+    /* Reports Buttons - Dark Mode */
+    html[data-theme="dark"] .reports-actions button,
+    html[data-theme="dark"] .action-buttons button,
+    html[data-theme="dark"] .control-buttons button {
+        background: rgba(59, 24, 33, 0.96) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] .reports-actions button:hover,
+    html[data-theme="dark"] .action-buttons button:hover,
+    html[data-theme="dark"] .control-buttons button:hover {
+        background: rgba(112, 19, 27, 0.96) !important;
+    }
 </style>
 @endpush
 

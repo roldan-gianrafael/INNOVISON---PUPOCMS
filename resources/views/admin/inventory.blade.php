@@ -2689,6 +2689,151 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
+
+    /* MOBILE RESPONSIVE FIXES */
+    @media (max-width: 768px) {
+        /* Item Modal */
+        #itemModal .modal-box {
+            max-height: 95vh !important;
+            width: 95vw !important;
+            max-width: 95vw !important;
+            overflow-y: auto !important;
+            padding: 16px !important;
+        }
+
+        .inventory-modal-body {
+            max-height: 85vh !important;
+            overflow-y: auto !important;
+        }
+
+        .modal-form-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        .modal-form-panel {
+            padding: 12px !important;
+        }
+
+        .modal-panel-title {
+            font-size: 13px !important;
+        }
+
+        .form-group {
+            margin-bottom: 10px !important;
+        }
+
+        .inventory-inline-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* Import Modal */
+        #inventoryImportModal .modal-box,
+        #inventoryImportReviewModal .modal-box {
+            max-height: 95vh !important;
+            width: 95vw !important;
+            max-width: 95vw !important;
+            overflow-y: auto !important;
+        }
+
+        #inventoryImportReviewModal .modal-body {
+            max-height: 80vh !important;
+            overflow-y: auto !important;
+        }
+
+        .table-wrap {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .inventory-table {
+            min-width: 100% !important;
+        }
+
+        /* Modal Actions */
+        .modal-actions-row {
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            padding: 12px !important;
+        }
+
+        .modal-actions-row button {
+            flex: 1 1 45% !important;
+            min-height: 40px !important;
+            font-size: 12px !important;
+        }
+
+        /* Scrollbar for mobile tables */
+        .table-wrap::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-wrap::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: #70131B;
+            border-radius: 3px;
+        }
+    }
+
+    /* DARK MODE FIXES */
+    html[data-theme="dark"] #itemModal .modal-box,
+    html[data-theme="dark"] #inventoryImportModal .modal-box,
+    html[data-theme="dark"] #inventoryImportReviewModal .modal-box {
+        background: rgba(35, 17, 25, 0.96) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .inventory-modal-head {
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] .inventory-modal-title {
+        color: #f3d6da !important;
+    }
+
+    html[data-theme="dark"] .modal-panel-title {
+        color: #f3d6da !important;
+    }
+
+    html[data-theme="dark"] .form-control,
+    html[data-theme="dark"] .form-select,
+    html[data-theme="dark"] .inventory-import-input {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .form-control::placeholder {
+        color: rgba(248, 250, 252, 0.5) !important;
+    }
+
+    html[data-theme="dark"] .inventory-table {
+        background: rgba(18, 18, 18, 0.4) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .inventory-table th {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] .inventory-table td {
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .inventory-category-option {
+        background: rgba(59, 24, 33, 0.96) !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] label {
+        color: #f8fafc !important;
+    }
 </style>
 @endpush
 

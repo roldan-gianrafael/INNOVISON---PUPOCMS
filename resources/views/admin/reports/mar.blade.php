@@ -275,6 +275,93 @@
     .form-group { margin-bottom: 15px; }
     .btn-save { background: #70131B; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
     .btn-delete { color: #ef4444; text-decoration: none; font-size: 12px; margin-left: 10px; }
+
+    /* MOBILE RESPONSIVE */
+    @media (max-width: 768px) {
+        /* Form - Stack on Mobile */
+        .form-group {
+            margin-bottom: 12px !important;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100% !important;
+            font-size: 16px !important;
+            padding: 10px !important;
+        }
+
+        .btn-save,
+        .btn-delete {
+            padding: 10px 16px !important;
+            font-size: 14px !important;
+            min-height: 40px !important;
+        }
+
+        /* Table - Horizontal Scroll */
+        .table-container,
+        .table-wrapper {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            min-width: 100% !important;
+            font-size: 13px !important;
+        }
+    }
+
+    /* DARK MODE FIXES */
+    html[data-theme="dark"] .manage-section {
+        background: rgba(35, 17, 25, 0.96) !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] .form-group label {
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .form-group input,
+    html[data-theme="dark"] .form-group textarea,
+    html[data-theme="dark"] .form-group select {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"] .form-group input::placeholder,
+    html[data-theme="dark"] .form-group textarea::placeholder {
+        color: rgba(248, 250, 252, 0.5) !important;
+    }
+
+    html[data-theme="dark"] .btn-save {
+        background: #70131B !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .btn-save:hover {
+        background: #8f2230 !important;
+    }
+
+    html[data-theme="dark"] table {
+        background: rgba(18, 18, 18, 0.4) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] table th {
+        background: rgba(18, 18, 18, 0.55) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="dark"] table td {
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] table tbody tr:hover {
+        background: rgba(59, 24, 33, 0.5) !important;
+    }
 </style>
 @endpush
 

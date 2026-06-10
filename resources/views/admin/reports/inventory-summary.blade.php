@@ -290,6 +290,47 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* DARK MODE FIXES - Inventory Summary Cards */
+    html[data-theme="dark"] .inventory-frame,
+    html[data-theme="dark"] .summary-card,
+    html[data-theme="dark"] .total-card {
+        background: rgba(35, 17, 25, 0.96) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] .inventory-frame::before {
+        background: #facc15 !important;
+    }
+
+    html[data-theme="dark"] .inventory-frame-title,
+    html[data-theme="dark"] .summary-card h3,
+    html[data-theme="dark"] .total-card h3 {
+        color: #f3d6da !important;
+    }
+
+    html[data-theme="dark"] .inventory-frame-value,
+    html[data-theme="dark"] .summary-card .value,
+    html[data-theme="dark"] .total-card .value {
+        color: #f8fafc !important;
+        font-weight: bold !important;
+    }
+
+    html[data-theme="dark"] .inventory-frame-label,
+    html[data-theme="dark"] .summary-card .label,
+    html[data-theme="dark"] .total-card .label {
+        color: rgba(248, 250, 252, 0.7) !important;
+    }
+
+    html[data-theme="dark"] .inventory-frame-change,
+    html[data-theme="dark"] .summary-card .change {
+        color: rgba(248, 250, 252, 0.6) !important;
+    }
+
+    html[data-theme="dark"] .summary-grid {
+        gap: 16px !important;
+    }
 </style>
 @endpush
 

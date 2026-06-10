@@ -8,7 +8,7 @@
     <style>
     /* 1. Print & Base Styles */
     @page {
-        margin: 115px 28px 85px;
+        margin: {{ $type === 'inventory' ? '24px 24px 28px' : '115px 28px 85px' }};
     }
 
     @media print {
@@ -395,9 +395,233 @@
         font-size: 13px;
         line-height: 1.45;
     }
+
+    .inventory-report .page-header,
+    .inventory-report .page-footer {
+        display: none !important;
+    }
+
+    body.pdf-mode.inventory-report {
+        margin: 0;
+    }
+
+    .official-inventory-report {
+        font-family: Arial, Helvetica, sans-serif;
+        color: #000;
+    }
+
+    .official-inventory-header {
+        position: relative;
+        min-height: 92px;
+        padding: 0 84px 8px 74px;
+        border-bottom: 1.5px solid #000;
+        text-align: center;
+    }
+
+    .official-inventory-logo {
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        width: 58px;
+        height: 58px;
+        object-fit: contain;
+    }
+
+    .official-inventory-clinic-logo {
+        position: absolute;
+        top: 2px;
+        right: 4px;
+        width: 66px;
+        height: 66px;
+        object-fit: contain;
+    }
+
+    .official-inventory-university {
+        margin: 0;
+        font-family: "Times New Roman", serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: uppercase;
+    }
+
+    .official-inventory-office {
+        margin: 2px 0 0;
+        font-family: "Times New Roman", serif;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .official-inventory-campus {
+        margin: 1px 0 4px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .official-inventory-contact {
+        margin: 0;
+        font-size: 7.5px;
+        line-height: 1.35;
+    }
+
+    .official-inventory-motto {
+        margin: 5px 0 0;
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: .35px;
+        text-transform: uppercase;
+    }
+
+    .official-inventory-form-code {
+        position: absolute;
+        right: 0;
+        bottom: -13px;
+        font-size: 6.5px;
+        white-space: nowrap;
+    }
+
+    .official-inventory-title {
+        margin: 22px 0 2px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .official-inventory-as-of {
+        margin: 0 0 13px;
+        text-align: center;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .official-inventory-meta {
+        width: 100%;
+        margin: 0 0 10px;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .official-inventory-meta td {
+        border: 0;
+        padding: 2px 4px;
+        font-size: 9px;
+        vertical-align: bottom;
+    }
+
+    .official-inventory-meta .meta-label {
+        display: inline-block;
+        min-width: 55px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .official-inventory-meta .meta-value {
+        display: inline-block;
+        min-width: 150px;
+        border-bottom: 1px solid #000;
+        padding: 0 4px 1px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .official-inventory-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .official-inventory-table thead {
+        display: table-header-group;
+    }
+
+    .official-inventory-table tr {
+        page-break-inside: avoid;
+    }
+
+    .official-inventory-table th,
+    .official-inventory-table td {
+        border: 1px solid #000;
+        padding: 3px 3px;
+        font-size: 7.5px;
+        line-height: 1.2;
+        vertical-align: middle;
+    }
+
+    .official-inventory-table th {
+        height: 31px;
+        background: #fff;
+        color: #000;
+        font-size: 7px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .official-inventory-table .inventory-category-row td {
+        height: 17px;
+        background: #fff;
+        font-size: 8px;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .official-inventory-table .number-cell,
+    .official-inventory-table .date-cell,
+    .official-inventory-table .unit-cell {
+        text-align: center;
+    }
+
+    .official-inventory-table .item-cell {
+        text-align: left;
+    }
+
+    .official-inventory-signatures {
+        width: 100%;
+        margin-top: 25px;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .official-inventory-signatures td {
+        width: 50%;
+        border: 0;
+        padding: 0 28px;
+        font-size: 8px;
+        vertical-align: top;
+    }
+
+    .official-inventory-signature-space {
+        height: 30px;
+    }
+
+    .official-inventory-signature-name {
+        border-bottom: 1px solid #000;
+        padding-bottom: 2px;
+        font-size: 9px;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .official-inventory-signature-role {
+        margin-top: 2px;
+        text-align: center;
+    }
+
+    @media print {
+        body.inventory-report {
+            margin: 0;
+        }
+
+        .official-inventory-report {
+            margin: 0;
+        }
+    }
 </style>
 </head>
-<body class="{{ !empty($isPdf) ? 'pdf-mode' : '' }}">
+<body class="{{ !empty($isPdf) ? 'pdf-mode' : '' }} {{ $type === 'inventory' ? 'inventory-report' : '' }}">
 
     <div class="page-header" aria-hidden="true">
         <div class="page-header-inner">
@@ -447,41 +671,30 @@
         </div>
     @endif
 
-    <div class="header-top">
-    <div class="pup-logo-section">
-        <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
-        <div class="logo-text-box">
-            <div class="title">PUP TAGUIG</div>
+    @if($type !== 'inventory')
+        <div class="header-top">
+        <div class="pup-logo-section">
+            <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
+            <div class="logo-text-box">
+                <div class="title">PUP TAGUIG</div>
+            </div>
+        </div>
+        <div class="bp-logo">
+            BAGONG PILIPINAS
         </div>
     </div>
-    <div class="bp-logo">
-        BAGONG PILIPINAS
-    </div>
-</div>
 
-    <div class="report-main-title">
-        @if($type == 'inventory')
-            INVENTORY OF SUPPLIES
-        @elseif($type == 'mar')
+        <div class="report-main-title">
+        @if($type == 'mar')
             MEDICAL ACCOMPLISHMENT REPORT
         @elseif($type == 'appointment')
             APPOINTMENT REPORT
         @else
             ACCOMPLISHMENT REPORT as of {{ date('F d, Y') }}
         @endif
-    </div>
+        </div>
 
-    <div class="info-section">
-        @if($type == 'inventory')
-            <div class="info-left">
-                <div class="info-row"><span class="label">Department:</span> <span class="value">Medical Services</span></div>
-                <div class="info-row"><span class="label">Prepared by:</span> <span class="value">{{ Auth::user()->name ?? 'Clinic Staff' }}</span></div>
-            </div>
-            <div class="info-right">
-                <div class="info-row"><span class="label">Date of Report:</span> <span class="value">{{ date('F d, Y') }}</span></div>
-                <div class="info-row"><span class="label">Period Covered:</span> <span class="value">As of {{ date('F d, Y') }}</span></div>
-            </div>
-        @else
+        <div class="info-section">
             <div class="info-left">
                 <div class="info-row"><span class="label">Name:</span> <span class="value">Nurse Joyce</span></div>
                 <div class="info-row"><span class="label">Position:</span> <span class="value">Nurse</span></div>
@@ -490,8 +703,8 @@
                 <div class="info-row"><span class="label">Date of Submission:</span> <span class="value">{{ date('m/d/Y') }}</span></div>
                 <div class="info-row"><span class="label">Unit/Department:</span> <span class="value">Medical Services Unit</span></div>
             </div>
-        @endif
-    </div>
+        </div>
+    @endif
 
     @if($type == 'mar')
         @php
@@ -812,93 +1025,152 @@
 
 
     @elseif($type == 'inventory')
-    <div style="margin: 20px 0; padding: 15px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px;">
-        <p style="margin: 0; font-size: 12px; font-weight: bold;">MEDICAL SERVICES DEPARTMENT</p>
-        <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">Report Period: As of {{ date('F d, Y') }}</p>
-    </div>
+        @php
+            $inventoryScope = $inventoryScope ?? 'all';
+            $reportAsOf = $inventoryReportAsOf ?? \Carbon\Carbon::parse(($monthFilter ?? now()->format('Y-m')) . '-01')->endOfMonth();
+            $preparedBy = $inventoryPreparedBy ?? null;
+            $preparedByName = trim((string) optional($preparedBy)->name) ?: 'CLINIC STAFF';
+            $preparedByOffice = trim((string) optional(optional($preparedBy)->adminProfile)->office);
+            $preparedByPosition = $preparedByOffice !== ''
+                ? $preparedByOffice
+                : (\App\Models\User::normalizeRole(optional($preparedBy)->user_role) === \App\Models\User::ROLE_ADMIN ? 'Nurse / Clinic Staff' : 'Clinic Staff');
+            $inventoryTitle = $inventoryScope === 'medicines'
+                ? 'Inventory of Medicines'
+                : 'Inventory of Supplies';
+            $inventoryFormCode = $inventoryScope === 'medicines'
+                ? 'PUP-IRDM-6-MEDS-030 Rev. 0 July 11, 2024'
+                : 'PUP Medical Services Inventory Form';
+            $inventoryGroups = collect($data)
+                ->sortBy(function ($item) use ($inventoryScope) {
+                    $group = $inventoryScope === 'medicines'
+                        ? ($item->medicine_type ?: 'Uncategorized Medicine')
+                        : 'Supplies';
 
-    <table style="margin-top: 15px; border-collapse: collapse; width: 100%; font-size: 11px;">
-        <thead>
-            <tr style="background-color: #800000; color: white;">
-                <th style="border: 1px solid #999; padding: 8px; text-align: left; width: 8%;">DATE</th>
-                <th style="border: 1px solid #999; padding: 8px; text-align: left; width: 10%;">STOCK NO.</th>
-                <th style="border: 1px solid #999; padding: 8px; text-align: left; width: 28%;">ITEM DESCRIPTION</th>
-                <th style="border: 1px solid #999; padding: 8px; text-align: center; width: 8%;">UNIT</th>
-                <th style="border: 1px solid #999; padding: 8px; text-align: right; width: 10%;">BEGINNING BALANCE</th>
-                <th style="border: 1px solid #999; padding: 8px; text-align: right; width: 10%;">CONSUMED</th>
-                <th style="border: 1px solid #999; padding: 8px; text-align: right; width: 10%;">ENDING BALANCE</th>
-                <th style="border: 1px solid #999; padding: 8px; text-align: center; width: 12%;">EXPIRATION DATE</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php
-                $inventoryScope = $inventoryScope ?? 'all';
-                $inventoryGroups = collect($data)
-                    ->sortBy(function ($item) {
-                        $group = $item->category === 'Medicine'
-                            ? ($item->medicine_type ?: 'Uncategorized Medicine')
-                            : ($item->category ?: 'Materials');
+                    return strtoupper($group . ' ' . $item->name);
+                })
+                ->groupBy(function ($item) use ($inventoryScope) {
+                    return $inventoryScope === 'medicines'
+                        ? ($item->medicine_type ?: 'Uncategorized Medicine')
+                        : 'Supplies';
+                });
+            $formatInventoryQuantity = function ($value) {
+                return rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.');
+            };
+        @endphp
 
-                        return strtoupper($group . ' ' . $item->name);
-                    })
-                    ->groupBy(function ($item) {
-                        if ($item->category === 'Medicine') {
-                            return $item->medicine_type ?: 'Uncategorized Medicine';
-                        }
+        <section class="official-inventory-report">
+            <header class="official-inventory-header">
+                <img class="official-inventory-logo" src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
+                <img class="official-inventory-clinic-logo" src="{{ asset('images/clinic_logo_transparent.png') }}" alt="Medical Clinic Logo">
+                <p class="official-inventory-university">Polytechnic University of the Philippines</p>
+                <p class="official-inventory-office">Medical Services Department</p>
+                <p class="official-inventory-campus">Taguig Campus</p>
+                <p class="official-inventory-contact">
+                    Gen. Santos Avenue, Lower Bicutan, Taguig City 1632<br>
+                    Direct Line: (02) 8837 5858 to 60 | Email: taguig@pup.edu.ph<br>
+                    Website: www.pup.edu.ph | Inquiries: https://bit.ly/PUPSINTA
+                </p>
+                <p class="official-inventory-motto">A Leading Comprehensive Polytechnic University in Asia</p>
+                <span class="official-inventory-form-code">{{ $inventoryFormCode }}</span>
+            </header>
 
-                        return $item->category ?: 'Materials';
-                    });
-            @endphp
+            <h1 class="official-inventory-title">{{ $inventoryTitle }}</h1>
+            <p class="official-inventory-as-of">As of {{ $reportAsOf->format('F d, Y') }}</p>
 
-            @forelse($inventoryGroups as $groupName => $items)
-                <tr style="background-color: #e8e8e8;">
-                    <td colspan="8" style="border: 1px solid #999; padding: 8px; font-weight: bold; color: #800000; text-transform: uppercase; font-size: 10px;">
-                        {{ $groupName }}
+            <table class="official-inventory-meta">
+                <tr>
+                    <td>
+                        <span class="meta-label">Name:</span>
+                        <span class="meta-value">{{ $preparedByName }}</span>
+                    </td>
+                    <td>
+                        <span class="meta-label">Date of Submission:</span>
+                        <span class="meta-value">{{ $reportAsOf->format('F d, Y') }}</span>
                     </td>
                 </tr>
-                @foreach($items as $item)
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="border: 1px solid #ddd; padding: 6px; text-align: left;">{{ optional($item->date_added)->format('m/d/Y') ?? '-' }}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px; text-align: left;">{{ $item->stock_number ?: '-' }}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px; text-align: left;">
-                        {{ $item->name }}
-                        @if($item->hasDispensingConversion())
-                            <div style="font-size: 10px; color: #666; margin-top: 2px;">{{ $item->dispensing_unit }} ({{ $item->units_per_stock_unit }}/{{ $item->unit }})</div>
-                        @endif
+                <tr>
+                    <td>
+                        <span class="meta-label">Position:</span>
+                        <span class="meta-value">{{ $preparedByPosition }}</span>
                     </td>
-                    <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">{{ $item->unit }}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px; text-align: right;">{{ rtrim(rtrim(number_format((float) $item->starting_stock, 2, '.', ''), '0'), '.') }}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px; text-align: right;">{{ rtrim(rtrim(number_format((float) $item->consumed, 2, '.', ''), '0'), '.') }}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px; text-align: right; font-weight: bold;">{{ rtrim(rtrim(number_format((float) $item->current_balance, 2, '.', ''), '0'), '.') }}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px; text-align: center;">{{ optional($item->expiration_date)->format('m/d/Y') ?? '-' }}</td>
+                    <td>
+                        <span class="meta-label">Unit / Department:</span>
+                        <span class="meta-value">Taguig Campus</span>
+                    </td>
                 </tr>
-                @endforeach
-            @empty
-            <tr>
-                <td colspan="8" style="border: 1px solid #999; padding: 15px; text-align: center; color: #666;">
-                    @if($inventoryScope === 'medicines')
-                        No medicines found in the inventory.
-                    @elseif($inventoryScope === 'supplies')
-                        No supplies or materials found in the inventory.
-                    @else
-                        No items found in the inventory.
-                    @endif
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </table>
 
-    <div style="margin-top: 30px; padding: 15px; border: 1px solid #ddd; background: #f9f9f9; font-size: 10px; line-height: 1.5;">
-        <p style="margin: 0 0 10px 0; font-weight: bold;">NOTES:</p>
-        <ul style="margin: 0; padding-left: 20px;">
-            <li>This inventory report reflects the current stock status as of the date prepared.</li>
-            <li>Beginning Balance represents the opening inventory for the period.</li>
-            <li>Consumed indicates items dispensed or used during the period.</li>
-            <li>Ending Balance shows the remaining stock available.</li>
-            <li>Items with approaching expiration dates should be noted for review.</li>
-        </ul>
-    </div>
+            <table class="official-inventory-table">
+                <colgroup>
+                    <col style="width: 10%;">
+                    <col style="width: 11%;">
+                    <col style="width: 31%;">
+                    <col style="width: 9%;">
+                    <col style="width: 10%;">
+                    <col style="width: 10%;">
+                    <col style="width: 9%;">
+                    <col style="width: 10%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Stock Number</th>
+                        <th>Medicines &amp; Materials</th>
+                        <th>Units</th>
+                        <th>Quantity</th>
+                        <th>Consumed</th>
+                        <th>Balance</th>
+                        <th>Expiration Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($inventoryGroups as $groupName => $items)
+                        <tr class="inventory-category-row">
+                            <td colspan="8">{{ $groupName }}</td>
+                        </tr>
+                        @foreach($items as $item)
+                            <tr>
+                                <td class="date-cell">{{ optional($item->date_added)->format('d-M-y') ?: '-' }}</td>
+                                <td class="number-cell">{{ $item->stock_number ?: '-' }}</td>
+                                <td class="item-cell">{{ $item->name }}</td>
+                                <td class="unit-cell">{{ $item->unit ?: 'Piece' }}</td>
+                                <td class="number-cell">{{ $formatInventoryQuantity($item->starting_stock) }}</td>
+                                <td class="number-cell">{{ $formatInventoryQuantity($item->consumed) }}</td>
+                                <td class="number-cell">{{ $formatInventoryQuantity($item->current_balance) }}</td>
+                                <td class="date-cell">{{ optional($item->expiration_date)->format('M Y') ?: '-' }}</td>
+                            </tr>
+                        @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="8" style="height: 38px; text-align: center;">
+                                No {{ $inventoryScope === 'medicines' ? 'medicines' : 'supplies' }} found in the inventory.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <table class="official-inventory-signatures">
+                <tr>
+                    <td>Prepared by:</td>
+                    <td>Noted by:</td>
+                </tr>
+                <tr>
+                    <td class="official-inventory-signature-space"></td>
+                    <td class="official-inventory-signature-space"></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="official-inventory-signature-name">{{ $preparedByName }}</div>
+                        <div class="official-inventory-signature-role">{{ $preparedByPosition }}</div>
+                    </td>
+                    <td>
+                        <div class="official-inventory-signature-name">Engr. Michael L. Zarco</div>
+                        <div class="official-inventory-signature-role">Administrative Officer</div>
+                    </td>
+                </tr>
+            </table>
+        </section>
 
 
 
@@ -955,19 +1227,8 @@
         </table>
     @endif
 
-    <div class="footer-signatures" style="margin-top: 40px;">
-        @if($type == 'inventory')
-            <div class="sig-box">
-                <p style="margin-bottom: 50px;">Prepared by:</p>
-                <div class="sig-line">{{ Auth::user()->name ?? 'CLINIC STAFF' }}</div>
-                <p style="font-size: 10px; margin-top: 5px;">Medical Services Department</p>
-            </div>
-            <div class="sig-box">
-                <p style="margin-bottom: 50px;">Reviewed by:</p>
-                <div class="sig-line">CLINIC HEAD / SUPERVISOR</div>
-                <p style="font-size: 10px; margin-top: 5px;">Medical Services</p>
-            </div>
-        @else
+    @if($type !== 'inventory')
+        <div class="footer-signatures" style="margin-top: 40px;">
             <div class="sig-box">
                 <p>Prepared by:</p>
                 <div class="sig-line">NURSE / MEDICAL STAFF</div>
@@ -976,26 +1237,26 @@
                 <p>Noted by:</p>
                 <div class="sig-line">BRANCH DIRECTOR</div>
             </div>
-        @endif
-    </div>
+        </div>
 
-    <div class="official-footer">
-        <div class="footer-details">
-            <p>General Santos Avenue, Lower Bicutan Taguig City Philippines, 1632</p>
-            <p>Direct Line (02) 8837 5658 to 60</p>
-            <p>Website: www.pup.edu.ph | Email: taguig@pup.edu.ph</p>
-        </div>
-        <div class="footer-motto">
-            THE COUNTRY'S FIRST POLYTECHNICU
-        </div>
-        <div class="generated-report-caption">
-            <div class="signature-note">This is system-generated, signature is not required.</div>
-            <div class="privacy-note">
-                This document contains personal-identifiable information that is subject to Data Privacy.<br>
-                Please keep this document protected and in a safe place.
+        <div class="official-footer">
+            <div class="footer-details">
+                <p>General Santos Avenue, Lower Bicutan Taguig City Philippines, 1632</p>
+                <p>Direct Line (02) 8837 5658 to 60</p>
+                <p>Website: www.pup.edu.ph | Email: taguig@pup.edu.ph</p>
+            </div>
+            <div class="footer-motto">
+                THE COUNTRY'S FIRST POLYTECHNICU
+            </div>
+            <div class="generated-report-caption">
+                <div class="signature-note">This is system-generated, signature is not required.</div>
+                <div class="privacy-note">
+                    This document contains personal-identifiable information that is subject to Data Privacy.<br>
+                    Please keep this document protected and in a safe place.
+                </div>
             </div>
         </div>
-    </div>
+    @endif
     </div>
 
 </body>

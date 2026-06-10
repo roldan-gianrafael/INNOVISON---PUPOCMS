@@ -680,6 +680,14 @@ public function printReport(Request $request)
             default => "INVENTORY STOCK REPORT",
         };
         $data = $this->buildInventoryReportData($monthFilter, $inventoryScope);
+        $inventoryReportAsOf = $monthEnd->isCurrentMonth()
+            ? now()->endOfDay()
+            : (clone $monthEnd);
+        $inventoryPreparedBy = auth('admin')->user() ?? auth()->user();
+
+        if ($inventoryPreparedBy) {
+            $inventoryPreparedBy->loadMissing('adminProfile');
+        }
     }
     elseif ($type == 'appointment') {
     $title = "APPOINTMENT SUMMARY REPORT";
@@ -735,6 +743,8 @@ public function printReport(Request $request)
             'title' => $title,
             'monthFilter' => $monthFilter,
             'inventoryScope' => $inventoryScope,
+            'inventoryReportAsOf' => $inventoryReportAsOf ?? null,
+            'inventoryPreparedBy' => $inventoryPreparedBy ?? null,
             'gadTables' => $gadTables ?? [],
             'isPdf' => true,
         ])->setPaper('a4', 'portrait');
@@ -751,6 +761,8 @@ public function printReport(Request $request)
         'title' => $title,
         'monthFilter' => $monthFilter,
         'inventoryScope' => $inventoryScope,
+        'inventoryReportAsOf' => $inventoryReportAsOf ?? null,
+        'inventoryPreparedBy' => $inventoryPreparedBy ?? null,
         'gadTables' => $gadTables ?? [],
         'isPdf' => false,
         'pdfUnavailable' => $output === 'pdf',

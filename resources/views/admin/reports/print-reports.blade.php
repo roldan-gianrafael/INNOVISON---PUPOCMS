@@ -8,7 +8,7 @@
     <style>
     /* 1. Print & Base Styles */
     @page {
-        margin: {{ $type === 'inventory' ? '24px 24px 28px' : '115px 28px 85px' }};
+        margin: {{ in_array($type, ['inventory', 'mar'], true) ? '24px 24px 72px' : '115px 28px 85px' }};
     }
 
     @media print {
@@ -396,12 +396,12 @@
         line-height: 1.45;
     }
 
-    .inventory-report .page-header,
-    .inventory-report .page-footer {
+    .official-form-report .page-header,
+    .official-form-report .page-footer {
         display: none !important;
     }
 
-    body.pdf-mode.inventory-report {
+    body.pdf-mode.official-form-report {
         margin: 0;
     }
 
@@ -410,10 +410,36 @@
         color: #000;
     }
 
+    .official-inventory-page-footer {
+        position: fixed;
+        right: 0;
+        bottom: -58px;
+        left: 0;
+        border-top: 1.5px solid #000;
+        padding-top: 5px;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #000;
+        text-align: center;
+    }
+
+    .official-inventory-footer-contact {
+        margin: 0;
+        font-size: 7px;
+        line-height: 1.3;
+    }
+
+    .official-inventory-footer-motto {
+        margin: 4px 0 0;
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: .35px;
+        text-transform: uppercase;
+    }
+
     .official-inventory-header {
         position: relative;
-        min-height: 92px;
-        padding: 0 84px 8px 74px;
+        min-height: 118px;
+        padding: 4px 92px 12px 76px;
         border-bottom: 1.5px solid #000;
         text-align: center;
     }
@@ -427,19 +453,19 @@
         object-fit: contain;
     }
 
-    .official-inventory-clinic-logo {
+    .official-inventory-government-logo {
         position: absolute;
-        top: 2px;
-        right: 4px;
-        width: 66px;
-        height: 66px;
+        top: 8px;
+        right: 0;
+        width: 86px;
+        height: 58px;
         object-fit: contain;
     }
 
     .official-inventory-university {
         margin: 0;
         font-family: "Times New Roman", serif;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
         letter-spacing: 0;
         text-transform: uppercase;
@@ -453,23 +479,22 @@
     }
 
     .official-inventory-campus {
-        margin: 1px 0 4px;
+        margin: 1px 0 8px;
         font-size: 11px;
         font-weight: 700;
     }
 
-    .official-inventory-contact {
+    .official-inventory-header-title {
         margin: 0;
-        font-size: 7.5px;
-        line-height: 1.35;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
     }
 
-    .official-inventory-motto {
-        margin: 5px 0 0;
-        font-size: 7px;
+    .official-inventory-header-date {
+        margin: 3px 0 0;
+        font-size: 10px;
         font-weight: 700;
-        letter-spacing: .35px;
-        text-transform: uppercase;
     }
 
     .official-inventory-form-code {
@@ -480,24 +505,9 @@
         white-space: nowrap;
     }
 
-    .official-inventory-title {
-        margin: 22px 0 2px;
-        text-align: center;
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
-    .official-inventory-as-of {
-        margin: 0 0 13px;
-        text-align: center;
-        font-size: 10px;
-        font-weight: 700;
-    }
-
     .official-inventory-meta {
         width: 100%;
-        margin: 0 0 10px;
+        margin: 24px 0 10px;
         border-collapse: collapse;
         table-layout: fixed;
     }
@@ -610,8 +620,12 @@
         text-align: center;
     }
 
+    .mar-service-table tbody td:last-child:not(.bg-category) {
+        color: transparent;
+    }
+
     @media print {
-        body.inventory-report {
+        body.official-form-report {
             margin: 0;
         }
 
@@ -621,7 +635,7 @@
     }
 </style>
 </head>
-<body class="{{ !empty($isPdf) ? 'pdf-mode' : '' }} {{ $type === 'inventory' ? 'inventory-report' : '' }}">
+<body class="{{ !empty($isPdf) ? 'pdf-mode' : '' }} {{ in_array($type, ['inventory', 'mar'], true) ? 'official-form-report' : '' }}">
 
     <div class="page-header" aria-hidden="true">
         <div class="page-header-inner">
@@ -671,7 +685,7 @@
         </div>
     @endif
 
-    @if($type !== 'inventory')
+    @if(!in_array($type, ['inventory', 'mar'], true))
         <div class="header-top">
         <div class="pup-logo-section">
             <img src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
@@ -712,8 +726,60 @@
             $certificateGad = $gadTables['certificate'] ?? [];
             $triageOnlineGad = $gadTables['triage_online'] ?? [];
             $combinedGad = $gadTables['combined'] ?? [];
+            $marMonthStart = \Carbon\Carbon::parse(($monthFilter ?? now()->format('Y-m')) . '-01')->startOfMonth();
+            $marReportAsOf = $marMonthStart->isCurrentMonth() ? now() : $marMonthStart->endOfMonth();
+            $marPreparedBy = auth('admin')->user() ?? auth()->user();
+            $marPreparedByName = trim((string) optional($marPreparedBy)->name) ?: 'CLINIC STAFF';
+            $marPreparedByPosition = \App\Models\User::normalizeRole(optional($marPreparedBy)->user_role) === \App\Models\User::ROLE_ADMIN
+                ? 'Nurse / Clinic Staff'
+                : 'Clinic Staff';
         @endphp
-        <table class="mar-report-table">
+
+        <footer class="official-inventory-page-footer">
+            <p class="official-inventory-footer-contact">
+                Gen. Santos Avenue, Lower Bicutan, Taguig City 1632<br>
+                Direct Line: (02) 8837 5858 to 60 | Email: taguig@pup.edu.ph<br>
+                Website: www.pup.edu.ph | Inquiries: https://bit.ly/PUPSINTA
+            </p>
+            <p class="official-inventory-footer-motto">A Leading Comprehensive Polytechnic University in Asia</p>
+        </footer>
+
+        <section class="official-inventory-report">
+            <header class="official-inventory-header">
+                <img class="official-inventory-logo" src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
+                <img class="official-inventory-government-logo" src="{{ asset('Bagong_Pilipinas_logo.png') }}" alt="Bagong Pilipinas Logo">
+                <p class="official-inventory-university">Polytechnic University of the Philippines</p>
+                <p class="official-inventory-office">Medical Services Department</p>
+                <p class="official-inventory-campus">Taguig Campus</p>
+                <h1 class="official-inventory-header-title">Monthly Accomplishment Report</h1>
+                <p class="official-inventory-header-date">As of {{ $marReportAsOf->format('F d, Y') }}</p>
+                <span class="official-inventory-form-code">PUP-IRDM-6-MEDS-030 Rev.0 July 11, 2024</span>
+            </header>
+
+            <table class="official-inventory-meta">
+                <tr>
+                    <td>
+                        <span class="meta-label">Name:</span>
+                        <span class="meta-value">{{ $marPreparedByName }}</span>
+                    </td>
+                    <td>
+                        <span class="meta-label">Date of Submission:</span>
+                        <span class="meta-value">{{ $marReportAsOf->format('F d, Y') }}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="meta-label">Position:</span>
+                        <span class="meta-value">{{ $marPreparedByPosition }}</span>
+                    </td>
+                    <td>
+                        <span class="meta-label">Unit / Department:</span>
+                        <span class="meta-value">Taguig Campus</span>
+                    </td>
+                </tr>
+            </table>
+
+        <table class="mar-report-table mar-service-table">
             <colgroup>
                 <col>
                 <col class="metric-col">
@@ -724,15 +790,12 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th rowspan="2">MEDICAL CONDITIONS / SERVICES</th>
-                    <th colspan="4">PATIENT TYPE</th>
-                    <th rowspan="2">TOTAL</th>
-                </tr>
-                <tr>
-                    <th>STUDENT</th>
+                    <th>MEDICAL SERVICE RENDERED</th>
+                    <th>STUDENTS</th>
                     <th>FACULTY</th>
                     <th>ADMIN</th>
                     <th>DEPENDENTS</th>
+                    <th>REMARKS</th>
                 </tr>
             </thead>
             <tbody>
@@ -1022,6 +1085,27 @@
             </tbody>
         </table>
 
+            <table class="official-inventory-signatures">
+                <tr>
+                    <td>Prepared by:</td>
+                    <td>Noted by:</td>
+                </tr>
+                <tr>
+                    <td class="official-inventory-signature-space"></td>
+                    <td class="official-inventory-signature-space"></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="official-inventory-signature-name">{{ $marPreparedByName }}</div>
+                        <div class="official-inventory-signature-role">{{ $marPreparedByPosition }}</div>
+                    </td>
+                    <td>
+                        <div class="official-inventory-signature-name">Engr. Michael L. Zarco</div>
+                        <div class="official-inventory-signature-role">Administrative Officer</div>
+                    </td>
+                </tr>
+            </table>
+        </section>
 
 
     @elseif($type == 'inventory')
@@ -1038,7 +1122,7 @@
                 ? 'Inventory of Medicines'
                 : 'Inventory of Supplies';
             $inventoryFormCode = $inventoryScope === 'medicines'
-                ? 'PUP-IRDM-6-MEDS-030 Rev. 0 July 11, 2024'
+                ? 'PUP-IRDM-6-MEDS-030 Rev.0 July 11, 2024'
                 : 'PUP Medical Services Inventory Form';
             $inventoryGroups = collect($data)
                 ->sortBy(function ($item) use ($inventoryScope) {
@@ -1058,24 +1142,26 @@
             };
         @endphp
 
+        <footer class="official-inventory-page-footer">
+            <p class="official-inventory-footer-contact">
+                Gen. Santos Avenue, Lower Bicutan, Taguig City 1632<br>
+                Direct Line: (02) 8837 5858 to 60 | Email: taguig@pup.edu.ph<br>
+                Website: www.pup.edu.ph | Inquiries: https://bit.ly/PUPSINTA
+            </p>
+            <p class="official-inventory-footer-motto">A Leading Comprehensive Polytechnic University in Asia</p>
+        </footer>
+
         <section class="official-inventory-report">
             <header class="official-inventory-header">
                 <img class="official-inventory-logo" src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
-                <img class="official-inventory-clinic-logo" src="{{ asset('images/clinic_logo_transparent.png') }}" alt="Medical Clinic Logo">
+                <img class="official-inventory-government-logo" src="{{ asset('Bagong_Pilipinas_logo.png') }}" alt="Bagong Pilipinas Logo">
                 <p class="official-inventory-university">Polytechnic University of the Philippines</p>
                 <p class="official-inventory-office">Medical Services Department</p>
                 <p class="official-inventory-campus">Taguig Campus</p>
-                <p class="official-inventory-contact">
-                    Gen. Santos Avenue, Lower Bicutan, Taguig City 1632<br>
-                    Direct Line: (02) 8837 5858 to 60 | Email: taguig@pup.edu.ph<br>
-                    Website: www.pup.edu.ph | Inquiries: https://bit.ly/PUPSINTA
-                </p>
-                <p class="official-inventory-motto">A Leading Comprehensive Polytechnic University in Asia</p>
+                <h1 class="official-inventory-header-title">{{ $inventoryTitle }}</h1>
+                <p class="official-inventory-header-date">As of {{ $reportAsOf->format('F d, Y') }}</p>
                 <span class="official-inventory-form-code">{{ $inventoryFormCode }}</span>
             </header>
-
-            <h1 class="official-inventory-title">{{ $inventoryTitle }}</h1>
-            <p class="official-inventory-as-of">As of {{ $reportAsOf->format('F d, Y') }}</p>
 
             <table class="official-inventory-meta">
                 <tr>
@@ -1227,7 +1313,7 @@
         </table>
     @endif
 
-    @if($type !== 'inventory')
+    @if(!in_array($type, ['inventory', 'mar'], true))
         <div class="footer-signatures" style="margin-top: 40px;">
             <div class="sig-box">
                 <p>Prepared by:</p>

@@ -155,25 +155,18 @@
     </div>
 
     <div class="section-header">PART III. PERSONAL SOCIAL HISTORY</div>
-    <div class="row" style="margin-top: 5px;">
-    <span class="labels">Cigarette Smoking :</span>
-    <div class="check-item" style="margin-left: 10px;">
-        <div class="box-ui">{{ ($profile->is_smoker ?? '') == 'Yes' ? '/' : '' }}</div> Yes
-    </div>
-    <div class="check-item">
-        <div class="box-ui">{{ ($profile->is_smoker ?? '') == 'No' ? '/' : '' }}</div> No
-    </div>
-</div>
-
-<div class="row">
-    <span class="labels">Alcohol Drinking:</span>
-    <div class="check-item" style="margin-left: 24px;">
-        <div class="box-ui">{{ ($profile->is_drinker ?? '') == 'Yes' ? '/' : '' }}</div> Yes
-    </div>
-    <div class="check-item">
-        <div class="box-ui">{{ ($profile->is_drinker ?? '') == 'No' ? '/' : '' }}</div> No
-    </div>
-</div>
+    <table class="social-history-table">
+        <tr>
+            <td class="social-label">Cigarette Smoking:</td>
+            <td><span class="box-ui">{{ ($profile->is_smoker ?? '') == 'Yes' ? '/' : '' }}</span> Yes</td>
+            <td><span class="box-ui">{{ ($profile->is_smoker ?? '') == 'No' ? '/' : '' }}</span> No</td>
+        </tr>
+        <tr>
+            <td class="social-label">Alcohol Drinking:</td>
+            <td><span class="box-ui">{{ ($profile->is_drinker ?? '') == 'Yes' ? '/' : '' }}</span> Yes</td>
+            <td><span class="box-ui">{{ ($profile->is_drinker ?? '') == 'No' ? '/' : '' }}</span> No</td>
+        </tr>
+    </table>
 
     <table class="covid-layout-table">
         <tr>
@@ -188,7 +181,7 @@
             <td>
         <table class="vax-table">
             @php $vax = is_array($profile->vaccine_history) ? $profile->vaccine_history : json_decode($profile->vaccine_history ?? '[]', true); @endphp
-            <thead><tr><th>Dose</th><th>Date Received</th><th>Brand</th></tr></thead>
+            <thead><tr><th>If Yes (Vaccinated)</th><th>Date Received</th><th>Brand</th></tr></thead>
             <tbody>
                 <tr><td>1st Dose</td><td>{{ $vax['first_dose']['date'] ?? '' }}</td><td>{{ $vax['first_dose']['brand'] ?? '' }}</td></tr>
                 <tr><td>2nd Dose</td><td>{{ $vax['second_dose']['date'] ?? '' }}</td><td>{{ $vax['second_dose']['brand'] ?? '' }}</td></tr>
@@ -221,8 +214,8 @@ for the improvement of healthcare services.
         <tr>
             <td>
                 <div class="signature-space"></div>
-                <div class="sig-line">Signature of Parent/Guardian</div>
-                <div class="signature-caption">For students below 18 years old</div>
+                <div class="sig-line"></div>
+                <div class="signature-caption">(Signature of parent/guardian for<br>students below 18 years old)</div>
             </td>
             <td>
                 @if(empty($studentPrintCopy) && $profile->digital_signature)
@@ -231,19 +224,20 @@ for the improvement of healthcare services.
                     <div class="signature-space"></div>
                 @endif
                 <div class="sig-line">{{ empty($studentPrintCopy) ? strtoupper($profile->user->name ?? '') : '' }}</div>
-                <div class="signature-caption">Printed Name and Signature of Student</div>
+                <div class="signature-caption">(Printed name and signature of student)</div>
             </td>
             <td>
                 <div class="signature-space signature-date-space">
                     {{ empty($studentPrintCopy) && $profile->created_at ? $profile->created_at->format('m/d/Y') : '' }}
                 </div>
-                <div class="sig-line">Date</div>
+                <div class="sig-line"></div>
+                <div class="signature-caption">Date</div>
             </td>
         </tr>
     </table>
 
-    <div class="physician-section" style="display: block; width: 100%; clear: both; border: 2px solid #000; margin-top: 28px; padding: 15px; position: relative;">
-        <p style="text-align: center; font-weight: bold; margin-bottom: 2px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
+    <div class="physician-section">
+        <p style="text-align: center; font-weight: bold; margin-bottom: 2px; font-size: 13px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
         <p class="physician-check-instruction">Please Check</p>
         
         <table class="physician-clearance-table">

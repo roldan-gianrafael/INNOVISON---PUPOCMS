@@ -3927,7 +3927,7 @@
 
         /* Header layout for mobile */
         .applicant-modal-head {
-            flex-wrap: wrap;
+            position: relative;
             padding: 14px 16px 12px;
             gap: 10px;
         }
@@ -3935,6 +3935,17 @@
         .applicant-modal-head-main {
             width: 100%;
             gap: 12px;
+        }
+
+        .applicant-modal-close {
+            position: absolute !important;
+            top: 14px !important;
+            right: 16px !important;
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            flex: none !important;
         }
 
         .applicant-modal-head-badge {
@@ -4197,12 +4208,25 @@
         }
 
         .applicant-modal-head {
+            position: relative;
             padding: 12px 14px 10px;
+            padding-right: 50px;
         }
 
         .applicant-modal-head-badge {
             width: 38px;
             height: 38px;
+        }
+
+        .applicant-modal-close {
+            position: absolute !important;
+            top: 12px !important;
+            right: 14px !important;
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            flex: none !important;
         }
 
         .applicant-modal-body {

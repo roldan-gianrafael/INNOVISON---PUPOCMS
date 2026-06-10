@@ -1910,7 +1910,7 @@
     #issueModal .inventory-modal-head {
         align-items: stretch;
         gap: 16px;
-        position: relative;
+        position: static;
     }
     #historyModal .inventory-modal-head {
         align-items: stretch;
@@ -2002,13 +2002,15 @@
     #restockModal .inventory-modal-close,
     #issueModal .inventory-modal-close {
         position: absolute !important;
-        top: 16px !important;
-        right: 16px !important;
+        top: 20px !important;
+        right: 20px !important;
         width: 40px !important;
         height: 40px !important;
         min-width: 40px !important;
         min-height: 40px !important;
+        min-height: 40px !important;
         flex: none !important;
+        z-index: 100 !important;
     }
 
     /* Modal content scrollable on mobile */

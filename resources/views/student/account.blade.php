@@ -2188,7 +2188,12 @@
                     Please print your Health Form before proceeding to the Medical Clinic to submit the physical copy.
                     Do not forget to bring a hard copy of your 2x2 photo.
                 </p>
-                <a class="health-print-reminder-button" href="{{ route('student.health_form.print') }}">Print</a>
+                <a
+                    class="health-print-reminder-button"
+                    href="{{ route('student.health_form.print') }}"
+                    target="_blank"
+                    rel="noopener"
+                >Open Health Form</a>
             </section>
         </div>
     @endif

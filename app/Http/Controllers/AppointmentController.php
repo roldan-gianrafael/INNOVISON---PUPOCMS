@@ -1463,7 +1463,14 @@ public function printHealthForm()
             ->with('error', 'Submit your health profile before printing the form.');
     }
 
-    return view('student.print_health_form', compact('profile'));
+    $pdf = $this->buildStudentHealthFormPdf($profile);
+    $fileName = $this->studentHealthFormFileName($profile, $user);
+
+    return $pdf->stream($fileName, [
+        'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma' => 'no-cache',
+        'Expires' => '0',
+    ]);
 }
 
 public function downloadHealthForm()
@@ -1484,16 +1491,35 @@ public function downloadHealthForm()
             ->with('error', 'Submit your health profile before downloading the form.');
     }
 
+    $pdf = $this->buildStudentHealthFormPdf($profile);
+    $fileName = $this->studentHealthFormFileName($profile, $user);
+
+    return $pdf->download($fileName);
+}
+
+private function buildStudentHealthFormPdf(HealthProfile $profile)
+{
     $pdf = Pdf::loadView('student.print_health_form', [
         'profile' => $profile,
         'pdfMode' => true,
     ]);
     $pdf->setPaper([0, 0, 612, 936]);
 
-    $studentNumber = trim((string) ($profile->student_number ?: $user->student_number ?: $user->student_id ?: $profile->id));
-    $fileName = 'health-form-' . preg_replace('/[^A-Za-z0-9\-_]+/', '-', $studentNumber) . '.pdf';
+    return $pdf;
+}
 
-    return $pdf->download($fileName);
+private function studentHealthFormFileName(HealthProfile $profile, User $user): string
+{
+    $identifier = trim((string) (
+        $profile->reference_number
+        ?: $user->reference_number
+        ?: $profile->student_number
+        ?: $user->student_number
+        ?: $user->student_id
+        ?: $profile->id
+    ));
+
+    return 'health-form-' . preg_replace('/[^A-Za-z0-9\-_]+/', '-', $identifier) . '.pdf';
 }
 
 public function testingSkipHealthForm()

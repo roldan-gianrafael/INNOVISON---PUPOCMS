@@ -19,6 +19,7 @@ class RegisterController extends Controller
 
     $request->validate([
         'first_name' => 'required|string|max:255',
+        'middle_name' => 'nullable|string|max:255',
         'last_name'  => 'required|string|max:255',
         'email'      => 'required|email|unique:users',
         'course'     => 'required',
@@ -32,8 +33,13 @@ class RegisterController extends Controller
 
     $payload = [
         'first_name' => $request->first_name,
+        'middle_name' => $request->input('middle_name'),
         'last_name'  => $request->last_name,
-        'name'       => $request->first_name . ' ' . $request->last_name, // Automated concatenation
+        'name'       => trim(implode(' ', array_filter([
+            $request->first_name,
+            $request->input('middle_name'),
+            $request->last_name,
+        ]))),
         'student_id' => $studentId,
         'email'      => $request->email,
         'DOB'        => null,

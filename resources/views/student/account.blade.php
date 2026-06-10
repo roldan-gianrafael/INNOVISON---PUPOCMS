@@ -2415,7 +2415,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div>
                         <label class="input-label">Middle Name</label>
-                        <input type="text" name="middle_name" class="form-control{{ $guisisPendingClass(old('middle_name', $accountProfileData['middle_name'] ?? $linkedAdminProfile->middle_name)) }}" value="{{ old('middle_name', $accountProfileData['middle_name'] ?? $linkedAdminProfile->middle_name) }}" placeholder="{{ $guisisPendingText }}" disabled>
+                        <input type="text" name="middle_name" class="form-control{{ $guisisPendingClass(old('middle_name', $accountProfileData['middle_name'] ?? $user->middle_name ?? $linkedAdminProfile->middle_name)) }}" value="{{ old('middle_name', $accountProfileData['middle_name'] ?? $user->middle_name ?? $linkedAdminProfile->middle_name) }}" placeholder="{{ $guisisPendingText }}" disabled>
                     </div>
                 </div>
 

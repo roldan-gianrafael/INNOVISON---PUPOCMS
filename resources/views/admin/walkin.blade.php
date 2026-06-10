@@ -6341,17 +6341,18 @@
                 return;
             }
 
-            const studentNumber = data.student_number || data.student_id || fallbackRef || '-';
+            const referenceNumber = data.reference_number || fallbackRef || '-';
+            const studentNumber = data.student_number || '';
             const yearSection = [data.year || '', data.section || ''].filter(Boolean).join(' / ') || 'N/A';
 
             console.log('Setting lookup values:', {
-                lookupRef: data.student_number || fallbackRef,
+                lookupRef: referenceNumber,
                 lookupStudentId: data.student_id,
                 lookupDob: data.dob,
                 lookupEmail: data.email
             });
 
-            if (lookupRef) lookupRef.textContent = data.student_number || fallbackRef || '-';
+            if (lookupRef) lookupRef.textContent = referenceNumber;
             if (lookupStudentId) lookupStudentId.textContent = data.student_id || 'N/A';
             if (lookupCourse) lookupCourse.textContent = data.course || 'N/A';
             if (lookupYearSec) lookupYearSec.textContent = yearSection;
@@ -6365,7 +6366,7 @@
             if (documentsButton) documentsButton.classList.add('is-visible');
             if (foundCard) foundCard.style.display = 'block';
             if (uploadForm) uploadForm.style.display = 'grid';
-            if (uploadRefInput) uploadRefInput.value = data.student_number || fallbackRef || '';
+            if (uploadRefInput) uploadRefInput.value = referenceNumber;
             if (uploadStudentNo) uploadStudentNo.value = data.student_id || studentNumber || '';
 
             const uploadEmailInput = document.getElementById('applicantAssessmentEmail');
@@ -6480,7 +6481,7 @@
                         applicantName = data.first_name + lastName;
                     }
 
-                    currentLookupRef = data.student_number || ref;
+                    currentLookupRef = data.reference_number || ref;
 
                     // Check if applicant is already approved
                     const isAlreadyApproved = data.is_health_profile_completed === true

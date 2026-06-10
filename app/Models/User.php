@@ -44,6 +44,7 @@ class User extends Authenticatable
     'student_number',
     'reference_number',
     'DOB',
+    'middle_name',
     'gender',
     'height',
     'weight',
@@ -82,6 +83,7 @@ class User extends Authenticatable
     {
         static::saving(function (User $user): void {
             $firstName = trim((string) ($user->first_name ?? ''));
+            $middleName = trim((string) ($user->middle_name ?? ''));
             $lastName = trim((string) ($user->last_name ?? ''));
             $name = trim((string) ($user->name ?? ''));
 
@@ -99,11 +101,14 @@ class User extends Authenticatable
                 $lastName = 'User';
             }
 
-            if ($name === '') {
-                $name = trim($firstName . ' ' . $lastName);
-            }
+            $name = trim(implode(' ', array_filter([
+                $firstName,
+                $middleName,
+                $lastName,
+            ])));
 
             $user->first_name = $firstName;
+            $user->middle_name = $middleName !== '' ? $middleName : null;
             $user->last_name = $lastName;
             $user->name = $name;
 
@@ -116,12 +121,16 @@ class User extends Authenticatable
 
     /**
      * MAGIC ACCESSOR for $user->name
-     * Returns "First Last" if first_name exists, else old 'name' column.
+     * Returns the structured student name when name parts are available.
      */
     public function getNameAttribute($value)
     {
         if ($this->first_name) {
-            return "{$this->first_name} {$this->last_name}";
+            return trim(implode(' ', array_filter([
+                $this->first_name,
+                $this->middle_name,
+                $this->last_name,
+            ])));
         }
         return $value;
     }

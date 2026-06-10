@@ -2627,6 +2627,9 @@ public function deleteItem($id)
 
     $passwordChanged = $request->filled('password') ? ' (Password was also updated)' : '';
     $user->first_name = $request->first_name;
+    if (Schema::hasColumn('users', 'middle_name')) {
+        $user->middle_name = $request->middle_name;
+    }
     $user->last_name = $request->last_name;
     $user->name = trim(implode(' ', array_filter([
         $request->first_name,

@@ -697,7 +697,7 @@ class LoginController extends Controller
 
     private function hasIdentityFields(array $payload): bool
     {
-        foreach (['email', 'role', 'roles', 'user_role', 'student_number', 'student_id', 'name', 'first_name', 'last_name', 'user_id', 'id'] as $key) {
+        foreach (['email', 'role', 'roles', 'user_role', 'student_number', 'student_id', 'name', 'first_name', 'middle_name', 'last_name', 'user_id', 'id'] as $key) {
             $value = data_get($payload, $key);
             if (is_string($value) && trim($value) !== '') {
                 return true;
@@ -1040,11 +1040,12 @@ class LoginController extends Controller
         ]) ?? '';
         $studentIdSeed = $this->firstNonEmptyScalar($profile, ['student_id', 'idp_user_id', 'user_id', 'id']) ?? '';
         $firstName = $this->firstNonEmptyScalar($profile, ['first_name', 'firstname', 'given_name']) ?? '';
+        $middleName = $this->firstNonEmptyScalar($profile, ['middle_name', 'middlename']) ?? '';
         $lastName = $this->firstNonEmptyScalar($profile, ['last_name', 'lastname', 'family_name']) ?? '';
         $displayName = $this->firstNonEmptyScalar($profile, ['name', 'full_name', 'display_name']) ?? '';
 
-        if ($displayName === '' && ($firstName !== '' || $lastName !== '')) {
-            $displayName = trim($firstName . ' ' . $lastName);
+        if ($displayName === '' && ($firstName !== '' || $middleName !== '' || $lastName !== '')) {
+            $displayName = trim(implode(' ', array_filter([$firstName, $middleName, $lastName])));
         }
 
         if ($displayName === '' && $emailSeed !== '' && str_contains($emailSeed, '@')) {
@@ -1099,8 +1100,15 @@ class LoginController extends Controller
                 (int) $existingUser->id
             );
             $existingUser->first_name = $firstName !== '' ? $firstName : ($existingUser->first_name ?: 'IDP');
+            if ($middleName !== '') {
+                $existingUser->middle_name = $middleName;
+            }
             $existingUser->last_name = $lastName !== '' ? $lastName : ($existingUser->last_name ?: 'User');
-            $existingUser->name = trim($fullName !== '' ? $fullName : ($existingUser->first_name . ' ' . $existingUser->last_name));
+            $existingUser->name = trim(implode(' ', array_filter([
+                $existingUser->first_name,
+                $existingUser->middle_name,
+                $existingUser->last_name,
+            ])));
             $existingUser->user_role = $role;
 
             $shouldUpdateStudentId = trim((string) $existingUser->student_id) === '' || Str::startsWith(strtolower((string) $existingUser->student_id), 'idp-');
@@ -1141,8 +1149,13 @@ class LoginController extends Controller
             'student_number' => $studentNumberSeed !== '' ? $studentNumberSeed : null,
             'reference_number' => $referenceNumberSeed !== '' ? $referenceNumberSeed : null,
             'first_name' => $firstName !== '' ? $firstName : 'IDP',
+            'middle_name' => $middleName !== '' ? $middleName : null,
             'last_name' => $lastName !== '' ? $lastName : 'User',
-            'name' => $fullName !== '' ? $fullName : trim(($firstName ?: 'IDP') . ' ' . ($lastName ?: 'User')),
+            'name' => trim(implode(' ', array_filter([
+                $firstName ?: 'IDP',
+                $middleName,
+                $lastName ?: 'User',
+            ]))),
             'email' => $email,
             'user_role' => $role,
             'password' => Hash::make(Str::random(40)),

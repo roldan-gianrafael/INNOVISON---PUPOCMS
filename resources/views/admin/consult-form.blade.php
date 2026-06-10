@@ -1329,7 +1329,7 @@
     <div class="consultation-main">
         <header class="patient-header consult-card">
             <div>
-                <h2 class="patient-name">{{ $student->first_name }} {{ $student->last_name }}</h2>
+                <h2 class="patient-name">{{ $student->name }}</h2>
                 <div class="patient-badges">
                     <span class="patient-badge">{{ $studentDisplayRole }}</span>
                     <span class="patient-badge">{{ $student->student_number ?: $student->student_id ?: 'N/A' }}</span>

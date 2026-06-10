@@ -255,10 +255,11 @@ class AdminUserController extends Controller
 
         $managementView = trim((string) $request->input('management_view', 'account-access'));
         $firstName = trim((string) $request->input('first_name', ''));
+        $middleName = trim((string) $request->input('middle_name', ''));
         $lastName = trim((string) $request->input('last_name', ''));
         $fullName = trim((string) $request->input('full_name', ''));
         if ($fullName === '') {
-            $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
+            $fullName = trim(implode(' ', array_filter([$firstName, $middleName, $lastName])));
         }
 
         if ($managementView === 'admin-hub') {
@@ -328,6 +329,7 @@ class AdminUserController extends Controller
             $user = new User();
             $user->student_id = $this->resolveUniqueLocalIdentifier($studentIdSeed);
             $user->first_name = $firstName !== '' ? $firstName : 'Faculty';
+            $user->middle_name = $middleName !== '' ? $middleName : null;
             $user->last_name = $lastName !== '' ? $lastName : 'User';
             $user->name = $fullName !== '' ? $fullName : trim($user->first_name . ' ' . $user->last_name);
             $user->email = $baseEmail;
@@ -348,6 +350,9 @@ class AdminUserController extends Controller
             }
             if (Admin::hasColumn('first_name')) {
                 $linkedAdmin->first_name = $user->first_name;
+            }
+            if (Admin::hasColumn('middle_name')) {
+                $linkedAdmin->middle_name = $user->middle_name;
             }
             if (Admin::hasColumn('last_name')) {
                 $linkedAdmin->last_name = $user->last_name;

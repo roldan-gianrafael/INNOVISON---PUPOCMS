@@ -488,15 +488,36 @@ class AppointmentController extends Controller
             data_get($applicantData, 'province'),
         ])));
 
+        $applicantFirstName = trim((string) (
+            data_get($applicantData, 'first_name')
+            ?: data_get($applicantData, 'firstname')
+            ?: data_get($applicantData, 'given_name')
+        ));
+        $applicantMiddleName = trim((string) (
+            data_get($applicantData, 'middle_name')
+            ?: data_get($applicantData, 'middlename')
+        ));
+        $applicantLastName = trim((string) (
+            data_get($applicantData, 'last_name')
+            ?: data_get($applicantData, 'lastname')
+            ?: data_get($applicantData, 'family_name')
+            ?: data_get($applicantData, 'surname')
+        ));
+        $applicantStructuredName = trim(implode(' ', array_filter([
+            $applicantFirstName,
+            $applicantMiddleName,
+            $applicantLastName,
+        ])));
+
         return [
-            'full_name' => trim(implode(' ', array_filter([
-                data_get($applicantData, 'first_name') ?: data_get($applicantData, 'firstname'),
-                data_get($applicantData, 'middle_name') ?: data_get($applicantData, 'middlename'),
-                data_get($applicantData, 'last_name') ?: data_get($applicantData, 'lastname'),
-            ]))) ?: trim((string) $user->name),
-            'first_name' => trim((string) (optional($linkedAdminProfile)->first_name ?? $user->first_name ?? data_get($applicantData, 'first_name') ?? data_get($applicantData, 'firstname') ?? '')),
-            'middle_name' => trim((string) (optional($linkedAdminProfile)->middle_name ?? '')),
-            'last_name' => trim((string) (optional($linkedAdminProfile)->last_name ?? $user->last_name ?? data_get($applicantData, 'last_name') ?? data_get($applicantData, 'lastname') ?? '')),
+            'full_name' => $applicantStructuredName
+                ?: trim((string) (data_get($applicantData, 'full_name') ?: data_get($applicantData, 'name') ?: $user->name)),
+            'first_name' => $applicantFirstName
+                ?: trim((string) (optional($linkedAdminProfile)->first_name ?? $user->first_name ?? '')),
+            'middle_name' => $applicantMiddleName
+                ?: trim((string) ($user->middle_name ?? optional($linkedAdminProfile)->middle_name ?? '')),
+            'last_name' => $applicantLastName
+                ?: trim((string) (optional($linkedAdminProfile)->last_name ?? $user->last_name ?? '')),
             'suffix_name' => trim((string) (optional($linkedAdminProfile)->suffix_name ?? '')),
             'student_id' => (string) (optional($healthProfile)->student_id ?? $user->student_id ?? ''),
             'reference_number' => $this->resolveReferenceNumber($user, $healthProfile, $applicantData),

@@ -35,14 +35,6 @@ return new class extends Migration
                 ]);
         }
 
-        // Older builds stored admission references in student_number.
-        DB::table('users')
-            ->whereNull('reference_number')
-            ->whereNotNull('student_number')
-            ->where('student_number', '!=', '')
-            ->update([
-                'reference_number' => DB::raw('student_number'),
-            ]);
     }
 
     public function down(): void

@@ -159,10 +159,22 @@ class WalkInController extends Controller
                     $query->orWhere('student_number', $identifier);
                 }
 
+                if (\Schema::hasColumn('users', 'reference_number')) {
+                    $query->orWhere('reference_number', $identifier);
+                }
+
                 $query->orWhere('barcode', $identifier)
                     ->orWhere('student_id', $identifier);
             })
             ->first();
+    }
+
+    private function looksLikeUuid(?string $value): bool
+    {
+        return (bool) preg_match(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+            trim((string) $value)
+        );
     }
 
     private function findUniqueUserByName(string $name): ?User
@@ -251,23 +263,25 @@ class WalkInController extends Controller
             $lastName = trim((string) data_get($applicant, 'surname'));
         }
 
-        // Include middle name if available
-        $middleName = trim((string) data_get($applicant, 'middlename'));
-        if ($middleName !== '' && $firstName !== '') {
-            $firstName = $firstName . ' ' . $middleName;
-        }
+        $middleName = trim((string) (
+            data_get($applicant, 'middle_name')
+            ?: data_get($applicant, 'middlename')
+        ));
 
-        // If no separate first/last name, try to use full name
-        $fullName = trim((string) data_get($applicant, 'full_name'));
-        if ($fullName === '') {
-            $fullName = trim((string) data_get($applicant, 'name'));
-        }
-        if ($fullName === '') {
-            $fullName = trim(implode(' ', array_filter([$firstName, $lastName])));
-        }
+        // Prefer the complete structured name. Some PUPTAS responses expose a
+        // shortened full_name while still providing all individual name fields.
+        $structuredFullName = trim(implode(' ', array_filter([
+            $firstName,
+            $middleName,
+            $lastName,
+        ])));
+        $fullName = $structuredFullName !== ''
+            ? $structuredFullName
+            : trim((string) (data_get($applicant, 'full_name') ?: data_get($applicant, 'name')));
 
         \Log::debug('Name extraction results', [
             'firstName' => $firstName,
+            'middleName' => $middleName,
             'lastName' => $lastName,
             'fullName' => $fullName,
             'applicantAllKeys' => array_keys($applicant),
@@ -307,6 +321,10 @@ class WalkInController extends Controller
             $user->first_name = $firstName;
         } elseif (trim((string) $user->first_name) === '') {
             $user->first_name = $fallbackFirstName;
+        }
+
+        if ($middleName !== '' && \Schema::hasColumn('users', 'middle_name')) {
+            $user->middle_name = $middleName;
         }
 
         if ($lastName !== '') {
@@ -572,15 +590,21 @@ class WalkInController extends Controller
         $lookupMessage = 'No patient matched that student number in local records or PUPTAS.';
         $lookupStatus = null;
 
-        if (!$student && $lookup !== '') {
+        if (
+            $lookup !== ''
+            && (
+                !$student
+                || ($previewOnly && !$this->looksLikeUuid($lookup))
+            )
+        ) {
             $lookupResult = $puptasWebhookService->fetchApplicantByStudentNumberDetailed($lookup);
             $lookupStatus = $lookupResult['status'] ?? null;
             $lookupMessage = trim((string) ($lookupResult['message'] ?? '')) ?: $lookupMessage;
             $applicant = $lookupResult['data'] ?? null;
 
             if (is_array($applicant)) {
-                // Don't persist - applicants don't have local records yet
-                // They'll be created when they register/login later
+                // Build the preview from current admission data. Persistence is
+                // deferred until the workflow performs a non-preview action.
                 $student = $this->resolveLocalUserFromApplicant($applicant, !$previewOnly, $lookup);
             }
 
@@ -614,6 +638,11 @@ class WalkInController extends Controller
         if ($student) {
             $resolvedName = trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? ''))));
             $healthProfile = HealthProfile::where('user_id', $student->id)->first();
+            $resolvedReferenceNumber = trim((string) (
+                ($lookup !== '' && !$this->looksLikeUuid($lookup) ? $lookup : null)
+                ?: $student->reference_number
+                ?: optional($healthProfile)->reference_number
+            ));
             $resolvedCourse = trim((string) ($student->course ?? $student->course_college ?? ''));
             $resolvedYear = trim((string) ($student->year ?? ''));
             $resolvedSection = trim((string) ($student->section ?? ''));
@@ -623,7 +652,8 @@ class WalkInController extends Controller
             if ($previewOnly) {
                 return response()->json([
                     'status' => 'preview',
-                    'student_number' => $student->student_number ?: $student->student_id,
+                    'reference_number' => $resolvedReferenceNumber,
+                    'student_number' => $student->student_number ?: '',
                     'student_id' => $student->student_id ?: '',
                     'student_name' => $resolvedName,
                     'course' => $resolvedCourse,
@@ -653,7 +683,8 @@ class WalkInController extends Controller
 
             return response()->json([
                 'status' => 'found',
-                'student_number' => $student->student_number ?: $student->student_id,
+                'reference_number' => $resolvedReferenceNumber,
+                'student_number' => $student->student_number ?: '',
                 'student_id' => $student->student_id ?: '',
                 'student_name' => $resolvedName,
                 'course' => $resolvedCourse,
@@ -671,7 +702,7 @@ class WalkInController extends Controller
                             [
                                 'student_id' => (string) ($student->student_id ?? ''),
                                 'student_number' => (string) ($student->student_number ?? ''),
-                                'reference_number' => (string) ($student->student_number ?? ''),
+                                'reference_number' => (string) ($student->reference_number ?? ''),
                                 'course_college' => (string) ($student->course ?? ''),
                                 'birthday' => (string) ($student->DOB ?? ''),
                                 'sex' => (string) ($student->gender ?? ''),
@@ -684,8 +715,8 @@ class WalkInController extends Controller
                             $profile->student_number = (string) $student->student_number;
                             $profileNeedsSave = true;
                         }
-                        if (empty($profile->reference_number) && !empty($student->student_number)) {
-                            $profile->reference_number = (string) $student->student_number;
+                        if (empty($profile->reference_number) && !empty($student->reference_number)) {
+                            $profile->reference_number = (string) $student->reference_number;
                             $profileNeedsSave = true;
                         }
                         if (empty($profile->student_id) && !empty($student->student_id)) {
@@ -829,6 +860,7 @@ PROMPT;
         $request->validate([
             'student_number' => 'required',
             'first_name' => 'required',
+            'middle_name' => 'nullable|string|max:255',
             'last_name'  => 'required',
             'email'      => 'required|email',
             'password'   => 'nullable|min:6',
@@ -872,8 +904,13 @@ PROMPT;
             'student_id' => $this->resolveUniqueStudentId('assisted-' . Str::slug($studentNumber, '-')),
             'student_number' => $studentNumber,
             'first_name' => $request->first_name,
+            'middle_name' => $request->input('middle_name'),
             'last_name'  => $request->last_name,
-            'name'       => $request->first_name . ' ' . $request->last_name,
+            'name'       => trim(implode(' ', array_filter([
+                $request->first_name,
+                $request->input('middle_name'),
+                $request->last_name,
+            ]))),
             'email'      => $email,
             'password'   => Hash::make($password),
             'user_role'  => $request->user_role, 
@@ -1032,7 +1069,7 @@ PROMPT;
                 $appointment->user_id    = $student->id;
                 $appointment->student_id = $student->student_id;
                 $appointment->student_number = $student->student_number ?? null;
-                $appointment->name       = $student->first_name . ' ' . $student->last_name;
+                $appointment->name       = $student->name;
                 $appointment->email      = $student->email; 
                 $appointment->service    = $request->service;
                 $appointment->remarks    = $request->input('reason_for_visit') ?: $request->remarks;
@@ -1083,7 +1120,7 @@ PROMPT;
                 'user_id'              => $student->id,
                 'attending_staff_id'   => auth()->id(),
                 'attending_staff_name' => auth()->user()?->name ?? auth()->user()?->email ?? 'Clinic Staff',
-                'name'                 => $student->first_name . ' ' . $student->last_name,
+                'name'                 => $student->name,
                 'consultation_date'    => now()->format('Y-m-d'),
                 'time_in'              => $consultationStartedAt,
                 'time_out'             => now()->format('H:i:s'),

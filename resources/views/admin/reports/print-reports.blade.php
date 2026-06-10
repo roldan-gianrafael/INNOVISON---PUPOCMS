@@ -747,7 +747,7 @@
         <section class="official-inventory-report">
             <header class="official-inventory-header">
                 <img class="official-inventory-logo" src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
-                <img class="official-inventory-government-logo" src="{{ asset('Bagong_Pilipinas_logo.png') }}" alt="Bagong Pilipinas Logo">
+                <img class="official-inventory-government-logo" src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" alt="Bagong Pilipinas Logo">
                 <p class="official-inventory-university">Polytechnic University of the Philippines</p>
                 <p class="official-inventory-office">Medical Services Department</p>
                 <p class="official-inventory-campus">Taguig Campus</p>
@@ -1154,7 +1154,7 @@
         <section class="official-inventory-report">
             <header class="official-inventory-header">
                 <img class="official-inventory-logo" src="{{ asset('images/pup_logo.png') }}" alt="PUP Logo">
-                <img class="official-inventory-government-logo" src="{{ asset('Bagong_Pilipinas_logo.png') }}" alt="Bagong Pilipinas Logo">
+                <img class="official-inventory-government-logo" src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" alt="Bagong Pilipinas Logo">
                 <p class="official-inventory-university">Polytechnic University of the Philippines</p>
                 <p class="official-inventory-office">Medical Services Department</p>
                 <p class="official-inventory-campus">Taguig Campus</p>

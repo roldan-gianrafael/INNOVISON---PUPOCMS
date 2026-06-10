@@ -752,10 +752,17 @@ public function printReport(Request $request)
         $fileType = $type === 'inventory' && $inventoryScope !== 'all' ? 'inventory-' . $inventoryScope : ($type !== '' ? $type : 'report');
         $safeMonth = preg_replace('/[^0-9\-]/', '', $monthFilter) ?: now()->format('Y-m');
 
-        return $pdf->stream("{$fileType}-report-{$safeMonth}.pdf");
+        return $pdf->stream(
+            "{$fileType}-report-{$safeMonth}-" . now()->format('YmdHis') . '.pdf',
+            [
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]
+        );
     }
 
-    return view('admin.reports.print-reports', [
+    return response()->view('admin.reports.print-reports', [
         'data' => $data,
         'type' => $type,
         'title' => $title,
@@ -766,6 +773,10 @@ public function printReport(Request $request)
         'gadTables' => $gadTables ?? [],
         'isPdf' => false,
         'pdfUnavailable' => $output === 'pdf',
+    ])->withHeaders([
+        'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma' => 'no-cache',
+        'Expires' => '0',
     ]);
 }
 }

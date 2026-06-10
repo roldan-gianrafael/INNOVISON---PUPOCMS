@@ -42,6 +42,7 @@ class User extends Authenticatable
     'name',
     'student_id',
     'student_number',
+    'reference_number',
     'DOB',
     'gender',
     'height',

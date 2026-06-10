@@ -161,11 +161,11 @@ class AppointmentController extends Controller
     {
         $puptasService = app(PuptasWebhookService::class);
 
-        $studentNumber = trim((string) ($user->student_number ?? ''));
-        if ($studentNumber !== '' && !$this->looksLikeIdpIdentifier($studentNumber, $user)) {
-            $applicantByStudentNumber = $puptasService->fetchApplicantByStudentNumber($studentNumber);
-            if (is_array($applicantByStudentNumber) && !empty($applicantByStudentNumber)) {
-                return $applicantByStudentNumber;
+        $referenceNumber = trim((string) ($user->reference_number ?? ''));
+        if ($referenceNumber !== '' && !$this->looksLikeIdpIdentifier($referenceNumber, $user)) {
+            $applicantByReference = $puptasService->fetchApplicantByStudentNumber($referenceNumber);
+            if (is_array($applicantByReference) && !empty($applicantByReference)) {
+                return $applicantByReference;
             }
         }
 
@@ -257,6 +257,25 @@ class AppointmentController extends Controller
         return '';
     }
 
+    private function resolveReferenceNumber(User $user, ?HealthProfile $healthProfile = null, ?array $applicantData = null): string
+    {
+        $candidates = [
+            trim((string) data_get($applicantData, 'reference_number')),
+            trim((string) data_get($applicantData, 'application.reference_number')),
+            trim((string) data_get($applicantData, 'admission.reference_number')),
+            trim((string) optional($healthProfile)->reference_number),
+            trim((string) ($user->reference_number ?? '')),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if ($candidate !== '' && !$this->looksLikeIdpIdentifier($candidate, $user)) {
+                return $candidate;
+            }
+        }
+
+        return '';
+    }
+
     private function persistResolvedStudentNumber(User $user, ?HealthProfile $healthProfile, ?string $studentNumber): void
     {
         $studentNumber = trim((string) $studentNumber);
@@ -272,6 +291,23 @@ class AppointmentController extends Controller
         if ($healthProfile && trim((string) $healthProfile->student_number) === '') {
             $healthProfile->student_number = $studentNumber;
             $healthProfile->save();
+        }
+    }
+
+    private function persistResolvedReferenceNumber(User $user, ?string $referenceNumber): void
+    {
+        $referenceNumber = trim((string) $referenceNumber);
+        if (
+            $referenceNumber === ''
+            || $this->looksLikeIdpIdentifier($referenceNumber, $user)
+            || !\Schema::hasColumn('users', 'reference_number')
+        ) {
+            return;
+        }
+
+        if (trim((string) ($user->reference_number ?? '')) !== $referenceNumber) {
+            $user->reference_number = $referenceNumber;
+            $user->save();
         }
     }
 
@@ -463,6 +499,7 @@ class AppointmentController extends Controller
             'last_name' => trim((string) (optional($linkedAdminProfile)->last_name ?? $user->last_name ?? data_get($applicantData, 'last_name') ?? data_get($applicantData, 'lastname') ?? '')),
             'suffix_name' => trim((string) (optional($linkedAdminProfile)->suffix_name ?? '')),
             'student_id' => (string) (optional($healthProfile)->student_id ?? $user->student_id ?? ''),
+            'reference_number' => $this->resolveReferenceNumber($user, $healthProfile, $applicantData),
             'student_number' => $this->resolveStudentNumber($user, $healthProfile, $applicantData),
             'email' => (string) (
                 optional(optional($healthProfile)->user)->email
@@ -1216,7 +1253,7 @@ public function showHealthForm()
     $linkedAdminProfile = $this->resolveLinkedAdminProfile($user);
     $healthFormPrefill = $this->buildHealthFormPrefill($user, $linkedAdminProfile);
     $this->persistResolvedUserProfileFields($user, $healthFormPrefill);
-    $this->persistResolvedStudentNumber($user, $user->healthProfile, $healthFormPrefill['student_number'] ?? '');
+    $this->persistResolvedReferenceNumber($user, $healthFormPrefill['reference_number'] ?? '');
     $calculatedAge = $healthFormPrefill['age'] ?? null;
 
     // Return the view with all required variables
@@ -1234,7 +1271,7 @@ public function storeHealthForm(Request $request)
 
     $request->validate([
         'student_id'        => 'nullable|string|max:255',
-        'student_number'    => 'required|string|max:255',
+        'reference_number'  => 'required|string|max:255',
         'school_year'       => 'required|string',
         'home_address'      => 'required|string|max:255',
         'zipcode'           => 'required|string|max:20',
@@ -1292,10 +1329,6 @@ public function storeHealthForm(Request $request)
     $normalizedWeight = $this->normalizeMeasurement($request->input('weight'), 'kg');
     $user->DOB = $request->input('birthday');
     $user->contact_no = $request->input('contact_no');
-    $resolvedStudentNumber = trim((string) $request->input('student_number'));
-    if ($resolvedStudentNumber !== '' && !$this->looksLikeIdpIdentifier($resolvedStudentNumber, $user)) {
-        $user->student_number = $resolvedStudentNumber;
-    }
     $resolvedGender = trim((string) $request->input('sex'));
     if ($resolvedGender !== '') {
         $user->gender = $resolvedGender;
@@ -1321,8 +1354,7 @@ public function storeHealthForm(Request $request)
             ['user_id' => $user->id],
             [
                 'student_id'         => $request->student_id,
-                'student_number'     => $request->student_number,
-                'reference_number'   => $request->student_number,
+                'reference_number'   => $request->input('reference_number'),
                 'school_year'        => $request->school_year,
                 'home_address'       => $request->home_address,
                 'zipcode'            => $request->zipcode,

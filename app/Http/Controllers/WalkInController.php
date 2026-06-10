@@ -209,15 +209,17 @@ class WalkInController extends Controller
         \Log::debug('PUPTAS applicant data', ['applicant' => $applicant, 'referenceNumber' => $referenceNumber]);
 
         $studentNumber = trim((string) data_get($applicant, 'student_number'));
+        $resolvedReferenceNumber = trim((string) (
+            data_get($applicant, 'reference_number')
+            ?: data_get($applicant, 'application.reference_number')
+            ?: $referenceNumber
+        ));
         $idpUserId = trim((string) data_get($applicant, 'idp_user_id'));
         $email = trim((string) data_get($applicant, 'email'));
 
-        if ($studentNumber === '' && $referenceNumber !== '') {
-            $studentNumber = trim($referenceNumber);
-        }
-
         \Log::debug('Extracted fields', [
             'studentNumber' => $studentNumber,
+            'referenceNumber' => $resolvedReferenceNumber,
             'idpUserId' => $idpUserId,
             'email' => $email,
         ]);
@@ -225,6 +227,7 @@ class WalkInController extends Controller
         $user = User::query()
             ->when($idpUserId !== '', fn ($query) => $query->orWhere('student_id', $idpUserId))
             ->when($studentNumber !== '' && \Schema::hasColumn('users', 'student_number'), fn ($query) => $query->orWhere('student_number', $studentNumber))
+            ->when($resolvedReferenceNumber !== '' && \Schema::hasColumn('users', 'reference_number'), fn ($query) => $query->orWhere('reference_number', $resolvedReferenceNumber))
             ->when($email !== '', fn ($query) => $query->orWhere('email', $email))
             ->first();
 
@@ -286,6 +289,10 @@ class WalkInController extends Controller
             $user->student_number = $studentNumber;
         }
 
+        if ($resolvedReferenceNumber !== '' && \Schema::hasColumn('users', 'reference_number')) {
+            $user->reference_number = $resolvedReferenceNumber;
+        }
+
         if ($idpUserId !== '' && trim((string) $user->student_id) === '') {
             $user->student_id = $this->resolveUniqueStudentId($idpUserId);
         }
@@ -293,6 +300,7 @@ class WalkInController extends Controller
         \Log::debug('User fields set', [
             'student_id' => $user->student_id,
             'student_number' => $user->student_number,
+            'reference_number' => $user->reference_number,
         ]);
 
         if ($firstName !== '') {

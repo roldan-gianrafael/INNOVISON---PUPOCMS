@@ -1,5 +1,10 @@
 <div class="print-container">
     <div class="print-page">
+    <div class="document-code">
+        <strong>PUP-HIFS-6-MEDS-028</strong><br>
+        Rev. 0<br>
+        June 26, 2024
+    </div>
     <div class="header-section">
         <img src="{{ $healthFormLogo ?? asset('images/pup_logo.png') }}" class="logo">
         <div class="header-text">
@@ -9,17 +14,13 @@
             <p class="dept-name">MEDICAL SERVICES DEPARTMENT</p>
         </div>
         <div class="photo-box">
-            @if(empty($studentPrintCopy) && $profile->student_photo)
-               <img src="{{ asset('storage/' . $profile->student_photo) }}" alt="Student Photo">
-            @else
-                <span style="font-size: 8px;">ATTACH 2x2 ID PHOTO</span>
-            @endif
+            <span>2x2 or passport-sized<br>current colored ID photo</span>
         </div>
     </div>
 
     <hr class="header-divider">
 
-    <div class="form-title">HEALTH INFORMATION FORM</div>
+    <div class="form-title">HEALTH INFORMATION FORM FOR STUDENTS</div>
 
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     <div class="row">
@@ -38,7 +39,7 @@
     </div>
     <div class="row">
         <span class="label">Blood Type:</span> <div class="field">{{ $profile->blood_type ?? 'N/A' }}</div>
-        <span class="label">Email:</span> <div class="field">{{ $profile->user->email }}</div>
+        <span class="label">Email Address:</span> <div class="field">{{ $profile->user->email }}</div>
     </div>
     <div class="row">
         <span class="label">Parent's Name / Guardian / Spouse:</span> <div class="field">{{ $profile->guardian_name ?? '' }}</div>
@@ -50,7 +51,7 @@
 
     <div class="section-header">PART II. MEDICAL HISTORY</div>
     <div class="row medical-attention-row">
-        <span class="medical-subsection-title">1. Do you need medical attention or have a known medical illness?</span>
+        <span class="medical-subsection-title">1. Do you need medical attention or has known medical illness?</span>
         <div class="check-item"><div class="box-ui">{{ $profile->has_illness == 'No' ? '/' : '' }}</div> No</div>
         <div class="check-item"><div class="box-ui">{{ $profile->has_illness == 'Yes' ? '/' : '' }}</div> Yes</div>
     </div>
@@ -58,15 +59,22 @@
     
     <div class="checkbox-grid">
         @php
-            $illnesses = ['Asthma', 'Loss of Consciousness', 'Eye Disease / Defect', 'Accident Injuries', 'Diabetes', 'Heart Disease', 'Kidney Disease', 'Tuberculosis / Primary Complex', 'Convulsion / Epilepsy', 'Migraine', 'Hyperventilation', 'High Blood Pressure', 'Hemophilia'];
+            $illnesses = ['Asthma', 'Loss of Consciousness', 'Eye Disease / Defect', 'Accident Injuries', 'Diabetes', 'Heart Disease', 'Kidney Disease', 'Tuberculosis', 'Convulsion / Epilepsy', 'Migraine', 'Hyperventilation', 'High Blood Pressure', 'Hemophilia', 'Primary Complex'];
             $saved_history = is_array($profile->medical_history) ? $profile->medical_history : json_decode($profile->medical_history ?? '[]', true);
         @endphp
         @foreach($illnesses as $illness)
+        @php
+            $illnessChecked = in_array($illness, $saved_history, true)
+                || (
+                    in_array($illness, ['Tuberculosis', 'Primary Complex'], true)
+                    && in_array('Tuberculosis / Primary Complex', $saved_history, true)
+                );
+        @endphp
         <div class="check-item">
-            <div class="box-ui">{{ in_array($illness, $saved_history) ? '/' : '' }}</div> {{ $illness }}
+            <div class="box-ui">{{ $illnessChecked ? '/' : '' }}</div> {{ $illness }}
         </div>
         @endforeach
-        <div class="check-item" style="grid-column: span 2;">Others: <div class="field">{{ $profile->other_illness ?? '' }}</div></div>
+        <div class="check-item" style="grid-column: span 2;">Others (Pls. Indicate): <div class="field">{{ $profile->other_illness ?? '' }}</div></div>
     </div>
 
     <div class="row">
@@ -77,7 +85,7 @@
     </div>
 
     <div class="medical-subsection-title medical-subsection-heading">
-        Additional Information for Students and Medical Conditions:
+        3. Additional Information for Students and Medical Conditions:
     </div>
     <div class="allergy-declaration">
         As a Parent / Guardian, I would like to declare that my child has history of allergies to the following:
@@ -123,10 +131,14 @@
     </div>
 </div>
 
-    <div class="row">
+    <div class="row covid-history-row">
         <div style="flex: 1;">
-            <span class="label">COVID-19 Vaccination History:</span><br>
-            <small>.</small>
+            <span class="medical-subsection-title">4. COVID-19 Vaccination History:</span>
+            <div class="vaccinated-choice">
+                <span class="label">Vaccinated:</span>
+                <div class="check-item"><div class="box-ui">{{ ($profile->covid_vaccinated ?? '') === 'Yes' ? '/' : '' }}</div> Yes</div>
+                <div class="check-item"><div class="box-ui">{{ ($profile->covid_vaccinated ?? '') !== 'Yes' ? '/' : '' }}</div> No</div>
+            </div>
         </div>
         <table class="vax-table" style="width: 65%;">
             @php $vax = is_array($profile->vaccine_history) ? $profile->vaccine_history : json_decode($profile->vaccine_history ?? '[]', true); @endphp
@@ -134,8 +146,8 @@
             <tbody>
                 <tr><td>1st Dose</td><td>{{ $vax['first_dose']['date'] ?? '' }}</td><td>{{ $vax['first_dose']['brand'] ?? '' }}</td></tr>
                 <tr><td>2nd Dose</td><td>{{ $vax['second_dose']['date'] ?? '' }}</td><td>{{ $vax['second_dose']['brand'] ?? '' }}</td></tr>
-                <tr><td>Booster 1</td><td>{{ $vax['booster_1']['date'] ?? '' }}</td><td>{{ $vax['booster_1']['brand'] ?? '' }}</td></tr>
-                <tr><td>Booster 2</td><td>{{ $vax['booster_2']['date'] ?? '' }}</td><td>{{ $vax['booster_2']['brand'] ?? '' }}</td></tr>
+                <tr><td>Booster 1st Dose</td><td>{{ $vax['booster_1']['date'] ?? '' }}</td><td>{{ $vax['booster_1']['brand'] ?? '' }}</td></tr>
+                <tr><td>Booster 2nd Dose</td><td>{{ $vax['booster_2']['date'] ?? '' }}</td><td>{{ $vax['booster_2']['brand'] ?? '' }}</td></tr>
             </tbody>
         </table>
     </div>
@@ -157,78 +169,71 @@ for the improvement of healthcare services.
 
 
 
-    <div class="signature-row">
-    <div class="sig-block">
-        <div class="signature-space"></div>
-        <div class="sig-line">Parent/Guardian Signature</div>
-    </div>
-
-    <div class="sig-block">
-        @if(empty($studentPrintCopy) && $profile->digital_signature)
-            <img src="{{ asset('storage/' . $profile->digital_signature) }}" class="sig-image" style="height: 60px; width: auto;">
-        @else
-            <div class="signature-space"></div>
-        @endif
-        
-        <div class="sig-line">{{ empty($studentPrintCopy) ? strtoupper($profile->user->name ?? '') : '' }}</div>
-        <div style="font-size: 8px;">Student Signature</div>
-    </div>
-
-    <div class="sig-block">
-        <div class="signature-space signature-date-space">
-            {{ empty($studentPrintCopy) && $profile->created_at ? $profile->created_at->format('m/d/Y') : '' }}
-        </div>
-        <div class="sig-line">Date Signed</div>
-    </div>
-</div>
+    <table class="signature-table">
+        <tr>
+            <td>
+                <div class="signature-space"></div>
+                <div class="sig-line">Signature of Parent/Guardian</div>
+                <div class="signature-caption">For students below 18 years old</div>
+            </td>
+            <td>
+                @if(empty($studentPrintCopy) && $profile->digital_signature)
+                    <img src="{{ asset('storage/' . $profile->digital_signature) }}" class="sig-image" style="height: 40px; width: auto;">
+                @else
+                    <div class="signature-space"></div>
+                @endif
+                <div class="sig-line">{{ empty($studentPrintCopy) ? strtoupper($profile->user->name ?? '') : '' }}</div>
+                <div class="signature-caption">Printed Name and Signature of Student</div>
+            </td>
+            <td>
+                <div class="signature-space signature-date-space">
+                    {{ empty($studentPrintCopy) && $profile->created_at ? $profile->created_at->format('m/d/Y') : '' }}
+                </div>
+                <div class="sig-line">Date</div>
+            </td>
+        </tr>
+    </table>
 
     <div class="physician-section" style="display: block; width: 100%; clear: both; border: 2px solid #000; margin-top: 28px; padding: 15px; position: relative;">
-        <p style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
+        <p style="text-align: center; font-weight: bold; margin-bottom: 2px; font-size: 12px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
+        <p class="physician-check-instruction">Please Check</p>
         
-        <div class="row" style="display: flex; align-items: center; gap: 15px;">
-            <span style="font-weight: bold;">Medical Clearance:</span>
-            
-            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
-                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
+        <table class="physician-clearance-table">
+            <tr>
+                <td class="physician-clearance-label">Medical Clearance:</td>
+                <td>
+                    <span class="box-ui physician-box">
                     {{ empty($studentPrintCopy) && in_array($profile->clearance_status, ['Issued', 'Fully Cleared'], true) ? '/' : '' }}
-                </div> 
-                Issued
-            </div>
-
-            <div class="check-item" style="display: flex; align-items: center; gap: 5px;">
-                <div class="box-ui" style="width: 15px; height: 15px; border: 1px solid #000; display: flex; align-items: center; justify-content: center;">
+                    </span>
+                    Issued
+                </td>
+                <td class="physician-pending-cell">
+                    <span class="box-ui physician-box">
                     {{ empty($studentPrintCopy) && in_array($profile->clearance_status, ['Pending', 'For Verification'], true) ? '/' : '' }}
-                </div> 
-                For Verification, Reason: 
-                <div class="field" style="border-bottom: 1px solid #000; min-width: 150px; padding-left: 5px; font-size: 12px; font-style: italic;">
-                    {{ empty($studentPrintCopy) && in_array($profile->clearance_status, ['Pending', 'For Verification'], true) ? $profile->pending_reason : '' }}
-                </div>
-            </div>
-        </div>
+                    </span>
+                    Pending, Reason:
+                    <span class="physician-reason-line">
+                        {{ empty($studentPrintCopy) && in_array($profile->clearance_status, ['Pending', 'For Verification'], true) ? $profile->pending_reason : '' }}
+                    </span>
+                </td>
+            </tr>
+        </table>
 
-        <div class="row physician-signature-row" style="margin-top: 25px; display: flex; align-items: flex-end; justify-content: space-between; gap: 28px;">
-            <div style="flex: 0 0 220px; max-width: 220px;">
-                <div class="field" style="border-bottom: 1px solid #000; text-align: center; font-weight: bold; min-height: 20px;">
-                    {{ empty($studentPrintCopy) && $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : '' }}
-                </div>
-                <div style="font-size: 10px; text-align: center; font-weight: bold; margin-top: 2px;">Date</div>
-            </div>
-
-            <div class="clinic-verifier-block" style="flex: 1; text-align: center; position: relative; min-height: 80px;">
-                <div class="field clinic-verifier-line" style="border-bottom: 1px solid #000; font-weight: bold; position: relative; z-index: 5; text-transform: uppercase; padding-top: 40px;"></div>
-                <div style="font-size: 10px; font-weight: bold;">Physician's Name and Signature</div>
-            </div>
-        </div>
+        <table class="physician-signature-table">
+            <tr>
+                <td>
+                    <div class="physician-signature-line">
+                        {{ empty($studentPrintCopy) && $profile->verified_at ? \Carbon\Carbon::parse($profile->verified_at)->format('m/d/Y') : '' }}
+                    </div>
+                    <div class="physician-signature-label">Date:</div>
+                </td>
+                <td>
+                    <div class="physician-signature-line"></div>
+                    <div class="physician-signature-label">Physician's Name and Signature</div>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <div class="generated-report-caption">
-        <div class="signature-note">
-            {{ empty($studentPrintCopy) ? 'This is system-generated, signature is not required.' : 'Please sign this printed form before submitting it to the Medical Clinic.' }}
-        </div>
-        <div class="privacy-note">
-            This document contains personal-identifiable information that is subject to Data Privacy.<br>
-            Please keep this document protected and in a safe place.
-        </div>
-    </div>
 </div>
 </div>

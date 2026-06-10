@@ -1032,6 +1032,12 @@ class LoginController extends Controller
     {
         $emailSeed = $this->firstNonEmptyScalar($profile, ['email', 'mail', 'username', 'user.email']) ?? '';
         $studentNumberSeed = $this->firstNonEmptyScalar($profile, ['student_number', 'studentNo']) ?? '';
+        $referenceNumberSeed = $this->firstNonEmptyScalar($profile, [
+            'reference_number',
+            'referenceNo',
+            'application.reference_number',
+            'admission.reference_number',
+        ]) ?? '';
         $studentIdSeed = $this->firstNonEmptyScalar($profile, ['student_id', 'idp_user_id', 'user_id', 'id']) ?? '';
         $firstName = $this->firstNonEmptyScalar($profile, ['first_name', 'firstname', 'given_name']) ?? '';
         $lastName = $this->firstNonEmptyScalar($profile, ['last_name', 'lastname', 'family_name']) ?? '';
@@ -1079,6 +1085,10 @@ class LoginController extends Controller
             $existingUser = User::query()->where('student_number', $studentNumberSeed)->first();
         }
 
+        if (!$existingUser && $referenceNumberSeed !== '') {
+            $existingUser = User::query()->where('reference_number', $referenceNumberSeed)->first();
+        }
+
         if (!$existingUser && $studentIdSeed !== '') {
             $existingUser = User::query()->where('student_id', $studentIdSeed)->first();
         }
@@ -1104,6 +1114,10 @@ class LoginController extends Controller
                 $existingUser->student_number = $studentNumberSeed;
             }
 
+            if ($referenceNumberSeed !== '') {
+                $existingUser->reference_number = $referenceNumberSeed;
+            }
+
             if (trim((string) $existingUser->password) === '') {
                 $existingUser->password = Hash::make(Str::random(40));
             }
@@ -1125,6 +1139,7 @@ class LoginController extends Controller
         $user = User::create([
             'student_id' => $studentId,
             'student_number' => $studentNumberSeed !== '' ? $studentNumberSeed : null,
+            'reference_number' => $referenceNumberSeed !== '' ? $referenceNumberSeed : null,
             'first_name' => $firstName !== '' ? $firstName : 'IDP',
             'last_name' => $lastName !== '' ? $lastName : 'User',
             'name' => $fullName !== '' ? $fullName : trim(($firstName ?: 'IDP') . ' ' . ($lastName ?: 'User')),

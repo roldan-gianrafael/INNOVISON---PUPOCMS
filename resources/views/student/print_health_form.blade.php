@@ -8,21 +8,23 @@
         @page { size: 8.5in 13in; margin: 0; }
         * { box-sizing: border-box; }
         body { margin: 0; padding: 0; background: #fff; color: #000; font-family: Arial, sans-serif; }
-        .print-container { width: 100%; padding: 0.12in 0.42in; line-height: 1.12; }
-        .header-section { display: flex; align-items: flex-start; position: relative; min-height: 130px; margin-bottom: 0; }
-        .logo { width: 80px; height: 80px; margin: 0 15px 0 50px; object-fit: contain; }
-        .header-text p { margin: 0; line-height: 1.3; font-size: 10px !important; }
-        .header-text p:nth-child(3) { font-size: 11px !important; }
-        .header-text .univ-name { font-size: 16px !important; font-weight: bold; }
-        .header-text .dept-name { font-size: 18px !important; font-weight: bold; }
-        .photo-box { position: absolute; top: 0; right: 0; display: flex; align-items: center; justify-content: center; width: 150px; height: 130px; overflow: hidden; border: 1px solid #000; text-align: center; }
+        .print-container { width: 100%; padding: 0.08in 0.38in; line-height: 1.05; }
+        .print-page { position: relative; }
+        .document-code { position: absolute; top: 0; right: 0; z-index: 2; width: 130px; font-size: 7px; line-height: 1.1; text-align: right; }
+        .header-section { display: flex; align-items: flex-start; position: relative; min-height: 105px; margin-bottom: 0; padding-top: 9px; }
+        .logo { width: 58px; height: 58px; margin: 0 10px 0 40px; object-fit: contain; }
+        .header-text p { margin: 0; line-height: 1.15; font-size: 8px !important; }
+        .header-text p:nth-child(3) { font-size: 8px !important; }
+        .header-text .univ-name { font-size: 12px !important; font-weight: bold; }
+        .header-text .dept-name { font-size: 14px !important; font-weight: bold; }
+        .photo-box { position: absolute; top: 15px; right: 0; display: flex; align-items: center; justify-content: center; width: 115px; height: 90px; overflow: hidden; border: 1px solid #000; padding: 6px; font-size: 7px; line-height: 1.15; text-align: center; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-        .header-divider { width: auto; margin: -43px 150px 0 0; border: 0; border-top: 1px solid #000; }
-        .form-title { margin: 9px 0 8px; text-align: center; font-size: 16px; font-weight: bold; font-style: italic; }
-        .section-header { margin-top: 7px; padding-left: 5px; font-size: 13px; font-weight: bold; font-style: italic; text-transform: uppercase; }
-        .row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
-        .field { min-height: 15px; flex: 1; padding-left: 4px; border-bottom: 1px solid #000; color: #000; font-size: 12px; font-weight: bold; }
-        .label, .labels { white-space: nowrap; font-size: 11px; }
+        .header-divider { width: auto; margin: -25px 115px 0 0; border: 0; border-top: 1px solid #000; }
+        .form-title { margin: 4px 0 3px; text-align: center; font-size: 12px; font-weight: bold; font-style: italic; }
+        .section-header { margin-top: 3px; padding-left: 4px; font-size: 9px; font-weight: bold; font-style: italic; text-transform: uppercase; }
+        .row { display: flex; align-items: baseline; gap: 5px; margin-bottom: 1px; }
+        .field { min-height: 10px; flex: 1; padding-left: 3px; border-bottom: 1px solid #000; color: #000; font-size: 8px; font-weight: bold; }
+        .label, .labels { white-space: nowrap; font-size: 8px; }
         .label { font-weight: bold; }
         .print-page .row,
         .print-page .field,
@@ -35,38 +37,49 @@
         .print-page .vax-table td,
         .print-page .cert-text,
         .print-page .sig-line,
-        .print-page .physician-section,
-        .print-page .generated-report-caption {
-            font-size: 11px !important;
+        .print-page .physician-section {
+            font-size: 8px !important;
         }
-        .medical-subsection-title { font-weight: bold; line-height: 1.25; }
-        .medical-subsection-heading { margin: 6px 0 4px; text-transform: uppercase; }
-        .allergy-declaration { margin: 0 0 4px; font-size: 11px; line-height: 1.35; }
+        .medical-subsection-title { font-weight: bold; line-height: 1.1; }
+        .medical-subsection-heading { margin: 3px 0 2px; text-transform: uppercase; }
+        .allergy-declaration { margin: 0 0 1px; font-size: 8px; line-height: 1.1; }
         .medicine-other-field { grid-column: span 2; }
         .contact-row .field { min-width: 120px; }
         .medical-attention-row { align-items: center; }
-        .medical-history-instruction { margin: 0 0 3px 5px; font-size: 9px; font-style: italic; }
-        .checkbox-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin: 4px 0 4px 14px; }
-        .check-item { display: flex; align-items: center; gap: 4px; font-size: 10px; }
-        .box-ui { display: inline-block; width: 11px; height: 11px; border: 1px solid #000; font-weight: bold; line-height: 10px; text-align: center; }
-        .vax-table { width: 100%; margin-top: 4px; border-collapse: collapse; }
-        .vax-table th, .vax-table td { padding: 2px 3px; border: 1px solid #000; font-size: 10px; text-align: center; }
-        .cert-text { margin-top: 8px; font-size: 9px; font-style: italic; line-height: 1.12; text-align: justify; }
-        .cert-text-first { margin-top: 18px; }
-        .signature-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-top: 4px; break-inside: avoid; page-break-inside: avoid; }
-        .sig-block { width: auto; flex: 1; text-align: center; }
+        .medical-history-instruction { margin: 0 0 1px 5px; font-size: 7px; font-style: italic; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px 3px; margin: 2px 0 2px 12px; }
+        .check-item { display: flex; align-items: center; gap: 3px; font-size: 7px; }
+        .box-ui { display: inline-block; width: 9px; height: 9px; border: 1px solid #000; font-weight: bold; line-height: 8px; text-align: center; }
+        .covid-history-row { align-items: flex-start; margin-top: 3px; }
+        .vaccinated-choice { display: flex; align-items: center; gap: 5px; margin: 3px 0 0 14px; }
+        .vax-table { width: 100%; margin-top: 2px; border-collapse: collapse; }
+        .vax-table th, .vax-table td { padding: 1px 2px; border: 1px solid #000; font-size: 7px; text-align: center; }
+        .cert-text { margin-top: 3px; font-size: 7px; font-style: italic; line-height: 1.02; text-align: justify; }
+        .cert-text-first { margin-top: 5px; }
+        .signature-table { width: 100%; margin-top: 2px; border-collapse: separate; border-spacing: 10px 0; table-layout: fixed; page-break-inside: avoid; }
+        .signature-table td { width: 33.333%; padding: 0; border: 0; vertical-align: bottom; text-align: center; }
         .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
-        .signature-space { height: 25px; }
+        .signature-space { height: 17px; }
         .signature-date-space { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 3px; font-weight: bold; }
-        .sig-line { min-height: 13px; margin-bottom: 1px; border-bottom: 1px solid #000; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .physician-section { margin-top: 6px !important; padding: 6px !important; break-inside: avoid; page-break-inside: avoid; }
-        .physician-section > p { margin: 0 0 3px !important; }
-        .physician-signature-row { margin-top: 6px !important; gap: 14px !important; }
-        .clinic-verifier-block { min-height: 38px !important; }
-        .clinic-verifier-line { padding-top: 10px !important; }
-        .generated-report-caption { margin: 4px 0 0; padding-top: 2px; border-top: 1px solid #9ca3af; font-size: 8px; line-height: 1.1; break-inside: avoid; page-break-inside: avoid; }
-        .generated-report-caption .signature-note { margin-bottom: 2px; color: #4b5563; font-weight: 700; text-align: right; }
-        .generated-report-caption .privacy-note { color: #9f4b5a; font-weight: 800; text-align: center; }
+        .sig-line { min-height: 10px; margin-bottom: 1px; border-bottom: 1px solid #000; font-size: 8px; font-weight: bold; text-transform: uppercase; }
+        .signature-caption { min-height: 13px; font-size: 7px; line-height: 1.05; text-align: center; }
+        .physician-section { margin-top: 3px !important; padding: 4px !important; border-width: 1px !important; break-inside: avoid; page-break-inside: avoid; }
+        .physician-section > p { margin: 0 0 1px !important; }
+        .physician-check-instruction { font-size: 7.5px; font-style: italic; text-align: center; }
+        .physician-clearance-table,
+        .physician-signature-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .physician-clearance-table td,
+        .physician-signature-table td { padding: 1px 3px; border: 0; font-size: 7px; vertical-align: middle; }
+        .physician-clearance-label { width: 20%; font-weight: bold; }
+        .physician-clearance-table td:nth-child(2) { width: 13%; white-space: nowrap; }
+        .physician-pending-cell { width: 67%; white-space: nowrap; }
+        .physician-box { width: 9px !important; height: 9px !important; line-height: 8px !important; margin-right: 3px; }
+        .physician-reason-line { display: inline-block; width: 55%; min-height: 9px; border-bottom: 1px solid #000; font-style: italic; vertical-align: bottom; }
+        .physician-signature-table { margin-top: 5px; }
+        .physician-signature-table td:first-child { width: 34%; padding-right: 12px; }
+        .physician-signature-table td:last-child { width: 66%; padding-left: 12px; }
+        .physician-signature-line { min-height: 15px; border-bottom: 1px solid #000; font-size: 7px; font-weight: bold; text-align: center; }
+        .physician-signature-label { margin-top: 1px; font-size: 7px; font-weight: bold; text-align: center; }
         .print-action-bar { display: flex; justify-content: flex-end; gap: 8px; width: min(8.5in, 100%); margin: 0 auto; padding: 10px 12px 0; }
         .print-action-button { display: inline-flex; align-items: center; justify-content: center; padding: 9px 18px; border: 1px solid #800000; border-radius: 6px; background: #fff; color: #800000; font-size: 13px; font-weight: bold; text-decoration: none; }
         .print-action-button.is-download { background: #800000; color: #fff; }

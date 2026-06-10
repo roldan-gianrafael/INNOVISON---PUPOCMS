@@ -913,7 +913,7 @@
                             <td>{{ $fac ?: '' }}</td>
                             <td>{{ $sta ?: '' }}</td>
                             <td>{{ $dep ?: '' }}</td>
-                            <td><strong>{{ $rowTotal }}</strong></td>
+                            <td></td>
                         </tr>
                     @endforeach
                 @endforeach
@@ -923,17 +923,17 @@
                     <td>{{ $consultationTotals['faculty'] }}</td>
                     <td>{{ $consultationTotals['admin'] }}</td>
                     <td>{{ $consultationTotals['dependent'] }}</td>
-                    <td><strong>{{ array_sum($consultationTotals) }}</strong></td>
+                    <td></td>
                 </tr>
                 <tr class="bg-category"><td colspan="6">2. MEDICAL CERTIFICATE / CLEARANCE - CERTIFICATE OF COMPLIANCE</td></tr>
-                <tr><td class="text-left" style="padding-left: 15px;">A. Excused Letter</td><td>{{ $excusedLetterTotals['student'] }}</td><td>{{ $excusedLetterTotals['faculty'] }}</td><td>{{ $excusedLetterTotals['admin'] }}</td><td>{{ $excusedLetterTotals['dependent'] }}</td><td>{{ array_sum($excusedLetterTotals) }}</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">A. Excused Letter</td><td>{{ $excusedLetterTotals['student'] }}</td><td>{{ $excusedLetterTotals['faculty'] }}</td><td>{{ $excusedLetterTotals['admin'] }}</td><td>{{ $excusedLetterTotals['dependent'] }}</td><td></td></tr>
                 @forelse($excusedLetterCategoryRows as $categoryRow)
                     <tr><td class="text-left" style="padding-left: 30px;">{{ $categoryRow['label'] }}</td><td>{{ $categoryRow['student'] }}</td><td>{{ $categoryRow['faculty'] }}</td><td>{{ $categoryRow['admin'] }}</td><td>{{ $categoryRow['dependent'] }}</td><td>{{ $categoryRow['total'] }}</td></tr>
                 @empty
                     <tr><td class="text-left" style="padding-left: 30px;">No excused letter category recorded yet.</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
                 @endforelse
-                <tr><td class="text-left" style="padding-left: 15px;">B. COC for IJT</td><td>{{ $cocIjtTotals['student'] }}</td><td>{{ $cocIjtTotals['faculty'] }}</td><td>{{ $cocIjtTotals['admin'] }}</td><td>{{ $cocIjtTotals['dependent'] }}</td><td>{{ array_sum($cocIjtTotals) }}</td></tr>
-                <tr><td class="text-left" style="padding-left: 15px;">C. COC for Ladderized</td><td>{{ $cocLadderizedTotals['student'] }}</td><td>{{ $cocLadderizedTotals['faculty'] }}</td><td>{{ $cocLadderizedTotals['admin'] }}</td><td>{{ $cocLadderizedTotals['dependent'] }}</td><td>{{ array_sum($cocLadderizedTotals) }}</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">B. COC for IJT</td><td>{{ $cocIjtTotals['student'] }}</td><td>{{ $cocIjtTotals['faculty'] }}</td><td>{{ $cocIjtTotals['admin'] }}</td><td>{{ $cocIjtTotals['dependent'] }}</td><td></td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">C. COC for Ladderized</td><td>{{ $cocLadderizedTotals['student'] }}</td><td>{{ $cocLadderizedTotals['faculty'] }}</td><td>{{ $cocLadderizedTotals['admin'] }}</td><td>{{ $cocLadderizedTotals['dependent'] }}</td><td></td></tr>
                 <tr class="bg-category"><td colspan="6">3. INJECTIONS</td></tr>
                 <tr><td class="text-left" style="padding-left: 15px;">Injection Services</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
                 <tr class="bg-category"><td colspan="6">4. REFERRALS</td></tr>
@@ -943,9 +943,9 @@
                 <tr class="bg-category"><td colspan="6">5. OTHERS</td></tr>
                 <tr><td class="text-left" style="padding-left: 15px;">Other Services</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
                 <tr class="bg-category"><td colspan="6">6. ON-LINE CONSULTATION</td></tr>
-                <tr><td class="text-left" style="padding-left: 15px;">A. Consultation</td><td>{{ $onlineTotals['consultation']['student'] }}</td><td>{{ $onlineTotals['consultation']['faculty'] }}</td><td>{{ $onlineTotals['consultation']['admin'] }}</td><td>{{ $onlineTotals['consultation']['dependent'] }}</td><td>{{ array_sum($onlineTotals['consultation']) }}</td></tr>
-                <tr><td class="text-left" style="padding-left: 15px;">B. Medical Clearance</td><td>{{ $onlineTotals['medical_clearance']['student'] }}</td><td>{{ $onlineTotals['medical_clearance']['faculty'] }}</td><td>{{ $onlineTotals['medical_clearance']['admin'] }}</td><td>{{ $onlineTotals['medical_clearance']['dependent'] }}</td><td>{{ array_sum($onlineTotals['medical_clearance']) }}</td></tr>
-                <tr><td class="text-left" style="padding-left: 15px;">C. Others</td><td>{{ $onlineTotals['others']['student'] }}</td><td>{{ $onlineTotals['others']['faculty'] }}</td><td>{{ $onlineTotals['others']['admin'] }}</td><td>{{ $onlineTotals['others']['dependent'] }}</td><td>{{ array_sum($onlineTotals['others']) }}</td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">A. Consultation</td><td>{{ $onlineTotals['consultation']['student'] }}</td><td>{{ $onlineTotals['consultation']['faculty'] }}</td><td>{{ $onlineTotals['consultation']['admin'] }}</td><td>{{ $onlineTotals['consultation']['dependent'] }}</td><td></td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">B. Medical Clearance</td><td>{{ $onlineTotals['medical_clearance']['student'] }}</td><td>{{ $onlineTotals['medical_clearance']['faculty'] }}</td><td>{{ $onlineTotals['medical_clearance']['admin'] }}</td><td>{{ $onlineTotals['medical_clearance']['dependent'] }}</td><td></td></tr>
+                <tr><td class="text-left" style="padding-left: 15px;">C. Others</td><td>{{ $onlineTotals['others']['student'] }}</td><td>{{ $onlineTotals['others']['faculty'] }}</td><td>{{ $onlineTotals['others']['admin'] }}</td><td>{{ $onlineTotals['others']['dependent'] }}</td><td></td></tr>
                 <tr class="bg-category"><td colspan="6">7. TRIAGE SURVEY</td></tr>
                 <tr><td class="text-left" style="padding-left: 15px;">A. Online</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
                 <tr class="bg-category"><td colspan="6">8. BULLETIN UPDATES</td></tr>

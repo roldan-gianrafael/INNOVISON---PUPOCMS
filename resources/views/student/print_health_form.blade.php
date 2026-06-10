@@ -21,7 +21,7 @@
         .official-heading-cell p { margin: 0; font-size: 13px; line-height: 1.17; }
         .official-heading-cell .univ-name { font-size: 19px; font-weight: normal; }
         .official-heading-cell .dept-name { margin-top: 2px; font-size: 21px; font-weight: normal; }
-        .photo-box { position: absolute; top: 10px; right: 2px; box-sizing: border-box; width: 116.5px; height: 115px; padding: 22px 8px 0; overflow: hidden; border: 1px solid #000; font-size: 13px; line-height: 1.25; text-align: center; white-space: normal; word-wrap: break-word; }
+        .photo-box { position: absolute; top: 14px; right: 2px; box-sizing: border-box; width: 116.5px; height: 115px; padding: 22px 8px 0; overflow: hidden; border: 1px solid #000; font-size: 13px; line-height: 1.25; text-align: center; white-space: normal; word-wrap: break-word; }
         .official-title-table { width: 80%; margin-top: -5px; margin-left: 2%; border-collapse: collapse; table-layout: fixed; }
         .official-title-table td { padding: 9px 0 5px; border-top: 1px solid #000; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: bold; font-style: italic; text-align: center; }
         .section-header { width: 80%; margin-top: 8px; padding: 3px 0 4px; border: 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; font-style: italic; text-transform: uppercase; }

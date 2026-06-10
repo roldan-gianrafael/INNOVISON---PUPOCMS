@@ -1910,6 +1910,7 @@
     #issueModal .inventory-modal-head {
         align-items: stretch;
         gap: 16px;
+        position: relative;
     }
     #historyModal .inventory-modal-head {
         align-items: stretch;
@@ -1966,10 +1967,10 @@
     .restock-stock-frame-after .restock-frame-value {
         color: #facc15 !important;
     }
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
         #restockModal .inventory-modal-head,
         #issueModal .inventory-modal-head {
-            flex-wrap: wrap;
+            flex-direction: column;
         }
         #historyModal .inventory-modal-head {
             flex-wrap: wrap;
@@ -1979,9 +1980,53 @@
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
+            gap: 12px;
         }
         .restock-stock-frames {
-            flex: 1 1 auto;
+            flex: 0 1 auto;
+            gap: 8px;
+        }
+        .restock-stock-frame {
+            min-width: 90px;
+            padding: 10px 12px;
+        }
+        .restock-frame-label {
+            font-size: 9px;
+        }
+        .restock-frame-value {
+            font-size: 18px;
+        }
+    }
+
+    /* Close button fixed positioning for mobile */
+    #restockModal .inventory-modal-close,
+    #issueModal .inventory-modal-close {
+        position: absolute !important;
+        top: 16px !important;
+        right: 16px !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        flex: none !important;
+    }
+
+    /* Modal content scrollable on mobile */
+    @media (max-width: 768px) {
+        #restockModal .modal-box,
+        #issueModal .modal-box {
+            max-height: 95vh !important;
+            overflow-y: auto !important;
+        }
+
+        #restockModal .inventory-modal-body,
+        #issueModal .inventory-modal-body {
+            max-height: 80vh !important;
+            overflow-y: auto !important;
+        }
+
+        #restockModal .inventory-modal-head {
+            padding-top: 45px !important;
         }
     }
 

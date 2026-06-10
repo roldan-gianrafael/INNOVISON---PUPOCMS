@@ -1554,27 +1554,26 @@
         }
 
         /* MOBILE: Appointment Summary Table - Horizontal Scroll */
-        .appointments-table-wrap {
+        .card table,
+        .appointments-table,
+        table {
+            display: block !important;
             overflow-x: auto !important;
             -webkit-overflow-scrolling: touch;
+            width: 100% !important;
+            max-width: 100% !important;
         }
 
-        .appointments-table-wrap::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .appointments-table-wrap::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.05);
-            border-radius: 3px;
-        }
-
-        .appointments-table-wrap::-webkit-scrollbar-thumb {
-            background: #70131B;
-            border-radius: 3px;
-        }
-
+        .card table,
         .appointments-table {
-            min-width: 900px;
+            min-width: 1200px !important;
+        }
+
+        .card table thead,
+        .card table tbody,
+        .card table tr {
+            display: table !important;
+            width: 100% !important;
         }
 
         /* MOBILE: Modal Responsive */

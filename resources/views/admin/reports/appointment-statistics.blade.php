@@ -30,43 +30,68 @@
         line-height: 1.6;
     }
     .treatment-record-back {
+        min-width: 132px;
+        width: auto !important;
+        flex: 0 0 auto;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
         gap: 7px;
-        min-height: 43px;
-        padding: 9px 17px;
-        border: 1px solid #70131b;
-        border-radius: 6px;
-        background: #f1f5f9;
-        color: #70131b;
+        padding: 10px 16px;
+        border: 1px solid rgba(112, 19, 27, 0.3);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.96);
+        color: #70131B;
         font-size: 13px;
         font-weight: 800;
         text-decoration: none;
         white-space: nowrap;
-        transition: background-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease;
+        box-shadow: 0 0 0 2px rgba(112, 19, 27, 0.09), 0 10px 20px rgba(15, 23, 42, 0.08);
+        transition: color .08s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
+
+    .treatment-record-back::after {
+        content: "";
+        position: absolute;
+        top: -40%;
+        left: -130%;
+        width: 120%;
+        height: 180%;
+        background: linear-gradient(115deg, rgba(250, 204, 21, 0) 0%, rgba(250, 204, 21, 0.46) 45%, rgba(250, 204, 21, 0) 100%);
+        transform: skewX(-20deg);
+        transition: left 1.5s ease;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .treatment-record-back:hover::after {
+        left: 125%;
+    }
+
     .treatment-record-back:hover,
     .treatment-record-back:focus {
-        background: #e2e8f0;
-        color: #70131b;
-        transform: translateY(-1px);
-        box-shadow: 0 7px 16px rgba(112, 19, 27, .12);
+        color: #70131B;
+        border-color: rgba(112, 19, 27, 0.48);
+        background: #ffffff;
+        box-shadow: 0 0 0 2px rgba(112, 19, 27, 0.12), 0 12px 28px rgba(15, 23, 42, 0.12);
         outline: none;
     }
+
     .treatment-record-actions {
         display: flex;
         align-items: center;
         gap: 12px;
     }
-    .treatment-record-actions .treatment-filter-button,
-    .treatment-record-actions .treatment-record-back {
-        width: 150px;
-    }
+
     .treatment-record-back svg {
         width: 18px;
         height: 18px;
         transform: rotate(180deg);
+        position: relative;
+        z-index: 1;
     }
     .treatment-filter {
         display: flex;

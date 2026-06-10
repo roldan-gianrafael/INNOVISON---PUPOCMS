@@ -3912,6 +3912,370 @@
         border-color: #0284c7;
         box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.2);
     }
+
+    /* === MOBILE RESPONSIVE FIXES FOR WALK-IN MODAL === */
+    @media (max-width: 768px) {
+        /* Modal container adjustments */
+        .applicant-modal-backdrop {
+            padding: 16px 12px;
+        }
+
+        .applicant-modal-shell {
+            border-radius: 16px;
+            max-height: calc(100vh - 32px);
+        }
+
+        /* Header layout for mobile */
+        .applicant-modal-head {
+            flex-wrap: wrap;
+            padding: 14px 16px 12px;
+            gap: 10px;
+        }
+
+        .applicant-modal-head-main {
+            width: 100%;
+            gap: 12px;
+        }
+
+        .applicant-modal-head-badge {
+            width: 40px;
+            height: 40px;
+            font-size: 11px;
+        }
+
+        .applicant-modal-head-copy {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .applicant-modal-head h3 {
+            font-size: 0.95rem;
+        }
+
+        .applicant-modal-head p {
+            font-size: 11px;
+            max-width: 100%;
+        }
+
+        .applicant-modal-close {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            min-height: 36px;
+            flex: 0 0 36px;
+        }
+
+        /* Modal body padding adjustment */
+        .applicant-modal-body {
+            padding: 14px;
+            max-height: calc(100vh - 110px);
+        }
+
+        /* Modal grid layout for mobile */
+        .applicant-modal-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        /* Applicant lookup grid - single column */
+        .applicant-lookup-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .applicant-lookup-card {
+            padding: 12px;
+            gap: 10px;
+        }
+
+        .applicant-lookup-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            font-size: 11px;
+        }
+
+        .applicant-lookup-label {
+            font-size: 10px;
+        }
+
+        .applicant-lookup-value {
+            font-size: 13px;
+        }
+
+        /* Medical condition section - single column */
+        .applicant-medical-condition-section {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .applicant-screening-panel {
+            padding: 14px 16px;
+        }
+
+        .applicant-screening-panel-title {
+            font-size: 14px;
+            margin-bottom: 11px;
+        }
+
+        .applicant-screening-panel-copy {
+            font-size: 11px;
+            margin-bottom: 13px;
+        }
+
+        /* Vitals grid responsive */
+        .applicant-vitals-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        /* Findings options on mobile */
+        .applicant-findings-options {
+            grid-template-columns: 1fr;
+        }
+
+        .applicant-findings-option span {
+            min-height: 38px;
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        /* Form field adjustments */
+        .applicant-condition-field {
+            gap: 5px;
+        }
+
+        .applicant-condition-field label {
+            font-size: 12px;
+        }
+
+        .applicant-condition-input,
+        .applicant-condition-textarea {
+            padding: 9px 11px;
+            font-size: 13px;
+        }
+
+        .applicant-condition-toggle-text {
+            font-size: 13px;
+        }
+
+        /* File actions - single column */
+        .applicant-file-actions {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        /* Reference actions - stacked */
+        .applicant-ref-actions {
+            grid-template-columns: 1fr;
+            gap: 9px;
+        }
+
+        .applicant-ref-action-btn {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 13px;
+            min-height: 42px;
+        }
+
+        /* Upload button full width */
+        .applicant-upload-btn,
+        .applicant-ref-toggle-btn,
+        .applicant-documents-trigger {
+            width: 100%;
+        }
+
+        .applicant-upload-btn {
+            min-height: 44px;
+            padding: 11px 14px;
+            font-size: 13px;
+        }
+
+        .applicant-documents-trigger {
+            min-height: 44px;
+            font-size: 13px;
+            padding: 11px 14px;
+        }
+
+        .applicant-upload-note {
+            font-size: 11px;
+        }
+
+        /* Reference lookup section */
+        .applicant-ref-mode {
+            gap: 12px;
+        }
+
+        .applicant-ref-copy h4 {
+            font-size: 14px;
+        }
+
+        .applicant-ref-copy p {
+            font-size: 12px;
+        }
+
+        .applicant-ref-instruction {
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .applicant-ref-field label {
+            font-size: 12px;
+        }
+
+        .applicant-ref-input {
+            padding: 9px 11px;
+            font-size: 13px;
+        }
+
+        /* OCR result panel adjustments */
+        .applicant-ref-result {
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .applicant-ref-result strong {
+            font-size: 14px;
+        }
+
+        /* Status message sizing */
+        .ocr-status {
+            padding: 10px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* Documents workspace for mobile */
+        .applicant-documents-workspace {
+            grid-template-columns: 1fr;
+            height: auto;
+            min-height: auto;
+            gap: 12px;
+        }
+
+        .applicant-documents-sidebar {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .applicant-documents-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .applicant-document-card {
+            padding: 10px;
+        }
+
+        /* Upload preview adjustments */
+        .applicant-upload-preview-container {
+            max-height: 300px;
+        }
+
+        /* Preview buttons sizing */
+        .applicant-preview-btn {
+            padding: 7px 11px;
+            font-size: 11px;
+            gap: 5px;
+        }
+
+        .applicant-preview-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        /* Extra tight mobile devices */
+        .applicant-modal-backdrop {
+            padding: 12px 10px;
+        }
+
+        .applicant-modal-shell {
+            border-radius: 14px;
+            max-height: calc(100vh - 24px);
+        }
+
+        .applicant-modal-head {
+            padding: 12px 14px 10px;
+        }
+
+        .applicant-modal-head-badge {
+            width: 38px;
+            height: 38px;
+        }
+
+        .applicant-modal-body {
+            padding: 12px;
+            max-height: calc(100vh - 100px);
+        }
+
+        .applicant-lookup-card {
+            padding: 10px;
+        }
+
+        .applicant-screening-panel {
+            padding: 12px 14px;
+        }
+
+        .applicant-condition-input,
+        .applicant-condition-textarea {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        .applicant-ref-action-btn {
+            padding: 10px 12px;
+            font-size: 12px;
+            min-height: 40px;
+        }
+
+        .applicant-upload-btn,
+        .applicant-documents-trigger {
+            min-height: 40px;
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+
+        .applicant-documents-sidebar {
+            max-height: 250px;
+        }
+
+        .applicant-documents-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+    }
+
+    /* Dark mode mobile adjustments */
+    @media (max-width: 768px) {
+        html[data-theme="dark"] .applicant-modal-shell {
+            background: linear-gradient(180deg, rgba(17,24,39,0.98), rgba(20,23,30,0.98));
+        }
+
+        html[data-theme="dark"] .applicant-lookup-card {
+            background: linear-gradient(135deg, rgba(30,41,59,0.8) 0%, rgba(15,23,42,0.8) 100%);
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+
+        html[data-theme="dark"] .applicant-lookup-card:hover {
+            border-color: rgba(250, 204, 21, 0.3);
+            background: linear-gradient(135deg, rgba(40,60,80,0.9) 0%, rgba(25,35,55,0.9) 100%);
+        }
+
+        html[data-theme="dark"] .applicant-condition-input,
+        html[data-theme="dark"] .applicant-condition-textarea {
+            background: rgba(30, 41, 59, 0.85);
+            border-color: rgba(148, 163, 184, 0.2);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="dark"] .applicant-ref-input {
+            background: rgba(30, 41, 59, 0.85);
+            border-color: rgba(148, 163, 184, 0.2);
+            color: #e2e8f0;
+        }
+    }
 </style>
 @endpush
 

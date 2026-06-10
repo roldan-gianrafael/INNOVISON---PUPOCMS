@@ -312,12 +312,12 @@
 
     /* MOBILE RESPONSIVE FIXES */
     @media (max-width: 768px) {
-        /* Reports Page Buttons - Responsive Layout */
+        /* Reports Page Buttons - Stack Vertically on Mobile */
         .reports-actions,
         .action-buttons,
         .control-buttons {
             display: flex !important;
-            flex-wrap: wrap !important;
+            flex-direction: column !important;
             gap: 8px !important;
             margin: 10px 0 !important;
         }
@@ -325,19 +325,13 @@
         .reports-actions button,
         .action-buttons button,
         .control-buttons button {
-            flex: 1 1 calc(50% - 4px) !important;
-            min-width: 80px !important;
-            padding: 8px 10px !important;
-            font-size: 12px !important;
-            min-height: 36px !important;
+            width: 100% !important;
+            padding: 10px 12px !important;
+            font-size: 13px !important;
+            min-height: 40px !important;
             white-space: normal !important;
             word-break: break-word !important;
-        }
-
-        /* Make buttons full width on extra small screens */
-        .reports-actions button:only-child,
-        .action-buttons button:only-child {
-            flex: 1 1 100% !important;
+            flex: none !important;
         }
 
         /* Manage MAR Buttons - Mobile Wrap */

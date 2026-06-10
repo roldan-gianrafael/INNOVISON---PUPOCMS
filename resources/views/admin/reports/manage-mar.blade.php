@@ -378,7 +378,7 @@
     html[data-theme="dark"] input[type="datetime-local"],
     html[data-theme="dark"] .date-field {
         background: rgba(18, 18, 18, 0.7) !important;
-        color: #f8fafc !important;
+        color: #000000 !important;
         border: 2px solid rgba(255, 255, 255, 0.16) !important;
         padding: 10px 12px !important;
         font-size: 14px !important;
@@ -451,6 +451,30 @@
 
     html[data-theme="dark"] table tbody tr:hover {
         background: rgba(59, 24, 33, 0.5) !important;
+    }
+
+    /* MAR Categories Dark Mode - Fixed Background & No Hover */
+    html[data-theme="dark"] .manage-category-option {
+        background: rgba(35, 17, 25, 0.96) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        box-shadow: none !important;
+    }
+
+    html[data-theme="dark"] .manage-category-option:hover {
+        transform: none !important;
+        background: rgba(35, 17, 25, 0.96) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        box-shadow: none !important;
+    }
+
+    html[data-theme="dark"] .manage-category-option.is-selected {
+        transform: none !important;
+        background: rgba(35, 17, 25, 0.96) !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        box-shadow: none !important;
     }
 
 </style>

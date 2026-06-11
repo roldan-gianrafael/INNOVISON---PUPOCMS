@@ -1380,7 +1380,7 @@
                         </div>
                         <div class="reference-panel">
                             <small>Reference Number</small>
-                            <strong>{{ $displayReferenceNumber !== '' ? $displayReferenceNumber : 'Pending' }}</strong>
+                            <strong>{{ $displayReferenceNumber !== '' ? $displayReferenceNumber : 'No Reference Found' }}</strong>
                         </div>
                     </div>
 
@@ -1391,7 +1391,7 @@
                             <li>Complete every required field in Personal Information using accurate and current details.</li>
                             <li>Answer the Medical History, allergy, disability, smoking, and alcohol questions truthfully.</li>
                             <li>Provide your COVID-19 vaccination status and dose details, when applicable.</li>
-                            <li>Prepare clear PDF copies of your medical certificate and official chest X-ray report.</li>
+                            <li>Prepare clear PDF or image copies of your medical certificate and official chest X-ray report.</li>
                             <li>If you are a PWD, upload your PWD ID in Step 5. Upload your formal 2x2 photo as JPG or PNG.</li>
                         </ol>
                     </div>

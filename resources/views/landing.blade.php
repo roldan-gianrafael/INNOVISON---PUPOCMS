@@ -1022,7 +1022,9 @@
         $landingStudentUser = Auth::guard('student')->user();
         $landingStudentUserType = strtolower(trim((string) ($landingStudentUser->user_type ?? '')));
         $landingStudentRawRole = strtolower(trim((string) ($landingStudentUser->user_role ?? '')));
+        $landingStudentNormalizedRole = \App\Models\User::normalizeRole($landingStudentRawRole);
         $landingIsStudentAssistant = $landingStudentUser
+            && $landingStudentNormalizedRole === \App\Models\User::ROLE_ADMIN
             && (
                 in_array($landingStudentUserType, ['assistant', 'student assistant', 'student_assistant'], true)
                 || in_array($landingStudentRawRole, ['student_assistant', 'studentassistant', 'assistant'], true)

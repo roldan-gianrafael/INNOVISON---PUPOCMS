@@ -18,6 +18,18 @@
             @endif
         </select>
     </div>
+    @if(($managementView ?? '') === 'admin-hub')
+        <div class="um-field" id="adminOfficeWrap">
+            <label for="detailOffice">Department / Office</label>
+            <input
+                type="text"
+                name="office"
+                id="detailOffice"
+                placeholder="Enter department or office"
+                maxlength="255"
+            >
+        </div>
+    @endif
     <input type="hidden" name="email" id="detailEditEmail">
     <div class="um-field">
         <label>Status</label>

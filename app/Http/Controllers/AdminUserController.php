@@ -957,9 +957,16 @@ class AdminUserController extends Controller
         $normalizedRole = User::normalizeRole($rawRole);
         $userType = strtolower(trim((string) ($user->user_type ?? '')));
 
+        if ($normalizedRole === User::ROLE_SUPERADMIN) {
+            return 'superadmin';
+        }
+
         if (
             in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)
-            || in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+            || (
+                $normalizedRole === User::ROLE_ADMIN
+                && in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+            )
         ) {
             return 'student_assistant';
         }
@@ -987,9 +994,16 @@ class AdminUserController extends Controller
         $normalizedRole = User::normalizeRole($rawRole);
         $userType = strtolower(trim((string) ($user->user_type ?? '')));
 
+        if ($normalizedRole === User::ROLE_SUPERADMIN) {
+            return 'Super Admin';
+        }
+
         if (
             in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)
-            || in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+            || (
+                $normalizedRole === User::ROLE_ADMIN
+                && in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+            )
         ) {
             return 'Admin - Student Assistant';
         }

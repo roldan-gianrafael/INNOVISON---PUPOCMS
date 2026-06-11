@@ -272,6 +272,10 @@ class LoginController extends Controller
 
     private function isStudentAssistantAccount(User $user): bool
     {
+        if (User::normalizeRole((string) $user->user_role) !== User::ROLE_ADMIN) {
+            return false;
+        }
+
         $userType = strtolower(trim((string) ($user->user_type ?? '')));
 
         return in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true);
@@ -1137,8 +1141,15 @@ class LoginController extends Controller
                 $existingUser->password = Hash::make(Str::random(40));
             }
 
-            if ($this->usersTableHasUserTypeColumn() && empty($existingUser->user_type)) {
-                $existingUser->user_type = User::normalizeRole($role) === User::normalizeRole($this->studentRoleValue()) ? 'Regular' : 'Assistant';
+            if ($this->usersTableHasUserTypeColumn()) {
+                $normalizedLocalRole = User::normalizeRole($role);
+                if ($normalizedLocalRole === User::ROLE_SUPERADMIN) {
+                    $existingUser->user_type = 'Regular';
+                } elseif (empty($existingUser->user_type)) {
+                    $existingUser->user_type = $normalizedLocalRole === User::normalizeRole($this->studentRoleValue())
+                        ? 'Regular'
+                        : 'Assistant';
+                }
             }
 
             $existingUser->save();
@@ -1173,7 +1184,11 @@ class LoginController extends Controller
         $user = User::create($newUserAttributes);
 
         if ($this->usersTableHasUserTypeColumn() && empty($user->user_type)) {
-            $user->user_type = User::normalizeRole($role) === User::normalizeRole($this->studentRoleValue()) ? 'Regular' : 'Assistant';
+            $normalizedLocalRole = User::normalizeRole($role);
+            $user->user_type = $normalizedLocalRole === User::ROLE_SUPERADMIN
+                || $normalizedLocalRole === User::normalizeRole($this->studentRoleValue())
+                ? 'Regular'
+                : 'Assistant';
             $user->save();
         }
 

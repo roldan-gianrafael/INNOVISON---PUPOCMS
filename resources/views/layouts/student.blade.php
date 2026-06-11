@@ -1905,7 +1905,9 @@
                 @php
                     $studentLayoutUser = auth()->user();
                     $studentLayoutUserType = strtolower(trim((string) ($studentLayoutUser->user_type ?? '')));
-                    $isStudentAssistantPortalUser = in_array($studentLayoutUserType, ['assistant', 'student assistant', 'student_assistant'], true);
+                    $studentLayoutRole = \App\Models\User::normalizeRole($studentLayoutUser->user_role ?? '');
+                    $isStudentAssistantPortalUser = $studentLayoutRole === \App\Models\User::ROLE_ADMIN
+                        && in_array($studentLayoutUserType, ['assistant', 'student assistant', 'student_assistant'], true);
                     $isMyAccountSection = Request::is('student/account') || Request::is('student/history') || Request::is('student/barcode-register');
                     $studentAllNotifications = collect($notifications ?? [])->values();
                     $studentUnreadNotifications = $studentAllNotifications

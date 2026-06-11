@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
         ];
 
         if (Schema::hasColumn('users', 'user_type')) {
-            $payload['user_type'] = 'Assistant';
+            $payload['user_type'] = 'Regular';
         }
 
         User::query()->updateOrCreate(

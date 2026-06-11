@@ -1621,14 +1621,14 @@
         const normalizedRole = (() => {
             const raw = (row.dataset.role || 'student').toLowerCase();
             const source = (row.dataset.source || '').toLowerCase();
+            if (raw === 'superadmin' || raw === 'super_admin' || source === 'superadmin') {
+                return 'super_admin';
+            }
             if (source === 'student_assistant') {
                 return 'student_assistant';
             }
             if (raw === 'student_assistant' || raw === 'studentassistant' || raw === 'assistant') {
                 return 'student_assistant';
-            }
-            if (raw === 'superadmin' || raw === 'super_admin') {
-                return 'super_admin';
             }
             return 'admin_clinic_staff';
         })();

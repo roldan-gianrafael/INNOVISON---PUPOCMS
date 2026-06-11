@@ -84,6 +84,10 @@ class AdminController extends Controller
 
     private function isStudentAssistantAccount(User $user): bool
     {
+        if (User::normalizeRole((string) $user->user_role) !== User::ROLE_ADMIN) {
+            return false;
+        }
+
         $userType = strtolower(trim((string) ($user->user_type ?? '')));
         return in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true);
     }

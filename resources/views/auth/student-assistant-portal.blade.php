@@ -410,8 +410,11 @@
         $normalizedUserRole = \App\Models\User::normalizeRole($user->user_role ?? '');
         $rawUserRole = strtolower(trim((string) ($user->user_role ?? '')));
         $userType = strtolower(trim((string) ($user->user_type ?? '')));
-        $isStudentAssistant = in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
-            || in_array($rawUserRole, ['student_assistant', 'studentassistant', 'assistant'], true);
+        $isStudentAssistant = $normalizedUserRole === \App\Models\User::ROLE_ADMIN
+            && (
+                in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+                || in_array($rawUserRole, ['student_assistant', 'studentassistant', 'assistant'], true)
+            );
         $showStudentWorkspace = $isStudentAssistant || $normalizedUserRole === \App\Models\User::ROLE_STUDENT;
         $showAdminWorkspace = $isStudentAssistant
             || in_array($normalizedUserRole, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPERADMIN], true);

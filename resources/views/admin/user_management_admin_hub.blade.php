@@ -1186,7 +1186,7 @@
                     <div class="um-settings-card-head">
                         <div>
                             <h4>Admin Hub Configuration</h4>
-                            <p>Manage the Admin Hub role, login email, office, and status.</p>
+                            <p>Manage the shared directory role, department or office, and status.</p>
                         </div>
                         <span class="um-settings-card-badge">AH</span>
                     </div>

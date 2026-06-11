@@ -1,14 +1,22 @@
 <div class="um-section-block account-access" id="accountAccessSection">
-    <div class="um-section-kicker">Users Table</div>
-    <h4 class="um-section-title">Account Access</h4>
-    <p class="um-section-copy">This controls the clinic login role, the student-side email, and whether the account can enter the clinic system.</p>
+    <div class="um-section-kicker">{{ ($managementView ?? '') === 'admin-hub' ? 'Admins Table' : 'Users Table' }}</div>
+    <h4 class="um-section-title">{{ ($managementView ?? '') === 'admin-hub' ? 'Admin Hub Access' : 'Account Access' }}</h4>
+    <p class="um-section-copy">
+        {{ ($managementView ?? '') === 'admin-hub'
+            ? 'Assign designee or super administrator access inside the clinic Admin Hub.'
+            : 'Assign clinic staff, Student Assistant, or super administrator access to this account.' }}
+    </p>
     <div class="um-field">
-        <label>Clinic Role</label>
+        <label>{{ ($managementView ?? '') === 'admin-hub' ? 'Admin Hub Role' : 'Clinic Role' }}</label>
         <select name="user_role" id="detailRole">
-            <option value="student">Student</option>
-            <option value="student_assistant">Student Assistant</option>
-            <option value="admin">Admin</option>
-            <option value="super_admin">Super Admin</option>
+            @if(($managementView ?? '') === 'admin-hub')
+                <option value="admin_designee">Admin - Designee</option>
+                <option value="super_admin">Super Admin</option>
+            @else
+                <option value="admin_clinic_staff">Admin - Clinic Staff</option>
+                <option value="student_assistant">Admin - Student Assistant</option>
+                <option value="super_admin">Super Admin</option>
+            @endif
         </select>
     </div>
     <div class="um-field">

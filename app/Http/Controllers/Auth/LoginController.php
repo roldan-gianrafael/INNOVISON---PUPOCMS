@@ -1064,7 +1064,11 @@ class LoginController extends Controller
             'user.role',
             'data.user.role',
         ]);
-        $role = $this->mapIdpRolesToLocal($this->extractRawRoles($profile), $preferredRole);
+        $rawIdpRoles = $this->extractRawRoles($profile);
+        $rawIdpRole = $preferredRole ?: ($rawIdpRoles[0] ?? 'student');
+        $idpRole = $this->normalizeIdpRoleToken((string) $rawIdpRole);
+        $idpRole = $idpRole !== '' ? $idpRole : 'student';
+        $role = $this->mapIdpRolesToLocal($rawIdpRoles, $preferredRole);
         $forcedRole = $this->resolveForcedLocalRole($emailSeed);
         if ($forcedRole !== null) {
             $role = $forcedRole;
@@ -1110,6 +1114,9 @@ class LoginController extends Controller
                 $existingUser->last_name,
             ])));
             $existingUser->user_role = $role;
+            if (Schema::hasColumn('users', 'idp_role')) {
+                $existingUser->idp_role = $idpRole;
+            }
 
             $shouldUpdateStudentId = trim((string) $existingUser->student_id) === '' || Str::startsWith(strtolower((string) $existingUser->student_id), 'idp-');
             if ($studentIdSeed !== '' && $shouldUpdateStudentId) {
@@ -1144,7 +1151,7 @@ class LoginController extends Controller
             $normalizedEmailSeed !== '' ? $normalizedEmailSeed : ($studentId . '@idp.local')
         );
 
-        $user = User::create([
+        $newUserAttributes = [
             'student_id' => $studentId,
             'student_number' => $studentNumberSeed !== '' ? $studentNumberSeed : null,
             'reference_number' => $referenceNumberSeed !== '' ? $referenceNumberSeed : null,
@@ -1159,7 +1166,11 @@ class LoginController extends Controller
             'email' => $email,
             'user_role' => $role,
             'password' => Hash::make(Str::random(40)),
-        ]);
+        ];
+        if (Schema::hasColumn('users', 'idp_role')) {
+            $newUserAttributes['idp_role'] = $idpRole;
+        }
+        $user = User::create($newUserAttributes);
 
         if ($this->usersTableHasUserTypeColumn() && empty($user->user_type)) {
             $user->user_type = User::normalizeRole($role) === User::normalizeRole($this->studentRoleValue()) ? 'Regular' : 'Assistant';

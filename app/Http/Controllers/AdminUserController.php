@@ -127,9 +127,14 @@ class AdminUserController extends Controller
     public function update(Request $request, User $user)
     {
         $this->ensureCanManageUsers();
+        $managementView = trim((string) $request->input('management_view', 'account-access'));
+        $allowedRoles = $managementView === 'admin-hub'
+            ? ['admin_designee', 'super_admin']
+            : ['admin_clinic_staff', 'student_assistant', 'super_admin'];
 
         $request->validate([
-            'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
+            'management_view' => ['nullable', Rule::in(['account-access', 'admin-hub'])],
+            'user_role' => ['required', Rule::in($allowedRoles)],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'admin_email' => ['nullable', 'email', 'max:255'],
@@ -144,12 +149,20 @@ class AdminUserController extends Controller
         $originalRole = $user->user_role;
         $originalStatus = $user->status ?? 'active';
         $requestedRoleRaw = strtolower(trim((string) $request->user_role));
-        $usesSeparateAdminEmail = in_array($requestedRoleRaw, ['student_assistant', 'studentassistant', 'assistant'], true);
-        $normalizedRequestedRole = User::normalizeRole($request->user_role);
+        $roleAssignment = $this->resolveClinicRoleAssignment($requestedRoleRaw);
+        $usesSeparateAdminEmail = $roleAssignment['user_type'] === 'Assistant';
+        $normalizedRequestedRole = $roleAssignment['user_role'];
 
+        if (
+            Schema::hasColumn('users', 'idp_role')
+            && trim((string) $user->idp_role) === ''
+            && !in_array(User::normalizeRole($originalRole), [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true)
+        ) {
+            $user->idp_role = trim((string) $originalRole) !== '' ? $originalRole : User::ROLE_STUDENT;
+        }
         $user->user_role = $normalizedRequestedRole;
         if (Schema::hasColumn('users', 'user_type')) {
-            $user->user_type = $usesSeparateAdminEmail ? 'Assistant' : 'Regular';
+            $user->user_type = $roleAssignment['user_type'];
         }
         $user->email = trim((string) $request->email);
         $adminLoginEmail = trim((string) $request->admin_email);
@@ -186,11 +199,7 @@ class AdminUserController extends Controller
                 $linkedAdmin->name = $user->name;
             }
             if (Admin::hasColumn('access_level')) {
-                $linkedAdmin->access_level = match ($normalizedRequestedRole) {
-                    User::ROLE_SUPERADMIN => 'superadmin',
-                    User::ROLE_ADMIN => $request->filled('access_level') ? $request->access_level : 'clinic_staff',
-                    default => null,
-                };
+                $linkedAdmin->access_level = $roleAssignment['access_level'];
             }
             if (Admin::hasColumn('status')) {
                 $linkedAdmin->status = $request->status;
@@ -235,11 +244,15 @@ class AdminUserController extends Controller
     public function storeFromLookup(Request $request)
     {
         $this->ensureCanManageUsers();
+        $managementView = trim((string) $request->input('management_view', 'account-access'));
+        $allowedRoles = $managementView === 'admin-hub'
+            ? ['admin_designee', 'super_admin']
+            : ['admin_clinic_staff', 'student_assistant', 'super_admin'];
 
         $request->validate([
             'lookup_source' => ['required', Rule::in(['faculty'])],
             'management_view' => ['nullable', Rule::in(['account-access', 'admin-hub'])],
-            'user_role' => ['required', Rule::in(['student', 'student_assistant', 'admin', 'superadmin', 'super_admin'])],
+            'user_role' => ['required', Rule::in($allowedRoles)],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'email' => ['required', 'email', 'max:255'],
             'admin_email' => ['nullable', 'email', 'max:255'],
@@ -251,12 +264,12 @@ class AdminUserController extends Controller
             'external_identifier' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $normalizedRequestedRole = User::normalizeRole($request->user_role);
         $requestedRoleRaw = strtolower(trim((string) $request->user_role));
-        $usesSeparateAdminEmail = in_array($requestedRoleRaw, ['student_assistant', 'studentassistant', 'assistant'], true);
+        $roleAssignment = $this->resolveClinicRoleAssignment($requestedRoleRaw);
+        $normalizedRequestedRole = $roleAssignment['user_role'];
+        $usesSeparateAdminEmail = $roleAssignment['user_type'] === 'Assistant';
         $baseEmail = trim((string) $request->email);
 
-        $managementView = trim((string) $request->input('management_view', 'account-access'));
         $firstName = trim((string) $request->input('first_name', ''));
         $middleName = trim((string) $request->input('middle_name', ''));
         $lastName = trim((string) $request->input('last_name', ''));
@@ -298,7 +311,7 @@ class AdminUserController extends Controller
                 $linkedAdmin->external_identifier = $externalIdentifier !== '' ? $externalIdentifier : null;
             }
             if (Admin::hasColumn('access_level')) {
-                $linkedAdmin->access_level = 'designee';
+                $linkedAdmin->access_level = $roleAssignment['access_level'];
             }
             if (Admin::hasColumn('status')) {
                 $linkedAdmin->status = $request->status;
@@ -311,10 +324,11 @@ class AdminUserController extends Controller
             $this->logUserManagementAction(
                 'Added admin hub profile from lookup',
                 sprintf(
-                    'Added %s (%s) from %s lookup into the clinic admin hub as designee only.',
+                    'Added %s (%s) from %s lookup into the clinic admin hub with %s access.',
                     $linkedAdmin->name ?? $adminEmail,
                     $adminEmail,
-                    $request->lookup_source
+                    $request->lookup_source,
+                    $roleAssignment['access_level']
                 )
             );
 
@@ -337,11 +351,20 @@ class AdminUserController extends Controller
             $user->name = $fullName !== '' ? $fullName : trim($user->first_name . ' ' . $user->last_name);
             $user->email = $baseEmail;
             $user->password = bcrypt(\Illuminate\Support\Str::random(40));
+            if (Schema::hasColumn('users', 'idp_role')) {
+                $user->idp_role = 'faculty';
+            }
+        } elseif (
+            Schema::hasColumn('users', 'idp_role')
+            && trim((string) $user->idp_role) === ''
+            && !in_array(User::normalizeRole((string) $user->user_role), [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true)
+        ) {
+            $user->idp_role = trim((string) $user->user_role) !== '' ? $user->user_role : 'faculty';
         }
 
         $user->user_role = $normalizedRequestedRole;
         if (Schema::hasColumn('users', 'user_type')) {
-            $user->user_type = $usesSeparateAdminEmail ? 'Assistant' : 'Regular';
+            $user->user_type = $roleAssignment['user_type'];
         }
         if (Schema::hasColumn('users', 'status')) {
             $user->status = $request->status;
@@ -377,11 +400,7 @@ class AdminUserController extends Controller
                     : $user->email;
             }
             if (Admin::hasColumn('access_level')) {
-                $linkedAdmin->access_level = match ($normalizedRequestedRole) {
-                    User::ROLE_SUPERADMIN => 'superadmin',
-                    User::ROLE_ADMIN => $request->filled('access_level') ? $request->access_level : 'clinic_staff',
-                    default => null,
-                };
+                $linkedAdmin->access_level = $roleAssignment['access_level'];
             }
             if (Admin::hasColumn('status')) {
                 $linkedAdmin->status = $request->status;
@@ -411,6 +430,7 @@ class AdminUserController extends Controller
         $this->ensureCanManageUsers();
 
         $request->validate([
+            'user_role' => ['required', Rule::in(['admin_designee', 'super_admin'])],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'admin_email' => ['required', 'email', 'max:255'],
             'office' => ['nullable', 'string', 'max:255'],
@@ -448,9 +468,35 @@ class AdminUserController extends Controller
             $admin->office = $request->input('office');
         }
         if (Admin::hasColumn('access_level')) {
-            $admin->access_level = 'designee';
+            $admin->access_level = $request->input('user_role') === 'super_admin' ? 'superadmin' : 'designee';
         }
         $admin->save();
+
+        if (Admin::hasColumn('user_id') && $admin->user_id) {
+            $linkedUser = User::find($admin->user_id);
+            if ($linkedUser) {
+                if (
+                    Schema::hasColumn('users', 'idp_role')
+                    && trim((string) $linkedUser->idp_role) === ''
+                    && !in_array(
+                        User::normalizeRole((string) $linkedUser->user_role),
+                        [User::ROLE_ADMIN, User::ROLE_SUPERADMIN],
+                        true
+                    )
+                ) {
+                    $linkedUser->idp_role = trim((string) $linkedUser->user_role) !== ''
+                        ? $linkedUser->user_role
+                        : User::ROLE_STUDENT;
+                }
+                $linkedUser->user_role = $request->input('user_role') === 'super_admin'
+                    ? User::ROLE_SUPERADMIN
+                    : User::ROLE_ADMIN;
+                if (Schema::hasColumn('users', 'user_type')) {
+                    $linkedUser->user_type = 'Regular';
+                }
+                $linkedUser->save();
+            }
+        }
 
         $this->logUserManagementAction(
             'Updated admin hub profile',
@@ -468,6 +514,10 @@ class AdminUserController extends Controller
     {
         $this->ensureCanManageUsers();
 
+        $linkedUser = Admin::hasColumn('user_id') && $admin->user_id
+            ? User::find($admin->user_id)
+            : null;
+
         if (Admin::hasColumn('access_level')) {
             $admin->access_level = null;
         }
@@ -475,6 +525,18 @@ class AdminUserController extends Controller
             $admin->status = 'active';
         }
         $admin->save();
+
+        if ($linkedUser) {
+            $restoredRole = trim((string) ($linkedUser->idp_role ?? ''));
+            if ($restoredRole === '') {
+                $restoredRole = User::ROLE_STUDENT;
+            }
+            $linkedUser->user_role = User::normalizeRole($restoredRole);
+            if (Schema::hasColumn('users', 'user_type')) {
+                $linkedUser->user_type = $this->defaultUserTypeForIdpRole($restoredRole);
+            }
+            $linkedUser->save();
+        }
 
         $this->logUserManagementAction(
             'Removed admin hub access',
@@ -485,7 +547,7 @@ class AdminUserController extends Controller
             )
         );
 
-        return $this->redirectToManagementView($request, 'success', 'Admin Hub access removed successfully.');
+        return $this->redirectToManagementView($request, 'success', 'Admin Hub access removed successfully. The original IDP role has been restored.');
     }
 
     public function deleteAdminHubRecord(Request $request, Admin $admin)
@@ -521,9 +583,13 @@ class AdminUserController extends Controller
         $originalStatus = $user->status ?? 'active';
         $adminProfileId = trim((string) request()->input('admin_profile_id', ''));
 
-        $user->user_role = User::ROLE_STUDENT;
+        $restoredRole = trim((string) ($user->idp_role ?? ''));
+        if ($restoredRole === '') {
+            $restoredRole = User::ROLE_STUDENT;
+        }
+        $user->user_role = User::normalizeRole($restoredRole);
         if (Schema::hasColumn('users', 'user_type')) {
-            $user->user_type = 'Regular';
+            $user->user_type = $this->defaultUserTypeForIdpRole($restoredRole);
         }
         if (Schema::hasColumn('users', 'status')) {
             $user->status = 'active';
@@ -557,14 +623,15 @@ class AdminUserController extends Controller
         $this->logUserManagementAction(
             'Removed user access',
             sprintf(
-                'Removed elevated access for %s (%s) and reset role from %s to student.',
+                'Removed elevated access for %s (%s) and restored role from %s to %s.',
                 $user->name ?? $user->email,
                 $user->email,
-                $originalRole
+                $originalRole,
+                $user->user_role
             )
         );
 
-        return $this->redirectToManagementView($request, 'success', 'User access removed successfully. The account is now back to the default student role.');
+        return $this->redirectToManagementView($request, 'success', 'User access removed successfully. The original IDP role has been restored.');
     }
 
     private function collectLocalUsers(string $search): array
@@ -743,7 +810,7 @@ class AdminUserController extends Controller
         $query = Admin::query();
 
         if (Admin::hasColumn('access_level')) {
-            $query->where('access_level', 'designee');
+            $query->whereIn('access_level', ['designee', 'superadmin']);
         }
 
         if ($search !== '') {
@@ -777,6 +844,7 @@ class AdminUserController extends Controller
                     : ($normalizedName !== '' && isset($facultyByName[$normalizedName]) ? $facultyByName[$normalizedName] : null);
                 $facultyIdentifier = trim((string) ($matchedFaculty['student_id'] ?? ''));
                 $status = strtolower(trim((string) ($admin->status ?? 'active')));
+                $accessLevel = strtolower(trim((string) ($admin->access_level ?? 'designee')));
                 if ($status === '') {
                     $status = 'active';
                 }
@@ -795,9 +863,9 @@ class AdminUserController extends Controller
                     'last_name' => (string) ($admin->last_name ?? ''),
                     'student_id' => $resolvedIdentifier,
                     'email' => $email,
-                    'role' => 'Admin - Designee',
-                    'raw_role' => 'admin',
-                    'normalized_role' => User::ROLE_ADMIN,
+                    'role' => $accessLevel === 'superadmin' ? 'Super Admin' : 'Admin - Designee',
+                    'raw_role' => $accessLevel === 'superadmin' ? 'super_admin' : 'admin_designee',
+                    'normalized_role' => $accessLevel === 'superadmin' ? User::ROLE_SUPERADMIN : User::ROLE_ADMIN,
                     'status' => $status === 'inactive' ? 'inactive' : 'active',
                     'avatar_url' => null,
                     'avatar_letter' => strtoupper(substr($displayName !== '' ? $displayName : ($email ?: 'A'), 0, 1)),
@@ -808,7 +876,7 @@ class AdminUserController extends Controller
                     'delete_admin_hub_url' => route('admin.user-management.admin-hub.delete-record', $admin->admin_id),
                     'meta' => [
                         'email' => $email,
-                        'access_level' => 'designee',
+                        'access_level' => $accessLevel,
                         'admin_login_email' => $email,
                         'admin_profile_id' => $admin->admin_id,
                         'admin_profile_name' => $displayName,
@@ -974,6 +1042,39 @@ class AdminUserController extends Controller
     {
         $current = Auth::user();
         abort_unless($current && User::normalizeRole((string) ($current->user_role ?? '')) === User::ROLE_SUPERADMIN, 403);
+    }
+
+    private function resolveClinicRoleAssignment(string $requestedRole): array
+    {
+        return match (strtolower(trim($requestedRole))) {
+            'student_assistant' => [
+                'user_role' => User::ROLE_ADMIN,
+                'user_type' => 'Assistant',
+                'access_level' => 'clinic_staff',
+            ],
+            'admin_designee' => [
+                'user_role' => User::ROLE_ADMIN,
+                'user_type' => 'Regular',
+                'access_level' => 'designee',
+            ],
+            'super_admin', 'superadmin' => [
+                'user_role' => User::ROLE_SUPERADMIN,
+                'user_type' => 'Regular',
+                'access_level' => 'superadmin',
+            ],
+            default => [
+                'user_role' => User::ROLE_ADMIN,
+                'user_type' => 'Regular',
+                'access_level' => 'clinic_staff',
+            ],
+        };
+    }
+
+    private function defaultUserTypeForIdpRole(string $idpRole): string
+    {
+        return in_array(strtolower(trim($idpRole)), ['student_assistant', 'studentassistant', 'assistant'], true)
+            ? 'Assistant'
+            : 'Regular';
     }
 
     private function logUserManagementAction(string $action, string $description): void

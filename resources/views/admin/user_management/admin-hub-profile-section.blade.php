@@ -8,13 +8,6 @@
             No linked admin hub record yet. One will be created when you save an admin-side role.
         </div>
     </div>
-    <div class="um-field" id="accessLevelWrap">
-        <label id="detailAccessLevelLabel">Admin Type</label>
-        <select name="access_level" id="detailAccessLevel">
-            <option value="clinic_staff">Clinic Staff</option>
-            <option value="designee">Designee</option>
-        </select>
-    </div>
     <div class="um-field" id="adminEmailWrap">
         <label>Admin Login Email</label>
         <input type="email" name="admin_email" id="detailAdminEmail" placeholder="Enter admin-side login email">

@@ -855,6 +855,238 @@
         color: #475569;
     }
 
+    /* Reference Lookup modal language */
+    .um-modal-content {
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.62);
+        border-bottom: 4px solid #70131b;
+        border-radius: 24px;
+        background: #ffffff;
+    }
+
+    .um-modal-head {
+        align-items: center;
+        padding: 18px 20px !important;
+        border-bottom: 0;
+        background: linear-gradient(135deg, #7f1d1d, #991b1b 55%, #b91c1c);
+        color: #ffffff;
+    }
+
+    .um-modal-head-main {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .um-modal-head-badge {
+        display: inline-flex;
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.16);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .um-modal-head h3 {
+        color: #ffffff !important;
+        font-size: 1rem;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .um-modal-head .um-note {
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.92) !important;
+        font-size: 12px;
+    }
+
+    .um-modal-close {
+        position: relative;
+        display: inline-flex;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        padding: 0;
+        overflow: hidden;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #8f2230;
+        border-radius: 50%;
+        background: #70131b;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 24px;
+        line-height: 1;
+        transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    .um-modal-close::after {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(255, 239, 181, .52), transparent);
+        content: "";
+        transform: translateX(-135%);
+        transition: transform .65s ease;
+    }
+
+    .um-modal-close:hover,
+    .um-modal-close:focus-visible {
+        border-color: #facc15;
+        box-shadow: 0 0 0 3px rgba(250, 204, 21, .18);
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+    .um-modal-close:hover::after,
+    .um-modal-close:focus-visible::after {
+        transform: translateX(135%);
+    }
+
+    .um-modal-body {
+        max-height: calc(100vh - 145px);
+        overflow-y: auto;
+        background: #f8fafc;
+        scrollbar-color: #8f2230 #e5e7eb;
+        scrollbar-width: thin;
+    }
+
+    #settingsModal .um-detail-card {
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .06);
+    }
+
+    #settingsModal .um-section-block {
+        border-radius: 14px;
+        background: #ffffff;
+    }
+
+    /* Inventory-style custom dropdown */
+    .um-custom-select {
+        position: relative;
+    }
+
+    .um-custom-select-native {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden;
+        border: 0 !important;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .um-custom-select-button {
+        position: relative;
+        width: 100%;
+        min-height: 52px;
+        padding: 14px 48px 14px 16px;
+        border: 1px solid rgba(127, 29, 29, .22);
+        border-radius: 18px;
+        background: linear-gradient(180deg, #ffffff, #fff8f6);
+        color: #111827;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, .08);
+        cursor: pointer;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        text-align: left;
+    }
+
+    .um-custom-select-button::after {
+        position: absolute;
+        top: 50%;
+        right: 18px;
+        width: 8px;
+        height: 8px;
+        border-right: 2px solid #70131b;
+        border-bottom: 2px solid #70131b;
+        content: "";
+        transform: translateY(-70%) rotate(45deg);
+        transition: transform .18s ease;
+    }
+
+    .um-custom-select.is-open .um-custom-select-button {
+        border-color: #8f2230;
+        box-shadow: 0 0 0 3px rgba(143, 34, 48, .10), 0 12px 24px rgba(15, 23, 42, .10);
+    }
+
+    .um-custom-select.is-open .um-custom-select-button::after {
+        transform: translateY(-25%) rotate(225deg);
+    }
+
+    .um-custom-select-menu {
+        position: absolute;
+        z-index: 5100;
+        top: calc(100% + 8px);
+        right: 0;
+        left: 0;
+        display: none;
+        gap: 8px;
+        max-height: 250px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid rgba(127, 29, 29, .18);
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, .18);
+    }
+
+    .um-custom-select.is-open .um-custom-select-menu {
+        display: grid;
+    }
+
+    .um-custom-select-option {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1px solid rgba(148, 163, 184, .22);
+        border-radius: 999px;
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        color: #1e293b;
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        text-align: left;
+        transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+    }
+
+    .um-custom-select-option:hover,
+    .um-custom-select-option.is-selected {
+        border-color: #8b0000;
+        background: linear-gradient(135deg, #8b0000, #70131b);
+        color: #facc15;
+        transform: translateY(-1px);
+    }
+
+    html[data-theme="dark"] .um-modal-body,
+    html[data-theme="dark"] #settingsModal .um-detail-card,
+    html[data-theme="dark"] #settingsModal .um-section-block {
+        background: #111827;
+    }
+
+    html[data-theme="dark"] .um-custom-select-button,
+    html[data-theme="dark"] .um-custom-select-menu {
+        border-color: rgba(248, 113, 113, .28);
+        background: #0f172a;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .um-custom-select-option {
+        border-color: rgba(148, 163, 184, .22);
+        background: #172033;
+        color: #ffffff;
+    }
+
     .um-actions {
         display: flex;
         gap: 10px;
@@ -1047,11 +1279,14 @@
 <div class="um-modal-backdrop {{ $lookupSearch !== '' ? 'show' : '' }}" id="lookupModal">
     <div class="um-modal-content">
         <div class="um-modal-head">
-            <div>
-                <h3>Add User Roles</h3>
-                <div class="um-note">Search across students, faculty, or admin profiles to add roles.</div>
+            <div class="um-modal-head-main">
+                <div class="um-modal-head-badge">AR</div>
+                <div>
+                    <h3>Add User Roles</h3>
+                    <div class="um-note">Search across students, faculty, or admin profiles to add roles.</div>
+                </div>
             </div>
-            <button type="button" class="um-btn um-btn-soft" data-close-lookup>Close</button>
+            <button type="button" class="um-modal-close" data-close-lookup aria-label="Close role lookup">&times;</button>
         </div>
         <div class="um-modal-body">
             <form class="um-search" method="GET" action="{{ route('admin.user-management.account-access') }}">
@@ -1135,11 +1370,14 @@
 <div class="um-modal-backdrop" id="settingsModal">
     <div class="um-modal-content">
         <div class="um-modal-head">
-            <div>
-                <h3>User Settings</h3>
-                <div class="um-note">Review the account, adjust the role or status, deactivate if needed, or delete the account.</div>
+            <div class="um-modal-head-main">
+                <div class="um-modal-head-badge">AA</div>
+                <div>
+                    <h3>User Settings</h3>
+                    <div class="um-note">Review the account, adjust the role or status, deactivate if needed, or delete the account.</div>
+                </div>
             </div>
-            <button type="button" class="um-btn um-btn-soft" data-close-settings>Close</button>
+            <button type="button" class="um-modal-close" data-close-settings aria-label="Close user settings">&times;</button>
         </div>
         <div class="um-modal-body">
             <div class="um-modal-grid">
@@ -1187,7 +1425,7 @@
                                 form="deleteForm"
                                 class="um-btn"
                                 style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;"
-                                onclick="return confirm('Remove this account access and return it to the default student role?')"
+                                onclick="return confirm('Remove this clinic access and restore the account role provided by the IDP?')"
                             >
                                 Remove Access
                             </button>
@@ -1298,9 +1536,9 @@
         const canEdit = options.canEdit === true;
         const canOnboard = options.canOnboard === true;
         const managementView = detailManagementView ? detailManagementView.value : 'account-access';
-        const isStudent = detailRole.value === 'student';
+        const isStudent = false;
         const isStudentAssistant = detailRole.value === 'student_assistant';
-        const isAdmin = detailRole.value === 'admin';
+        const isAdmin = detailRole.value === 'admin_clinic_staff';
         const isSuperAdmin = detailRole.value === 'super_admin';
         const hasAdminHub = isStudentAssistant || isAdmin || isSuperAdmin;
         const usesSeparateAdminEmail = managementView !== 'admin-hub' && isStudentAssistant;
@@ -1317,11 +1555,10 @@
         } else {
             detailEmailLabel.textContent = 'Student Email';
             emailRoleNote.textContent = 'Keep this email for the student side.';
-            if (accessLevelWrap) accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
-            if (detailAccessLevel) detailAccessLevel.disabled = !isAdmin || !(canEdit || canOnboard);
+            if (accessLevelWrap) accessLevelWrap.style.display = 'none';
+            if (detailAccessLevel) detailAccessLevel.disabled = true;
             if (adminEmailWrap) adminEmailWrap.style.display = usesSeparateAdminEmail ? 'block' : 'none';
             if (adminOfficeWrap) adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
-            if (detailAccessLevelLabel) detailAccessLevelLabel.textContent = 'Admin Type';
         }
 
         if (adminEmailNote) {
@@ -1367,16 +1604,13 @@
             if (source === 'student_assistant') {
                 return 'student_assistant';
             }
-            if (raw === 'admin') {
-                return 'admin';
-            }
             if (raw === 'student_assistant' || raw === 'studentassistant' || raw === 'assistant') {
                 return 'student_assistant';
             }
             if (raw === 'superadmin' || raw === 'super_admin') {
                 return 'super_admin';
             }
-            return 'student';
+            return 'admin_clinic_staff';
         })();
         detailRole.value = normalizedRole;
         detailStatus.value = row.dataset.status || 'active';
@@ -1430,7 +1664,7 @@
             detailAdminProfileStatus.textContent = adminProfileId
                 ? `Linked to admin hub record #${adminProfileId}${meta.admin_profile_name ? ` | ${meta.admin_profile_name}` : ''}`
                 : (managementView === 'admin-hub'
-                    ? 'No linked admin hub record yet. Saving here will create a designee-only admin hub record.'
+                    ? 'No linked admin hub record yet. Saving here will create the selected Admin Hub role.'
                     : 'No linked admin hub record yet. One will be created when you save an admin-side role.');
         }
         if (avatarUrl) {
@@ -1473,7 +1707,7 @@
             deleteAdminHubForm.style.display = 'none';
         }
         if (!canEdit && canOnboard) {
-            detailRole.value = 'admin';
+            detailRole.value = 'admin_clinic_staff';
             if (detailAccessLevel) {
                 detailAccessLevel.value = 'designee';
             }
@@ -1565,5 +1799,6 @@
         }
     });
 </script>
+@include('admin.user_management.modal-ui-script')
 @endpush
 @endsection

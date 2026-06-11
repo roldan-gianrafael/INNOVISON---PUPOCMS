@@ -55,6 +55,7 @@ class User extends Authenticatable
     'section',
     'barcode',
     'user_role',
+    'idp_role',
     'user_type',
     'status',
     'password',

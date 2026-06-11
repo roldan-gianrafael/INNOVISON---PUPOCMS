@@ -2410,20 +2410,34 @@
                             'Medical Certificate' => [
                                 'key' => 'medical_certificate',
                                 'path' => $readonlyRecord->medical_certificate,
+                                'url' => null,
                             ],
                             'Chest X-ray Result' => [
                                 'key' => 'chest_xray_result',
                                 'path' => $readonlyRecord->chest_xray_result,
+                                'url' => null,
                             ],
                             '2x2 Photo' => [
                                 'key' => 'student_photo',
                                 'path' => $readonlyRecord->student_photo,
+                                'url' => null,
                             ],
-                            'PWD ID Proof' => [
-                                'key' => 'pwd_id_proof',
-                                'path' => $readonlyRecord->pwd_id_proof,
+                            'Health Information Form' => [
+                                'key' => 'health_form',
+                                'path' => true,
+                                'url' => route('walkin.healthForm', [
+                                    'healthProfile' => $readonlyRecord->id,
+                                ]),
                             ],
                         ];
+
+                        if ($readonlyRecord->pwd_id_proof) {
+                            $readonlyDocs['PWD ID Proof'] = [
+                                'key' => 'pwd_id_proof',
+                                'path' => $readonlyRecord->pwd_id_proof,
+                                'url' => null,
+                            ];
+                        }
                     @endphp
                     <article class="readonly-record-card">
                         <div class="readonly-record-head">
@@ -2458,10 +2472,10 @@
                                         @if($document['path'])
                                             <a
                                                 class="readonly-doc-link"
-                                                href="{{ route('walkin.document', [
-                                                    'healthProfile' => $readonlyRecord->id,
-                                                    'document' => $document['key'],
-                                                ]) }}"
+                                                href="{{ $document['url'] ?: route('walkin.document', [
+                                                        'healthProfile' => $readonlyRecord->id,
+                                                        'document' => $document['key'],
+                                                    ]) }}"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >

@@ -732,7 +732,7 @@
     }
 
     #settingsModal.admin-hub-mode #accountAccessSection {
-        display: none !important;
+        display: block !important;
     }
 
     #settingsModal.account-access-mode #accountAccessSection {
@@ -945,6 +945,9 @@
     }
 </style>
 @endpush
+@push('styles')
+    @include('admin.user_management.modal-ui-styles')
+@endpush
 
 @section('content')
 <div class="user-management-shell">
@@ -1045,11 +1048,14 @@
 <div class="um-modal-backdrop {{ $lookupSearch !== '' ? 'show' : '' }}" id="lookupModal">
     <div class="um-modal-content">
         <div class="um-modal-head">
-            <div>
-                <h3>Add User Roles</h3>
-                <div class="um-note">Search across students, faculty, or admin profiles to add roles.</div>
+            <div class="um-modal-head-main">
+                <div class="um-modal-head-badge">AR</div>
+                <div>
+                    <h3>Add User Roles</h3>
+                    <div class="um-note">Search across students, faculty, or admin profiles to add roles.</div>
+                </div>
             </div>
-            <button type="button" class="um-btn um-btn-soft" data-close-lookup>Close</button>
+            <button type="button" class="um-modal-close" data-close-lookup aria-label="Close role lookup">&times;</button>
         </div>
         <div class="um-modal-body">
             <form class="um-search" method="GET" action="{{ route('admin.user-management.admin-hub') }}">
@@ -1133,11 +1139,14 @@
 <div class="um-modal-backdrop" id="settingsModal">
     <div class="um-modal-content">
         <div class="um-modal-head">
-            <div>
-                <h3>User Settings</h3>
-                <div class="um-note">Review the account, adjust the role or status, deactivate if needed, or delete the account.</div>
+            <div class="um-modal-head-main">
+                <div class="um-modal-head-badge">AH</div>
+                <div>
+                    <h3>User Settings</h3>
+                    <div class="um-note">Review the account, adjust the role or status, deactivate if needed, or delete the account.</div>
+                </div>
             </div>
-            <button type="button" class="um-btn um-btn-soft" data-close-settings>Close</button>
+            <button type="button" class="um-modal-close" data-close-settings aria-label="Close user settings">&times;</button>
         </div>
         <div class="um-modal-body">
             <div class="um-modal-grid">
@@ -1186,7 +1195,7 @@
                                 form="deleteForm"
                                 class="um-btn"
                                 style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;"
-                                onclick="return confirm('Remove this account access and return it to the default student role?')"
+                                onclick="return confirm('Remove this Admin Hub access and restore the account role provided by the IDP?')"
                             >
                                 Remove Access
                             </button>
@@ -1283,8 +1292,8 @@
         }
 
         if (accountAccessSection) {
-            accountAccessSection.classList.toggle('is-hidden', isAdminHubOnly);
-            accountAccessSection.style.display = isAdminHubOnly ? 'none' : '';
+            accountAccessSection.classList.remove('is-hidden');
+            accountAccessSection.style.display = '';
         }
 
         if (adminHubSection) {
@@ -1297,9 +1306,9 @@
         const canEdit = options.canEdit === true;
         const canOnboard = options.canOnboard === true;
         const managementView = detailManagementView ? detailManagementView.value : 'account-access';
-        const isStudent = detailRole.value === 'student';
+        const isStudent = false;
         const isStudentAssistant = detailRole.value === 'student_assistant';
-        const isAdmin = detailRole.value === 'admin';
+        const isAdmin = detailRole.value === 'admin_designee';
         const isSuperAdmin = detailRole.value === 'super_admin';
         const hasAdminHub = isStudentAssistant || isAdmin || isSuperAdmin;
         const usesSeparateAdminEmail = managementView !== 'admin-hub' && isStudentAssistant;
@@ -1307,20 +1316,19 @@
         applySettingsSectionMode(managementView, canEdit, canOnboard);
 
         if (isStudent) {
-            detailEmailLabel.textContent = 'Student Email';
-            emailRoleNote.textContent = 'This email stays with the student account.';
+            detailEmailLabel.textContent = 'Account Email';
+            emailRoleNote.textContent = 'This email remains linked to the account.';
             if (accessLevelWrap) accessLevelWrap.style.display = 'none';
             if (detailAccessLevel) detailAccessLevel.disabled = true;
             if (adminEmailWrap) adminEmailWrap.style.display = 'none';
             if (adminOfficeWrap) adminOfficeWrap.style.display = 'none';
         } else {
-            detailEmailLabel.textContent = 'Student Email';
-            emailRoleNote.textContent = 'Keep this email for the student side.';
-            if (accessLevelWrap) accessLevelWrap.style.display = isAdmin ? 'block' : 'none';
-            if (detailAccessLevel) detailAccessLevel.disabled = !isAdmin || !(canEdit || canOnboard);
+            detailEmailLabel.textContent = 'Account Email';
+            emailRoleNote.textContent = 'This email remains linked to the account.';
+            if (accessLevelWrap) accessLevelWrap.style.display = 'none';
+            if (detailAccessLevel) detailAccessLevel.disabled = true;
             if (adminEmailWrap) adminEmailWrap.style.display = usesSeparateAdminEmail ? 'block' : 'none';
             if (adminOfficeWrap) adminOfficeWrap.style.display = hasAdminHub ? 'block' : 'none';
-            if (detailAccessLevelLabel) detailAccessLevelLabel.textContent = 'Admin Type';
         }
 
         if (adminEmailNote) {
@@ -1366,16 +1374,10 @@
             if (source === 'student_assistant') {
                 return 'student_assistant';
             }
-            if (raw === 'admin') {
-                return 'admin';
-            }
-            if (raw === 'student_assistant' || raw === 'studentassistant' || raw === 'assistant') {
-                return 'student_assistant';
-            }
             if (raw === 'superadmin' || raw === 'super_admin') {
                 return 'super_admin';
             }
-            return 'student';
+            return 'admin_designee';
         })();
         detailRole.value = normalizedRole;
         detailStatus.value = row.dataset.status || 'active';
@@ -1400,10 +1402,8 @@
         applySettingsSectionMode(managementView, canEdit, canOnboard);
 
         detailEditEmail.value = row.dataset.email || '';
-        detailEmailLabel.textContent = 'Student Email';
-        emailRoleNote.textContent = normalizedRole === 'student'
-            ? 'This email stays with the student account.'
-            : 'Keep this email for the student side.';
+        detailEmailLabel.textContent = 'Account Email';
+        emailRoleNote.textContent = 'This email remains linked to the account.';
         if (detailAdminEmail) {
             detailAdminEmail.value = adminLoginEmail;
         }
@@ -1429,7 +1429,7 @@
             detailAdminProfileStatus.textContent = adminProfileId
                 ? `Linked to admin hub record #${adminProfileId}${meta.admin_profile_name ? ` | ${meta.admin_profile_name}` : ''}`
                 : (managementView === 'admin-hub'
-                    ? 'No linked admin hub record yet. Saving here will create a designee-only admin hub record.'
+                    ? 'No linked admin hub record yet. Saving here will create the selected Admin Hub role.'
                     : 'No linked admin hub record yet. One will be created when you save an admin-side role.');
         }
         if (avatarUrl) {
@@ -1472,7 +1472,7 @@
             deleteAdminHubForm.style.display = 'none';
         }
         if (!canEdit && canOnboard) {
-            detailRole.value = 'admin';
+            detailRole.value = 'admin_designee';
             if (detailAccessLevel) {
                 detailAccessLevel.value = 'designee';
             }
@@ -1564,5 +1564,6 @@
         }
     });
 </script>
+@include('admin.user_management.modal-ui-script')
 @endpush
 @endsection

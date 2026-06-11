@@ -1024,7 +1024,7 @@
                                     </div>
                                 </td>
                                 <td>{{ $record['meta']['admin_login_email'] ?: 'Not assigned yet' }}</td>
-                                <td>{{ $record['meta']['access_level'] ?: 'Not assigned yet' }}</td>
+                                <td>{{ $record['role'] }}</td>
                                 <td>{{ $record['meta']['office'] ?: 'Not assigned yet' }}</td>
                                 <td>
                                     <span class="um-badge {{ $record['status'] === 'inactive' ? 'inactive' : 'active' }}">
@@ -1150,30 +1150,47 @@
         </div>
         <div class="um-modal-body">
             <div class="um-modal-grid">
-                <div class="um-detail-card">
-                    <div class="um-detail-photo" id="detailAvatar">U</div>
-                    <div class="um-field">
-                        <label>Name</label>
-                        <input type="text" id="detailName" readonly>
+                <div class="um-detail-card um-profile-summary-card">
+                    <div class="um-profile-identity">
+                        <div class="um-detail-photo" id="detailAvatar">U</div>
+                        <div>
+                            <span class="um-profile-eyebrow">Admin Profile</span>
+                            <h4 class="um-profile-heading">User Information</h4>
+                            <p class="um-profile-copy">Identity details linked to the Admin Hub account.</p>
+                        </div>
                     </div>
-                    <div class="um-field">
-                        <label>Email</label>
-                        <input type="text" id="detailEmail" readonly>
-                    </div>
-                    <div class="um-field">
-                        <label id="detailIdentifierLabel">Student / Faculty ID</label>
-                        <input type="text" id="detailIdentifier" readonly>
-                    </div>
-                    <div class="um-field">
-                        <label>Source</label>
-                        <input type="text" id="detailSource" readonly>
-                    </div>
-                    <div class="um-field">
-                        <label>Last Updated</label>
-                        <input type="text" id="detailUpdated" readonly>
+                    <div class="um-profile-fields">
+                        <div class="um-field">
+                            <label>Name</label>
+                            <input type="text" id="detailName" readonly>
+                        </div>
+                        <div class="um-field">
+                            <label>Email</label>
+                            <input type="text" id="detailEmail" readonly>
+                        </div>
+                        <div class="um-field">
+                            <label id="detailIdentifierLabel">Student / Faculty ID</label>
+                            <input type="text" id="detailIdentifier" readonly>
+                        </div>
+                        <div class="um-field">
+                            <label>Source</label>
+                            <input type="text" id="detailSource" readonly>
+                        </div>
+                        <div class="um-field">
+                            <label>Last Updated</label>
+                            <input type="text" id="detailUpdated" readonly>
+                        </div>
                     </div>
                 </div>
-                <div class="um-detail-card">
+                <div class="um-detail-card um-settings-form-card">
+                    <div class="um-settings-card-head">
+                        <div>
+                            <h4>Admin Hub Configuration</h4>
+                            <p>Manage the Admin Hub role, login email, office, and status.</p>
+                        </div>
+                        <span class="um-settings-card-badge">AH</span>
+                    </div>
+                    <div class="um-settings-form-body">
                     <form method="POST" id="settingsForm">
                         @csrf
                         <input type="hidden" name="_method" id="settingsMethod" value="PUT">
@@ -1184,32 +1201,30 @@
                         <input type="hidden" name="full_name" id="detailFullName" value="">
                         <input type="hidden" name="external_identifier" id="detailExternalIdentifier" value="">
                         @include('admin.user_management.account-access-section')
-                        @include('admin.user_management.admin-hub-profile-section')
                         <div class="um-note" id="externalNote" style="display:none; margin-top: 6px;">
                             This faculty profile comes from the external source. Saving here will add a clinic-side user and admin hub record without changing the source system.
                         </div>
                         <div class="um-actions">
-                            <button type="button" class="um-btn um-btn-soft" id="deactivateBtn">Deactivate Account</button>
+                            <button type="button" class="um-settings-action um-action-neutral" id="deactivateBtn">Mark Directory Inactive</button>
                             <button
                                 type="submit"
                                 form="deleteForm"
-                                class="um-btn"
-                                style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;"
-                                onclick="return confirm('Remove this Admin Hub access and restore the account role provided by the IDP?')"
+                                class="um-settings-action um-action-warning"
+                                onclick="return confirm('Remove this profile from the Admin Hub directory? Clinic account permissions will remain unchanged.')"
                             >
                                 Remove Access
                             </button>
                             <button
                                 type="submit"
                                 form="deleteAdminHubForm"
-                                class="um-btn"
+                                class="um-settings-action um-action-danger"
                                 id="deleteAdminHubBtn"
-                                style="display:none; background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;"
-                                onclick="return confirm('Delete this admin hub record from the admins table? This cannot be undone.')"
+                                style="display:none;"
+                                onclick="return confirm('Delete this standalone directory record? Linked clinic accounts will be preserved and only removed from the Admin Hub.')"
                             >
-                                Delete Admin Record
+                                Delete Directory Record
                             </button>
-                            <button type="submit" class="um-btn um-btn-primary" id="saveSettingsBtn">Save Changes</button>
+                            <button type="submit" class="um-settings-action um-action-primary" id="saveSettingsBtn">Save Changes</button>
                         </div>
                     </form>
 
@@ -1225,6 +1240,7 @@
                         @method('DELETE')
                         <input type="hidden" name="management_view" id="deleteAdminHubManagementView" value="admin-hub">
                     </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1316,15 +1332,15 @@
         applySettingsSectionMode(managementView, canEdit, canOnboard);
 
         if (isStudent) {
-            detailEmailLabel.textContent = 'Account Email';
-            emailRoleNote.textContent = 'This email remains linked to the account.';
+            if (detailEmailLabel) detailEmailLabel.textContent = 'Directory Email';
+            if (emailRoleNote) emailRoleNote.textContent = 'This email is shared as part of the Admin Hub profile.';
             if (accessLevelWrap) accessLevelWrap.style.display = 'none';
             if (detailAccessLevel) detailAccessLevel.disabled = true;
             if (adminEmailWrap) adminEmailWrap.style.display = 'none';
             if (adminOfficeWrap) adminOfficeWrap.style.display = 'none';
         } else {
-            detailEmailLabel.textContent = 'Account Email';
-            emailRoleNote.textContent = 'This email remains linked to the account.';
+            if (detailEmailLabel) detailEmailLabel.textContent = 'Directory Email';
+            if (emailRoleNote) emailRoleNote.textContent = 'This email is shared as part of the Admin Hub profile.';
             if (accessLevelWrap) accessLevelWrap.style.display = 'none';
             if (detailAccessLevel) detailAccessLevel.disabled = true;
             if (adminEmailWrap) adminEmailWrap.style.display = usesSeparateAdminEmail ? 'block' : 'none';
@@ -1402,8 +1418,8 @@
         applySettingsSectionMode(managementView, canEdit, canOnboard);
 
         detailEditEmail.value = row.dataset.email || '';
-        detailEmailLabel.textContent = 'Account Email';
-        emailRoleNote.textContent = 'This email remains linked to the account.';
+        if (detailEmailLabel) detailEmailLabel.textContent = 'Directory Email';
+        if (emailRoleNote) emailRoleNote.textContent = 'This email is shared as part of the Admin Hub profile.';
         if (detailAdminEmail) {
             detailAdminEmail.value = adminLoginEmail;
         }
@@ -1480,7 +1496,7 @@
         }
         syncRoleUi({ canEdit, canOnboard });
         if (saveSettingsBtn) {
-            saveSettingsBtn.textContent = canEdit ? 'Save Changes' : 'Add to Clinic';
+            saveSettingsBtn.textContent = canEdit ? 'Save Changes' : 'Add to Admin Hub';
         }
         settingsModal.classList.add('show');
     };
@@ -1544,7 +1560,7 @@
     });
 
     deactivateBtn.addEventListener('click', () => {
-        const confirmDeactivate = window.confirm('Deactivate this account? The user will lose access until reactivated.');
+        const confirmDeactivate = window.confirm('Mark this Admin Hub directory profile as inactive? Clinic access will not be changed.');
         if (!confirmDeactivate) {
             return;
         }

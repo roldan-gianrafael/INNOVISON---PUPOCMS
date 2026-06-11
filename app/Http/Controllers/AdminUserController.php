@@ -81,6 +81,13 @@ class AdminUserController extends Controller
         $lookupRecords = $lookupSearch !== ''
             ? collect($this->collectLocalUsers($lookupSearch))
                 ->merge($this->collectFacultyUsers($facultySyncService, $lookupSearch))
+                ->map(function (array $record) use ($managementView) {
+                    if ($managementView === 'admin-hub' && ($record['source'] ?? '') !== 'faculty') {
+                        $record['can_edit'] = true;
+                    }
+
+                    return $record;
+                })
                 ->sortBy(fn (array $record) => sprintf(
                     '%02d-%s',
                     $this->recordSortWeight($record['source'] ?? 'student'),
@@ -141,6 +148,61 @@ class AdminUserController extends Controller
             'access_level' => ['nullable', Rule::in(['clinic_staff', 'designee'])],
             'office' => ['nullable', 'string', 'max:255'],
         ]);
+
+        if ($managementView === 'admin-hub') {
+            $linkedAdmin = $this->findLinkedAdminProfile($user) ?? new Admin();
+
+            if (Admin::hasColumn('user_id')) {
+                $linkedAdmin->user_id = $user->id;
+            }
+            if (Admin::hasColumn('first_name')) {
+                $linkedAdmin->first_name = $user->first_name;
+            }
+            if (Admin::hasColumn('middle_name')) {
+                $linkedAdmin->middle_name = $user->middle_name;
+            }
+            if (Admin::hasColumn('last_name')) {
+                $linkedAdmin->last_name = $user->last_name;
+            }
+            if (Admin::hasColumn('name')) {
+                $linkedAdmin->name = $user->name;
+            }
+            if (Admin::hasColumn('email')) {
+                $linkedAdmin->email = trim((string) $request->email);
+            }
+            if (Admin::hasColumn('email_address')) {
+                $linkedAdmin->email_address = trim((string) $request->email);
+            }
+            if (Admin::hasColumn('admin_hub_enabled')) {
+                $linkedAdmin->admin_hub_enabled = true;
+            }
+            if (Admin::hasColumn('admin_hub_role')) {
+                $linkedAdmin->admin_hub_role = $request->user_role;
+            }
+            if (Admin::hasColumn('status')) {
+                $linkedAdmin->status = $request->status;
+            }
+            if (Admin::hasColumn('office')) {
+                $linkedAdmin->office = $request->input('office');
+            }
+            $linkedAdmin->save();
+
+            $this->logUserManagementAction(
+                'Added local account to Admin Hub',
+                sprintf(
+                    'Added %s (%s) to the centralized Admin Hub as %s without changing clinic access.',
+                    $user->name ?? $user->email,
+                    $user->email,
+                    $request->user_role
+                )
+            );
+
+            return $this->redirectToManagementView(
+                $request,
+                'success',
+                'The profile was added to the Admin Hub. Clinic account permissions were not changed.'
+            );
+        }
 
         if ($this->isProtectedUser($user)) {
             return redirect()->back()->with('error', 'This account is protected and cannot be modified here.');
@@ -310,8 +372,11 @@ class AdminUserController extends Controller
             if (Admin::hasColumn('external_identifier')) {
                 $linkedAdmin->external_identifier = $externalIdentifier !== '' ? $externalIdentifier : null;
             }
-            if (Admin::hasColumn('access_level')) {
-                $linkedAdmin->access_level = $roleAssignment['access_level'];
+            if (Admin::hasColumn('admin_hub_enabled')) {
+                $linkedAdmin->admin_hub_enabled = true;
+            }
+            if (Admin::hasColumn('admin_hub_role')) {
+                $linkedAdmin->admin_hub_role = $requestedRoleRaw;
             }
             if (Admin::hasColumn('status')) {
                 $linkedAdmin->status = $request->status;
@@ -324,11 +389,11 @@ class AdminUserController extends Controller
             $this->logUserManagementAction(
                 'Added admin hub profile from lookup',
                 sprintf(
-                    'Added %s (%s) from %s lookup into the clinic admin hub with %s access.',
+                    'Added %s (%s) from %s lookup into the centralized Admin Hub as %s.',
                     $linkedAdmin->name ?? $adminEmail,
                     $adminEmail,
                     $request->lookup_source,
-                    $roleAssignment['access_level']
+                    $requestedRoleRaw
                 )
             );
 
@@ -432,7 +497,7 @@ class AdminUserController extends Controller
         $request->validate([
             'user_role' => ['required', Rule::in(['admin_designee', 'super_admin'])],
             'status' => ['required', Rule::in(['active', 'inactive'])],
-            'admin_email' => ['required', 'email', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'office' => ['nullable', 'string', 'max:255'],
             'first_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
@@ -450,10 +515,10 @@ class AdminUserController extends Controller
             $admin->name = $fullName !== '' ? $fullName : trim(implode(' ', array_filter([$admin->first_name, $admin->last_name])));
         }
         if (Admin::hasColumn('email')) {
-            $admin->email = trim((string) $request->input('admin_email'));
+            $admin->email = trim((string) $request->input('email'));
         }
         if (Admin::hasColumn('email_address')) {
-            $admin->email_address = trim((string) $request->input('admin_email'));
+            $admin->email_address = trim((string) $request->input('email'));
         }
         if (Admin::hasColumn('external_identifier')) {
             $incomingIdentifier = trim((string) $request->input('external_identifier', ''));
@@ -467,36 +532,13 @@ class AdminUserController extends Controller
         if (Admin::hasColumn('office')) {
             $admin->office = $request->input('office');
         }
-        if (Admin::hasColumn('access_level')) {
-            $admin->access_level = $request->input('user_role') === 'super_admin' ? 'superadmin' : 'designee';
+        if (Admin::hasColumn('admin_hub_enabled')) {
+            $admin->admin_hub_enabled = true;
+        }
+        if (Admin::hasColumn('admin_hub_role')) {
+            $admin->admin_hub_role = $request->input('user_role');
         }
         $admin->save();
-
-        if (Admin::hasColumn('user_id') && $admin->user_id) {
-            $linkedUser = User::find($admin->user_id);
-            if ($linkedUser) {
-                if (
-                    Schema::hasColumn('users', 'idp_role')
-                    && trim((string) $linkedUser->idp_role) === ''
-                    && !in_array(
-                        User::normalizeRole((string) $linkedUser->user_role),
-                        [User::ROLE_ADMIN, User::ROLE_SUPERADMIN],
-                        true
-                    )
-                ) {
-                    $linkedUser->idp_role = trim((string) $linkedUser->user_role) !== ''
-                        ? $linkedUser->user_role
-                        : User::ROLE_STUDENT;
-                }
-                $linkedUser->user_role = $request->input('user_role') === 'super_admin'
-                    ? User::ROLE_SUPERADMIN
-                    : User::ROLE_ADMIN;
-                if (Schema::hasColumn('users', 'user_type')) {
-                    $linkedUser->user_type = 'Regular';
-                }
-                $linkedUser->save();
-            }
-        }
 
         $this->logUserManagementAction(
             'Updated admin hub profile',
@@ -514,40 +556,24 @@ class AdminUserController extends Controller
     {
         $this->ensureCanManageUsers();
 
-        $linkedUser = Admin::hasColumn('user_id') && $admin->user_id
-            ? User::find($admin->user_id)
-            : null;
-
-        if (Admin::hasColumn('access_level')) {
-            $admin->access_level = null;
+        if (Admin::hasColumn('admin_hub_enabled')) {
+            $admin->admin_hub_enabled = false;
         }
-        if (Admin::hasColumn('status')) {
-            $admin->status = 'active';
+        if (Admin::hasColumn('admin_hub_role')) {
+            $admin->admin_hub_role = null;
         }
         $admin->save();
-
-        if ($linkedUser) {
-            $restoredRole = trim((string) ($linkedUser->idp_role ?? ''));
-            if ($restoredRole === '') {
-                $restoredRole = User::ROLE_STUDENT;
-            }
-            $linkedUser->user_role = User::normalizeRole($restoredRole);
-            if (Schema::hasColumn('users', 'user_type')) {
-                $linkedUser->user_type = $this->defaultUserTypeForIdpRole($restoredRole);
-            }
-            $linkedUser->save();
-        }
 
         $this->logUserManagementAction(
             'Removed admin hub access',
             sprintf(
-                'Removed admin hub designee access for record #%s (%s).',
+                'Removed centralized Admin Hub membership for record #%s (%s) without changing clinic access.',
                 $admin->admin_id,
                 $admin->name ?? ($admin->email ?? 'Unknown Admin')
             )
         );
 
-        return $this->redirectToManagementView($request, 'success', 'Admin Hub access removed successfully. The original IDP role has been restored.');
+        return $this->redirectToManagementView($request, 'success', 'Admin Hub membership removed. Clinic account access was not changed.');
     }
 
     public function deleteAdminHubRecord(Request $request, Admin $admin)
@@ -556,19 +582,39 @@ class AdminUserController extends Controller
 
         $adminName = $admin->name ?? ($admin->email ?? 'Unknown Admin');
         $adminId = $admin->admin_id;
+        $hasLinkedClinicAccount = (Admin::hasColumn('user_id') && !empty($admin->user_id))
+            || (Admin::hasColumn('access_level') && trim((string) $admin->access_level) !== '');
 
-        $admin->delete();
+        if ($hasLinkedClinicAccount) {
+            if (Admin::hasColumn('admin_hub_enabled')) {
+                $admin->admin_hub_enabled = false;
+            }
+            if (Admin::hasColumn('admin_hub_role')) {
+                $admin->admin_hub_role = null;
+            }
+            $admin->save();
+        } else {
+            $admin->delete();
+        }
 
         $this->logUserManagementAction(
-            'Deleted admin hub record',
+            $hasLinkedClinicAccount ? 'Removed linked Admin Hub record' : 'Deleted admin hub record',
             sprintf(
-                'Deleted admin hub record #%s (%s) from the admins table.',
+                $hasLinkedClinicAccount
+                    ? 'Removed record #%s (%s) from the Admin Hub directory while preserving clinic access.'
+                    : 'Deleted standalone admin hub record #%s (%s) from the admins table.',
                 $adminId,
                 $adminName
             )
         );
 
-        return $this->redirectToManagementView($request, 'success', 'Admin Hub record deleted successfully.');
+        return $this->redirectToManagementView(
+            $request,
+            'success',
+            $hasLinkedClinicAccount
+                ? 'The directory entry was removed. Clinic account access was preserved.'
+                : 'The standalone Admin Hub record was deleted successfully.'
+        );
     }
 
     public function destroy(Request $request, User $user)
@@ -614,7 +660,9 @@ class AdminUserController extends Controller
             if (Admin::hasColumn('status')) {
                 $linkedAdmin->status = 'active';
             }
-            if (Admin::hasColumn('email_address')) {
+            $isAdminHubMember = Admin::hasColumn('admin_hub_enabled')
+                && (bool) $linkedAdmin->admin_hub_enabled;
+            if (Admin::hasColumn('email_address') && !$isAdminHubMember) {
                 $linkedAdmin->email_address = null;
             }
             $linkedAdmin->save();
@@ -809,8 +857,11 @@ class AdminUserController extends Controller
 
         $query = Admin::query();
 
-        if (Admin::hasColumn('access_level')) {
-            $query->whereIn('access_level', ['designee', 'superadmin']);
+        if (Admin::hasColumn('admin_hub_enabled')) {
+            $query->where('admin_hub_enabled', true);
+        } else {
+            // Backward compatibility before the Admin Hub membership migration runs.
+            $query->where('access_level', 'designee');
         }
 
         if ($search !== '') {
@@ -844,7 +895,11 @@ class AdminUserController extends Controller
                     : ($normalizedName !== '' && isset($facultyByName[$normalizedName]) ? $facultyByName[$normalizedName] : null);
                 $facultyIdentifier = trim((string) ($matchedFaculty['student_id'] ?? ''));
                 $status = strtolower(trim((string) ($admin->status ?? 'active')));
-                $accessLevel = strtolower(trim((string) ($admin->access_level ?? 'designee')));
+                $hubRole = strtolower(trim((string) ($admin->admin_hub_role ?? 'admin_designee')));
+                if (!in_array($hubRole, ['admin_designee', 'super_admin'], true)) {
+                    $hubRole = 'admin_designee';
+                }
+                $accessLevel = strtolower(trim((string) ($admin->access_level ?? '')));
                 if ($status === '') {
                     $status = 'active';
                 }
@@ -863,9 +918,11 @@ class AdminUserController extends Controller
                     'last_name' => (string) ($admin->last_name ?? ''),
                     'student_id' => $resolvedIdentifier,
                     'email' => $email,
-                    'role' => $accessLevel === 'superadmin' ? 'Super Admin' : 'Admin - Designee',
-                    'raw_role' => $accessLevel === 'superadmin' ? 'super_admin' : 'admin_designee',
-                    'normalized_role' => $accessLevel === 'superadmin' ? User::ROLE_SUPERADMIN : User::ROLE_ADMIN,
+                    'role' => $hubRole === 'super_admin' ? 'Super Admin' : 'Admin - Designee',
+                    'raw_role' => $hubRole,
+                    'normalized_role' => $linkedUser
+                        ? User::normalizeRole((string) $linkedUser->user_role)
+                        : User::ROLE_ADMIN,
                     'status' => $status === 'inactive' ? 'inactive' : 'active',
                     'avatar_url' => null,
                     'avatar_letter' => strtoupper(substr($displayName !== '' ? $displayName : ($email ?: 'A'), 0, 1)),
@@ -877,6 +934,7 @@ class AdminUserController extends Controller
                     'meta' => [
                         'email' => $email,
                         'access_level' => $accessLevel,
+                        'admin_hub_role' => $hubRole,
                         'admin_login_email' => $email,
                         'admin_profile_id' => $admin->admin_id,
                         'admin_profile_name' => $displayName,

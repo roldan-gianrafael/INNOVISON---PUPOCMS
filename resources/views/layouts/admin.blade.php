@@ -4246,7 +4246,7 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 @if($isStudentAssistant)
                     <a href="{{ route('assistant.enter-student') }}" class="switch-student-link">
                         <x-outline-icon name="user-plus" />
-                        <span>Switch to Student Side</span>
+                        <span>Switch to Student Workspace</span>
                     </a>
                 @endif
                 <a href="#" class="logout-link" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">

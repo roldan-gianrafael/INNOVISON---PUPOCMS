@@ -67,10 +67,16 @@
             </td>
         </tr>
         <tr>
-            <td class="line-label">Blood Type:</td>
-            <td class="line-value">{{ $profile->blood_type ?? 'N/A' }}</td>
-            <td class="line-label email-label">Email Address:</td>
-            <td class="line-value">{{ $profile->user->email }}</td>
+            <td colspan="4" class="compound-row">
+                <table class="blood-email-table">
+                    <tr>
+                        <td class="line-label blood-type-label">Blood Type:</td>
+                        <td class="line-value blood-type-value">{{ $profile->blood_type ?? 'N/A' }}</td>
+                        <td class="line-label email-label">Email Address:</td>
+                        <td class="line-value email-value">{{ $profile->user->email }}</td>
+                    </tr>
+                </table>
+            </td>
         </tr>
         <tr>
             <td class="guardian-row" colspan="4">

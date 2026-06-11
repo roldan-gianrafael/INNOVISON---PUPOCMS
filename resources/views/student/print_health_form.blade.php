@@ -23,7 +23,7 @@
         .official-heading-cell .dept-name { margin-top: 2px; font-size: 21px; font-weight: normal; }
         .photo-box { position: absolute; top: 14px; right: 2px; box-sizing: border-box; width: 116.5px; height: 115px; padding: 22px 8px 0; overflow: hidden; border: 1px solid #000; font-size: 13px; line-height: 1.25; text-align: center; white-space: normal; word-wrap: break-word; }
         .official-title-table { width: 80%; margin-top: -5px; margin-left: 2%; border-collapse: collapse; table-layout: fixed; }
-        .official-title-table td { padding: 9px 0 5px; border-top: 1px solid #000; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: bold; font-style: italic; text-align: center; }
+        .official-title-table td { padding: 9px 0 5px; border-top: 1px solid #000; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: bold; font-style: italic; text-align: center; transform: translateX(2px); }
         .section-header { width: 80%; margin-top: 8px; padding: 3px 0 4px; border: 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; font-style: italic; text-transform: uppercase; }
         .official-title-table + .section-header { margin-top: 11px; }
         .student-information-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; table-layout: fixed; }
@@ -33,6 +33,12 @@
         .student-number-value { width: 24% !important; padding-left: 4px !important; border-bottom: 1px solid #000 !important; font-weight: bold; }
         .compound-information-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         .compound-information-table td { padding: 0 3px 1px 0; font-size: 12px; vertical-align: bottom; }
+        .blood-email-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .blood-email-table td { padding-top: 0; padding-bottom: 1px; font-size: 12px; vertical-align: bottom; }
+        .blood-type-label { width: 15%; }
+        .blood-type-value { width: 43%; }
+        .blood-email-table .email-label { width: 14%; padding-left: 10px !important; }
+        .email-value { width: 28%; overflow: hidden; font-size: 11px !important; white-space: nowrap; text-overflow: clip; }
         .student-full-name { display: inline-block; width: 86%; vertical-align: bottom; }
         .line-label { padding-right: 4px !important; font-weight: 700; white-space: nowrap; }
         .line-value { padding-left: 4px !important; border-bottom: 1px solid #000 !important; font-weight: bold; overflow-wrap: break-word; word-wrap: break-word; }
@@ -61,8 +67,6 @@
         .print-page .check-item,
         .print-page .medical-history-instruction,
         .print-page .medical-subsection-title,
-        .print-page .vax-table th,
-        .print-page .vax-table td,
         .print-page .cert-text,
         .print-page .sig-line,
         .print-page .physician-section {
@@ -84,13 +88,19 @@
         .social-history-table .social-label { width: 58%; }
         .social-history-table td:nth-child(2),
         .social-history-table td:nth-child(3) { width: 21%; white-space: nowrap; }
-        .covid-layout-table { width: 72%; margin-top: 5px; border-collapse: collapse; table-layout: fixed; }
+        .covid-layout-table { width: 82%; margin: 4px 0 0 3%; border-collapse: collapse; table-layout: fixed; }
         .covid-layout-table td { padding: 0; border: 0; vertical-align: top; }
-        .covid-label-cell { width: 46%; padding-right: 8px !important; }
-        .vaccinated-choice { margin: 5px 0 0 12px; }
-        .vax-table { width: 100%; margin-top: 2px; border-collapse: collapse; }
-        .vax-table th, .vax-table td { padding: 2px 3px; border: 1px solid #000; font-size: 11px; text-align: center; }
-        .vax-table th:first-child { width: 42%; text-align: left; }
+        .covid-label-cell { width: 38%; padding-right: 10px !important; }
+        .covid-label-cell > .medical-subsection-title { position: relative; left: -22px; white-space: nowrap; }
+        .vaccinated-choice { margin: 3px 0 0 12px; }
+        .vax-table { width: 100%; margin-top: 0; border-collapse: collapse; table-layout: fixed; }
+        .vax-table th, .vax-table td { height: 18px; padding: 0 4px; border: 1px solid #000; font-size: 10px; line-height: 1; text-align: center; white-space: nowrap; }
+        .vax-table th:first-child,
+        .vax-table td:first-child { width: 40%; text-align: left; }
+        .vax-table th:nth-child(2),
+        .vax-table td:nth-child(2) { width: 30%; }
+        .vax-table th:nth-child(3),
+        .vax-table td:nth-child(3) { width: 30%; }
         .cert-text { margin-top: 8px; font-size: 11px; font-style: italic; line-height: 1.22; text-align: justify; }
         .cert-text-first { margin-top: 12px; }
         .signature-table { width: 92%; margin: 12px auto 0; border-collapse: separate; border-spacing: 20px 0; table-layout: fixed; page-break-inside: avoid; }

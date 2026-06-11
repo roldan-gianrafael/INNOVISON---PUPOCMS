@@ -1321,8 +1321,8 @@
                     $displayLastName = array_pop($nameParts);
                 }
 
-                if ($displayMiddleName === '' && count($nameParts) > 0) {
-                    $displayMiddleName = implode(' ', $nameParts);
+                if ($displayMiddleName === '') {
+                    $displayMiddleName = 'N/A';
                 }
 
                 $displayReferenceNumber = trim((string) old('reference_number', $prefill['reference_number'] ?? ''));

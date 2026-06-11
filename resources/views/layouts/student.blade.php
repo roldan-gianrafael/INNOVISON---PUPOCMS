@@ -1114,6 +1114,33 @@
             color: #8b0000 !important;
         }
 
+        .nav-dropdown-menu .nav-dropdown-disabled {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #94a3b8;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: left;
+            cursor: not-allowed;
+            opacity: .8;
+        }
+
+        .nav-dropdown-schedule {
+            display: block;
+            margin-top: 2px;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
         .notif-toggle-btn {
             width: 38px;
             height: 38px;
@@ -1634,6 +1661,10 @@
             color: #ffd166 !important;
         }
 
+        html[data-theme="dark"] .nav-dropdown-menu .nav-dropdown-disabled {
+            color: #8290a5;
+        }
+
         html[data-theme="dark"] .notif-toggle-btn {
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 255, 255, 0.4);
@@ -1903,11 +1934,13 @@
 
             <nav id="main-menu" class="main-nav">
                 @php
-                    $studentLayoutUser = auth()->user();
-                    $studentLayoutUserType = strtolower(trim((string) ($studentLayoutUser->user_type ?? '')));
-                    $studentLayoutRole = \App\Models\User::normalizeRole($studentLayoutUser->user_role ?? '');
-                    $isStudentAssistantPortalUser = $studentLayoutRole === \App\Models\User::ROLE_ADMIN
-                        && in_array($studentLayoutUserType, ['assistant', 'student assistant', 'student_assistant'], true);
+                    $studentLayoutUser = Auth::guard('student')->user();
+                    $isStudentAssistantPortalUser = $studentLayoutUser?->isStudentAssistant() ?? false;
+                    $studentLayoutNow = now(config('app.timezone'));
+                    $studentLayoutMinutes = ((int) $studentLayoutNow->format('H') * 60)
+                        + (int) $studentLayoutNow->format('i');
+                    $studentAssistantAdminAvailable = $studentLayoutMinutes >= (8 * 60)
+                        && $studentLayoutMinutes < (20 * 60);
                     $isMyAccountSection = Request::is('student/account') || Request::is('student/history') || Request::is('student/barcode-register');
                     $studentAllNotifications = collect($notifications ?? [])->values();
                     $studentUnreadNotifications = $studentAllNotifications
@@ -2002,12 +2035,24 @@
                             </li>
                             @if($isStudentAssistantPortalUser)
                                 <li>
-                                    <a href="{{ route('assistant.enter-admin') }}">
-                                        <span class="nav-dropdown-link-content">
-                                            <x-outline-icon name="arrows-right-left" class="nav-dropdown-link-icon" />
-                                            <span>Switch to Admin Side</span>
-                                        </span>
-                                    </a>
+                                    @if($studentAssistantAdminAvailable)
+                                        <a href="{{ route('assistant.enter-admin') }}">
+                                            <span class="nav-dropdown-link-content">
+                                                <x-outline-icon name="arrows-right-left" class="nav-dropdown-link-icon" />
+                                                <span>Switch to Admin Workspace</span>
+                                            </span>
+                                        </a>
+                                    @else
+                                        <button type="button" class="nav-dropdown-disabled" disabled aria-disabled="true">
+                                            <span class="nav-dropdown-link-content">
+                                                <x-outline-icon name="arrows-right-left" class="nav-dropdown-link-icon" />
+                                                <span>
+                                                    Switch to Admin Workspace
+                                                    <small class="nav-dropdown-schedule">Available 8:00 AM–8:00 PM</small>
+                                                </span>
+                                            </span>
+                                        </button>
+                                    @endif
                                 </li>
                             @endif
                         </ul>

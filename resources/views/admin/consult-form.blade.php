@@ -782,6 +782,104 @@
         font-size: 12px;
         line-height: 1.5;
     }
+    .inventory-panel-search {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        min-height: 38px;
+        margin: -4px 0 14px;
+    }
+    .inventory-panel-search-wrap {
+        width: 0;
+        flex: 0 0 0;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transform: translateX(8px) scaleX(.96);
+        transform-origin: right center;
+        transition:
+            width .28s cubic-bezier(.22, 1, .36, 1),
+            flex-basis .28s cubic-bezier(.22, 1, .36, 1),
+            opacity .2s ease,
+            transform .24s cubic-bezier(.22, 1, .36, 1);
+    }
+    .inventory-panel-search.is-open .inventory-panel-search-wrap {
+        width: calc(100% - 44px);
+        flex: 1 1 auto;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0) scaleX(1);
+    }
+    .inventory-panel-search-input {
+        width: 100%;
+        height: 36px;
+        padding: 7px 9px;
+        border: 0;
+        border-bottom: 2px solid #8f2230;
+        border-radius: 0 0 9px 9px;
+        background: transparent;
+        color: #111827;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        outline: none;
+        transition: border-color .18s ease, transform .18s ease;
+    }
+    .inventory-panel-search-input::placeholder {
+        color: #7f1d2d;
+        opacity: 1;
+    }
+    .inventory-panel-search-input:focus {
+        border-bottom-color: #70131b;
+        transform: translateY(-1px);
+    }
+    .inventory-panel-search-toggle {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        padding: 0;
+        border: 1px solid #8f2230;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #70131b, #8f2230);
+        color: #ffffff;
+        box-shadow:
+            0 0 0 2px rgba(112, 19, 27, .1),
+            0 7px 15px rgba(112, 19, 27, .18);
+        cursor: pointer;
+        transition: background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+    .inventory-panel-search-toggle svg {
+        width: 19px;
+        height: 19px;
+        stroke-width: 2;
+    }
+    .inventory-panel-search-toggle:hover,
+    .inventory-panel-search-toggle:focus,
+    .inventory-panel-search-toggle.is-open {
+        border-color: #facc15;
+        background: #facc15;
+        color: #111827;
+        box-shadow:
+            0 0 0 2px rgba(250, 204, 21, .16),
+            0 9px 18px rgba(112, 19, 27, .16);
+        outline: none;
+    }
+    .inventory-search-empty {
+        display: none;
+        padding: 22px 12px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.5;
+        text-align: center;
+    }
+    .inventory-search-empty.is-visible {
+        display: block;
+    }
     .consultation-treatment-table-wrap {
         width: 100%;
         overflow-x: auto;
@@ -836,17 +934,22 @@
     .consultation-treatment-table .treatment-medicine-col { width: 165px; }
     .consultation-treatment-table .treatment-quantity-col { width: 62px; text-align: center; }
     .consultation-treatment-table .treatment-staff-col { width: 145px; }
-    .treatment-table-diagnosis {
-        display: table;
-        margin-bottom: 5px;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: #fef3c7;
-        color: #92400e;
-        font-size: 9px;
-        font-weight: 800;
+    .treatment-table-entry {
+        display: block;
+        margin-bottom: 6px;
     }
-    .treatment-table-remarks {
+    .treatment-table-entry:last-child {
+        margin-bottom: 0;
+    }
+    .treatment-table-entry-label {
+        display: block;
+        margin-bottom: 2px;
+        color: #70131b;
+        font-size: 8px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+    .treatment-table-entry-value {
         display: block;
     }
     .consultation-treatment-empty {
@@ -896,11 +999,36 @@
     html[data-theme="dark"] .consultation-treatment-table td {
         color: #e5e7eb;
     }
+    html[data-theme="dark"] .treatment-table-entry-label {
+        color: #facc15;
+    }
     html[data-theme="dark"] .consultation-treatment-table tbody tr:nth-child(even) {
         background: #1f2937;
     }
     html[data-theme="dark"] .consultation-treatment-table tbody tr:hover {
         background: #332d19;
+    }
+    html[data-theme="dark"] .inventory-panel-search-input {
+        border-bottom-color: #facc15;
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .inventory-panel-search-input::placeholder {
+        color: #cbd5e1;
+    }
+    html[data-theme="dark"] .inventory-panel-search-toggle {
+        border-color: #facc15;
+        background: #800000;
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .inventory-panel-search-toggle:hover,
+    html[data-theme="dark"] .inventory-panel-search-toggle:focus,
+    html[data-theme="dark"] .inventory-panel-search-toggle.is-open {
+        background: #facc15;
+        color: #111827;
+    }
+    html[data-theme="dark"] .inventory-search-empty {
+        border-color: #465267;
+        color: #cbd5e1;
     }
     @media (max-width: 760px) {
         .consultation-workspace {
@@ -948,6 +1076,13 @@
         box-shadow: 0 10px 24px rgba(15, 23, 42, .06);
     }
     .consultation-main .patient-header {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        min-height: 175px;
+        padding: 24px 28px;
+        overflow: hidden;
         border-left: 0;
         border-top: 5px solid var(--clinic-form-maroon);
         background:
@@ -955,10 +1090,62 @@
             linear-gradient(180deg, #fff 0%, #fffaf2 100%);
         box-shadow: 0 14px 30px rgba(127, 29, 45, .08);
     }
+    .consultation-main .patient-header::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #facc15, transparent);
+        opacity: .72;
+    }
+    .patient-identity {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        min-width: 0;
+        text-align: left;
+    }
+    .patient-identity-copy {
+        min-width: 0;
+    }
+    .patient-avatar {
+        display: grid;
+        place-items: center;
+        width: 92px;
+        height: 92px;
+        flex: 0 0 92px;
+        overflow: hidden;
+        border: 3px solid #ffffff;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #70131b, #9f1d35);
+        color: #facc15;
+        box-shadow:
+            0 0 0 2px rgba(112, 19, 27, .22),
+            0 10px 24px rgba(112, 19, 27, .2);
+        font-size: 25px;
+        font-weight: 900;
+    }
+    .patient-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
     .consultation-main .patient-name {
+        max-width: 100%;
+        margin: 0 0 9px;
         color: #70131b;
-        font-size: 1.25rem;
-        font-weight: 800;
+        font-size: clamp(1.65rem, 3vw, 2.25rem);
+        font-weight: 900;
+        line-height: 1.05;
+        overflow-wrap: anywhere;
+    }
+    .consultation-main .patient-badges {
+        justify-content: flex-start;
+        margin-bottom: 8px;
     }
     .consultation-main .patient-badge {
         border: 1px solid rgba(127, 29, 45, .12);
@@ -968,10 +1155,52 @@
         font-size: .68rem;
         font-weight: 800;
     }
+    .patient-meta {
+        display: grid;
+        gap: 4px;
+        color: #4b5563;
+        font-size: .75rem;
+        font-weight: 650;
+        line-height: 1.35;
+    }
+    .patient-meta-row {
+        display: flex;
+        align-items: baseline;
+        gap: 7px;
+        min-width: 0;
+    }
+    .patient-meta-label {
+        flex: 0 0 auto;
+        color: #8f2230;
+        font-size: .64rem;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+    .patient-meta-value {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
     .consultation-main .consultation-date {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-self: end;
+        min-width: 142px;
+        padding: 13px 14px;
+        border: 1px solid rgba(127, 29, 45, .14);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, .72);
         color: #111827;
         font-size: .9rem;
         font-weight: 800;
+        box-shadow: 0 8px 18px rgba(112, 19, 27, .06);
+        text-align: center;
+    }
+    .consultation-source-badge {
+        margin: 6px 0 8px;
+    }
+    .consultation-main .consultation-date .source-walkin {
+        color: #111111;
     }
     .consultation-main .consultation-date span {
         color: #6b7280;
@@ -981,16 +1210,54 @@
     }
     .consultation-main .consult-card > h3,
     .consultation-main .medicine-header h3 {
-        margin: 0 0 16px;
-        padding-bottom: 8px;
-        border-bottom: 2px solid rgba(127, 29, 45, .12);
+        margin: 0;
         color: var(--clinic-form-maroon);
         font-size: 1.05rem;
         font-weight: 800;
     }
+    .consult-section-heading {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin: -22px -24px 18px;
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(250, 204, 21, .24);
+        border-radius: 15px 15px 0 0;
+        background: linear-gradient(135deg, #70131b 0%, #8f2230 100%);
+        box-shadow: 0 8px 18px rgba(112, 19, 27, .14);
+    }
+    .consult-section-icon {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        border: 1px solid rgba(250, 204, 21, .58);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, .1);
+        color: #facc15;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+    }
+    .consult-section-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+    .consult-section-copy {
+        min-width: 0;
+    }
+    .consult-section-copy h3 {
+        padding: 0 !important;
+        border: 0 !important;
+        color: #ffffff !important;
+        font-size: 1.02rem !important;
+    }
     .consultation-main .medicine-header {
         display: block;
-        margin-bottom: 16px;
+        width: 100%;
+        margin-bottom: 0;
+    }
+    .consultation-main .medicine-header .consult-section-heading {
+        width: auto;
     }
     .consultation-main .form-grid-2 {
         gap: 12px;
@@ -1307,10 +1574,224 @@
         to { opacity: 1; transform: scale(1) translateY(0); }
     }
     .consultation-main .btn-cancel {
-        color: #4b5563;
+        position: relative;
+        z-index: 0;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 122px;
+        min-height: 46px;
+        padding: 11px 18px;
+        border: 1px solid #70131b;
+        border-radius: 12px;
+        background: #eef0f3;
+        color: #70131b;
+        box-shadow: 0 7px 16px rgba(15, 23, 42, .08);
         font-family: "Segoe UI", Arial, sans-serif;
         font-size: .86rem;
-        font-weight: 700;
+        font-weight: 800;
+        text-decoration: none;
+        isolation: isolate;
+        transition: color .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .consultation-main .btn-cancel::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background: #facc15;
+        transform: translateX(-105%);
+        transition: transform .32s ease;
+    }
+    .consultation-main .btn-cancel svg {
+        width: 17px;
+        height: 17px;
+        flex: 0 0 17px;
+    }
+    .consultation-main .btn-cancel:hover,
+    .consultation-main .btn-cancel:focus {
+        border-color: #facc15;
+        color: #70131b;
+        box-shadow: 0 10px 20px rgba(112, 19, 27, .14);
+        outline: none;
+    }
+    .consultation-main .btn-cancel:hover::before,
+    .consultation-main .btn-cancel:focus::before {
+        transform: translateX(0);
+    }
+
+    /* Dark mode overrides for the consultation form's health-profile styling. */
+    html[data-theme="dark"] .consultation-main {
+        --clinic-form-field: #172033;
+        --clinic-form-border: #3b475b;
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .consultation-main .consult-card {
+        border-color: #354158;
+        background: #101827;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, .24);
+    }
+    html[data-theme="dark"] .consultation-main .patient-header {
+        border-top-color: #9f1d35;
+        background:
+            radial-gradient(circle at top left, rgba(250, 204, 21, .08), transparent 34%),
+            linear-gradient(180deg, #202c3d 0%, #1b2637 100%);
+    }
+    html[data-theme="dark"] .consultation-main .patient-name,
+    html[data-theme="dark"] .consultation-main .consultation-date,
+    html[data-theme="dark"] .consultation-main .consult-card > h3,
+    html[data-theme="dark"] .consultation-main .medicine-header h3 {
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .consultation-main .consult-card > h3,
+    html[data-theme="dark"] .consultation-main .medicine-header h3 {
+        border-bottom-color: rgba(248, 113, 113, .16);
+    }
+    html[data-theme="dark"] .consultation-main .consultation-date span,
+    html[data-theme="dark"] .consultation-main .form-group label {
+        color: #cbd5e1;
+    }
+    html[data-theme="dark"] .patient-avatar {
+        border-color: #263348;
+        box-shadow:
+            0 0 0 2px rgba(250, 204, 21, .45),
+            0 10px 24px rgba(0, 0, 0, .32);
+    }
+    html[data-theme="dark"] .patient-meta {
+        color: #e2e8f0;
+    }
+    html[data-theme="dark"] .patient-meta-label {
+        color: #facc15;
+    }
+    html[data-theme="dark"] .consultation-main .consultation-date {
+        border-color: #465267;
+        background: rgba(13, 22, 40, .72);
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .consultation-main .consultation-date .source-walkin {
+        color: #111111;
+    }
+    html[data-theme="dark"] .consult-section-heading {
+        border-bottom-color: rgba(250, 204, 21, .24);
+        background: linear-gradient(135deg, #70131b 0%, #8f2230 100%);
+    }
+    html[data-theme="dark"] .consult-section-icon {
+        border-color: rgba(250, 204, 21, .34);
+    }
+    html[data-theme="dark"] .consultation-main .patient-badge {
+        border-color: #536076;
+        background: #f8fafc;
+        color: #1f2937;
+    }
+    html[data-theme="dark"] .consultation-main .form-group {
+        border-color: #3b475b;
+        background: #182235;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+    }
+    html[data-theme="dark"] .consultation-main .form-control,
+    html[data-theme="dark"] .consultation-main .mar-required {
+        border-color: #536076;
+        background: #0d1628;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035);
+        color: #f8fafc;
+        color-scheme: dark;
+    }
+    html[data-theme="dark"] .consultation-main .form-control:hover {
+        border-color: #6b7890;
+    }
+    html[data-theme="dark"] .consultation-main .form-control:focus,
+    html[data-theme="dark"] .consultation-main .mar-required:focus {
+        border-color: #facc15;
+        background: #111c30;
+        box-shadow:
+            0 0 0 .18rem rgba(250, 204, 21, .12),
+            0 10px 22px rgba(0, 0, 0, .2);
+    }
+    html[data-theme="dark"] .consultation-main .form-control[readonly] {
+        border-color: #465267;
+        background: #202a3a;
+        color: #dbe4f0;
+    }
+    html[data-theme="dark"] .consultation-main .form-control::placeholder {
+        color: #8491a5;
+        opacity: 1;
+    }
+    html[data-theme="dark"] .consultation-main .form-help {
+        color: #fca5a5;
+    }
+    html[data-theme="dark"] .consultation-main .choice-card {
+        border-color: #536076;
+        background: #0d1628;
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .consultation-main .choice-card:hover {
+        border-color: #facc15;
+        background: #17233a;
+    }
+    html[data-theme="dark"] .consultation-main .choice-input:checked + .choice-card {
+        border-color: #9f1d35;
+        background: linear-gradient(135deg, #991b32 0%, #700018 100%);
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .consultation-main .clinic-select-display {
+        border-color: #536076;
+        background: #0d1628;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035);
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .consultation-main .clinic-select-display::before {
+        background: #3b475b;
+    }
+    html[data-theme="dark"] .consultation-main .clinic-select-display::after {
+        border-color: #facc15;
+    }
+    html[data-theme="dark"] .consultation-main .clinic-select-display:hover,
+    html[data-theme="dark"] .consultation-main .clinic-select-display.is-open {
+        border-color: #facc15;
+        box-shadow: 0 0 0 4px rgba(250, 204, 21, .08);
+    }
+    html[data-theme="dark"] .consultation-main .clinic-select-menu {
+        border-color: #465267;
+        background: #111827;
+        box-shadow: 0 18px 34px rgba(0, 0, 0, .35);
+    }
+    html[data-theme="dark"] .consultation-main .clinic-select-option {
+        border-color: #3b475b;
+        background: #182235;
+        color: #f8fafc;
+    }
+    html[data-theme="dark"] .consultation-main .clinic-select-option:hover,
+    html[data-theme="dark"] .consultation-main .clinic-select-option.is-selected {
+        border-color: #facc15;
+        background: #800000;
+        color: #facc15;
+    }
+    html[data-theme="dark"] .consultation-main .btn-cancel {
+        border-color: #facc15;
+        background: #273145;
+        color: #ffffff;
+    }
+    html[data-theme="dark"] .consultation-main .btn-cancel:hover {
+        border-color: #facc15;
+        color: #70131b;
+    }
+    @media (max-width: 820px) {
+        .consultation-main .patient-header {
+            grid-template-columns: 1fr;
+            gap: 16px;
+            padding: 22px 18px;
+        }
+        .patient-identity {
+            justify-content: center;
+        }
+        .patient-header-actions {
+            justify-content: center;
+        }
+        .consultation-main .consultation-date {
+            justify-self: center;
+        }
     }
 </style>
 @endpush
@@ -1323,34 +1804,60 @@
     $studentDisplayRole = \App\Models\Appointment::normalizeUserType($student->user_role ?? $student->user_type ?? 'Student');
     $isAssistedIntake = ($user_source ?? '') === 'assisted';
     $studentDocuments = $studentDocuments ?? [];
+    $studentPhotoDocument = collect($studentDocuments)->firstWhere('key', 'student_photo');
+    $studentCourse = trim((string) ($student->course ?: optional($student->healthProfile)->course_college));
+    $studentInitials = collect(preg_split('/\s+/', trim((string) $student->name)) ?: [])
+        ->filter()
+        ->take(2)
+        ->map(fn ($namePart) => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($namePart, 0, 1)))
+        ->implode('');
 @endphp
 
 <div class="consultation-workspace">
     <div class="consultation-main">
         <header class="patient-header consult-card">
-            <div>
-                <h2 class="patient-name">{{ $student->name }}</h2>
-                <div class="patient-badges">
-                    <span class="patient-badge">{{ $studentDisplayRole }}</span>
-                    <span class="patient-badge">{{ $student->student_number ?: $student->student_id ?: 'N/A' }}</span>
-                    @if(($user_source ?? '') === 'online' && $latestAppointment)
-                        <span class="badge-source source-online">Online Appointment</span>
-                    @elseif($isAssistedIntake)
-                        <span class="badge-source source-walkin">Assisted Intake</span>
+            <div class="patient-identity">
+                <div class="patient-avatar" aria-label="{{ $student->name }} profile photo">
+                    @if($studentPhotoDocument)
+                        <img src="{{ $studentPhotoDocument['url'] }}" alt="{{ $student->name }} 2x2 photo">
                     @else
-                        <span class="badge-source source-walkin">Walk-in Patient</span>
+                        <span aria-hidden="true">{{ $studentInitials ?: 'ST' }}</span>
                     @endif
                 </div>
-                @if(($user_source ?? '') === 'online' && $latestAppointment)
-                    <div class="form-help">
-                        Scheduled {{ \Carbon\Carbon::parse($latestAppointment->date)->format('M d, Y') }}
-                        at {{ \Carbon\Carbon::parse($latestAppointment->time)->format('g:i A') }}
+                <div class="patient-identity-copy">
+                    <h2 class="patient-name">{{ $student->name }}</h2>
+                    <div class="patient-badges">
+                        <span class="patient-badge">{{ $studentDisplayRole }}</span>
+                        <span class="patient-badge">Student No. {{ $student->student_number ?: $student->student_id ?: 'N/A' }}</span>
                     </div>
-                @endif
+                    <div class="patient-meta">
+                        <div class="patient-meta-row">
+                            <span class="patient-meta-label">Email</span>
+                            <span class="patient-meta-value">{{ $student->email ?: 'Not provided' }}</span>
+                        </div>
+                        <div class="patient-meta-row">
+                            <span class="patient-meta-label">Course</span>
+                            <span class="patient-meta-value">{{ $studentCourse ?: 'Not provided' }}</span>
+                        </div>
+                    </div>
+                    @if(($user_source ?? '') === 'online' && $latestAppointment)
+                        <div class="form-help">
+                            Scheduled {{ \Carbon\Carbon::parse($latestAppointment->date)->format('M d, Y') }}
+                            at {{ \Carbon\Carbon::parse($latestAppointment->time)->format('g:i A') }}
+                        </div>
+                    @endif
+                </div>
             </div>
             <div class="patient-header-actions">
                 <div class="consultation-date">
                     <span>Today's Consultation</span>
+                    @if(($user_source ?? '') === 'online' && $latestAppointment)
+                        <span class="badge-source source-online consultation-source-badge">Online Appointment</span>
+                    @elseif($isAssistedIntake)
+                        <span class="badge-source source-walkin consultation-source-badge">Assisted Intake</span>
+                    @else
+                        <span class="badge-source source-walkin consultation-source-badge">Walk-in Patient</span>
+                    @endif
                     {{ now()->format('F d, Y') }}
                 </div>
             </div>
@@ -1364,7 +1871,12 @@
             <input type="hidden" name="consultation_started_at" value="{{ old('consultation_started_at', $consultationStartedAt ?? now()->format('H:i:s')) }}">
 
             <section class="consult-card">
-                <h3>Physical Assessment</h3>
+                <div class="consult-section-heading">
+                    <span class="consult-section-icon" aria-hidden="true"><x-outline-icon name="chart-bar" /></span>
+                    <div class="consult-section-copy">
+                        <h3>Physical Assessment</h3>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="consultDob">Date of Birth</label>
                     <input type="date" id="consultDob" name="dob" class="form-control" value="{{ old('dob', $consultationDob ?? '') }}">
@@ -1412,7 +1924,12 @@
             </section>
 
             <section class="consult-card">
-                <h3>Visit Details</h3>
+                <div class="consult-section-heading">
+                    <span class="consult-section-icon" aria-hidden="true"><x-outline-icon name="clipboard-document-list" /></span>
+                    <div class="consult-section-copy">
+                        <h3>Visit Details</h3>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="consultReason">{{ ($user_source ?? '') === 'online' ? 'Appointment Remarks' : 'Reason for Visiting Clinic' }}</label>
                     <input type="text" id="consultReason" name="reason_for_visit" class="form-control" {{ ($user_source ?? '') === 'online' ? 'readonly' : '' }} value="{{ old('reason_for_visit', optional($latestAppointment)->remarks) }}">
@@ -1453,7 +1970,12 @@
 
             <section class="consult-card">
                 <div class="medicine-header">
-                    <h3>Medicine Dispensing</h3>
+                    <div class="consult-section-heading">
+                        <span class="consult-section-icon" aria-hidden="true"><x-outline-icon name="cube" /></span>
+                        <div class="consult-section-copy">
+                            <h3>Medicine Dispensing</h3>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="consultMedicineSelect">Select Medicine (Inventory)</label>
@@ -1497,7 +2019,12 @@
             </section>
 
             <section class="consult-card">
-                <h3>Clinical Findings</h3>
+                <div class="consult-section-heading">
+                    <span class="consult-section-icon" aria-hidden="true"><x-outline-icon name="document-text" /></span>
+                    <div class="consult-section-copy">
+                        <h3>Clinical Findings</h3>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="consultRemarks">Remarks / Assessment</label>
                     <textarea name="remarks" id="consultRemarks" class="form-control" rows="5" required placeholder="Describe symptoms or concerns...">{{ old('remarks') }}</textarea>
@@ -1506,7 +2033,10 @@
                     <button type="submit" class="btn-save" id="finalizeConsultationButton">
                         <span>Save &amp; Finalize Consultation</span>
                     </button>
-                    <a href="{{ route($walkinIndexRoute) }}" class="btn-cancel">Cancel</a>
+                    <a href="{{ route($walkinIndexRoute) }}" class="btn-cancel">
+                        <x-outline-icon name="x-mark" />
+                        <span>Cancel</span>
+                    </a>
                 </div>
             </section>
         </form>
@@ -1577,7 +2107,28 @@
     </section>
 
     <section class="utility-panel-pane" data-utility-pane="inventory">
-        <p class="utility-pane-note">{{ $items->count() }} available medicine {{ $items->count() === 1 ? 'item' : 'items' }} from clinic inventory.</p>
+        <div class="inventory-panel-search" id="inventoryPanelSearch">
+            <div class="inventory-panel-search-wrap">
+                <input
+                    type="search"
+                    id="inventoryPanelSearchInput"
+                    class="inventory-panel-search-input"
+                    placeholder="Search medicine..."
+                    autocomplete="off"
+                    aria-label="Search medicine inventory"
+                >
+            </div>
+            <button
+                type="button"
+                class="inventory-panel-search-toggle"
+                id="inventoryPanelSearchToggle"
+                aria-label="Open medicine search"
+                aria-expanded="false"
+                aria-controls="inventoryPanelSearchInput"
+            >
+                <x-outline-icon name="magnifying-glass" />
+            </button>
+        </div>
         <div class="inventory-tally-list">
             @forelse($items as $item)
                 @php
@@ -1606,6 +2157,9 @@
                 <div class="documents-empty">No medicines are currently available.</div>
             @endforelse
         </div>
+        <div class="inventory-search-empty" id="inventorySearchEmpty">
+            No medicine matches your search.
+        </div>
     </section>
 
     <section class="utility-panel-pane" data-utility-pane="treatments">
@@ -1627,12 +2181,13 @@
                 <tbody>
                     @forelse($studentTreatments as $treatment)
                         @php
-                            $treatmentDiagnosis = trim((string) optional($treatment->medicalCondition)->name);
                             $treatmentMedicine = trim((string) (optional($treatment->medicineItem)->name ?: $treatment->medicine));
                             $treatmentStaff = trim((string) ($treatment->attending_staff_name ?: optional($treatment->attendingStaff)->name));
                             $treatmentQuantity = (float) $treatment->medicine_quantity;
                             $treatmentTimeIn = $treatment->time_in ?: optional($treatment->created_at)->format('H:i:s');
                             $treatmentTimeOut = $treatment->time_out ?: optional($treatment->updated_at)->format('H:i:s');
+                            $treatmentComplaint = trim((string) $treatment->reason_for_visit);
+                            $treatmentImpression = trim((string) $treatment->comments);
                         @endphp
                         <tr>
                             <td>{{ optional($treatment->consultation_date)->format('m/d/Y') ?: '-' }}</td>
@@ -1640,10 +2195,14 @@
                             <td>{{ $treatmentTimeOut ? \Carbon\Carbon::parse($treatmentTimeOut)->format('g:i A') : '-' }}</td>
                             <td>{{ $treatment->service ?: 'Consultation' }}</td>
                             <td>
-                                @if($treatmentDiagnosis !== '')
-                                    <span class="treatment-table-diagnosis">{{ $treatmentDiagnosis }}</span>
-                                @endif
-                                <span class="treatment-table-remarks">{{ $treatment->reason_for_visit ?: $treatment->comments ?: 'No complaint recorded.' }}</span>
+                                <span class="treatment-table-entry">
+                                    <span class="treatment-table-entry-label">Complaint</span>
+                                    <span class="treatment-table-entry-value">{{ $treatmentComplaint ?: 'No complaint recorded.' }}</span>
+                                </span>
+                                <span class="treatment-table-entry">
+                                    <span class="treatment-table-entry-label">Impression</span>
+                                    <span class="treatment-table-entry-value">{{ $treatmentImpression ?: 'No assessment recorded.' }}</span>
+                                </span>
                             </td>
                             <td>{{ $treatmentMedicine !== '' && strtolower($treatmentMedicine) !== 'none' ? $treatmentMedicine : 'No medicine issued' }}</td>
                             <td class="treatment-quantity-col">{{ $treatmentQuantity > 0 ? rtrim(rtrim(number_format($treatmentQuantity, 2, '.', ''), '0'), '.') : '-' }}</td>
@@ -1678,6 +2237,10 @@
         const headerQuickActions = document.getElementById('headerQuickActions');
         const inventoryCards = Array.from(document.querySelectorAll('[data-inventory-item]'));
         const issueButtons = Array.from(document.querySelectorAll('[data-issue-medicine]'));
+        const inventorySearchShell = document.getElementById('inventoryPanelSearch');
+        const inventorySearchInput = document.getElementById('inventoryPanelSearchInput');
+        const inventorySearchToggle = document.getElementById('inventoryPanelSearchToggle');
+        const inventorySearchEmpty = document.getElementById('inventorySearchEmpty');
         const consultationForm = document.getElementById('consultationForm');
         const finalizeButton = document.getElementById('finalizeConsultationButton');
         const consultationSuccessOverlay = document.getElementById('consultationSuccessOverlay');
@@ -1696,6 +2259,27 @@
             documents: 'Uploaded Documents',
             inventory: 'Live Medicine Stock',
             treatments: 'Treatment Record'
+        };
+
+        const setInventorySearchOpen = function (isOpen) {
+            if (!inventorySearchShell || !inventorySearchToggle) return;
+            inventorySearchShell.classList.toggle('is-open', isOpen);
+            inventorySearchToggle.classList.toggle('is-open', isOpen);
+            inventorySearchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            inventorySearchToggle.setAttribute('aria-label', isOpen ? 'Close medicine search' : 'Open medicine search');
+        };
+
+        const filterInventoryCards = function () {
+            const searchTerm = (inventorySearchInput?.value || '').trim().toLowerCase();
+            let visibleCount = 0;
+
+            inventoryCards.forEach(function (card) {
+                const matches = searchTerm === '' || card.textContent.toLowerCase().includes(searchTerm);
+                card.style.display = matches ? '' : 'none';
+                if (matches) visibleCount += 1;
+            });
+
+            inventorySearchEmpty?.classList.toggle('is-visible', inventoryCards.length > 0 && visibleCount === 0);
         };
 
         const closeUtility = function () {
@@ -1906,6 +2490,23 @@
                     quantityInput.focus();
                 }, 350);
             });
+        });
+
+        inventorySearchToggle?.addEventListener('click', function () {
+            const isOpening = !inventorySearchShell.classList.contains('is-open');
+            setInventorySearchOpen(isOpening);
+
+            if (isOpening) {
+                window.setTimeout(function () {
+                    inventorySearchInput?.focus();
+                }, 120);
+            } else if (inventorySearchInput && inventorySearchInput.value.trim() === '') {
+                inventorySearchInput.blur();
+            }
+        });
+        inventorySearchInput?.addEventListener('input', filterInventoryCards);
+        inventorySearchInput?.addEventListener('focus', function () {
+            setInventorySearchOpen(true);
         });
 
         quantityInput.addEventListener('input', function () {

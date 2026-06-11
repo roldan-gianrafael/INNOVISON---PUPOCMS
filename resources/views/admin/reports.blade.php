@@ -741,11 +741,7 @@
         </div>
     </div>
 
-    <div class="back-nav">
-        <a href="{{ $dashboardUrl }}" class="btn-back-dashboard">
-            &larr; Back to System Dashboard
-        </a>
-    </div>
+    
 
 </div>
 @endsection

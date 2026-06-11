@@ -165,6 +165,18 @@
             mix-blend-mode: normal;
         }
 
+        .topbar-btn-local {
+            border-color: rgba(255, 255, 255, 0.42);
+            background: rgba(15, 23, 42, 0.24);
+        }
+
+        .topbar-btn-local:hover,
+        .topbar-btn-local:focus-visible {
+            border-color: var(--gold);
+            background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+            color: var(--maroon);
+        }
+
         .landing-panel {
             width: min(1040px, 100%);
             min-height: min(620px, calc(100vh - 72px));
@@ -1029,6 +1041,10 @@
                 in_array($landingStudentUserType, ['assistant', 'student assistant', 'student_assistant'], true)
                 || in_array($landingStudentRawRole, ['student_assistant', 'studentassistant', 'assistant'], true)
             );
+        $landingNow = now(config('app.timezone'));
+        $landingMinutesSinceMidnight = ((int) $landingNow->format('H') * 60) + (int) $landingNow->format('i');
+        $saAdminWorkspaceAvailable = $landingMinutesSinceMidnight >= (8 * 60)
+            && $landingMinutesSinceMidnight < (20 * 60);
 
         if ($landingAdminUser) {
             $workspaceHref = url('/admin/dashboard');
@@ -1096,14 +1112,23 @@
                     </button>
                 </form>
             @else
-                <button type="button" class="topbar-btn topbar-btn-adaptive" onclick="showLoginPrompt()">
+                @env('local')
+                    <a class="topbar-btn topbar-btn-local" href="{{ route('login') }}">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor"/>
+                            <path d="M8 8h8M8 12h5M8 16h3" stroke="currentColor" stroke-linecap="round"/>
+                        </svg>
+                        <span>Local Login</span>
+                    </a>
+                @endenv
+                <a class="topbar-btn topbar-btn-adaptive" href="{{ route('login.portal') }}">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <span>Log In via One Portal</span>
-                </button>
+                </a>
             @endif
         </nav>
     </header>
@@ -1265,13 +1290,25 @@
                                 <h2>Choose Your Workspace</h2>
                                 <p>Select where you want to continue today.</p>
                             </div>
-                            <a class="workspace-btn" href="/student/home">
+                            <a class="workspace-btn" href="{{ route('assistant.enter-student') }}">
                                 <span class="workspace-badge">👤</span>
                                 <span>Go to Student Side</span>
                             </a>
-                            <a class="workspace-btn" href="/assistant/dashboard">
+                            <a
+                                class="workspace-btn"
+                                href="{{ $saAdminWorkspaceAvailable ? route('assistant.enter-admin') : '#' }}"
+                                @unless($saAdminWorkspaceAvailable)
+                                    aria-disabled="true"
+                                    onclick="event.preventDefault();"
+                                    style="cursor: not-allowed; opacity: .58;"
+                                @endunless
+                            >
                                 <span class="workspace-badge">⚙️</span>
-                                <span>Go to Admin/SA Side</span>
+                                <span>
+                                    {{ $saAdminWorkspaceAvailable
+                                        ? 'Go to Admin/SA Side'
+                                        : 'Admin Side: Available 8:00 AM–8:00 PM' }}
+                                </span>
                             </a>
                         </div>
 
@@ -1369,10 +1406,10 @@
 
             console.log('[LANDING] URL Params - workspace:', workspaceParam, 'auth_error:', authErrorParam);
 
-            // If auth_error=true, show login prompt
+            // Keep the public landing page visible if authentication returns an error.
             if (authErrorParam === 'true') {
-                console.log('[LANDING] Gateway returned auth_error - showing login prompt');
-                showLoginPrompt();
+                console.log('[LANDING] Gateway returned auth_error - keeping public workspace UI visible');
+                updateUIForGuest();
                 return;
             }
 
@@ -1412,6 +1449,7 @@
         // Show Student Assistant workspace selector modal
         function showStudentAssistantSelector() {
             console.log('[LANDING] Creating Student Assistant workspace selector');
+            const adminWorkspaceAvailable = @json($saAdminWorkspaceAvailable);
 
             // Create modal overlay
             const modal = document.createElement('div');
@@ -1495,8 +1533,14 @@
                 this.style.boxShadow = '0 12px 28px rgba(112, 19, 27, 0.18)';
             });
 
-            const adminButton = document.createElement('a');
-            adminButton.href = '{{ url('/assistant/dashboard') }}';
+            const adminButton = document.createElement(adminWorkspaceAvailable ? 'a' : 'button');
+            if (adminWorkspaceAvailable) {
+                adminButton.href = '{{ route('assistant.enter-admin') }}';
+            } else {
+                adminButton.type = 'button';
+                adminButton.disabled = true;
+                adminButton.setAttribute('aria-disabled', 'true');
+            }
             adminButton.style.cssText = `
                 display: flex;
                 align-items: center;
@@ -1512,29 +1556,32 @@
                 font-size: 16px;
                 font-weight: 950;
                 text-decoration: none;
-                cursor: pointer;
+                cursor: ${adminWorkspaceAvailable ? 'pointer' : 'not-allowed'};
                 transition: all 0.18s ease;
                 box-shadow: 0 12px 28px rgba(112, 19, 27, 0.18);
+                opacity: ${adminWorkspaceAvailable ? '1' : '.58'};
             `;
             adminButton.innerHTML = `
                 <svg viewBox="0 0 24 24" fill="none" style="width: 22px; height: 22px; flex: 0 0 auto; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
                     <path d="M12 2L2 7v10a8 8 0 0 0 8 8 8 8 0 0 0 8-8V7l-10-5z"/>
                     <path d="M12 11v5M9 14h6"/>
                 </svg>
-                <span>Go to Admin/SA Side</span>
+                <span>${adminWorkspaceAvailable ? 'Go to Admin/SA Side' : 'Admin Side: Available 8:00 AM–8:00 PM'}</span>
             `;
-            adminButton.addEventListener('mouseover', function() {
-                this.style.background = 'linear-gradient(135deg, #facc15, #fff1a8)';
-                this.style.color = '#70131b';
-                this.style.borderColor = '#facc15';
-                this.style.boxShadow = '0 16px 36px rgba(112, 19, 27, 0.22)';
-            });
-            adminButton.addEventListener('mouseout', function() {
-                this.style.background = 'linear-gradient(135deg, #70131b, #8f2230)';
-                this.style.color = 'white';
-                this.style.borderColor = '#70131b';
-                this.style.boxShadow = '0 12px 28px rgba(112, 19, 27, 0.18)';
-            });
+            if (adminWorkspaceAvailable) {
+                adminButton.addEventListener('mouseover', function() {
+                    this.style.background = 'linear-gradient(135deg, #facc15, #fff1a8)';
+                    this.style.color = '#70131b';
+                    this.style.borderColor = '#facc15';
+                    this.style.boxShadow = '0 16px 36px rgba(112, 19, 27, 0.22)';
+                });
+                adminButton.addEventListener('mouseout', function() {
+                    this.style.background = 'linear-gradient(135deg, #70131b, #8f2230)';
+                    this.style.color = 'white';
+                    this.style.borderColor = '#70131b';
+                    this.style.boxShadow = '0 12px 28px rgba(112, 19, 27, 0.18)';
+                });
+            }
 
             const footerHTML = `
                 <p style="margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.6;">PUP Taguig Clinic Management System</p>
@@ -1578,105 +1625,6 @@
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     console.log('[LANDING] Closing SA workspace selector');
-                    modal.remove();
-                }
-            });
-        }
-
-        // Show modal/alert prompting user to login
-        function showLoginPrompt() {
-            console.log('[LANDING] Showing login prompt modal');
-
-            // Create modal overlay
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(15, 23, 42, 0.6);
-                backdrop-filter: blur(4px);
-                -webkit-backdrop-filter: blur(4px);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10000;
-                animation: fadeInOverlay 0.3s ease;
-            `;
-
-            const modalBox = document.createElement('div');
-            modalBox.style.cssText = `
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 230, 0.95));
-                border-radius: 24px;
-                padding: 48px 40px;
-                max-width: 420px;
-                width: 90%;
-                box-shadow: 0 28px 68px rgba(15, 23, 42, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-                border: 1px solid rgba(112, 19, 27, 0.10);
-                text-align: center;
-                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                animation: slideInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-            `;
-
-            modalBox.innerHTML = `
-                <h2 style="margin: 0 0 12px 0; color: #70131b; font-size: 28px; line-height: 1.08; font-weight: 950;">Login Required</h2>
-                <p style="margin: 0 0 28px 0; color: #64748b; font-size: 15px; line-height: 1.6;">
-                    Please login to One Portal first to access the clinic management system.
-                </p>
-                <button id="loginNowBtn" style="
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    padding: 16px 32px;
-                    border-radius: 999px;
-                    border: 1.5px solid #70131b;
-                    background: linear-gradient(135deg, #70131b, #8f2230);
-                    color: white;
-                    font-size: 16px;
-                    font-weight: 950;
-                    cursor: pointer;
-                    transition: all 0.18s ease;
-                    box-shadow: 0 12px 28px rgba(112, 19, 27, 0.18);
-                    font-family: inherit;
-                ">
-                    <svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px; flex: 0 0 auto; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                        <path d="M10 17l5-5-5-5"/>
-                        <path d="M15 12H4"/>
-                        <path d="M20 4v16"/>
-                    </svg>
-                    <span>Login via One Portal</span>
-                </button>
-            `;
-
-            modal.appendChild(modalBox);
-            document.body.appendChild(modal);
-
-            // Add hover effect
-            const button = modalBox.querySelector('#loginNowBtn');
-            button.addEventListener('mouseover', function() {
-                this.style.background = 'linear-gradient(135deg, #facc15, #fff1a8)';
-                this.style.color = '#70131b';
-                this.style.borderColor = '#facc15';
-                this.style.boxShadow = '0 16px 36px rgba(112, 19, 27, 0.22)';
-            });
-            button.addEventListener('mouseout', function() {
-                this.style.background = 'linear-gradient(135deg, #70131b, #8f2230)';
-                this.style.color = 'white';
-                this.style.borderColor = '#70131b';
-                this.style.boxShadow = '0 12px 28px rgba(112, 19, 27, 0.18)';
-            });
-
-            // Handle button click
-            button.addEventListener('click', function() {
-                modal.remove();
-                window.location.href = '{{ route('login.portal') }}';
-            });
-
-            // Close modal on overlay click
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
                     modal.remove();
                 }
             });

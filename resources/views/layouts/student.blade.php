@@ -2651,7 +2651,7 @@
 
     @if($showHealthFormModal)
     <div id="healthFormModal" style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; height: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 999999 !important;">
-        <div style="background: #fff; border-radius: 24px; padding: 40px; max-width: 520px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.4); margin: auto; position: relative; border-top: 2px solid #ffc107; border-bottom: 2px solid #ffc107;">
+        <div class="health-profile-prompt-card" style="background: #fff; border-radius: 24px; padding: 40px; max-width: 520px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.4); margin: auto; position: relative; border-top: 2px solid #ffc107; border-bottom: 2px solid #ffc107;">
             <div style="position: relative; width: 90px; height: 90px; margin: 0 auto 24px;">
                 <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #8b0000 0%, #6b0000 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: floatIcon 3s ease-in-out infinite; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2663,19 +2663,25 @@
                 </div>
                 <div style="width: 70px; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, transparent 70%); margin: 8px auto 0; border-radius: 50%;"></div>
             </div>
-            <h2 style="color: #1f2937; font-size: 24px; font-weight: 800; margin: 0 0 16px;">Complete Your Health Profile</h2>
-            <p style="color: #4b5563; font-size: 16px; line-height: 1.7; margin: 0 0 28px;">
+            <h2 class="health-profile-prompt-title" style="color: #1f2937; font-size: 24px; font-weight: 800; margin: 0 0 16px;">Complete Your Health Profile</h2>
+            <p class="health-profile-prompt-copy" style="color: #4b5563; font-size: 16px; line-height: 1.7; margin: 0 0 28px;">
                 Hello <strong>{{ $studentUser->first_name ?? 'Student' }}</strong>! Good day!<br>
                 Please fill up your <strong>Health Profile</strong> to complete your clinic record.<br>
-                <span style="color: #6b7280; font-size: 14px;">You can skip this for now, but this prompt will show again on your next login until submitted.</span>
+                <span class="health-profile-prompt-instruction" style="color: #6b7280; font-size: 14px;">Prepare your personal information, medical history, vaccination details, and clinic requirement files before you begin.</span>
             </p>
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <a href="{{ route('health.form') }}" style="display: inline-block; background: #8b0000; color: #fff; padding: 14px 30px; border-radius: 12px; font-size: 16px; font-weight: 700; text-decoration: none; transition: all 0.2s; box-shadow: 0 8px 24px rgba(139,0,0,0.3);">
-                    Open Health Profile
+            <div class="health-profile-prompt-actions" style="display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                <a class="health-profile-fill-button" href="{{ route('health.form') }}">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M14 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-linecap="round"/>
+                        <path d="M9 3.5h6v3H9zM8 12h8M8 16h5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Fill Up Form</span>
                 </a>
-                <button type="button" onclick="document.getElementById('healthFormModal').style.display='none'" style="display: inline-block; background: #e5e7eb; color: #1f2937; border: none; padding: 14px 30px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;">
-                    Skip for Now
-                </button>
+                @env('local')
+                    <button type="button" onclick="document.getElementById('healthFormModal').style.display='none'" style="display: inline-block; background: #e5e7eb; color: #1f2937; border: none; padding: 14px 30px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;">
+                        Skip for Now
+                    </button>
+                @endenv
             </div>
         </div>
     </div>
@@ -2684,10 +2690,66 @@
             background: rgba(0, 0, 0, 0.75) !important;
             backdrop-filter: blur(8px);
         }
-        #healthFormModal a:hover {
-            background: #6b0000 !important;
+        #healthFormModal .health-profile-prompt-card {
+            background: #ffffff !important;
+            color: #1f2937 !important;
+        }
+        #healthFormModal .health-profile-prompt-title {
+            color: #1f2937 !important;
+        }
+        #healthFormModal .health-profile-prompt-copy {
+            color: #4b5563 !important;
+        }
+        #healthFormModal .health-profile-prompt-instruction {
+            color: #6b7280 !important;
+        }
+        #healthFormModal .health-profile-fill-button {
+            position: relative;
+            isolation: isolate;
+            display: inline-flex;
+            min-width: 210px;
+            min-height: 52px;
+            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 28px;
+            border: 1px solid #8b0000;
+            border-radius: 12px;
+            background: #8b0000;
+            color: #ffffff !important;
+            font-size: 16px;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(139, 0, 0, .3);
+            transition: color .25s ease, border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+        }
+        #healthFormModal .health-profile-fill-button::before {
+            position: absolute;
+            z-index: -1;
+            inset: 0;
+            background: #facc15;
+            content: "";
+            transform: translateX(-102%);
+            transition: transform .32s ease;
+        }
+        #healthFormModal .health-profile-fill-button svg {
+            width: 20px;
+            height: 20px;
+            flex: 0 0 auto;
+            stroke-width: 2;
+        }
+        #healthFormModal .health-profile-fill-button:hover,
+        #healthFormModal .health-profile-fill-button:focus-visible {
+            border-color: #facc15;
+            color: #70131b !important;
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(139,0,0,0.4) !important;
+            box-shadow: 0 12px 32px rgba(139, 0, 0, .4);
+            outline: none;
+        }
+        #healthFormModal .health-profile-fill-button:hover::before,
+        #healthFormModal .health-profile-fill-button:focus-visible::before {
+            transform: translateX(0);
         }
         @keyframes floatIcon {
             0%, 100% {

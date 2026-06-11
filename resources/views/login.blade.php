@@ -706,6 +706,7 @@
     </div>
   </main>
 
+  @env('local')
   @unless(config('services.idp.enabled'))
       <div id="registerModal" class="modal-overlay">
           <div class="modal-content">
@@ -737,22 +738,21 @@
                       </div>
 
                       <div class="form-group">
-                          <label>COURSE</label>
-                          <select name="course" required>
-                            <option value="BSBAHRM">Bachelor of Science in Business Administration - Human Resourse Management</option>
-                            <option value="BSBAMM">Bachelor of Science in Business Administration - Marketing Management</option>
-                            <option value="BSED-English">Bachelor of Science in Education - English</option>
-                            <option value="BSED-Math">Bachelor of Science in Education - Mathematics</option>
-                            <option value="BSECE">Bachelor of Science in Electronic Engineering</option>
-                            <option value="BSEME">Bachelor of Science in Mechanical Mathematics</option>
-                            <option value="BSIT">Bachelor of Science in Information Technology</option>
-                            <option value="BSOA">Bachelor of Science in Office Administration</option>
-                            <option value="BSPSYCH">Bachelor of Science in Psychology</option>
-                            <option value="DIT">Diploma in Information Technology</option>
-                            <option value="DOMT">Diploma in Office Management and Technology</option>
-                            <option value="FACULTY">Faculty</option>
+                          <label>CLINIC ROLE</label>
+                          <select name="clinic_role" required>
+                              <option value="" disabled {{ old('clinic_role') ? '' : 'selected' }}>Select clinic role</option>
+                              <option value="admin_clinic_staff" {{ old('clinic_role') === 'admin_clinic_staff' ? 'selected' : '' }}>
+                                  Admin - Clinic Staff
+                              </option>
+                              <option value="student_assistant" {{ old('clinic_role') === 'student_assistant' ? 'selected' : '' }}>
+                                  Admin - Student Assistant
+                              </option>
+                              <option value="super_admin" {{ old('clinic_role') === 'super_admin' ? 'selected' : '' }}>
+                                  Superadmin
+                              </option>
                           </select>
                       </div>
+
                       <div class="form-row">
                           <div class="form-group">
                               <label>PASSWORD</label>
@@ -776,6 +776,7 @@
           </div>
       </div>
   @endunless
+  @endenv
 
   <div id="loginLoadingOverlay" class="login-loading-overlay" aria-hidden="true">
       <div class="login-loading-card">

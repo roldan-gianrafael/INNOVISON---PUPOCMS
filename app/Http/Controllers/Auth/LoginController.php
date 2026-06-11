@@ -389,6 +389,7 @@ class LoginController extends Controller
 
         return view('auth.student-assistant-portal', [
             'user' => $user,
+            'adminWorkspaceAvailable' => $this->studentAssistantAdminWorkspaceAvailable(),
         ]);
     }
 
@@ -409,10 +410,26 @@ class LoginController extends Controller
         $user = $this->authenticatedUser();
         abort_unless($user instanceof User && $this->isStudentAssistantAccount($user), 403);
 
+        if (!$this->studentAssistantAdminWorkspaceAvailable()) {
+            return redirect()
+                ->route('assistant.choose-portal')
+                ->withErrors([
+                    'workspace' => 'Admin Workspace is available daily from 8:00 AM to 8:00 PM.',
+                ]);
+        }
+
         Auth::guard($this->adminGuardName())->login($user);
         Auth::shouldUse($this->adminGuardName());
 
         return redirect('/assistant/dashboard');
+    }
+
+    private function studentAssistantAdminWorkspaceAvailable(): bool
+    {
+        $now = now(config('app.timezone'));
+        $minutesSinceMidnight = ((int) $now->format('H') * 60) + (int) $now->format('i');
+
+        return $minutesSinceMidnight >= (8 * 60) && $minutesSinceMidnight < (20 * 60);
     }
 
     private function idpUrl(string $path): ?string

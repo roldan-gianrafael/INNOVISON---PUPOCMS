@@ -337,6 +337,51 @@
             stroke-width: 2.2;
         }
 
+        .workspace-button.is-disabled {
+            cursor: not-allowed;
+            border-color: #cbd5e1;
+            background: #e5e7eb;
+            color: #64748b;
+            box-shadow: none;
+            opacity: .82;
+        }
+
+        .workspace-button.is-disabled::before {
+            display: none;
+        }
+
+        .workspace-button.is-disabled:hover,
+        .workspace-button.is-disabled:focus-visible {
+            border-color: #cbd5e1;
+            background: #e5e7eb;
+            color: #64748b;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .workspace-schedule {
+            display: block;
+            margin: -3px 0 2px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.45;
+            text-align: center;
+        }
+
+        .workspace-error {
+            margin: 0 0 14px;
+            padding: 10px 12px;
+            border: 1px solid rgba(153, 27, 27, .2);
+            border-radius: 8px;
+            background: #fff1f2;
+            color: #991b1b;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.45;
+            text-align: center;
+        }
+
         .account-note {
             margin: 22px 0 0;
             color: #7c8797;
@@ -418,6 +463,7 @@
         $showStudentWorkspace = $isStudentAssistant || $normalizedUserRole === \App\Models\User::ROLE_STUDENT;
         $showAdminWorkspace = $isStudentAssistant
             || in_array($normalizedUserRole, [\App\Models\User::ROLE_ADMIN, \App\Models\User::ROLE_SUPERADMIN], true);
+        $adminWorkspaceAvailable = (bool) ($adminWorkspaceAvailable ?? false);
     @endphp
 
     <main class="workspace-shell">
@@ -509,6 +555,10 @@
                     </div>
 
                     <div class="workspace-actions">
+                        @error('workspace')
+                            <p class="workspace-error" role="alert">{{ $message }}</p>
+                        @enderror
+
                         @if($showStudentWorkspace)
                             <a class="workspace-button" href="{{ route('assistant.enter-student') }}">
                                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -520,12 +570,22 @@
                         @endif
 
                         @if($showAdminWorkspace)
-                            <a class="workspace-button" href="{{ route('assistant.enter-admin') }}">
-                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M3.75 21h16.5M4.5 3h15a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V3.75A.75.75 0 0 1 4.5 3ZM9 21v-5.25m6 5.25v-5.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span>Admin Workspace</span>
-                            </a>
+                            @if($adminWorkspaceAvailable)
+                                <a class="workspace-button" href="{{ route('assistant.enter-admin') }}">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M3.75 21h16.5M4.5 3h15a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V3.75A.75.75 0 0 1 4.5 3ZM9 21v-5.25m6 5.25v-5.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span>Admin Workspace</span>
+                                </a>
+                            @else
+                                <button class="workspace-button is-disabled" type="button" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M3.75 21h16.5M4.5 3h15a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V3.75A.75.75 0 0 1 4.5 3ZM9 21v-5.25m6 5.25v-5.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span>Admin Workspace</span>
+                                </button>
+                            @endif
+                            <small class="workspace-schedule">Available daily from 8:00 AM to 8:00 PM</small>
                         @endif
                     </div>
 

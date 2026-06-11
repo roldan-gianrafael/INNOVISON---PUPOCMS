@@ -477,17 +477,22 @@
         color: #64748b;
         font-size: 10px;
     }
-    .diagnosis-label {
-        display: table;
-        margin-bottom: 5px;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: #fef3c7;
-        color: #92400e;
-        font-size: 10px;
-        font-weight: 800;
+    .complaint-impression-entry {
+        display: block;
+        margin-bottom: 6px;
     }
-    .complaint-remarks {
+    .complaint-impression-entry:last-child {
+        margin-bottom: 0;
+    }
+    .complaint-impression-label {
+        display: block;
+        margin-bottom: 2px;
+        color: #70131b;
+        font-size: 9px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+    .complaint-impression-value {
         display: block;
     }
     .quantity-cell,
@@ -578,6 +583,9 @@
     html[data-theme="dark"] .form-b-table td {
         border-color: #374151;
         color: #e5e7eb;
+    }
+    html[data-theme="dark"] .complaint-impression-label {
+        color: #facc15;
     }
     html[data-theme="dark"] .form-b-table tbody tr:hover {
         background: #332d19;
@@ -701,8 +709,8 @@
                                 trim((string) $patient?->section),
                             ])));
                             $courseDepartment = trim(implode(' / ', array_filter([$course, $yearSection])));
-                            $reason = trim((string) ($consultation->reason_for_visit ?: $consultation->comments));
-                            $diagnosis = trim((string) optional($consultation->medicalCondition)->name);
+                            $complaint = trim((string) $consultation->reason_for_visit);
+                            $impression = trim((string) $consultation->comments);
                             $medicineName = trim((string) (optional($consultation->medicineItem)->name ?: $consultation->medicine));
                             $medicineQuantity = (float) $consultation->medicine_quantity;
                             $staffName = trim((string) ($consultation->attending_staff_name ?: optional($consultation->attendingStaff)->name));
@@ -723,10 +731,14 @@
                             </td>
                             <td>{{ $courseDepartment ?: ($consultation->user_role ?: '-') }}</td>
                             <td>
-                                @if($diagnosis !== '')
-                                    <span class="diagnosis-label">{{ $diagnosis }}</span>
-                                @endif
-                                <span class="complaint-remarks">{{ $reason ?: 'No complaint recorded' }}</span>
+                                <span class="complaint-impression-entry">
+                                    <span class="complaint-impression-label">Complaint</span>
+                                    <span class="complaint-impression-value">{{ $complaint ?: 'No complaint recorded' }}</span>
+                                </span>
+                                <span class="complaint-impression-entry">
+                                    <span class="complaint-impression-label">Impression</span>
+                                    <span class="complaint-impression-value">{{ $impression ?: 'No assessment recorded' }}</span>
+                                </span>
                             </td>
                             <td>
                                 {{ $medicineName !== '' && strtolower($medicineName) !== 'none' ? $medicineName : 'No medicine issued' }}

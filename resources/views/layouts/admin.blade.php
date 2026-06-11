@@ -1382,6 +1382,15 @@
             color: #ffffff;
         }
 
+        .profile-dropdown a.switch-student-link {
+            color: #fff7cf;
+        }
+
+        .profile-dropdown a.switch-student-link:hover {
+            background: rgba(250, 204, 21, 0.14);
+            color: #facc15;
+        }
+
         .profile-dropdown a.logout-link {
             color: #ffd7df;
             border-bottom: none;
@@ -3236,6 +3245,15 @@
             color: #56111d;
         }
 
+        html[data-theme="light"] .profile-dropdown a.switch-student-link {
+            color: #70131b;
+        }
+
+        html[data-theme="light"] .profile-dropdown a.switch-student-link:hover {
+            background: #fff8d6;
+            color: #70131b;
+        }
+
         html[data-theme="light"] .profile-dropdown a.logout-link {
             color: #a2263f;
         }
@@ -4223,6 +4241,12 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                     <a href="{{ $settingsUrl }}">
                         <x-outline-icon name="cog-6-tooth" />
                         <span>Settings</span>
+                    </a>
+                @endif
+                @if($isStudentAssistant)
+                    <a href="{{ route('assistant.enter-student') }}" class="switch-student-link">
+                        <x-outline-icon name="user-plus" />
+                        <span>Switch to Student Side</span>
                     </a>
                 @endif
                 <a href="#" class="logout-link" onclick="event.preventDefault(); document.getElementById('layoutLogoutForm').submit();">

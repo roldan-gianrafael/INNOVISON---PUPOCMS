@@ -3871,13 +3871,20 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
 @php
     $authUser = auth()->user();
     $currentRole = \App\Models\User::normalizeRole(optional($authUser)->user_role ?? '');
-    $isStudentAssistant = $currentRole === \App\Models\User::ROLE_ADMIN;
+    $currentUserType = strtolower(trim((string) (optional($authUser)->user_type ?? '')));
+    $isStudentAssistant = $currentRole === \App\Models\User::ROLE_ADMIN
+        && in_array($currentUserType, ['assistant', 'student assistant', 'student_assistant'], true);
     $isAdminLike = $currentRole === \App\Models\User::ROLE_SUPERADMIN;
     $linkedAdminProfile = null;
     $adminTypeLabel = null;
     if ($authUser && $currentRole === \App\Models\User::ROLE_ADMIN) {
         $email = trim((string) ($authUser->email ?? ''));
-        if ($email !== '') {
+        if (\App\Models\Admin::hasColumn('user_id')) {
+            $linkedAdminProfile = \App\Models\Admin::query()
+                ->where('user_id', $authUser->id)
+                ->first();
+        }
+        if (!$linkedAdminProfile && $email !== '') {
             $linkedAdminProfile = \App\Models\Admin::query()
                 ->where(function ($query) use ($email) {
                     $query->where('email', $email);
@@ -3887,6 +3894,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
                 })
                 ->first();
 
+        }
+
+        if ($isStudentAssistant) {
+            $adminTypeLabel = 'Admin - Student Assistant';
+        } else {
             $accessLevel = strtolower(trim((string) ($linkedAdminProfile?->access_level ?? '')));
             if ($accessLevel === 'designee') {
                 $adminTypeLabel = 'Admin - Designee';
@@ -3918,7 +3930,16 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $walkinUrl = $isStudentAssistant ? url('/assistant/walkin') : url('/admin/walkin');
     $assistantEndpoint = $isStudentAssistant ? route('assistant.intent') : route('admin.assistant.intent');
     $displayName = optional($authUser)->name ?? 'Clinic User';
-    $welcomeName = in_array($displayName, ['Admin Account', 'Super Admin Account'], true) ? 'Nurse Joyce' : $displayName;
+    $welcomeFirstName = trim((string) (optional($authUser)->first_name ?? ''));
+    $welcomeLastName = trim((string) (optional($authUser)->last_name ?? ''));
+    if ($welcomeFirstName === '') {
+        $welcomeNameParts = preg_split('/\s+/', trim((string) $displayName), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $welcomeFirstName = $welcomeNameParts[0] ?? 'Clinic User';
+        $welcomeLastName = count($welcomeNameParts) > 1 ? (string) end($welcomeNameParts) : '';
+    }
+    $welcomeName = in_array($displayName, ['Admin Account', 'Super Admin Account'], true)
+        ? 'Nurse J.'
+        : trim($welcomeFirstName . ($welcomeLastName !== '' ? ' ' . strtoupper(substr($welcomeLastName, 0, 1)) . '.' : ''));
     $avatarInitial = strtoupper(substr($displayName, 0, 1));
     $brandLogo = asset('images/clinic_logo_transparent.png') . '?v=' . filemtime(public_path('images/clinic_logo_transparent.png'));
     $brandUniversityLogo = asset('images/pup_logo.png');

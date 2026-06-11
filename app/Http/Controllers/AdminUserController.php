@@ -148,6 +148,9 @@ class AdminUserController extends Controller
         $normalizedRequestedRole = User::normalizeRole($request->user_role);
 
         $user->user_role = $normalizedRequestedRole;
+        if (Schema::hasColumn('users', 'user_type')) {
+            $user->user_type = $usesSeparateAdminEmail ? 'Assistant' : 'Regular';
+        }
         $user->email = trim((string) $request->email);
         $adminLoginEmail = trim((string) $request->admin_email);
 
@@ -337,6 +340,9 @@ class AdminUserController extends Controller
         }
 
         $user->user_role = $normalizedRequestedRole;
+        if (Schema::hasColumn('users', 'user_type')) {
+            $user->user_type = $usesSeparateAdminEmail ? 'Assistant' : 'Regular';
+        }
         if (Schema::hasColumn('users', 'status')) {
             $user->status = $request->status;
         }
@@ -516,6 +522,9 @@ class AdminUserController extends Controller
         $adminProfileId = trim((string) request()->input('admin_profile_id', ''));
 
         $user->user_role = User::ROLE_STUDENT;
+        if (Schema::hasColumn('users', 'user_type')) {
+            $user->user_type = 'Regular';
+        }
         if (Schema::hasColumn('users', 'status')) {
             $user->status = 'active';
         }
@@ -618,7 +627,7 @@ class AdminUserController extends Controller
                     'last_name' => (string) ($user->last_name ?? ''),
                     'student_id' => $resolvedIdentifier,
                     'email' => (string) ($user->email ?? ''),
-                    'role' => $this->resolveRoleLabel($rawRole, $linkedAdmin),
+                    'role' => $this->resolveRoleLabel($user, $linkedAdmin),
                     'raw_role' => $rawRole,
                     'normalized_role' => $role,
                     'status' => $status === 'inactive' ? 'inactive' : 'active',
@@ -637,6 +646,7 @@ class AdminUserController extends Controller
                         'contact_no' => (string) ($user->contact_no ?? ''),
                         'is_health_profile_completed' => (bool) ($user->is_health_profile_completed ?? false),
                         'access_level' => (string) ($linkedAdmin?->access_level ?? ''),
+                        'user_type' => (string) ($user->user_type ?? ''),
                         'admin_login_email' => (string) ($linkedAdmin?->email_address ?? $linkedAdmin?->email ?? ''),
                         'admin_profile_id' => $linkedAdmin?->admin_id,
                         'admin_profile_name' => (string) ($linkedAdmin?->name ?? ''),
@@ -819,8 +829,12 @@ class AdminUserController extends Controller
     {
         $rawRole = strtolower(trim((string) ($user->user_role ?? 'student')));
         $normalizedRole = User::normalizeRole($rawRole);
+        $userType = strtolower(trim((string) ($user->user_type ?? '')));
 
-        if (in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)) {
+        if (
+            in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)
+            || in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+        ) {
             return 'student_assistant';
         }
 
@@ -841,13 +855,17 @@ class AdminUserController extends Controller
         };
     }
 
-    private function resolveRoleLabel(string $role, ?Admin $linkedAdmin = null): string
+    private function resolveRoleLabel(User $user, ?Admin $linkedAdmin = null): string
     {
-        $rawRole = strtolower(trim($role));
+        $rawRole = strtolower(trim((string) ($user->user_role ?? 'student')));
         $normalizedRole = User::normalizeRole($rawRole);
+        $userType = strtolower(trim((string) ($user->user_type ?? '')));
 
-        if (in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)) {
-            return 'Student Assistant';
+        if (
+            in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)
+            || in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+        ) {
+            return 'Admin - Student Assistant';
         }
 
         if ($normalizedRole === User::ROLE_ADMIN && $linkedAdmin) {

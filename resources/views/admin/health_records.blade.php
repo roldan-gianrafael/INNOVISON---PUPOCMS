@@ -2285,7 +2285,10 @@
                         'documents' => [
                             [
                                 'title' => 'Medical Certificate',
-                                'url' => $record->medical_certificate ? asset('storage/' . $record->medical_certificate) : '',
+                                'url' => $record->medical_certificate ? route('walkin.document', [
+                                    'healthProfile' => $record->id,
+                                    'document' => 'medical_certificate',
+                                ]) : '',
                                 'meta' => [
                                     'Doctor' => $record->doctor_name ?: '-',
                                     'Certificate Date' => optional($record->med_cert_date)->format('M d, Y') ?: '-',
@@ -2294,7 +2297,10 @@
                             ],
                             [
                                 'title' => 'Chest X-ray Result',
-                                'url' => $record->chest_xray_result ? asset('storage/' . $record->chest_xray_result) : '',
+                                'url' => $record->chest_xray_result ? route('walkin.document', [
+                                    'healthProfile' => $record->id,
+                                    'document' => 'chest_xray_result',
+                                ]) : '',
                                 'meta' => [
                                     'Exam Date' => optional($record->xray_date)->format('M d, Y') ?: '-',
                                     'Findings' => $record->xray_findings ?: '-',
@@ -2302,7 +2308,10 @@
                             ],
                             [
                                 'title' => '2x2 Photo',
-                                'url' => $record->student_photo ? asset('storage/' . $record->student_photo) : '',
+                                'url' => $record->student_photo ? route('walkin.document', [
+                                    'healthProfile' => $record->id,
+                                    'document' => 'student_photo',
+                                ]) : '',
                                 'meta' => [
                                     'Guideline' => 'Formal white-background photo.',
                                 ],
@@ -2398,10 +2407,22 @@
                 @forelse($records->whereIn('id', $pendingApprovalRecordIds) as $readonlyRecord)
                     @php
                         $readonlyDocs = [
-                            'Medical Certificate' => $readonlyRecord->medical_certificate,
-                            'Chest X-ray Result' => $readonlyRecord->chest_xray_result,
-                            '2x2 Photo' => $readonlyRecord->student_photo,
-                            'PWD ID Proof' => $readonlyRecord->pwd_id_proof,
+                            'Medical Certificate' => [
+                                'key' => 'medical_certificate',
+                                'path' => $readonlyRecord->medical_certificate,
+                            ],
+                            'Chest X-ray Result' => [
+                                'key' => 'chest_xray_result',
+                                'path' => $readonlyRecord->chest_xray_result,
+                            ],
+                            '2x2 Photo' => [
+                                'key' => 'student_photo',
+                                'path' => $readonlyRecord->student_photo,
+                            ],
+                            'PWD ID Proof' => [
+                                'key' => 'pwd_id_proof',
+                                'path' => $readonlyRecord->pwd_id_proof,
+                            ],
                         ];
                     @endphp
                     <article class="readonly-record-card">
@@ -2432,10 +2453,18 @@
                         <div class="readonly-record-details">
                             <h5 class="readonly-docs-title">Uploaded Files Checklist</h5>
                             <ul class="readonly-doc-list">
-                                @foreach($readonlyDocs as $docLabel => $docPath)
+                                @foreach($readonlyDocs as $docLabel => $document)
                                     <li>
-                                        @if($docPath)
-                                            <a class="readonly-doc-link" href="{{ asset('storage/' . $docPath) }}" target="_blank" rel="noopener noreferrer">
+                                        @if($document['path'])
+                                            <a
+                                                class="readonly-doc-link"
+                                                href="{{ route('walkin.document', [
+                                                    'healthProfile' => $readonlyRecord->id,
+                                                    'document' => $document['key'],
+                                                ]) }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
                                                 <span>{{ $docLabel }}</span>
                                                 <span>Open</span>
                                             </a>

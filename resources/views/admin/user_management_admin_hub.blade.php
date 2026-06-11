@@ -1301,7 +1301,7 @@
         const isStudentAssistant = detailRole.value === 'student_assistant';
         const isAdmin = detailRole.value === 'admin';
         const isSuperAdmin = detailRole.value === 'super_admin';
-        const hasAdminHub = isAdmin || isSuperAdmin;
+        const hasAdminHub = isStudentAssistant || isAdmin || isSuperAdmin;
         const usesSeparateAdminEmail = managementView !== 'admin-hub' && isStudentAssistant;
 
         applySettingsSectionMode(managementView, canEdit, canOnboard);
@@ -1362,6 +1362,10 @@
         detailUpdated.value = row.dataset.updated || 'N/A';
         const normalizedRole = (() => {
             const raw = (row.dataset.role || 'student').toLowerCase();
+            const source = (row.dataset.source || '').toLowerCase();
+            if (source === 'student_assistant') {
+                return 'student_assistant';
+            }
             if (raw === 'admin') {
                 return 'admin';
             }

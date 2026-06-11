@@ -55,6 +55,7 @@ class User extends Authenticatable
     'section',
     'barcode',
     'user_role',
+    'user_type',
     'status',
     'password',
     'is_health_profile_completed',
@@ -174,9 +175,18 @@ class User extends Authenticatable
 
     public function isStudentAssistant(): bool
     {
-        return $this->hasRole(self::ROLE_ADMIN);
+        $rawRole = strtolower(trim((string) $this->user_role));
+        $userType = strtolower(trim((string) ($this->user_type ?? '')));
+
+        return in_array($rawRole, ['student_assistant', 'studentassistant', 'assistant'], true)
+            || (
+                self::normalizeRole($rawRole) === self::ROLE_ADMIN
+                && in_array($userType, ['assistant', 'student assistant', 'student_assistant'], true)
+            );
     }
-public function healthProfile() {
-    return $this->hasOne(HealthProfile::class);
-}
+
+    public function healthProfile()
+    {
+        return $this->hasOne(HealthProfile::class);
+    }
 }

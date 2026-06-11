@@ -15,7 +15,17 @@ class StudentAssistantController extends Controller
     public function index()
     {
         $assistants = User::query()
-            ->whereIn('user_role', [User::ROLE_ADMIN, 'student_assistant', 'assistant', 'studentassistant'])
+            ->where(function ($query) {
+                $query->whereIn('user_role', ['student_assistant', 'assistant', 'studentassistant']);
+
+                if (Schema::hasColumn('users', 'user_type')) {
+                    $query->orWhere(function ($assistantQuery) {
+                        $assistantQuery
+                            ->where('user_role', User::ROLE_ADMIN)
+                            ->whereIn('user_type', ['Assistant', 'assistant', 'Student Assistant', 'student_assistant']);
+                    });
+                }
+            })
             ->latest()
             ->get();
 
@@ -72,7 +82,7 @@ class StudentAssistantController extends Controller
         $assistant->email = $validated['email'];
         $assistant->user_role = User::ROLE_ADMIN;
         if (Schema::hasColumn('users', 'user_type')) {
-            $assistant->user_type = $assistant->user_type ?: 'Assistant';
+            $assistant->user_type = 'Assistant';
         }
 
         if (!empty($validated['password'])) {

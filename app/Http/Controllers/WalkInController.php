@@ -404,13 +404,16 @@ class WalkInController extends Controller
             ['key' => 'pwd_id_proof', 'label' => 'PWD ID Proof', 'path' => $profile->pwd_id_proof],
             ['key' => 'medical_assessment_upload', 'label' => 'Compliance / Assessment Copy', 'path' => $profile->medical_assessment_upload],
         ])->filter(fn (array $document) => filled($document['path']))
-            ->map(function (array $document) {
+            ->map(function (array $document) use ($request, $profile) {
                 $extension = strtolower(pathinfo((string) $document['path'], PATHINFO_EXTENSION));
 
                 return [
                     'key' => $document['key'],
                     'label' => $document['label'],
-                    'url' => asset('storage/' . ltrim((string) $document['path'], '/')),
+                    'url' => route($this->walkinRouteName($request, 'document'), [
+                        'healthProfile' => $profile->id,
+                        'document' => $document['key'],
+                    ]),
                     'type' => in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true) ? 'image' : 'file',
                 ];
             })
@@ -425,6 +428,35 @@ class WalkInController extends Controller
         ];
 
         return $documents;
+    }
+
+    public function showApplicantDocument(HealthProfile $healthProfile, string $document)
+    {
+        $allowedDocuments = [
+            'medical_certificate',
+            'chest_xray_result',
+            'student_photo',
+            'pwd_id_proof',
+            'medical_assessment_upload',
+        ];
+
+        abort_unless(in_array($document, $allowedDocuments, true), 404);
+
+        $path = ltrim((string) $healthProfile->{$document}, '/');
+        $path = preg_replace('#^(?:public/)?storage/#', '', $path) ?? $path;
+
+        abort_if($path === '' || !Storage::disk('public')->exists($path), 404, 'Uploaded document not found.');
+
+        $disk = Storage::disk('public');
+        $mimeType = $disk->mimeType($path) ?: 'application/octet-stream';
+        $filename = basename($path);
+
+        return response()->file($disk->path($path), [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . str_replace('"', '', $filename) . '"',
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, max-age=300',
+        ]);
     }
 
     private function formatQuantityNumber(float $value): string

@@ -58,7 +58,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: clamp(92px, 12vw, 116px) 18px clamp(20px, 4vw, 48px);
+            padding: clamp(20px, 4vw, 48px) 18px;
         }
 
         .landing-topbar {
@@ -263,8 +263,7 @@
             pointer-events: none;
         }
 
-        .info-login-swap .portal-btn,
-        .info-login-swap .help-btn {
+        .info-login-swap > .portal-btn {
             height: 54px !important;
             padding: 0 24px !important;
             font-size: 15px !important;
@@ -274,11 +273,6 @@
         }
 
         .info-login-swap .portal-btn svg {
-            width: 18px !important;
-            height: 18px !important;
-        }
-
-        .info-login-swap .help-btn svg {
             width: 18px !important;
             height: 18px !important;
         }
@@ -612,6 +606,71 @@
             gap: 12px;
         }
 
+        .workspace-utility-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .help-btn.help-link,
+        .local-login-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 32px;
+            width: auto;
+            padding: 4px 8px;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: #111827;
+            box-shadow: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.2;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .help-btn.help-link:hover,
+        .help-btn.help-link:focus-visible,
+        .local-login-link:hover,
+        .local-login-link:focus-visible,
+        .landing-panel.is-help .help-btn.help-link {
+            transform: none;
+            border: 0;
+            background: transparent;
+            color: var(--maroon);
+            box-shadow: none;
+            outline: none;
+        }
+
+        .help-btn.help-link svg,
+        .local-login-link svg {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            color: var(--maroon);
+            stroke-width: 2.2;
+            transition: transform .2s ease;
+        }
+
+        .login-primary .system-foot,
+        .info-login-swap .system-foot {
+            color: #111827;
+        }
+
+        .help-btn.help-link:hover svg,
+        .help-btn.help-link:focus-visible svg,
+        .local-login-link:hover svg,
+        .local-login-link:focus-visible svg {
+            transform: translateY(-1px) scale(1.06);
+        }
+
         .portal-btn {
             position: relative;
             overflow: hidden;
@@ -748,9 +807,49 @@
         }
 
         .help-panel-head {
+            position: relative;
+            position: sticky;
+            top: 0;
+            z-index: 3;
             display: grid;
             gap: 8px;
+            margin: -2px -4px 2px 0;
+            padding: 2px 4px 14px 42px;
+            background: linear-gradient(180deg, #7b151f 0%, #7b151f 82%, rgba(123, 21, 31, 0) 100%);
             text-align: left;
+        }
+
+        .help-panel-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: inline-flex;
+            width: 32px;
+            height: 32px;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 1px solid rgba(250, 204, 21, .5);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .08);
+            color: #ffffff;
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+        }
+
+        .help-panel-back:hover,
+        .help-panel-back:focus-visible {
+            border-color: var(--gold);
+            background: var(--gold);
+            color: var(--maroon);
+            transform: translateX(-2px);
+            outline: none;
+        }
+
+        .help-panel-back svg {
+            width: 17px;
+            height: 17px;
+            stroke-width: 2.3;
         }
 
         .help-panel-kicker {
@@ -779,54 +878,186 @@
 
         .help-guide {
             display: grid;
-            gap: 9px;
-        }
-
-        .help-guide-item {
-            display: flex;
-            align-items: flex-start;
             gap: 10px;
-            padding: 11px 12px;
-            border-radius: 14px;
-            border: 1px solid rgba(250, 204, 21, 0.16);
-            background: rgba(15, 23, 42, 0.14);
         }
 
-        .help-guide-number {
-            width: 25px;
-            height: 25px;
-            border-radius: 999px;
+        .help-guide-legacy {
+            display: none;
+        }
+
+        .help-accordion {
+            overflow: hidden;
+            border: 1px solid rgba(250, 204, 21, .2);
+            border-radius: 8px;
+            background: rgba(30, 8, 14, .2);
+            transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+        }
+
+        .help-accordion[open] {
+            border-color: rgba(250, 204, 21, .5);
+            background: rgba(30, 8, 14, .3);
+            box-shadow: 0 12px 26px rgba(31, 4, 9, .16);
+        }
+
+        .help-accordion summary {
+            display: flex;
+            min-height: 54px;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            color: #ffffff;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+
+        .help-accordion summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .help-accordion summary:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: -2px;
+        }
+
+        .help-accordion-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            flex: 0 0 25px;
+            flex: 0 0 32px;
             background: linear-gradient(135deg, var(--gold), var(--gold-soft));
             color: var(--maroon);
-            font-size: 11px;
-            font-weight: 950;
+            box-shadow: 0 8px 18px rgba(250, 204, 21, .12);
         }
 
-        .help-guide-text {
+        .help-accordion-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+        }
+
+        .help-accordion-heading {
             display: grid;
-            gap: 2px;
+            flex: 1 1 auto;
+            gap: 1px;
+            min-width: 0;
         }
 
-        .help-guide-text strong {
+        .help-accordion-heading strong {
             color: #ffffff;
             font-size: 13px;
             line-height: 1.3;
         }
 
-        .help-guide-text span {
-            color: rgba(255, 255, 255, 0.68);
+        .help-accordion-heading span {
+            overflow: hidden;
+            color: rgba(255, 255, 255, .6);
+            font-size: 10px;
+            line-height: 1.35;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .help-accordion-chevron {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            color: var(--gold);
+            transition: transform .22s ease;
+        }
+
+        .help-accordion[open] .help-accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        .help-accordion-body {
+            padding: 0 13px 13px 55px;
+        }
+
+        .help-check-list,
+        .help-issue-list {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .help-check-list li,
+        .help-issue-list li {
+            position: relative;
+            padding-left: 18px;
+            color: rgba(255, 255, 255, .78);
             font-size: 11px;
-            line-height: 1.45;
+            line-height: 1.5;
+        }
+
+        .help-check-list li::before {
+            position: absolute;
+            top: 1px;
+            left: 0;
+            color: var(--gold);
+            font-weight: 950;
+            content: "✓";
+        }
+
+        .help-issue-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .help-issue-list li {
+            padding: 7px 8px 7px 25px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, .045);
+        }
+
+        .help-issue-list li::before {
+            position: absolute;
+            top: 7px;
+            left: 8px;
+            color: var(--gold);
+            font-weight: 950;
+            content: "!";
+        }
+
+        .help-contact-card {
+            display: grid;
+            gap: 5px;
+            padding: 11px 12px;
+            border-left: 3px solid var(--gold);
+            border-radius: 0 6px 6px 0;
+            background: rgba(250, 204, 21, .08);
+        }
+
+        .help-contact-card strong {
+            color: #ffffff;
+            font-size: 12px;
+        }
+
+        .help-contact-card span {
+            color: rgba(255, 255, 255, .72);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .help-issue-list {
+                grid-template-columns: 1fr;
+            }
+
+            .help-accordion-body {
+                padding-left: 13px;
+            }
         }
 
         @media (max-width: 920px) {
             .landing-shell {
                 align-items: flex-start;
-                padding: 104px 18px 18px;
+                padding: 18px;
             }
 
             .landing-topbar {
@@ -1061,77 +1292,6 @@
             <img src="{{ asset('images/clinic_logo_transparent.png') }}" alt="Clinic Logo">
         </div>
     </div>
-    <header class="landing-topbar" aria-label="Main authentication navigation">
-        <a class="landing-topbar-brand" href="{{ url('/') }}">
-            <img src="{{ asset('images/clinic_logo_transparent.png') }}" alt="Clinic Logo">
-            <span>PUP Taguig Medical Clinic</span>
-        </a>
-
-        <nav class="landing-topbar-actions" aria-label="Authentication actions">
-            @if($landingStudentUser)
-                <a class="topbar-btn" href="{{ url('/student/account?view=profile') }}">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="9" cy="7" r="4" stroke="currentColor"/>
-                        <path d="M19 8v6M22 11h-6" stroke="currentColor" stroke-linecap="round"/>
-                    </svg>
-                    <span>My Account</span>
-                </a>
-
-                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
-                    @csrf
-                    <input type="hidden" name="portal_guard" value="student">
-                    <button type="submit" class="topbar-btn">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M15 12H3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M8 7l-5 5 5 5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M21 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>Log Out</span>
-                    </button>
-                </form>
-            @elseif($landingAdminUser)
-                <a class="topbar-btn" href="{{ url('/admin/dashboard') }}">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M12 3l7 4v5c0 4.5-2.9 7.4-7 9-4.1-1.6-7-4.5-7-9V7l7-4z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9 12l2 2 4-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>My Account</span>
-                </a>
-
-                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
-                    @csrf
-                    <input type="hidden" name="portal_guard" value="admin">
-                    <button type="submit" class="topbar-btn">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M15 12H3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M8 7l-5 5 5 5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M21 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>Log Out</span>
-                    </button>
-                </form>
-            @else
-                @env('local')
-                    <a class="topbar-btn topbar-btn-local" href="{{ route('login') }}">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor"/>
-                            <path d="M8 8h8M8 12h5M8 16h3" stroke="currentColor" stroke-linecap="round"/>
-                        </svg>
-                        <span>Local Login</span>
-                    </a>
-                @endenv
-                <a class="topbar-btn topbar-btn-adaptive" href="{{ route('login.portal') }}">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Log In via One Portal</span>
-                </a>
-            @endif
-        </nav>
-    </header>
     <main class="landing-shell">
         <section class="landing-panel" aria-label="PUP medical clinic access">
             <div class="info-column">
@@ -1149,8 +1309,7 @@
                     <div class="hero-copy">
                         <h1>PUP Taguig Medical Clinic</h1>
                         <p>
-                            A unified clinic access point for student health profiles, appointments,
-                            clinic verification, and staff workflows through One Portal.
+                           A centralized web-based clinic management platform designed to digitize PUP Taguig Clinic operations, integrating student health profiles, appointment scheduling, verification processes, and staff workflows into a unified portal.
                         </p>
                     </div>
 
@@ -1164,19 +1323,7 @@
                             </span>
                             <span class="trust-text">
                                 <span class="trust-title">One Portal Integrated</span>
-                                <span class="trust-copy">Central IdP access</span>
-                            </span>
-                        </div>
-                        <div class="trust-item">
-                            <span class="trust-icon">
-                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M7 4h10l2 2v16H5V6l2-2z" stroke="currentColor" stroke-linejoin="round"/>
-                                    <path d="M8 10h8M8 14h8M8 18h5" stroke="currentColor" stroke-linecap="round"/>
-                                </svg>
-                            </span>
-                            <span class="trust-text">
-                                <span class="trust-title">Clinic Records</span>
-                                <span class="trust-copy">Organized health data</span>
+                                <span class="trust-copy">Secure centralized IdP access</span>
                             </span>
                         </div>
                         <div class="trust-item">
@@ -1188,7 +1335,7 @@
                             </span>
                             <span class="trust-text">
                                 <span class="trust-title">Appointments</span>
-                                <span class="trust-copy">Student service flow</span>
+                                <span class="trust-copy">Student scheduling and visit tracking</span>
                             </span>
                         </div>
                         <div class="trust-item">
@@ -1199,8 +1346,19 @@
                                 </svg>
                             </span>
                             <span class="trust-text">
-                                <span class="trust-title">Health Profiles</span>
-                                <span class="trust-copy">Clinic verification ready</span>
+                                <span class="trust-title">Health Records</span>
+                                <span class="trust-copy">Organized profiles and clinic verification</span>
+                            </span>
+                        </div>
+                        <div class="trust-item">
+                            <span class="trust-icon">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M12 3l1.2 3.8L17 8l-3.8 1.2L12 13l-1.2-3.8L7 8l3.8-1.2L12 3zM18 14l.8 2.2L21 17l-2.2.8L18 20l-.8-2.2L15 17l2.2-.8L18 14zM6 13l.7 1.8L8.5 15.5l-1.8.7L6 18l-.7-1.8-1.8-.7 1.8-.7L6 13z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <span class="trust-text">
+                                <span class="trust-title">AI Integrated</span>
+                                <span class="trust-copy">Assisted intake and clinic workflows</span>
                             </span>
                         </div>
                     </div>
@@ -1230,14 +1388,57 @@
                         <span>View Clinic Workspace</span>
                     </a>
 
-                    <button class="help-btn" type="button" aria-controls="landingHelpPanel" aria-expanded="false">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>Need Help</span>
-                    </button>
+                    @if($landingStudentUser)
+                        <a class="portal-btn" href="{{ url('/student/account?view=profile') }}">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <circle cx="12" cy="8" r="4" stroke="currentColor"/>
+                                <path d="M5 21a7 7 0 0 1 14 0" stroke="currentColor" stroke-linecap="round"/>
+                            </svg>
+                            <span>My Account</span>
+                        </a>
+                    @elseif($landingAdminUser)
+                        <a class="portal-btn" href="{{ url('/admin/dashboard') }}">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M12 3l7 4v5c0 4.5-2.9 7.4-7 9-4.1-1.6-7-4.5-7-9V7l7-4z" stroke="currentColor" stroke-linejoin="round"/>
+                                <path d="M9 12l2 2 4-5" stroke="currentColor" stroke-linecap="round"/>
+                            </svg>
+                            <span>My Account</span>
+                        </a>
+                    @else
+                        <a class="portal-btn" href="{{ route('login.portal') }}">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Log In via One Portal</span>
+                        </a>
+                    @endif
+
+                    <div class="workspace-utility-actions">
+                        <button class="help-btn help-link" type="button" aria-controls="landingHelpPanel" aria-expanded="true">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Need Help?</span>
+                        </button>
+
+                        @guest('student')
+                            @guest('admin')
+                                @env('local')
+                                    <a class="local-login-link" href="{{ route('login') }}">
+                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor"/>
+                                            <path d="M8 8h8M8 12h5M8 16h3" stroke="currentColor" stroke-linecap="round"/>
+                                        </svg>
+                                        <span>Local Login</span>
+                                    </a>
+                                @endenv
+                            @endguest
+                        @endguest
+                    </div>
 
                     <p class="system-foot">PUP Taguig Clinic Management System</p>
                 </div>
@@ -1274,14 +1475,57 @@
                                 <span>View Clinic Workspace</span>
                             </a>
 
-                            <button class="help-btn" type="button" id="landingNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
-                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span>Need Help</span>
-                            </button>
+                            @if($landingStudentUser)
+                                <a class="portal-btn" href="{{ url('/student/account?view=profile') }}">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle cx="12" cy="8" r="4" stroke="currentColor"/>
+                                        <path d="M5 21a7 7 0 0 1 14 0" stroke="currentColor" stroke-linecap="round"/>
+                                    </svg>
+                                    <span>My Account</span>
+                                </a>
+                            @elseif($landingAdminUser)
+                                <a class="portal-btn" href="{{ url('/admin/dashboard') }}">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M12 3l7 4v5c0 4.5-2.9 7.4-7 9-4.1-1.6-7-4.5-7-9V7l7-4z" stroke="currentColor" stroke-linejoin="round"/>
+                                        <path d="M9 12l2 2 4-5" stroke="currentColor" stroke-linecap="round"/>
+                                    </svg>
+                                    <span>My Account</span>
+                                </a>
+                            @else
+                                <a class="portal-btn" href="{{ route('login.portal') }}">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M15 12H4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M20 4v16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span>Log In via One Portal</span>
+                                </a>
+                            @endif
+
+                            <div class="workspace-utility-actions">
+                                <button class="help-btn help-link" type="button" id="landingNeedHelpButton" aria-controls="landingHelpPanel" aria-expanded="false">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M12 18h.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.2-1.6 2.6v.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span>Need Help?</span>
+                                </button>
+
+                                @guest('student')
+                                    @guest('admin')
+                                        @env('local')
+                                            <a class="local-login-link" href="{{ route('login') }}">
+                                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                    <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor"/>
+                                                    <path d="M8 8h8M8 12h5M8 16h3" stroke="currentColor" stroke-linecap="round"/>
+                                                </svg>
+                                                <span>Local Login</span>
+                                            </a>
+                                        @endenv
+                                    @endguest
+                                @endguest
+                            </div>
                         </div>
 
                         <!-- Student Assistant Workspace Selector -->
@@ -1317,12 +1561,121 @@
 
                     <div class="help-panel" id="landingHelpPanel" aria-hidden="true">
                         <div class="help-panel-head">
-                            <p class="help-panel-kicker">Need Help</p>
+                            <button type="button" class="help-panel-back" id="landingHelpBackButton" aria-label="Back to clinic access">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <p class="help-panel-kicker">Help Center</p>
                             <h2 class="help-panel-title">Before You Continue</h2>
                             <p class="help-panel-copy">Use this guide if you cannot continue through One Portal or you are unsure what to do next.</p>
                         </div>
 
-                        <div class="help-guide" aria-label="Need help guide">
+                        <div class="help-guide" aria-label="Help Center guide">
+                            <details class="help-accordion" open>
+                                <summary>
+                                    <span class="help-accordion-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <circle cx="12" cy="7" r="4" stroke="currentColor"/>
+                                            <path d="M5 21v-2a7 7 0 0 1 14 0v2" stroke="currentColor" stroke-linecap="round"/>
+                                        </svg>
+                                    </span>
+                                    <span class="help-accordion-heading">
+                                        <strong>For Students</strong>
+                                        <span>Login, clinic records, and medical clearance</span>
+                                    </span>
+                                    <svg class="help-accordion-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </summary>
+                                <div class="help-accordion-body">
+                                    <ul class="help-check-list">
+                                        <li>Use your official One Portal account.</li>
+                                        <li>If One Portal does not open, refresh the page and try again.</li>
+                                        <li>Contact clinic staff if your clinic record is not visible after login.</li>
+                                        <li>Prepare your Admission System reference number for medical clearance.</li>
+                                        <li>Visit the clinic when instructed to proceed with medical assessment.</li>
+                                    </ul>
+                                </div>
+                            </details>
+
+                            <details class="help-accordion">
+                                <summary>
+                                    <span class="help-accordion-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </span>
+                                    <span class="help-accordion-heading">
+                                        <strong>For Clinic Staff</strong>
+                                        <span>Staff access and system assistance</span>
+                                    </span>
+                                    <svg class="help-accordion-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </summary>
+                                <div class="help-accordion-body">
+                                    <ul class="help-check-list">
+                                        <li>Use One Portal for the normal clinic login process.</li>
+                                        <li>Contact the system administrator when One Portal is unavailable.</li>
+                                    </ul>
+                                </div>
+                            </details>
+
+                            <details class="help-accordion">
+                                <summary>
+                                    <span class="help-accordion-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M12 3 2.8 20h18.4L12 3z" stroke="currentColor" stroke-linejoin="round"/>
+                                            <path d="M12 9v5M12 17h.01" stroke="currentColor" stroke-linecap="round"/>
+                                        </svg>
+                                    </span>
+                                    <span class="help-accordion-heading">
+                                        <strong>Common Issues</strong>
+                                        <span>Quick checks for access and record problems</span>
+                                    </span>
+                                    <svg class="help-accordion-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </summary>
+                                <div class="help-accordion-body">
+                                    <ul class="help-issue-list">
+                                        <li>One Portal unavailable</li>
+                                        <li>Wrong account used</li>
+                                        <li>Missing reference number</li>
+                                        <li>Profile not submitted</li>
+                                        <li>Status not approved</li>
+                                        <li>Record under review</li>
+                                    </ul>
+                                </div>
+                            </details>
+
+                            <details class="help-accordion">
+                                <summary>
+                                    <span class="help-accordion-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M4 5h16v12H8l-4 4V5z" stroke="currentColor" stroke-linejoin="round"/>
+                                            <path d="M8 9h8M8 13h5" stroke="currentColor" stroke-linecap="round"/>
+                                        </svg>
+                                    </span>
+                                    <span class="help-accordion-heading">
+                                        <strong>Contact</strong>
+                                        <span>Where to request further assistance</span>
+                                    </span>
+                                    <svg class="help-accordion-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </summary>
+                                <div class="help-accordion-body">
+                                    <div class="help-contact-card">
+                                        <strong>PUP Taguig Medical Clinic</strong>
+                                        <span>For clinic record, clearance, or assessment concerns, contact the clinic staff. For login or technical issues, contact the system administrator.</span>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+
+                        <div class="help-guide help-guide-legacy" aria-hidden="true">
                             <div class="help-guide-item">
                                 <span class="help-guide-number">1</span>
                                 <span class="help-guide-text">
@@ -1383,6 +1736,8 @@
         const helpPanel = document.getElementById('landingHelpPanel');
         const infoLoginSwap = document.querySelector('.info-login-swap');
         const helpButtons = Array.from(document.querySelectorAll('.help-btn'));
+        const helpBackButton = document.getElementById('landingHelpBackButton');
+        const helpAccordions = Array.from(document.querySelectorAll('.help-accordion'));
         let isHelpMode = false;
 
         // Initialize: Show preloader, check URL parameters from gateway
@@ -1673,6 +2028,24 @@
         helpButtons.forEach(function (button) {
             button.addEventListener('click', function () {
                 setLandingHelpMode(!isHelpMode);
+            });
+        });
+
+        helpBackButton?.addEventListener('click', function () {
+            setLandingHelpMode(false);
+        });
+
+        helpAccordions.forEach(function (accordion) {
+            accordion.addEventListener('toggle', function () {
+                if (!accordion.open) {
+                    return;
+                }
+
+                helpAccordions.forEach(function (otherAccordion) {
+                    if (otherAccordion !== accordion) {
+                        otherAccordion.open = false;
+                    }
+                });
             });
         });
 

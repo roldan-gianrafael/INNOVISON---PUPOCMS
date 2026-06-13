@@ -3936,6 +3936,8 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     $adminNotificationsFeedUrl = $isStudentAssistant
         ? route('assistant.notifications.feed')
         : route('admin.notifications.feed');
+    $workflowSettings = app(\App\Services\ClinicWorkflowService::class)->settings();
+    $adminLiveNotificationsEnabled = $workflowSettings->admin_live_notifications !== false;
     $apiTestingUrl = $isStudentAssistant ? url('/assistant/api-testing') : url('/admin/api-testing');
     $developerToolsUrl = $isStudentAssistant ? url('/assistant/developer-tools') : url('/admin/developer-tools');
     $developerToolEmails = array_map(static fn ($email) => strtolower(trim((string) $email)), array_filter(array_merge(
@@ -4902,6 +4904,11 @@ html[data-theme="dark"] .medicine-see-more-link:hover {
     }
 
     function initAdminLiveAlerts() {
+        const liveAlertsEnabled = @json($adminLiveNotificationsEnabled);
+        if (!liveAlertsEnabled) {
+            return;
+        }
+
         const modal = document.getElementById('adminLiveAlertModal');
         const dataNode = document.getElementById('adminLiveAlertData');
         const feedUrlNode = document.getElementById('adminLiveAlertFeedUrl');

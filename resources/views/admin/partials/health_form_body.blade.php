@@ -29,17 +29,23 @@
     </table>
 
     <div class="section-header">PART I. STUDENT INFORMATION</div>
+    @php
+        $printedStudentName = trim((string) ($healthFormIdentity['full_name'] ?? ''))
+            ?: trim((string) ($profile->user->name ?? ''));
+        $printedStudentEmail = trim((string) ($healthFormIdentity['email'] ?? ''))
+            ?: trim((string) ($profile->user->email ?? ''));
+    @endphp
     <table class="student-information-table">
         <colgroup>
-            <col style="width: 15%;">
-            <col style="width: 47%;">
+            <col style="width: 9%;">
+            <col style="width: 53%;">
             <col style="width: 13%;">
             <col style="width: 25%;">
         </colgroup>
         <tr>
             <td class="student-name-cell" colspan="2">
                 <span class="line-label">Name:</span>
-                <span class="line-value student-full-name">{{ $profile->user->name ?? '' }}</span>
+                <span class="line-value student-full-name">{{ $printedStudentName }}</span>
             </td>
             <td class="student-number-label">PUP Student No.:</td>
             <td class="student-number-value">{{ $profile->student_number ?: $profile->user->student_number }}</td>
@@ -73,7 +79,7 @@
                         <td class="line-label blood-type-label">Blood Type:</td>
                         <td class="line-value blood-type-value">{{ $profile->blood_type ?? 'N/A' }}</td>
                         <td class="line-label email-label">Email Address:</td>
-                        <td class="line-value email-value">{{ $profile->user->email }}</td>
+                        <td class="line-value email-value">{{ $printedStudentEmail }}</td>
                     </tr>
                 </table>
             </td>
@@ -85,10 +91,11 @@
             </td>
         </tr>
         <tr>
-            <td class="line-label">Landline:</td>
-            <td class="line-value">{{ $profile->landline ?? 'N/A' }}</td>
-            <td class="line-label cellphone-label">Cellphone:</td>
-            <td class="line-value">{{ $profile->cellphone ?? '' }}</td>
+            <td colspan="4" class="compound-row">
+                <div class="contact-information-row">
+                    <span class="contact-label landline-label">Landline:</span><span class="contact-value landline-value">{{ $profile->landline ?? 'N/A' }}</span><span class="contact-label cellphone-label">Cellphone:</span><span class="contact-value cellphone-value">{{ $profile->cellphone ?? '' }}</span>
+                </div>
+            </td>
         </tr>
     </table>
 
@@ -144,21 +151,20 @@
         <span class="label">Food (Please specify):</span> <div class="field">{{ $profile->food_allergies ?? '' }}</div>
         <span class="label">No Known Allergies:</span> <div class="box-ui">{{ $profile->no_allergies ? '/' : '' }}</div>
     </div>
-    <div class="row px-4">
-        <span class="label">Medicines:</span>
-        @php
-            $meds_list = ['Aspirin', 'Ibuprofen', 'Amoxicillin', 'Mefenamic Acid', 'Penicillin'];
-            $saved_meds = is_array($profile->medicine_allergies) ? $profile->medicine_allergies : json_decode($profile->medicine_allergies ?? '[]', true);
-        @endphp
-        @foreach($meds_list as $med)
-            <div class="check-item">
-                <div class="box-ui">{{ in_array($med, $saved_meds) ? '/' : '' }}</div> {{ $med }}
-            </div>
-        @endforeach
-        <div class="check-item medicine-other-field">
-            Others: <div class="field">{{ $profile->other_med_allergies ?? '' }}</div>
-        </div>
-    </div>
+    @php
+        $saved_meds = is_array($profile->medicine_allergies) ? $profile->medicine_allergies : json_decode($profile->medicine_allergies ?? '[]', true);
+    @endphp
+    <table class="medicine-allergy-table">
+        <tr>
+            <td class="medicine-label-cell">Medicines:</td>
+            <td class="medicine-item-cell"><span class="box-ui">{{ in_array('Aspirin', $saved_meds) ? '/' : '' }}</span>Aspirin</td>
+            <td class="medicine-item-cell"><span class="box-ui">{{ in_array('Ibuprofen', $saved_meds) ? '/' : '' }}</span>Ibuprofen</td>
+            <td class="medicine-item-cell-wide"><span class="box-ui">{{ in_array('Amoxicillin', $saved_meds) ? '/' : '' }}</span>Amoxicillin</td>
+            <td class="medicine-item-cell-wide"><span class="box-ui">{{ in_array('Mefenamic Acid', $saved_meds) ? '/' : '' }}</span>Mefenamic Acid</td>
+            <td class="medicine-item-cell"><span class="box-ui">{{ in_array('Penicillin', $saved_meds) ? '/' : '' }}</span>Penicillin</td>
+            <td class="medicine-other-cell">Others: <span class="field medicine-other-field">{{ $profile->other_med_allergies ?? '' }}</span></td>
+        </tr>
+    </table>
 
     <div class="section-header">PART III. PERSONAL SOCIAL HISTORY</div>
     <table class="social-history-table">
@@ -229,7 +235,7 @@ for the improvement of healthcare services.
                 @else
                     <div class="signature-space"></div>
                 @endif
-                <div class="sig-line">{{ empty($studentPrintCopy) ? strtoupper($profile->user->name ?? '') : '' }}</div>
+                <div class="sig-line">{{ empty($studentPrintCopy) ? strtoupper($printedStudentName) : '' }}</div>
                 <div class="signature-caption">(Printed name and signature of student)</div>
             </td>
             <td>
@@ -243,7 +249,7 @@ for the improvement of healthcare services.
     </table>
 
     <div class="physician-section">
-        <p style="text-align: center; font-weight: bold; margin-bottom: 2px; font-size: 13px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
+        <p style="text-align: center; font-weight: bold; margin-bottom: 2px; font-size: 14px; text-transform: uppercase;">FOR PHYSICIAN ONLY</p>
         <p class="physician-check-instruction">Please Check</p>
         
         <table class="physician-clearance-table">

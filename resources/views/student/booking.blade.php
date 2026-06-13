@@ -123,6 +123,39 @@
         padding: 0;
     }
 
+    .booking-closure-notice {
+        margin-bottom: 18px;
+        padding: 16px 18px;
+        border: 1px solid #facc15;
+        border-left: 5px solid #7f1d2d;
+        border-radius: 10px;
+        background: #fff8dc;
+        color: #64101d;
+    }
+
+    .booking-closure-notice strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .booking-closure-notice p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.55;
+    }
+
+    .booking-disabled-fields {
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    .booking-disabled-fields:disabled {
+        opacity: 0.62;
+    }
+
     .booking-form-section {
         flex: 2;
         padding: 32px;
@@ -1239,8 +1272,22 @@
             </div>
 
             
+            @if(!empty($clinicClosure))
+                <div class="booking-closure-notice" role="status">
+                    <strong>New appointment booking is temporarily unavailable</strong>
+                    <p>
+                        {{ $clinicClosure['message'] }}
+                        @if(!empty($clinicClosure['ends_at']))
+                            Expected reopening: {{ $clinicClosure['ends_at']->format('M d, Y g:i A') }}.
+                        @endif
+                        Existing appointments and student records remain accessible.
+                    </p>
+                </div>
+            @endif
+
             <form id="bookingForm" method="POST" action="/student/appointments/store" autocomplete="off">
                 @csrf 
+                <fieldset class="booking-disabled-fields" {{ !empty($clinicClosure) ? 'disabled' : '' }}>
                 
                 <div class="booking-grid-2">
                     <div class="input-group">
@@ -1336,8 +1383,9 @@
                 </div>
 
                 <button type="submit" class="btn-submit">
-                    Confirm Appointment ➜
+                    {{ !empty($clinicClosure) ? 'Booking Temporarily Closed' : 'Confirm Appointment' }}
                 </button>
+                </fieldset>
             </form>
         </div>
 

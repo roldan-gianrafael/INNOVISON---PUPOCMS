@@ -86,6 +86,11 @@
             padding-bottom: 8px;
         }
 
+        .section-title.step-page-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
         .stepper-shell {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -755,6 +760,10 @@
             z-index: 90;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
+            max-height: 260px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(127, 29, 45, 0.45) transparent;
         }
 
         .clinic-select-wrap.is-open .clinic-select-menu {
@@ -813,6 +822,74 @@
             gap: 8px;
         }
 
+        .btn-health-back,
+        .btn-health-next,
+        .btn-health-submit {
+            isolation: isolate;
+        }
+
+        .btn-health-back > span,
+        .btn-health-back > svg,
+        .btn-health-next > span,
+        .btn-health-next > svg,
+        .btn-health-submit > span,
+        .btn-health-submit > svg {
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-health-back::after,
+        .btn-health-next::after,
+        .btn-health-submit::after {
+            content: "";
+            position: absolute;
+            top: -45%;
+            bottom: -45%;
+            left: -55%;
+            width: 34%;
+            background: linear-gradient(
+                105deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.12) 30%,
+                rgba(255, 255, 255, 0.72) 50%,
+                rgba(255, 255, 255, 0.12) 70%,
+                transparent 100%
+            );
+            transform: translateX(0) skewX(-18deg);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .btn-health-next:hover::after,
+        .btn-health-next:focus::after,
+        .btn-health-submit:hover::after,
+        .btn-health-submit:focus::after {
+            animation: health-button-reflection 0.65s ease-out;
+        }
+
+        .btn-health-back:hover::after,
+        .btn-health-back:focus::after {
+            animation: health-button-reflection 0.65s ease-out reverse;
+        }
+
+        @keyframes health-button-reflection {
+            0% {
+                left: -55%;
+                opacity: 0;
+            }
+            18% {
+                opacity: 0.85;
+            }
+            82% {
+                opacity: 0.85;
+            }
+            100% {
+                left: 125%;
+                opacity: 0;
+            }
+        }
+
         .btn-health svg {
             width: 18px;
             height: 18px;
@@ -823,6 +900,49 @@
         }
 
         .btn-health-back {
+            position: relative;
+            overflow: hidden;
+            background: #f8fafc;
+            color: var(--clinic-maroon);
+            border: 1px solid rgba(127, 29, 45, 0.42);
+            box-shadow: 0 7px 16px rgba(127, 29, 45, 0.08);
+            transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+            z-index: 0;
+        }
+
+        .btn-health-back::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: var(--clinic-maroon);
+            transform: translateX(105%);
+            transition: transform 0.34s ease;
+            z-index: 1;
+        }
+
+        .btn-health-back:hover,
+        .btn-health-back:focus {
+            color: #ffffff;
+            border-color: var(--clinic-maroon);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(127, 29, 45, 0.2);
+        }
+
+        .btn-health-back:hover::before,
+        .btn-health-back:focus::before {
+            transform: translateX(0);
+        }
+
+        .btn-health-back:hover svg,
+        .btn-health-back:focus svg {
+            transform: translateX(-2px);
+        }
+
+        .btn-health-back svg {
+            transition: transform 0.22s ease;
+        }
+
+        .btn-testing-skip {
             background: #e5e7eb;
             color: #111827;
         }
@@ -846,7 +966,7 @@
             background: var(--clinic-yellow);
             transform: translateX(-105%);
             transition: transform 0.34s ease;
-            z-index: -1;
+            z-index: 1;
         }
 
         .btn-health-submit:hover,
@@ -863,6 +983,20 @@
         .btn-health-next:hover::before,
         .btn-health-next:focus::before {
             transform: translateX(0);
+        }
+
+        .btn-health-next span {
+            order: 1;
+        }
+
+        .btn-health-next svg {
+            order: 2;
+            transition: transform 0.22s ease;
+        }
+
+        .btn-health-next:hover svg,
+        .btn-health-next:focus svg {
+            transform: translateX(2px);
         }
 
         .required {
@@ -1135,11 +1269,16 @@
         }
 
         .privacy-note {
-            margin: 14px 0 0;
+            margin: 18px 0 0;
+            padding-top: 14px;
+            border-top: 1px solid rgba(127, 29, 45, 0.22);
             text-align: center;
             font-size: 0.78rem;
-            color: #5b6470;
+            color: #000000;
             line-height: 1.5;
+        }
+        .privacy-noteD {
+            font-weight: 700;
         }
 
         .submit-overlay {
@@ -1298,7 +1437,7 @@
                 $selectedPwd = old('has_disability', $prefill['has_disability'] ?? 'No');
                 $personalErrorFields = ['school_year', 'home_address', 'zipcode', 'birthday', 'age', 'sex', 'civil_status', 'height', 'weight', 'blood_type', 'contact_no', 'guardian_name', 'landline', 'cellphone'];
                 $medicalErrorFields = ['has_illness', 'medical_history', 'other_illness', 'has_disability', 'disability_type', 'food_allergies', 'no_allergies', 'medicine_allergies', 'other_med_allergies', 'is_smoker', 'is_drinker'];
-                $covidErrorFields = ['vaccine_history'];
+                $covidErrorFields = ['covid_vaccinated', 'vaccine_history'];
                 $uploadErrorFields = ['medical_certificate', 'doctor_name', 'med_cert_date', 'med_cert_findings', 'chest_xray_result', 'xray_date', 'xray_findings', 'pwd_id_proof', 'student_photo', 'health_profile_certified'];
                 $startStep = collect($uploadErrorFields)->contains(fn ($field) => $errors->has($field)) ? 5
                     : (collect($covidErrorFields)->contains(fn ($field) => $errors->has($field)) ? 4
@@ -1393,15 +1532,23 @@
                             <li>Provide your COVID-19 vaccination status and dose details, when applicable.</li>
                             <li>Prepare clear PDF or image copies of your medical certificate and official chest X-ray report.</li>
                             <li>If you are a PWD, upload your PWD ID in Step 5. Upload your formal 2x2 photo as JPG or PNG.</li>
+                            <li>Upload your formal 2x2 photo as JPG or PNG.</li>
+                            <li>Download and print your Health Information Form before proceeding to Clinic for Assessment.</li>
+                            <li>Don't forget to bring your hard copy of requirements and printed 2 by 2 photo to the clinic.</li>
                         </ol>
                     </div>
 
                     <div class="btn-row">
-                        <a href="{{ url('/student/account') }}" class="btn btn-health btn-health-back">Back</a>
                         @env('local')
+                            <a href="{{ url('/student/account') }}" class="btn btn-health btn-health-back">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="m15 18-6-6 6-6"></path>
+                                </svg>
+                                <span>Back</span>
+                            </a>
                             <button
                                 type="submit"
-                                class="btn btn-health btn-health-back"
+                                class="btn btn-health btn-testing-skip"
                                 formaction="{{ route('student.health_form.testing_skip') }}"
                                 formmethod="POST"
                                 formnovalidate
@@ -1410,12 +1557,17 @@
                                 Skip to Print (Testing)
                             </button>
                         @endenv
-                        <button type="button" class="btn btn-health btn-health-next" id="nextToStep2">Next</button>
+                        <button type="button" class="btn btn-health btn-health-next" id="nextToStep2">
+                            <span>Next</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
                 <div class="step-panel {{ $startStep === 2 ? '' : 'is-hidden' }}" id="stepPanel2">
-                    <h2 class="section-title">Personal Information</h2>
+                    <h2 class="section-title step-page-title">Personal Information</h2>
                     <p class="step-fill-note">Complete the student and emergency contact details from the official PUP Health Information Form.</p>
                     <div class="personal-identity-grid">
                         <div class="form-field">
@@ -1438,7 +1590,17 @@
                     <div class="step-one-grid">
                         <div class="form-field">
                             <label class="form-label" for="school_year">School Year <span class="required">*</span></label>
-                            <input id="school_year" class="form-control field-maroon" name="school_year" value="{{ old('school_year', $prefill['school_year'] ?? '2026-2027') }}" required>
+                            <input
+                                id="school_year"
+                                class="form-control field-maroon{{ !empty($prefill['school_year_from_puptas']) ? ' identity-readonly' : '' }}"
+                                name="school_year"
+                                value="{{ old('school_year', $prefill['school_year'] ?? '') }}"
+                                placeholder="YYYY-YYYY"
+                                pattern="\d{4}-\d{4}"
+                                inputmode="numeric"
+                                required
+                                {{ !empty($prefill['school_year_from_puptas']) ? 'readonly' : '' }}
+                            >
                         </div>
                         <div class="form-field">
                             <label class="form-label" for="birthday">Birthday <span class="required">*</span></label>
@@ -1450,28 +1612,51 @@
                         </div>
                         <div class="form-field">
                             <label class="form-label" for="sex">Sex <span class="required">*</span></label>
-                            <select id="sex" class="form-select field-maroon" name="sex" required>
-                                <option value="">Select sex</option>
-                                @foreach(['Male', 'Female'] as $option)
-                                    <option value="{{ $option }}" {{ old('sex', $prefill['sex'] ?? '') === $option ? 'selected' : '' }}>{{ $option }}</option>
-                                @endforeach
-                            </select>
+                            <div class="clinic-select-wrap" data-clinic-select data-select-placeholder="Select sex">
+                                <select id="sex" class="form-select clinic-select-native field-maroon" name="sex" required>
+                                    <option value="">Select sex</option>
+                                    @foreach(['Male', 'Female'] as $option)
+                                        <option value="{{ $option }}" {{ old('sex', $prefill['sex'] ?? '') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="clinic-select-display" aria-haspopup="listbox" aria-expanded="false">Select sex</button>
+                                <div class="clinic-select-menu" role="listbox" aria-label="Sex options">
+                                    <button type="button" class="clinic-select-option" data-select-value="Male">Male</button>
+                                    <button type="button" class="clinic-select-option" data-select-value="Female">Female</button>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-field">
                             <label class="form-label" for="civil_status">Civil Status <span class="required">*</span></label>
-                            <select id="civil_status" class="form-select field-maroon" name="civil_status" required>
-                                @foreach(['Single', 'Married', 'Widowed', 'Separated'] as $option)
-                                    <option value="{{ $option }}" {{ old('civil_status', $prefill['civil_status'] ?? 'Single') === $option ? 'selected' : '' }}>{{ $option }}</option>
-                                @endforeach
-                            </select>
+                            <div class="clinic-select-wrap" data-clinic-select data-select-placeholder="Select civil status">
+                                <select id="civil_status" class="form-select clinic-select-native field-maroon" name="civil_status" required>
+                                    @foreach(['Single', 'Married', 'Widowed', 'Separated'] as $option)
+                                        <option value="{{ $option }}" {{ old('civil_status', $prefill['civil_status'] ?? 'Single') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="clinic-select-display" aria-haspopup="listbox" aria-expanded="false">Select civil status</button>
+                                <div class="clinic-select-menu" role="listbox" aria-label="Civil status options">
+                                    @foreach(['Single', 'Married', 'Widowed', 'Separated'] as $option)
+                                        <button type="button" class="clinic-select-option" data-select-value="{{ $option }}">{{ $option }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                         <div class="form-field">
                             <label class="form-label" for="blood_type">Blood Type <span class="required">*</span></label>
-                            <select id="blood_type" class="form-select field-maroon" name="blood_type" required>
-                                @foreach(['Unknown', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $option)
-                                    <option value="{{ $option }}" {{ old('blood_type', $prefill['blood_type'] ?? 'Unknown') === $option ? 'selected' : '' }}>{{ $option }}</option>
-                                @endforeach
-                            </select>
+                            <div class="clinic-select-wrap" data-clinic-select data-select-placeholder="Select blood type">
+                                <select id="blood_type" class="form-select clinic-select-native field-maroon" name="blood_type" required>
+                                    @foreach(['Unknown', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $option)
+                                        <option value="{{ $option }}" {{ old('blood_type', $prefill['blood_type'] ?? 'Unknown') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="clinic-select-display" aria-haspopup="listbox" aria-expanded="false">Select blood type</button>
+                                <div class="clinic-select-menu" role="listbox" aria-label="Blood type options">
+                                    @foreach(['Unknown', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $option)
+                                        <button type="button" class="clinic-select-option" data-select-value="{{ $option }}">{{ $option }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                         <div class="form-field">
                             <label class="form-label" for="height">Height (cm) <span class="required">*</span></label>
@@ -1507,13 +1692,23 @@
                         </div>
                     </div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-health btn-health-back" data-step-back="1">Back</button>
-                        <button type="button" class="btn btn-health btn-health-next" data-step-next="3">Next</button>
+                        <button type="button" class="btn btn-health btn-health-back" data-step-back="1">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span>Back</span>
+                        </button>
+                        <button type="button" class="btn btn-health btn-health-next" data-step-next="3">
+                            <span>Next</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
                 <div class="step-panel {{ $startStep === 3 ? '' : 'is-hidden' }}" id="stepPanel3">
-                    <h2 class="section-title">Medical History</h2>
+                    <h2 class="section-title step-page-title">Medical History</h2>
                     <div class="form-field mb-3">
                         <label class="form-label">Do you need medical attention or have a known medical illness? <span class="required">*</span></label>
                         <div class="pwd-toggle">
@@ -1595,40 +1790,72 @@
                         @endforeach
                     </div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-health btn-health-back" data-step-back="2">Back</button>
-                        <button type="button" class="btn btn-health btn-health-next" data-step-next="4">Next</button>
+                        <button type="button" class="btn btn-health btn-health-back" data-step-back="2">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span>Back</span>
+                        </button>
+                        <button type="button" class="btn btn-health btn-health-next" data-step-next="4">
+                            <span>Next</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
                 <div class="step-panel {{ $startStep === 4 ? '' : 'is-hidden' }}" id="stepPanel4">
-                    <h2 class="section-title">COVID-19 Vaccination History</h2>
-                    <p class="step-fill-note">Enter the date received and vaccine brand for every COVID-19 dose. All fields are required.</p>
-                    <input type="hidden" name="covid_vaccinated" value="Yes">
-                    <div id="vaccineHistoryDetails">
+                    <h2 class="section-title step-page-title">COVID-19</h2>
+                    <p class="step-fill-note">Select your vaccination status. If vaccinated, provide at least your first and second dose details.</p>
+                    @php
+                        $selectedCovidVaccinated = old('covid_vaccinated', $prefill['covid_vaccinated'] ?? '');
+                    @endphp
+                    <div class="form-field mb-3">
+                        <label class="form-label">Have you received a COVID-19 vaccine? <span class="required">*</span></label>
+                        <div class="pwd-toggle" id="covidVaccinatedToggle">
+                            <input class="pwd-radio" type="radio" name="covid_vaccinated" id="covid_vaccinated_no" value="No" required {{ $selectedCovidVaccinated === 'No' ? 'checked' : '' }}>
+                            <label class="pwd-option" for="covid_vaccinated_no">No</label>
+                            <input class="pwd-radio" type="radio" name="covid_vaccinated" id="covid_vaccinated_yes" value="Yes" required {{ $selectedCovidVaccinated === 'Yes' ? 'checked' : '' }}>
+                            <label class="pwd-option" for="covid_vaccinated_yes">Yes</label>
+                        </div>
+                    </div>
+                    <div id="vaccineHistoryDetails" class="conditional-section {{ $selectedCovidVaccinated === 'Yes' ? '' : 'is-hidden' }}">
                         <div class="dose-grid">
                             @foreach(['first_dose' => '1st Dose', 'second_dose' => '2nd Dose', 'booster_1' => 'Booster 1', 'booster_2' => 'Booster 2'] as $doseKey => $doseLabel)
+                                @php $doseRequired = in_array($doseKey, ['first_dose', 'second_dose'], true); @endphp
                                 <div class="dose-row">
-                                    <div class="dose-label">{{ $doseLabel }}</div>
+                                    <div class="dose-label">{{ $doseLabel }}{{ $doseRequired ? '' : ' (Optional)' }}</div>
                                     <div class="form-field">
-                                        <label class="form-label" for="{{ $doseKey }}_date">Date Received <span class="required">*</span></label>
-                                        <input id="{{ $doseKey }}_date" type="date" name="vaccine_history[{{ $doseKey }}][date]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.date") }}" min="2020-01-01" max="2025-12-31" required>
+                                        <label class="form-label" for="{{ $doseKey }}_date">Date Received @if($doseRequired)<span class="required">*</span>@endif</label>
+                                        <input id="{{ $doseKey }}_date" type="date" name="vaccine_history[{{ $doseKey }}][date]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.date") }}" min="2021-03-01" max="2025-12-31" data-vaccine-field data-dose-required="{{ $doseRequired ? 'true' : 'false' }}">
                                     </div>
                                     <div class="form-field">
-                                        <label class="form-label" for="{{ $doseKey }}_brand">Vaccine Brand <span class="required">*</span></label>
-                                        <input id="{{ $doseKey }}_brand" name="vaccine_history[{{ $doseKey }}][brand]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.brand") }}" placeholder="e.g. Pfizer, Moderna" required>
+                                        <label class="form-label" for="{{ $doseKey }}_brand">Vaccine Brand @if($doseRequired)<span class="required">*</span>@endif</label>
+                                        <input id="{{ $doseKey }}_brand" name="vaccine_history[{{ $doseKey }}][brand]" class="form-control field-maroon" value="{{ old("vaccine_history.$doseKey.brand") }}" placeholder="e.g. Pfizer, Moderna" data-vaccine-field data-dose-required="{{ $doseRequired ? 'true' : 'false' }}">
                                     </div>
                                 </div>
                             @endforeach
                         </div>
                     </div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-health btn-health-back" data-step-back="3">Back</button>
-                        <button type="button" class="btn btn-health btn-health-next" data-step-next="5">Next</button>
+                        <button type="button" class="btn btn-health btn-health-back" data-step-back="3">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span>Back</span>
+                        </button>
+                        <button type="button" class="btn btn-health btn-health-next" data-step-next="5">
+                            <span>Next</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
                 <div class="step-panel {{ $startStep === 5 ? '' : 'is-hidden' }}" id="stepPanel5">
-                    <h2 class="section-title">Clinic Requirements</h2>
+                    <h2 class="section-title step-page-title">Clinic Requirements</h2>
                     <div class="requirement-grid">
                         <div class="requirement-card" id="pwdUploadWrap" data-requirement-card>
                             <div class="requirement-card-header">
@@ -1764,7 +1991,12 @@
                         </label>
                     </div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-health btn-health-back" data-step-back="4">Back</button>
+                        <button type="button" class="btn btn-health btn-health-back" data-step-back="4">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span>Back</span>
+                        </button>
                         <button type="submit" class="btn btn-health btn-health-submit">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path>
@@ -1777,7 +2009,8 @@
                 </div>
 
                 <p class="privacy-note">
-                    Data Privacy Notice: The information you provide is collected for school clinic documentation and health clearance processing only, in compliance with school data privacy requirements.
+                    <span class="privacy-noteD">Data Privacy Notice:</span>
+                    The information you provide is collected for school clinic documentation and health clearance processing only, in compliance with school data privacy requirements.
                 </p>
             </form>
         </div>
@@ -1812,6 +2045,15 @@
             const pwdUploadWrap = document.getElementById('pwdUploadWrap');
             const noAllergiesInput = document.getElementById('no_allergies');
             const allergyDetails = document.getElementById('allergyDetails');
+            const covidVaccinatedRadios = document.querySelectorAll('input[name="covid_vaccinated"]');
+            const vaccineHistoryDetails = document.getElementById('vaccineHistoryDetails');
+            const vaccineFields = Array.from(document.querySelectorAll('[data-vaccine-field]'));
+            const vaccineDateFields = [
+                document.getElementById('first_dose_date'),
+                document.getElementById('second_dose_date'),
+                document.getElementById('booster_1_date'),
+                document.getElementById('booster_2_date'),
+            ].filter(Boolean);
             const submitOverlay = document.getElementById('submitOverlay');
             const requirementFiles = document.querySelectorAll('[data-requirement-file]');
             const clinicSelects = Array.from(document.querySelectorAll('[data-clinic-select]'));
@@ -1843,7 +2085,10 @@
                 }
 
                 showValidationBubble(firstInvalid);
-                firstInvalid.focus({ preventScroll: true });
+                const visibleValidationControl = firstInvalid.classList.contains('clinic-select-native')
+                    ? firstInvalid.closest('[data-clinic-select]')?.querySelector('.clinic-select-display')
+                    : firstInvalid;
+                visibleValidationControl?.focus({ preventScroll: true });
                 firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return false;
             }
@@ -1865,9 +2110,12 @@
                 bubble.className = 'validation-bubble';
                 bubble.setAttribute('role', 'alert');
                 if (field.validity?.rangeUnderflow) {
-                    bubble.textContent = 'Date must be January 1, 2020 or later.';
+                    bubble.textContent = field.dataset.validationMessage
+                        || 'Date must be January 1, 2020 or later.';
                 } else if (field.validity?.rangeOverflow) {
                     bubble.textContent = 'Date must not be later than December 31, 2025.';
+                } else if (field.validationMessage && field.dataset.validationMessage) {
+                    bubble.textContent = field.dataset.validationMessage;
                 } else {
                     bubble.textContent = 'Please fill this field.';
                 }
@@ -1940,6 +2188,75 @@
                 });
             }
 
+            function toggleVaccineHistory() {
+                const isVaccinated = document.querySelector('input[name="covid_vaccinated"]:checked')?.value === 'Yes';
+                vaccineHistoryDetails?.classList.toggle('is-hidden', !isVaccinated);
+
+                vaccineFields.forEach((field) => {
+                    field.disabled = !isVaccinated;
+                    field.required = isVaccinated && field.dataset.doseRequired === 'true';
+
+                    if (!isVaccinated) {
+                        field.value = '';
+                        field.setCustomValidity('');
+                        delete field.dataset.validationMessage;
+                    }
+                });
+
+                syncVaccineDateRules();
+            }
+
+            function addDaysToIsoDate(dateValue, days) {
+                if (!dateValue) return '';
+                const date = new Date(`${dateValue}T00:00:00`);
+                if (Number.isNaN(date.getTime())) return '';
+                date.setDate(date.getDate() + days);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            function syncVaccineDateRules() {
+                const firstDoseDate = document.getElementById('first_dose_date');
+                const secondDoseDate = document.getElementById('second_dose_date');
+                const minimumSecondDoseDate = addDaysToIsoDate(firstDoseDate?.value, 28);
+
+                if (secondDoseDate) {
+                    secondDoseDate.min = minimumSecondDoseDate || '2021-03-01';
+                    if (
+                        minimumSecondDoseDate
+                        && secondDoseDate.value
+                        && secondDoseDate.value < minimumSecondDoseDate
+                    ) {
+                        secondDoseDate.dataset.validationMessage = 'The 2nd Dose must be at least 4 weeks after the 1st Dose.';
+                    } else {
+                        delete secondDoseDate.dataset.validationMessage;
+                    }
+                }
+
+                const dateUsage = new Map();
+                vaccineDateFields.forEach((field) => {
+                    field.setCustomValidity('');
+                    if (field !== secondDoseDate || !field.dataset.validationMessage) {
+                        delete field.dataset.validationMessage;
+                    }
+
+                    if (!field.disabled && field.value) {
+                        if (dateUsage.has(field.value)) {
+                            const message = 'Each COVID-19 dose must have a different date.';
+                            field.dataset.validationMessage = message;
+                            field.setCustomValidity(message);
+                            const firstField = dateUsage.get(field.value);
+                            firstField.dataset.validationMessage = message;
+                            firstField.setCustomValidity(message);
+                        } else {
+                            dateUsage.set(field.value, field);
+                        }
+                    }
+                });
+            }
+
             function syncRequirementCard(fileInput) {
                 const card = fileInput?.closest('[data-requirement-card]');
                 if (!card) return;
@@ -1967,9 +2284,12 @@
                 if (!select || !display) return;
 
                 const selectedValue = select.value || '';
+                const placeholder = wrap.dataset.selectPlaceholder
+                    || select.options[0]?.text
+                    || 'Select option';
                 const selectedText = selectedValue
                     ? (select.options[select.selectedIndex]?.text || selectedValue)
-                    : 'Select findings';
+                    : placeholder;
 
                 display.textContent = selectedText;
                 options.forEach((option) => {
@@ -2083,6 +2403,13 @@
                 radio.addEventListener('change', togglePwdRequirements);
             });
             noAllergiesInput?.addEventListener('change', toggleAllergyDetails);
+            covidVaccinatedRadios.forEach((radio) => {
+                radio.addEventListener('change', toggleVaccineHistory);
+            });
+            vaccineDateFields.forEach((field) => {
+                field.addEventListener('change', syncVaccineDateRules);
+                field.addEventListener('input', syncVaccineDateRules);
+            });
             requirementFiles.forEach((fileInput) => {
                 syncRequirementCard(fileInput);
                 fileInput.addEventListener('change', () => syncRequirementCard(fileInput));
@@ -2100,6 +2427,7 @@
                 });
             });
             togglePwdRequirements();
+            toggleVaccineHistory();
 
             const maroonFields = Array.from(document.querySelectorAll('.field-maroon'));
 

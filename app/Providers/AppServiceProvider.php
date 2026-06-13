@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Http\Controllers\AppointmentController;
+use App\Services\ClinicWorkflowService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
@@ -23,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('layouts.student', function ($view) {
+            $workflow = app(ClinicWorkflowService::class);
+            $view->with('clinicClosure', $workflow->activeClosure());
+            $view->with('studentAssistantAdminAvailable', $workflow->studentAssistantWorkspaceAvailable());
+            $view->with('studentAssistantHoursLabel', $workflow->studentAssistantHoursLabel());
+
             $existingNotifications = $view->getData()['notifications'] ?? null;
             if ($existingNotifications !== null) {
                 return;

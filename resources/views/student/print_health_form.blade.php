@@ -21,9 +21,10 @@
         .official-heading-cell p { margin: 0; font-size: 13px; line-height: 1.17; }
         .official-heading-cell .univ-name { font-size: 19px; font-weight: normal; }
         .official-heading-cell .dept-name { margin-top: 2px; font-size: 21px; font-weight: normal; }
-        .photo-box { position: absolute; top: 14px; right: 2px; box-sizing: border-box; width: 116.5px; height: 115px; padding: 22px 8px 0; overflow: hidden; border: 1px solid #000; font-size: 13px; line-height: 1.25; text-align: center; white-space: normal; word-wrap: break-word; }
-        .official-title-table { width: 80%; margin-top: -5px; margin-left: 2%; border-collapse: collapse; table-layout: fixed; }
-        .official-title-table td { padding: 9px 0 5px; border-top: 1px solid #000; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: bold; font-style: italic; text-align: center; transform: translateX(2px); }
+        .photo-box { position: absolute; top: 29px; right: 2px; box-sizing: border-box; width: 116.5px; height: 115px; padding: 22px 8px 0; overflow: hidden; border: 1px solid #000; font-size: 13px; line-height: 1.25; text-align: center; white-space: normal; word-wrap: break-word; }
+        .official-title-table { position: relative; width: 60%; margin-top: -5px; margin-left: 20%; border-collapse: collapse; table-layout: fixed; }
+        .official-title-table::before { position: absolute; top: 0; left: -33.333%; width: 133.333%; border-top: 2px solid #000; content: ""; }
+        .official-title-table td { padding: 9px 0 5px; border: 0; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: 700; font-style: italic; text-align: center; }
         .section-header { width: 80%; margin-top: 8px; padding: 3px 0 4px; border: 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; font-style: italic; text-transform: uppercase; }
         .official-title-table + .section-header { margin-top: 11px; }
         .student-information-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; table-layout: fixed; }
@@ -37,8 +38,8 @@
         .blood-email-table td { padding-top: 0; padding-bottom: 1px; font-size: 12px; vertical-align: bottom; }
         .blood-type-label { width: 15%; }
         .blood-type-value { width: 43%; }
-        .blood-email-table .email-label { width: 14%; padding-left: 10px !important; }
-        .email-value { width: 28%; overflow: hidden; font-size: 11px !important; white-space: nowrap; text-overflow: clip; }
+        .blood-email-table .email-label { position: relative; left: -10px; width: 14%; padding-left: 0 !important; }
+        .email-value { position: relative; left: -10px; width: 28%; overflow: hidden; font-size: 11px !important; white-space: nowrap; text-overflow: clip; }
         .student-full-name { display: inline-block; width: 86%; vertical-align: bottom; }
         .line-label { padding-right: 4px !important; font-weight: 700; white-space: nowrap; }
         .line-value { padding-left: 4px !important; border-bottom: 1px solid #000 !important; font-weight: bold; overflow-wrap: break-word; word-wrap: break-word; }
@@ -47,6 +48,14 @@
         .cellphone-label { padding-left: 10px !important; }
         .guardian-row { padding-top: 1px !important; white-space: nowrap; }
         .guardian-value { display: inline-block; width: 66%; white-space: normal; vertical-align: bottom; }
+        .contact-information-row { width: 100%; white-space: nowrap; }
+        .contact-information-row .contact-label,
+        .contact-information-row .contact-value { display: inline-block; font-size: 13px; vertical-align: bottom; }
+        .contact-information-row .contact-label { padding: 0 3px 0 0 !important; font-weight: 700; }
+        .contact-information-row .landline-label { width: 72px; }
+        .contact-information-row .landline-value { width: 42%; padding: 0 3px 0 2px !important; border-bottom: 1px solid #000; font-weight: 700; }
+        .contact-information-row .cellphone-label { width: 92px; margin-left: 10px; }
+        .contact-information-row .cellphone-value { width: 25%; padding: 0 3px !important; border-bottom: 1px solid #000; font-weight: 700; }
         .compound-row { padding: 0 !important; }
         .age-label { width: 5%; }
         .age-value { width: 10%; }
@@ -76,7 +85,15 @@
         .medical-subsection-heading { margin: 5px 0 3px; font-weight: 700; text-transform: none; }
         .disability-row .check-item { font-weight: 700; }
         .allergy-declaration { margin: 2px 0 3px 18px; font-size: 13px; line-height: 1.18; }
-        .medicine-other-field { display: inline-block; }
+        .medicine-allergy-table { width: 100%; margin: 5px 0; border-collapse: collapse; table-layout: fixed; }
+        .medicine-allergy-table td { padding: 0 3px 0 0; border: 0; font-size: 13px; line-height: 15px; vertical-align: middle; white-space: nowrap; }
+        .medicine-allergy-table .medicine-label-cell { width: 9%; font-weight: 700; }
+        .medicine-allergy-table .medicine-item-cell { width: 12%; }
+        .medicine-allergy-table .medicine-item-cell-wide { width: 15%; }
+        .medicine-allergy-table td:nth-child(5) { width: 18%; }
+        .medicine-allergy-table .medicine-other-cell { width: 22%; }
+        .medicine-allergy-table .box-ui { margin-right: 3px; vertical-align: middle; }
+        .medicine-other-field { display: inline-block; width: 62%; min-width: 0; padding: 0; }
         .medical-history-instruction { margin: 2px 0 3px 24px; font-size: 12px; font-style: italic; }
         .medical-check-table { width: 96%; margin: 3px 0 5px 4%; border-collapse: collapse; table-layout: fixed; }
         .medical-check-table td { width: 25%; padding: 2px 3px; border: 0; font-size: 12px; vertical-align: middle; }
@@ -93,7 +110,7 @@
         .covid-label-cell { width: 38%; padding-right: 10px !important; }
         .covid-label-cell > .medical-subsection-title { position: relative; left: -22px; white-space: nowrap; }
         .vaccinated-choice { margin: 3px 0 0 12px; }
-        .vax-table { width: 100%; margin-top: 0; border-collapse: collapse; table-layout: fixed; }
+        .vax-table { position: relative; left: 10px; width: 100%; margin-top: 0; border-collapse: collapse; table-layout: fixed; }
         .vax-table th, .vax-table td { height: 18px; padding: 0 4px; border: 1px solid #000; font-size: 10px; line-height: 1; text-align: center; white-space: nowrap; }
         .vax-table th:first-child,
         .vax-table td:first-child { width: 40%; text-align: left; }
@@ -102,23 +119,23 @@
         .vax-table th:nth-child(3),
         .vax-table td:nth-child(3) { width: 30%; }
         .cert-text { margin-top: 8px; font-size: 11px; font-style: italic; line-height: 1.22; text-align: justify; }
-        .cert-text-first { margin-top: 12px; }
-        .signature-table { width: 92%; margin: 12px auto 0; border-collapse: separate; border-spacing: 20px 0; table-layout: fixed; page-break-inside: avoid; }
+        .cert-text-first { margin-top: 16px; }
+        .signature-table { width: 92%; margin: 25px auto 0; border-collapse: separate; border-spacing: 20px 0; table-layout: fixed; page-break-inside: avoid; }
         .signature-table td { width: 33.333%; padding: 0; border: 0; vertical-align: bottom; text-align: center; }
         .sig-image { width: 120px; height: auto; margin-bottom: -10px; }
         .signature-space { height: 18px; }
         .signature-date-space { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 3px; font-weight: bold; }
         .sig-line { min-height: 11px; margin-bottom: 2px; border-bottom: 1px solid #000; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .signature-caption { min-height: 17px; font-size: 11.5px; font-weight: 700; line-height: 1.1; text-align: center; }
-        .physician-section { width: 100%; clear: both; margin-top: 8px !important; padding: 5px 24px 0 !important; border: 0 !important; border-top: 1px dotted #000 !important; break-inside: avoid; page-break-inside: avoid; }
+        .signature-caption { min-height: 17px; font-size: 12.5px; font-weight: 700; line-height: 1.1; text-align: center; }
+        .physician-section { width: 100%; clear: both; margin-top: 15px !important; padding: 7px 24px 0 !important; border: 0 !important; border-top: 1px dotted #000 !important; break-inside: avoid; page-break-inside: avoid; }
         .physician-section,
         .physician-section * { font-family: Arial, Helvetica, sans-serif; }
         .physician-section > p { margin: 0 0 1px !important; font-weight: 700 !important; }
-        .physician-check-instruction { font-size: 11.5px; font-style: italic; font-weight: 700; text-align: center; }
+        .physician-check-instruction { font-size: 12.5px; font-style: italic; font-weight: 700; text-align: center; }
         .physician-clearance-table,
         .physician-signature-table { width: 94%; margin-left: auto; margin-right: auto; border-collapse: collapse; table-layout: fixed; }
         .physician-clearance-table td,
-        .physician-signature-table td { padding: 1px 3px; border: 0; font-size: 11px; font-weight: 700; vertical-align: middle; }
+        .physician-signature-table td { padding: 1px 3px; border: 0; font-size: 12px; font-weight: 700; vertical-align: middle; }
         .physician-clearance-label { width: 20%; font-weight: bold; }
         .physician-clearance-table td:nth-child(2) { width: 13%; white-space: nowrap; }
         .physician-pending-cell { width: 67%; white-space: nowrap; }
@@ -127,8 +144,8 @@
         .physician-signature-table { margin-top: 12px; }
         .physician-signature-table td:first-child { width: 34%; padding-right: 12px; }
         .physician-signature-table td:last-child { width: 66%; padding-left: 12px; }
-        .physician-signature-line { min-height: 15px; border-bottom: 1px solid #000; font-size: 11px; font-weight: bold; text-align: center; }
-        .physician-signature-label { margin-top: 1px; font-size: 11px; font-weight: 700; text-align: center; }
+        .physician-signature-line { min-height: 15px; border-bottom: 1px solid #000; font-size: 12px; font-weight: bold; text-align: center; }
+        .physician-signature-label { margin-top: 1px; font-size: 12px; font-weight: 700; text-align: center; }
         .print-action-bar { display: flex; justify-content: flex-end; gap: 8px; width: min(8.5in, 100%); margin: 0 auto; padding: 10px 12px 0; }
         .print-action-button { display: inline-flex; align-items: center; justify-content: center; padding: 9px 18px; border: 1px solid #800000; border-radius: 6px; background: #fff; color: #800000; font-size: 13px; font-weight: bold; text-decoration: none; }
         .print-action-button.is-download { background: #800000; color: #fff; }

@@ -285,7 +285,6 @@
 
         .workspace-button {
             position: relative;
-            isolation: isolate;
             display: flex;
             min-height: 58px;
             width: 100%;
@@ -296,38 +295,55 @@
             padding: 0 24px;
             border: 1px solid var(--maroon);
             border-radius: 999px;
-            background: var(--maroon);
+            background: linear-gradient(135deg, var(--maroon), var(--maroon-strong));
             color: #ffffff;
             font-family: inherit;
             font-size: 15px;
             font-weight: 900;
             text-decoration: none;
-            box-shadow: 0 12px 24px rgba(112, 19, 27, 0.16);
-            transition: color .24s ease, border-color .24s ease, box-shadow .24s ease, transform .24s ease;
+            box-shadow:
+                0 0 0 4px rgba(112, 19, 27, 0.10),
+                0 18px 34px rgba(112, 19, 27, 0.22);
+            transition: color .12s ease, transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
         }
 
-        .workspace-button::before {
-            position: absolute;
-            z-index: -1;
-            inset: 0;
-            background: var(--gold);
+        .workspace-button::after {
             content: "";
-            transform: translateX(-102%);
-            transition: transform .32s ease;
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(120deg,
+                    rgba(255, 248, 196, 0) 0%,
+                    rgba(255, 239, 181, 0.16) 22%,
+                    rgba(255, 239, 181, 0.58) 48%,
+                    rgba(255, 239, 181, 0.16) 72%,
+                    rgba(255, 248, 196, 0) 100%);
+            transform: translateX(-135%);
+            transition: transform 1.4s ease;
+            pointer-events: none;
         }
 
         .workspace-button:hover,
         .workspace-button:focus-visible {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--gold), var(--gold-soft));
             border-color: var(--gold);
             color: var(--maroon);
-            box-shadow: 0 16px 30px rgba(112, 19, 27, 0.20);
+            box-shadow:
+                0 0 0 4px rgba(250, 204, 21, 0.18),
+                0 22px 42px rgba(112, 19, 27, 0.20);
             outline: none;
-            transform: translateY(-1px);
         }
 
-        .workspace-button:hover::before,
-        .workspace-button:focus-visible::before {
-            transform: translateX(0);
+        .workspace-button:hover::after,
+        .workspace-button:focus-visible::after {
+            transform: translateX(135%);
+        }
+
+        .workspace-button svg,
+        .workspace-button span {
+            position: relative;
+            z-index: 1;
         }
 
         .workspace-button svg {
@@ -346,7 +362,7 @@
             opacity: .82;
         }
 
-        .workspace-button.is-disabled::before {
+        .workspace-button.is-disabled::after {
             display: none;
         }
 
@@ -585,7 +601,7 @@
                                     <span>Admin Workspace</span>
                                 </button>
                             @endif
-                            <small class="workspace-schedule">Available daily from 8:00 AM to 8:00 PM</small>
+                            <small class="workspace-schedule">Available daily from {{ $adminWorkspaceHoursLabel ?? '8:00 AM–8:00 PM' }}</small>
                         @endif
                     </div>
 

@@ -9,8 +9,10 @@ use App\Models\AppointmentFeedback;
 use App\Models\HealthProfile;
 use App\Models\User;
 use App\Services\PuptasWebhookService;
+use App\Services\ClinicWorkflowService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
@@ -59,6 +61,8 @@ class AppointmentController extends Controller
     public function getStudentNotifications(User $user): array
     {
         Appointment::expireOverduePending();
+        $workflow = app(ClinicWorkflowService::class);
+        $settings = $workflow->settings();
 
         $user->loadMissing('healthProfile');
 
@@ -112,6 +116,23 @@ class AppointmentController extends Controller
                     'link' => route('student.feedback.show', ['appointment' => $appt->id]),
                 ];
             }
+
+            $reminderHours = (int) ($settings->appointment_reminder_hours ?? 0);
+            if ($appt->status === 'Approved' && $reminderHours > 0 && $appt->date && $appt->time) {
+                $appointmentAt = Carbon::parse($appt->date . ' ' . $appt->time);
+                $hoursUntilAppointment = now()->diffInMinutes($appointmentAt, false) / 60;
+
+                if ($hoursUntilAppointment > 0 && $hoursUntilAppointment <= $reminderHours) {
+                    $notifications[] = [
+                        'id' => $this->buildNotificationId('appointment-reminder', [$appt->id, $reminderHours, $appt->date, $appt->time]),
+                        'type' => 'info',
+                        'icon' => '!',
+                        'message' => "Reminder: Your {$appt->service} appointment is on {$dateStr} at " . Carbon::parse($appt->time)->format('g:i A') . '.',
+                        'time' => 'Upcoming appointment',
+                        'link' => url('/student/history'),
+                    ];
+                }
+            }
         }
 
         $healthProfile = $user->healthProfile;
@@ -149,6 +170,24 @@ class AppointmentController extends Controller
             }
         }
 
+        $closure = $workflow->activeClosure();
+        if ($closure) {
+            $notifications[] = [
+                'id' => $this->buildNotificationId('clinic-closure', [
+                    $closure['reason'],
+                    optional($closure['updated_at'])->timestamp,
+                    optional($closure['ends_at'])->timestamp,
+                ]),
+                'type' => 'warning',
+                'icon' => '!',
+                'message' => $closure['reason'] . ': ' . $closure['message'],
+                'time' => $closure['ends_at']
+                    ? 'Expected reopening ' . $closure['ends_at']->format('M d, g:i A')
+                    : 'Clinic advisory',
+                'link' => url('/student/booking'),
+            ];
+        }
+
         $readMap = $this->getNotificationReadMap($user);
 
         return array_map(function (array $notification) use ($readMap) {
@@ -178,6 +217,117 @@ class AppointmentController extends Controller
         }
 
         return null;
+    }
+
+    private function normalizePuptasApplicantIdentity(?array $applicantData): array
+    {
+        if (!is_array($applicantData) || empty($applicantData)) {
+            return [
+                'available' => false,
+                'first_name' => '',
+                'middle_name' => '',
+                'last_name' => '',
+                'full_name' => '',
+                'reference_number' => '',
+                'email' => '',
+                'school_year' => '',
+            ];
+        }
+
+        $firstName = trim((string) (
+            data_get($applicantData, 'user.firstname')
+            ?: data_get($applicantData, 'user.first_name')
+            ?: data_get($applicantData, 'firstname')
+            ?: data_get($applicantData, 'first_name')
+            ?: data_get($applicantData, 'given_name')
+        ));
+        $middleName = trim((string) (
+            data_get($applicantData, 'user.middlename')
+            ?: data_get($applicantData, 'user.middle_name')
+            ?: data_get($applicantData, 'middlename')
+            ?: data_get($applicantData, 'middle_name')
+        ));
+        $lastName = trim((string) (
+            data_get($applicantData, 'user.lastname')
+            ?: data_get($applicantData, 'user.last_name')
+            ?: data_get($applicantData, 'lastname')
+            ?: data_get($applicantData, 'last_name')
+            ?: data_get($applicantData, 'family_name')
+            ?: data_get($applicantData, 'surname')
+        ));
+        $referenceNumber = trim((string) (
+            data_get($applicantData, 'user.reference_number')
+            ?: data_get($applicantData, 'reference_number')
+            ?: data_get($applicantData, 'application.reference_number')
+            ?: data_get($applicantData, 'admission.reference_number')
+        ));
+        $email = trim((string) (
+            data_get($applicantData, 'user.email')
+            ?: data_get($applicantData, 'email')
+        ));
+        $schoolYear = trim((string) (
+            data_get($applicantData, 'user.school_year')
+            ?: data_get($applicantData, 'user.schoolyear')
+            ?: data_get($applicantData, 'school_year')
+            ?: data_get($applicantData, 'schoolyear')
+            ?: data_get($applicantData, 'academic_year')
+        ));
+
+        return [
+            'available' => $firstName !== '' || $lastName !== '' || $referenceNumber !== '',
+            'first_name' => $firstName,
+            'middle_name' => $middleName,
+            'last_name' => $lastName,
+            'full_name' => trim(implode(' ', array_filter([$firstName, $middleName, $lastName]))),
+            'reference_number' => $referenceNumber,
+            'email' => $email,
+            'school_year' => $schoolYear,
+        ];
+    }
+
+    private function persistPuptasApplicantIdentity(User $user, array $identity): void
+    {
+        if (empty($identity['available'])) {
+            return;
+        }
+
+        $firstName = trim((string) ($identity['first_name'] ?? ''));
+        $middleName = trim((string) ($identity['middle_name'] ?? ''));
+        $lastName = trim((string) ($identity['last_name'] ?? ''));
+        $referenceNumber = trim((string) ($identity['reference_number'] ?? ''));
+        $shouldSave = false;
+
+        if ($firstName !== '' && trim((string) $user->first_name) !== $firstName) {
+            $user->first_name = $firstName;
+            $shouldSave = true;
+        }
+
+        // PUPTAS does not always provide a middle-name key. In that case the
+        // health form must show N/A instead of reconstructing one from the IDP name.
+        $resolvedMiddleName = $middleName !== '' ? $middleName : null;
+        if (($user->middle_name ?: null) !== $resolvedMiddleName) {
+            $user->middle_name = $resolvedMiddleName;
+            $shouldSave = true;
+        }
+
+        if ($lastName !== '' && trim((string) $user->last_name) !== $lastName) {
+            $user->last_name = $lastName;
+            $shouldSave = true;
+        }
+
+        if (
+            $referenceNumber !== ''
+            && !$this->looksLikeIdpIdentifier($referenceNumber, $user)
+            && \Schema::hasColumn('users', 'reference_number')
+            && trim((string) ($user->reference_number ?? '')) !== $referenceNumber
+        ) {
+            $user->reference_number = $referenceNumber;
+            $shouldSave = true;
+        }
+
+        if ($shouldSave) {
+            $user->save();
+        }
     }
 
     private function buildRecentFeedbackCollection()
@@ -260,6 +410,7 @@ class AppointmentController extends Controller
     private function resolveReferenceNumber(User $user, ?HealthProfile $healthProfile = null, ?array $applicantData = null): string
     {
         $candidates = [
+            trim((string) data_get($applicantData, 'user.reference_number')),
             trim((string) data_get($applicantData, 'reference_number')),
             trim((string) data_get($applicantData, 'application.reference_number')),
             trim((string) data_get($applicantData, 'admission.reference_number')),
@@ -294,7 +445,7 @@ class AppointmentController extends Controller
         }
     }
 
-    private function persistResolvedReferenceNumber(User $user, ?string $referenceNumber): void
+    private function persistResolvedReferenceNumber(User $user, ?string $referenceNumber, ?HealthProfile $healthProfile = null): void
     {
         $referenceNumber = trim((string) $referenceNumber);
         if (
@@ -308,6 +459,11 @@ class AppointmentController extends Controller
         if (trim((string) ($user->reference_number ?? '')) !== $referenceNumber) {
             $user->reference_number = $referenceNumber;
             $user->save();
+        }
+
+        if ($healthProfile && trim((string) ($healthProfile->reference_number ?? '')) !== $referenceNumber) {
+            $healthProfile->reference_number = $referenceNumber;
+            $healthProfile->save();
         }
     }
 
@@ -369,15 +525,21 @@ class AppointmentController extends Controller
 
     private function resolveSchoolYear(?array $applicantData, User $user): string
     {
+        $providedSchoolYear = trim((string) (
+            data_get($applicantData, 'user.school_year')
+            ?: data_get($applicantData, 'user.schoolyear')
+            ?: data_get($applicantData, 'school_year')
+            ?: data_get($applicantData, 'schoolyear')
+            ?: data_get($applicantData, 'academic_year')
+        ));
+
+        if ($providedSchoolYear !== '') {
+            return $providedSchoolYear;
+        }
+
         $now = now();
         $calendarYear = (int) $now->format('Y');
-        $academicStartMonth = 7;
-
-        $isApplicant = is_array($applicantData) && $this->isPuptasApplicant($applicantData);
-
-        if ($isApplicant) {
-            return $calendarYear . '-' . ($calendarYear + 1);
-        }
+        $academicStartMonth = 5;
 
         $startYear = ((int) $now->format('n')) >= $academicStartMonth
             ? $calendarYear
@@ -438,6 +600,8 @@ class AppointmentController extends Controller
     {
         $linkedAdminProfile = $linkedAdminProfile ?: $this->resolveLinkedAdminProfile($user);
         $applicantData = $this->fetchPuptasApplicantForUser($user);
+        $applicantIdentity = $this->normalizePuptasApplicantIdentity($applicantData);
+        $this->persistPuptasApplicantIdentity($user, $applicantIdentity);
 
         $calculatedAge = null;
         if (!empty($user->DOB)) {
@@ -488,43 +652,30 @@ class AppointmentController extends Controller
             data_get($applicantData, 'province'),
         ])));
 
-        $applicantFirstName = trim((string) (
-            data_get($applicantData, 'first_name')
-            ?: data_get($applicantData, 'firstname')
-            ?: data_get($applicantData, 'given_name')
-        ));
-        $applicantMiddleName = trim((string) (
-            data_get($applicantData, 'middle_name')
-            ?: data_get($applicantData, 'middlename')
-        ));
-        $applicantLastName = trim((string) (
-            data_get($applicantData, 'last_name')
-            ?: data_get($applicantData, 'lastname')
-            ?: data_get($applicantData, 'family_name')
-            ?: data_get($applicantData, 'surname')
-        ));
-        $applicantStructuredName = trim(implode(' ', array_filter([
-            $applicantFirstName,
-            $applicantMiddleName,
-            $applicantLastName,
-        ])));
+        $applicantFirstName = trim((string) $applicantIdentity['first_name']);
+        $applicantMiddleName = trim((string) $applicantIdentity['middle_name']);
+        $applicantLastName = trim((string) $applicantIdentity['last_name']);
+        $applicantStructuredName = trim((string) $applicantIdentity['full_name']);
+        $hasOfficialApplicantIdentity = (bool) $applicantIdentity['available'];
 
         return [
             'full_name' => $applicantStructuredName
                 ?: trim((string) (data_get($applicantData, 'full_name') ?: data_get($applicantData, 'name') ?: $user->name)),
             'first_name' => $applicantFirstName
                 ?: trim((string) (optional($linkedAdminProfile)->first_name ?? $user->first_name ?? '')),
-            'middle_name' => $applicantMiddleName
-                ?: trim((string) ($user->middle_name ?? optional($linkedAdminProfile)->middle_name ?? '')),
+            'middle_name' => $hasOfficialApplicantIdentity
+                ? $applicantMiddleName
+                : trim((string) ($user->middle_name ?? optional($linkedAdminProfile)->middle_name ?? '')),
             'last_name' => $applicantLastName
                 ?: trim((string) (optional($linkedAdminProfile)->last_name ?? $user->last_name ?? '')),
             'suffix_name' => trim((string) (optional($linkedAdminProfile)->suffix_name ?? '')),
             'student_id' => (string) (optional($healthProfile)->student_id ?? $user->student_id ?? ''),
             'reference_number' => $this->resolveReferenceNumber($user, $healthProfile, $applicantData),
             'student_number' => $this->resolveStudentNumber($user, $healthProfile, $applicantData),
+            'school_year_from_puptas' => trim((string) $applicantIdentity['school_year']) !== '',
             'email' => (string) (
-                optional(optional($healthProfile)->user)->email
-                ?? data_get($applicantData, 'email')
+                $applicantIdentity['email']
+                ?: optional(optional($healthProfile)->user)->email
                 ?: ($user->email ?? optional($linkedAdminProfile)->email ?? '')
             ),
             'course_college' => trim((string) (
@@ -682,7 +833,9 @@ class AppointmentController extends Controller
 
         $studentContext = $this->resolveStudentContext($user);
 
-        return view('student.booking', compact('user', 'appointments', 'studentContext'));
+        $clinicClosure = app(ClinicWorkflowService::class)->activeClosure();
+
+        return view('student.booking', compact('user', 'appointments', 'studentContext', 'clinicClosure'));
     }
 
     // -------------------------------
@@ -690,6 +843,15 @@ class AppointmentController extends Controller
     // -------------------------------
     public function store(Request $request)
     {
+        $workflow = app(ClinicWorkflowService::class);
+        $closure = $workflow->activeClosure();
+        if ($closure) {
+            return redirect()->back()->withInput()->with(
+                'error',
+                'New appointment booking is temporarily unavailable. ' . $closure['message']
+            );
+        }
+
         $request->validate([
             'date' => 'required|date',
             'time' => 'required',
@@ -756,14 +918,18 @@ class AppointmentController extends Controller
         $appointment->date = $request->date;
         $appointment->time = $request->time;
         $appointment->service = $request->service;
-        $appointment->status = 'Pending';
+        $appointment->status = $workflow->settings()->auto_approve ? 'Approved' : 'Pending';
         $appointment->remarks = $request->remarks; 
         $appointment->type = 'online';
         $appointment->user_type = Appointment::normalizeUserType($user->user_role);
         $appointment->save(); // Dito lang dapat magtatapos ang command.
 
+        $successMessage = $appointment->status === 'Approved'
+            ? 'Appointment booked and approved automatically.'
+            : 'Appointment request submitted! Please wait for admin approval.';
+
         return redirect()->back()
-            ->with('success', 'Appointment request submitted! Please wait for admin approval.')
+            ->with('success', $successMessage)
             ->with('appointment_confirmation', [
                 'service' => $appointment->service,
                 'date' => Carbon::parse($appointment->date)->format('M d, Y'),
@@ -774,6 +940,17 @@ class AppointmentController extends Controller
 
     public function availability(Request $request)
     {
+        $closure = app(ClinicWorkflowService::class)->activeClosure();
+        if ($closure) {
+            return response()->json([
+                'date' => (string) $request->query('date', ''),
+                'available' => false,
+                'reason' => 'clinic_temporarily_closed',
+                'message' => $closure['message'],
+                'slots' => [],
+            ], 423);
+        }
+
         $request->validate([
             'date' => 'required|date_format:Y-m-d',
         ]);
@@ -1293,7 +1470,7 @@ public function storeHealthForm(Request $request)
     $request->validate([
         'student_id'        => 'nullable|string|max:255',
         'reference_number'  => 'required|string|max:255',
-        'school_year'       => 'required|string',
+        'school_year'       => ['required', 'string', 'regex:/^\d{4}-\d{4}$/'],
         'home_address'      => 'required|string|max:255',
         'zipcode'           => 'required|string|max:20',
         'birthday'          => 'required|date',
@@ -1320,16 +1497,16 @@ public function storeHealthForm(Request $request)
         'other_med_allergies' => 'nullable|string|max:255',
         'is_smoker'         => 'required|string|in:Yes,No',
         'is_drinker'        => 'required|string|in:Yes,No',
-        'covid_vaccinated'  => 'required|string|in:Yes',
-        'vaccine_history'   => 'required|array',
-        'vaccine_history.first_dose.date' => 'required|date|after_or_equal:2020-01-01|before_or_equal:2025-12-31',
-        'vaccine_history.first_dose.brand' => 'required|string|max:100',
-        'vaccine_history.second_dose.date' => 'required|date|after_or_equal:2020-01-01|before_or_equal:2025-12-31',
-        'vaccine_history.second_dose.brand' => 'required|string|max:100',
-        'vaccine_history.booster_1.date' => 'required|date|after_or_equal:2020-01-01|before_or_equal:2025-12-31',
-        'vaccine_history.booster_1.brand' => 'required|string|max:100',
-        'vaccine_history.booster_2.date' => 'required|date|after_or_equal:2020-01-01|before_or_equal:2025-12-31',
-        'vaccine_history.booster_2.brand' => 'required|string|max:100',
+        'covid_vaccinated'  => 'required|string|in:Yes,No',
+        'vaccine_history'   => 'nullable|array',
+        'vaccine_history.first_dose.date' => 'required_if:covid_vaccinated,Yes|nullable|date|after_or_equal:2021-03-01|before_or_equal:2025-12-31',
+        'vaccine_history.first_dose.brand' => 'required_if:covid_vaccinated,Yes|nullable|string|max:100',
+        'vaccine_history.second_dose.date' => 'required_if:covid_vaccinated,Yes|nullable|date|after_or_equal:2021-03-01|before_or_equal:2025-12-31',
+        'vaccine_history.second_dose.brand' => 'required_if:covid_vaccinated,Yes|nullable|string|max:100',
+        'vaccine_history.booster_1.date' => 'nullable|required_with:vaccine_history.booster_1.brand|date|after_or_equal:2021-03-01|before_or_equal:2025-12-31',
+        'vaccine_history.booster_1.brand' => 'nullable|required_with:vaccine_history.booster_1.date|string|max:100',
+        'vaccine_history.booster_2.date' => 'nullable|required_with:vaccine_history.booster_2.brand|date|after_or_equal:2021-03-01|before_or_equal:2025-12-31',
+        'vaccine_history.booster_2.brand' => 'nullable|required_with:vaccine_history.booster_2.date|string|max:100',
 
         'chest_xray_result' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
         'xray_date'         => 'required|date',
@@ -1343,6 +1520,48 @@ public function storeHealthForm(Request $request)
         'med_cert_findings' => 'required|string|in:No Findings / Normal,With Findings,Not Sure / For Clinic Review',
         'health_profile_certified' => 'accepted',
     ]);
+
+    if ($request->input('covid_vaccinated') === 'Yes') {
+        $doseDateFields = [
+            'first_dose' => '1st Dose',
+            'second_dose' => '2nd Dose',
+            'booster_1' => 'Booster 1',
+            'booster_2' => 'Booster 2',
+        ];
+        $usedDates = [];
+        $dateErrors = [];
+
+        foreach ($doseDateFields as $doseKey => $doseLabel) {
+            $date = trim((string) $request->input("vaccine_history.{$doseKey}.date"));
+            if ($date === '') {
+                continue;
+            }
+
+            if (isset($usedDates[$date])) {
+                $dateErrors["vaccine_history.{$doseKey}.date"] =
+                    "{$doseLabel} cannot use the same date as {$usedDates[$date]}.";
+            } else {
+                $usedDates[$date] = $doseLabel;
+            }
+        }
+
+        $firstDoseDate = trim((string) $request->input('vaccine_history.first_dose.date'));
+        $secondDoseDate = trim((string) $request->input('vaccine_history.second_dose.date'));
+
+        if ($firstDoseDate !== '' && $secondDoseDate !== '') {
+            $minimumSecondDoseDate = Carbon::parse($firstDoseDate)->addWeeks(4)->startOfDay();
+            $selectedSecondDoseDate = Carbon::parse($secondDoseDate)->startOfDay();
+
+            if ($selectedSecondDoseDate->lt($minimumSecondDoseDate)) {
+                $dateErrors['vaccine_history.second_dose.date'] =
+                    'The 2nd Dose must be at least 4 weeks after the 1st Dose.';
+            }
+        }
+
+        if ($dateErrors !== []) {
+            throw ValidationException::withMessages($dateErrors);
+        }
+    }
 
     /** @var \App\Models\User $user */
     $user = Auth::user();
@@ -1404,8 +1623,10 @@ public function storeHealthForm(Request $request)
                 'other_med_allergies' => $request->boolean('no_allergies') ? null : $request->input('other_med_allergies'),
                 'is_smoker'          => $request->input('is_smoker'),
                 'is_drinker'         => $request->input('is_drinker'),
-                'covid_vaccinated'   => 'Yes',
-                'vaccine_history'    => $request->input('vaccine_history', []),
+                'covid_vaccinated'   => $request->input('covid_vaccinated'),
+                'vaccine_history'    => $request->input('covid_vaccinated') === 'Yes'
+                    ? $request->input('vaccine_history', [])
+                    : [],
                 'chest_xray_result'  => $chestXrayPath,
                 'xray_date'          => $request->input('xray_date'),
                 'xray_findings'      => $request->input('xray_findings'),
@@ -1499,9 +1720,22 @@ public function downloadHealthForm()
 
 private function buildStudentHealthFormPdf(HealthProfile $profile)
 {
+    $healthFormIdentity = $this->buildHealthFormPrefill(
+        $profile->user,
+        $this->resolveLinkedAdminProfile($profile->user),
+        $profile
+    );
+    $this->persistResolvedReferenceNumber(
+        $profile->user,
+        $healthFormIdentity['reference_number'] ?? '',
+        $profile
+    );
+    $profile->load('user');
+
     $pdf = Pdf::loadView('student.print_health_form', [
         'profile' => $profile,
         'pdfMode' => true,
+        'healthFormIdentity' => $healthFormIdentity,
     ]);
     $pdf->setPaper([0, 0, 612, 936]);
 

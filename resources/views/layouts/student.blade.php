@@ -12,6 +12,49 @@
         defer
     ></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const banner = document.getElementById('clinicAvailabilityBanner');
+            const dismiss = document.getElementById('clinicAvailabilityBannerDismiss');
+            if (!banner || !dismiss) {
+                return;
+            }
+
+            const storageKey = 'pup-clinic-advisory:' + banner.dataset.dismissKey;
+            try {
+                if (sessionStorage.getItem(storageKey) === 'dismissed') {
+                    banner.hidden = true;
+                }
+            } catch (error) {
+                // Keep the advisory visible when browser storage is unavailable.
+            }
+
+            dismiss.addEventListener('click', function () {
+                banner.hidden = true;
+                try {
+                    sessionStorage.setItem(storageKey, 'dismissed');
+                } catch (error) {
+                    // The current page can still dismiss the advisory.
+                }
+            });
+
+            const logoutForm = document.getElementById('logout-form');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function () {
+                    try {
+                        Object.keys(sessionStorage)
+                            .filter(function (key) {
+                                return key.indexOf('pup-clinic-advisory:') === 0;
+                            })
+                            .forEach(function (key) {
+                                sessionStorage.removeItem(key);
+                            });
+                    } catch (error) {
+                        // Logout continues even when browser storage is unavailable.
+                    }
+                });
+            }
+        });
+
         (function() {
             try {
                 var savedTheme = localStorage.getItem('student_theme');
@@ -1885,6 +1928,77 @@
             color: #d4deec !important;
         }
 
+        .clinic-availability-banner {
+            position: relative;
+            z-index: 40;
+            background: #7f1d2d;
+            color: #ffffff;
+            border-bottom: 3px solid #facc15;
+            box-shadow: 0 10px 24px rgba(70, 8, 20, 0.18);
+        }
+
+        .clinic-availability-banner[hidden] { display: none; }
+
+        .clinic-availability-banner-inner {
+            width: min(1180px, calc(100% - 32px));
+            min-height: 64px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+        }
+
+        .clinic-availability-banner-icon {
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #facc15;
+            color: #64101d;
+            font-weight: 900;
+        }
+
+        .clinic-availability-banner-copy {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .clinic-availability-banner-copy strong {
+            display: block;
+            margin-bottom: 2px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .clinic-availability-banner-copy span {
+            color: rgba(255,255,255,0.88);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .clinic-availability-banner-dismiss {
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            border: 1px solid rgba(250,204,21,0.7);
+            border-radius: 50%;
+            background: transparent;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            transition: background .18s ease, color .18s ease;
+        }
+
+        .clinic-availability-banner-dismiss:hover {
+            background: #facc15;
+            color: #64101d;
+        }
+
         @media (max-width: 768px) {
             .notif-fab-wrap {
                 right: 18px;
@@ -1936,11 +2050,6 @@
                 @php
                     $studentLayoutUser = Auth::guard('student')->user();
                     $isStudentAssistantPortalUser = $studentLayoutUser?->isStudentAssistant() ?? false;
-                    $studentLayoutNow = now(config('app.timezone'));
-                    $studentLayoutMinutes = ((int) $studentLayoutNow->format('H') * 60)
-                        + (int) $studentLayoutNow->format('i');
-                    $studentAssistantAdminAvailable = $studentLayoutMinutes >= (8 * 60)
-                        && $studentLayoutMinutes < (20 * 60);
                     $isMyAccountSection = Request::is('student/account') || Request::is('student/history') || Request::is('student/barcode-register');
                     $studentAllNotifications = collect($notifications ?? [])->values();
                     $studentUnreadNotifications = $studentAllNotifications
@@ -2048,7 +2157,7 @@
                                                 <x-outline-icon name="arrows-right-left" class="nav-dropdown-link-icon" />
                                                 <span>
                                                     Switch to Admin Workspace
-                                                    <small class="nav-dropdown-schedule">Available 8:00 AM–8:00 PM</small>
+                                                    <small class="nav-dropdown-schedule">Available {{ $studentAssistantHoursLabel ?? '8:00 AM–8:00 PM' }}</small>
                                                 </span>
                                             </span>
                                         </button>
@@ -2086,6 +2195,36 @@
             </nav>
         </div>
     </header>
+
+    @if(!empty($clinicClosure))
+        @php
+            $closureBannerKey = 'clinic-closure-' . sha1(
+                ($clinicClosure['reason'] ?? '')
+                . '|'
+                . optional($clinicClosure['updated_at'] ?? null)->timestamp
+            );
+        @endphp
+        <aside
+            class="clinic-availability-banner"
+            id="clinicAvailabilityBanner"
+            data-dismiss-key="{{ $closureBannerKey }}"
+            aria-label="Clinic availability advisory"
+        >
+            <div class="clinic-availability-banner-inner">
+                <span class="clinic-availability-banner-icon" aria-hidden="true">!</span>
+                <div class="clinic-availability-banner-copy">
+                    <strong>{{ $clinicClosure['reason'] }}</strong>
+                    <span>
+                        {{ $clinicClosure['message'] }}
+                        @if(!empty($clinicClosure['ends_at']))
+                            Expected reopening: {{ $clinicClosure['ends_at']->format('M d, Y g:i A') }}.
+                        @endif
+                    </span>
+                </div>
+                <button type="button" class="clinic-availability-banner-dismiss" id="clinicAvailabilityBannerDismiss" aria-label="Dismiss advisory">&times;</button>
+            </div>
+        </aside>
+    @endif
 
     <main>
         @yield('content')

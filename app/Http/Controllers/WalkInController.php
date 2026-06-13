@@ -675,8 +675,6 @@ class WalkInController extends Controller
         $lookupName = trim((string) $request->student_name);
         $previewOnly = $request->boolean('preview_only');
         $intakeTarget = strtolower(trim((string) $request->query('intake_target', 'consultation')));
-        $applicant = null;
-
         $student = $this->findUserByIdentifier($lookup);
         $lookupMessage = 'No patient matched that student number in local records or PUPTAS.';
         $lookupStatus = null;
@@ -688,25 +686,28 @@ class WalkInController extends Controller
                 || ($previewOnly && !$this->looksLikeUuid($lookup))
             )
         ) {
-            $lookupResult = $puptasWebhookService->fetchApplicantByStudentNumberDetailed($lookup);
+            $lookupResult = $puptasWebhookService->fetchApplicantByReferenceNumberDetailed($lookup);
             $lookupStatus = $lookupResult['status'] ?? null;
             $lookupMessage = trim((string) ($lookupResult['message'] ?? '')) ?: $lookupMessage;
             $applicant = $lookupResult['data'] ?? null;
 
             if (is_array($applicant)) {
-                // Build the preview from current admission data. Persistence is
-                // deferred until the workflow performs a non-preview action.
-                $student = $this->resolveLocalUserFromApplicant($applicant, !$previewOnly, $lookup);
-            } elseif ($previewOnly) {
-                // Admission reference previews must never fall back to a local
-                // name when PUPTAS did not return an applicant.
-                $student = null;
+                // Keep a synchronized local identity snapshot after a confirmed
+                // PUPTAS response. The medical endpoint may stop listing an
+                // applicant after their workflow status changes.
+                $student = $this->resolveLocalUserFromApplicant($applicant, true, $lookup);
             }
 
             // Log the reference lookup attempt
             if (is_array($applicant) && $student) {
                 // Successful lookup
-                $applicantName = $this->puptasApplicantFullName($applicant);
+                $applicantName = $applicant['full_name'] ?? $applicant['name'] ?? '';
+                if (!$applicantName && isset($applicant['first_name'])) {
+                    $applicantName = $applicant['first_name'];
+                    if (isset($applicant['last_name'])) {
+                        $applicantName .= ' ' . $applicant['last_name'];
+                    }
+                }
                 $this->logReferenceLookup($request, $lookup, true, $applicantName, null, [
                     'local_user_id' => $student->id,
                     'local_email' => $student->email,
@@ -725,9 +726,7 @@ class WalkInController extends Controller
         }
 
         if ($student) {
-            $resolvedName = is_array($applicant)
-                ? $this->puptasApplicantFullName($applicant)
-                : trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? ''))));
+            $resolvedName = trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? ''))));
             $healthProfile = HealthProfile::where('user_id', $student->id)->first();
             $resolvedReferenceNumber = trim((string) (
                 ($lookup !== '' && !$this->looksLikeUuid($lookup) ? $lookup : null)

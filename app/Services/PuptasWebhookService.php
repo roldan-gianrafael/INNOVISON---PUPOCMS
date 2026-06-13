@@ -148,22 +148,22 @@ class PuptasWebhookService
         return $base . '/api/v1/medical/applicants';
     }
 
-    public function fetchApplicantByStudentNumber(string $studentNumber): ?array
+    public function fetchApplicantByReferenceNumber(string $referenceNumber): ?array
     {
-        $result = $this->fetchApplicantByStudentNumberDetailed($studentNumber);
+        $result = $this->fetchApplicantByReferenceNumberDetailed($referenceNumber);
 
         return $result['success'] ? ($result['data'] ?? null) : null;
     }
 
-    public function fetchApplicantByStudentNumberDetailed(string $studentNumber): array
+    public function fetchApplicantByReferenceNumberDetailed(string $referenceNumber): array
     {
         try {
-            $studentNumber = trim($studentNumber);
-            if ($studentNumber === '') {
+            $referenceNumber = trim($referenceNumber);
+            if ($referenceNumber === '') {
                 return [
                     'success' => false,
                     'status' => null,
-                    'message' => 'Student number is required.',
+                    'message' => 'Reference number is required.',
                     'data' => null,
                 ];
             }
@@ -181,12 +181,12 @@ class PuptasWebhookService
             $response = Http::timeout($this->timeout)
                 ->withToken($this->getAccessToken())
                 ->acceptJson()
-                ->get(rtrim($applicantsBaseUrl, '/') . '/' . urlencode($studentNumber));
+                ->get(rtrim($applicantsBaseUrl, '/') . '/' . rawurlencode($referenceNumber));
 
             if (!$response->successful()) {
                 $responseMessage = trim((string) $response->json('message'));
                 Log::warning('PUPTAS applicant lookup failed', [
-                    'student_number' => $studentNumber,
+                    'reference_number' => $referenceNumber,
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
@@ -213,7 +213,7 @@ class PuptasWebhookService
             ];
         } catch (\Throwable $exception) {
             Log::warning('PUPTAS applicant lookup exception', [
-                'student_number' => $studentNumber,
+                'reference_number' => $referenceNumber,
                 'error' => $exception->getMessage(),
             ]);
             return [
@@ -223,6 +223,20 @@ class PuptasWebhookService
                 'data' => null,
             ];
         }
+    }
+
+    /**
+     * Backward-compatible aliases for callers that still use the former,
+     * misleading student-number method names.
+     */
+    public function fetchApplicantByStudentNumber(string $studentNumber): ?array
+    {
+        return $this->fetchApplicantByReferenceNumber($studentNumber);
+    }
+
+    public function fetchApplicantByStudentNumberDetailed(string $studentNumber): array
+    {
+        return $this->fetchApplicantByReferenceNumberDetailed($studentNumber);
     }
 
     public function fetchApplicantByIdpUserId(string $idpUserId): ?array

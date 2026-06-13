@@ -4466,11 +4466,11 @@
                             <div class="applicant-lookup-item">
                                 <div class="applicant-lookup-card">
                                     <div class="applicant-lookup-icon">
-                                        ID
+                                        ST
                                     </div>
                                     <div class="applicant-lookup-content">
-                                        <p class="applicant-lookup-label">Student ID</p>
-                                        <p class="applicant-lookup-value" id="applicantLookupStudentId">-</p>
+                                        <p class="applicant-lookup-label">Status</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupStatus">-</p>
                                     </div>
                                 </div>
                             </div>
@@ -4501,9 +4501,13 @@
                     </div>
 
                     <div class="applicant-file-actions" id="applicantFileActions">
+                        <button type="button" id="btnViewApplicantInformation" class="applicant-documents-trigger applicant-file-action">
+                            <x-outline-icon name="identification" />
+                            <span data-information-button-label>View Information</span>
+                        </button>
                         <button type="button" id="btnViewApplicantDocuments" class="applicant-documents-trigger applicant-file-action">
                             <x-outline-icon name="document-text" />
-                            <span>Uploaded Documents</span>
+                            <span>View Uploaded Documents</span>
                             <span class="applicant-documents-count" id="applicantDocumentsCount">0</span>
                         </button>
                     </div>
@@ -4562,36 +4566,6 @@
                             </div>
                         </section>
                     </div>
-
-                    <form id="applicantAssessmentUploadForm" class="applicant-upload-wrap" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="reference_number" id="applicantAssessmentReferenceNumber">
-                        <input type="hidden" name="student_number" id="applicantAssessmentStudentNumber">
-                        <input type="hidden" name="email" id="applicantAssessmentEmail">
-                        <input type="file" name="medical_assessment_copy" id="applicantAssessmentUploadInput" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*" style="display:none;">
-
-                        <div id="applicantUploadPreviewArea" class="applicant-upload-preview-area" style="display:none;">
-                            <div class="applicant-upload-preview-container">
-                                <img id="applicantUploadPreviewImage" src="" alt="Medical Assessment Preview" class="applicant-upload-preview-image">
-                                <div class="applicant-upload-preview-overlay">
-                                    <button type="button" id="btnReplaceAssessmentCopy" class="applicant-preview-btn applicant-preview-replace-btn" aria-label="Replace image">
-                                        <x-outline-icon name="arrow-path" />
-                                        <span>Replace</span>
-                                    </button>
-                                    <button type="button" id="btnRemoveAssessmentCopy" class="applicant-preview-btn applicant-preview-remove-btn" aria-label="Remove image">
-                                        <x-outline-icon name="trash" />
-                                        <span>Remove</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="button" id="btnUploadAssessmentCopy" class="applicant-upload-btn applicant-file-action">
-                            <x-outline-icon name="arrow-up-tray" />
-                            Upload Medical Assessment Copy
-                        </button>
-                        <div class="applicant-upload-note">Optional digital copy for clinic records only.</div>
-                    </form>
 
                     <div class="applicant-ref-actions">
                         <button type="button" id="btnCancelApplicantRef" class="applicant-ref-action-btn applicant-ref-cancel-btn">Cancel</button>
@@ -5704,7 +5678,7 @@
                 return;
             }
 
-            $('#btnRunAiOcr').prop('disabled', true).text('AI Reading...');
+            $('#btnRunAiOcr').prop('disabled', true).text('Reading ID...');
             buildStatus(
                 isAutoAssist
                     ? 'Live OCR needs help, so we are sending the current camera image to AI to extract the student number.'
@@ -6109,11 +6083,12 @@
         const foundName       = document.getElementById('applicantFoundName');
         const lookupDetails   = document.getElementById('applicantLookupDetails');
         const lookupRef       = document.getElementById('applicantLookupRef');
-        const lookupStudentId = document.getElementById('applicantLookupStudentId');
+        const lookupStatus    = document.getElementById('applicantLookupStatus');
         const lookupCourse    = document.getElementById('applicantLookupCourse');
         const lookupYearSec   = document.getElementById('applicantLookupYearSection');
         const lookupDob       = document.getElementById('applicantLookupDob');
         const lookupEmail     = document.getElementById('applicantLookupEmail');
+        const informationButton = document.getElementById('btnViewApplicantInformation');
         const documentsButton = document.getElementById('btnViewApplicantDocuments');
         const documentsCount  = document.getElementById('applicantDocumentsCount');
         const documentsModal  = document.getElementById('applicantDocumentsModal');
@@ -6125,20 +6100,10 @@
         const previewImage    = document.getElementById('applicantDocumentPreviewImage');
         const previewEmpty    = document.getElementById('applicantDocumentPreviewEmpty');
         const previewOpen     = document.getElementById('applicantDocumentPreviewOpen');
-        const uploadForm      = document.getElementById('applicantAssessmentUploadForm');
-        const fileActions     = document.getElementById('applicantFileActions');
         const approvalOverlay = document.getElementById('applicantApprovalOverlay');
-        const uploadInput     = document.getElementById('applicantAssessmentUploadInput');
-        const uploadButton    = document.getElementById('btnUploadAssessmentCopy');
-        const uploadRefInput  = document.getElementById('applicantAssessmentReferenceNumber');
-        const uploadStudentNo = document.getElementById('applicantAssessmentStudentNumber');
         let currentLookupRef  = '';
         let currentDocuments  = [];
         const getStudentUrl   = '{{ url($basePrefix . '/walkin/get-student') }}';
-
-        if (fileActions && uploadForm) {
-            fileActions.appendChild(uploadForm);
-        }
 
         function closeDocumentPreview() {
             if (previewFrame) {
@@ -6270,11 +6235,13 @@
             if (foundCard) foundCard.style.display = 'none';
             if (foundName) foundName.textContent = '';
             if (lookupDetails) lookupDetails.style.display = 'none';
+            if (informationButton) {
+                informationButton.classList.remove('is-visible');
+                const label = informationButton.querySelector('[data-information-button-label]');
+                if (label) label.textContent = 'View Information';
+                informationButton.setAttribute('aria-expanded', 'false');
+            }
             if (documentsButton) documentsButton.classList.remove('is-visible');
-            if (uploadForm) uploadForm.style.display = 'none';
-            if (uploadRefInput) uploadRefInput.value = '';
-            if (uploadStudentNo) uploadStudentNo.value = '';
-            if (uploadInput) uploadInput.value = '';
             currentLookupRef = '';
             if (defaultPane) defaultPane.style.display = 'flex';
             if (entryPane) entryPane.classList.remove('is-visible');
@@ -6347,30 +6314,28 @@
 
             console.log('Setting lookup values:', {
                 lookupRef: referenceNumber,
-                lookupStudentId: data.student_id,
+                lookupStatus: data.clinic_status,
                 lookupDob: data.dob,
                 lookupEmail: data.email
             });
 
             if (lookupRef) lookupRef.textContent = referenceNumber;
-            if (lookupStudentId) lookupStudentId.textContent = data.student_id || 'N/A';
+            if (lookupStatus) lookupStatus.textContent = data.clinic_status || 'Awaiting Uploads';
             if (lookupCourse) lookupCourse.textContent = data.course || 'N/A';
             if (lookupYearSec) lookupYearSec.textContent = yearSection;
             if (lookupDob) lookupDob.textContent = data.dob || 'N/A';
             if (lookupEmail) lookupEmail.textContent = data.email || 'N/A';
 
             console.log('Setting display styles...');
-            lookupDetails.style.display = 'block';
+            lookupDetails.style.display = 'none';
             if (modalShell) modalShell.classList.add('has-lookup-result');
             renderDocuments(data.documents);
+            if (informationButton) {
+                informationButton.classList.add('is-visible');
+                informationButton.setAttribute('aria-expanded', 'false');
+            }
             if (documentsButton) documentsButton.classList.add('is-visible');
             if (foundCard) foundCard.style.display = 'block';
-            if (uploadForm) uploadForm.style.display = 'grid';
-            if (uploadRefInput) uploadRefInput.value = referenceNumber;
-            if (uploadStudentNo) uploadStudentNo.value = data.student_id || studentNumber || '';
-
-            const uploadEmailInput = document.getElementById('applicantAssessmentEmail');
-            if (uploadEmailInput) uploadEmailInput.value = data.email || '';
 
             const modalBody = document.querySelector('.applicant-modal-body');
             if (modalBody) {
@@ -6406,53 +6371,6 @@
             });
 
             console.log('showLookupDetails completed');
-        }
-
-        function uploadAssessmentCopy(file) {
-            if (!uploadForm || !uploadRefInput || !file) {
-                console.log('Upload validation failed:', { uploadForm, uploadRefInput, file });
-                return;
-            }
-
-            const formData = new FormData(uploadForm);
-            formData.set('medical_assessment_copy', file);
-            formData.set('reference_number', uploadRefInput.value || currentLookupRef || '');
-            formData.set('student_number', uploadStudentNo ? uploadStudentNo.value : '');
-
-            console.log('Uploading file:', {
-                fileName: file.name,
-                fileType: file.type,
-                fileSize: file.size,
-                referenceNumber: uploadRefInput.value || currentLookupRef,
-                studentNumber: uploadStudentNo ? uploadStudentNo.value : ''
-            });
-
-            setStatus('info', 'Uploading medical assessment copy...');
-
-            fetch("{{ route('admin.medical_assessment_upload') }}", {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                },
-                body: formData
-            })
-            .then(async function (response) {
-                const payload = await response.json().catch(function () { return {}; });
-                console.log('Upload response:', { status: response.status, ok: response.ok, payload });
-
-                if (!response.ok) {
-                    throw new Error(payload.message || 'Upload failed with status ' + response.status);
-                }
-
-                setStatus('success', payload.message || 'Medical assessment copy uploaded successfully.');
-                if (uploadInput) uploadInput.value = '';
-                return payload;
-            })
-            .catch(function (error) {
-                console.error('Upload error:', error);
-                setStatus('error', error.message || 'Unable to upload right now. Please try again.');
-            });
         }
 
         let isApprovalMode = false;
@@ -6654,6 +6572,20 @@
         if (openBtn) openBtn.addEventListener('click', function (e) { e.preventDefault(); openApplicantsModal(); });
         if (closeBtn) closeBtn.addEventListener('click', closeApplicantsModal);
         if (backdrop) backdrop.addEventListener('click', function (e) { if (e.target === backdrop) closeApplicantsModal(); });
+        if (informationButton) informationButton.addEventListener('click', function () {
+            if (!lookupDetails) return;
+
+            const willShow = lookupDetails.style.display === 'none' || getComputedStyle(lookupDetails).display === 'none';
+            lookupDetails.style.display = willShow ? 'block' : 'none';
+            informationButton.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+
+            const label = informationButton.querySelector('[data-information-button-label]');
+            if (label) label.textContent = willShow ? 'Hide Information' : 'View Information';
+
+            if (willShow) {
+                lookupDetails.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
         if (documentsButton) documentsButton.addEventListener('click', function () {
             if (documentsModal) documentsModal.classList.add('show');
         });
@@ -6667,75 +6599,6 @@
             setEntryMode(false);
         });
         if (findBtn) findBtn.addEventListener('click', doLookup);
-        if (uploadButton) {
-            uploadButton.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (!currentLookupRef) {
-                    setStatus('error', 'Find the applicant first before uploading a copy.');
-                    return;
-                }
-                if (uploadInput) {
-                    uploadInput.click();
-                }
-            });
-        }
-
-        if (uploadInput) {
-            uploadInput.addEventListener('change', function () {
-                const file = this.files && this.files[0] ? this.files[0] : null;
-                if (file) {
-                    showAssessmentPreview(file);
-                    uploadAssessmentCopy(file);
-                }
-            });
-
-            function showAssessmentPreview(file) {
-                const previewArea = document.getElementById('applicantUploadPreviewArea');
-                const previewImage = document.getElementById('applicantUploadPreviewImage');
-                const uploadBtn = document.getElementById('btnUploadAssessmentCopy');
-
-                if (!previewArea || !previewImage) return;
-
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        previewImage.src = e.target.result;
-                        previewArea.style.display = 'block';
-                        uploadBtn.style.display = 'none';
-                    };
-                    reader.readAsDataURL(file);
-                } else if (file && file.type === 'application/pdf') {
-                    previewImage.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M7 2h10l5 5v13a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2z%22 fill=%22%23dc2626%22/%3E%3Ctext x=%2212%22 y=%2217%22 text-anchor=%22middle%22 font-size=%2210%22 fill=%22white%22 font-weight=%22bold%22%3EPDF%3C/text%3E%3C/svg%3E';
-                    previewArea.style.display = 'block';
-                    uploadBtn.style.display = 'none';
-                }
-            }
-
-            const replaceBtn = document.getElementById('btnReplaceAssessmentCopy');
-            if (replaceBtn) {
-                replaceBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (uploadInput) uploadInput.click();
-                });
-            }
-
-            const removeBtn = document.getElementById('btnRemoveAssessmentCopy');
-            if (removeBtn) {
-                removeBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const previewArea = document.getElementById('applicantUploadPreviewArea');
-                    const previewImage = document.getElementById('applicantUploadPreviewImage');
-                    const uploadBtn = document.getElementById('btnUploadAssessmentCopy');
-
-                    if (previewArea && previewImage && uploadBtn) {
-                        previewArea.style.display = 'none';
-                        previewImage.src = '';
-                        uploadBtn.style.display = 'flex';
-                        if (uploadInput) uploadInput.value = '';
-                    }
-                });
-            }
-        }
         if (refInput) {
             refInput.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {

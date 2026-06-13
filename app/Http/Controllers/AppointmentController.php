@@ -659,6 +659,11 @@ class AppointmentController extends Controller
         $hasOfficialApplicantIdentity = (bool) $applicantIdentity['available'];
 
         return [
+            'identity_from_puptas' => $hasOfficialApplicantIdentity,
+            'puptas_full_name' => $applicantStructuredName,
+            'puptas_first_name' => $applicantFirstName,
+            'puptas_middle_name' => $applicantMiddleName,
+            'puptas_last_name' => $applicantLastName,
             'full_name' => $applicantStructuredName
                 ?: trim((string) (data_get($applicantData, 'full_name') ?: data_get($applicantData, 'name') ?: $user->name)),
             'first_name' => $applicantFirstName

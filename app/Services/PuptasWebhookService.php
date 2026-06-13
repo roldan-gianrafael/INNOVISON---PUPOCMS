@@ -184,6 +184,7 @@ class PuptasWebhookService
                 ->get(rtrim($applicantsBaseUrl, '/') . '/' . urlencode($studentNumber));
 
             if (!$response->successful()) {
+                $responseMessage = trim((string) $response->json('message'));
                 Log::warning('PUPTAS applicant lookup failed', [
                     'student_number' => $studentNumber,
                     'status' => $response->status(),
@@ -192,7 +193,11 @@ class PuptasWebhookService
                 return [
                     'success' => false,
                     'status' => $response->status(),
-                    'message' => 'PUPTAS lookup failed with status ' . $response->status() . '.',
+                    'message' => $responseMessage !== ''
+                        ? $responseMessage
+                        : ($response->status() === 404
+                            ? 'No eligible PUPTAS applicant was found for that reference number.'
+                            : 'PUPTAS lookup could not be completed. Please try again.'),
                     'body' => $response->body(),
                     'data' => null,
                 ];
@@ -256,6 +261,7 @@ class PuptasWebhookService
                 ->get(rtrim($applicantsBaseUrl, '/') . '/idp/' . urlencode($idpUserId));
 
             if (!$response->successful()) {
+                $responseMessage = trim((string) $response->json('message'));
                 Log::warning('PUPTAS applicant IDP lookup failed', [
                     'idp_user_id' => $idpUserId,
                     'status' => $response->status(),
@@ -264,7 +270,11 @@ class PuptasWebhookService
                 return [
                     'success' => false,
                     'status' => $response->status(),
-                    'message' => 'PUPTAS IDP lookup failed with status ' . $response->status() . '.',
+                    'message' => $responseMessage !== ''
+                        ? $responseMessage
+                        : ($response->status() === 404
+                            ? 'No eligible PUPTAS applicant was found for this account.'
+                            : 'PUPTAS lookup could not be completed. Please try again.'),
                     'body' => $response->body(),
                     'data' => null,
                 ];

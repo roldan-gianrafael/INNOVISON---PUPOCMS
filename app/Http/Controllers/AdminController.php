@@ -99,13 +99,10 @@ class AdminController extends Controller
 
     private function canAccessApiTesting(User $user): bool
     {
-        $allowedEmails = array_map(static fn ($email) => strtolower(trim((string) $email)), array_filter(array_merge(
-            ['pupocms2027@gmail.com'],
-            (array) config('services.api_testing.allowed_emails', [])
-        )));
         $email = strtolower(trim((string) ($user->email ?? '')));
 
-        return $email !== '' && in_array($email, $allowedEmails, true);
+        return app()->environment('local')
+            && $email === 'pupocms2027@gmail.com';
     }
 
     private function findLinkedAdminProfile(User $user): ?Admin

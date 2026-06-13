@@ -3014,6 +3014,25 @@
         box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
     }
 
+    .applicant-lookup-details.is-summary-visible {
+        display: block;
+    }
+
+    .applicant-information-details {
+        display: none;
+        width: 100%;
+        margin-top: 12px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(112, 19, 27, 0.14);
+        background: linear-gradient(180deg, #fffdf8, #ffffff);
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+    }
+
+    .applicant-information-details.is-visible {
+        display: block;
+    }
+
     .applicant-lookup-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3240,6 +3259,11 @@
     }
 
     html[data-theme="dark"] .applicant-lookup-details {
+        background: rgba(15, 23, 42, 0.94);
+        border-color: rgba(250, 204, 21, 0.14);
+    }
+
+    html[data-theme="dark"] .applicant-information-details {
         background: rgba(15, 23, 42, 0.94);
         border-color: rgba(250, 204, 21, 0.14);
     }
@@ -4494,6 +4518,65 @@
                                     <div class="applicant-lookup-content">
                                         <p class="applicant-lookup-label">Email</p>
                                         <p class="applicant-lookup-value" id="applicantLookupEmail">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="applicantInformationDetails" class="applicant-information-details" aria-hidden="true">
+                        <div class="applicant-lookup-grid">
+                            <div class="applicant-lookup-item">
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">HT</div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Height</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupHeight">N/A</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="applicant-lookup-item">
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">WT</div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Weight</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupWeight">N/A</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="applicant-lookup-item">
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">CS</div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Civil Status</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupCivilStatus">N/A</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="applicant-lookup-item">
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">AGE</div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Age</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupAge">N/A</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="applicant-lookup-item">
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">G</div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Gender</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupGender">N/A</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="applicant-lookup-item">
+                                <div class="applicant-lookup-card">
+                                    <div class="applicant-lookup-icon">CN</div>
+                                    <div class="applicant-lookup-content">
+                                        <p class="applicant-lookup-label">Contact Number</p>
+                                        <p class="applicant-lookup-value" id="applicantLookupContact">N/A</p>
                                     </div>
                                 </div>
                             </div>
@@ -6088,6 +6171,13 @@
         const lookupYearSec   = document.getElementById('applicantLookupYearSection');
         const lookupDob       = document.getElementById('applicantLookupDob');
         const lookupEmail     = document.getElementById('applicantLookupEmail');
+        const informationDetails = document.getElementById('applicantInformationDetails');
+        const lookupHeight    = document.getElementById('applicantLookupHeight');
+        const lookupWeight    = document.getElementById('applicantLookupWeight');
+        const lookupCivilStatus = document.getElementById('applicantLookupCivilStatus');
+        const lookupAge       = document.getElementById('applicantLookupAge');
+        const lookupGender    = document.getElementById('applicantLookupGender');
+        const lookupContact   = document.getElementById('applicantLookupContact');
         const informationButton = document.getElementById('btnViewApplicantInformation');
         const documentsButton = document.getElementById('btnViewApplicantDocuments');
         const documentsCount  = document.getElementById('applicantDocumentsCount');
@@ -6235,6 +6325,11 @@
             if (foundCard) foundCard.style.display = 'none';
             if (foundName) foundName.textContent = '';
             if (lookupDetails) lookupDetails.style.display = 'none';
+            lookupDetails?.classList.remove('is-summary-visible');
+            if (informationDetails) {
+                informationDetails.classList.remove('is-visible');
+                informationDetails.setAttribute('aria-hidden', 'true');
+            }
             if (informationButton) {
                 informationButton.classList.remove('is-visible');
                 const label = informationButton.querySelector('[data-information-button-label]');
@@ -6325,9 +6420,20 @@
             if (lookupYearSec) lookupYearSec.textContent = yearSection;
             if (lookupDob) lookupDob.textContent = data.dob || 'N/A';
             if (lookupEmail) lookupEmail.textContent = data.email || 'N/A';
+            if (lookupHeight) lookupHeight.textContent = data.height ? data.height + ' cm' : 'N/A';
+            if (lookupWeight) lookupWeight.textContent = data.weight ? data.weight + ' kg' : 'N/A';
+            if (lookupCivilStatus) lookupCivilStatus.textContent = data.civil_status || 'N/A';
+            if (lookupAge) lookupAge.textContent = data.age !== null && data.age !== undefined && data.age !== '' ? String(data.age) : 'N/A';
+            if (lookupGender) lookupGender.textContent = data.sex || 'N/A';
+            if (lookupContact) lookupContact.textContent = data.contact_number || 'N/A';
 
             console.log('Setting display styles...');
-            lookupDetails.style.display = 'none';
+            lookupDetails.style.display = 'block';
+            lookupDetails.classList.add('is-summary-visible');
+            if (informationDetails) {
+                informationDetails.classList.remove('is-visible');
+                informationDetails.setAttribute('aria-hidden', 'true');
+            }
             if (modalShell) modalShell.classList.add('has-lookup-result');
             renderDocuments(data.documents);
             if (informationButton) {
@@ -6573,17 +6679,18 @@
         if (closeBtn) closeBtn.addEventListener('click', closeApplicantsModal);
         if (backdrop) backdrop.addEventListener('click', function (e) { if (e.target === backdrop) closeApplicantsModal(); });
         if (informationButton) informationButton.addEventListener('click', function () {
-            if (!lookupDetails) return;
+            if (!informationDetails) return;
 
-            const willShow = lookupDetails.style.display === 'none' || getComputedStyle(lookupDetails).display === 'none';
-            lookupDetails.style.display = willShow ? 'block' : 'none';
+            const willShow = !informationDetails.classList.contains('is-visible');
+            informationDetails.classList.toggle('is-visible', willShow);
+            informationDetails.setAttribute('aria-hidden', willShow ? 'false' : 'true');
             informationButton.setAttribute('aria-expanded', willShow ? 'true' : 'false');
 
             const label = informationButton.querySelector('[data-information-button-label]');
             if (label) label.textContent = willShow ? 'Hide Information' : 'View Information';
 
             if (willShow) {
-                lookupDetails.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                informationDetails.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         });
         if (documentsButton) documentsButton.addEventListener('click', function () {

@@ -30,7 +30,16 @@
 
     <div class="section-header">PART I. STUDENT INFORMATION</div>
     @php
-        $printedStudentName = trim((string) ($healthFormIdentity['puptas_full_name'] ?? '')) ?: 'N/A';
+        $printedStudentName = trim((string) (
+            ($healthFormIdentity['puptas_full_name'] ?? '')
+            ?: ($healthFormIdentity['full_name'] ?? '')
+            ?: ($profile->user->name ?? '')
+            ?: trim(implode(' ', array_filter([
+                $profile->user->first_name ?? '',
+                $profile->user->middle_name ?? '',
+                $profile->user->last_name ?? '',
+            ])))
+        )) ?: 'N/A';
         $printedStudentEmail = trim((string) ($healthFormIdentity['email'] ?? ''))
             ?: trim((string) ($profile->user->email ?? ''));
     @endphp

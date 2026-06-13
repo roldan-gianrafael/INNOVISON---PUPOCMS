@@ -738,6 +738,24 @@ class WalkInController extends Controller
             $resolvedSection = trim((string) ($student->section ?? ''));
             $resolvedDob = !empty($student->DOB) ? (string) $student->DOB : '';
             $resolvedEmail = trim((string) ($student->email ?? ''));
+            $resolvedBirthday = trim((string) (optional($healthProfile)->birthday ?: $resolvedDob));
+            $resolvedAge = optional($healthProfile)->age;
+            if (($resolvedAge === null || $resolvedAge === '') && $resolvedBirthday !== '') {
+                try {
+                    $resolvedAge = \Carbon\Carbon::parse($resolvedBirthday)->age;
+                } catch (\Throwable $exception) {
+                    $resolvedAge = null;
+                }
+            }
+            $resolvedHeight = trim((string) (optional($healthProfile)->height ?: ($student->height ?? '')));
+            $resolvedWeight = trim((string) (optional($healthProfile)->weight ?: ($student->weight ?? '')));
+            $resolvedSex = trim((string) (optional($healthProfile)->sex ?: ($student->gender ?? '')));
+            $resolvedCivilStatus = trim((string) optional($healthProfile)->civil_status);
+            $resolvedContactNumber = trim((string) (
+                optional($healthProfile)->cellphone
+                ?: optional($healthProfile)->landline
+                ?: ($student->contact_no ?? '')
+            ));
             $rawClearanceStatus = trim((string) optional($healthProfile)->clearance_status);
             $resolvedClinicStatus = match (true) {
                 in_array($rawClearanceStatus, ['Issued', 'Fully Cleared'], true) => 'Fully Cleared',
@@ -759,6 +777,12 @@ class WalkInController extends Controller
                     'section' => $resolvedSection,
                     'dob' => $resolvedDob,
                     'email' => $resolvedEmail,
+                    'age' => $resolvedAge,
+                    'height' => $resolvedHeight,
+                    'weight' => $resolvedWeight,
+                    'sex' => $resolvedSex,
+                    'civil_status' => $resolvedCivilStatus,
+                    'contact_number' => $resolvedContactNumber,
                     'clinic_status' => $resolvedClinicStatus,
                     'health_profile_id' => optional($healthProfile)->id,
                     'medical_assessment_upload' => optional($healthProfile)->medical_assessment_upload,
@@ -791,6 +815,12 @@ class WalkInController extends Controller
                 'section' => $resolvedSection,
                 'dob' => $resolvedDob,
                 'email' => $resolvedEmail,
+                'age' => $resolvedAge,
+                'height' => $resolvedHeight,
+                'weight' => $resolvedWeight,
+                'sex' => $resolvedSex,
+                'civil_status' => $resolvedCivilStatus,
+                'contact_number' => $resolvedContactNumber,
                 'clinic_status' => $resolvedClinicStatus,
                 'health_profile_id' => optional($healthProfile)->id,
                 'medical_assessment_upload' => optional($healthProfile)->medical_assessment_upload,

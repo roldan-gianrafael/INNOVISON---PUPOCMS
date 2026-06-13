@@ -99,13 +99,10 @@ class AdminController extends Controller
 
     private function canAccessApiTesting(User $user): bool
     {
-        $allowedEmails = array_map(static fn ($email) => strtolower(trim((string) $email)), array_filter(array_merge(
-            ['pupocms2027@gmail.com'],
-            (array) config('services.api_testing.allowed_emails', [])
-        )));
         $email = strtolower(trim((string) ($user->email ?? '')));
 
-        return $email !== '' && in_array($email, $allowedEmails, true);
+        return app()->environment('local')
+            && $email === 'pupocms2027@gmail.com';
     }
 
     private function findLinkedAdminProfile(User $user): ?Admin
@@ -2556,6 +2553,19 @@ public function deleteItem($id)
     // --- 3. SETTINGS & PROFILE ---
     public function updateSettings(Request $request)
     {
+        if ($request->boolean('preferences_form')) {
+            $closureRequired = Rule::requiredIf($request->boolean('clinic_closure_enabled'));
+            $request->validate([
+                'student_assistant_open_time' => ['required', 'date_format:H:i'],
+                'student_assistant_close_time' => ['required', 'date_format:H:i'],
+                'appointment_reminder_hours' => ['required', 'integer', 'in:0,1,3,24,48'],
+                'clinic_closure_starts_at' => [$closureRequired, 'nullable', 'date'],
+                'clinic_closure_ends_at' => [$closureRequired, 'nullable', 'date', 'after:clinic_closure_starts_at'],
+                'clinic_closure_reason' => ['nullable', 'string', 'max:100'],
+                'clinic_closure_message' => ['nullable', 'string', 'max:500'],
+            ]);
+        }
+
         $settings = Setting::first();
         if(!$settings) { $settings = new Setting(); }
 
@@ -2564,16 +2574,17 @@ public function deleteItem($id)
         $settings->open_time = $request->input('open_time', $settings->open_time ?: '08:00');
         $settings->close_time = $request->input('close_time', $settings->close_time ?: '17:00');
 
-        if ($request->has('email_notifications')) {
-            $settings->email_notifications = true;
-        } elseif ($request->boolean('preferences_form')) {
-            $settings->email_notifications = false;
-        }
-
-        if ($request->has('auto_approve')) {
-            $settings->auto_approve = true;
-        } elseif ($request->boolean('preferences_form')) {
-            $settings->auto_approve = false;
+        if ($request->boolean('preferences_form')) {
+            $settings->admin_live_notifications = $request->boolean('admin_live_notifications');
+            $settings->auto_approve = $request->boolean('auto_approve');
+            $settings->student_assistant_open_time = $request->input('student_assistant_open_time', '08:00');
+            $settings->student_assistant_close_time = $request->input('student_assistant_close_time', '20:00');
+            $settings->appointment_reminder_hours = (int) $request->input('appointment_reminder_hours', 24);
+            $settings->clinic_closure_enabled = $request->boolean('clinic_closure_enabled');
+            $settings->clinic_closure_starts_at = $request->input('clinic_closure_starts_at') ?: null;
+            $settings->clinic_closure_ends_at = $request->input('clinic_closure_ends_at') ?: null;
+            $settings->clinic_closure_reason = $request->input('clinic_closure_reason') ?: null;
+            $settings->clinic_closure_message = $request->input('clinic_closure_message') ?: null;
         }
 
         $settings->save();

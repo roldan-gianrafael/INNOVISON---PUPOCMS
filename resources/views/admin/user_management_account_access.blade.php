@@ -50,6 +50,7 @@
     .um-hero p {
         margin: 6px 0 0;
         color: #475569;
+        font-size: .82rem;
     }
 
 
@@ -243,7 +244,7 @@
 
     .um-panel-header h2 {
         margin: 0;
-        font-size: 1.3rem;
+        font-size: 1.08rem;
         font-weight: 900;
         color: #111827;
     }
@@ -251,6 +252,7 @@
     .um-panel-header p {
         margin: 6px 0 0;
         color: #64748b;
+        font-size: .8rem;
     }
 
     .um-btn-ghost {
@@ -450,6 +452,20 @@
         color: #0f172a;
     }
 
+    .um-table tbody td:nth-child(1),
+    .um-table tbody td:nth-child(2),
+    .um-table tbody td:nth-child(3) {
+        font-size: .82rem;
+    }
+
+    .um-table .um-name {
+        font-size: .84rem;
+    }
+
+    .um-table .um-sub {
+        font-size: .72rem;
+    }
+
     .um-table thead th:last-child,
     .um-table tbody td:last-child {
         width: 190px;
@@ -479,25 +495,55 @@
     }
 
     .um-avatar {
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
         overflow: hidden;
-        flex: 0 0 46px;
-        background: linear-gradient(135deg, #800000, #d97706);
+        flex: 0 0 44px;
+        position: relative;
+        background: linear-gradient(145deg, #8f1725 0%, #70131b 56%, #4e0a12 100%);
         color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 800;
+        border: 1px solid rgba(234, 179, 8, 0.78);
+        font-weight: 900;
         letter-spacing: .04em;
-        box-shadow: 0 8px 14px rgba(128, 0, 0, 0.18);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.18),
+            0 8px 16px rgba(112, 19, 27, 0.20);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .um-avatar::after {
+        content: "";
+        position: absolute;
+        right: 4px;
+        bottom: 4px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #facc15;
+        border: 2px solid #70131b;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.45);
+    }
+
+    tr[data-user-card]:hover .um-avatar {
+        transform: translateY(-2px);
+        border-color: #facc15;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.20),
+            0 11px 20px rgba(112, 19, 27, 0.28);
     }
 
     .um-avatar img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+    }
+
+    .um-avatar:has(img)::after {
+        border-color: #ffffff;
     }
 
     .um-name {

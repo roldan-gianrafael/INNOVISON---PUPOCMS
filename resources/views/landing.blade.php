@@ -1272,10 +1272,9 @@
                 in_array($landingStudentUserType, ['assistant', 'student assistant', 'student_assistant'], true)
                 || in_array($landingStudentRawRole, ['student_assistant', 'studentassistant', 'assistant'], true)
             );
-        $landingNow = now(config('app.timezone'));
-        $landingMinutesSinceMidnight = ((int) $landingNow->format('H') * 60) + (int) $landingNow->format('i');
-        $saAdminWorkspaceAvailable = $landingMinutesSinceMidnight >= (8 * 60)
-            && $landingMinutesSinceMidnight < (20 * 60);
+        $landingWorkflow = app(\App\Services\ClinicWorkflowService::class);
+        $saAdminWorkspaceAvailable = $landingWorkflow->studentAssistantWorkspaceAvailable();
+        $saAdminWorkspaceHoursLabel = $landingWorkflow->studentAssistantHoursLabel();
 
         if ($landingAdminUser) {
             $workspaceHref = url('/admin/dashboard');
@@ -1551,7 +1550,7 @@
                                 <span>
                                     {{ $saAdminWorkspaceAvailable
                                         ? 'Go to Admin/SA Side'
-                                        : 'Admin Side: Available 8:00 AM–8:00 PM' }}
+                                        : 'Admin Side: Available ' . $saAdminWorkspaceHoursLabel }}
                                 </span>
                             </a>
                         </div>
@@ -1805,6 +1804,7 @@
         function showStudentAssistantSelector() {
             console.log('[LANDING] Creating Student Assistant workspace selector');
             const adminWorkspaceAvailable = @json($saAdminWorkspaceAvailable);
+            const adminWorkspaceHoursLabel = @json($saAdminWorkspaceHoursLabel);
 
             // Create modal overlay
             const modal = document.createElement('div');
@@ -1921,7 +1921,7 @@
                     <path d="M12 2L2 7v10a8 8 0 0 0 8 8 8 8 0 0 0 8-8V7l-10-5z"/>
                     <path d="M12 11v5M9 14h6"/>
                 </svg>
-                <span>${adminWorkspaceAvailable ? 'Go to Admin/SA Side' : 'Admin Side: Available 8:00 AM–8:00 PM'}</span>
+                <span>${adminWorkspaceAvailable ? 'Go to Admin/SA Side' : `Admin Side: Available ${adminWorkspaceHoursLabel}`}</span>
             `;
             if (adminWorkspaceAvailable) {
                 adminButton.addEventListener('mouseover', function() {

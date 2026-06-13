@@ -160,7 +160,7 @@
 
     .um-entry-card h2 {
         margin: 0 0 10px;
-        font-size: 1.26rem;
+        font-size: 1.08rem;
         font-weight: 900;
         color: #111827;
         position: relative;
@@ -171,13 +171,14 @@
         margin: 0;
         color: #475569;
         line-height: 1.65;
+        font-size: 0.82rem;
         position: relative;
         z-index: 1;
     }
 
     .um-entry-meta {
         margin-top: 14px;
-        font-size: 0.92rem;
+        font-size: 0.82rem;
         font-weight: 700;
         color: #70131b;
         position: relative;

@@ -220,14 +220,24 @@ class WalkInController extends Controller
     {
         \Log::debug('PUPTAS applicant data', ['applicant' => $applicant, 'referenceNumber' => $referenceNumber]);
 
-        $studentNumber = trim((string) data_get($applicant, 'student_number'));
+        $studentNumber = trim((string) (
+            data_get($applicant, 'user.student_number')
+            ?: data_get($applicant, 'student_number')
+        ));
         $resolvedReferenceNumber = trim((string) (
-            data_get($applicant, 'reference_number')
+            data_get($applicant, 'user.reference_number')
+            ?: data_get($applicant, 'reference_number')
             ?: data_get($applicant, 'application.reference_number')
             ?: $referenceNumber
         ));
-        $idpUserId = trim((string) data_get($applicant, 'idp_user_id'));
-        $email = trim((string) data_get($applicant, 'email'));
+        $idpUserId = trim((string) (
+            data_get($applicant, 'user.id')
+            ?: data_get($applicant, 'idp_user_id')
+        ));
+        $email = trim((string) (
+            data_get($applicant, 'user.email')
+            ?: data_get($applicant, 'email')
+        ));
 
         \Log::debug('Extracted fields', [
             'studentNumber' => $studentNumber,
@@ -244,7 +254,13 @@ class WalkInController extends Controller
             ->first();
 
         // Try multiple field name variations for first and last name
-        $firstName = trim((string) data_get($applicant, 'first_name'));
+        $firstName = trim((string) data_get($applicant, 'user.firstname'));
+        if ($firstName === '') {
+            $firstName = trim((string) data_get($applicant, 'user.first_name'));
+        }
+        if ($firstName === '') {
+            $firstName = trim((string) data_get($applicant, 'first_name'));
+        }
         if ($firstName === '') {
             $firstName = trim((string) data_get($applicant, 'firstname'));
         }
@@ -252,7 +268,13 @@ class WalkInController extends Controller
             $firstName = trim((string) data_get($applicant, 'given_name'));
         }
 
-        $lastName = trim((string) data_get($applicant, 'last_name'));
+        $lastName = trim((string) data_get($applicant, 'user.lastname'));
+        if ($lastName === '') {
+            $lastName = trim((string) data_get($applicant, 'user.last_name'));
+        }
+        if ($lastName === '') {
+            $lastName = trim((string) data_get($applicant, 'last_name'));
+        }
         if ($lastName === '') {
             $lastName = trim((string) data_get($applicant, 'lastname'));
         }
@@ -264,7 +286,9 @@ class WalkInController extends Controller
         }
 
         $middleName = trim((string) (
-            data_get($applicant, 'middle_name')
+            data_get($applicant, 'user.middlename')
+            ?: data_get($applicant, 'user.middle_name')
+            ?: data_get($applicant, 'middle_name')
             ?: data_get($applicant, 'middlename')
         ));
 
@@ -354,6 +378,40 @@ class WalkInController extends Controller
         }
 
         return $user;
+    }
+
+    private function puptasApplicantFullName(array $applicant): string
+    {
+        $firstName = trim((string) (
+            data_get($applicant, 'user.firstname')
+            ?: data_get($applicant, 'user.first_name')
+            ?: data_get($applicant, 'firstname')
+            ?: data_get($applicant, 'first_name')
+            ?: data_get($applicant, 'given_name')
+        ));
+        $middleName = trim((string) (
+            data_get($applicant, 'user.middlename')
+            ?: data_get($applicant, 'user.middle_name')
+            ?: data_get($applicant, 'middlename')
+            ?: data_get($applicant, 'middle_name')
+        ));
+        $lastName = trim((string) (
+            data_get($applicant, 'user.lastname')
+            ?: data_get($applicant, 'user.last_name')
+            ?: data_get($applicant, 'lastname')
+            ?: data_get($applicant, 'last_name')
+            ?: data_get($applicant, 'family_name')
+            ?: data_get($applicant, 'surname')
+        ));
+        $structuredName = trim(implode(' ', array_filter([$firstName, $middleName, $lastName])));
+
+        return $structuredName !== ''
+            ? $structuredName
+            : trim((string) (
+                data_get($applicant, 'user.full_name')
+                ?: data_get($applicant, 'full_name')
+                ?: data_get($applicant, 'name')
+            ));
     }
 
     private function resolveAssistedEmail(string $referenceId): string
@@ -617,6 +675,7 @@ class WalkInController extends Controller
         $lookupName = trim((string) $request->student_name);
         $previewOnly = $request->boolean('preview_only');
         $intakeTarget = strtolower(trim((string) $request->query('intake_target', 'consultation')));
+        $applicant = null;
 
         $student = $this->findUserByIdentifier($lookup);
         $lookupMessage = 'No patient matched that student number in local records or PUPTAS.';
@@ -638,18 +697,16 @@ class WalkInController extends Controller
                 // Build the preview from current admission data. Persistence is
                 // deferred until the workflow performs a non-preview action.
                 $student = $this->resolveLocalUserFromApplicant($applicant, !$previewOnly, $lookup);
+            } elseif ($previewOnly) {
+                // Admission reference previews must never fall back to a local
+                // name when PUPTAS did not return an applicant.
+                $student = null;
             }
 
             // Log the reference lookup attempt
             if (is_array($applicant) && $student) {
                 // Successful lookup
-                $applicantName = $applicant['full_name'] ?? $applicant['name'] ?? '';
-                if (!$applicantName && isset($applicant['first_name'])) {
-                    $applicantName = $applicant['first_name'];
-                    if (isset($applicant['last_name'])) {
-                        $applicantName .= ' ' . $applicant['last_name'];
-                    }
-                }
+                $applicantName = $this->puptasApplicantFullName($applicant);
                 $this->logReferenceLookup($request, $lookup, true, $applicantName, null, [
                     'local_user_id' => $student->id,
                     'local_email' => $student->email,
@@ -668,7 +725,9 @@ class WalkInController extends Controller
         }
 
         if ($student) {
-            $resolvedName = trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? ''))));
+            $resolvedName = is_array($applicant)
+                ? $this->puptasApplicantFullName($applicant)
+                : trim((string) ($student->name ?: trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? ''))));
             $healthProfile = HealthProfile::where('user_id', $student->id)->first();
             $resolvedReferenceNumber = trim((string) (
                 ($lookup !== '' && !$this->looksLikeUuid($lookup) ? $lookup : null)
@@ -680,6 +739,14 @@ class WalkInController extends Controller
             $resolvedSection = trim((string) ($student->section ?? ''));
             $resolvedDob = !empty($student->DOB) ? (string) $student->DOB : '';
             $resolvedEmail = trim((string) ($student->email ?? ''));
+            $rawClearanceStatus = trim((string) optional($healthProfile)->clearance_status);
+            $resolvedClinicStatus = match (true) {
+                in_array($rawClearanceStatus, ['Issued', 'Fully Cleared'], true) => 'Fully Cleared',
+                $rawClearanceStatus === 'Pending/Conditional' => 'Pending Compliance / Conditional',
+                in_array($rawClearanceStatus, ['Pending', 'For Verification'], true) => 'Pending Verification',
+                $rawClearanceStatus !== '' => $rawClearanceStatus,
+                default => 'Awaiting Uploads',
+            };
 
             if ($previewOnly) {
                 return response()->json([
@@ -693,6 +760,7 @@ class WalkInController extends Controller
                     'section' => $resolvedSection,
                     'dob' => $resolvedDob,
                     'email' => $resolvedEmail,
+                    'clinic_status' => $resolvedClinicStatus,
                     'health_profile_id' => optional($healthProfile)->id,
                     'medical_assessment_upload' => optional($healthProfile)->medical_assessment_upload,
                     'documents' => $this->healthProfileDocuments($request, $healthProfile),
@@ -724,6 +792,7 @@ class WalkInController extends Controller
                 'section' => $resolvedSection,
                 'dob' => $resolvedDob,
                 'email' => $resolvedEmail,
+                'clinic_status' => $resolvedClinicStatus,
                 'health_profile_id' => optional($healthProfile)->id,
                 'medical_assessment_upload' => optional($healthProfile)->medical_assessment_upload,
                 'documents' => $this->healthProfileDocuments($request, $healthProfile),

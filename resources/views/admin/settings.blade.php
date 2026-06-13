@@ -456,6 +456,119 @@
         font-size: 14px;
         color: var(--stg-text);
     }
+    .workflow-settings {
+        display: grid;
+        gap: 16px;
+    }
+    .workflow-setting-group {
+        padding: 18px;
+        border: 1px solid rgba(127,0,0,0.10);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.92));
+        box-shadow: 0 12px 28px rgba(15,23,42,0.05);
+    }
+    .workflow-setting-group h4 {
+        margin: 0 0 5px;
+        color: var(--stg-text);
+        font-size: 15px;
+        font-weight: 900;
+    }
+    .workflow-setting-group > p {
+        margin: 0 0 15px;
+        color: var(--stg-muted);
+        font-size: 12px;
+        line-height: 1.55;
+    }
+    .workflow-setting-group .field {
+        box-shadow: none;
+    }
+    .workflow-setting-group textarea {
+        width: 100%;
+        min-height: 96px;
+        resize: vertical;
+        padding: 16px;
+        border: 1px solid rgba(127,0,0,0.10);
+        border-radius: 16px;
+        background: #fff;
+        color: var(--stg-text);
+        font: inherit;
+        line-height: 1.55;
+        outline: none;
+    }
+    .workflow-setting-group textarea:focus {
+        border-color: var(--stg-maroon);
+        box-shadow: 0 0 0 4px rgba(127,0,0,0.08);
+    }
+    #clinicClosureMessage::placeholder {
+        font-size: 11px;
+    }
+    .workflow-closure-fields {
+        display: grid;
+        gap: 16px;
+        margin-top: 16px;
+    }
+    .workflow-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: #eef2f7;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 900;
+    }
+    .workflow-status.is-active {
+        background: #fff3cd;
+        color: #7f1d1d;
+    }
+    .workflow-summary-list {
+        display: grid;
+        gap: 10px;
+    }
+    .workflow-summary-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 13px 15px;
+        border: 1px solid rgba(127,0,0,0.08);
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+    .workflow-summary-row span {
+        color: var(--stg-muted);
+        font-size: 12px;
+        font-weight: 800;
+    }
+    .workflow-summary-row strong {
+        color: var(--stg-text);
+        font-size: 12px;
+        text-align: right;
+    }
+    .workflow-modal-box {
+        width: min(920px, 96vw);
+    }
+    .workflow-duration-output {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border: 1px solid rgba(112, 19, 27, 0.15);
+        border-radius: 12px;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 900;
+    }
+    .workflow-message-label {
+        display: block;
+        margin: 0 0 7px;
+        color: var(--stg-text);
+        font-size: 12px;
+        font-weight: 900;
+    }
     .actions-row {
         display: flex;
         justify-content: flex-end;
@@ -1014,6 +1127,48 @@
         border-color: rgba(255,255,255,0.08);
         box-shadow: 0 18px 34px rgba(0,0,0,0.18);
     }
+    html[data-theme="dark"] .workflow-setting-group,
+    html[data-theme="dark"] .workflow-summary-row {
+        background: rgba(255,255,255,0.05);
+        border-color: rgba(255,255,255,0.09);
+        box-shadow: none;
+    }
+    html[data-theme="dark"] .workflow-setting-group h4,
+    html[data-theme="dark"] .workflow-summary-row strong {
+        color: #fff1f4;
+    }
+    html[data-theme="dark"] .workflow-setting-group > p,
+    html[data-theme="dark"] .workflow-summary-row span {
+        color: #d7b3bc;
+    }
+    html[data-theme="dark"] .workflow-setting-group textarea {
+        background: rgba(20, 9, 13, 0.92);
+        color: #fff1f4;
+        border-color: rgba(255,255,255,0.10);
+    }
+    html[data-theme="dark"] .workflow-setting-group textarea::placeholder {
+        color: #b7929d;
+    }
+    html[data-theme="dark"] .workflow-setting-group textarea:focus {
+        border-color: #facc15;
+        box-shadow: 0 0 0 4px rgba(250,204,21,0.10);
+    }
+    html[data-theme="dark"] .workflow-duration-output {
+        background: rgba(20, 9, 13, 0.92);
+        color: #fff1f4;
+        border-color: rgba(255,255,255,0.10);
+    }
+    html[data-theme="dark"] .workflow-message-label {
+        color: #fff1f4;
+    }
+    html[data-theme="dark"] .workflow-status {
+        background: rgba(255,255,255,0.08);
+        color: #e5e7eb;
+    }
+    html[data-theme="dark"] .workflow-status.is-active {
+        background: rgba(250,204,21,0.14);
+        color: #fde68a;
+    }
     html[data-theme="dark"] .modal-section-kicker {
         background: rgba(255,255,255,0.08);
         color: #ffd7df;
@@ -1177,31 +1332,162 @@
                 </div>
             </section>
 
+            @php
+                $closureIsCurrentlyActive = app(\App\Services\ClinicWorkflowService::class)->activeClosure() !== null;
+                $reminderLabels = [0 => 'Disabled', 1 => '1 hour before', 3 => '3 hours before', 24 => '1 day before', 48 => '2 days before'];
+            @endphp
+            <section class="panel">
+                <div class="panel-head">
+                    <div class="panel-head-top">
+                        <div>
+                            <div class="section-spot">Workflow</div>
+                            <h3>System Preferences</h3>
+                            <p>Control clinic notifications, appointment decisions, workspace access, reminders, and temporary availability.</p>
+                        </div>
+                        <button type="button" class="mini-edit-btn" onclick="openSettingsModal('workflowSettingsModal')">Configure</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="workflow-summary-list">
+                        <div class="workflow-summary-row">
+                            <span>Admin Live Notifications</span>
+                            <strong>{{ $settings->admin_live_notifications !== false ? 'Enabled' : 'Disabled' }}</strong>
+                        </div>
+                        <div class="workflow-summary-row">
+                            <span>Appointment Approval</span>
+                            <strong>{{ $settings->auto_approve ? 'Automatic' : 'Manual Review' }}</strong>
+                        </div>
+                        <div class="workflow-summary-row">
+                            <span>Student Assistant Admin Hours</span>
+                            <strong>{{ app(\App\Services\ClinicWorkflowService::class)->studentAssistantHoursLabel() }}</strong>
+                        </div>
+                        <div class="workflow-summary-row">
+                            <span>Appointment Reminder</span>
+                            <strong>{{ $reminderLabels[(int) ($settings->appointment_reminder_hours ?? 24)] ?? '1 day before' }}</strong>
+                        </div>
+                        <div class="workflow-summary-row">
+                            <span>Appointment Booking</span>
+                            <strong>{{ $closureIsCurrentlyActive ? 'Temporarily Closed' : 'Available' }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="workflowSettingsModal" class="modal-overlay">
+        <div class="modal-box workflow-modal-box">
+            <div class="modal-head">
+                <div class="modal-head-main">
+                    <div class="modal-head-badge">WF</div>
+                    <div class="modal-head-copy">
+                        <h3>Workflow Settings</h3>
+                        <p>Manage admin alerts, appointment behavior, access hours, reminders, and temporary clinic availability.</p>
+                    </div>
+                </div>
+                <button type="button" class="modal-head-close" onclick="closeSettingsModal('workflowSettingsModal')" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
             <form action="{{ url('/admin/settings/update') }}" method="POST">
                 @csrf @method('PUT')
                 <input type="hidden" name="preferences_form" value="1">
-                <section class="panel">
-                    <div class="panel-head">
-                        <div class="section-spot">Workflow</div>
-                        <h3>System Preferences</h3>
-                        <p>Control reminder and auto-approval behavior for the clinic workflow.</p>
-                    </div>
-                    <div class="panel-body">
-                        <div class="switch-list">
-                            <div class="switch-item">
-                                <input type="checkbox" name="email_notifications" id="emailNotif" {{ $settings->email_notifications ? 'checked' : '' }}>
-                                <label for="emailNotif">Enable Email Notifications</label>
+                <div class="modal-body">
+                    <div class="workflow-settings">
+                        <section class="workflow-setting-group">
+                            <h4>Admin Workflow</h4>
+                            <p>These options affect the admin live notification alert and appointment approval only.</p>
+                            <div class="switch-list">
+                                <div class="switch-item">
+                                    <input type="checkbox" name="admin_live_notifications" id="adminLiveNotifications" {{ $settings->admin_live_notifications !== false ? 'checked' : '' }}>
+                                    <label for="adminLiveNotifications">Enable Admin Live Notifications</label>
+                                </div>
+                                <div class="switch-item">
+                                    <input type="checkbox" name="auto_approve" id="autoApprove" {{ $settings->auto_approve ? 'checked' : '' }}>
+                                    <label for="autoApprove">Auto-Approve Appointments</label>
+                                </div>
                             </div>
-                            <div class="switch-item">
-                                <input type="checkbox" name="auto_approve" id="autoApprove" {{ $settings->auto_approve ? 'checked' : '' }}>
-                                <label for="autoApprove">Auto-approve Student Requests</label>
+                        </section>
+
+                        <section class="workflow-setting-group">
+                            <h4>Student Assistant Access Hours</h4>
+                            <p>The Student Workspace remains available. Only access to the Admin Workspace follows this schedule.</p>
+                            <div class="field-grid two">
+                                <div class="field">
+                                    <label for="studentAssistantOpenTime">Admin Access Starts</label>
+                                    <input type="time" id="studentAssistantOpenTime" name="student_assistant_open_time" value="{{ old('student_assistant_open_time', substr((string) ($settings->student_assistant_open_time ?: '08:00'), 0, 5)) }}" required>
+                                </div>
+                                <div class="field">
+                                    <label for="studentAssistantCloseTime">Admin Access Ends</label>
+                                    <input type="time" id="studentAssistantCloseTime" name="student_assistant_close_time" value="{{ old('student_assistant_close_time', substr((string) ($settings->student_assistant_close_time ?: '20:00'), 0, 5)) }}" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="actions-row">
-                            <button type="submit" class="btn-save">Save System Settings</button>
-                        </div>
+                        </section>
+
+                        <section class="workflow-setting-group">
+                            <h4>Appointment Reminder Schedule</h4>
+                            <p>Creates an in-system student reminder when an approved appointment enters the selected time window.</p>
+                            <div class="field-grid">
+                                <div class="field">
+                                    <label for="appointmentReminderHours">Reminder Timing</label>
+                                    <select id="appointmentReminderHours" name="appointment_reminder_hours">
+                                        @foreach($reminderLabels as $hours => $label)
+                                            <option value="{{ $hours }}" {{ (int) old('appointment_reminder_hours', $settings->appointment_reminder_hours ?? 24) === $hours ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="workflow-setting-group">
+                            <h4>Temporary Clinic Closure / Availability Notice</h4>
+                            <p>Students may continue browsing records, but new appointment booking is blocked while this notice is active.</p>
+                            <div class="switch-item">
+                                <input type="checkbox" name="clinic_closure_enabled" id="clinicClosureEnabled" {{ old('clinic_closure_enabled', $settings->clinic_closure_enabled) ? 'checked' : '' }}>
+                                <label for="clinicClosureEnabled">Temporarily close appointment booking</label>
+                            </div>
+
+                            <div class="workflow-closure-fields">
+                                <div class="field-grid two">
+                                    <div class="field">
+                                        <label for="clinicClosureStartsAt">Closure Starts</label>
+                                        <input type="datetime-local" id="clinicClosureStartsAt" name="clinic_closure_starts_at" value="{{ old('clinic_closure_starts_at', optional($settings->clinic_closure_starts_at)->format('Y-m-d\\TH:i')) }}">
+                                    </div>
+                                    <div class="field">
+                                        <label for="clinicClosureEndsAt">Expected Reopening</label>
+                                        <input type="datetime-local" id="clinicClosureEndsAt" name="clinic_closure_ends_at" value="{{ old('clinic_closure_ends_at', optional($settings->clinic_closure_ends_at)->format('Y-m-d\\TH:i')) }}">
+                                    </div>
+                                </div>
+                                <div class="field-grid two">
+                                    <div class="field">
+                                        <label for="clinicClosureReason">Reason</label>
+                                        <select id="clinicClosureReason" name="clinic_closure_reason">
+                                            @foreach(['Staff Meeting', 'Official Clinic Activity', 'Emergency', 'Early Closure', 'Other'] as $reason)
+                                                <option value="{{ $reason }}" {{ old('clinic_closure_reason', $settings->clinic_closure_reason) === $reason ? 'selected' : '' }}>{{ $reason }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="field">
+                                        <label>Closure Duration</label>
+                                        <output class="workflow-duration-output" id="clinicClosureDuration">Select start and reopening times</output>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="clinicClosureMessage" class="workflow-message-label">Public Notice Message</label>
+                                    <textarea id="clinicClosureMessage" name="clinic_closure_message" maxlength="500" placeholder="Example: The clinic will close early today due to an official staff meeting. Existing appointments and health records remain accessible.">{{ old('clinic_closure_message', $settings->clinic_closure_message) }}</textarea>
+                                </div>
+                            </div>
+
+                            <span class="workflow-status {{ $closureIsCurrentlyActive ? 'is-active' : '' }}">
+                                {{ $closureIsCurrentlyActive ? 'Closure notice is currently active' : 'Clinic booking is currently available' }}
+                            </span>
+                        </section>
                     </div>
-                </section>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeSettingsModal('workflowSettingsModal')">Cancel</button>
+                    <button type="submit" class="btn-save">Save System Settings</button>
+                </div>
             </form>
         </div>
     </div>
@@ -1449,7 +1735,68 @@
         if (e.target === document.getElementById('clinicHoursModal')) {
             closeSettingsModal('clinicHoursModal');
         }
+        if (e.target === document.getElementById('workflowSettingsModal')) {
+            closeSettingsModal('workflowSettingsModal');
+        }
     });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Escape') return;
+
+        const openModal = Array.from(document.querySelectorAll('.modal-overlay'))
+            .find(function (modal) {
+                return modal.style.display === 'flex';
+            });
+
+        if (!openModal) return;
+        if (openModal.id === 'profileModal') {
+            closeProfileModal();
+            return;
+        }
+        closeSettingsModal(openModal.id);
+    });
+
+    function syncClosureDuration() {
+        const startsInput = document.getElementById('clinicClosureStartsAt');
+        const endsInput = document.getElementById('clinicClosureEndsAt');
+        const durationOutput = document.getElementById('clinicClosureDuration');
+
+        if (!startsInput || !endsInput || !durationOutput) return;
+        if (!startsInput.value || !endsInput.value) {
+            durationOutput.textContent = 'Select start and reopening times';
+            return;
+        }
+
+        const startsAt = new Date(startsInput.value);
+        const endsAt = new Date(endsInput.value);
+        const durationMinutes = Math.round((endsAt.getTime() - startsAt.getTime()) / 60000);
+
+        if (!Number.isFinite(durationMinutes) || durationMinutes <= 0) {
+            durationOutput.textContent = 'Reopening must be later than closure start';
+            return;
+        }
+
+        const days = Math.floor(durationMinutes / 1440);
+        const hours = Math.floor((durationMinutes % 1440) / 60);
+        const minutes = durationMinutes % 60;
+        const parts = [];
+
+        if (days > 0) parts.push(days + (days === 1 ? ' day' : ' days'));
+        if (hours > 0) parts.push(hours + (hours === 1 ? ' hour' : ' hours'));
+        if (minutes > 0) parts.push(minutes + (minutes === 1 ? ' minute' : ' minutes'));
+
+        durationOutput.textContent = parts.join(' ') || 'Less than 1 minute';
+    }
+
+    function syncClosureRequirements() {
+        const closureToggle = document.getElementById('clinicClosureEnabled');
+        const startsInput = document.getElementById('clinicClosureStartsAt');
+        const endsInput = document.getElementById('clinicClosureEndsAt');
+
+        if (!closureToggle || !startsInput || !endsInput) return;
+        startsInput.required = closureToggle.checked;
+        endsInput.required = closureToggle.checked;
+    }
 
     function syncCmsAge() {
         const birthdayInput = document.getElementById('cmsBirthdayInput');
@@ -1483,6 +1830,23 @@
             birthdayInput.addEventListener('change', syncCmsAge);
             syncCmsAge();
         }
+
+        const closureStartsInput = document.getElementById('clinicClosureStartsAt');
+        const closureEndsInput = document.getElementById('clinicClosureEndsAt');
+        const closureToggle = document.getElementById('clinicClosureEnabled');
+        if (closureStartsInput && closureEndsInput) {
+            closureStartsInput.addEventListener('change', syncClosureDuration);
+            closureEndsInput.addEventListener('change', syncClosureDuration);
+            syncClosureDuration();
+        }
+        if (closureToggle) {
+            closureToggle.addEventListener('change', syncClosureRequirements);
+            syncClosureRequirements();
+        }
+
+        @if($errors->any() && old('preferences_form'))
+            openSettingsModal('workflowSettingsModal');
+        @endif
     });
 </script>
 @endpush

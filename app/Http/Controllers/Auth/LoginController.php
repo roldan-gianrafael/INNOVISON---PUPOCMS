@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\ActivityLog;
 use App\Models\User;
+use App\Services\ClinicWorkflowService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -390,6 +391,7 @@ class LoginController extends Controller
         return view('auth.student-assistant-portal', [
             'user' => $user,
             'adminWorkspaceAvailable' => $this->studentAssistantAdminWorkspaceAvailable(),
+            'adminWorkspaceHoursLabel' => app(ClinicWorkflowService::class)->studentAssistantHoursLabel(),
         ]);
     }
 
@@ -411,10 +413,11 @@ class LoginController extends Controller
         abort_unless($user instanceof User && $this->isStudentAssistantAccount($user), 403);
 
         if (!$this->studentAssistantAdminWorkspaceAvailable()) {
+            $hours = app(ClinicWorkflowService::class)->studentAssistantHoursLabel();
             return redirect()
                 ->route('assistant.choose-portal')
                 ->withErrors([
-                    'workspace' => 'Admin Workspace is available daily from 8:00 AM to 8:00 PM.',
+                    'workspace' => "Admin Workspace is available daily from {$hours}.",
                 ]);
         }
 
@@ -426,10 +429,7 @@ class LoginController extends Controller
 
     private function studentAssistantAdminWorkspaceAvailable(): bool
     {
-        $now = now(config('app.timezone'));
-        $minutesSinceMidnight = ((int) $now->format('H') * 60) + (int) $now->format('i');
-
-        return $minutesSinceMidnight >= (8 * 60) && $minutesSinceMidnight < (20 * 60);
+        return app(ClinicWorkflowService::class)->studentAssistantWorkspaceAvailable();
     }
 
     private function idpUrl(string $path): ?string
